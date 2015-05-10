@@ -1,0 +1,56 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+
+namespace Durados.Web.Mvc
+{
+    [Serializable()]
+    public class PersistentSession : Durados.DataAccess.AutoGeneration.PersistentSession
+    {
+        public PersistentSession(string connectionString, string sessionSchemaGeneratorFileName)
+            : base(connectionString, sessionSchemaGeneratorFileName)
+        {
+        }
+
+        public object this[string name]
+        {
+            get
+            {
+                try
+                {
+                    if (System.Web.HttpContext.Current.Session == null)
+                    {
+                        if (System.Web.HttpContext.Current.Items[name] == null)
+                        {
+                            System.Web.HttpContext.Current.Items[name] = base.GetSession(name, System.Web.HttpContext.Current.Items[Database.RequestId].ToString());
+                        }
+                        return System.Web.HttpContext.Current.Items[name];
+                    }
+                    else if (System.Web.HttpContext.Current.Session[name] == null)
+                    {
+                        System.Web.HttpContext.Current.Session[name] = base.GetSession(name, System.Web.HttpContext.Current.Session.SessionID);
+                    }
+                    return System.Web.HttpContext.Current.Session[name];
+                }
+                catch
+                {
+                    return null;
+                }
+            }
+            set
+            {
+                if (System.Web.HttpContext.Current.Session == null)
+                {
+                    System.Web.HttpContext.Current.Items[name] = value;
+                    base.SetSession(name, System.Web.HttpContext.Current.Items[Database.RequestId].ToString(), value);
+                }
+                else
+                {
+                    System.Web.HttpContext.Current.Session[name] = value;
+                    base.SetSession(name, System.Web.HttpContext.Current.Session.SessionID, value);
+                }
+            }
+        }
+    }
+}

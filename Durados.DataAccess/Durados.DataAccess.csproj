@@ -1,0 +1,215 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>9.0.30729</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{FE0D5849-2911-4615-BCC4-C286B213761C}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>Durados.DataAccess</RootNamespace>
+    <AssemblyName>Durados.DataAccess</AssemblyName>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <FileUpgradeFlags>
+    </FileUpgradeFlags>
+    <OldToolsVersion>3.5</OldToolsVersion>
+    <UpgradeBackupLocation />
+    <PublishUrl>publish\</PublishUrl>
+    <Install>true</Install>
+    <InstallFrom>Disk</InstallFrom>
+    <UpdateEnabled>false</UpdateEnabled>
+    <UpdateMode>Foreground</UpdateMode>
+    <UpdateInterval>7</UpdateInterval>
+    <UpdateIntervalUnits>Days</UpdateIntervalUnits>
+    <UpdatePeriodically>false</UpdatePeriodically>
+    <UpdateRequired>false</UpdateRequired>
+    <MapFileExtensions>true</MapFileExtensions>
+    <ApplicationRevision>0</ApplicationRevision>
+    <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
+    <IsWebBootstrapper>false</IsWebBootstrapper>
+    <UseApplicationTrust>false</UseApplicationTrust>
+    <BootstrapperEnabled>true</BootstrapperEnabled>
+    <TargetFrameworkProfile />
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="ChilkatDotNet45, Version=9.5.0.0, Culture=neutral, PublicKeyToken=eb5fc1fc52ef09bd, processorArchitecture=AMD64">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\Duradus.Web.Mvc.App\deployment\x64\ChilkatDotNet45.dll</HintPath>
+    </Reference>
+    <Reference Include="FSharp.Core, Version=2.3.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\Duradus.Web.Mvc.App\deployment\FSharp.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="MailChimp">
+      <HintPath>..\Duradus.Web.Mvc.App\deployment\MailChimp.dll</HintPath>
+    </Reference>
+    <Reference Include="Mono.Security, Version=4.0.0.0, Culture=neutral, PublicKeyToken=0738eb9f132ed756, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\Npgsql.2.2.5\lib\net45\Mono.Security.dll</HintPath>
+    </Reference>
+    <Reference Include="Mono.Security.Protocol.Tls">
+      <HintPath>..\Duradus.Web.Mvc.App\deployment\Mono.Security.Protocol.Tls.dll</HintPath>
+    </Reference>
+    <Reference Include="MySql.Data, Version=6.4.6.0, Culture=neutral, PublicKeyToken=c5687fc88969c44d, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\Duradus.Web.Mvc.App\deployment\MySql.Data.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="MySql.Web, Version=6.4.6.0, Culture=neutral, PublicKeyToken=c5687fc88969c44d, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\Duradus.Web.Mvc.App\deployment\MySql.Web.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Npgsql, Version=2.2.5.0, Culture=neutral, PublicKeyToken=5d8b90d52f46fda7, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\Npgsql.2.2.5\lib\net45\Npgsql.dll</HintPath>
+    </Reference>
+    <Reference Include="Oracle.ManagedDataAccess, Version=4.121.1.0, Culture=neutral, PublicKeyToken=89b483f429c47342, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\Duradus.Web.Mvc.App\deployment\Oracle.ManagedDataAccess.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Core">
+      <RequiredTargetFramework>3.5</RequiredTargetFramework>
+    </Reference>
+    <Reference Include="System.Web.Extensions" />
+    <Reference Include="System.Xml.Linq">
+      <RequiredTargetFramework>3.5</RequiredTargetFramework>
+    </Reference>
+    <Reference Include="System.Data.DataSetExtensions">
+      <RequiredTargetFramework>3.5</RequiredTargetFramework>
+    </Reference>
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="AutoGeneration\Content.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="AutoGeneration\DnsAlias.cs" />
+    <Compile Include="AutoGeneration\Dynamic\OracleMapper.cs" />
+    <Compile Include="AutoGeneration\Dynamic\PostgreMapper.cs" />
+    <Compile Include="AutoGeneration\Dynamic\MySqlMapper.cs" />
+    <Compile Include="AutoGeneration\MailingService.cs" />
+    <Compile Include="AutoGeneration\PlugIn.cs" />
+    <Compile Include="AutoGeneration\User.cs" />
+    <Compile Include="AutoGeneration\CustomViews.cs" />
+    <Compile Include="AutoGeneration\WorkFlowGraph.cs" />
+    <Compile Include="AutoGeneration\Dynamic\Schema\ForeignKeys.cs" />
+    <Compile Include="AutoGeneration\Dynamic\MapDataSet.cs">
+      <DependentUpon>MapDataSet.xsd</DependentUpon>
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="AutoGeneration\Dynamic\MapDataSet.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>MapDataSet.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="AutoGeneration\Dynamic\Mapper.cs" />
+    <Compile Include="AutoGeneration\Dynamic\Schema\Dependency.cs" />
+    <Compile Include="AutoGeneration\Dynamic\Schema\ForeignKey.cs" />
+    <Compile Include="AutoGeneration\Dynamic\Schema\Table.cs" />
+    <Compile Include="AutoGeneration\Dynamic\Schema\View.cs" />
+    <Compile Include="AutoGeneration\MessageBoard.cs" />
+    <Compile Include="AutoGeneration\History.cs" />
+    <Compile Include="AutoGeneration\Generator.cs" />
+    <Compile Include="AutoGeneration\Link.cs" />
+    <Compile Include="ConfigAccess.cs" />
+    <Compile Include="FKPath.cs" />
+    <Compile Include="MailingServices\GroBootPushAppNotification.cs" />
+    <Compile Include="OracleAccess.cs" />
+    <Compile Include="PostgreAccess.cs" />
+    <Compile Include="Csv.cs" />
+    <Compile Include="DataAccessHelper.cs" />
+    <Compile Include="IDataTableAccess.cs" />
+    <Compile Include="AutoGeneration\PersistentSession.cs" />
+    <Compile Include="MailingServices\MailChimpAccess.cs" />
+    <Compile Include="MailingServices\MailingServiceFactory.cs" />
+    <Compile Include="MailingServices\OngageMailAccess.cs" />
+    <Compile Include="MySqlAccess.cs" />
+    <Compile Include="SqlAccess.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="SqlGeneralAccess.cs" />
+    <Compile Include="SqlRequest.cs" />
+    <Compile Include="Ssh\ChilkatSession.cs" />
+    <Compile Include="Ssh\Tunnel.cs" />
+    <Compile Include="Storage\IStorage.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Durados.Config.Attributes\Durados.Config.Attributes.csproj">
+      <Project>{8B1EB484-4146-4D68-B6F8-8A1C81092576}</Project>
+      <Name>Durados.Config.Attributes</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Durados.Config\Durados.Config.csproj">
+      <Project>{236C76B6-4489-46B7-86B3-0D2651C88F49}</Project>
+      <Name>Durados.Config</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Durados\Durados.csproj">
+      <Project>{04183BAC-B3DA-46EC-BE81-D635768F98F4}</Project>
+      <Name>Durados</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="AutoGeneration\Dynamic\MapDataSet.xsc">
+      <DependentUpon>MapDataSet.xsd</DependentUpon>
+    </None>
+    <None Include="AutoGeneration\Dynamic\MapDataSet.xsd">
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>MapDataSet.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="AutoGeneration\Dynamic\MapDataSet.xss">
+      <DependentUpon>MapDataSet.xsd</DependentUpon>
+    </None>
+    <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <BootstrapperPackage Include="Microsoft.Net.Client.3.5">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 3.5 SP1 Client Profile</ProductName>
+      <Install>false</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Net.Framework.3.5.SP1">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 3.5 SP1</ProductName>
+      <Install>true</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Windows.Installer.3.1">
+      <Visible>False</Visible>
+      <ProductName>Windows Installer 3.1</ProductName>
+      <Install>true</Install>
+    </BootstrapperPackage>
+  </ItemGroup>
+  <ItemGroup />
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

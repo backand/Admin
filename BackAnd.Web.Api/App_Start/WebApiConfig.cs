@@ -1,0 +1,333 @@
+﻿using System;
+using System.IO;
+using System.Net;
+using System.Net.Http.Formatting;
+using System.Net.Http.Headers;
+using System.Threading.Tasks;
+using System.Linq;
+using System.Web.Http;
+using Newtonsoft.Json.Serialization;
+
+namespace BackAnd.Web.Api
+{
+    public static class WebApiConfig
+    {
+        public static void Register(HttpConfiguration config)
+        {
+            // Web API configuration and services
+
+            // Web API routes
+            config.MapHttpAttributeRoutes();
+
+            config.Routes.MapHttpRoute(
+                name: "dashboardData",
+                routeTemplate: "1/dashboard/data/{id}",
+                defaults: new { controller = "dashboardData" }
+            );
+
+            config.Routes.MapHttpRoute(
+                name: "dashboardConfig",
+                routeTemplate: "1/dashboard/config/{id}",
+                defaults: new { controller = "dashboardConfig", id = RouteParameter.Optional }
+            );
+
+            config.Routes.MapHttpRoute(
+                name: "contentConfig",
+                routeTemplate: "1/content/config/{id}",
+                defaults: new { controller = "contentConfig", id = RouteParameter.Optional }
+            );
+
+            config.Routes.MapHttpRoute(
+                name: "chartData",
+                routeTemplate: "1/chart/data/{id}",
+                defaults: new { controller = "chartData" }
+            );
+
+            config.Routes.MapHttpRoute(
+                name: "chartConfig",
+                routeTemplate: "1/chart/config/{id}",
+                defaults: new { controller = "chartConfig", id = RouteParameter.Optional }
+            );
+
+            config.Routes.MapHttpRoute(
+                name: "viewDataWithId",
+                routeTemplate: "1/view/data/{name}/{id}",
+                defaults: new { controller = "viewData", name = RouteParameter.Optional, id = RouteParameter.Optional }
+            );
+
+            config.Routes.MapHttpRoute(
+               name: "tableDataWithId",
+               routeTemplate: "1/table/data/{name}/{id}",
+               defaults: new { controller = "viewData", name = RouteParameter.Optional, id = RouteParameter.Optional }
+           );
+
+
+            config.Routes.MapHttpRoute(
+               name: "objectWithId",
+               routeTemplate: "1/objects/{name}/{id}",
+               defaults: new { controller = "viewData", name = RouteParameter.Optional, id = RouteParameter.Optional }
+           );
+
+            config.Routes.MapHttpRoute(
+                name: "viewData",
+                routeTemplate: "1/view/data/{name}",
+                defaults: new { controller = "viewData", name = RouteParameter.Optional }
+            );
+
+            config.Routes.MapHttpRoute(
+                name: "tableData",
+                routeTemplate: "1/table/data/{name}",
+                defaults: new { controller = "viewData", name = RouteParameter.Optional }
+            );
+
+            config.Routes.MapHttpRoute(
+                name: "object",
+                routeTemplate: "1/objects/{name}",
+                defaults: new { controller = "viewData", name = RouteParameter.Optional }
+            );
+
+            
+
+            config.Routes.MapHttpRoute(
+                name: "appConfig",
+                routeTemplate: "1/app/config",
+                defaults: new { controller = "appConfig" }
+            );
+
+            config.Routes.MapHttpRoute(
+                name: "viewConfig",
+                routeTemplate: "1/view/config/{name}",
+                defaults: new { controller = "viewConfig" }
+            );
+
+            config.Routes.MapHttpRoute(
+                name: "businessRule",
+                routeTemplate: "1/businessRule/{id}",
+                defaults: new { controller = "businessRule" }
+            );
+
+            config.Routes.MapHttpRoute(
+                name: "action",
+                routeTemplate: "1/action/config/{id}",
+                defaults: new { controller = "businessRule" }
+            );
+
+            //config.Routes.MapHttpRoute(
+            //    name: "performAction",
+            //    routeTemplate: "1/table/action/{viewName}/{id}",
+            //    defaults: new { controller = "rule", action = "Perform" }
+            //);
+
+            config.Routes.MapHttpRoute(
+                name: "tableConfig",
+                routeTemplate: "1/table/config/{name}",
+                defaults: new { controller = "viewConfig" }
+            );
+
+            config.Routes.MapHttpRoute(
+               name: "ConfigSchema",
+               routeTemplate: "1/table/config/template",
+               defaults: new { controller = "viewConfig" }
+           );
+
+            config.Routes.MapHttpRoute(
+                name: "fileUpload",
+                routeTemplate: "1/file/upload/{viewName}/{fieldName}",
+                defaults: new { controller = "file", action = "Upload" }
+            );
+
+            config.Routes.MapHttpRoute(
+                name: "file2Upload",
+                routeTemplate: "1/file2/",
+                defaults: new { controller = "file2" }
+            );
+
+
+            config.Routes.MapHttpRoute(
+                name: "viewListConfig",
+                routeTemplate: "1/view/config",
+                defaults: new { controller = "viewConfig" }
+            );
+
+            config.Routes.MapHttpRoute(
+                name: "actionList",
+                routeTemplate: "1/action/config",
+                defaults: new { controller = "businessRule" }
+            );
+            config.Routes.MapHttpRoute(
+                name: "businessRuleList",
+                routeTemplate: "1/businessRule",
+                defaults: new { controller = "businessRule" }
+            );
+
+            config.Routes.MapHttpRoute(
+                name: "tableListConfig",
+                routeTemplate: "1/table/config",
+                defaults: new { controller = "viewConfig" }
+            );
+
+            //config.Routes.MapHttpRoute(
+            //    name: "banner",
+            //    routeTemplate: "1/banner/getAdminUrl",
+            //    defaults: new { controller = "banner", action = "getAdminUrl" }
+            //);
+
+            config.Routes.MapHttpRoute(
+                name: "autoComplete",
+                routeTemplate: "1/view/data/autocomplete/{viewName}/{fieldName}",
+                defaults: new { controller = "viewData", action = "autoComplete" }
+            );
+
+            config.Routes.MapHttpRoute(
+                name: "selectOptions",
+                routeTemplate: "1/view/data/selectOptions/{viewName}/{fieldName}",
+                defaults: new { controller = "viewData", action = "selectOptions" }
+            );
+
+            config.Routes.MapHttpRoute(
+                name: "autoComplete2",
+                routeTemplate: "1/table/data/autocomplete/{viewName}/{fieldName}",
+                defaults: new { controller = "viewData", action = "autoComplete" }
+            );
+
+            config.Routes.MapHttpRoute(
+                name: "selectOptions2",
+                routeTemplate: "1/table/data/selectOptions/{viewName}/{fieldName}",
+                defaults: new { controller = "viewData", action = "selectOptions" }
+            );
+
+            config.Routes.MapHttpRoute(
+                name: "autoComplete3",
+                routeTemplate: "1/objects/autocomplete/{viewName}/{fieldName}",
+                defaults: new { controller = "viewData", action = "autoComplete" }
+            );
+
+            config.Routes.MapHttpRoute(
+                name: "selectOptions3",
+                routeTemplate: "1/objects/selectOptions/{viewName}/{fieldName}",
+                defaults: new { controller = "viewData", action = "selectOptions" }
+            );
+
+            //config.Routes.MapHttpRoute(
+            //    name: "sync",
+            //    routeTemplate: "1/app/sync",
+            //    defaults: new { controller = "appConfig", action = "sync" }
+            //);
+            config.Routes.MapHttpRoute(
+                name: "refresh",
+                routeTemplate: "1/config/refresh/{appname}",
+                defaults: new { controller = "appConfig", action = "refresh" }
+            );
+
+            config.Routes.MapHttpRoute(
+                name: "unlock",
+                routeTemplate: "1/account/unlock",
+                defaults: new { controller = "account", action = "unlock" }
+            );
+
+            //admin
+            config.Routes.MapHttpRoute(
+               name: "myAppsGet",
+               routeTemplate: "admin/myApps/{id}",
+               defaults: new { controller = "myApps", id = RouteParameter.Optional }
+           );
+
+            config.Routes.MapHttpRoute(
+               name: "myAppConnection",
+               routeTemplate: "admin/myAppConnection/{id}",
+               defaults: new { controller = "myAppConnection", id = RouteParameter.Optional }
+           );
+
+            config.Routes.MapHttpRoute(
+              name: "myAppConnectionPassword",
+              routeTemplate: "admin/myAppConnection/getPassword/{id}",
+              defaults: new { controller = "myAppConnection", action = "getPassword", id = RouteParameter.Optional }
+          );
+			config.Routes.MapHttpRoute(
+               name: "rdsCreateDbCallback",
+               routeTemplate: "admin/myAppConnection/rdsResponse",
+               defaults: new { controller = "myAppConnection", action ="rdsResponse" }
+           );
+
+            config.Routes.MapHttpRoute(
+              name: "myAppConnectionTest",
+              routeTemplate: "admin/myAppConnectionTest",
+              defaults: new { controller = "myAppConnection", action = "Test" }
+          );
+
+           
+           // config.Routes.MapHttpRoute(
+           //    name: "myAppsPost",
+           //    routeTemplate: "admin/myApps",
+           //    defaults: new { controller = "myApps", action = "Post" }
+           //);
+           // config.Routes.MapHttpRoute(
+           //    name: "myAppsPut",
+           //    routeTemplate: "admin/myApps/{id}",
+           //    defaults: new { controller = "myApps", action = "Put", id = RouteParameter.Optional }
+           //);
+
+            //config.Routes.MapHttpRoute(
+            //    name: "myApps",
+            //    routeTemplate: "admin/myApps",
+            //    defaults: new { controller = "myApps", action = "Get" }
+            //);
+
+
+            config.Routes.MapHttpRoute(
+                           name: "ExternalLogin",
+                           routeTemplate: "account/ExternalLogin", defaults: new { });
+                
+
+            config.Routes.MapHttpRoute(
+                name: "DefaultApi",
+                routeTemplate: "api/{controller}/{id}",
+                defaults: new { id = RouteParameter.Optional }
+            );
+
+            /*var jsonFormatter = config.Formatters.OfType<JsonMediaTypeFormatter>().First();
+            jsonFormatter.SerializerSettings.ContractResolver = new CamelCasePropertyNamesContractResolver();
+            */
+            config.Formatters.Add(new TextPlainFormatter());
+        }
+    }
+
+    public class TextPlainFormatter : MediaTypeFormatter
+    {
+        public TextPlainFormatter()
+        {
+            this.SupportedMediaTypes.Add(new MediaTypeHeaderValue("text/plain"));
+        }
+
+        public override bool CanWriteType(Type type)
+        {
+            return type == typeof(string);
+        }
+
+        public override bool CanReadType(Type type)
+        {
+            return type == typeof(string);
+        }
+
+        public override Task<object> ReadFromStreamAsync(Type type, Stream readStream, System.Net.Http.HttpContent content, IFormatterLogger formatterLogger)
+        {
+            return Task.Factory.StartNew(() =>
+            {
+                StreamReader reader = new StreamReader(readStream);
+                return (object)reader.ReadToEnd();
+            });
+        }
+
+        public override Task WriteToStreamAsync(Type type, object value, Stream writeStream, System.Net.Http.HttpContent content, TransportContext transportContext)
+        {
+            return Task.Factory.StartNew(() =>
+            {
+                StreamWriter writer = new StreamWriter(writeStream);
+                writer.Write(value);
+                writer.Flush();
+            });
+        }
+
+        
+    }
+}

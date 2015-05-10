@@ -1,0 +1,496 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<xs:schema id="P8cmDataSet" targetNamespace="http://tempuri.org/P8cmDataSet.xsd" xmlns:mstns="http://tempuri.org/P8cmDataSet.xsd" xmlns="http://tempuri.org/P8cmDataSet.xsd" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata" xmlns:msprop="urn:schemas-microsoft-com:xml-msprop" attributeFormDefault="qualified" elementFormDefault="qualified">
+  <xs:annotation>
+    <xs:appinfo source="urn:schemas-microsoft-com:xml-msdatasource">
+      <DataSource DefaultConnectionIndex="1" FunctionsComponentName="QueriesTableAdapter" Modifier="AutoLayout, AnsiClass, Class, Public" SchemaSerializationMode="IncludeSchema" xmlns="urn:schemas-microsoft-com:xml-msdatasource">
+        <Connections>
+          <Connection AppSettingsObjectName="Settings" AppSettingsPropertyName="FIBI_P8CMConnectionString" ConnectionStringObject="" IsAppSettingsProperty="true" Modifier="Assembly" Name="FIBI_P8CMConnectionString (Settings)" ParameterPrefix="@" PropertyReference="ApplicationSettings.Durados.Web.Mvc.Specifics.Fibi.P8.Properties.Settings.GlobalReference.Default.FIBI_P8CMConnectionString" Provider="System.Data.SqlClient" />
+          <Connection AppSettingsObjectName="Settings" AppSettingsPropertyName="FIBI_P8CMConnectionString1" ConnectionStringObject="" IsAppSettingsProperty="true" Modifier="Assembly" Name="FIBI_P8CMConnectionString1 (Settings)" ParameterPrefix="@" PropertyReference="ApplicationSettings.Durados.Web.Mvc.Specifics.Fibi.P8.Properties.Settings.GlobalReference.Default.FIBI_P8CMConnectionString1" Provider="System.Data.SqlClient" />
+        </Connections>
+        <Tables>
+          <TableAdapter BaseClass="System.ComponentModel.Component" DataAccessorModifier="AutoLayout, AnsiClass, Class, Public" DataAccessorName="v_UserTableAdapter" GeneratorDataComponentClassName="v_UserTableAdapter" Name="v_User" UserDataComponentName="v_UserTableAdapter">
+            <MainSource>
+              <DbSource ConnectionRef="FIBI_P8CMConnectionString (Settings)" DbObjectName="FIBI_P8CM.dbo.v_User" DbObjectType="View" FillMethodModifier="Public" FillMethodName="Fill" GenerateMethods="Both" GenerateShortCommands="false" GeneratorGetMethodName="GetData" GeneratorSourceName="Fill" GetMethodModifier="Public" GetMethodName="GetData" QueryType="Rowset" ScalarCallRetval="System.Object, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" UseOptimisticConcurrency="true" UserGetMethodName="GetData" UserSourceName="Fill">
+                <SelectCommand>
+                  <DbCommand CommandType="Text" ModifiedByUser="false">
+                    <CommandText>SELECT ID, Username, FirstName, LastName, Email, Password, Role, Guid, Signature, SignatureHTML, IsApproved, FullName, NewUser, Comments FROM dbo.v_User</CommandText>
+                    <Parameters />
+                  </DbCommand>
+                </SelectCommand>
+              </DbSource>
+            </MainSource>
+            <Mappings>
+              <Mapping SourceColumn="ID" DataSetColumn="ID" />
+              <Mapping SourceColumn="Username" DataSetColumn="Username" />
+              <Mapping SourceColumn="FirstName" DataSetColumn="FirstName" />
+              <Mapping SourceColumn="LastName" DataSetColumn="LastName" />
+              <Mapping SourceColumn="Email" DataSetColumn="Email" />
+              <Mapping SourceColumn="Password" DataSetColumn="Password" />
+              <Mapping SourceColumn="Role" DataSetColumn="Role" />
+              <Mapping SourceColumn="Guid" DataSetColumn="Guid" />
+              <Mapping SourceColumn="Signature" DataSetColumn="Signature" />
+              <Mapping SourceColumn="SignatureHTML" DataSetColumn="SignatureHTML" />
+              <Mapping SourceColumn="IsApproved" DataSetColumn="IsApproved" />
+              <Mapping SourceColumn="FullName" DataSetColumn="FullName" />
+              <Mapping SourceColumn="NewUser" DataSetColumn="NewUser" />
+              <Mapping SourceColumn="Comments" DataSetColumn="Comments" />
+            </Mappings>
+            <Sources />
+          </TableAdapter>
+          <TableAdapter BaseClass="System.ComponentModel.Component" DataAccessorModifier="AutoLayout, AnsiClass, Class, Public" DataAccessorName="UserRoleTableAdapter" GeneratorDataComponentClassName="UserRoleTableAdapter" Name="UserRole" UserDataComponentName="UserRoleTableAdapter">
+            <MainSource>
+              <DbSource ConnectionRef="FIBI_P8CMConnectionString (Settings)" DbObjectName="FIBI_P8CM.dbo.UserRole" DbObjectType="Table" FillMethodModifier="Public" FillMethodName="Fill" GenerateMethods="Both" GenerateShortCommands="true" GeneratorGetMethodName="GetData" GeneratorSourceName="Fill" GetMethodModifier="Public" GetMethodName="GetData" QueryType="Rowset" ScalarCallRetval="System.Object, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" UseOptimisticConcurrency="true" UserGetMethodName="GetData" UserSourceName="Fill">
+                <DeleteCommand>
+                  <DbCommand CommandType="Text" ModifiedByUser="false">
+                    <CommandText>DELETE FROM [dbo].[UserRole] WHERE (([Name] = @Original_Name) AND ([Description] = @Original_Description) AND ((@IsNull_FirstView = 1 AND [FirstView] IS NULL) OR ([FirstView] = @Original_FirstView)))</CommandText>
+                    <Parameters>
+                      <Parameter AllowDbNull="false" AutogeneratedName="" DataSourceName="" DbType="String" Direction="Input" ParameterName="@Original_Name" Precision="0" ProviderType="NVarChar" Scale="0" Size="0" SourceColumn="Name" SourceColumnNullMapping="false" SourceVersion="Original" />
+                      <Parameter AllowDbNull="false" AutogeneratedName="" DataSourceName="" DbType="String" Direction="Input" ParameterName="@Original_Description" Precision="0" ProviderType="NVarChar" Scale="0" Size="0" SourceColumn="Description" SourceColumnNullMapping="false" SourceVersion="Original" />
+                      <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DbType="Int32" Direction="Input" ParameterName="@IsNull_FirstView" Precision="0" ProviderType="Int" Scale="0" Size="0" SourceColumn="FirstView" SourceColumnNullMapping="true" SourceVersion="Original" />
+                      <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DbType="String" Direction="Input" ParameterName="@Original_FirstView" Precision="0" ProviderType="NVarChar" Scale="0" Size="0" SourceColumn="FirstView" SourceColumnNullMapping="false" SourceVersion="Original" />
+                    </Parameters>
+                  </DbCommand>
+                </DeleteCommand>
+                <InsertCommand>
+                  <DbCommand CommandType="Text" ModifiedByUser="false">
+                    <CommandText>INSERT INTO [dbo].[UserRole] ([Name], [Description], [FirstView]) VALUES (@Name, @Description, @FirstView);
+SELECT Name, Description, FirstView FROM UserRole WHERE (Name = @Name)</CommandText>
+                    <Parameters>
+                      <Parameter AllowDbNull="false" AutogeneratedName="" DataSourceName="" DbType="String" Direction="Input" ParameterName="@Name" Precision="0" ProviderType="NVarChar" Scale="0" Size="0" SourceColumn="Name" SourceColumnNullMapping="false" SourceVersion="Current" />
+                      <Parameter AllowDbNull="false" AutogeneratedName="" DataSourceName="" DbType="String" Direction="Input" ParameterName="@Description" Precision="0" ProviderType="NVarChar" Scale="0" Size="0" SourceColumn="Description" SourceColumnNullMapping="false" SourceVersion="Current" />
+                      <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DbType="String" Direction="Input" ParameterName="@FirstView" Precision="0" ProviderType="NVarChar" Scale="0" Size="0" SourceColumn="FirstView" SourceColumnNullMapping="false" SourceVersion="Current" />
+                    </Parameters>
+                  </DbCommand>
+                </InsertCommand>
+                <SelectCommand>
+                  <DbCommand CommandType="Text" ModifiedByUser="false">
+                    <CommandText>SELECT Name, Description, FirstView FROM dbo.UserRole</CommandText>
+                    <Parameters />
+                  </DbCommand>
+                </SelectCommand>
+                <UpdateCommand>
+                  <DbCommand CommandType="Text" ModifiedByUser="false">
+                    <CommandText>UPDATE [dbo].[UserRole] SET [Name] = @Name, [Description] = @Description, [FirstView] = @FirstView WHERE (([Name] = @Original_Name) AND ([Description] = @Original_Description) AND ((@IsNull_FirstView = 1 AND [FirstView] IS NULL) OR ([FirstView] = @Original_FirstView)));
+SELECT Name, Description, FirstView FROM UserRole WHERE (Name = @Name)</CommandText>
+                    <Parameters>
+                      <Parameter AllowDbNull="false" AutogeneratedName="" DataSourceName="" DbType="String" Direction="Input" ParameterName="@Name" Precision="0" ProviderType="NVarChar" Scale="0" Size="0" SourceColumn="Name" SourceColumnNullMapping="false" SourceVersion="Current" />
+                      <Parameter AllowDbNull="false" AutogeneratedName="" DataSourceName="" DbType="String" Direction="Input" ParameterName="@Description" Precision="0" ProviderType="NVarChar" Scale="0" Size="0" SourceColumn="Description" SourceColumnNullMapping="false" SourceVersion="Current" />
+                      <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DbType="String" Direction="Input" ParameterName="@FirstView" Precision="0" ProviderType="NVarChar" Scale="0" Size="0" SourceColumn="FirstView" SourceColumnNullMapping="false" SourceVersion="Current" />
+                      <Parameter AllowDbNull="false" AutogeneratedName="" DataSourceName="" DbType="String" Direction="Input" ParameterName="@Original_Name" Precision="0" ProviderType="NVarChar" Scale="0" Size="0" SourceColumn="Name" SourceColumnNullMapping="false" SourceVersion="Original" />
+                      <Parameter AllowDbNull="false" AutogeneratedName="" DataSourceName="" DbType="String" Direction="Input" ParameterName="@Original_Description" Precision="0" ProviderType="NVarChar" Scale="0" Size="0" SourceColumn="Description" SourceColumnNullMapping="false" SourceVersion="Original" />
+                      <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DbType="Int32" Direction="Input" ParameterName="@IsNull_FirstView" Precision="0" ProviderType="Int" Scale="0" Size="0" SourceColumn="FirstView" SourceColumnNullMapping="true" SourceVersion="Original" />
+                      <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DbType="String" Direction="Input" ParameterName="@Original_FirstView" Precision="0" ProviderType="NVarChar" Scale="0" Size="0" SourceColumn="FirstView" SourceColumnNullMapping="false" SourceVersion="Original" />
+                    </Parameters>
+                  </DbCommand>
+                </UpdateCommand>
+              </DbSource>
+            </MainSource>
+            <Mappings>
+              <Mapping SourceColumn="Name" DataSetColumn="Name" />
+              <Mapping SourceColumn="Description" DataSetColumn="Description" />
+              <Mapping SourceColumn="FirstView" DataSetColumn="FirstView" />
+            </Mappings>
+            <Sources />
+          </TableAdapter>
+          <TableAdapter BaseClass="System.ComponentModel.Component" DataAccessorModifier="AutoLayout, AnsiClass, Class, Public" DataAccessorName="v_WORKSPACESTableAdapter" GeneratorDataComponentClassName="v_WORKSPACESTableAdapter" Name="v_WORKSPACES" UserDataComponentName="v_WORKSPACESTableAdapter">
+            <MainSource>
+              <DbSource ConnectionRef="FIBI_P8CMConnectionString1 (Settings)" DbObjectName="FIBI_P8CM.dbo.v_WORKSPACES" DbObjectType="View" FillMethodModifier="Public" FillMethodName="Fill" GenerateMethods="Both" GenerateShortCommands="false" GeneratorGetMethodName="GetData" GeneratorSourceName="Fill" GetMethodModifier="Public" GetMethodName="GetData" QueryType="Rowset" ScalarCallRetval="System.Object, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" UseOptimisticConcurrency="true" UserGetMethodName="GetData" UserSourceName="Fill">
+                <SelectCommand>
+                  <DbCommand CommandType="Text" ModifiedByUser="false">
+                    <CommandText>SELECT CODE, DESCRIPTION FROM dbo.v_WORKSPACES</CommandText>
+                    <Parameters />
+                  </DbCommand>
+                </SelectCommand>
+              </DbSource>
+            </MainSource>
+            <Mappings>
+              <Mapping SourceColumn="CODE" DataSetColumn="CODE" />
+              <Mapping SourceColumn="DESCRIPTION" DataSetColumn="DESCRIPTION" />
+            </Mappings>
+            <Sources />
+          </TableAdapter>
+          <TableAdapter BaseClass="System.ComponentModel.Component" DataAccessorModifier="AutoLayout, AnsiClass, Class, Public" DataAccessorName="v_MECHITSA2SUG_MISMACHTableAdapter" GeneratorDataComponentClassName="v_MECHITSA2SUG_MISMACHTableAdapter" Name="v_MECHITSA2SUG_MISMACH" UserDataComponentName="v_MECHITSA2SUG_MISMACHTableAdapter">
+            <MainSource>
+              <DbSource ConnectionRef="FIBI_P8CMConnectionString1 (Settings)" DbObjectName="FIBI_P8CM.dbo.v_MECHITSA2SUG_MISMACH" DbObjectType="View" FillMethodModifier="Public" FillMethodName="Fill" GenerateMethods="Both" GenerateShortCommands="false" GeneratorGetMethodName="GetData" GeneratorSourceName="Fill" GetMethodModifier="Public" GetMethodName="GetData" QueryType="Rowset" ScalarCallRetval="System.Object, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" UseOptimisticConcurrency="false" UserGetMethodName="GetData" UserSourceName="Fill">
+                <SelectCommand>
+                  <DbCommand CommandType="Text" ModifiedByUser="true">
+                    <CommandText>SELECT WORKSPACE, MECHITSA, SUG_MISMACH FROM dbo.v_MECHITSA2SUG_MISMACH</CommandText>
+                    <Parameters />
+                  </DbCommand>
+                </SelectCommand>
+              </DbSource>
+            </MainSource>
+            <Mappings>
+              <Mapping SourceColumn="WORKSPACE" DataSetColumn="WORKSPACE" />
+              <Mapping SourceColumn="MECHITSA" DataSetColumn="MECHITSA" />
+              <Mapping SourceColumn="SUG_MISMACH" DataSetColumn="SUG_MISMACH" />
+            </Mappings>
+            <Sources />
+          </TableAdapter>
+          <TableAdapter BaseClass="System.ComponentModel.Component" DataAccessorModifier="AutoLayout, AnsiClass, Class, Public" DataAccessorName="v_SUGEI_MISMACHTableAdapter" GeneratorDataComponentClassName="v_SUGEI_MISMACHTableAdapter" Name="v_SUGEI_MISMACH" UserDataComponentName="v_SUGEI_MISMACHTableAdapter">
+            <MainSource>
+              <DbSource ConnectionRef="FIBI_P8CMConnectionString1 (Settings)" DbObjectName="FIBI_P8CM.dbo.v_SUGEI_MISMACH" DbObjectType="View" FillMethodModifier="Public" FillMethodName="Fill" GenerateMethods="Both" GenerateShortCommands="false" GeneratorGetMethodName="GetData" GeneratorSourceName="Fill" GetMethodModifier="Public" GetMethodName="GetData" QueryType="Rowset" ScalarCallRetval="System.Object, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" UseOptimisticConcurrency="true" UserGetMethodName="GetData" UserSourceName="Fill">
+                <SelectCommand>
+                  <DbCommand CommandType="Text" ModifiedByUser="false">
+                    <CommandText>SELECT WORKSPACE, CODE, DESCRIPTION, STATUS FROM dbo.v_SUGEI_MISMACH</CommandText>
+                    <Parameters />
+                  </DbCommand>
+                </SelectCommand>
+              </DbSource>
+            </MainSource>
+            <Mappings>
+              <Mapping SourceColumn="WORKSPACE" DataSetColumn="WORKSPACE" />
+              <Mapping SourceColumn="CODE" DataSetColumn="CODE" />
+              <Mapping SourceColumn="DESCRIPTION" DataSetColumn="DESCRIPTION" />
+              <Mapping SourceColumn="STATUS" DataSetColumn="STATUS" />
+            </Mappings>
+            <Sources />
+          </TableAdapter>
+          <TableAdapter BaseClass="System.ComponentModel.Component" DataAccessorModifier="AutoLayout, AnsiClass, Class, Public" DataAccessorName="v_KODEI_MECHITSOTTableAdapter" GeneratorDataComponentClassName="v_KODEI_MECHITSOTTableAdapter" Name="v_KODEI_MECHITSOT" UserDataComponentName="v_KODEI_MECHITSOTTableAdapter">
+            <MainSource>
+              <DbSource ConnectionRef="FIBI_P8CMConnectionString1 (Settings)" DbObjectName="FIBI_P8CM.dbo.v_KODEI_MECHITSOT" DbObjectType="View" FillMethodModifier="Public" FillMethodName="Fill" GenerateMethods="Both" GenerateShortCommands="false" GeneratorGetMethodName="GetData" GeneratorSourceName="Fill" GetMethodModifier="Public" GetMethodName="GetData" QueryType="Rowset" ScalarCallRetval="System.Object, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" UseOptimisticConcurrency="true" UserGetMethodName="GetData" UserSourceName="Fill">
+                <SelectCommand>
+                  <DbCommand CommandType="Text" ModifiedByUser="false">
+                    <CommandText>SELECT WORKSPACE, CODE, DESCRIPTION, STATUS FROM dbo.v_KODEI_MECHITSOT</CommandText>
+                    <Parameters />
+                  </DbCommand>
+                </SelectCommand>
+              </DbSource>
+            </MainSource>
+            <Mappings>
+              <Mapping SourceColumn="WORKSPACE" DataSetColumn="WORKSPACE" />
+              <Mapping SourceColumn="CODE" DataSetColumn="CODE" />
+              <Mapping SourceColumn="DESCRIPTION" DataSetColumn="DESCRIPTION" />
+              <Mapping SourceColumn="STATUS" DataSetColumn="STATUS" />
+            </Mappings>
+            <Sources />
+          </TableAdapter>
+          <TableAdapter BaseClass="System.ComponentModel.Component" DataAccessorModifier="AutoLayout, AnsiClass, Class, Public" DataAccessorName="v_KG_MAKOR_MISMACHTableAdapter" GeneratorDataComponentClassName="v_KG_MAKOR_MISMACHTableAdapter" Name="v_KG_MAKOR_MISMACH" UserDataComponentName="v_KG_MAKOR_MISMACHTableAdapter">
+            <MainSource>
+              <DbSource ConnectionRef="FIBI_P8CMConnectionString1 (Settings)" DbObjectName="FIBI_P8CM.dbo.v_KG_MAKOR_MISMACH" DbObjectType="View" FillMethodModifier="Public" FillMethodName="Fill" GenerateMethods="Both" GenerateShortCommands="false" GeneratorGetMethodName="GetData" GeneratorSourceName="Fill" GetMethodModifier="Public" GetMethodName="GetData" QueryType="Rowset" ScalarCallRetval="System.Object, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" UseOptimisticConcurrency="true" UserGetMethodName="GetData" UserSourceName="Fill">
+                <SelectCommand>
+                  <DbCommand CommandType="Text" ModifiedByUser="false">
+                    <CommandText>SELECT CODE, DESCRIPTION FROM dbo.v_KG_MAKOR_MISMACH</CommandText>
+                    <Parameters />
+                  </DbCommand>
+                </SelectCommand>
+              </DbSource>
+            </MainSource>
+            <Mappings>
+              <Mapping SourceColumn="CODE" DataSetColumn="CODE" />
+              <Mapping SourceColumn="DESCRIPTION" DataSetColumn="DESCRIPTION" />
+            </Mappings>
+            <Sources />
+          </TableAdapter>
+          <TableAdapter BaseClass="System.ComponentModel.Component" DataAccessorModifier="AutoLayout, AnsiClass, Class, Public" DataAccessorName="v_UNIDENTIFIED_DOCUMENT_REASONSTableAdapter" GeneratorDataComponentClassName="v_UNIDENTIFIED_DOCUMENT_REASONSTableAdapter" Name="v_UNIDENTIFIED_DOCUMENT_REASONS" UserDataComponentName="v_UNIDENTIFIED_DOCUMENT_REASONSTableAdapter">
+            <MainSource>
+              <DbSource ConnectionRef="FIBI_P8CMConnectionString1 (Settings)" DbObjectName="FIBI_P8CM.dbo.v_UNIDENTIFIED_DOCUMENT_REASONS" DbObjectType="View" FillMethodModifier="Public" FillMethodName="Fill" GenerateMethods="Both" GenerateShortCommands="false" GeneratorGetMethodName="GetData" GeneratorSourceName="Fill" GetMethodModifier="Public" GetMethodName="GetData" QueryType="Rowset" ScalarCallRetval="System.Object, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" UseOptimisticConcurrency="true" UserGetMethodName="GetData" UserSourceName="Fill">
+                <SelectCommand>
+                  <DbCommand CommandType="Text" ModifiedByUser="false">
+                    <CommandText>SELECT REASON_CODE, DESCRIPTION FROM dbo.v_UNIDENTIFIED_DOCUMENT_REASONS</CommandText>
+                    <Parameters />
+                  </DbCommand>
+                </SelectCommand>
+              </DbSource>
+            </MainSource>
+            <Mappings>
+              <Mapping SourceColumn="REASON_CODE" DataSetColumn="REASON_CODE" />
+              <Mapping SourceColumn="DESCRIPTION" DataSetColumn="DESCRIPTION" />
+            </Mappings>
+            <Sources />
+          </TableAdapter>
+          <TableAdapter BaseClass="System.ComponentModel.Component" DataAccessorModifier="AutoLayout, AnsiClass, Class, Public" DataAccessorName="v_UNDEF_DOC_LISTTableAdapter" GeneratorDataComponentClassName="v_UNDEF_DOC_LISTTableAdapter" Name="v_UNDEF_DOC_LIST" UserDataComponentName="v_UNDEF_DOC_LISTTableAdapter">
+            <MainSource>
+              <DbSource ConnectionRef="FIBI_P8CMConnectionString1 (Settings)" DbObjectName="FIBI_P8CM.dbo.v_UNDEF_DOC_LIST" DbObjectType="View" FillMethodModifier="Public" FillMethodName="Fill" GenerateMethods="Both" GenerateShortCommands="false" GeneratorGetMethodName="GetData" GeneratorSourceName="Fill" GetMethodModifier="Public" GetMethodName="GetData" QueryType="Rowset" ScalarCallRetval="System.Object, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" UseOptimisticConcurrency="false" UserGetMethodName="GetData" UserSourceName="Fill">
+                <SelectCommand>
+                  <DbCommand CommandType="Text" ModifiedByUser="true">
+                    <CommandText>SELECT WORKSPACE, DOCNUMBER, ERROR_CODE, ERROR_REASON, ERROR_DESCRIPTION, USER_NAME FROM dbo.v_UNDEF_DOC_LIST </CommandText>
+                    <Parameters />
+                  </DbCommand>
+                </SelectCommand>
+              </DbSource>
+            </MainSource>
+            <Mappings>
+              <Mapping SourceColumn="WORKSPACE" DataSetColumn="WORKSPACE" />
+              <Mapping SourceColumn="DOCNUMBER" DataSetColumn="DOCNUMBER" />
+              <Mapping SourceColumn="ERROR_CODE" DataSetColumn="ERROR_CODE" />
+              <Mapping SourceColumn="ERROR_REASON" DataSetColumn="ERROR_REASON" />
+              <Mapping SourceColumn="ERROR_DESCRIPTION" DataSetColumn="ERROR_DESCRIPTION" />
+              <Mapping SourceColumn="USER_NAME" DataSetColumn="USER_NAME" />
+            </Mappings>
+            <Sources />
+          </TableAdapter>
+        </Tables>
+        <Sources />
+      </DataSource>
+    </xs:appinfo>
+  </xs:annotation>
+  <xs:element name="P8cmDataSet" msdata:IsDataSet="true" msdata:UseCurrentLocale="true" msprop:Generator_UserDSName="P8cmDataSet" msprop:Generator_DataSetName="P8cmDataSet" msprop:EnableTableAdapterManager="true">
+    <xs:complexType>
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:element name="v_User" msprop:Generator_UserTableName="v_User" msprop:Generator_RowDeletedName="v_UserRowDeleted" msprop:Generator_RowChangedName="v_UserRowChanged" msprop:Generator_RowClassName="v_UserRow" msprop:Generator_RowChangingName="v_UserRowChanging" msprop:Generator_RowEvArgName="v_UserRowChangeEvent" msprop:Generator_RowEvHandlerName="v_UserRowChangeEventHandler" msprop:Generator_TableClassName="v_UserDataTable" msprop:Generator_TableVarName="tablev_User" msprop:Generator_RowDeletingName="v_UserRowDeleting" msprop:Generator_TablePropName="v_User">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="ID" msdata:AutoIncrement="true" msdata:AutoIncrementSeed="1" msprop:Generator_UserColumnName="ID" msprop:Generator_ColumnPropNameInRow="ID" msprop:Generator_ColumnVarNameInTable="columnID" msprop:Generator_ColumnPropNameInTable="IDColumn" type="xs:int" />
+              <xs:element name="Username" msprop:Generator_UserColumnName="Username" msprop:Generator_ColumnPropNameInRow="Username" msprop:Generator_ColumnVarNameInTable="columnUsername" msprop:Generator_ColumnPropNameInTable="UsernameColumn">
+                <xs:simpleType>
+                  <xs:restriction base="xs:string">
+                    <xs:maxLength value="50" />
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:element>
+              <xs:element name="FirstName" msprop:Generator_UserColumnName="FirstName" msprop:Generator_ColumnPropNameInRow="FirstName" msprop:Generator_ColumnVarNameInTable="columnFirstName" msprop:Generator_ColumnPropNameInTable="FirstNameColumn">
+                <xs:simpleType>
+                  <xs:restriction base="xs:string">
+                    <xs:maxLength value="50" />
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:element>
+              <xs:element name="LastName" msprop:Generator_UserColumnName="LastName" msprop:Generator_ColumnPropNameInRow="LastName" msprop:Generator_ColumnVarNameInTable="columnLastName" msprop:Generator_ColumnPropNameInTable="LastNameColumn">
+                <xs:simpleType>
+                  <xs:restriction base="xs:string">
+                    <xs:maxLength value="50" />
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:element>
+              <xs:element name="Email" msprop:Generator_UserColumnName="Email" msprop:Generator_ColumnPropNameInRow="Email" msprop:Generator_ColumnVarNameInTable="columnEmail" msprop:Generator_ColumnPropNameInTable="EmailColumn">
+                <xs:simpleType>
+                  <xs:restriction base="xs:string">
+                    <xs:maxLength value="250" />
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:element>
+              <xs:element name="Password" msprop:Generator_UserColumnName="Password" msprop:Generator_ColumnPropNameInRow="Password" msprop:Generator_ColumnVarNameInTable="columnPassword" msprop:Generator_ColumnPropNameInTable="PasswordColumn" minOccurs="0">
+                <xs:simpleType>
+                  <xs:restriction base="xs:string">
+                    <xs:maxLength value="20" />
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:element>
+              <xs:element name="Role" msprop:Generator_UserColumnName="Role" msprop:Generator_ColumnPropNameInRow="Role" msprop:Generator_ColumnVarNameInTable="columnRole" msprop:Generator_ColumnPropNameInTable="RoleColumn">
+                <xs:simpleType>
+                  <xs:restriction base="xs:string">
+                    <xs:maxLength value="20" />
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:element>
+              <xs:element name="Guid" msdata:DataType="System.Guid, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" msprop:Generator_UserColumnName="Guid" msprop:Generator_ColumnPropNameInRow="Guid" msprop:Generator_ColumnVarNameInTable="columnGuid" msprop:Generator_ColumnPropNameInTable="GuidColumn" type="xs:string" />
+              <xs:element name="Signature" msprop:Generator_UserColumnName="Signature" msprop:Generator_ColumnPropNameInRow="Signature" msprop:Generator_ColumnVarNameInTable="columnSignature" msprop:Generator_ColumnPropNameInTable="SignatureColumn" minOccurs="0">
+                <xs:simpleType>
+                  <xs:restriction base="xs:string">
+                    <xs:maxLength value="4000" />
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:element>
+              <xs:element name="SignatureHTML" msprop:Generator_UserColumnName="SignatureHTML" msprop:Generator_ColumnPropNameInRow="SignatureHTML" msprop:Generator_ColumnVarNameInTable="columnSignatureHTML" msprop:Generator_ColumnPropNameInTable="SignatureHTMLColumn" minOccurs="0">
+                <xs:simpleType>
+                  <xs:restriction base="xs:string">
+                    <xs:maxLength value="4000" />
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:element>
+              <xs:element name="IsApproved" msprop:Generator_UserColumnName="IsApproved" msprop:Generator_ColumnPropNameInRow="IsApproved" msprop:Generator_ColumnVarNameInTable="columnIsApproved" msprop:Generator_ColumnPropNameInTable="IsApprovedColumn" type="xs:boolean" />
+              <xs:element name="FullName" msdata:ReadOnly="true" msprop:Generator_UserColumnName="FullName" msprop:Generator_ColumnPropNameInRow="FullName" msprop:Generator_ColumnVarNameInTable="columnFullName" msprop:Generator_ColumnPropNameInTable="FullNameColumn" minOccurs="0">
+                <xs:simpleType>
+                  <xs:restriction base="xs:string">
+                    <xs:maxLength value="101" />
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:element>
+              <xs:element name="NewUser" msprop:Generator_UserColumnName="NewUser" msprop:Generator_ColumnPropNameInRow="NewUser" msprop:Generator_ColumnVarNameInTable="columnNewUser" msprop:Generator_ColumnPropNameInTable="NewUserColumn" type="xs:boolean" minOccurs="0" />
+              <xs:element name="Comments" msprop:Generator_UserColumnName="Comments" msprop:Generator_ColumnPropNameInRow="Comments" msprop:Generator_ColumnVarNameInTable="columnComments" msprop:Generator_ColumnPropNameInTable="CommentsColumn" minOccurs="0">
+                <xs:simpleType>
+                  <xs:restriction base="xs:string">
+                    <xs:maxLength value="2147483647" />
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:element>
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="UserRole" msprop:Generator_UserTableName="UserRole" msprop:Generator_RowDeletedName="UserRoleRowDeleted" msprop:Generator_RowChangedName="UserRoleRowChanged" msprop:Generator_RowClassName="UserRoleRow" msprop:Generator_RowChangingName="UserRoleRowChanging" msprop:Generator_RowEvArgName="UserRoleRowChangeEvent" msprop:Generator_RowEvHandlerName="UserRoleRowChangeEventHandler" msprop:Generator_TableClassName="UserRoleDataTable" msprop:Generator_TableVarName="tableUserRole" msprop:Generator_RowDeletingName="UserRoleRowDeleting" msprop:Generator_TablePropName="UserRole">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="Name" msprop:Generator_UserColumnName="Name" msprop:Generator_ColumnPropNameInRow="Name" msprop:Generator_ColumnVarNameInTable="columnName" msprop:Generator_ColumnPropNameInTable="NameColumn">
+                <xs:simpleType>
+                  <xs:restriction base="xs:string">
+                    <xs:maxLength value="20" />
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:element>
+              <xs:element name="Description" msprop:Generator_UserColumnName="Description" msprop:Generator_ColumnPropNameInRow="Description" msprop:Generator_ColumnVarNameInTable="columnDescription" msprop:Generator_ColumnPropNameInTable="DescriptionColumn">
+                <xs:simpleType>
+                  <xs:restriction base="xs:string">
+                    <xs:maxLength value="50" />
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:element>
+              <xs:element name="FirstView" msprop:Generator_UserColumnName="FirstView" msprop:Generator_ColumnPropNameInRow="FirstView" msprop:Generator_ColumnVarNameInTable="columnFirstView" msprop:Generator_ColumnPropNameInTable="FirstViewColumn" minOccurs="0">
+                <xs:simpleType>
+                  <xs:restriction base="xs:string">
+                    <xs:maxLength value="200" />
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:element>
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="v_WORKSPACES" msprop:Generator_UserTableName="v_WORKSPACES" msprop:Generator_RowDeletedName="v_WORKSPACESRowDeleted" msprop:Generator_RowChangedName="v_WORKSPACESRowChanged" msprop:Generator_RowClassName="v_WORKSPACESRow" msprop:Generator_RowChangingName="v_WORKSPACESRowChanging" msprop:Generator_RowEvArgName="v_WORKSPACESRowChangeEvent" msprop:Generator_RowEvHandlerName="v_WORKSPACESRowChangeEventHandler" msprop:Generator_TableClassName="v_WORKSPACESDataTable" msprop:Generator_TableVarName="tablev_WORKSPACES" msprop:Generator_RowDeletingName="v_WORKSPACESRowDeleting" msprop:Generator_TablePropName="v_WORKSPACES">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="CODE" msprop:Generator_UserColumnName="CODE" msprop:Generator_ColumnPropNameInRow="CODE" msprop:Generator_ColumnVarNameInTable="columnCODE" msprop:Generator_ColumnPropNameInTable="CODEColumn" type="xs:int" />
+              <xs:element name="DESCRIPTION" msprop:Generator_UserColumnName="DESCRIPTION" msprop:Generator_ColumnPropNameInRow="DESCRIPTION" msprop:Generator_ColumnVarNameInTable="columnDESCRIPTION" msprop:Generator_ColumnPropNameInTable="DESCRIPTIONColumn" minOccurs="0">
+                <xs:simpleType>
+                  <xs:restriction base="xs:string">
+                    <xs:maxLength value="255" />
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:element>
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="v_MECHITSA2SUG_MISMACH" msprop:Generator_UserTableName="v_MECHITSA2SUG_MISMACH" msprop:Generator_RowDeletedName="v_MECHITSA2SUG_MISMACHRowDeleted" msprop:Generator_RowChangedName="v_MECHITSA2SUG_MISMACHRowChanged" msprop:Generator_RowClassName="v_MECHITSA2SUG_MISMACHRow" msprop:Generator_RowChangingName="v_MECHITSA2SUG_MISMACHRowChanging" msprop:Generator_RowEvArgName="v_MECHITSA2SUG_MISMACHRowChangeEvent" msprop:Generator_RowEvHandlerName="v_MECHITSA2SUG_MISMACHRowChangeEventHandler" msprop:Generator_TableClassName="v_MECHITSA2SUG_MISMACHDataTable" msprop:Generator_TableVarName="tablev_MECHITSA2SUG_MISMACH" msprop:Generator_RowDeletingName="v_MECHITSA2SUG_MISMACHRowDeleting" msprop:Generator_TablePropName="v_MECHITSA2SUG_MISMACH">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="WORKSPACE" msprop:Generator_UserColumnName="WORKSPACE" msprop:Generator_ColumnPropNameInRow="WORKSPACE" msprop:Generator_ColumnVarNameInTable="columnWORKSPACE" msprop:Generator_ColumnPropNameInTable="WORKSPACEColumn" type="xs:int" />
+              <xs:element name="MECHITSA" msprop:Generator_UserColumnName="MECHITSA" msprop:Generator_ColumnPropNameInRow="MECHITSA" msprop:Generator_ColumnVarNameInTable="columnMECHITSA" msprop:Generator_ColumnPropNameInTable="MECHITSAColumn" type="xs:int" />
+              <xs:element name="WORKSPACE2" msprop:Generator_UserColumnName="WORKSPACE2" msprop:Generator_ColumnVarNameInTable="columnWORKSPACE2" msprop:Generator_ColumnPropNameInRow="WORKSPACE2" msprop:Generator_ColumnPropNameInTable="WORKSPACE2Column" type="xs:int" />
+              <xs:element name="SUG_MISMACH" msprop:Generator_UserColumnName="SUG_MISMACH" msprop:Generator_ColumnPropNameInRow="SUG_MISMACH" msprop:Generator_ColumnVarNameInTable="columnSUG_MISMACH" msprop:Generator_ColumnPropNameInTable="SUG_MISMACHColumn" type="xs:int" />
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="v_SUGEI_MISMACH" msprop:Generator_UserTableName="v_SUGEI_MISMACH" msprop:Generator_RowDeletedName="v_SUGEI_MISMACHRowDeleted" msprop:Generator_RowChangedName="v_SUGEI_MISMACHRowChanged" msprop:Generator_RowClassName="v_SUGEI_MISMACHRow" msprop:Generator_RowChangingName="v_SUGEI_MISMACHRowChanging" msprop:Generator_RowEvArgName="v_SUGEI_MISMACHRowChangeEvent" msprop:Generator_RowEvHandlerName="v_SUGEI_MISMACHRowChangeEventHandler" msprop:Generator_TableClassName="v_SUGEI_MISMACHDataTable" msprop:Generator_TableVarName="tablev_SUGEI_MISMACH" msprop:Generator_RowDeletingName="v_SUGEI_MISMACHRowDeleting" msprop:Generator_TablePropName="v_SUGEI_MISMACH">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="WORKSPACE" msprop:Generator_UserColumnName="WORKSPACE" msprop:Generator_ColumnPropNameInRow="WORKSPACE" msprop:Generator_ColumnVarNameInTable="columnWORKSPACE" msprop:Generator_ColumnPropNameInTable="WORKSPACEColumn" type="xs:int" />
+              <xs:element name="CODE" msprop:Generator_UserColumnName="CODE" msprop:Generator_ColumnPropNameInRow="CODE" msprop:Generator_ColumnVarNameInTable="columnCODE" msprop:Generator_ColumnPropNameInTable="CODEColumn" type="xs:int" />
+              <xs:element name="DESCRIPTION" msprop:Generator_UserColumnName="DESCRIPTION" msprop:Generator_ColumnPropNameInRow="DESCRIPTION" msprop:Generator_ColumnVarNameInTable="columnDESCRIPTION" msprop:Generator_ColumnPropNameInTable="DESCRIPTIONColumn">
+                <xs:simpleType>
+                  <xs:restriction base="xs:string">
+                    <xs:maxLength value="50" />
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:element>
+              <xs:element name="STATUS" msprop:Generator_UserColumnName="STATUS" msprop:Generator_ColumnPropNameInRow="STATUS" msprop:Generator_ColumnVarNameInTable="columnSTATUS" msprop:Generator_ColumnPropNameInTable="STATUSColumn" type="xs:boolean" />
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="v_KODEI_MECHITSOT" msprop:Generator_UserTableName="v_KODEI_MECHITSOT" msprop:Generator_RowDeletedName="v_KODEI_MECHITSOTRowDeleted" msprop:Generator_RowChangedName="v_KODEI_MECHITSOTRowChanged" msprop:Generator_RowClassName="v_KODEI_MECHITSOTRow" msprop:Generator_RowChangingName="v_KODEI_MECHITSOTRowChanging" msprop:Generator_RowEvArgName="v_KODEI_MECHITSOTRowChangeEvent" msprop:Generator_RowEvHandlerName="v_KODEI_MECHITSOTRowChangeEventHandler" msprop:Generator_TableClassName="v_KODEI_MECHITSOTDataTable" msprop:Generator_TableVarName="tablev_KODEI_MECHITSOT" msprop:Generator_RowDeletingName="v_KODEI_MECHITSOTRowDeleting" msprop:Generator_TablePropName="v_KODEI_MECHITSOT">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="WORKSPACE" msprop:Generator_UserColumnName="WORKSPACE" msprop:Generator_ColumnPropNameInRow="WORKSPACE" msprop:Generator_ColumnVarNameInTable="columnWORKSPACE" msprop:Generator_ColumnPropNameInTable="WORKSPACEColumn" type="xs:int" />
+              <xs:element name="CODE" msprop:Generator_UserColumnName="CODE" msprop:Generator_ColumnPropNameInRow="CODE" msprop:Generator_ColumnVarNameInTable="columnCODE" msprop:Generator_ColumnPropNameInTable="CODEColumn" type="xs:int" />
+              <xs:element name="DESCRIPTION" msprop:Generator_UserColumnName="DESCRIPTION" msprop:Generator_ColumnPropNameInRow="DESCRIPTION" msprop:Generator_ColumnVarNameInTable="columnDESCRIPTION" msprop:Generator_ColumnPropNameInTable="DESCRIPTIONColumn">
+                <xs:simpleType>
+                  <xs:restriction base="xs:string">
+                    <xs:maxLength value="50" />
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:element>
+              <xs:element name="STATUS" msprop:Generator_UserColumnName="STATUS" msprop:Generator_ColumnPropNameInRow="STATUS" msprop:Generator_ColumnVarNameInTable="columnSTATUS" msprop:Generator_ColumnPropNameInTable="STATUSColumn" type="xs:boolean" />
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="v_KG_MAKOR_MISMACH" msprop:Generator_UserTableName="v_KG_MAKOR_MISMACH" msprop:Generator_RowDeletedName="v_KG_MAKOR_MISMACHRowDeleted" msprop:Generator_RowChangedName="v_KG_MAKOR_MISMACHRowChanged" msprop:Generator_RowClassName="v_KG_MAKOR_MISMACHRow" msprop:Generator_RowChangingName="v_KG_MAKOR_MISMACHRowChanging" msprop:Generator_RowEvArgName="v_KG_MAKOR_MISMACHRowChangeEvent" msprop:Generator_RowEvHandlerName="v_KG_MAKOR_MISMACHRowChangeEventHandler" msprop:Generator_TableClassName="v_KG_MAKOR_MISMACHDataTable" msprop:Generator_TableVarName="tablev_KG_MAKOR_MISMACH" msprop:Generator_RowDeletingName="v_KG_MAKOR_MISMACHRowDeleting" msprop:Generator_TablePropName="v_KG_MAKOR_MISMACH">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="CODE" msprop:Generator_UserColumnName="CODE" msprop:Generator_ColumnPropNameInRow="CODE" msprop:Generator_ColumnVarNameInTable="columnCODE" msprop:Generator_ColumnPropNameInTable="CODEColumn" type="xs:int" />
+              <xs:element name="DESCRIPTION" msprop:Generator_UserColumnName="DESCRIPTION" msprop:Generator_ColumnPropNameInRow="DESCRIPTION" msprop:Generator_ColumnVarNameInTable="columnDESCRIPTION" msprop:Generator_ColumnPropNameInTable="DESCRIPTIONColumn">
+                <xs:simpleType>
+                  <xs:restriction base="xs:string">
+                    <xs:maxLength value="50" />
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:element>
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="v_UNIDENTIFIED_DOCUMENT_REASONS" msprop:Generator_UserTableName="v_UNIDENTIFIED_DOCUMENT_REASONS" msprop:Generator_RowDeletedName="v_UNIDENTIFIED_DOCUMENT_REASONSRowDeleted" msprop:Generator_RowChangedName="v_UNIDENTIFIED_DOCUMENT_REASONSRowChanged" msprop:Generator_RowClassName="v_UNIDENTIFIED_DOCUMENT_REASONSRow" msprop:Generator_RowChangingName="v_UNIDENTIFIED_DOCUMENT_REASONSRowChanging" msprop:Generator_RowEvArgName="v_UNIDENTIFIED_DOCUMENT_REASONSRowChangeEvent" msprop:Generator_RowEvHandlerName="v_UNIDENTIFIED_DOCUMENT_REASONSRowChangeEventHandler" msprop:Generator_TableClassName="v_UNIDENTIFIED_DOCUMENT_REASONSDataTable" msprop:Generator_TableVarName="tablev_UNIDENTIFIED_DOCUMENT_REASONS" msprop:Generator_RowDeletingName="v_UNIDENTIFIED_DOCUMENT_REASONSRowDeleting" msprop:Generator_TablePropName="v_UNIDENTIFIED_DOCUMENT_REASONS">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="REASON_CODE" msprop:Generator_UserColumnName="REASON_CODE" msprop:Generator_ColumnPropNameInRow="REASON_CODE" msprop:Generator_ColumnVarNameInTable="columnREASON_CODE" msprop:Generator_ColumnPropNameInTable="REASON_CODEColumn" type="xs:int" />
+              <xs:element name="DESCRIPTION" msprop:Generator_UserColumnName="DESCRIPTION" msprop:Generator_ColumnPropNameInRow="DESCRIPTION" msprop:Generator_ColumnVarNameInTable="columnDESCRIPTION" msprop:Generator_ColumnPropNameInTable="DESCRIPTIONColumn" minOccurs="0">
+                <xs:simpleType>
+                  <xs:restriction base="xs:string">
+                    <xs:maxLength value="255" />
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:element>
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="v_UNDEF_DOC_LIST" msprop:Generator_UserTableName="v_UNDEF_DOC_LIST" msprop:Generator_RowDeletedName="v_UNDEF_DOC_LISTRowDeleted" msprop:Generator_RowChangedName="v_UNDEF_DOC_LISTRowChanged" msprop:Generator_RowClassName="v_UNDEF_DOC_LISTRow" msprop:Generator_RowChangingName="v_UNDEF_DOC_LISTRowChanging" msprop:Generator_RowEvArgName="v_UNDEF_DOC_LISTRowChangeEvent" msprop:Generator_RowEvHandlerName="v_UNDEF_DOC_LISTRowChangeEventHandler" msprop:Generator_TableClassName="v_UNDEF_DOC_LISTDataTable" msprop:Generator_TableVarName="tablev_UNDEF_DOC_LIST" msprop:Generator_RowDeletingName="v_UNDEF_DOC_LISTRowDeleting" msprop:Generator_TablePropName="v_UNDEF_DOC_LIST">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="WORKSPACE" msprop:Generator_UserColumnName="WORKSPACE" msprop:Generator_ColumnPropNameInRow="WORKSPACE" msprop:Generator_ColumnVarNameInTable="columnWORKSPACE" msprop:Generator_ColumnPropNameInTable="WORKSPACEColumn" type="xs:int" />
+              <xs:element name="DOCNUMBER" msprop:Generator_UserColumnName="DOCNUMBER" msprop:Generator_ColumnPropNameInRow="DOCNUMBER" msprop:Generator_ColumnVarNameInTable="columnDOCNUMBER" msprop:Generator_ColumnPropNameInTable="DOCNUMBERColumn" type="xs:double" />
+              <xs:element name="ERROR_CODE" msprop:Generator_UserColumnName="ERROR_CODE" msprop:Generator_ColumnPropNameInRow="ERROR_CODE" msprop:Generator_ColumnVarNameInTable="columnERROR_CODE" msprop:Generator_ColumnPropNameInTable="ERROR_CODEColumn" type="xs:int" />
+              <xs:element name="ERROR_REASON" msprop:Generator_UserColumnName="ERROR_REASON" msprop:Generator_ColumnPropNameInRow="ERROR_REASON" msprop:Generator_ColumnVarNameInTable="columnERROR_REASON" msprop:Generator_ColumnPropNameInTable="ERROR_REASONColumn" type="xs:int" />
+              <xs:element name="ERROR_DESCRIPTION" msprop:Generator_UserColumnName="ERROR_DESCRIPTION" msprop:Generator_ColumnPropNameInRow="ERROR_DESCRIPTION" msprop:Generator_ColumnVarNameInTable="columnERROR_DESCRIPTION" msprop:Generator_ColumnPropNameInTable="ERROR_DESCRIPTIONColumn">
+                <xs:simpleType>
+                  <xs:restriction base="xs:string">
+                    <xs:maxLength value="255" />
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:element>
+              <xs:element name="USER_NAME" msprop:Generator_UserColumnName="USER_NAME" msprop:Generator_ColumnPropNameInRow="USER_NAME" msprop:Generator_ColumnVarNameInTable="columnUSER_NAME" msprop:Generator_ColumnPropNameInTable="USER_NAMEColumn">
+                <xs:simpleType>
+                  <xs:restriction base="xs:string">
+                    <xs:maxLength value="50" />
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:element>
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+      </xs:choice>
+    </xs:complexType>
+    <xs:unique name="Constraint1" msdata:PrimaryKey="true">
+      <xs:selector xpath=".//mstns:v_User" />
+      <xs:field xpath="mstns:ID" />
+    </xs:unique>
+    <xs:unique name="UserRole_Constraint1" msdata:ConstraintName="Constraint1" msdata:PrimaryKey="true">
+      <xs:selector xpath=".//mstns:UserRole" />
+      <xs:field xpath="mstns:Name" />
+    </xs:unique>
+    <xs:unique name="v_WORKSPACES_Constraint1" msdata:ConstraintName="Constraint1" msdata:PrimaryKey="true">
+      <xs:selector xpath=".//mstns:v_WORKSPACES" />
+      <xs:field xpath="mstns:CODE" />
+    </xs:unique>
+    <xs:unique name="v_MECHITSA2SUG_MISMACH_Constraint1" msdata:ConstraintName="Constraint1" msdata:PrimaryKey="true">
+      <xs:selector xpath=".//mstns:v_MECHITSA2SUG_MISMACH" />
+      <xs:field xpath="mstns:WORKSPACE" />
+      <xs:field xpath="mstns:MECHITSA" />
+      <xs:field xpath="mstns:WORKSPACE2" />
+      <xs:field xpath="mstns:SUG_MISMACH" />
+    </xs:unique>
+    <xs:unique name="v_SUGEI_MISMACH_Constraint1" msdata:ConstraintName="Constraint1" msdata:PrimaryKey="true">
+      <xs:selector xpath=".//mstns:v_SUGEI_MISMACH" />
+      <xs:field xpath="mstns:WORKSPACE" />
+      <xs:field xpath="mstns:CODE" />
+    </xs:unique>
+    <xs:unique name="v_KODEI_MECHITSOT_Constraint1" msdata:ConstraintName="Constraint1" msdata:PrimaryKey="true">
+      <xs:selector xpath=".//mstns:v_KODEI_MECHITSOT" />
+      <xs:field xpath="mstns:WORKSPACE" />
+      <xs:field xpath="mstns:CODE" />
+    </xs:unique>
+    <xs:unique name="v_KG_MAKOR_MISMACH_Constraint1" msdata:ConstraintName="Constraint1" msdata:PrimaryKey="true">
+      <xs:selector xpath=".//mstns:v_KG_MAKOR_MISMACH" />
+      <xs:field xpath="mstns:CODE" />
+    </xs:unique>
+    <xs:unique name="v_UNIDENTIFIED_DOCUMENT_REASONS_Constraint1" msdata:ConstraintName="Constraint1" msdata:PrimaryKey="true">
+      <xs:selector xpath=".//mstns:v_UNIDENTIFIED_DOCUMENT_REASONS" />
+      <xs:field xpath="mstns:REASON_CODE" />
+    </xs:unique>
+  </xs:element>
+  <xs:annotation>
+    <xs:appinfo>
+      <msdata:Relationship name="UserRole_v_User" msdata:parent="UserRole" msdata:child="v_User" msdata:parentkey="Name" msdata:childkey="Role" msprop:Generator_UserRelationName="UserRole_v_User" msprop:Generator_RelationVarName="relationUserRole_v_User" msprop:Generator_UserChildTable="v_User" msprop:Generator_UserParentTable="UserRole" msprop:Generator_ParentPropName="UserRoleRow" msprop:Generator_ChildPropName="Getv_UserRows" />
+      <msdata:Relationship name="v_KODEI_MECHITSOT_v_MECHITSA2SUG_MISMACH" msdata:parent="v_KODEI_MECHITSOT" msdata:child="v_MECHITSA2SUG_MISMACH" msdata:parentkey="WORKSPACE CODE" msdata:childkey="WORKSPACE MECHITSA" msprop:Generator_UserRelationName="v_KODEI_MECHITSOT_v_MECHITSA2SUG_MISMACH" msprop:Generator_RelationVarName="relationv_KODEI_MECHITSOT_v_MECHITSA2SUG_MISMACH" msprop:Generator_UserChildTable="v_MECHITSA2SUG_MISMACH" msprop:Generator_UserParentTable="v_KODEI_MECHITSOT" msprop:Generator_ParentPropName="v_KODEI_MECHITSOTRowParent" msprop:Generator_ChildPropName="Getv_MECHITSA2SUG_MISMACHRows" />
+      <msdata:Relationship name="v_WORKSPACES_v_SUGEI_MISMACH" msdata:parent="v_WORKSPACES" msdata:child="v_SUGEI_MISMACH" msdata:parentkey="CODE" msdata:childkey="WORKSPACE" msprop:Generator_UserRelationName="v_WORKSPACES_v_SUGEI_MISMACH" msprop:Generator_RelationVarName="relationv_WORKSPACES_v_SUGEI_MISMACH" msprop:Generator_UserChildTable="v_SUGEI_MISMACH" msprop:Generator_UserParentTable="v_WORKSPACES" msprop:Generator_ParentPropName="v_WORKSPACESRow" msprop:Generator_ChildPropName="Getv_SUGEI_MISMACHRows" />
+      <msdata:Relationship name="v_WORKSPACES_v_KODEI_MECHITSOT" msdata:parent="v_WORKSPACES" msdata:child="v_KODEI_MECHITSOT" msdata:parentkey="CODE" msdata:childkey="WORKSPACE" msprop:Generator_UserRelationName="v_WORKSPACES_v_KODEI_MECHITSOT" msprop:Generator_RelationVarName="relationv_WORKSPACES_v_KODEI_MECHITSOT" msprop:Generator_UserChildTable="v_KODEI_MECHITSOT" msprop:Generator_UserParentTable="v_WORKSPACES" msprop:Generator_ParentPropName="v_WORKSPACESRow" msprop:Generator_ChildPropName="Getv_KODEI_MECHITSOTRows" />
+      <msdata:Relationship name="v_UNIDENTIFIED_DOCUMENT_REASONS_v_UNDEF_DOC_LIST" msdata:parent="v_UNIDENTIFIED_DOCUMENT_REASONS" msdata:child="v_UNDEF_DOC_LIST" msdata:parentkey="REASON_CODE" msdata:childkey="ERROR_CODE" msprop:Generator_UserRelationName="v_UNIDENTIFIED_DOCUMENT_REASONS_v_UNDEF_DOC_LIST" msprop:Generator_RelationVarName="relationv_UNIDENTIFIED_DOCUMENT_REASONS_v_UNDEF_DOC_LIST" msprop:Generator_UserChildTable="v_UNDEF_DOC_LIST" msprop:Generator_UserParentTable="v_UNIDENTIFIED_DOCUMENT_REASONS" msprop:Generator_ParentPropName="v_UNIDENTIFIED_DOCUMENT_REASONSRow" msprop:Generator_ChildPropName="Getv_UNDEF_DOC_LISTRows" />
+      <msdata:Relationship name="v_SUGEI_MISMACH_v_MECHITSA2SUG_MISMACH" msdata:parent="v_SUGEI_MISMACH" msdata:child="v_MECHITSA2SUG_MISMACH" msdata:parentkey="WORKSPACE CODE" msdata:childkey="WORKSPACE2 SUG_MISMACH" msprop:Generator_UserRelationName="v_SUGEI_MISMACH_v_MECHITSA2SUG_MISMACH" msprop:Generator_RelationVarName="relationv_SUGEI_MISMACH_v_MECHITSA2SUG_MISMACH" msprop:Generator_UserChildTable="v_MECHITSA2SUG_MISMACH" msprop:Generator_UserParentTable="v_SUGEI_MISMACH" msprop:Generator_ParentPropName="v_SUGEI_MISMACHRowParent" msprop:Generator_ChildPropName="Getv_MECHITSA2SUG_MISMACHRows" />
+    </xs:appinfo>
+  </xs:annotation>
+</xs:schema>

@@ -1,0 +1,393 @@
+<P8CM_Config>
+	<P8CM_Workspace svivaDispName="קופות גמל - עמיתים/מעסיקים" workspace="18">
+		<Search classNm="MTF_KG_AMITIM_MAASIKIM_DOC" searchNm="כלל מסמכים"
+		        timeLimit="20" maxRows="500" default="yes">
+			<Criterions>
+				<Criterion propName="Kupa" propType="Integer" dispName="קופה" templName="inputTextHova"
+				           Size="3" MaxLength="3" Validation="^[0-9]*$"/>
+				<Criterion propName="Kidomet" propType="Integer" dispName="קידומת" templName="inputText"
+				           Size="9" MaxLength="9" Validation="^[0-9]*$"/>
+				<Criterion propName="Heshbon" propType="Integer" dispName="חשבון" templName="inputTextHova"
+				           Size="9" MaxLength="9" Validation="^[0-9]*$"/>
+				<Criterion propName="DocNumber" propType="Integer" dispName="מזהה מסמך" templName="inputTextHova"
+				           Size="10" MaxLength="10" Validation="^[0-9]*$"/>
+				<Criterion propName="ScanDate" propType="DateTime" dispName="תאריך סריקה" templName="inputTaarihPeriodHova"
+				           Size="10" MaxLength="10" Validation="^(|((0[1-9]|[12]\d|3[01])\/(0[13578]|1[02])\/((1[6-9]|[2-9]\d)\d{2}))|((0[1-9]|[12]\d|30)\/(0[13456789]|1[012])\/((1[6-9]|[2-9]\d)\d{2}))|((0[1-9]|1\d|2[0-8])\/02\/((1[6-9]|[2-9]\d)\d{2}))|(29\/02\/(((([02468][048])|([13579][26]))00)|(\d{2}(([02468][48])|([2468][048])|([13579][26]))))))$"/>
+				<Criterion propName="KG_DocType" propType="Integer" dispName="סוג מסמך-קופות גמל" templName="inputSugMismah"
+				           Size="3" MaxLength="3" Validation="^[0-9]*$"/>
+				<Criterion propName="KG_Folder" propType="Integer" dispName="מחיצה-קופות גמל" templName="inputMehitza"
+				           Size="3" MaxLength="3" Validation="^[0-9]*$"/>
+				<Criterion templName="TZ" tableNm="KG_AMITIM_MAASIKIM_TZ2KKH"/>
+			</Criterions>
+			<!--Templates>
+				<Template templName="TZ"/>
+			</Templates-->
+			<Results>
+				<Column propName="Workspace" showMode="no"/>
+				<Column propName="DocSource" showMode="no"/>
+				<Column propName="BoxNo" dispName="מס ארגז" orderPropNm="BoxNo" orderType="number" showMode="yes"/>
+				<Column propName="DocNumber" dispName="מזהה מסמך" showMode="yes"/>
+				<Column propName="NumberOfPages" dispName="דפים" showMode="yes"/>
+				<Column propName="ScanDate" dispName="תאריך סריקה" orderSort="DESC" showMode="yes"/>
+				<JoinResults tableNm="KG_MAKOR_MISMACH">
+    			<Criterions>
+  					<Criterion propName="CODE" linkedName="DocSource" propType="Integer"/>
+    			</Criterions>
+    			<Results>
+  					<Column propName="CODE" linkedName="DocSource"/>
+  					<Column propName="DESCRIPTION" dispName="מקור מסמך"
+  					        orderPropNm="DocSource" orderType="text" showMode="yes"/>
+			    </Results>
+ 				</JoinResults>
+				<Column propName="KG_Folder" showMode="no"/>
+				<JoinResults tableNm="KODEI_MECHITSOT">
+    			<Criterions>
+  					<Criterion propName="WORKSPACE" linkedName="Workspace" propType="String"/>
+  					<Criterion propName="CODE" linkedName="KG_Folder" propType="Integer"/>
+    			</Criterions>
+    			<Results>
+  					<Column propName="CODE" linkedName="KG_Folder"/>
+  					<Column propName="DESCRIPTION" dispName="מחיצה" showLink="yes"
+  					        orderPropNm="KG_Folder" orderType="text" showMode="yes"/>
+    			</Results>
+				</JoinResults>
+				<Column propName="KG_DocType" showMode="no"/>
+				<JoinResults tableNm="SUGEI_MISMACH">
+    			<Criterions>
+  					<Criterion propName="WORKSPACE" linkedName="Workspace" propType="String"/>
+  					<Criterion propName="CODE" linkedName="KG_DocType" propType="Integer"/>
+    			</Criterions>
+    			<Results>
+  					<Column propName="CODE" linkedName="KG_DocType"/>
+  					<Column propName="DESCRIPTION" dispName="סוג מסמך"
+  					        orderPropNm="KG_DocType" orderType="text" showMode="yes"/>
+    			</Results>
+				</JoinResults>
+				<JoinResults tableNm="KG_AMITIM_MAASIKIM_TZ2KKH">
+    			<Criterions>
+  					<Criterion propName="KUPA" linkedName="Kupa" propType="Integer"/>
+  					<Criterion propName="KIDOMET" linkedName="Kidomet" propType="Integer"/>
+  					<Criterion propName="HESHBON" linkedName="Heshbon" propType="Integer"/>
+    			</Criterions>
+    			<Results>
+  					<Column propName="KUPA" linkedName="Kupa"/>
+  					<Column propName="KIDOMET" linkedName="Kidomet"/>
+  					<Column propName="HESHBON" linkedName="Heshbon"/>
+  					<Column propName="TZ" dispName="ת.ז."
+    				        orderPropNm="TZ" orderType="text" showMode="yes"/>
+  					<Column propName="SHEM_MALE" dispName="שם מלא"
+    				        orderPropNm="SHEM_MALE" orderType="text" showMode="yes"/>
+    			</Results>
+				</JoinResults>
+				<Column propName="Heshbon" dispName="חשבון" showMode="yes"/>
+				<Column propName="Kidomet" dispName="קידומת" showMode="yes"/>
+				<Column propName="Kupa" dispName="קופה" showMode="yes"/>
+				<Column propName="Id" showMode="no"/>
+			</Results>
+		</Search>
+		<Search tableNm="KG_AMITIM_MAASIKIM_TZ2KKH" searchNm="">
+			<Criterions>
+				<Criterion propName="Kupa" propType="Integer"/>
+				<Criterion propName="Kidomet" propType="Integer"/>
+				<Criterion propName="Heshbon" propType="Integer"/>
+				<Criterion propName="TZ" propType="String" dispName=".ת.ז"/>
+				<Criterion propName="SHEM_MALE" propType="String" compOperand="LIKE" dispName="שם מלא"/>
+			</Criterions>
+			<Results>
+				<Column propName="MIKUD" dispName="מיקוד" showMode="yes"/>
+				<Column propName="KTOVET" dispName="כתובת" showMode="yes"/>
+				<Column propName="HESHBON" aliasName="Heshbon" dispName="חשבון" showMode="yes"/>
+				<Column propName="KIDOMET" aliasName="Kidomet" dispName="קידומת" showMode="yes"/>
+				<Column propName="KUPA" aliasName="Kupa" dispName="קופה" showMode="yes"/>
+				<Column propName="TZ" dispName=".ת.ז" showMode="yes"/>
+				<Column propName="SHEM_MALE" orderSort="ASC" dispName="שם" showMode="yes"/>
+			</Results>
+		</Search>
+		<Search tableNm="SUGEI_MISMACH" searchNm="">
+			<Criterions>
+				<Criterion propName="WORKSPACE" propType="String"/>
+			</Criterions>
+			<Results>
+				<Column propName="WORKSPACE"/>
+				<Column propName="STATUS"/>
+				<Column propName="CODE"/>
+				<Column propName="DESCRIPTION" orderSort="ASC"/>
+				<JoinResults tableNm="MECHITSA2SUG_MISMACH">
+    			<Criterions>
+  					<Criterion propName="WORKSPACE" linkedName="WORKSPACE" propType="Integer"/>
+  					<Criterion propName="SUG_MISMACH" linkedName="CODE" propType="Integer"/>
+    			</Criterions>
+    			<Results>
+  					<Column propName="SUG_MISMACH" linkedName="CODE"/>
+  					<Column propName="MECHITSA"/>
+    			</Results>
+				</JoinResults>
+			</Results>
+		</Search>
+		<Search tableNm="KODEI_MECHITSOT" searchNm="">
+			<Criterions>
+				<Criterion propName="WORKSPACE" propType="String"/>
+			</Criterions>
+			<Results>
+				<Column propName="STATUS"/>
+				<Column propName="CODE"/>
+				<Column propName="DESCRIPTION" orderSort="ASC"/>
+			</Results>
+		</Search>
+		<Search classNm="MTF_KG_AMITIM_MAASIKIM_DOC" searchNm="בלתי מזוהים"
+		        timeLimit="20" maxRows="500" default="yes">
+			<Criterions>
+				<Criterion propName="Kupa" propType="Integer" dispName="קופה" templName="inputText"
+				           Size="3" MaxLength="3" Validation="^[0-9]*$"/>
+				<Criterion propName="Kidomet" propType="Integer" dispName="קידומת" templName="inputText"
+				           Size="9" MaxLength="9" Validation="^[0-9]*$"/>
+				<Criterion propName="Heshbon" propType="Integer" dispName="חשבון" templName="inputText"
+				           Size="6" MaxLength="6" Validation="^[0-9]*$"/>
+				<Criterion propName="DocNumber" propType="Integer" dispName="מזהה מסמך" templName="inputText" 
+				           Size="10" MaxLength="10" Validation="^[0-9]*$"/>
+				<Criterion propName="ScanDate" propType="DateTime" dispName="תאריך סריקה" templName="inputTaarihPeriod" 
+				           Size="10" MaxLength="10" Validation="^(|((0[1-9]|[12]\d|3[01])\/(0[13578]|1[02])\/((1[6-9]|[2-9]\d)\d{2}))|((0[1-9]|[12]\d|30)\/(0[13456789]|1[012])\/((1[6-9]|[2-9]\d)\d{2}))|((0[1-9]|1\d|2[0-8])\/02\/((1[6-9]|[2-9]\d)\d{2}))|(29\/02\/(((([02468][048])|([13579][26]))00)|(\d{2}(([02468][48])|([2468][048])|([13579][26]))))))$"/>
+				<Criterion propName="KG_DocType" propType="Integer" dispName="סוג מסמך-קופות גמל" templName="inputSugMismah"  
+				           Size="5" MaxLength="5" Validation="^[0-9]*$"/>
+				<Criterion propName="KG_Folder" propType="Integer" dispName="מחיצה-קופות גמל" templName="inputMehitza" 
+				           Size="3" MaxLength="3" Validation="^[0-9]*$"/>
+				<Criterion propName="ErrorCode" propType="Integer"  initVal="0"
+				           compOperand=">" templName="inputHidden"/>
+			</Criterions>
+			<Results>
+				<Column propName="Workspace" showMode="no"/>
+				<Column propName="BoxNo" dispName="מס ארגז" showMode="yes"/>
+				<Column propName="NumberOfPages" dispName="דפים" showMode="yes"/>
+				<Column propName="ScanDate" dispName="תאריך סריקה" showMode="yes"/>
+				<Column propName="KG_DocType" showMode="no"/>
+				<JoinResults tableNm="SUGEI_MISMACH">
+    			<Criterions>
+  					<Criterion propName="WORKSPACE" linkedName="Workspace" propType="String"/>
+  					<Criterion propName="CODE" linkedName="KG_DocType" propType="Integer"/>
+    			</Criterions>
+    			<Results>
+  					<Column propName="CODE" linkedName="KG_DocType"/>
+  					<Column propName="DESCRIPTION" dispName="סוג מסמך"
+  					        orderPropNm="KG_DocType" orderType="text" showMode="yes"/>
+    			</Results>
+				</JoinResults>
+				<Column propName="KG_Folder" showMode="no"/>
+				<JoinResults tableNm="KODEI_MECHITSOT">
+    			<Criterions>
+  					<Criterion propName="WORKSPACE" linkedName="Workspace" propType="String"/>
+  					<Criterion propName="CODE" linkedName="KG_Folder" propType="Integer"/>
+    			</Criterions>
+    			<Results>
+  					<Column propName="CODE" linkedName="KG_Folder"/>
+  					<Column propName="DESCRIPTION" dispName="מחיצה" showLink="yes"
+  					        orderPropNm="KG_Folder" orderType="text" showMode="yes"/>
+    			</Results>
+				</JoinResults>
+				<Column propName="ErrorCode" dispName="קוד שגיאה" showMode="yes"/>
+				<Column propName="Heshbon" dispName="חשבון" showMode="yes"/>
+				<Column propName="Kidomet" dispName="קידומת" showMode="yes"/>
+				<Column propName="Kupa" dispName="קופה" showMode="yes"/>
+				<Column propName="DocNumber" dispName="מזהה מסמך" showMode="yes"/>
+				<Column propName="Id" showMode="no"/>
+			</Results>
+		</Search>
+		<HistoriatMismah classNm="MTF_KG_AMITIM_MAASIKIM_DOC" default="yes">
+			<Results>
+  			<Column propName="Taarih_EVNT" dispName="תאריך" showMode="yes"/>
+  			<Column propName="Mishtamesh_EVNT" dispName="משתמש" showMode="yes"/>
+  			<Column propName="Peula_EVNT" dispName="פעולה" showMode="yes" showLink="yes"/>
+  			<Column propName="Status_EVNT" dispName="מצב הפעולה" showMode="yes"/>
+  			<Column propName="DocNumber" dispName="מזהה מסמך" showMode="yes"/>
+  			<Column propName="Heshbon" dispName="חשבון" showMode="yes"/>
+  			<Column propName="Kidomet" dispName="קידומת" showMode="yes"/>
+  			<Column propName="Kupa" dispName="קופה" showMode="yes"/>
+			</Results>
+		</HistoriatMismah>
+		<IdkunMiftuah classNm="MTF_KG_AMITIM_MAASIKIM_DOC" default="yes">
+			<Criterions>
+  			<Criterion propName="Kupa" dispName="קופה" markingName="Kupa4marking" templName="inputText"
+  				           Size="3" MaxLength="3" Validation="^[0-9]*$"/>
+				<Criterion propName="Kidomet" propType="Integer" dispName="קידומת" templName="inputText"
+				           Size="9" MaxLength="9" Validation="^[0-9]*$"/>
+  			<Criterion propName="Heshbon" dispName="חשבון" templName="inputText"
+  				           Size="9" MaxLength="9" Validation="^[0-9]*$"/>
+  			<Criterion propName="TeudatZehutDoc" dispName="תעודת זהות" showOnly="yes" templName="inputText"
+  				           Size="9" MaxLength="9" Validation="^[0-9]*$"/>
+  			<Criterion propName="KG_DocType" propType="Integer" dispName="סוג מסמך-קופות גמל" templName="inputSugMismah"
+  				           Size="3" MaxLength="3" Validation="^[0-9]*$"/>
+  			<Criterion propName="KG_Folder" propType="Integer" dispName="מחיצה-קופות גמל" templName="inputMehitza"
+  				           Size="3" MaxLength="3" Validation="^[0-9]*$"/>
+  			<Criterion propName="ScanDate" dispName="תאריך סריקה" templName="inputTaarih"
+  				           Size="10" MaxLength="10" Validation="^(|((0[1-9]|[12]\d|3[01])\/(0[13578]|1[02])\/((1[6-9]|[2-9]\d)\d{2}))|((0[1-9]|[12]\d|30)\/(0[13456789]|1[012])\/((1[6-9]|[2-9]\d)\d{2}))|((0[1-9]|1\d|2[0-8])\/02\/((1[6-9]|[2-9]\d)\d{2}))|(29\/02\/(((([02468][048])|([13579][26]))00)|(\d{2}(([02468][48])|([2468][048])|([13579][26]))))))$"/>
+  			<Criterion propName="DocNumber" dispName="מזהה מסמך" showOnly="yes" templName="inputText"
+  				           Size="10" MaxLength="10"/>
+  			<Criterion propName="BoxNo" dispName="מספר ארגז" showOnly="yes" templName="inputText"
+  				           Size="3" MaxLength="3"/>
+  			<Criterion propName="FilmNo" dispName="מספר סרט" showOnly="yes" templName="inputText"
+  				           Size="5" MaxLength="5"/>
+  			<Criterion propName="FrameNo" dispName="מספר פריים" showOnly="yes" templName="inputText"
+  				           Size="5" MaxLength="5"/>
+  			<Criterion propName="Kupa4marking" propType="String" templName="inputHidden"/>
+			</Criterions>
+		</IdkunMiftuah>
+		<KlitatMismah classNm="MTF_KG_AMITIM_MAASIKIM_DOC" default="yes">
+			<Criterions>
+  			<Criterion propName="Kupa" propType="Integer" dispName="קופה" markingName="Kupa4marking" templName="inputText"
+  				           Size="3" MaxLength="3" Validation="^[0-9]*$"/>
+				<Criterion propName="Kidomet" propType="Integer" dispName="קידומת" templName="inputText"
+				           Size="9" MaxLength="9" Validation="^[0-9]*$"/>
+  			<Criterion propName="Heshbon" propType="Integer" dispName="חשבון" templName="inputText"
+  				           Size="9" MaxLength="9" Validation="^[0-9]*$"/>
+  			<Criterion propName="KG_DocType" propType="Integer" dispName="סוג מסמך-קופות גמל" templName="inputSugMismah"
+  				           Size="3" MaxLength="3" Validation="^[0-9]*$"/>
+  			<Criterion propName="KG_Folder" propType="Integer" dispName="מחיצה-קופות גמל" templName="inputMehitza"
+  				           Size="3" MaxLength="3" Validation="^[0-9]*$"/>
+  			<Criterion propName="ScanDate" propType="DateTime" dispName="תאריך סריקה" templName="inputTaarih"
+  				           Size="10" MaxLength="10" Validation="^(|((0[1-9]|[12]\d|3[01])\/(0[13578]|1[02])\/((1[6-9]|[2-9]\d)\d{2}))|((0[1-9]|[12]\d|30)\/(0[13456789]|1[012])\/((1[6-9]|[2-9]\d)\d{2}))|((0[1-9]|1\d|2[0-8])\/02\/((1[6-9]|[2-9]\d)\d{2}))|(29\/02\/(((([02468][048])|([13579][26]))00)|(\d{2}(([02468][48])|([2468][048])|([13579][26]))))))$"/>
+  			<Criterion propName="Workspace" propType="Integer" templName="inputHidden"/>
+  			<Criterion propName="Kupa4marking" propType="String" templName="inputHidden"/>
+			</Criterions>
+		</KlitatMismah>
+	</P8CM_Workspace>
+	<P8CM_Workspace svivaDispName="משכנתא - הבינלאומי" workspace="27">
+		<Search classNm="MTF_MSH_BEINLEUMI_DOC" searchNm="כלל מסמכים"
+		        timeLimit="20" maxRows="500" default="yes">
+			<Criterions>
+				<Criterion propName="MSH_LoanerNo" propType="Integer" dispName="מספר לווה" templName="inputTextHova"
+				           Size="9" MaxLength="9" Validation="^[0-9]*$"/>
+				<Criterion propName="DocNumber" propType="Integer" dispName="מזהה מסמך" templName="inputTextHova"
+				           Size="50" MaxLength="255"/>
+				<Criterion propName="ScanDate" propType="DateTime" dispName="תאריך סריקה" templName="inputTaarihPeriodHova"
+				           Size="10" MaxLength="10" Validation="^(|((0[1-9]|[12]\d|3[01])\/(0[13578]|1[02])\/((1[6-9]|[2-9]\d)\d{2}))|((0[1-9]|[12]\d|30)\/(0[13456789]|1[012])\/((1[6-9]|[2-9]\d)\d{2}))|((0[1-9]|1\d|2[0-8])\/02\/((1[6-9]|[2-9]\d)\d{2}))|(29\/02\/(((([02468][048])|([13579][26]))00)|(\d{2}(([02468][48])|([2468][048])|([13579][26]))))))$"/>
+				<Criterion propName="MSH_DocType" propType="Integer" dispName="סוג מסמך - תיקי הלוואה" templName="inputSugMismah"
+				           Size="3" MaxLength="3" Validation="^[0-9]*$"/>
+				<Criterion propName="MSH_Folder" propType="Integer" dispName="מחיצה - תיקי הלוואה" templName="inputMehitza"
+				           Size="3" MaxLength="3" Validation="^[0-9]*$"/>
+				<Criterion templName="TZ" tableNm="MSH_LOANS_FIBI"/>
+			</Criterions>
+			<Results>
+				<Column propName="Workspace" showMode="no"/>
+				<Column propName="BoxNo" dispName="מס ארגז" orderPropNm="BoxNo" orderType="number" showMode="yes"/>
+				<Column propName="DocNumber" dispName="מזהה מסמך" showMode="yes"/>
+				<Column propName="NumberOfPages" dispName="דפים" showMode="yes"/>
+				<Column propName="ScanDate" dispName="תאריך סריקה" orderSort="DESC" showMode="yes"/>
+				<Column propName="MSH_Folder" showMode="no"/>
+				<JoinResults tableNm="KODEI_MECHITSOT">
+    			<Criterions>
+  					<Criterion propName="WORKSPACE" linkedName="Workspace" propType="String"/>
+  					<Criterion propName="CODE" linkedName="MSH_Folder" propType="Integer"/>
+    			</Criterions>
+    			<Results>
+  					<Column propName="CODE" linkedName="MSH_Folder"/>
+  					<Column propName="DESCRIPTION" dispName="מחיצה" showLink="yes"
+  					        orderPropNm="MSH_Folder" orderType="text" showMode="yes"/>
+    			</Results>
+				</JoinResults>
+				<Column propName="MSH_DocType" showMode="no"/>
+				<JoinResults tableNm="SUGEI_MISMACH">
+    			<Criterions>
+  					<Criterion propName="WORKSPACE" linkedName="Workspace" propType="String"/>
+  					<Criterion propName="CODE" linkedName="MSH_DocType" propType="Integer"/>
+    			</Criterions>
+    			<Results>
+  					<Column propName="CODE" linkedName="MSH_DocType"/>
+  					<Column propName="DESCRIPTION" dispName="סוג מסמך"
+  					        orderPropNm="MSH_DocType" orderType="text" showMode="yes"/>
+    			</Results>
+				</JoinResults>
+				<Column propName="MSH_LoanerNo" dispName="מספר לווה" showMode="yes"/>
+				<Column propName="Id" showMode="no"/>
+			</Results>
+		</Search>
+		<Search tableNm="SUGEI_MISMACH" searchNm="">
+			<Criterions>
+				<Criterion propName="WORKSPACE" propType="String"/>
+			</Criterions>
+			<Results>
+				<Column propName="WORKSPACE"/>
+				<Column propName="STATUS"/>
+				<Column propName="CODE"/>
+				<Column propName="DESCRIPTION" orderSort="ASC"/>
+				<JoinResults tableNm="MECHITSA2SUG_MISMACH">
+    			<Criterions>
+  					<Criterion propName="WORKSPACE" linkedName="WORKSPACE" propType="Integer"/>
+  					<Criterion propName="SUG_MISMACH" linkedName="CODE" propType="Integer"/>
+    			</Criterions>
+    			<Results>
+  					<Column propName="SUG_MISMACH" linkedName="CODE"/>
+  					<Column propName="MECHITSA"/>
+    			</Results>
+				</JoinResults>
+			</Results>
+		</Search>
+		<Search tableNm="KODEI_MECHITSOT" searchNm="">
+			<Criterions>
+				<Criterion propName="WORKSPACE" propType="String"/>
+			</Criterions>
+			<Results>
+				<Column propName="STATUS"/>
+				<Column propName="CODE"/>
+				<Column propName="DESCRIPTION" orderSort="ASC"/>
+			</Results>
+		</Search>
+		<Search tableNm="MSH_LOANS_FIBI" searchNm="">
+			<Criterions>
+				<Criterion propName="MSH_LoanNo" propType="String"/>
+				<Criterion propName="TZ" propType="String" dispName=".ת.ז"/>
+				<Criterion propName="SHEM_MALE" propType="String" compOperand="LIKE" dispName="שם מלא"/>
+			</Criterions>
+			<Results>
+				<Column propName="MSH_LoanerNo" dispName="מס' לווה" showMode="yes"/>
+				<Column propName="TZ" dispName=".ת.ז" showMode="yes"/>
+				<Column propName="SHEM_MALE" orderSort="ASC" dispName="שם" showMode="yes"/>
+			</Results>
+		</Search>
+		<HistoriatMismah classNm="MTF_MSH_BEINLEUMI_DOC" default="yes">
+			<Results>
+  			<Column propName="Taarih_EVNT" dispName="תאריך" showMode="yes"/>
+  			<Column propName="Mishtamesh_EVNT" dispName="משתמש" showMode="yes"/>
+  			<Column propName="Peula_EVNT" dispName="פעולה" showMode="yes" showLink="yes"/>
+  			<Column propName="Status_EVNT" dispName="מצב הפעולה" showMode="yes"/>
+  			<Column propName="DocNumber" dispName="מזהה מסמך" showMode="yes"/>
+  			<Column propName="MSH_LoanNo" dispName="מספר הלוואה" showMode="yes"/>
+			</Results>
+		</HistoriatMismah>
+		<IdkunMiftuah classNm="MTF_MSH_BEINLEUMI_DOC" default="yes">
+			<Criterions>
+				<Criterion propName="MSH_LoanNo" propType="String" dispName="מספר הלוואה" templName="inputTextHova"
+				           Size="20" MaxLength="50" Validation="isValidMisparHalvaa"/>
+				<Criterion templName="MSH_LoanNo_JS" tableNm="MSH_LOANS_FIBI"/>
+				<Criterion propName="MSH_DocType" propType="Integer" dispName="סוג מסמך - תיקי הלוואה" templName="inputSugMismah"
+				           Size="3" MaxLength="3" Validation="^[0-9]*$"/>
+				<Criterion propName="MSH_Folder" propType="Integer" dispName="מחיצה - תיקי הלוואה" templName="inputMehitza"
+				           Size="3" MaxLength="3" Validation="^[0-9]*$"/>
+  			<Criterion propName="ScanDate" dispName="תאריך סריקה" showOnly="yes" templName="inputText"
+  				         Size="10" MaxLength="10"/>
+				<Criterion propName="MSH_LoanerNo" propType="Integer" dispName="מספר לווה"
+				           showOnly="yesExceptOfSubmit" templName="inputText"
+				           Size="9" MaxLength="9" Validation="^[0-9]*$"/>
+  			<Criterion propName="DocNumber" dispName="מזהה מסמך" showOnly="yes" templName="inputText"
+  				           Size="10" MaxLength="10"/>
+  			<Criterion propName="BoxNo" dispName="מספר ארגז" showOnly="yes" templName="inputText"
+  				           Size="3" MaxLength="3"/>
+			</Criterions>
+		</IdkunMiftuah>
+		<KlitatMismah classNm="MTF_MSH_BEINLEUMI_DOC" default="yes">
+			<Criterions>
+				<Criterion propName="MSH_LoanNo" propType="String" dispName="מספר הלוואה" templName="inputTextHova"
+				           Size="20" MaxLength="50" Validation="isValidMisparHalvaa"/>
+				<Criterion templName="MSH_LoanNo_JS" tableNm="MSH_LOANS_FIBI"/>
+				<Criterion propName="MSH_DocType" propType="Integer" dispName="סוג מסמך - תיקי הלוואה" templName="inputSugMismah"
+				           Size="3" MaxLength="3" Validation="^[0-9]*$"/>
+				<Criterion propName="MSH_Folder" propType="Integer" dispName="מחיצה - תיקי הלוואה" templName="inputMehitza"
+				           Size="3" MaxLength="3" Validation="^[0-9]*$"/>
+  			<Criterion propName="ScanDate" propType="DateTime" dispName="תאריך סריקה" templName="inputTaarih"
+  				           Size="10" MaxLength="10" Validation="^(|((0[1-9]|[12]\d|3[01])\/(0[13578]|1[02])\/((1[6-9]|[2-9]\d)\d{2}))|((0[1-9]|[12]\d|30)\/(0[13456789]|1[012])\/((1[6-9]|[2-9]\d)\d{2}))|((0[1-9]|1\d|2[0-8])\/02\/((1[6-9]|[2-9]\d)\d{2}))|(29\/02\/(((([02468][048])|([13579][26]))00)|(\d{2}(([02468][48])|([2468][048])|([13579][26]))))))$"/>
+				<Criterion propName="MSH_LoanerNo" propType="Integer" dispName="מספר לווה"
+				           showOnly="yesExceptOfSubmit" templName="inputText"
+				           Size="9" MaxLength="9" Validation="^[0-9]*$"/>
+  			<Criterion propName="Workspace" propType="Integer" templName="inputHidden"/>
+			</Criterions>
+		</KlitatMismah>
+	</P8CM_Workspace>
+</P8CM_Config>

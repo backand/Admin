@@ -1,0 +1,75 @@
+﻿<?xml version='1.0' encoding='utf-8'?>
+<SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)" GeneratedClassNamespace="Durados.Windows.Utilities.AzureUploader.Properties" GeneratedClassName="Settings">
+  <Profiles />
+  <Settings>
+    <Setting Name="Folder" Type="System.String" Scope="User">
+      <Value Profile="(Default)" />
+    </Setting>
+    <Setting Name="Connection" Type="System.String" Scope="User">
+      <Value Profile="(Default)" />
+    </Setting>
+    <Setting Name="Query" Type="System.String" Scope="User">
+      <Value Profile="(Default)" />
+    </Setting>
+    <Setting Name="AzureAccountName" Type="System.String" Scope="User">
+      <Value Profile="(Default)" />
+    </Setting>
+    <Setting Name="AzureAccountKey" Type="System.String" Scope="User">
+      <Value Profile="(Default)" />
+    </Setting>
+    <Setting Name="Hours" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">0</Value>
+    </Setting>
+    <Setting Name="LogoFolder" Type="System.String" Scope="User">
+      <Value Profile="(Default)" />
+    </Setting>
+    <Setting Name="LogoConnection" Type="System.String" Scope="User">
+      <Value Profile="(Default)" />
+    </Setting>
+    <Setting Name="LogoQuery" Type="System.String" Scope="User">
+      <Value Profile="(Default)" />
+    </Setting>
+    <Setting Name="LogoAzureAccountName" Type="System.String" Scope="User">
+      <Value Profile="(Default)" />
+    </Setting>
+    <Setting Name="LogoAzureAccountKey" Type="System.String" Scope="User">
+      <Value Profile="(Default)" />
+    </Setting>
+    <Setting Name="BackupAzureAccountName" Type="System.String" Scope="User">
+      <Value Profile="(Default)" />
+    </Setting>
+    <Setting Name="BackupAzureAccountKey" Type="System.String" Scope="User">
+      <Value Profile="(Default)" />
+    </Setting>
+    <Setting Name="BackupBackupAzureAccountName" Type="System.String" Scope="User">
+      <Value Profile="(Default)" />
+    </Setting>
+    <Setting Name="BackupBackupAzureAccountKey" Type="System.String" Scope="User">
+      <Value Profile="(Default)" />
+    </Setting>
+    <Setting Name="Copies" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">14</Value>
+    </Setting>
+    <Setting Name="ConfigPath" Type="System.String" Scope="User">
+      <Value Profile="(Default)">C:\QA\Config\</Value>
+    </Setting>
+    <Setting Name="LocalConnection" Type="System.String" Scope="User">
+      <Value Profile="(Default)">Data Source=backand-db-p1.cloudapp.net\modubiz_qa,42002;Initial Catalog=ModuBiz_qa;User ID=backqa;Password=Backqa1234!;Integrated Security=False;</Value>
+    </Setting>
+    <Setting Name="ProductionConnection" Type="System.String" Scope="User">
+      <Value Profile="(Default)">Data Source=backand-db-p1.cloudapp.net\modubiz_qa,42002;Initial Catalog=ModuBiz_qa;User ID=backqa;Password=Backqa1234!;Integrated Security=False;</Value>
+    </Setting>
+    <Setting Name="QAConnection" Type="System.String" Scope="User">
+      <Value Profile="(Default)">Data Source=backand-db-p1.cloudapp.net\modubiz_qa,42002;Initial Catalog=ModuBiz_qa;User ID=backqa;Password=Backqa1234!;Integrated Security=False;</Value>
+    </Setting>
+    <Setting Name="DuradosAppSysPrefix" Type="System.String" Scope="User">
+      <Value Profile="(Default)" />
+    </Setting>
+    <Setting Name="DuradosMapConnectionString" Type="System.String" Scope="User">
+      <Value Profile="(Default)">Data Source=backand-db-p1.cloudapp.net\modubiz_qa,42002;Initial Catalog=ModuBiz_qa;User ID=backqa;Password=Backqa1234!;Integrated Security=False;</Value>
+    </Setting>
+    <Setting Name="DeleteFullContainerOndelete" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">True</Value>
+    </Setting>
+  </Settings>
+</SettingsFile>

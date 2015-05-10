@@ -1,0 +1,1116 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<xs:schema id="MapDataSet" targetNamespace="http://tempuri.org/MapDataSet.xsd" xmlns:mstns="http://tempuri.org/MapDataSet.xsd" xmlns="http://tempuri.org/MapDataSet.xsd" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata" xmlns:msprop="urn:schemas-microsoft-com:xml-msprop" attributeFormDefault="qualified" elementFormDefault="qualified">
+  <xs:annotation>
+    <xs:appinfo source="urn:schemas-microsoft-com:xml-msdatasource">
+      <DataSource DefaultConnectionIndex="2" FunctionsComponentName="QueriesTableAdapter" Modifier="AutoLayout, AnsiClass, Class, Public" SchemaSerializationMode="IncludeSchema" xmlns="urn:schemas-microsoft-com:xml-msdatasource">
+        <Connections>
+          <Connection AppSettingsObjectName="Settings" AppSettingsPropertyName="duradosConnectionString" ConnectionStringObject="" IsAppSettingsProperty="true" Modifier="Assembly" Name="duradosConnectionString (Settings)" ParameterPrefix="@" PropertyReference="ApplicationSettings.Durados.Web.Mvc.Properties.Settings.GlobalReference.Default.duradosConnectionString" Provider="System.Data.SqlClient" />
+          <Connection AppSettingsObjectName="Settings" AppSettingsPropertyName="duradosConnectionString1" ConnectionStringObject="" IsAppSettingsProperty="true" Modifier="Assembly" Name="duradosConnectionString1 (Settings)" ParameterPrefix="@" PropertyReference="ApplicationSettings.Durados.Web.Mvc.Properties.Settings.GlobalReference.Default.duradosConnectionString1" Provider="System.Data.SqlClient" />
+          <Connection ConnectionStringObject="Data Source=.\dev1;Initial Catalog=ModuBiz_dev;Integrated Security=True" IsAppSettingsProperty="false" Modifier="Assembly" Name="modubiz-dev1\dev1.ModuBiz_dev.dbo" ParameterPrefix="@" Provider="System.Data.SqlClient" />
+        </Connections>
+        <Tables>
+          <TableAdapter BaseClass="System.ComponentModel.Component" DataAccessorModifier="AutoLayout, AnsiClass, Class, Public" DataAccessorName="durados_AppTableAdapter" GeneratorDataComponentClassName="durados_AppTableAdapter" Name="durados_App" UserDataComponentName="durados_AppTableAdapter">
+            <MainSource>
+              <DbSource ConnectionRef="duradosConnectionString (Settings)" DbObjectName="durados.dbo.durados_App" DbObjectType="Table" FillMethodModifier="Public" FillMethodName="Fill" GenerateMethods="Both" GenerateShortCommands="true" GeneratorGetMethodName="GetData" GeneratorSourceName="Fill" GetMethodModifier="Public" GetMethodName="GetData" QueryType="Rowset" ScalarCallRetval="System.Object, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" UseOptimisticConcurrency="true" UserGetMethodName="GetData" UserSourceName="Fill">
+                <DeleteCommand>
+                  <DbCommand CommandType="Text" ModifiedByUser="false">
+                    <CommandText>DELETE FROM [dbo].[durados_App] WHERE (([Id] = @Original_Id) AND ([Name] = @Original_Name) AND ([Creator] = @Original_Creator) AND ([CreatedDate] = @Original_CreatedDate) AND ([ToDelete] = @Original_ToDelete) AND ((@IsNull_ToDeleteDate = 1 AND [ToDeleteDate] IS NULL) OR ([ToDeleteDate] = @Original_ToDeleteDate)) AND ([Deleted] = @Original_Deleted) AND ((@IsNull_DeletedDate = 1 AND [DeletedDate] IS NULL) OR ([DeletedDate] = @Original_DeletedDate)) AND ((@IsNull_DataSourceTypeId = 1 AND [DataSourceTypeId] IS NULL) OR ([DataSourceTypeId] = @Original_DataSourceTypeId)) AND ((@IsNull_SqlConnectionId = 1 AND [SqlConnectionId] IS NULL) OR ([SqlConnectionId] = @Original_SqlConnectionId)) AND ((@IsNull_UsesSpecificBinary = 1 AND [UsesSpecificBinary] IS NULL) OR ([UsesSpecificBinary] = @Original_UsesSpecificBinary)) AND ((@IsNull_Url = 1 AND [Url] IS NULL) OR ([Url] = @Original_Url)) AND ((@IsNull_Image = 1 AND [Image] IS NULL) OR ([Image] = @Original_Image)) AND ((@IsNull_ExistingDataSource = 1 AND [ExistingDataSource] IS NULL) OR ([ExistingDataSource] = @Original_ExistingDataSource)) AND ((@IsNull_TemplateId = 1 AND [TemplateId] IS NULL) OR ([TemplateId] = @Original_TemplateId)) AND ((@IsNull_ExcelFileName = 1 AND [ExcelFileName] IS NULL) OR ([ExcelFileName] = @Original_ExcelFileName)) AND ((@IsNull_SpecificDOTNET = 1 AND [SpecificDOTNET] IS NULL) OR ([SpecificDOTNET] = @Original_SpecificDOTNET)) AND ((@IsNull_SpecificJS = 1 AND [SpecificJS] IS NULL) OR ([SpecificJS] = @Original_SpecificJS)) AND ((@IsNull_SpecificCss = 1 AND [SpecificCss] IS NULL) OR ([SpecificCss] = @Original_SpecificCss)) AND ((@IsNull_UseAsTemplate = 1 AND [UseAsTemplate] IS NULL) OR ([UseAsTemplate] = @Original_UseAsTemplate)) AND ((@IsNull_TemplateFile = 1 AND [TemplateFile] IS NULL) OR ([TemplateFile] = @Original_TemplateFile)) AND ((@IsNull_SystemSqlConnectionId = 1 AND [SystemSqlConnectionId] IS NULL) OR ([SystemSqlConnectionId] = @Original_SystemSqlConnectionId)) AND ((@IsNull_PrivateAuthentication = 1 AND [PrivateAuthentication] IS NULL) OR ([PrivateAuthentication] = @Original_PrivateAuthentication)) AND ((@IsNull_SecuritySqlConnectionId = 1 AND [SecuritySqlConnectionId] IS NULL) OR ([SecuritySqlConnectionId] = @Original_SecuritySqlConnectionId)))</CommandText>
+                    <Parameters>
+                      <Parameter AllowDbNull="false" AutogeneratedName="" DataSourceName="" DbType="Int32" Direction="Input" ParameterName="@Original_Id" Precision="0" ProviderType="Int" Scale="0" Size="0" SourceColumn="Id" SourceColumnNullMapping="false" SourceVersion="Original" />
+                      <Parameter AllowDbNull="false" AutogeneratedName="" DataSourceName="" DbType="String" Direction="Input" ParameterName="@Original_Name" Precision="0" ProviderType="NVarChar" Scale="0" Size="0" SourceColumn="Name" SourceColumnNullMapping="false" SourceVersion="Original" />
+                      <Parameter AllowDbNull="false" AutogeneratedName="" DataSourceName="" DbType="Int32" Direction="Input" ParameterName="@Original_Creator" Precision="0" ProviderType="Int" Scale="0" Size="0" SourceColumn="Creator" SourceColumnNullMapping="false" SourceVersion="Original" />
+                      <Parameter AllowDbNull="false" AutogeneratedName="" DataSourceName="" DbType="DateTime" Direction="Input" ParameterName="@Original_CreatedDate" Precision="0" ProviderType="DateTime" Scale="0" Size="0" SourceColumn="CreatedDate" SourceColumnNullMapping="false" SourceVersion="Original" />
+                      <Parameter AllowDbNull="false" AutogeneratedName="" DataSourceName="" DbType="Boolean" Direction="Input" ParameterName="@Original_ToDelete" Precision="0" ProviderType="Bit" Scale="0" Size="0" SourceColumn="ToDelete" SourceColumnNullMapping="false" SourceVersion="Original" />
+                      <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DbType="Int32" Direction="Input" ParameterName="@IsNull_ToDeleteDate" Precision="0" ProviderType="Int" Scale="0" Size="0" SourceColumn="ToDeleteDate" SourceColumnNullMapping="true" SourceVersion="Original" />
+                      <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DbType="DateTime" Direction="Input" ParameterName="@Original_ToDeleteDate" Precision="0" ProviderType="DateTime" Scale="0" Size="0" SourceColumn="ToDeleteDate" SourceColumnNullMapping="false" SourceVersion="Original" />
+                      <Parameter AllowDbNull="false" AutogeneratedName="" DataSourceName="" DbType="Boolean" Direction="Input" ParameterName="@Original_Deleted" Precision="0" ProviderType="Bit" Scale="0" Size="0" SourceColumn="Deleted" SourceColumnNullMapping="false" SourceVersion="Original" />
+                      <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DbType="Int32" Direction="Input" ParameterName="@IsNull_DeletedDate" Precision="0" ProviderType="Int" Scale="0" Size="0" SourceColumn="DeletedDate" SourceColumnNullMapping="true" SourceVersion="Original" />
+                      <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DbType="DateTime" Direction="Input" ParameterName="@Original_DeletedDate" Precision="0" ProviderType="DateTime" Scale="0" Size="0" SourceColumn="DeletedDate" SourceColumnNullMapping="false" SourceVersion="Original" />
+                      <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DbType="Int32" Direction="Input" ParameterName="@IsNull_DataSourceTypeId" Precision="0" ProviderType="Int" Scale="0" Size="0" SourceColumn="DataSourceTypeId" SourceColumnNullMapping="true" SourceVersion="Original" />
+                      <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DbType="Int32" Direction="Input" ParameterName="@Original_DataSourceTypeId" Precision="0" ProviderType="Int" Scale="0" Size="0" SourceColumn="DataSourceTypeId" SourceColumnNullMapping="false" SourceVersion="Original" />
+                      <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DbType="Int32" Direction="Input" ParameterName="@IsNull_SqlConnectionId" Precision="0" ProviderType="Int" Scale="0" Size="0" SourceColumn="SqlConnectionId" SourceColumnNullMapping="true" SourceVersion="Original" />
+                      <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DbType="Int32" Direction="Input" ParameterName="@Original_SqlConnectionId" Precision="0" ProviderType="Int" Scale="0" Size="0" SourceColumn="SqlConnectionId" SourceColumnNullMapping="false" SourceVersion="Original" />
+                      <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DbType="Int32" Direction="Input" ParameterName="@IsNull_UsesSpecificBinary" Precision="0" ProviderType="Int" Scale="0" Size="0" SourceColumn="UsesSpecificBinary" SourceColumnNullMapping="true" SourceVersion="Original" />
+                      <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DbType="Boolean" Direction="Input" ParameterName="@Original_UsesSpecificBinary" Precision="0" ProviderType="Bit" Scale="0" Size="0" SourceColumn="UsesSpecificBinary" SourceColumnNullMapping="false" SourceVersion="Original" />
+                      <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DbType="Int32" Direction="Input" ParameterName="@IsNull_Url" Precision="0" ProviderType="Int" Scale="0" Size="0" SourceColumn="Url" SourceColumnNullMapping="true" SourceVersion="Original" />
+                      <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DbType="String" Direction="Input" ParameterName="@Original_Url" Precision="0" ProviderType="NVarChar" Scale="0" Size="0" SourceColumn="Url" SourceColumnNullMapping="false" SourceVersion="Original" />
+                      <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DbType="Int32" Direction="Input" ParameterName="@IsNull_Image" Precision="0" ProviderType="Int" Scale="0" Size="0" SourceColumn="Image" SourceColumnNullMapping="true" SourceVersion="Original" />
+                      <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DbType="String" Direction="Input" ParameterName="@Original_Image" Precision="0" ProviderType="NVarChar" Scale="0" Size="0" SourceColumn="Image" SourceColumnNullMapping="false" SourceVersion="Original" />
+                      <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DbType="Int32" Direction="Input" ParameterName="@IsNull_ExistingDataSource" Precision="0" ProviderType="Int" Scale="0" Size="0" SourceColumn="ExistingDataSource" SourceColumnNullMapping="true" SourceVersion="Original" />
+                      <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DbType="Boolean" Direction="Input" ParameterName="@Original_ExistingDataSource" Precision="0" ProviderType="Bit" Scale="0" Size="0" SourceColumn="ExistingDataSource" SourceColumnNullMapping="false" SourceVersion="Original" />
+                      <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DbType="Int32" Direction="Input" ParameterName="@IsNull_TemplateId" Precision="0" ProviderType="Int" Scale="0" Size="0" SourceColumn="TemplateId" SourceColumnNullMapping="true" SourceVersion="Original" />
+                      <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DbType="Int32" Direction="Input" ParameterName="@Original_TemplateId" Precision="0" ProviderType="Int" Scale="0" Size="0" SourceColumn="TemplateId" SourceColumnNullMapping="false" SourceVersion="Original" />
+                      <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DbType="Int32" Direction="Input" ParameterName="@IsNull_ExcelFileName" Precision="0" ProviderType="Int" Scale="0" Size="0" SourceColumn="ExcelFileName" SourceColumnNullMapping="true" SourceVersion="Original" />
+                      <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DbType="String" Direction="Input" ParameterName="@Original_ExcelFileName" Precision="0" ProviderType="NVarChar" Scale="0" Size="0" SourceColumn="ExcelFileName" SourceColumnNullMapping="false" SourceVersion="Original" />
+                      <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DbType="Int32" Direction="Input" ParameterName="@IsNull_SpecificDOTNET" Precision="0" ProviderType="Int" Scale="0" Size="0" SourceColumn="SpecificDOTNET" SourceColumnNullMapping="true" SourceVersion="Original" />
+                      <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DbType="String" Direction="Input" ParameterName="@Original_SpecificDOTNET" Precision="0" ProviderType="NVarChar" Scale="0" Size="0" SourceColumn="SpecificDOTNET" SourceColumnNullMapping="false" SourceVersion="Original" />
+                      <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DbType="Int32" Direction="Input" ParameterName="@IsNull_SpecificJS" Precision="0" ProviderType="Int" Scale="0" Size="0" SourceColumn="SpecificJS" SourceColumnNullMapping="true" SourceVersion="Original" />
+                      <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DbType="String" Direction="Input" ParameterName="@Original_SpecificJS" Precision="0" ProviderType="NVarChar" Scale="0" Size="0" SourceColumn="SpecificJS" SourceColumnNullMapping="false" SourceVersion="Original" />
+                      <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DbType="Int32" Direction="Input" ParameterName="@IsNull_SpecificCss" Precision="0" ProviderType="Int" Scale="0" Size="0" SourceColumn="SpecificCss" SourceColumnNullMapping="true" SourceVersion="Original" />
+                      <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DbType="String" Direction="Input" ParameterName="@Original_SpecificCss" Precision="0" ProviderType="NVarChar" Scale="0" Size="0" SourceColumn="SpecificCss" SourceColumnNullMapping="false" SourceVersion="Original" />
+                      <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DbType="Int32" Direction="Input" ParameterName="@IsNull_UseAsTemplate" Precision="0" ProviderType="Int" Scale="0" Size="0" SourceColumn="UseAsTemplate" SourceColumnNullMapping="true" SourceVersion="Original" />
+                      <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DbType="Boolean" Direction="Input" ParameterName="@Original_UseAsTemplate" Precision="0" ProviderType="Bit" Scale="0" Size="0" SourceColumn="UseAsTemplate" SourceColumnNullMapping="false" SourceVersion="Original" />
+                      <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DbType="Int32" Direction="Input" ParameterName="@IsNull_TemplateFile" Precision="0" ProviderType="Int" Scale="0" Size="0" SourceColumn="TemplateFile" SourceColumnNullMapping="true" SourceVersion="Original" />
+                      <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DbType="String" Direction="Input" ParameterName="@Original_TemplateFile" Precision="0" ProviderType="NVarChar" Scale="0" Size="0" SourceColumn="TemplateFile" SourceColumnNullMapping="false" SourceVersion="Original" />
+                      <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DbType="Int32" Direction="Input" ParameterName="@IsNull_SystemSqlConnectionId" Precision="0" ProviderType="Int" Scale="0" Size="0" SourceColumn="SystemSqlConnectionId" SourceColumnNullMapping="true" SourceVersion="Original" />
+                      <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DbType="Int32" Direction="Input" ParameterName="@Original_SystemSqlConnectionId" Precision="0" ProviderType="Int" Scale="0" Size="0" SourceColumn="SystemSqlConnectionId" SourceColumnNullMapping="false" SourceVersion="Original" />
+                      <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DbType="Int32" Direction="Input" ParameterName="@IsNull_PrivateAuthentication" Precision="0" ProviderType="Int" Scale="0" Size="0" SourceColumn="PrivateAuthentication" SourceColumnNullMapping="true" SourceVersion="Original" />
+                      <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DbType="Boolean" Direction="Input" ParameterName="@Original_PrivateAuthentication" Precision="0" ProviderType="Bit" Scale="0" Size="0" SourceColumn="PrivateAuthentication" SourceColumnNullMapping="false" SourceVersion="Original" />
+                      <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DbType="Int32" Direction="Input" ParameterName="@IsNull_SecuritySqlConnectionId" Precision="0" ProviderType="Int" Scale="0" Size="0" SourceColumn="SecuritySqlConnectionId" SourceColumnNullMapping="true" SourceVersion="Original" />
+                      <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DbType="Int32" Direction="Input" ParameterName="@Original_SecuritySqlConnectionId" Precision="0" ProviderType="Int" Scale="0" Size="0" SourceColumn="SecuritySqlConnectionId" SourceColumnNullMapping="false" SourceVersion="Original" />
+                    </Parameters>
+                  </DbCommand>
+                </DeleteCommand>
+                <InsertCommand>
+                  <DbCommand CommandType="Text" ModifiedByUser="false">
+                    <CommandText>INSERT INTO [dbo].[durados_App] ([Name], [Creator], [CreatedDate], [ToDelete], [ToDeleteDate], [Deleted], [DeletedDate], [DataSourceTypeId], [SqlConnectionId], [UsesSpecificBinary], [Url], [Image], [ExistingDataSource], [TemplateId], [ExcelFileName], [SpecificDOTNET], [SpecificJS], [SpecificCss], [UseAsTemplate], [Description], [TemplateFile], [SystemSqlConnectionId], [PrivateAuthentication], [SecuritySqlConnectionId]) VALUES (@Name, @Creator, @CreatedDate, @ToDelete, @ToDeleteDate, @Deleted, @DeletedDate, @DataSourceTypeId, @SqlConnectionId, @UsesSpecificBinary, @Url, @Image, @ExistingDataSource, @TemplateId, @ExcelFileName, @SpecificDOTNET, @SpecificJS, @SpecificCss, @UseAsTemplate, @Description, @TemplateFile, @SystemSqlConnectionId, @PrivateAuthentication, @SecuritySqlConnectionId);
+SELECT Id, Name, Creator, CreatedDate, ToDelete, ToDeleteDate, Deleted, DeletedDate, DataSourceTypeId, SqlConnectionId, UsesSpecificBinary, Url, Image, ExistingDataSource, TemplateId, ExcelFileName, SpecificDOTNET, SpecificJS, SpecificCss, UseAsTemplate, Description, TemplateFile, SystemSqlConnectionId, PrivateAuthentication, SecuritySqlConnectionId FROM durados_App WHERE (Id = SCOPE_IDENTITY())</CommandText>
+                    <Parameters>
+                      <Parameter AllowDbNull="false" AutogeneratedName="" DataSourceName="" DbType="String" Direction="Input" ParameterName="@Name" Precision="0" ProviderType="NVarChar" Scale="0" Size="0" SourceColumn="Name" SourceColumnNullMapping="false" SourceVersion="Current" />
+                      <Parameter AllowDbNull="false" AutogeneratedName="" DataSourceName="" DbType="Int32" Direction="Input" ParameterName="@Creator" Precision="0" ProviderType="Int" Scale="0" Size="0" SourceColumn="Creator" SourceColumnNullMapping="false" SourceVersion="Current" />
+                      <Parameter AllowDbNull="false" AutogeneratedName="" DataSourceName="" DbType="DateTime" Direction="Input" ParameterName="@CreatedDate" Precision="0" ProviderType="DateTime" Scale="0" Size="0" SourceColumn="CreatedDate" SourceColumnNullMapping="false" SourceVersion="Current" />
+                      <Parameter AllowDbNull="false" AutogeneratedName="" DataSourceName="" DbType="Boolean" Direction="Input" ParameterName="@ToDelete" Precision="0" ProviderType="Bit" Scale="0" Size="0" SourceColumn="ToDelete" SourceColumnNullMapping="false" SourceVersion="Current" />
+                      <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DbType="DateTime" Direction="Input" ParameterName="@ToDeleteDate" Precision="0" ProviderType="DateTime" Scale="0" Size="0" SourceColumn="ToDeleteDate" SourceColumnNullMapping="false" SourceVersion="Current" />
+                      <Parameter AllowDbNull="false" AutogeneratedName="" DataSourceName="" DbType="Boolean" Direction="Input" ParameterName="@Deleted" Precision="0" ProviderType="Bit" Scale="0" Size="0" SourceColumn="Deleted" SourceColumnNullMapping="false" SourceVersion="Current" />
+                      <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DbType="DateTime" Direction="Input" ParameterName="@DeletedDate" Precision="0" ProviderType="DateTime" Scale="0" Size="0" SourceColumn="DeletedDate" SourceColumnNullMapping="false" SourceVersion="Current" />
+                      <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DbType="Int32" Direction="Input" ParameterName="@DataSourceTypeId" Precision="0" ProviderType="Int" Scale="0" Size="0" SourceColumn="DataSourceTypeId" SourceColumnNullMapping="false" SourceVersion="Current" />
+                      <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DbType="Int32" Direction="Input" ParameterName="@SqlConnectionId" Precision="0" ProviderType="Int" Scale="0" Size="0" SourceColumn="SqlConnectionId" SourceColumnNullMapping="false" SourceVersion="Current" />
+                      <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DbType="Boolean" Direction="Input" ParameterName="@UsesSpecificBinary" Precision="0" ProviderType="Bit" Scale="0" Size="0" SourceColumn="UsesSpecificBinary" SourceColumnNullMapping="false" SourceVersion="Current" />
+                      <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DbType="String" Direction="Input" ParameterName="@Url" Precision="0" ProviderType="NVarChar" Scale="0" Size="0" SourceColumn="Url" SourceColumnNullMapping="false" SourceVersion="Current" />
+                      <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DbType="String" Direction="Input" ParameterName="@Image" Precision="0" ProviderType="NVarChar" Scale="0" Size="0" SourceColumn="Image" SourceColumnNullMapping="false" SourceVersion="Current" />
+                      <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DbType="Boolean" Direction="Input" ParameterName="@ExistingDataSource" Precision="0" ProviderType="Bit" Scale="0" Size="0" SourceColumn="ExistingDataSource" SourceColumnNullMapping="false" SourceVersion="Current" />
+                      <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DbType="Int32" Direction="Input" ParameterName="@TemplateId" Precision="0" ProviderType="Int" Scale="0" Size="0" SourceColumn="TemplateId" SourceColumnNullMapping="false" SourceVersion="Current" />
+                      <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DbType="String" Direction="Input" ParameterName="@ExcelFileName" Precision="0" ProviderType="NVarChar" Scale="0" Size="0" SourceColumn="ExcelFileName" SourceColumnNullMapping="false" SourceVersion="Current" />
+                      <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DbType="String" Direction="Input" ParameterName="@SpecificDOTNET" Precision="0" ProviderType="NVarChar" Scale="0" Size="0" SourceColumn="SpecificDOTNET" SourceColumnNullMapping="false" SourceVersion="Current" />
+                      <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DbType="String" Direction="Input" ParameterName="@SpecificJS" Precision="0" ProviderType="NVarChar" Scale="0" Size="0" SourceColumn="SpecificJS" SourceColumnNullMapping="false" SourceVersion="Current" />
+                      <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DbType="String" Direction="Input" ParameterName="@SpecificCss" Precision="0" ProviderType="NVarChar" Scale="0" Size="0" SourceColumn="SpecificCss" SourceColumnNullMapping="false" SourceVersion="Current" />
+                      <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DbType="Boolean" Direction="Input" ParameterName="@UseAsTemplate" Precision="0" ProviderType="Bit" Scale="0" Size="0" SourceColumn="UseAsTemplate" SourceColumnNullMapping="false" SourceVersion="Current" />
+                      <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DbType="String" Direction="Input" ParameterName="@Description" Precision="0" ProviderType="NVarChar" Scale="0" Size="0" SourceColumn="Description" SourceColumnNullMapping="false" SourceVersion="Current" />
+                      <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DbType="String" Direction="Input" ParameterName="@TemplateFile" Precision="0" ProviderType="NVarChar" Scale="0" Size="0" SourceColumn="TemplateFile" SourceColumnNullMapping="false" SourceVersion="Current" />
+                      <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DbType="Int32" Direction="Input" ParameterName="@SystemSqlConnectionId" Precision="0" ProviderType="Int" Scale="0" Size="0" SourceColumn="SystemSqlConnectionId" SourceColumnNullMapping="false" SourceVersion="Current" />
+                      <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DbType="Boolean" Direction="Input" ParameterName="@PrivateAuthentication" Precision="0" ProviderType="Bit" Scale="0" Size="0" SourceColumn="PrivateAuthentication" SourceColumnNullMapping="false" SourceVersion="Current" />
+                      <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DbType="Int32" Direction="Input" ParameterName="@SecuritySqlConnectionId" Precision="0" ProviderType="Int" Scale="0" Size="0" SourceColumn="SecuritySqlConnectionId" SourceColumnNullMapping="false" SourceVersion="Current" />
+                    </Parameters>
+                  </DbCommand>
+                </InsertCommand>
+                <SelectCommand>
+                  <DbCommand CommandType="Text" ModifiedByUser="false">
+                    <CommandText>SELECT Id, Name, Creator, CreatedDate, ToDelete, ToDeleteDate, Deleted, DeletedDate, DataSourceTypeId, SqlConnectionId, UsesSpecificBinary, Url, Image, ExistingDataSource, TemplateId, ExcelFileName, SpecificDOTNET, SpecificJS, SpecificCss, UseAsTemplate, Description, TemplateFile, SystemSqlConnectionId, PrivateAuthentication, SecuritySqlConnectionId FROM durados_App</CommandText>
+                    <Parameters />
+                  </DbCommand>
+                </SelectCommand>
+                <UpdateCommand>
+                  <DbCommand CommandType="Text" ModifiedByUser="false">
+                    <CommandText>UPDATE [dbo].[durados_App] SET [Name] = @Name, [Creator] = @Creator, [CreatedDate] = @CreatedDate, [ToDelete] = @ToDelete, [ToDeleteDate] = @ToDeleteDate, [Deleted] = @Deleted, [DeletedDate] = @DeletedDate, [DataSourceTypeId] = @DataSourceTypeId, [SqlConnectionId] = @SqlConnectionId, [UsesSpecificBinary] = @UsesSpecificBinary, [Url] = @Url, [Image] = @Image, [ExistingDataSource] = @ExistingDataSource, [TemplateId] = @TemplateId, [ExcelFileName] = @ExcelFileName, [SpecificDOTNET] = @SpecificDOTNET, [SpecificJS] = @SpecificJS, [SpecificCss] = @SpecificCss, [UseAsTemplate] = @UseAsTemplate, [Description] = @Description, [TemplateFile] = @TemplateFile, [SystemSqlConnectionId] = @SystemSqlConnectionId, [PrivateAuthentication] = @PrivateAuthentication, [SecuritySqlConnectionId] = @SecuritySqlConnectionId WHERE (([Id] = @Original_Id) AND ([Name] = @Original_Name) AND ([Creator] = @Original_Creator) AND ([CreatedDate] = @Original_CreatedDate) AND ([ToDelete] = @Original_ToDelete) AND ((@IsNull_ToDeleteDate = 1 AND [ToDeleteDate] IS NULL) OR ([ToDeleteDate] = @Original_ToDeleteDate)) AND ([Deleted] = @Original_Deleted) AND ((@IsNull_DeletedDate = 1 AND [DeletedDate] IS NULL) OR ([DeletedDate] = @Original_DeletedDate)) AND ((@IsNull_DataSourceTypeId = 1 AND [DataSourceTypeId] IS NULL) OR ([DataSourceTypeId] = @Original_DataSourceTypeId)) AND ((@IsNull_SqlConnectionId = 1 AND [SqlConnectionId] IS NULL) OR ([SqlConnectionId] = @Original_SqlConnectionId)) AND ((@IsNull_UsesSpecificBinary = 1 AND [UsesSpecificBinary] IS NULL) OR ([UsesSpecificBinary] = @Original_UsesSpecificBinary)) AND ((@IsNull_Url = 1 AND [Url] IS NULL) OR ([Url] = @Original_Url)) AND ((@IsNull_Image = 1 AND [Image] IS NULL) OR ([Image] = @Original_Image)) AND ((@IsNull_ExistingDataSource = 1 AND [ExistingDataSource] IS NULL) OR ([ExistingDataSource] = @Original_ExistingDataSource)) AND ((@IsNull_TemplateId = 1 AND [TemplateId] IS NULL) OR ([TemplateId] = @Original_TemplateId)) AND ((@IsNull_ExcelFileName = 1 AND [ExcelFileName] IS NULL) OR ([ExcelFileName] = @Original_ExcelFileName)) AND ((@IsNull_SpecificDOTNET = 1 AND [SpecificDOTNET] IS NULL) OR ([SpecificDOTNET] = @Original_SpecificDOTNET)) AND ((@IsNull_SpecificJS = 1 AND [SpecificJS] IS NULL) OR ([SpecificJS] = @Original_SpecificJS)) AND ((@IsNull_SpecificCss = 1 AND [SpecificCss] IS NULL) OR ([SpecificCss] = @Original_SpecificCss)) AND ((@IsNull_UseAsTemplate = 1 AND [UseAsTemplate] IS NULL) OR ([UseAsTemplate] = @Original_UseAsTemplate)) AND ((@IsNull_TemplateFile = 1 AND [TemplateFile] IS NULL) OR ([TemplateFile] = @Original_TemplateFile)) AND ((@IsNull_SystemSqlConnectionId = 1 AND [SystemSqlConnectionId] IS NULL) OR ([SystemSqlConnectionId] = @Original_SystemSqlConnectionId)) AND ((@IsNull_PrivateAuthentication = 1 AND [PrivateAuthentication] IS NULL) OR ([PrivateAuthentication] = @Original_PrivateAuthentication)) AND ((@IsNull_SecuritySqlConnectionId = 1 AND [SecuritySqlConnectionId] IS NULL) OR ([SecuritySqlConnectionId] = @Original_SecuritySqlConnectionId)));
+SELECT Id, Name, Creator, CreatedDate, ToDelete, ToDeleteDate, Deleted, DeletedDate, DataSourceTypeId, SqlConnectionId, UsesSpecificBinary, Url, Image, ExistingDataSource, TemplateId, ExcelFileName, SpecificDOTNET, SpecificJS, SpecificCss, UseAsTemplate, Description, TemplateFile, SystemSqlConnectionId, PrivateAuthentication, SecuritySqlConnectionId FROM durados_App WHERE (Id = @Id)</CommandText>
+                    <Parameters>
+                      <Parameter AllowDbNull="false" AutogeneratedName="" DataSourceName="" DbType="String" Direction="Input" ParameterName="@Name" Precision="0" ProviderType="NVarChar" Scale="0" Size="0" SourceColumn="Name" SourceColumnNullMapping="false" SourceVersion="Current" />
+                      <Parameter AllowDbNull="false" AutogeneratedName="" DataSourceName="" DbType="Int32" Direction="Input" ParameterName="@Creator" Precision="0" ProviderType="Int" Scale="0" Size="0" SourceColumn="Creator" SourceColumnNullMapping="false" SourceVersion="Current" />
+                      <Parameter AllowDbNull="false" AutogeneratedName="" DataSourceName="" DbType="DateTime" Direction="Input" ParameterName="@CreatedDate" Precision="0" ProviderType="DateTime" Scale="0" Size="0" SourceColumn="CreatedDate" SourceColumnNullMapping="false" SourceVersion="Current" />
+                      <Parameter AllowDbNull="false" AutogeneratedName="" DataSourceName="" DbType="Boolean" Direction="Input" ParameterName="@ToDelete" Precision="0" ProviderType="Bit" Scale="0" Size="0" SourceColumn="ToDelete" SourceColumnNullMapping="false" SourceVersion="Current" />
+                      <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DbType="DateTime" Direction="Input" ParameterName="@ToDeleteDate" Precision="0" ProviderType="DateTime" Scale="0" Size="0" SourceColumn="ToDeleteDate" SourceColumnNullMapping="false" SourceVersion="Current" />
+                      <Parameter AllowDbNull="false" AutogeneratedName="" DataSourceName="" DbType="Boolean" Direction="Input" ParameterName="@Deleted" Precision="0" ProviderType="Bit" Scale="0" Size="0" SourceColumn="Deleted" SourceColumnNullMapping="false" SourceVersion="Current" />
+                      <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DbType="DateTime" Direction="Input" ParameterName="@DeletedDate" Precision="0" ProviderType="DateTime" Scale="0" Size="0" SourceColumn="DeletedDate" SourceColumnNullMapping="false" SourceVersion="Current" />
+                      <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DbType="Int32" Direction="Input" ParameterName="@DataSourceTypeId" Precision="0" ProviderType="Int" Scale="0" Size="0" SourceColumn="DataSourceTypeId" SourceColumnNullMapping="false" SourceVersion="Current" />
+                      <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DbType="Int32" Direction="Input" ParameterName="@SqlConnectionId" Precision="0" ProviderType="Int" Scale="0" Size="0" SourceColumn="SqlConnectionId" SourceColumnNullMapping="false" SourceVersion="Current" />
+                      <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DbType="Boolean" Direction="Input" ParameterName="@UsesSpecificBinary" Precision="0" ProviderType="Bit" Scale="0" Size="0" SourceColumn="UsesSpecificBinary" SourceColumnNullMapping="false" SourceVersion="Current" />
+                      <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DbType="String" Direction="Input" ParameterName="@Url" Precision="0" ProviderType="NVarChar" Scale="0" Size="0" SourceColumn="Url" SourceColumnNullMapping="false" SourceVersion="Current" />
+                      <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DbType="String" Direction="Input" ParameterName="@Image" Precision="0" ProviderType="NVarChar" Scale="0" Size="0" SourceColumn="Image" SourceColumnNullMapping="false" SourceVersion="Current" />
+                      <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DbType="Boolean" Direction="Input" ParameterName="@ExistingDataSource" Precision="0" ProviderType="Bit" Scale="0" Size="0" SourceColumn="ExistingDataSource" SourceColumnNullMapping="false" SourceVersion="Current" />
+                      <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DbType="Int32" Direction="Input" ParameterName="@TemplateId" Precision="0" ProviderType="Int" Scale="0" Size="0" SourceColumn="TemplateId" SourceColumnNullMapping="false" SourceVersion="Current" />
+                      <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DbType="String" Direction="Input" ParameterName="@ExcelFileName" Precision="0" ProviderType="NVarChar" Scale="0" Size="0" SourceColumn="ExcelFileName" SourceColumnNullMapping="false" SourceVersion="Current" />
+                      <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DbType="String" Direction="Input" ParameterName="@SpecificDOTNET" Precision="0" ProviderType="NVarChar" Scale="0" Size="0" SourceColumn="SpecificDOTNET" SourceColumnNullMapping="false" SourceVersion="Current" />
+                      <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DbType="String" Direction="Input" ParameterName="@SpecificJS" Precision="0" ProviderType="NVarChar" Scale="0" Size="0" SourceColumn="SpecificJS" SourceColumnNullMapping="false" SourceVersion="Current" />
+                      <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DbType="String" Direction="Input" ParameterName="@SpecificCss" Precision="0" ProviderType="NVarChar" Scale="0" Size="0" SourceColumn="SpecificCss" SourceColumnNullMapping="false" SourceVersion="Current" />
+                      <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DbType="Boolean" Direction="Input" ParameterName="@UseAsTemplate" Precision="0" ProviderType="Bit" Scale="0" Size="0" SourceColumn="UseAsTemplate" SourceColumnNullMapping="false" SourceVersion="Current" />
+                      <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DbType="String" Direction="Input" ParameterName="@Description" Precision="0" ProviderType="NVarChar" Scale="0" Size="0" SourceColumn="Description" SourceColumnNullMapping="false" SourceVersion="Current" />
+                      <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DbType="String" Direction="Input" ParameterName="@TemplateFile" Precision="0" ProviderType="NVarChar" Scale="0" Size="0" SourceColumn="TemplateFile" SourceColumnNullMapping="false" SourceVersion="Current" />
+                      <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DbType="Int32" Direction="Input" ParameterName="@SystemSqlConnectionId" Precision="0" ProviderType="Int" Scale="0" Size="0" SourceColumn="SystemSqlConnectionId" SourceColumnNullMapping="false" SourceVersion="Current" />
+                      <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DbType="Boolean" Direction="Input" ParameterName="@PrivateAuthentication" Precision="0" ProviderType="Bit" Scale="0" Size="0" SourceColumn="PrivateAuthentication" SourceColumnNullMapping="false" SourceVersion="Current" />
+                      <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DbType="Int32" Direction="Input" ParameterName="@SecuritySqlConnectionId" Precision="0" ProviderType="Int" Scale="0" Size="0" SourceColumn="SecuritySqlConnectionId" SourceColumnNullMapping="false" SourceVersion="Current" />
+                      <Parameter AllowDbNull="false" AutogeneratedName="" DataSourceName="" DbType="Int32" Direction="Input" ParameterName="@Original_Id" Precision="0" ProviderType="Int" Scale="0" Size="0" SourceColumn="Id" SourceColumnNullMapping="false" SourceVersion="Original" />
+                      <Parameter AllowDbNull="false" AutogeneratedName="" DataSourceName="" DbType="String" Direction="Input" ParameterName="@Original_Name" Precision="0" ProviderType="NVarChar" Scale="0" Size="0" SourceColumn="Name" SourceColumnNullMapping="false" SourceVersion="Original" />
+                      <Parameter AllowDbNull="false" AutogeneratedName="" DataSourceName="" DbType="Int32" Direction="Input" ParameterName="@Original_Creator" Precision="0" ProviderType="Int" Scale="0" Size="0" SourceColumn="Creator" SourceColumnNullMapping="false" SourceVersion="Original" />
+                      <Parameter AllowDbNull="false" AutogeneratedName="" DataSourceName="" DbType="DateTime" Direction="Input" ParameterName="@Original_CreatedDate" Precision="0" ProviderType="DateTime" Scale="0" Size="0" SourceColumn="CreatedDate" SourceColumnNullMapping="false" SourceVersion="Original" />
+                      <Parameter AllowDbNull="false" AutogeneratedName="" DataSourceName="" DbType="Boolean" Direction="Input" ParameterName="@Original_ToDelete" Precision="0" ProviderType="Bit" Scale="0" Size="0" SourceColumn="ToDelete" SourceColumnNullMapping="false" SourceVersion="Original" />
+                      <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DbType="Int32" Direction="Input" ParameterName="@IsNull_ToDeleteDate" Precision="0" ProviderType="Int" Scale="0" Size="0" SourceColumn="ToDeleteDate" SourceColumnNullMapping="true" SourceVersion="Original" />
+                      <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DbType="DateTime" Direction="Input" ParameterName="@Original_ToDeleteDate" Precision="0" ProviderType="DateTime" Scale="0" Size="0" SourceColumn="ToDeleteDate" SourceColumnNullMapping="false" SourceVersion="Original" />
+                      <Parameter AllowDbNull="false" AutogeneratedName="" DataSourceName="" DbType="Boolean" Direction="Input" ParameterName="@Original_Deleted" Precision="0" ProviderType="Bit" Scale="0" Size="0" SourceColumn="Deleted" SourceColumnNullMapping="false" SourceVersion="Original" />
+                      <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DbType="Int32" Direction="Input" ParameterName="@IsNull_DeletedDate" Precision="0" ProviderType="Int" Scale="0" Size="0" SourceColumn="DeletedDate" SourceColumnNullMapping="true" SourceVersion="Original" />
+                      <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DbType="DateTime" Direction="Input" ParameterName="@Original_DeletedDate" Precision="0" ProviderType="DateTime" Scale="0" Size="0" SourceColumn="DeletedDate" SourceColumnNullMapping="false" SourceVersion="Original" />
+                      <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DbType="Int32" Direction="Input" ParameterName="@IsNull_DataSourceTypeId" Precision="0" ProviderType="Int" Scale="0" Size="0" SourceColumn="DataSourceTypeId" SourceColumnNullMapping="true" SourceVersion="Original" />
+                      <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DbType="Int32" Direction="Input" ParameterName="@Original_DataSourceTypeId" Precision="0" ProviderType="Int" Scale="0" Size="0" SourceColumn="DataSourceTypeId" SourceColumnNullMapping="false" SourceVersion="Original" />
+                      <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DbType="Int32" Direction="Input" ParameterName="@IsNull_SqlConnectionId" Precision="0" ProviderType="Int" Scale="0" Size="0" SourceColumn="SqlConnectionId" SourceColumnNullMapping="true" SourceVersion="Original" />
+                      <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DbType="Int32" Direction="Input" ParameterName="@Original_SqlConnectionId" Precision="0" ProviderType="Int" Scale="0" Size="0" SourceColumn="SqlConnectionId" SourceColumnNullMapping="false" SourceVersion="Original" />
+                      <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DbType="Int32" Direction="Input" ParameterName="@IsNull_UsesSpecificBinary" Precision="0" ProviderType="Int" Scale="0" Size="0" SourceColumn="UsesSpecificBinary" SourceColumnNullMapping="true" SourceVersion="Original" />
+                      <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DbType="Boolean" Direction="Input" ParameterName="@Original_UsesSpecificBinary" Precision="0" ProviderType="Bit" Scale="0" Size="0" SourceColumn="UsesSpecificBinary" SourceColumnNullMapping="false" SourceVersion="Original" />
+                      <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DbType="Int32" Direction="Input" ParameterName="@IsNull_Url" Precision="0" ProviderType="Int" Scale="0" Size="0" SourceColumn="Url" SourceColumnNullMapping="true" SourceVersion="Original" />
+                      <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DbType="String" Direction="Input" ParameterName="@Original_Url" Precision="0" ProviderType="NVarChar" Scale="0" Size="0" SourceColumn="Url" SourceColumnNullMapping="false" SourceVersion="Original" />
+                      <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DbType="Int32" Direction="Input" ParameterName="@IsNull_Image" Precision="0" ProviderType="Int" Scale="0" Size="0" SourceColumn="Image" SourceColumnNullMapping="true" SourceVersion="Original" />
+                      <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DbType="String" Direction="Input" ParameterName="@Original_Image" Precision="0" ProviderType="NVarChar" Scale="0" Size="0" SourceColumn="Image" SourceColumnNullMapping="false" SourceVersion="Original" />
+                      <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DbType="Int32" Direction="Input" ParameterName="@IsNull_ExistingDataSource" Precision="0" ProviderType="Int" Scale="0" Size="0" SourceColumn="ExistingDataSource" SourceColumnNullMapping="true" SourceVersion="Original" />
+                      <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DbType="Boolean" Direction="Input" ParameterName="@Original_ExistingDataSource" Precision="0" ProviderType="Bit" Scale="0" Size="0" SourceColumn="ExistingDataSource" SourceColumnNullMapping="false" SourceVersion="Original" />
+                      <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DbType="Int32" Direction="Input" ParameterName="@IsNull_TemplateId" Precision="0" ProviderType="Int" Scale="0" Size="0" SourceColumn="TemplateId" SourceColumnNullMapping="true" SourceVersion="Original" />
+                      <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DbType="Int32" Direction="Input" ParameterName="@Original_TemplateId" Precision="0" ProviderType="Int" Scale="0" Size="0" SourceColumn="TemplateId" SourceColumnNullMapping="false" SourceVersion="Original" />
+                      <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DbType="Int32" Direction="Input" ParameterName="@IsNull_ExcelFileName" Precision="0" ProviderType="Int" Scale="0" Size="0" SourceColumn="ExcelFileName" SourceColumnNullMapping="true" SourceVersion="Original" />
+                      <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DbType="String" Direction="Input" ParameterName="@Original_ExcelFileName" Precision="0" ProviderType="NVarChar" Scale="0" Size="0" SourceColumn="ExcelFileName" SourceColumnNullMapping="false" SourceVersion="Original" />
+                      <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DbType="Int32" Direction="Input" ParameterName="@IsNull_SpecificDOTNET" Precision="0" ProviderType="Int" Scale="0" Size="0" SourceColumn="SpecificDOTNET" SourceColumnNullMapping="true" SourceVersion="Original" />
+                      <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DbType="String" Direction="Input" ParameterName="@Original_SpecificDOTNET" Precision="0" ProviderType="NVarChar" Scale="0" Size="0" SourceColumn="SpecificDOTNET" SourceColumnNullMapping="false" SourceVersion="Original" />
+                      <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DbType="Int32" Direction="Input" ParameterName="@IsNull_SpecificJS" Precision="0" ProviderType="Int" Scale="0" Size="0" SourceColumn="SpecificJS" SourceColumnNullMapping="true" SourceVersion="Original" />
+                      <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DbType="String" Direction="Input" ParameterName="@Original_SpecificJS" Precision="0" ProviderType="NVarChar" Scale="0" Size="0" SourceColumn="SpecificJS" SourceColumnNullMapping="false" SourceVersion="Original" />
+                      <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DbType="Int32" Direction="Input" ParameterName="@IsNull_SpecificCss" Precision="0" ProviderType="Int" Scale="0" Size="0" SourceColumn="SpecificCss" SourceColumnNullMapping="true" SourceVersion="Original" />
+                      <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DbType="String" Direction="Input" ParameterName="@Original_SpecificCss" Precision="0" ProviderType="NVarChar" Scale="0" Size="0" SourceColumn="SpecificCss" SourceColumnNullMapping="false" SourceVersion="Original" />
+                      <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DbType="Int32" Direction="Input" ParameterName="@IsNull_UseAsTemplate" Precision="0" ProviderType="Int" Scale="0" Size="0" SourceColumn="UseAsTemplate" SourceColumnNullMapping="true" SourceVersion="Original" />
+                      <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DbType="Boolean" Direction="Input" ParameterName="@Original_UseAsTemplate" Precision="0" ProviderType="Bit" Scale="0" Size="0" SourceColumn="UseAsTemplate" SourceColumnNullMapping="false" SourceVersion="Original" />
+                      <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DbType="Int32" Direction="Input" ParameterName="@IsNull_TemplateFile" Precision="0" ProviderType="Int" Scale="0" Size="0" SourceColumn="TemplateFile" SourceColumnNullMapping="true" SourceVersion="Original" />
+                      <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DbType="String" Direction="Input" ParameterName="@Original_TemplateFile" Precision="0" ProviderType="NVarChar" Scale="0" Size="0" SourceColumn="TemplateFile" SourceColumnNullMapping="false" SourceVersion="Original" />
+                      <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DbType="Int32" Direction="Input" ParameterName="@IsNull_SystemSqlConnectionId" Precision="0" ProviderType="Int" Scale="0" Size="0" SourceColumn="SystemSqlConnectionId" SourceColumnNullMapping="true" SourceVersion="Original" />
+                      <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DbType="Int32" Direction="Input" ParameterName="@Original_SystemSqlConnectionId" Precision="0" ProviderType="Int" Scale="0" Size="0" SourceColumn="SystemSqlConnectionId" SourceColumnNullMapping="false" SourceVersion="Original" />
+                      <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DbType="Int32" Direction="Input" ParameterName="@IsNull_PrivateAuthentication" Precision="0" ProviderType="Int" Scale="0" Size="0" SourceColumn="PrivateAuthentication" SourceColumnNullMapping="true" SourceVersion="Original" />
+                      <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DbType="Boolean" Direction="Input" ParameterName="@Original_PrivateAuthentication" Precision="0" ProviderType="Bit" Scale="0" Size="0" SourceColumn="PrivateAuthentication" SourceColumnNullMapping="false" SourceVersion="Original" />
+                      <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DbType="Int32" Direction="Input" ParameterName="@IsNull_SecuritySqlConnectionId" Precision="0" ProviderType="Int" Scale="0" Size="0" SourceColumn="SecuritySqlConnectionId" SourceColumnNullMapping="true" SourceVersion="Original" />
+                      <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DbType="Int32" Direction="Input" ParameterName="@Original_SecuritySqlConnectionId" Precision="0" ProviderType="Int" Scale="0" Size="0" SourceColumn="SecuritySqlConnectionId" SourceColumnNullMapping="false" SourceVersion="Original" />
+                      <Parameter AllowDbNull="false" AutogeneratedName="Id" ColumnName="Id" DataSourceName="" DataTypeServer="int" DbType="Int32" Direction="Input" ParameterName="@Id" Precision="0" ProviderType="Int" Scale="0" Size="4" SourceColumn="Id" SourceColumnNullMapping="false" SourceVersion="Current" />
+                    </Parameters>
+                  </DbCommand>
+                </UpdateCommand>
+              </DbSource>
+            </MainSource>
+            <Mappings>
+              <Mapping SourceColumn="Id" DataSetColumn="Id" />
+              <Mapping SourceColumn="Name" DataSetColumn="Name" />
+              <Mapping SourceColumn="Creator" DataSetColumn="Creator" />
+              <Mapping SourceColumn="CreatedDate" DataSetColumn="CreatedDate" />
+              <Mapping SourceColumn="ToDelete" DataSetColumn="ToDelete" />
+              <Mapping SourceColumn="ToDeleteDate" DataSetColumn="ToDeleteDate" />
+              <Mapping SourceColumn="Deleted" DataSetColumn="Deleted" />
+              <Mapping SourceColumn="DeletedDate" DataSetColumn="DeletedDate" />
+              <Mapping SourceColumn="DataSourceTypeId" DataSetColumn="DataSourceTypeId" />
+              <Mapping SourceColumn="SqlConnectionId" DataSetColumn="SqlConnectionId" />
+              <Mapping SourceColumn="UsesSpecificBinary" DataSetColumn="UsesSpecificBinary" />
+              <Mapping SourceColumn="Url" DataSetColumn="Url" />
+              <Mapping SourceColumn="Image" DataSetColumn="Image" />
+              <Mapping SourceColumn="ExistingDataSource" DataSetColumn="ExistingDataSource" />
+              <Mapping SourceColumn="TemplateId" DataSetColumn="TemplateId" />
+              <Mapping SourceColumn="ExcelFileName" DataSetColumn="ExcelFileName" />
+              <Mapping SourceColumn="SpecificDOTNET" DataSetColumn="SpecificDOTNET" />
+              <Mapping SourceColumn="SpecificJS" DataSetColumn="SpecificJS" />
+              <Mapping SourceColumn="SpecificCss" DataSetColumn="SpecificCss" />
+              <Mapping SourceColumn="UseAsTemplate" DataSetColumn="UseAsTemplate" />
+              <Mapping SourceColumn="Description" DataSetColumn="Description" />
+              <Mapping SourceColumn="TemplateFile" DataSetColumn="TemplateFile" />
+              <Mapping SourceColumn="SystemSqlConnectionId" DataSetColumn="SystemSqlConnectionId" />
+              <Mapping SourceColumn="PrivateAuthentication" DataSetColumn="PrivateAuthentication" />
+              <Mapping SourceColumn="SecuritySqlConnectionId" DataSetColumn="SecuritySqlConnectionId" />
+            </Mappings>
+            <Sources />
+          </TableAdapter>
+          <TableAdapter BaseClass="System.ComponentModel.Component" DataAccessorModifier="AutoLayout, AnsiClass, Class, Public" DataAccessorName="durados_SqlConnectionTableAdapter" GeneratorDataComponentClassName="durados_SqlConnectionTableAdapter" Name="durados_SqlConnection" UserDataComponentName="durados_SqlConnectionTableAdapter">
+            <MainSource>
+              <DbSource ConnectionRef="duradosConnectionString (Settings)" DbObjectName="BackAnd_dev.dbo.durados_SqlConnection" DbObjectType="Table" FillMethodModifier="Public" FillMethodName="Fill" GenerateMethods="Both" GenerateShortCommands="true" GeneratorGetMethodName="GetData" GeneratorSourceName="Fill" GetMethodModifier="Public" GetMethodName="GetData" QueryType="Rowset" ScalarCallRetval="System.Object, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" UseOptimisticConcurrency="true" UserGetMethodName="GetData" UserSourceName="Fill">
+                <DeleteCommand>
+                  <DbCommand CommandType="Text" ModifiedByUser="false">
+                    <CommandText>DELETE FROM [dbo].[durados_SqlConnection] WHERE (([Id] = @Original_Id) AND ((@IsNull_ServerName = 1 AND [ServerName] IS NULL) OR ([ServerName] = @Original_ServerName)) AND ((@IsNull_Catalog = 1 AND [Catalog] IS NULL) OR ([Catalog] = @Original_Catalog)) AND ((@IsNull_Username = 1 AND [Username] IS NULL) OR ([Username] = @Original_Username)) AND ((@IsNull_Password = 1 AND [Password] IS NULL) OR ([Password] = @Original_Password)) AND ((@IsNull_IntegratedSecurity = 1 AND [IntegratedSecurity] IS NULL) OR ([IntegratedSecurity] = @Original_IntegratedSecurity)) AND ((@IsNull_DuradosUser = 1 AND [DuradosUser] IS NULL) OR ([DuradosUser] = @Original_DuradosUser)))</CommandText>
+                    <Parameters>
+                      <Parameter AllowDbNull="false" AutogeneratedName="" DataSourceName="" DbType="Int32" Direction="Input" ParameterName="@Original_Id" Precision="0" ProviderType="Int" Scale="0" Size="0" SourceColumn="Id" SourceColumnNullMapping="false" SourceVersion="Original" />
+                      <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DbType="Int32" Direction="Input" ParameterName="@IsNull_ServerName" Precision="0" ProviderType="Int" Scale="0" Size="0" SourceColumn="ServerName" SourceColumnNullMapping="true" SourceVersion="Original" />
+                      <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DbType="String" Direction="Input" ParameterName="@Original_ServerName" Precision="0" ProviderType="NVarChar" Scale="0" Size="0" SourceColumn="ServerName" SourceColumnNullMapping="false" SourceVersion="Original" />
+                      <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DbType="Int32" Direction="Input" ParameterName="@IsNull_Catalog" Precision="0" ProviderType="Int" Scale="0" Size="0" SourceColumn="Catalog" SourceColumnNullMapping="true" SourceVersion="Original" />
+                      <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DbType="String" Direction="Input" ParameterName="@Original_Catalog" Precision="0" ProviderType="NVarChar" Scale="0" Size="0" SourceColumn="Catalog" SourceColumnNullMapping="false" SourceVersion="Original" />
+                      <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DbType="Int32" Direction="Input" ParameterName="@IsNull_Username" Precision="0" ProviderType="Int" Scale="0" Size="0" SourceColumn="Username" SourceColumnNullMapping="true" SourceVersion="Original" />
+                      <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DbType="String" Direction="Input" ParameterName="@Original_Username" Precision="0" ProviderType="NVarChar" Scale="0" Size="0" SourceColumn="Username" SourceColumnNullMapping="false" SourceVersion="Original" />
+                      <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DbType="Int32" Direction="Input" ParameterName="@IsNull_Password" Precision="0" ProviderType="Int" Scale="0" Size="0" SourceColumn="Password" SourceColumnNullMapping="true" SourceVersion="Original" />
+                      <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DbType="String" Direction="Input" ParameterName="@Original_Password" Precision="0" ProviderType="NVarChar" Scale="0" Size="0" SourceColumn="Password" SourceColumnNullMapping="false" SourceVersion="Original" />
+                      <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DbType="Int32" Direction="Input" ParameterName="@IsNull_IntegratedSecurity" Precision="0" ProviderType="Int" Scale="0" Size="0" SourceColumn="IntegratedSecurity" SourceColumnNullMapping="true" SourceVersion="Original" />
+                      <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DbType="Boolean" Direction="Input" ParameterName="@Original_IntegratedSecurity" Precision="0" ProviderType="Bit" Scale="0" Size="0" SourceColumn="IntegratedSecurity" SourceColumnNullMapping="false" SourceVersion="Original" />
+                      <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DbType="Int32" Direction="Input" ParameterName="@IsNull_DuradosUser" Precision="0" ProviderType="Int" Scale="0" Size="0" SourceColumn="DuradosUser" SourceColumnNullMapping="true" SourceVersion="Original" />
+                      <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DbType="Int32" Direction="Input" ParameterName="@Original_DuradosUser" Precision="0" ProviderType="Int" Scale="0" Size="0" SourceColumn="DuradosUser" SourceColumnNullMapping="false" SourceVersion="Original" />
+                    </Parameters>
+                  </DbCommand>
+                </DeleteCommand>
+                <InsertCommand>
+                  <DbCommand CommandType="Text" ModifiedByUser="false">
+                    <CommandText>INSERT INTO [dbo].[durados_SqlConnection] ([ServerName], [Catalog], [Username], [Password], [IntegratedSecurity], [DuradosUser]) VALUES (@ServerName, @Catalog, @Username, @Password, @IntegratedSecurity, @DuradosUser);
+SELECT Id, ServerName, Catalog, Username, Password, IntegratedSecurity, DuradosUser FROM durados_SqlConnection WHERE (Id = SCOPE_IDENTITY())</CommandText>
+                    <Parameters>
+                      <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DbType="String" Direction="Input" ParameterName="@ServerName" Precision="0" ProviderType="NVarChar" Scale="0" Size="0" SourceColumn="ServerName" SourceColumnNullMapping="false" SourceVersion="Current" />
+                      <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DbType="String" Direction="Input" ParameterName="@Catalog" Precision="0" ProviderType="NVarChar" Scale="0" Size="0" SourceColumn="Catalog" SourceColumnNullMapping="false" SourceVersion="Current" />
+                      <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DbType="String" Direction="Input" ParameterName="@Username" Precision="0" ProviderType="NVarChar" Scale="0" Size="0" SourceColumn="Username" SourceColumnNullMapping="false" SourceVersion="Current" />
+                      <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DbType="String" Direction="Input" ParameterName="@Password" Precision="0" ProviderType="NVarChar" Scale="0" Size="0" SourceColumn="Password" SourceColumnNullMapping="false" SourceVersion="Current" />
+                      <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DbType="Boolean" Direction="Input" ParameterName="@IntegratedSecurity" Precision="0" ProviderType="Bit" Scale="0" Size="0" SourceColumn="IntegratedSecurity" SourceColumnNullMapping="false" SourceVersion="Current" />
+                      <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DbType="Int32" Direction="Input" ParameterName="@DuradosUser" Precision="0" ProviderType="Int" Scale="0" Size="0" SourceColumn="DuradosUser" SourceColumnNullMapping="false" SourceVersion="Current" />
+                    </Parameters>
+                  </DbCommand>
+                </InsertCommand>
+                <SelectCommand>
+                  <DbCommand CommandType="Text" ModifiedByUser="false">
+                    <CommandText>SELECT Id, ServerName, Catalog, Username, Password, IntegratedSecurity, DuradosUser FROM durados_SqlConnection</CommandText>
+                    <Parameters />
+                  </DbCommand>
+                </SelectCommand>
+                <UpdateCommand>
+                  <DbCommand CommandType="Text" ModifiedByUser="false">
+                    <CommandText>UPDATE [dbo].[durados_SqlConnection] SET [ServerName] = @ServerName, [Catalog] = @Catalog, [Username] = @Username, [Password] = @Password, [IntegratedSecurity] = @IntegratedSecurity, [DuradosUser] = @DuradosUser WHERE (([Id] = @Original_Id) AND ((@IsNull_ServerName = 1 AND [ServerName] IS NULL) OR ([ServerName] = @Original_ServerName)) AND ((@IsNull_Catalog = 1 AND [Catalog] IS NULL) OR ([Catalog] = @Original_Catalog)) AND ((@IsNull_Username = 1 AND [Username] IS NULL) OR ([Username] = @Original_Username)) AND ((@IsNull_Password = 1 AND [Password] IS NULL) OR ([Password] = @Original_Password)) AND ((@IsNull_IntegratedSecurity = 1 AND [IntegratedSecurity] IS NULL) OR ([IntegratedSecurity] = @Original_IntegratedSecurity)) AND ((@IsNull_DuradosUser = 1 AND [DuradosUser] IS NULL) OR ([DuradosUser] = @Original_DuradosUser)));
+SELECT Id, ServerName, Catalog, Username, Password, IntegratedSecurity, DuradosUser FROM durados_SqlConnection WHERE (Id = @Id)</CommandText>
+                    <Parameters>
+                      <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DbType="String" Direction="Input" ParameterName="@ServerName" Precision="0" ProviderType="NVarChar" Scale="0" Size="0" SourceColumn="ServerName" SourceColumnNullMapping="false" SourceVersion="Current" />
+                      <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DbType="String" Direction="Input" ParameterName="@Catalog" Precision="0" ProviderType="NVarChar" Scale="0" Size="0" SourceColumn="Catalog" SourceColumnNullMapping="false" SourceVersion="Current" />
+                      <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DbType="String" Direction="Input" ParameterName="@Username" Precision="0" ProviderType="NVarChar" Scale="0" Size="0" SourceColumn="Username" SourceColumnNullMapping="false" SourceVersion="Current" />
+                      <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DbType="String" Direction="Input" ParameterName="@Password" Precision="0" ProviderType="NVarChar" Scale="0" Size="0" SourceColumn="Password" SourceColumnNullMapping="false" SourceVersion="Current" />
+                      <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DbType="Boolean" Direction="Input" ParameterName="@IntegratedSecurity" Precision="0" ProviderType="Bit" Scale="0" Size="0" SourceColumn="IntegratedSecurity" SourceColumnNullMapping="false" SourceVersion="Current" />
+                      <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DbType="Int32" Direction="Input" ParameterName="@DuradosUser" Precision="0" ProviderType="Int" Scale="0" Size="0" SourceColumn="DuradosUser" SourceColumnNullMapping="false" SourceVersion="Current" />
+                      <Parameter AllowDbNull="false" AutogeneratedName="" DataSourceName="" DbType="Int32" Direction="Input" ParameterName="@Original_Id" Precision="0" ProviderType="Int" Scale="0" Size="0" SourceColumn="Id" SourceColumnNullMapping="false" SourceVersion="Original" />
+                      <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DbType="Int32" Direction="Input" ParameterName="@IsNull_ServerName" Precision="0" ProviderType="Int" Scale="0" Size="0" SourceColumn="ServerName" SourceColumnNullMapping="true" SourceVersion="Original" />
+                      <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DbType="String" Direction="Input" ParameterName="@Original_ServerName" Precision="0" ProviderType="NVarChar" Scale="0" Size="0" SourceColumn="ServerName" SourceColumnNullMapping="false" SourceVersion="Original" />
+                      <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DbType="Int32" Direction="Input" ParameterName="@IsNull_Catalog" Precision="0" ProviderType="Int" Scale="0" Size="0" SourceColumn="Catalog" SourceColumnNullMapping="true" SourceVersion="Original" />
+                      <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DbType="String" Direction="Input" ParameterName="@Original_Catalog" Precision="0" ProviderType="NVarChar" Scale="0" Size="0" SourceColumn="Catalog" SourceColumnNullMapping="false" SourceVersion="Original" />
+                      <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DbType="Int32" Direction="Input" ParameterName="@IsNull_Username" Precision="0" ProviderType="Int" Scale="0" Size="0" SourceColumn="Username" SourceColumnNullMapping="true" SourceVersion="Original" />
+                      <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DbType="String" Direction="Input" ParameterName="@Original_Username" Precision="0" ProviderType="NVarChar" Scale="0" Size="0" SourceColumn="Username" SourceColumnNullMapping="false" SourceVersion="Original" />
+                      <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DbType="Int32" Direction="Input" ParameterName="@IsNull_Password" Precision="0" ProviderType="Int" Scale="0" Size="0" SourceColumn="Password" SourceColumnNullMapping="true" SourceVersion="Original" />
+                      <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DbType="String" Direction="Input" ParameterName="@Original_Password" Precision="0" ProviderType="NVarChar" Scale="0" Size="0" SourceColumn="Password" SourceColumnNullMapping="false" SourceVersion="Original" />
+                      <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DbType="Int32" Direction="Input" ParameterName="@IsNull_IntegratedSecurity" Precision="0" ProviderType="Int" Scale="0" Size="0" SourceColumn="IntegratedSecurity" SourceColumnNullMapping="true" SourceVersion="Original" />
+                      <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DbType="Boolean" Direction="Input" ParameterName="@Original_IntegratedSecurity" Precision="0" ProviderType="Bit" Scale="0" Size="0" SourceColumn="IntegratedSecurity" SourceColumnNullMapping="false" SourceVersion="Original" />
+                      <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DbType="Int32" Direction="Input" ParameterName="@IsNull_DuradosUser" Precision="0" ProviderType="Int" Scale="0" Size="0" SourceColumn="DuradosUser" SourceColumnNullMapping="true" SourceVersion="Original" />
+                      <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DbType="Int32" Direction="Input" ParameterName="@Original_DuradosUser" Precision="0" ProviderType="Int" Scale="0" Size="0" SourceColumn="DuradosUser" SourceColumnNullMapping="false" SourceVersion="Original" />
+                      <Parameter AllowDbNull="false" AutogeneratedName="Id" ColumnName="Id" DataSourceName="" DataTypeServer="int" DbType="Int32" Direction="Input" ParameterName="@Id" Precision="0" ProviderType="Int" Scale="0" Size="4" SourceColumn="Id" SourceColumnNullMapping="false" SourceVersion="Current" />
+                    </Parameters>
+                  </DbCommand>
+                </UpdateCommand>
+              </DbSource>
+            </MainSource>
+            <Mappings>
+              <Mapping SourceColumn="Id" DataSetColumn="Id" />
+              <Mapping SourceColumn="ServerName" DataSetColumn="ServerName" />
+              <Mapping SourceColumn="Catalog" DataSetColumn="Catalog" />
+              <Mapping SourceColumn="Username" DataSetColumn="Username" />
+              <Mapping SourceColumn="Password" DataSetColumn="Password" />
+              <Mapping SourceColumn="IntegratedSecurity" DataSetColumn="IntegratedSecurity" />
+              <Mapping SourceColumn="DuradosUser" DataSetColumn="DuradosUser" />
+            </Mappings>
+            <Sources />
+          </TableAdapter>
+          <TableAdapter BaseClass="System.ComponentModel.Component" DataAccessorModifier="AutoLayout, AnsiClass, Class, Public" DataAccessorName="v_durados_UserTableAdapter" GeneratorDataComponentClassName="v_durados_UserTableAdapter" Name="v_durados_User" UserDataComponentName="v_durados_UserTableAdapter">
+            <MainSource>
+              <DbSource ConnectionRef="duradosConnectionString (Settings)" DbObjectName="durados.dbo.v_durados_User" DbObjectType="View" FillMethodModifier="Public" FillMethodName="Fill" GenerateMethods="Both" GenerateShortCommands="false" GeneratorGetMethodName="GetData" GeneratorSourceName="Fill" GetMethodModifier="Public" GetMethodName="GetData" QueryType="Rowset" ScalarCallRetval="System.Object, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" UseOptimisticConcurrency="true" UserGetMethodName="GetData" UserSourceName="Fill">
+                <SelectCommand>
+                  <DbCommand CommandType="Text" ModifiedByUser="true">
+                    <CommandText>SELECT ID, Username, FirstName, LastName, Email, Password, Role, Guid, Signature, SignatureHTML, IsApproved, NewUser, Comments, FullName
+FROM     v_durados_User</CommandText>
+                    <Parameters />
+                  </DbCommand>
+                </SelectCommand>
+              </DbSource>
+            </MainSource>
+            <Mappings>
+              <Mapping SourceColumn="ID" DataSetColumn="ID" />
+              <Mapping SourceColumn="Username" DataSetColumn="Username" />
+              <Mapping SourceColumn="FirstName" DataSetColumn="FirstName" />
+              <Mapping SourceColumn="LastName" DataSetColumn="LastName" />
+              <Mapping SourceColumn="Email" DataSetColumn="Email" />
+              <Mapping SourceColumn="Password" DataSetColumn="Password" />
+              <Mapping SourceColumn="Role" DataSetColumn="Role" />
+              <Mapping SourceColumn="Guid" DataSetColumn="Guid" />
+              <Mapping SourceColumn="Signature" DataSetColumn="Signature" />
+              <Mapping SourceColumn="SignatureHTML" DataSetColumn="SignatureHTML" />
+              <Mapping SourceColumn="NewUser" DataSetColumn="NewUser" />
+              <Mapping SourceColumn="Comments" DataSetColumn="Comments" />
+              <Mapping SourceColumn="IsApproved" DataSetColumn="IsApproved" />
+              <Mapping SourceColumn="FullName" DataSetColumn="FullName" />
+            </Mappings>
+            <Sources />
+          </TableAdapter>
+          <TableAdapter BaseClass="System.ComponentModel.Component" DataAccessorModifier="AutoLayout, AnsiClass, Class, Public" DataAccessorName="durados_UserAliasTableAdapter" GeneratorDataComponentClassName="durados_UserAliasTableAdapter" Name="durados_UserAlias" UserDataComponentName="durados_UserAliasTableAdapter">
+            <MainSource>
+              <DbSource ConnectionRef="duradosConnectionString (Settings)" DbObjectName="durados.dbo.durados_UserAlias" DbObjectType="Table" FillMethodModifier="Public" FillMethodName="Fill" GenerateMethods="Both" GenerateShortCommands="true" GeneratorGetMethodName="GetData" GeneratorSourceName="Fill" GetMethodModifier="Public" GetMethodName="GetData" QueryType="Rowset" ScalarCallRetval="System.Object, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" UseOptimisticConcurrency="true" UserGetMethodName="GetData" UserSourceName="Fill">
+                <DeleteCommand>
+                  <DbCommand CommandType="Text" ModifiedByUser="false">
+                    <CommandText>DELETE FROM [dbo].[durados_UserAlias] WHERE (([Id] = @Original_Id) AND ([MainUsername] = @Original_MainUsername) AND ([Alias] = @Original_Alias))</CommandText>
+                    <Parameters>
+                      <Parameter AllowDbNull="false" AutogeneratedName="" DataSourceName="" DbType="Int32" Direction="Input" ParameterName="@Original_Id" Precision="0" ProviderType="Int" Scale="0" Size="0" SourceColumn="Id" SourceColumnNullMapping="false" SourceVersion="Original" />
+                      <Parameter AllowDbNull="false" AutogeneratedName="" DataSourceName="" DbType="Int32" Direction="Input" ParameterName="@Original_MainUsername" Precision="0" ProviderType="Int" Scale="0" Size="0" SourceColumn="MainUsername" SourceColumnNullMapping="false" SourceVersion="Original" />
+                      <Parameter AllowDbNull="false" AutogeneratedName="" DataSourceName="" DbType="Int32" Direction="Input" ParameterName="@Original_Alias" Precision="0" ProviderType="Int" Scale="0" Size="0" SourceColumn="Alias" SourceColumnNullMapping="false" SourceVersion="Original" />
+                    </Parameters>
+                  </DbCommand>
+                </DeleteCommand>
+                <InsertCommand>
+                  <DbCommand CommandType="Text" ModifiedByUser="false">
+                    <CommandText>INSERT INTO [dbo].[durados_UserAlias] ([MainUsername], [Alias]) VALUES (@MainUsername, @Alias);
+SELECT Id, MainUsername, Alias FROM durados_UserAlias WHERE (Id = SCOPE_IDENTITY())</CommandText>
+                    <Parameters>
+                      <Parameter AllowDbNull="false" AutogeneratedName="" DataSourceName="" DbType="Int32" Direction="Input" ParameterName="@MainUsername" Precision="0" ProviderType="Int" Scale="0" Size="0" SourceColumn="MainUsername" SourceColumnNullMapping="false" SourceVersion="Current" />
+                      <Parameter AllowDbNull="false" AutogeneratedName="" DataSourceName="" DbType="Int32" Direction="Input" ParameterName="@Alias" Precision="0" ProviderType="Int" Scale="0" Size="0" SourceColumn="Alias" SourceColumnNullMapping="false" SourceVersion="Current" />
+                    </Parameters>
+                  </DbCommand>
+                </InsertCommand>
+                <SelectCommand>
+                  <DbCommand CommandType="Text" ModifiedByUser="false">
+                    <CommandText>SELECT Id, MainUsername, Alias FROM dbo.durados_UserAlias</CommandText>
+                    <Parameters />
+                  </DbCommand>
+                </SelectCommand>
+                <UpdateCommand>
+                  <DbCommand CommandType="Text" ModifiedByUser="false">
+                    <CommandText>UPDATE [dbo].[durados_UserAlias] SET [MainUsername] = @MainUsername, [Alias] = @Alias WHERE (([Id] = @Original_Id) AND ([MainUsername] = @Original_MainUsername) AND ([Alias] = @Original_Alias));
+SELECT Id, MainUsername, Alias FROM durados_UserAlias WHERE (Id = @Id)</CommandText>
+                    <Parameters>
+                      <Parameter AllowDbNull="false" AutogeneratedName="" DataSourceName="" DbType="Int32" Direction="Input" ParameterName="@MainUsername" Precision="0" ProviderType="Int" Scale="0" Size="0" SourceColumn="MainUsername" SourceColumnNullMapping="false" SourceVersion="Current" />
+                      <Parameter AllowDbNull="false" AutogeneratedName="" DataSourceName="" DbType="Int32" Direction="Input" ParameterName="@Alias" Precision="0" ProviderType="Int" Scale="0" Size="0" SourceColumn="Alias" SourceColumnNullMapping="false" SourceVersion="Current" />
+                      <Parameter AllowDbNull="false" AutogeneratedName="" DataSourceName="" DbType="Int32" Direction="Input" ParameterName="@Original_Id" Precision="0" ProviderType="Int" Scale="0" Size="0" SourceColumn="Id" SourceColumnNullMapping="false" SourceVersion="Original" />
+                      <Parameter AllowDbNull="false" AutogeneratedName="" DataSourceName="" DbType="Int32" Direction="Input" ParameterName="@Original_MainUsername" Precision="0" ProviderType="Int" Scale="0" Size="0" SourceColumn="MainUsername" SourceColumnNullMapping="false" SourceVersion="Original" />
+                      <Parameter AllowDbNull="false" AutogeneratedName="" DataSourceName="" DbType="Int32" Direction="Input" ParameterName="@Original_Alias" Precision="0" ProviderType="Int" Scale="0" Size="0" SourceColumn="Alias" SourceColumnNullMapping="false" SourceVersion="Original" />
+                      <Parameter AllowDbNull="false" AutogeneratedName="Id" ColumnName="Id" DataSourceName="" DataTypeServer="int" DbType="Int32" Direction="Input" ParameterName="@Id" Precision="0" ProviderType="Int" Scale="0" Size="4" SourceColumn="Id" SourceColumnNullMapping="false" SourceVersion="Current" />
+                    </Parameters>
+                  </DbCommand>
+                </UpdateCommand>
+              </DbSource>
+            </MainSource>
+            <Mappings>
+              <Mapping SourceColumn="Id" DataSetColumn="Id" />
+              <Mapping SourceColumn="MainUsername" DataSetColumn="MainUsername" />
+              <Mapping SourceColumn="Alias" DataSetColumn="Alias" />
+            </Mappings>
+            <Sources />
+          </TableAdapter>
+          <TableAdapter BaseClass="System.ComponentModel.Component" DataAccessorModifier="AutoLayout, AnsiClass, Class, Public" DataAccessorName="durados_UserAppTableAdapter" GeneratorDataComponentClassName="durados_UserAppTableAdapter" Name="durados_UserApp" UserDataComponentName="durados_UserAppTableAdapter">
+            <MainSource>
+              <DbSource ConnectionRef="duradosConnectionString (Settings)" DbObjectName="durados.dbo.durados_UserApp" DbObjectType="Table" FillMethodModifier="Public" FillMethodName="Fill" GenerateMethods="Both" GenerateShortCommands="true" GeneratorGetMethodName="GetData" GeneratorSourceName="Fill" GetMethodModifier="Public" GetMethodName="GetData" QueryType="Rowset" ScalarCallRetval="System.Object, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" UseOptimisticConcurrency="true" UserGetMethodName="GetData" UserSourceName="Fill">
+                <DeleteCommand>
+                  <DbCommand CommandType="Text" ModifiedByUser="false">
+                    <CommandText>DELETE FROM [dbo].[durados_UserApp] WHERE (([Id] = @Original_Id) AND ([UserId] = @Original_UserId) AND ([AppId] = @Original_AppId) AND ((@IsNull_Category = 1 AND [Category] IS NULL) OR ([Category] = @Original_Category)))</CommandText>
+                    <Parameters>
+                      <Parameter AllowDbNull="false" AutogeneratedName="" DataSourceName="" DbType="Int32" Direction="Input" ParameterName="@Original_Id" Precision="0" ProviderType="Int" Scale="0" Size="0" SourceColumn="Id" SourceColumnNullMapping="false" SourceVersion="Original" />
+                      <Parameter AllowDbNull="false" AutogeneratedName="" DataSourceName="" DbType="Int32" Direction="Input" ParameterName="@Original_UserId" Precision="0" ProviderType="Int" Scale="0" Size="0" SourceColumn="UserId" SourceColumnNullMapping="false" SourceVersion="Original" />
+                      <Parameter AllowDbNull="false" AutogeneratedName="" DataSourceName="" DbType="Int32" Direction="Input" ParameterName="@Original_AppId" Precision="0" ProviderType="Int" Scale="0" Size="0" SourceColumn="AppId" SourceColumnNullMapping="false" SourceVersion="Original" />
+                      <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DbType="Int32" Direction="Input" ParameterName="@IsNull_Category" Precision="0" ProviderType="Int" Scale="0" Size="0" SourceColumn="Category" SourceColumnNullMapping="true" SourceVersion="Original" />
+                      <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DbType="String" Direction="Input" ParameterName="@Original_Category" Precision="0" ProviderType="NVarChar" Scale="0" Size="0" SourceColumn="Category" SourceColumnNullMapping="false" SourceVersion="Original" />
+                    </Parameters>
+                  </DbCommand>
+                </DeleteCommand>
+                <InsertCommand>
+                  <DbCommand CommandType="Text" ModifiedByUser="false">
+                    <CommandText>INSERT INTO [dbo].[durados_UserApp] ([UserId], [AppId], [Category]) VALUES (@UserId, @AppId, @Category);
+SELECT Id, UserId, AppId, Category FROM durados_UserApp WHERE (Id = SCOPE_IDENTITY())</CommandText>
+                    <Parameters>
+                      <Parameter AllowDbNull="false" AutogeneratedName="" DataSourceName="" DbType="Int32" Direction="Input" ParameterName="@UserId" Precision="0" ProviderType="Int" Scale="0" Size="0" SourceColumn="UserId" SourceColumnNullMapping="false" SourceVersion="Current" />
+                      <Parameter AllowDbNull="false" AutogeneratedName="" DataSourceName="" DbType="Int32" Direction="Input" ParameterName="@AppId" Precision="0" ProviderType="Int" Scale="0" Size="0" SourceColumn="AppId" SourceColumnNullMapping="false" SourceVersion="Current" />
+                      <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DbType="String" Direction="Input" ParameterName="@Category" Precision="0" ProviderType="NVarChar" Scale="0" Size="0" SourceColumn="Category" SourceColumnNullMapping="false" SourceVersion="Current" />
+                    </Parameters>
+                  </DbCommand>
+                </InsertCommand>
+                <SelectCommand>
+                  <DbCommand CommandType="Text" ModifiedByUser="false">
+                    <CommandText>SELECT Id, UserId, AppId, Category FROM dbo.durados_UserApp</CommandText>
+                    <Parameters />
+                  </DbCommand>
+                </SelectCommand>
+                <UpdateCommand>
+                  <DbCommand CommandType="Text" ModifiedByUser="false">
+                    <CommandText>UPDATE [dbo].[durados_UserApp] SET [UserId] = @UserId, [AppId] = @AppId, [Category] = @Category WHERE (([Id] = @Original_Id) AND ([UserId] = @Original_UserId) AND ([AppId] = @Original_AppId) AND ((@IsNull_Category = 1 AND [Category] IS NULL) OR ([Category] = @Original_Category)));
+SELECT Id, UserId, AppId, Category FROM durados_UserApp WHERE (Id = @Id)</CommandText>
+                    <Parameters>
+                      <Parameter AllowDbNull="false" AutogeneratedName="" DataSourceName="" DbType="Int32" Direction="Input" ParameterName="@UserId" Precision="0" ProviderType="Int" Scale="0" Size="0" SourceColumn="UserId" SourceColumnNullMapping="false" SourceVersion="Current" />
+                      <Parameter AllowDbNull="false" AutogeneratedName="" DataSourceName="" DbType="Int32" Direction="Input" ParameterName="@AppId" Precision="0" ProviderType="Int" Scale="0" Size="0" SourceColumn="AppId" SourceColumnNullMapping="false" SourceVersion="Current" />
+                      <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DbType="String" Direction="Input" ParameterName="@Category" Precision="0" ProviderType="NVarChar" Scale="0" Size="0" SourceColumn="Category" SourceColumnNullMapping="false" SourceVersion="Current" />
+                      <Parameter AllowDbNull="false" AutogeneratedName="" DataSourceName="" DbType="Int32" Direction="Input" ParameterName="@Original_Id" Precision="0" ProviderType="Int" Scale="0" Size="0" SourceColumn="Id" SourceColumnNullMapping="false" SourceVersion="Original" />
+                      <Parameter AllowDbNull="false" AutogeneratedName="" DataSourceName="" DbType="Int32" Direction="Input" ParameterName="@Original_UserId" Precision="0" ProviderType="Int" Scale="0" Size="0" SourceColumn="UserId" SourceColumnNullMapping="false" SourceVersion="Original" />
+                      <Parameter AllowDbNull="false" AutogeneratedName="" DataSourceName="" DbType="Int32" Direction="Input" ParameterName="@Original_AppId" Precision="0" ProviderType="Int" Scale="0" Size="0" SourceColumn="AppId" SourceColumnNullMapping="false" SourceVersion="Original" />
+                      <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DbType="Int32" Direction="Input" ParameterName="@IsNull_Category" Precision="0" ProviderType="Int" Scale="0" Size="0" SourceColumn="Category" SourceColumnNullMapping="true" SourceVersion="Original" />
+                      <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DbType="String" Direction="Input" ParameterName="@Original_Category" Precision="0" ProviderType="NVarChar" Scale="0" Size="0" SourceColumn="Category" SourceColumnNullMapping="false" SourceVersion="Original" />
+                      <Parameter AllowDbNull="false" AutogeneratedName="Id" ColumnName="Id" DataSourceName="" DataTypeServer="int" DbType="Int32" Direction="Input" ParameterName="@Id" Precision="0" ProviderType="Int" Scale="0" Size="4" SourceColumn="Id" SourceColumnNullMapping="false" SourceVersion="Current" />
+                    </Parameters>
+                  </DbCommand>
+                </UpdateCommand>
+              </DbSource>
+            </MainSource>
+            <Mappings>
+              <Mapping SourceColumn="Id" DataSetColumn="Id" />
+              <Mapping SourceColumn="UserId" DataSetColumn="UserId" />
+              <Mapping SourceColumn="AppId" DataSetColumn="AppId" />
+              <Mapping SourceColumn="Category" DataSetColumn="Category" />
+            </Mappings>
+            <Sources />
+          </TableAdapter>
+          <TableAdapter BaseClass="System.ComponentModel.Component" DataAccessorModifier="AutoLayout, AnsiClass, Class, Public" DataAccessorName="durados_DataSourceTypeTableAdapter" GeneratorDataComponentClassName="durados_DataSourceTypeTableAdapter" Name="durados_DataSourceType" UserDataComponentName="durados_DataSourceTypeTableAdapter">
+            <MainSource>
+              <DbSource ConnectionRef="duradosConnectionString (Settings)" DbObjectName="durados.dbo.durados_DataSourceType" DbObjectType="Table" FillMethodModifier="Public" FillMethodName="Fill" GenerateMethods="Both" GenerateShortCommands="true" GeneratorGetMethodName="GetData" GeneratorSourceName="Fill" GetMethodModifier="Public" GetMethodName="GetData" QueryType="Rowset" ScalarCallRetval="System.Object, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" UseOptimisticConcurrency="true" UserGetMethodName="GetData" UserSourceName="Fill">
+                <DeleteCommand>
+                  <DbCommand CommandType="Text" ModifiedByUser="false">
+                    <CommandText>DELETE FROM [dbo].[durados_DataSourceType] WHERE (([Id] = @Original_Id) AND ((@IsNull_Name = 1 AND [Name] IS NULL) OR ([Name] = @Original_Name)) AND ((@IsNull_Ordinal = 1 AND [Ordinal] IS NULL) OR ([Ordinal] = @Original_Ordinal)))</CommandText>
+                    <Parameters>
+                      <Parameter AllowDbNull="false" AutogeneratedName="" DataSourceName="" DbType="Int32" Direction="Input" ParameterName="@Original_Id" Precision="0" ProviderType="Int" Scale="0" Size="0" SourceColumn="Id" SourceColumnNullMapping="false" SourceVersion="Original" />
+                      <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DbType="Int32" Direction="Input" ParameterName="@IsNull_Name" Precision="0" ProviderType="Int" Scale="0" Size="0" SourceColumn="Name" SourceColumnNullMapping="true" SourceVersion="Original" />
+                      <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DbType="String" Direction="Input" ParameterName="@Original_Name" Precision="0" ProviderType="NVarChar" Scale="0" Size="0" SourceColumn="Name" SourceColumnNullMapping="false" SourceVersion="Original" />
+                      <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DbType="Int32" Direction="Input" ParameterName="@IsNull_Ordinal" Precision="0" ProviderType="Int" Scale="0" Size="0" SourceColumn="Ordinal" SourceColumnNullMapping="true" SourceVersion="Original" />
+                      <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DbType="Int32" Direction="Input" ParameterName="@Original_Ordinal" Precision="0" ProviderType="Int" Scale="0" Size="0" SourceColumn="Ordinal" SourceColumnNullMapping="false" SourceVersion="Original" />
+                    </Parameters>
+                  </DbCommand>
+                </DeleteCommand>
+                <InsertCommand>
+                  <DbCommand CommandType="Text" ModifiedByUser="false">
+                    <CommandText>INSERT INTO [dbo].[durados_DataSourceType] ([Id], [Name], [Ordinal]) VALUES (@Id, @Name, @Ordinal);
+SELECT Id, Name, Ordinal FROM durados_DataSourceType WHERE (Id = @Id)</CommandText>
+                    <Parameters>
+                      <Parameter AllowDbNull="false" AutogeneratedName="" DataSourceName="" DbType="Int32" Direction="Input" ParameterName="@Id" Precision="0" ProviderType="Int" Scale="0" Size="0" SourceColumn="Id" SourceColumnNullMapping="false" SourceVersion="Current" />
+                      <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DbType="String" Direction="Input" ParameterName="@Name" Precision="0" ProviderType="NVarChar" Scale="0" Size="0" SourceColumn="Name" SourceColumnNullMapping="false" SourceVersion="Current" />
+                      <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DbType="Int32" Direction="Input" ParameterName="@Ordinal" Precision="0" ProviderType="Int" Scale="0" Size="0" SourceColumn="Ordinal" SourceColumnNullMapping="false" SourceVersion="Current" />
+                    </Parameters>
+                  </DbCommand>
+                </InsertCommand>
+                <SelectCommand>
+                  <DbCommand CommandType="Text" ModifiedByUser="false">
+                    <CommandText>SELECT Id, Name, Ordinal FROM dbo.durados_DataSourceType</CommandText>
+                    <Parameters />
+                  </DbCommand>
+                </SelectCommand>
+                <UpdateCommand>
+                  <DbCommand CommandType="Text" ModifiedByUser="false">
+                    <CommandText>UPDATE [dbo].[durados_DataSourceType] SET [Id] = @Id, [Name] = @Name, [Ordinal] = @Ordinal WHERE (([Id] = @Original_Id) AND ((@IsNull_Name = 1 AND [Name] IS NULL) OR ([Name] = @Original_Name)) AND ((@IsNull_Ordinal = 1 AND [Ordinal] IS NULL) OR ([Ordinal] = @Original_Ordinal)));
+SELECT Id, Name, Ordinal FROM durados_DataSourceType WHERE (Id = @Id)</CommandText>
+                    <Parameters>
+                      <Parameter AllowDbNull="false" AutogeneratedName="" DataSourceName="" DbType="Int32" Direction="Input" ParameterName="@Id" Precision="0" ProviderType="Int" Scale="0" Size="0" SourceColumn="Id" SourceColumnNullMapping="false" SourceVersion="Current" />
+                      <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DbType="String" Direction="Input" ParameterName="@Name" Precision="0" ProviderType="NVarChar" Scale="0" Size="0" SourceColumn="Name" SourceColumnNullMapping="false" SourceVersion="Current" />
+                      <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DbType="Int32" Direction="Input" ParameterName="@Ordinal" Precision="0" ProviderType="Int" Scale="0" Size="0" SourceColumn="Ordinal" SourceColumnNullMapping="false" SourceVersion="Current" />
+                      <Parameter AllowDbNull="false" AutogeneratedName="" DataSourceName="" DbType="Int32" Direction="Input" ParameterName="@Original_Id" Precision="0" ProviderType="Int" Scale="0" Size="0" SourceColumn="Id" SourceColumnNullMapping="false" SourceVersion="Original" />
+                      <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DbType="Int32" Direction="Input" ParameterName="@IsNull_Name" Precision="0" ProviderType="Int" Scale="0" Size="0" SourceColumn="Name" SourceColumnNullMapping="true" SourceVersion="Original" />
+                      <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DbType="String" Direction="Input" ParameterName="@Original_Name" Precision="0" ProviderType="NVarChar" Scale="0" Size="0" SourceColumn="Name" SourceColumnNullMapping="false" SourceVersion="Original" />
+                      <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DbType="Int32" Direction="Input" ParameterName="@IsNull_Ordinal" Precision="0" ProviderType="Int" Scale="0" Size="0" SourceColumn="Ordinal" SourceColumnNullMapping="true" SourceVersion="Original" />
+                      <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DbType="Int32" Direction="Input" ParameterName="@Original_Ordinal" Precision="0" ProviderType="Int" Scale="0" Size="0" SourceColumn="Ordinal" SourceColumnNullMapping="false" SourceVersion="Original" />
+                    </Parameters>
+                  </DbCommand>
+                </UpdateCommand>
+              </DbSource>
+            </MainSource>
+            <Mappings>
+              <Mapping SourceColumn="Id" DataSetColumn="Id" />
+              <Mapping SourceColumn="Name" DataSetColumn="Name" />
+              <Mapping SourceColumn="Ordinal" DataSetColumn="Ordinal" />
+            </Mappings>
+            <Sources />
+          </TableAdapter>
+          <TableAdapter BaseClass="System.ComponentModel.Component" DataAccessorModifier="AutoLayout, AnsiClass, Class, Public" DataAccessorName="durados_DnsAliasTableAdapter" GeneratorDataComponentClassName="durados_DnsAliasTableAdapter" Name="durados_DnsAlias" UserDataComponentName="durados_DnsAliasTableAdapter">
+            <MainSource>
+              <DbSource ConnectionRef="duradosConnectionString (Settings)" DbObjectName="durados.dbo.durados_DnsAlias" DbObjectType="Table" FillMethodModifier="Public" FillMethodName="Fill" GenerateMethods="Both" GenerateShortCommands="true" GeneratorGetMethodName="GetData" GeneratorSourceName="Fill" GetMethodModifier="Public" GetMethodName="GetData" QueryType="Rowset" ScalarCallRetval="System.Object, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" UseOptimisticConcurrency="true" UserGetMethodName="GetData" UserSourceName="Fill">
+                <DeleteCommand>
+                  <DbCommand CommandType="Text" ModifiedByUser="false">
+                    <CommandText>DELETE FROM [dbo].[durados_DnsAlias] WHERE (([Id] = @Original_Id) AND ([Alias] = @Original_Alias) AND ([AppId] = @Original_AppId))</CommandText>
+                    <Parameters>
+                      <Parameter AllowDbNull="false" AutogeneratedName="" DataSourceName="" DbType="Int32" Direction="Input" ParameterName="@Original_Id" Precision="0" ProviderType="Int" Scale="0" Size="0" SourceColumn="Id" SourceColumnNullMapping="false" SourceVersion="Original" />
+                      <Parameter AllowDbNull="false" AutogeneratedName="" DataSourceName="" DbType="String" Direction="Input" ParameterName="@Original_Alias" Precision="0" ProviderType="NVarChar" Scale="0" Size="0" SourceColumn="Alias" SourceColumnNullMapping="false" SourceVersion="Original" />
+                      <Parameter AllowDbNull="false" AutogeneratedName="" DataSourceName="" DbType="Int32" Direction="Input" ParameterName="@Original_AppId" Precision="0" ProviderType="Int" Scale="0" Size="0" SourceColumn="AppId" SourceColumnNullMapping="false" SourceVersion="Original" />
+                    </Parameters>
+                  </DbCommand>
+                </DeleteCommand>
+                <InsertCommand>
+                  <DbCommand CommandType="Text" ModifiedByUser="false">
+                    <CommandText>INSERT INTO [dbo].[durados_DnsAlias] ([Id], [Alias], [AppId]) VALUES (@Id, @Alias, @AppId);
+SELECT Id, Alias, AppId FROM durados_DnsAlias WHERE (Id = @Id)</CommandText>
+                    <Parameters>
+                      <Parameter AllowDbNull="false" AutogeneratedName="" DataSourceName="" DbType="Int32" Direction="Input" ParameterName="@Id" Precision="0" ProviderType="Int" Scale="0" Size="0" SourceColumn="Id" SourceColumnNullMapping="false" SourceVersion="Current" />
+                      <Parameter AllowDbNull="false" AutogeneratedName="" DataSourceName="" DbType="String" Direction="Input" ParameterName="@Alias" Precision="0" ProviderType="NVarChar" Scale="0" Size="0" SourceColumn="Alias" SourceColumnNullMapping="false" SourceVersion="Current" />
+                      <Parameter AllowDbNull="false" AutogeneratedName="" DataSourceName="" DbType="Int32" Direction="Input" ParameterName="@AppId" Precision="0" ProviderType="Int" Scale="0" Size="0" SourceColumn="AppId" SourceColumnNullMapping="false" SourceVersion="Current" />
+                    </Parameters>
+                  </DbCommand>
+                </InsertCommand>
+                <SelectCommand>
+                  <DbCommand CommandType="Text" ModifiedByUser="false">
+                    <CommandText>SELECT Id, Alias, AppId FROM dbo.durados_DnsAlias</CommandText>
+                    <Parameters />
+                  </DbCommand>
+                </SelectCommand>
+                <UpdateCommand>
+                  <DbCommand CommandType="Text" ModifiedByUser="false">
+                    <CommandText>UPDATE [dbo].[durados_DnsAlias] SET [Id] = @Id, [Alias] = @Alias, [AppId] = @AppId WHERE (([Id] = @Original_Id) AND ([Alias] = @Original_Alias) AND ([AppId] = @Original_AppId));
+SELECT Id, Alias, AppId FROM durados_DnsAlias WHERE (Id = @Id)</CommandText>
+                    <Parameters>
+                      <Parameter AllowDbNull="false" AutogeneratedName="" DataSourceName="" DbType="Int32" Direction="Input" ParameterName="@Id" Precision="0" ProviderType="Int" Scale="0" Size="0" SourceColumn="Id" SourceColumnNullMapping="false" SourceVersion="Current" />
+                      <Parameter AllowDbNull="false" AutogeneratedName="" DataSourceName="" DbType="String" Direction="Input" ParameterName="@Alias" Precision="0" ProviderType="NVarChar" Scale="0" Size="0" SourceColumn="Alias" SourceColumnNullMapping="false" SourceVersion="Current" />
+                      <Parameter AllowDbNull="false" AutogeneratedName="" DataSourceName="" DbType="Int32" Direction="Input" ParameterName="@AppId" Precision="0" ProviderType="Int" Scale="0" Size="0" SourceColumn="AppId" SourceColumnNullMapping="false" SourceVersion="Current" />
+                      <Parameter AllowDbNull="false" AutogeneratedName="" DataSourceName="" DbType="Int32" Direction="Input" ParameterName="@Original_Id" Precision="0" ProviderType="Int" Scale="0" Size="0" SourceColumn="Id" SourceColumnNullMapping="false" SourceVersion="Original" />
+                      <Parameter AllowDbNull="false" AutogeneratedName="" DataSourceName="" DbType="String" Direction="Input" ParameterName="@Original_Alias" Precision="0" ProviderType="NVarChar" Scale="0" Size="0" SourceColumn="Alias" SourceColumnNullMapping="false" SourceVersion="Original" />
+                      <Parameter AllowDbNull="false" AutogeneratedName="" DataSourceName="" DbType="Int32" Direction="Input" ParameterName="@Original_AppId" Precision="0" ProviderType="Int" Scale="0" Size="0" SourceColumn="AppId" SourceColumnNullMapping="false" SourceVersion="Original" />
+                    </Parameters>
+                  </DbCommand>
+                </UpdateCommand>
+              </DbSource>
+            </MainSource>
+            <Mappings>
+              <Mapping SourceColumn="Id" DataSetColumn="Id" />
+              <Mapping SourceColumn="Alias" DataSetColumn="Alias" />
+              <Mapping SourceColumn="AppId" DataSetColumn="AppId" />
+            </Mappings>
+            <Sources />
+          </TableAdapter>
+          <TableAdapter BaseClass="System.ComponentModel.Component" DataAccessorModifier="AutoLayout, AnsiClass, Class, Public" DataAccessorName="durados_SqlProductTableAdapter" GeneratorDataComponentClassName="durados_SqlProductTableAdapter" Name="durados_SqlProduct" UserDataComponentName="durados_SqlProductTableAdapter">
+            <MainSource>
+              <DbSource ConnectionRef="duradosConnectionString (Settings)" DbObjectName="BackAnd_dev.dbo.durados_SqlProduct" DbObjectType="Table" FillMethodModifier="Public" FillMethodName="Fill" GenerateMethods="Both" GenerateShortCommands="true" GeneratorGetMethodName="GetData" GeneratorSourceName="Fill" GetMethodModifier="Public" GetMethodName="GetData" QueryType="Rowset" ScalarCallRetval="System.Object, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" UseOptimisticConcurrency="true" UserGetMethodName="GetData" UserSourceName="Fill">
+                <DeleteCommand>
+                  <DbCommand CommandType="Text" ModifiedByUser="false">
+                    <CommandText>DELETE FROM [durados_SqlProduct] WHERE (([Id] = @Original_Id) AND ((@IsNull_Name = 1 AND [Name] IS NULL) OR ([Name] = @Original_Name)) AND ((@IsNull_Ordinal = 1 AND [Ordinal] IS NULL) OR ([Ordinal] = @Original_Ordinal)))</CommandText>
+                    <Parameters>
+                      <Parameter AllowDbNull="false" AutogeneratedName="" DataSourceName="" DbType="Int32" Direction="Input" ParameterName="@Original_Id" Precision="0" ProviderType="Int" Scale="0" Size="0" SourceColumn="Id" SourceColumnNullMapping="false" SourceVersion="Original" />
+                      <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DbType="Int32" Direction="Input" ParameterName="@IsNull_Name" Precision="0" ProviderType="Int" Scale="0" Size="0" SourceColumn="Name" SourceColumnNullMapping="true" SourceVersion="Original" />
+                      <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DbType="String" Direction="Input" ParameterName="@Original_Name" Precision="0" ProviderType="NVarChar" Scale="0" Size="0" SourceColumn="Name" SourceColumnNullMapping="false" SourceVersion="Original" />
+                      <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DbType="Int32" Direction="Input" ParameterName="@IsNull_Ordinal" Precision="0" ProviderType="Int" Scale="0" Size="0" SourceColumn="Ordinal" SourceColumnNullMapping="true" SourceVersion="Original" />
+                      <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DbType="Int32" Direction="Input" ParameterName="@Original_Ordinal" Precision="0" ProviderType="Int" Scale="0" Size="0" SourceColumn="Ordinal" SourceColumnNullMapping="false" SourceVersion="Original" />
+                    </Parameters>
+                  </DbCommand>
+                </DeleteCommand>
+                <InsertCommand>
+                  <DbCommand CommandType="Text" ModifiedByUser="false">
+                    <CommandText>INSERT INTO [durados_SqlProduct] ([Name], [Ordinal]) VALUES (@Name, @Ordinal);
+SELECT Id, Name, Ordinal FROM durados_SqlProduct WHERE (Id = SCOPE_IDENTITY())</CommandText>
+                    <Parameters>
+                      <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DbType="String" Direction="Input" ParameterName="@Name" Precision="0" ProviderType="NVarChar" Scale="0" Size="0" SourceColumn="Name" SourceColumnNullMapping="false" SourceVersion="Current" />
+                      <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DbType="Int32" Direction="Input" ParameterName="@Ordinal" Precision="0" ProviderType="Int" Scale="0" Size="0" SourceColumn="Ordinal" SourceColumnNullMapping="false" SourceVersion="Current" />
+                    </Parameters>
+                  </DbCommand>
+                </InsertCommand>
+                <SelectCommand>
+                  <DbCommand CommandType="Text" ModifiedByUser="false">
+                    <CommandText>SELECT     durados_SqlProduct.*
+FROM         durados_SqlProduct</CommandText>
+                    <Parameters />
+                  </DbCommand>
+                </SelectCommand>
+                <UpdateCommand>
+                  <DbCommand CommandType="Text" ModifiedByUser="false">
+                    <CommandText>UPDATE [durados_SqlProduct] SET [Name] = @Name, [Ordinal] = @Ordinal WHERE (([Id] = @Original_Id) AND ((@IsNull_Name = 1 AND [Name] IS NULL) OR ([Name] = @Original_Name)) AND ((@IsNull_Ordinal = 1 AND [Ordinal] IS NULL) OR ([Ordinal] = @Original_Ordinal)));
+SELECT Id, Name, Ordinal FROM durados_SqlProduct WHERE (Id = @Id)</CommandText>
+                    <Parameters>
+                      <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DbType="String" Direction="Input" ParameterName="@Name" Precision="0" ProviderType="NVarChar" Scale="0" Size="0" SourceColumn="Name" SourceColumnNullMapping="false" SourceVersion="Current" />
+                      <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DbType="Int32" Direction="Input" ParameterName="@Ordinal" Precision="0" ProviderType="Int" Scale="0" Size="0" SourceColumn="Ordinal" SourceColumnNullMapping="false" SourceVersion="Current" />
+                      <Parameter AllowDbNull="false" AutogeneratedName="" DataSourceName="" DbType="Int32" Direction="Input" ParameterName="@Original_Id" Precision="0" ProviderType="Int" Scale="0" Size="0" SourceColumn="Id" SourceColumnNullMapping="false" SourceVersion="Original" />
+                      <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DbType="Int32" Direction="Input" ParameterName="@IsNull_Name" Precision="0" ProviderType="Int" Scale="0" Size="0" SourceColumn="Name" SourceColumnNullMapping="true" SourceVersion="Original" />
+                      <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DbType="String" Direction="Input" ParameterName="@Original_Name" Precision="0" ProviderType="NVarChar" Scale="0" Size="0" SourceColumn="Name" SourceColumnNullMapping="false" SourceVersion="Original" />
+                      <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DbType="Int32" Direction="Input" ParameterName="@IsNull_Ordinal" Precision="0" ProviderType="Int" Scale="0" Size="0" SourceColumn="Ordinal" SourceColumnNullMapping="true" SourceVersion="Original" />
+                      <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DbType="Int32" Direction="Input" ParameterName="@Original_Ordinal" Precision="0" ProviderType="Int" Scale="0" Size="0" SourceColumn="Ordinal" SourceColumnNullMapping="false" SourceVersion="Original" />
+                      <Parameter AllowDbNull="false" AutogeneratedName="Id" ColumnName="Id" DataSourceName="" DataTypeServer="int" DbType="Int32" Direction="Input" ParameterName="@Id" Precision="0" ProviderType="Int" Scale="0" Size="4" SourceColumn="Id" SourceColumnNullMapping="false" SourceVersion="Current" />
+                    </Parameters>
+                  </DbCommand>
+                </UpdateCommand>
+              </DbSource>
+            </MainSource>
+            <Mappings>
+              <Mapping SourceColumn="Id" DataSetColumn="Id" />
+              <Mapping SourceColumn="Name" DataSetColumn="Name" />
+              <Mapping SourceColumn="Ordinal" DataSetColumn="Ordinal" />
+            </Mappings>
+            <Sources />
+          </TableAdapter>
+          <TableAdapter BaseClass="System.ComponentModel.Component" DataAccessorModifier="AutoLayout, AnsiClass, Class, Public" DataAccessorName="durados_ThemeTableAdapter" GeneratorDataComponentClassName="durados_ThemeTableAdapter" Name="durados_Theme" UserDataComponentName="durados_ThemeTableAdapter">
+            <MainSource>
+              <DbSource ConnectionRef="duradosConnectionString (Settings)" DbObjectName="BackAnd_dev.dbo.durados_Theme" DbObjectType="Table" FillMethodModifier="Public" FillMethodName="Fill" GenerateMethods="Both" GenerateShortCommands="true" GeneratorGetMethodName="GetData" GeneratorSourceName="Fill" GetMethodModifier="Public" GetMethodName="GetData" QueryType="Rowset" ScalarCallRetval="System.Object, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" UseOptimisticConcurrency="true" UserGetMethodName="GetData" UserSourceName="Fill">
+                <DeleteCommand>
+                  <DbCommand CommandType="Text" ModifiedByUser="false">
+                    <CommandText>DELETE FROM [dbo].[durados_Theme] WHERE (([Id] = @Original_Id) AND ([Name] = @Original_Name) AND ([RelativePath] = @Original_RelativePath))</CommandText>
+                    <Parameters>
+                      <Parameter AllowDbNull="false" AutogeneratedName="" DataSourceName="" DbType="Int32" Direction="Input" ParameterName="@Original_Id" Precision="0" ProviderType="Int" Scale="0" Size="0" SourceColumn="Id" SourceColumnNullMapping="false" SourceVersion="Original" />
+                      <Parameter AllowDbNull="false" AutogeneratedName="" DataSourceName="" DbType="String" Direction="Input" ParameterName="@Original_Name" Precision="0" ProviderType="NVarChar" Scale="0" Size="0" SourceColumn="Name" SourceColumnNullMapping="false" SourceVersion="Original" />
+                      <Parameter AllowDbNull="false" AutogeneratedName="" DataSourceName="" DbType="String" Direction="Input" ParameterName="@Original_RelativePath" Precision="0" ProviderType="NVarChar" Scale="0" Size="0" SourceColumn="RelativePath" SourceColumnNullMapping="false" SourceVersion="Original" />
+                    </Parameters>
+                  </DbCommand>
+                </DeleteCommand>
+                <InsertCommand>
+                  <DbCommand CommandType="Text" ModifiedByUser="false">
+                    <CommandText>INSERT INTO [dbo].[durados_Theme] ([Name], [RelativePath]) VALUES (@Name, @RelativePath);
+SELECT Id, Name, RelativePath FROM durados_Theme WHERE (Id = SCOPE_IDENTITY())</CommandText>
+                    <Parameters>
+                      <Parameter AllowDbNull="false" AutogeneratedName="" DataSourceName="" DbType="String" Direction="Input" ParameterName="@Name" Precision="0" ProviderType="NVarChar" Scale="0" Size="0" SourceColumn="Name" SourceColumnNullMapping="false" SourceVersion="Current" />
+                      <Parameter AllowDbNull="false" AutogeneratedName="" DataSourceName="" DbType="String" Direction="Input" ParameterName="@RelativePath" Precision="0" ProviderType="NVarChar" Scale="0" Size="0" SourceColumn="RelativePath" SourceColumnNullMapping="false" SourceVersion="Current" />
+                    </Parameters>
+                  </DbCommand>
+                </InsertCommand>
+                <SelectCommand>
+                  <DbCommand CommandType="Text" ModifiedByUser="false">
+                    <CommandText>SELECT Id, Name, RelativePath FROM dbo.durados_Theme</CommandText>
+                    <Parameters />
+                  </DbCommand>
+                </SelectCommand>
+                <UpdateCommand>
+                  <DbCommand CommandType="Text" ModifiedByUser="false">
+                    <CommandText>UPDATE [dbo].[durados_Theme] SET [Name] = @Name, [RelativePath] = @RelativePath WHERE (([Id] = @Original_Id) AND ([Name] = @Original_Name) AND ([RelativePath] = @Original_RelativePath));
+SELECT Id, Name, RelativePath FROM durados_Theme WHERE (Id = @Id)</CommandText>
+                    <Parameters>
+                      <Parameter AllowDbNull="false" AutogeneratedName="" DataSourceName="" DbType="String" Direction="Input" ParameterName="@Name" Precision="0" ProviderType="NVarChar" Scale="0" Size="0" SourceColumn="Name" SourceColumnNullMapping="false" SourceVersion="Current" />
+                      <Parameter AllowDbNull="false" AutogeneratedName="" DataSourceName="" DbType="String" Direction="Input" ParameterName="@RelativePath" Precision="0" ProviderType="NVarChar" Scale="0" Size="0" SourceColumn="RelativePath" SourceColumnNullMapping="false" SourceVersion="Current" />
+                      <Parameter AllowDbNull="false" AutogeneratedName="" DataSourceName="" DbType="Int32" Direction="Input" ParameterName="@Original_Id" Precision="0" ProviderType="Int" Scale="0" Size="0" SourceColumn="Id" SourceColumnNullMapping="false" SourceVersion="Original" />
+                      <Parameter AllowDbNull="false" AutogeneratedName="" DataSourceName="" DbType="String" Direction="Input" ParameterName="@Original_Name" Precision="0" ProviderType="NVarChar" Scale="0" Size="0" SourceColumn="Name" SourceColumnNullMapping="false" SourceVersion="Original" />
+                      <Parameter AllowDbNull="false" AutogeneratedName="" DataSourceName="" DbType="String" Direction="Input" ParameterName="@Original_RelativePath" Precision="0" ProviderType="NVarChar" Scale="0" Size="0" SourceColumn="RelativePath" SourceColumnNullMapping="false" SourceVersion="Original" />
+                      <Parameter AllowDbNull="false" AutogeneratedName="Id" ColumnName="Id" DataSourceName="" DataTypeServer="int" DbType="Int32" Direction="Input" ParameterName="@Id" Precision="0" ProviderType="Int" Scale="0" Size="4" SourceColumn="Id" SourceColumnNullMapping="false" SourceVersion="Current" />
+                    </Parameters>
+                  </DbCommand>
+                </UpdateCommand>
+              </DbSource>
+            </MainSource>
+            <Mappings>
+              <Mapping SourceColumn="Id" DataSetColumn="Id" />
+              <Mapping SourceColumn="Name" DataSetColumn="Name" />
+              <Mapping SourceColumn="RelativePath" DataSetColumn="RelativePath" />
+            </Mappings>
+            <Sources />
+          </TableAdapter>
+          <TableAdapter BaseClass="System.ComponentModel.Component" DataAccessorModifier="AutoLayout, AnsiClass, Class, Public" DataAccessorName="durados_AppStatTableAdapter" GeneratorDataComponentClassName="durados_AppStatTableAdapter" Name="durados_AppStat" UserDataComponentName="durados_AppStatTableAdapter">
+            <MainSource>
+              <DbSource ConnectionRef="duradosConnectionString (Settings)" DbObjectName="BackAnd_dev.dbo.durados_AppStat" DbObjectType="Table" FillMethodModifier="Public" FillMethodName="Fill" GenerateMethods="Both" GenerateShortCommands="true" GeneratorGetMethodName="GetData" GeneratorSourceName="Fill" GetMethodModifier="Public" GetMethodName="GetData" QueryType="Rowset" ScalarCallRetval="System.Object, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" UseOptimisticConcurrency="true" UserGetMethodName="GetData" UserSourceName="Fill">
+                <DeleteCommand>
+                  <DbCommand CommandType="Text" ModifiedByUser="false">
+                    <CommandText>DELETE FROM [dbo].[durados_AppStat] WHERE (([Id] = @Original_Id) AND ((@IsNull_AppId = 1 AND [AppId] IS NULL) OR ([AppId] = @Original_AppId)) AND ((@IsNull_Name = 1 AND [Name] IS NULL) OR ([Name] = @Original_Name)) AND ((@IsNull_Value = 1 AND [Value] IS NULL) OR ([Value] = @Original_Value)) AND ((@IsNull_Date = 1 AND [Date] IS NULL) OR ([Date] = @Original_Date)))</CommandText>
+                    <Parameters>
+                      <Parameter AllowDbNull="false" AutogeneratedName="" DataSourceName="" DbType="Int32" Direction="Input" ParameterName="@Original_Id" Precision="0" ProviderType="Int" Scale="0" Size="0" SourceColumn="Id" SourceColumnNullMapping="false" SourceVersion="Original" />
+                      <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DbType="Int32" Direction="Input" ParameterName="@IsNull_AppId" Precision="0" ProviderType="Int" Scale="0" Size="0" SourceColumn="AppId" SourceColumnNullMapping="true" SourceVersion="Original" />
+                      <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DbType="Int32" Direction="Input" ParameterName="@Original_AppId" Precision="0" ProviderType="Int" Scale="0" Size="0" SourceColumn="AppId" SourceColumnNullMapping="false" SourceVersion="Original" />
+                      <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DbType="Int32" Direction="Input" ParameterName="@IsNull_Name" Precision="0" ProviderType="Int" Scale="0" Size="0" SourceColumn="Name" SourceColumnNullMapping="true" SourceVersion="Original" />
+                      <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DbType="String" Direction="Input" ParameterName="@Original_Name" Precision="0" ProviderType="NVarChar" Scale="0" Size="0" SourceColumn="Name" SourceColumnNullMapping="false" SourceVersion="Original" />
+                      <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DbType="Int32" Direction="Input" ParameterName="@IsNull_Value" Precision="0" ProviderType="Int" Scale="0" Size="0" SourceColumn="Value" SourceColumnNullMapping="true" SourceVersion="Original" />
+                      <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DbType="Single" Direction="Input" ParameterName="@Original_Value" Precision="0" ProviderType="Real" Scale="0" Size="0" SourceColumn="Value" SourceColumnNullMapping="false" SourceVersion="Original" />
+                      <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DbType="Int32" Direction="Input" ParameterName="@IsNull_Date" Precision="0" ProviderType="Int" Scale="0" Size="0" SourceColumn="Date" SourceColumnNullMapping="true" SourceVersion="Original" />
+                      <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DbType="DateTime" Direction="Input" ParameterName="@Original_Date" Precision="0" ProviderType="DateTime" Scale="0" Size="0" SourceColumn="Date" SourceColumnNullMapping="false" SourceVersion="Original" />
+                    </Parameters>
+                  </DbCommand>
+                </DeleteCommand>
+                <InsertCommand>
+                  <DbCommand CommandType="Text" ModifiedByUser="false">
+                    <CommandText>INSERT INTO [dbo].[durados_AppStat] ([Id], [AppId], [Name], [Value], [Date]) VALUES (@Id, @AppId, @Name, @Value, @Date);
+SELECT Id, AppId, Name, Value, Date FROM durados_AppStat WHERE (Id = @Id)</CommandText>
+                    <Parameters>
+                      <Parameter AllowDbNull="false" AutogeneratedName="" DataSourceName="" DbType="Int32" Direction="Input" ParameterName="@Id" Precision="0" ProviderType="Int" Scale="0" Size="0" SourceColumn="Id" SourceColumnNullMapping="false" SourceVersion="Current" />
+                      <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DbType="Int32" Direction="Input" ParameterName="@AppId" Precision="0" ProviderType="Int" Scale="0" Size="0" SourceColumn="AppId" SourceColumnNullMapping="false" SourceVersion="Current" />
+                      <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DbType="String" Direction="Input" ParameterName="@Name" Precision="0" ProviderType="NVarChar" Scale="0" Size="0" SourceColumn="Name" SourceColumnNullMapping="false" SourceVersion="Current" />
+                      <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DbType="Single" Direction="Input" ParameterName="@Value" Precision="0" ProviderType="Real" Scale="0" Size="0" SourceColumn="Value" SourceColumnNullMapping="false" SourceVersion="Current" />
+                      <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DbType="DateTime" Direction="Input" ParameterName="@Date" Precision="0" ProviderType="DateTime" Scale="0" Size="0" SourceColumn="Date" SourceColumnNullMapping="false" SourceVersion="Current" />
+                    </Parameters>
+                  </DbCommand>
+                </InsertCommand>
+                <SelectCommand>
+                  <DbCommand CommandType="Text" ModifiedByUser="false">
+                    <CommandText>SELECT Id, AppId, Name, Value, Date FROM dbo.durados_AppStat</CommandText>
+                    <Parameters />
+                  </DbCommand>
+                </SelectCommand>
+                <UpdateCommand>
+                  <DbCommand CommandType="Text" ModifiedByUser="false">
+                    <CommandText>UPDATE [dbo].[durados_AppStat] SET [Id] = @Id, [AppId] = @AppId, [Name] = @Name, [Value] = @Value, [Date] = @Date WHERE (([Id] = @Original_Id) AND ((@IsNull_AppId = 1 AND [AppId] IS NULL) OR ([AppId] = @Original_AppId)) AND ((@IsNull_Name = 1 AND [Name] IS NULL) OR ([Name] = @Original_Name)) AND ((@IsNull_Value = 1 AND [Value] IS NULL) OR ([Value] = @Original_Value)) AND ((@IsNull_Date = 1 AND [Date] IS NULL) OR ([Date] = @Original_Date)));
+SELECT Id, AppId, Name, Value, Date FROM durados_AppStat WHERE (Id = @Id)</CommandText>
+                    <Parameters>
+                      <Parameter AllowDbNull="false" AutogeneratedName="" DataSourceName="" DbType="Int32" Direction="Input" ParameterName="@Id" Precision="0" ProviderType="Int" Scale="0" Size="0" SourceColumn="Id" SourceColumnNullMapping="false" SourceVersion="Current" />
+                      <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DbType="Int32" Direction="Input" ParameterName="@AppId" Precision="0" ProviderType="Int" Scale="0" Size="0" SourceColumn="AppId" SourceColumnNullMapping="false" SourceVersion="Current" />
+                      <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DbType="String" Direction="Input" ParameterName="@Name" Precision="0" ProviderType="NVarChar" Scale="0" Size="0" SourceColumn="Name" SourceColumnNullMapping="false" SourceVersion="Current" />
+                      <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DbType="Single" Direction="Input" ParameterName="@Value" Precision="0" ProviderType="Real" Scale="0" Size="0" SourceColumn="Value" SourceColumnNullMapping="false" SourceVersion="Current" />
+                      <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DbType="DateTime" Direction="Input" ParameterName="@Date" Precision="0" ProviderType="DateTime" Scale="0" Size="0" SourceColumn="Date" SourceColumnNullMapping="false" SourceVersion="Current" />
+                      <Parameter AllowDbNull="false" AutogeneratedName="" DataSourceName="" DbType="Int32" Direction="Input" ParameterName="@Original_Id" Precision="0" ProviderType="Int" Scale="0" Size="0" SourceColumn="Id" SourceColumnNullMapping="false" SourceVersion="Original" />
+                      <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DbType="Int32" Direction="Input" ParameterName="@IsNull_AppId" Precision="0" ProviderType="Int" Scale="0" Size="0" SourceColumn="AppId" SourceColumnNullMapping="true" SourceVersion="Original" />
+                      <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DbType="Int32" Direction="Input" ParameterName="@Original_AppId" Precision="0" ProviderType="Int" Scale="0" Size="0" SourceColumn="AppId" SourceColumnNullMapping="false" SourceVersion="Original" />
+                      <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DbType="Int32" Direction="Input" ParameterName="@IsNull_Name" Precision="0" ProviderType="Int" Scale="0" Size="0" SourceColumn="Name" SourceColumnNullMapping="true" SourceVersion="Original" />
+                      <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DbType="String" Direction="Input" ParameterName="@Original_Name" Precision="0" ProviderType="NVarChar" Scale="0" Size="0" SourceColumn="Name" SourceColumnNullMapping="false" SourceVersion="Original" />
+                      <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DbType="Int32" Direction="Input" ParameterName="@IsNull_Value" Precision="0" ProviderType="Int" Scale="0" Size="0" SourceColumn="Value" SourceColumnNullMapping="true" SourceVersion="Original" />
+                      <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DbType="Single" Direction="Input" ParameterName="@Original_Value" Precision="0" ProviderType="Real" Scale="0" Size="0" SourceColumn="Value" SourceColumnNullMapping="false" SourceVersion="Original" />
+                      <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DbType="Int32" Direction="Input" ParameterName="@IsNull_Date" Precision="0" ProviderType="Int" Scale="0" Size="0" SourceColumn="Date" SourceColumnNullMapping="true" SourceVersion="Original" />
+                      <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DbType="DateTime" Direction="Input" ParameterName="@Original_Date" Precision="0" ProviderType="DateTime" Scale="0" Size="0" SourceColumn="Date" SourceColumnNullMapping="false" SourceVersion="Original" />
+                    </Parameters>
+                  </DbCommand>
+                </UpdateCommand>
+              </DbSource>
+            </MainSource>
+            <Mappings>
+              <Mapping SourceColumn="Id" DataSetColumn="Id" />
+              <Mapping SourceColumn="AppId" DataSetColumn="AppId" />
+              <Mapping SourceColumn="Name" DataSetColumn="Name" />
+              <Mapping SourceColumn="Value" DataSetColumn="Value" />
+              <Mapping SourceColumn="Date" DataSetColumn="Date" />
+            </Mappings>
+            <Sources />
+          </TableAdapter>
+        </Tables>
+        <Sources />
+      </DataSource>
+    </xs:appinfo>
+  </xs:annotation>
+  <xs:element name="MapDataSet" msdata:IsDataSet="true" msdata:UseCurrentLocale="true" msprop:EnableTableAdapterManager="true" msprop:Generator_DataSetName="MapDataSet" msprop:Generator_UserDSName="MapDataSet">
+    <xs:complexType>
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:element name="durados_App" msprop:Generator_TableClassName="durados_AppDataTable" msprop:Generator_TableVarName="tabledurados_App" msprop:Generator_TablePropName="durados_App" msprop:Generator_RowDeletingName="durados_AppRowDeleting" msprop:Generator_RowChangingName="durados_AppRowChanging" msprop:Generator_RowEvHandlerName="durados_AppRowChangeEventHandler" msprop:Generator_RowDeletedName="durados_AppRowDeleted" msprop:Generator_UserTableName="durados_App" msprop:Generator_RowChangedName="durados_AppRowChanged" msprop:Generator_RowEvArgName="durados_AppRowChangeEvent" msprop:Generator_RowClassName="durados_AppRow">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="Id" msdata:ReadOnly="true" msdata:AutoIncrement="true" msdata:AutoIncrementSeed="-1" msdata:AutoIncrementStep="-1" msprop:Generator_ColumnVarNameInTable="columnId" msprop:Generator_ColumnPropNameInRow="Id" msprop:Generator_ColumnPropNameInTable="IdColumn" msprop:Generator_UserColumnName="Id" type="xs:int" />
+              <xs:element name="Name" msprop:Generator_ColumnVarNameInTable="columnName" msprop:Generator_ColumnPropNameInRow="Name" msprop:Generator_ColumnPropNameInTable="NameColumn" msprop:Generator_UserColumnName="Name">
+                <xs:simpleType>
+                  <xs:restriction base="xs:string">
+                    <xs:maxLength value="250" />
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:element>
+              <xs:element name="Creator" msprop:Generator_ColumnVarNameInTable="columnCreator" msprop:Generator_ColumnPropNameInRow="Creator" msprop:Generator_ColumnPropNameInTable="CreatorColumn" msprop:Generator_UserColumnName="Creator" type="xs:int" />
+              <xs:element name="CreatedDate" msprop:Generator_ColumnVarNameInTable="columnCreatedDate" msprop:Generator_ColumnPropNameInRow="CreatedDate" msprop:Generator_ColumnPropNameInTable="CreatedDateColumn" msprop:Generator_UserColumnName="CreatedDate" type="xs:dateTime" />
+              <xs:element name="ToDelete" msprop:Generator_ColumnVarNameInTable="columnToDelete" msprop:Generator_ColumnPropNameInRow="ToDelete" msprop:Generator_ColumnPropNameInTable="ToDeleteColumn" msprop:Generator_UserColumnName="ToDelete" type="xs:boolean" />
+              <xs:element name="ToDeleteDate" msprop:Generator_ColumnVarNameInTable="columnToDeleteDate" msprop:Generator_ColumnPropNameInRow="ToDeleteDate" msprop:Generator_ColumnPropNameInTable="ToDeleteDateColumn" msprop:Generator_UserColumnName="ToDeleteDate" type="xs:dateTime" minOccurs="0" />
+              <xs:element name="Deleted" msprop:Generator_ColumnVarNameInTable="columnDeleted" msprop:Generator_ColumnPropNameInRow="Deleted" msprop:Generator_ColumnPropNameInTable="DeletedColumn" msprop:Generator_UserColumnName="Deleted" type="xs:boolean" />
+              <xs:element name="DeletedDate" msprop:Generator_ColumnVarNameInTable="columnDeletedDate" msprop:Generator_ColumnPropNameInRow="DeletedDate" msprop:Generator_ColumnPropNameInTable="DeletedDateColumn" msprop:Generator_UserColumnName="DeletedDate" type="xs:dateTime" minOccurs="0" />
+              <xs:element name="DataSourceTypeId" msprop:Generator_ColumnVarNameInTable="columnDataSourceTypeId" msprop:Generator_ColumnPropNameInRow="DataSourceTypeId" msprop:Generator_ColumnPropNameInTable="DataSourceTypeIdColumn" msprop:Generator_UserColumnName="DataSourceTypeId" type="xs:int" minOccurs="0" />
+              <xs:element name="SqlConnectionId" msprop:Generator_ColumnVarNameInTable="columnSqlConnectionId" msprop:Generator_ColumnPropNameInRow="SqlConnectionId" msprop:Generator_ColumnPropNameInTable="SqlConnectionIdColumn" msprop:Generator_UserColumnName="SqlConnectionId" type="xs:int" minOccurs="0" />
+              <xs:element name="UsesSpecificBinary" msprop:Generator_ColumnVarNameInTable="columnUsesSpecificBinary" msprop:Generator_ColumnPropNameInRow="UsesSpecificBinary" msprop:Generator_ColumnPropNameInTable="UsesSpecificBinaryColumn" msprop:Generator_UserColumnName="UsesSpecificBinary" type="xs:boolean" minOccurs="0" />
+              <xs:element name="Url" msprop:Generator_ColumnVarNameInTable="columnUrl" msprop:Generator_ColumnPropNameInRow="Url" msprop:Generator_ColumnPropNameInTable="UrlColumn" msprop:Generator_UserColumnName="Url" minOccurs="0">
+                <xs:simpleType>
+                  <xs:restriction base="xs:string">
+                    <xs:maxLength value="250" />
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:element>
+              <xs:element name="Image" msprop:Generator_ColumnVarNameInTable="columnImage" msprop:Generator_ColumnPropNameInRow="Image" msprop:Generator_ColumnPropNameInTable="ImageColumn" msprop:Generator_UserColumnName="Image" minOccurs="0">
+                <xs:simpleType>
+                  <xs:restriction base="xs:string">
+                    <xs:maxLength value="250" />
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:element>
+              <xs:element name="ExistingDataSource" msprop:Generator_ColumnVarNameInTable="columnExistingDataSource" msprop:Generator_ColumnPropNameInRow="ExistingDataSource" msprop:Generator_ColumnPropNameInTable="ExistingDataSourceColumn" msprop:Generator_UserColumnName="ExistingDataSource" type="xs:boolean" minOccurs="0" />
+              <xs:element name="TemplateId" msprop:Generator_ColumnVarNameInTable="columnTemplateId" msprop:Generator_ColumnPropNameInRow="TemplateId" msprop:Generator_ColumnPropNameInTable="TemplateIdColumn" msprop:Generator_UserColumnName="TemplateId" type="xs:int" minOccurs="0" />
+              <xs:element name="ExcelFileName" msprop:Generator_ColumnVarNameInTable="columnExcelFileName" msprop:Generator_ColumnPropNameInRow="ExcelFileName" msprop:Generator_ColumnPropNameInTable="ExcelFileNameColumn" msprop:Generator_UserColumnName="ExcelFileName" minOccurs="0">
+                <xs:simpleType>
+                  <xs:restriction base="xs:string">
+                    <xs:maxLength value="250" />
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:element>
+              <xs:element name="SpecificDOTNET" msprop:Generator_ColumnVarNameInTable="columnSpecificDOTNET" msprop:Generator_ColumnPropNameInRow="SpecificDOTNET" msprop:Generator_ColumnPropNameInTable="SpecificDOTNETColumn" msprop:Generator_UserColumnName="SpecificDOTNET" minOccurs="0">
+                <xs:simpleType>
+                  <xs:restriction base="xs:string">
+                    <xs:maxLength value="250" />
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:element>
+              <xs:element name="SpecificJS" msprop:Generator_ColumnVarNameInTable="columnSpecificJS" msprop:Generator_ColumnPropNameInRow="SpecificJS" msprop:Generator_ColumnPropNameInTable="SpecificJSColumn" msprop:Generator_UserColumnName="SpecificJS" minOccurs="0">
+                <xs:simpleType>
+                  <xs:restriction base="xs:string">
+                    <xs:maxLength value="250" />
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:element>
+              <xs:element name="SpecificCss" msprop:Generator_ColumnVarNameInTable="columnSpecificCss" msprop:Generator_ColumnPropNameInRow="SpecificCss" msprop:Generator_ColumnPropNameInTable="SpecificCssColumn" msprop:Generator_UserColumnName="SpecificCss" minOccurs="0">
+                <xs:simpleType>
+                  <xs:restriction base="xs:string">
+                    <xs:maxLength value="250" />
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:element>
+              <xs:element name="UseAsTemplate" msprop:Generator_ColumnVarNameInTable="columnUseAsTemplate" msprop:Generator_ColumnPropNameInRow="UseAsTemplate" msprop:Generator_ColumnPropNameInTable="UseAsTemplateColumn" msprop:Generator_UserColumnName="UseAsTemplate" type="xs:boolean" minOccurs="0" />
+              <xs:element name="Description" msprop:Generator_ColumnVarNameInTable="columnDescription" msprop:Generator_ColumnPropNameInRow="Description" msprop:Generator_ColumnPropNameInTable="DescriptionColumn" msprop:Generator_UserColumnName="Description" minOccurs="0">
+                <xs:simpleType>
+                  <xs:restriction base="xs:string">
+                    <xs:maxLength value="2147483647" />
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:element>
+              <xs:element name="TemplateFile" msprop:Generator_ColumnVarNameInTable="columnTemplateFile" msprop:Generator_ColumnPropNameInRow="TemplateFile" msprop:Generator_ColumnPropNameInTable="TemplateFileColumn" msprop:Generator_UserColumnName="TemplateFile" minOccurs="0">
+                <xs:simpleType>
+                  <xs:restriction base="xs:string">
+                    <xs:maxLength value="250" />
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:element>
+              <xs:element name="SystemSqlConnectionId" msprop:Generator_ColumnVarNameInTable="columnSystemSqlConnectionId" msprop:Generator_ColumnPropNameInRow="SystemSqlConnectionId" msprop:Generator_ColumnPropNameInTable="SystemSqlConnectionIdColumn" msprop:Generator_UserColumnName="SystemSqlConnectionId" type="xs:int" minOccurs="0" />
+              <xs:element name="PrivateAuthentication" msprop:Generator_ColumnVarNameInTable="columnPrivateAuthentication" msprop:Generator_ColumnPropNameInRow="PrivateAuthentication" msprop:Generator_ColumnPropNameInTable="PrivateAuthenticationColumn" msprop:Generator_UserColumnName="PrivateAuthentication" type="xs:boolean" minOccurs="0" />
+              <xs:element name="SecuritySqlConnectionId" msprop:Generator_ColumnVarNameInTable="columnSecuritySqlConnectionId" msprop:Generator_ColumnPropNameInRow="SecuritySqlConnectionId" msprop:Generator_ColumnPropNameInTable="SecuritySqlConnectionIdColumn" msprop:Generator_UserColumnName="SecuritySqlConnectionId" type="xs:int" minOccurs="0" />
+              <xs:element name="Title" msprop:Generator_ColumnVarNameInTable="columnTitle" msprop:Generator_ColumnPropNameInRow="Title" msprop:Generator_ColumnPropNameInTable="TitleColumn" msprop:Generator_UserColumnName="Title" type="xs:string" minOccurs="0" />
+              <xs:element name="Basic" msprop:Generator_ColumnVarNameInTable="columnBasic" msprop:Generator_ColumnPropNameInRow="Basic" msprop:Generator_ColumnPropNameInTable="BasicColumn" msprop:Generator_UserColumnName="Basic" type="xs:boolean" minOccurs="0" />
+              <xs:element name="Guid" msdata:DataType="System.Guid, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" msprop:Generator_ColumnVarNameInTable="columnGuid" msprop:Generator_ColumnPropNameInRow="Guid" msprop:Generator_ColumnPropNameInTable="GuidColumn" msprop:Generator_UserColumnName="Guid" type="xs:string" />
+              <xs:element name="ThemeId" msprop:Generator_ColumnVarNameInTable="columnThemeId" msprop:Generator_ColumnPropNameInRow="ThemeId" msprop:Generator_ColumnPropNameInTable="ThemeIdColumn" msprop:Generator_UserColumnName="ThemeId" type="xs:int" minOccurs="0" />
+              <xs:element name="CustomThemePath" msprop:Generator_ColumnVarNameInTable="columnCustomThemePath" msprop:Generator_ColumnPropNameInRow="CustomThemePath" msprop:Generator_ColumnPropNameInTable="CustomThemePathColumn" msprop:Generator_UserColumnName="CustomThemePath" type="xs:string" minOccurs="0" />
+              <xs:element name="DatabaseStatus" msprop:Generator_ColumnVarNameInTable="columnDatabaseStatus" msprop:Generator_ColumnPropNameInRow="DatabaseStatus" msprop:Generator_ColumnPropNameInTable="DatabaseStatusColumn" msprop:Generator_UserColumnName="DatabaseStatus" type="xs:int" minOccurs="0" />
+              <xs:element name="TemplateStatus" msprop:Generator_ColumnVarNameInTable="columnTemplateStatus" msprop:Generator_ColumnPropNameInRow="TemplateStatus" msprop:Generator_ColumnPropNameInTable="TemplateStatusColumn" msprop:Generator_UserColumnName="TemplateStatus" type="xs:int" minOccurs="0" />
+              <xs:element name="CodeStatus" msprop:Generator_ColumnVarNameInTable="columnCodeStatus" msprop:Generator_ColumnPropNameInRow="CodeStatus" msprop:Generator_ColumnPropNameInTable="CodeStatusColumn" msprop:Generator_UserColumnName="CodeStatus" type="xs:int" minOccurs="0" />
+              <xs:element name="HostingStatus" msprop:Generator_ColumnVarNameInTable="columnHostingStatus" msprop:Generator_ColumnPropNameInRow="HostingStatus" msprop:Generator_ColumnPropNameInTable="HostingStatusColumn" msprop:Generator_UserColumnName="HostingStatus" type="xs:int" minOccurs="0" />
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="durados_SqlConnection" msprop:Generator_TableClassName="durados_SqlConnectionDataTable" msprop:Generator_TableVarName="tabledurados_SqlConnection" msprop:Generator_TablePropName="durados_SqlConnection" msprop:Generator_RowDeletingName="durados_SqlConnectionRowDeleting" msprop:Generator_RowChangingName="durados_SqlConnectionRowChanging" msprop:Generator_RowEvHandlerName="durados_SqlConnectionRowChangeEventHandler" msprop:Generator_RowDeletedName="durados_SqlConnectionRowDeleted" msprop:Generator_UserTableName="durados_SqlConnection" msprop:Generator_RowChangedName="durados_SqlConnectionRowChanged" msprop:Generator_RowEvArgName="durados_SqlConnectionRowChangeEvent" msprop:Generator_RowClassName="durados_SqlConnectionRow">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="Id" msdata:ReadOnly="true" msdata:AutoIncrement="true" msdata:AutoIncrementSeed="-1" msdata:AutoIncrementStep="-1" msprop:Generator_ColumnVarNameInTable="columnId" msprop:Generator_ColumnPropNameInRow="Id" msprop:Generator_ColumnPropNameInTable="IdColumn" msprop:Generator_UserColumnName="Id" type="xs:int" />
+              <xs:element name="ServerName" msprop:Generator_ColumnVarNameInTable="columnServerName" msprop:Generator_ColumnPropNameInRow="ServerName" msprop:Generator_ColumnPropNameInTable="ServerNameColumn" msprop:Generator_UserColumnName="ServerName" minOccurs="0">
+                <xs:simpleType>
+                  <xs:restriction base="xs:string">
+                    <xs:maxLength value="250" />
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:element>
+              <xs:element name="Catalog" msprop:Generator_ColumnVarNameInTable="columnCatalog" msprop:Generator_ColumnPropNameInRow="Catalog" msprop:Generator_ColumnPropNameInTable="CatalogColumn" msprop:Generator_UserColumnName="Catalog" minOccurs="0">
+                <xs:simpleType>
+                  <xs:restriction base="xs:string">
+                    <xs:maxLength value="250" />
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:element>
+              <xs:element name="Username" msprop:Generator_ColumnVarNameInTable="columnUsername" msprop:Generator_ColumnPropNameInRow="Username" msprop:Generator_ColumnPropNameInTable="UsernameColumn" msprop:Generator_UserColumnName="Username" minOccurs="0">
+                <xs:simpleType>
+                  <xs:restriction base="xs:string">
+                    <xs:maxLength value="250" />
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:element>
+              <xs:element name="Password" msprop:Generator_ColumnVarNameInTable="columnPassword" msprop:Generator_ColumnPropNameInRow="Password" msprop:Generator_ColumnPropNameInTable="PasswordColumn" msprop:Generator_UserColumnName="Password" type="xs:string" minOccurs="0" />
+              <xs:element name="IntegratedSecurity" msprop:Generator_ColumnVarNameInTable="columnIntegratedSecurity" msprop:Generator_ColumnPropNameInRow="IntegratedSecurity" msprop:Generator_ColumnPropNameInTable="IntegratedSecurityColumn" msprop:Generator_UserColumnName="IntegratedSecurity" type="xs:boolean" minOccurs="0" />
+              <xs:element name="DuradosUser" msprop:Generator_ColumnVarNameInTable="columnDuradosUser" msprop:Generator_ColumnPropNameInRow="DuradosUser" msprop:Generator_ColumnPropNameInTable="DuradosUserColumn" msprop:Generator_UserColumnName="DuradosUser" type="xs:int" minOccurs="0" />
+              <xs:element name="SqlProductId" msprop:Generator_ColumnVarNameInTable="columnSqlProductId" msprop:Generator_ColumnPropNameInRow="SqlProductId" msprop:Generator_ColumnPropNameInTable="SqlProductIdColumn" msprop:Generator_UserColumnName="SqlProductId" type="xs:int" minOccurs="0" />
+              <xs:element name="ProductPort" msprop:Generator_ColumnVarNameInTable="columnProductPort" msprop:Generator_ColumnPropNameInRow="ProductPort" msprop:Generator_ColumnPropNameInTable="ProductPortColumn" msprop:Generator_UserColumnName="ProductPort" type="xs:string" minOccurs="0" />
+              <xs:element name="SshRemoteHost" msprop:Generator_ColumnVarNameInTable="columnSshRemoteHost" msprop:Generator_ColumnPropNameInRow="SshRemoteHost" msprop:Generator_ColumnPropNameInTable="SshRemoteHostColumn" msprop:Generator_UserColumnName="SshRemoteHost" type="xs:string" minOccurs="0" />
+              <xs:element name="SshPort" msprop:Generator_ColumnVarNameInTable="columnSshPort" msprop:Generator_ColumnPropNameInRow="SshPort" msprop:Generator_ColumnPropNameInTable="SshPortColumn" msprop:Generator_UserColumnName="SshPort" type="xs:int" minOccurs="0" />
+              <xs:element name="SshUser" msprop:Generator_ColumnVarNameInTable="columnSshUser" msprop:Generator_ColumnPropNameInRow="SshUser" msprop:Generator_ColumnPropNameInTable="SshUserColumn" msprop:Generator_UserColumnName="SshUser" type="xs:string" minOccurs="0" />
+              <xs:element name="SshPassword" msprop:Generator_ColumnVarNameInTable="columnSshPassword" msprop:Generator_ColumnPropNameInRow="SshPassword" msprop:Generator_ColumnPropNameInTable="SshPasswordColumn" msprop:Generator_UserColumnName="SshPassword" type="xs:string" minOccurs="0" />
+              <xs:element name="SshUses" msprop:Generator_ColumnVarNameInTable="columnSshUses" msprop:Generator_ColumnPropNameInRow="SshUses" msprop:Generator_ColumnPropNameInTable="SshUsesColumn" msprop:Generator_UserColumnName="SshUses" type="xs:boolean" minOccurs="0" />
+              <xs:element name="SslUses" msprop:Generator_ColumnVarNameInTable="columnSslUses" msprop:Generator_ColumnPropNameInRow="SslUses" msprop:Generator_ColumnPropNameInTable="SslUsesColumn" msprop:Generator_UserColumnName="SslUses" type="xs:boolean" minOccurs="0" />
+              <xs:element name="SshPrivateKey" msprop:Generator_ColumnVarNameInTable="columnSshPrivateKey" msprop:Generator_ColumnPropNameInRow="SshPrivateKey" msprop:Generator_ColumnPropNameInTable="SshPrivateKeyColumn" msprop:Generator_UserColumnName="SshPrivateKey" type="xs:string" minOccurs="0" />
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="v_durados_User" msprop:Generator_TableClassName="v_durados_UserDataTable" msprop:Generator_TableVarName="tablev_durados_User" msprop:Generator_TablePropName="v_durados_User" msprop:Generator_RowDeletingName="v_durados_UserRowDeleting" msprop:Generator_RowChangingName="v_durados_UserRowChanging" msprop:Generator_RowEvHandlerName="v_durados_UserRowChangeEventHandler" msprop:Generator_RowDeletedName="v_durados_UserRowDeleted" msprop:Generator_UserTableName="v_durados_User" msprop:Generator_RowChangedName="v_durados_UserRowChanged" msprop:Generator_RowEvArgName="v_durados_UserRowChangeEvent" msprop:Generator_RowClassName="v_durados_UserRow">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="ID" msdata:ReadOnly="true" msdata:AutoIncrement="true" msdata:AutoIncrementSeed="-1" msdata:AutoIncrementStep="-1" msprop:Generator_ColumnVarNameInTable="columnID" msprop:Generator_ColumnPropNameInRow="ID" msprop:Generator_ColumnPropNameInTable="IDColumn" msprop:Generator_UserColumnName="ID" type="xs:int" />
+              <xs:element name="Username" msprop:Generator_ColumnVarNameInTable="columnUsername" msprop:Generator_ColumnPropNameInRow="Username" msprop:Generator_ColumnPropNameInTable="UsernameColumn" msprop:Generator_UserColumnName="Username">
+                <xs:simpleType>
+                  <xs:restriction base="xs:string">
+                    <xs:maxLength value="256" />
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:element>
+              <xs:element name="FirstName" msprop:Generator_ColumnVarNameInTable="columnFirstName" msprop:Generator_ColumnPropNameInRow="FirstName" msprop:Generator_ColumnPropNameInTable="FirstNameColumn" msprop:Generator_UserColumnName="FirstName">
+                <xs:simpleType>
+                  <xs:restriction base="xs:string">
+                    <xs:maxLength value="50" />
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:element>
+              <xs:element name="LastName" msprop:Generator_ColumnVarNameInTable="columnLastName" msprop:Generator_ColumnPropNameInRow="LastName" msprop:Generator_ColumnPropNameInTable="LastNameColumn" msprop:Generator_UserColumnName="LastName">
+                <xs:simpleType>
+                  <xs:restriction base="xs:string">
+                    <xs:maxLength value="50" />
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:element>
+              <xs:element name="Email" msprop:Generator_ColumnVarNameInTable="columnEmail" msprop:Generator_ColumnPropNameInRow="Email" msprop:Generator_ColumnPropNameInTable="EmailColumn" msprop:Generator_UserColumnName="Email">
+                <xs:simpleType>
+                  <xs:restriction base="xs:string">
+                    <xs:maxLength value="250" />
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:element>
+              <xs:element name="Password" msprop:Generator_ColumnVarNameInTable="columnPassword" msprop:Generator_ColumnPropNameInRow="Password" msprop:Generator_ColumnPropNameInTable="PasswordColumn" msprop:Generator_UserColumnName="Password" minOccurs="0">
+                <xs:simpleType>
+                  <xs:restriction base="xs:string">
+                    <xs:maxLength value="20" />
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:element>
+              <xs:element name="Role" msprop:Generator_ColumnVarNameInTable="columnRole" msprop:Generator_ColumnPropNameInRow="Role" msprop:Generator_ColumnPropNameInTable="RoleColumn" msprop:Generator_UserColumnName="Role">
+                <xs:simpleType>
+                  <xs:restriction base="xs:string">
+                    <xs:maxLength value="256" />
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:element>
+              <xs:element name="Guid" msdata:DataType="System.Guid, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" msprop:Generator_ColumnVarNameInTable="columnGuid" msprop:Generator_ColumnPropNameInRow="Guid" msprop:Generator_ColumnPropNameInTable="GuidColumn" msprop:Generator_UserColumnName="Guid" type="xs:string" />
+              <xs:element name="Signature" msprop:Generator_ColumnVarNameInTable="columnSignature" msprop:Generator_ColumnPropNameInRow="Signature" msprop:Generator_ColumnPropNameInTable="SignatureColumn" msprop:Generator_UserColumnName="Signature" minOccurs="0">
+                <xs:simpleType>
+                  <xs:restriction base="xs:string">
+                    <xs:maxLength value="4000" />
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:element>
+              <xs:element name="SignatureHTML" msprop:Generator_ColumnVarNameInTable="columnSignatureHTML" msprop:Generator_ColumnPropNameInRow="SignatureHTML" msprop:Generator_ColumnPropNameInTable="SignatureHTMLColumn" msprop:Generator_UserColumnName="SignatureHTML" minOccurs="0">
+                <xs:simpleType>
+                  <xs:restriction base="xs:string">
+                    <xs:maxLength value="4000" />
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:element>
+              <xs:element name="NewUser" msprop:Generator_ColumnVarNameInTable="columnNewUser" msprop:Generator_ColumnPropNameInRow="NewUser" msprop:Generator_ColumnPropNameInTable="NewUserColumn" msprop:Generator_UserColumnName="NewUser" type="xs:boolean" minOccurs="0" />
+              <xs:element name="Comments" msprop:Generator_ColumnVarNameInTable="columnComments" msprop:Generator_ColumnPropNameInRow="Comments" msprop:Generator_ColumnPropNameInTable="CommentsColumn" msprop:Generator_UserColumnName="Comments" minOccurs="0">
+                <xs:simpleType>
+                  <xs:restriction base="xs:string">
+                    <xs:maxLength value="2147483647" />
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:element>
+              <xs:element name="IsApproved" msdata:ReadOnly="true" msprop:Generator_ColumnVarNameInTable="columnIsApproved" msprop:Generator_ColumnPropNameInRow="IsApproved" msprop:Generator_ColumnPropNameInTable="IsApprovedColumn" msprop:Generator_UserColumnName="IsApproved" type="xs:int" minOccurs="0" />
+              <xs:element name="FullName" msdata:ReadOnly="true" msprop:Generator_ColumnVarNameInTable="columnFullName" msprop:Generator_ColumnPropNameInRow="FullName" msprop:Generator_ColumnPropNameInTable="FullNameColumn" msprop:Generator_UserColumnName="FullName" minOccurs="0">
+                <xs:simpleType>
+                  <xs:restriction base="xs:string">
+                    <xs:maxLength value="101" />
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:element>
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="durados_UserAlias" msprop:Generator_TableClassName="durados_UserAliasDataTable" msprop:Generator_TableVarName="tabledurados_UserAlias" msprop:Generator_TablePropName="durados_UserAlias" msprop:Generator_RowDeletingName="durados_UserAliasRowDeleting" msprop:Generator_RowChangingName="durados_UserAliasRowChanging" msprop:Generator_RowEvHandlerName="durados_UserAliasRowChangeEventHandler" msprop:Generator_RowDeletedName="durados_UserAliasRowDeleted" msprop:Generator_UserTableName="durados_UserAlias" msprop:Generator_RowChangedName="durados_UserAliasRowChanged" msprop:Generator_RowEvArgName="durados_UserAliasRowChangeEvent" msprop:Generator_RowClassName="durados_UserAliasRow">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="Id" msdata:ReadOnly="true" msdata:AutoIncrement="true" msdata:AutoIncrementSeed="-1" msdata:AutoIncrementStep="-1" msprop:Generator_ColumnVarNameInTable="columnId" msprop:Generator_ColumnPropNameInRow="Id" msprop:Generator_ColumnPropNameInTable="IdColumn" msprop:Generator_UserColumnName="Id" type="xs:int" />
+              <xs:element name="MainUsername" msprop:Generator_ColumnVarNameInTable="columnMainUsername" msprop:Generator_ColumnPropNameInRow="MainUsername" msprop:Generator_ColumnPropNameInTable="MainUsernameColumn" msprop:Generator_UserColumnName="MainUsername" type="xs:int" />
+              <xs:element name="Alias" msprop:Generator_ColumnVarNameInTable="columnAlias" msprop:Generator_ColumnPropNameInRow="Alias" msprop:Generator_ColumnPropNameInTable="AliasColumn" msprop:Generator_UserColumnName="Alias" type="xs:int" />
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="durados_UserApp" msprop:Generator_TableClassName="durados_UserAppDataTable" msprop:Generator_TableVarName="tabledurados_UserApp" msprop:Generator_TablePropName="durados_UserApp" msprop:Generator_RowDeletingName="durados_UserAppRowDeleting" msprop:Generator_RowChangingName="durados_UserAppRowChanging" msprop:Generator_RowEvHandlerName="durados_UserAppRowChangeEventHandler" msprop:Generator_RowDeletedName="durados_UserAppRowDeleted" msprop:Generator_UserTableName="durados_UserApp" msprop:Generator_RowChangedName="durados_UserAppRowChanged" msprop:Generator_RowEvArgName="durados_UserAppRowChangeEvent" msprop:Generator_RowClassName="durados_UserAppRow">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="Id" msdata:ReadOnly="true" msdata:AutoIncrement="true" msdata:AutoIncrementSeed="-1" msdata:AutoIncrementStep="-1" msprop:Generator_ColumnVarNameInTable="columnId" msprop:Generator_ColumnPropNameInRow="Id" msprop:Generator_ColumnPropNameInTable="IdColumn" msprop:Generator_UserColumnName="Id" type="xs:int" />
+              <xs:element name="UserId" msprop:Generator_ColumnVarNameInTable="columnUserId" msprop:Generator_ColumnPropNameInRow="UserId" msprop:Generator_ColumnPropNameInTable="UserIdColumn" msprop:Generator_UserColumnName="UserId" type="xs:int" />
+              <xs:element name="AppId" msprop:Generator_ColumnVarNameInTable="columnAppId" msprop:Generator_ColumnPropNameInRow="AppId" msprop:Generator_ColumnPropNameInTable="AppIdColumn" msprop:Generator_UserColumnName="AppId" type="xs:int" />
+              <xs:element name="Category" msprop:Generator_ColumnVarNameInTable="columnCategory" msprop:Generator_ColumnPropNameInRow="Category" msprop:Generator_ColumnPropNameInTable="CategoryColumn" msprop:Generator_UserColumnName="Category" minOccurs="0">
+                <xs:simpleType>
+                  <xs:restriction base="xs:string">
+                    <xs:maxLength value="250" />
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:element>
+              <xs:element name="Role" msprop:Generator_ColumnVarNameInTable="columnRole" msprop:Generator_ColumnPropNameInRow="Role" msprop:Generator_ColumnPropNameInTable="RoleColumn" msprop:Generator_UserColumnName="Role" type="xs:string" minOccurs="0" />
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="durados_DataSourceType" msprop:Generator_TableClassName="durados_DataSourceTypeDataTable" msprop:Generator_TableVarName="tabledurados_DataSourceType" msprop:Generator_TablePropName="durados_DataSourceType" msprop:Generator_RowDeletingName="durados_DataSourceTypeRowDeleting" msprop:Generator_RowChangingName="durados_DataSourceTypeRowChanging" msprop:Generator_RowEvHandlerName="durados_DataSourceTypeRowChangeEventHandler" msprop:Generator_RowDeletedName="durados_DataSourceTypeRowDeleted" msprop:Generator_UserTableName="durados_DataSourceType" msprop:Generator_RowChangedName="durados_DataSourceTypeRowChanged" msprop:Generator_RowEvArgName="durados_DataSourceTypeRowChangeEvent" msprop:Generator_RowClassName="durados_DataSourceTypeRow">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="Id" msprop:Generator_ColumnVarNameInTable="columnId" msprop:Generator_ColumnPropNameInRow="Id" msprop:Generator_ColumnPropNameInTable="IdColumn" msprop:Generator_UserColumnName="Id" type="xs:int" />
+              <xs:element name="Name" msprop:Generator_ColumnVarNameInTable="columnName" msprop:Generator_ColumnPropNameInRow="Name" msprop:Generator_ColumnPropNameInTable="NameColumn" msprop:Generator_UserColumnName="Name" minOccurs="0">
+                <xs:simpleType>
+                  <xs:restriction base="xs:string">
+                    <xs:maxLength value="50" />
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:element>
+              <xs:element name="Ordinal" msprop:Generator_ColumnVarNameInTable="columnOrdinal" msprop:Generator_ColumnPropNameInRow="Ordinal" msprop:Generator_ColumnPropNameInTable="OrdinalColumn" msprop:Generator_UserColumnName="Ordinal" type="xs:int" minOccurs="0" />
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="durados_DnsAlias" msprop:Generator_TableClassName="durados_DnsAliasDataTable" msprop:Generator_TableVarName="tabledurados_DnsAlias" msprop:Generator_TablePropName="durados_DnsAlias" msprop:Generator_RowDeletingName="durados_DnsAliasRowDeleting" msprop:Generator_RowChangingName="durados_DnsAliasRowChanging" msprop:Generator_RowEvHandlerName="durados_DnsAliasRowChangeEventHandler" msprop:Generator_RowDeletedName="durados_DnsAliasRowDeleted" msprop:Generator_UserTableName="durados_DnsAlias" msprop:Generator_RowChangedName="durados_DnsAliasRowChanged" msprop:Generator_RowEvArgName="durados_DnsAliasRowChangeEvent" msprop:Generator_RowClassName="durados_DnsAliasRow">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="Id" msdata:AutoIncrement="true" msdata:AutoIncrementSeed="-1" msdata:AutoIncrementStep="-1" msprop:Generator_ColumnVarNameInTable="columnId" msprop:Generator_ColumnPropNameInRow="Id" msprop:Generator_ColumnPropNameInTable="IdColumn" msprop:Generator_UserColumnName="Id" type="xs:int" />
+              <xs:element name="Alias" msprop:Generator_ColumnVarNameInTable="columnAlias" msprop:Generator_ColumnPropNameInRow="Alias" msprop:Generator_ColumnPropNameInTable="AliasColumn" msprop:Generator_UserColumnName="Alias">
+                <xs:simpleType>
+                  <xs:restriction base="xs:string">
+                    <xs:maxLength value="250" />
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:element>
+              <xs:element name="AppId" msprop:Generator_ColumnVarNameInTable="columnAppId" msprop:Generator_ColumnPropNameInRow="AppId" msprop:Generator_ColumnPropNameInTable="AppIdColumn" msprop:Generator_UserColumnName="AppId" type="xs:int" />
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="durados_SqlProduct" msprop:Generator_TableClassName="durados_SqlProductDataTable" msprop:Generator_TableVarName="tabledurados_SqlProduct" msprop:Generator_TablePropName="durados_SqlProduct" msprop:Generator_RowDeletingName="durados_SqlProductRowDeleting" msprop:Generator_RowChangingName="durados_SqlProductRowChanging" msprop:Generator_RowEvHandlerName="durados_SqlProductRowChangeEventHandler" msprop:Generator_RowDeletedName="durados_SqlProductRowDeleted" msprop:Generator_UserTableName="durados_SqlProduct" msprop:Generator_RowChangedName="durados_SqlProductRowChanged" msprop:Generator_RowEvArgName="durados_SqlProductRowChangeEvent" msprop:Generator_RowClassName="durados_SqlProductRow">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="Id" msdata:ReadOnly="true" msdata:AutoIncrement="true" msdata:AutoIncrementSeed="-1" msdata:AutoIncrementStep="-1" msprop:Generator_ColumnVarNameInTable="columnId" msprop:Generator_ColumnPropNameInRow="Id" msprop:Generator_ColumnPropNameInTable="IdColumn" msprop:Generator_UserColumnName="Id" type="xs:int" />
+              <xs:element name="Name" msprop:Generator_ColumnVarNameInTable="columnName" msprop:Generator_ColumnPropNameInRow="Name" msprop:Generator_ColumnPropNameInTable="NameColumn" msprop:Generator_UserColumnName="Name" minOccurs="0">
+                <xs:simpleType>
+                  <xs:restriction base="xs:string">
+                    <xs:maxLength value="50" />
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:element>
+              <xs:element name="Ordinal" msprop:Generator_ColumnVarNameInTable="columnOrdinal" msprop:Generator_ColumnPropNameInRow="Ordinal" msprop:Generator_ColumnPropNameInTable="OrdinalColumn" msprop:Generator_UserColumnName="Ordinal" type="xs:int" minOccurs="0" />
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="durados_Theme" msprop:Generator_TableClassName="durados_ThemeDataTable" msprop:Generator_TableVarName="tabledurados_Theme" msprop:Generator_RowChangedName="durados_ThemeRowChanged" msprop:Generator_TablePropName="durados_Theme" msprop:Generator_RowDeletingName="durados_ThemeRowDeleting" msprop:Generator_RowChangingName="durados_ThemeRowChanging" msprop:Generator_RowEvHandlerName="durados_ThemeRowChangeEventHandler" msprop:Generator_RowDeletedName="durados_ThemeRowDeleted" msprop:Generator_RowClassName="durados_ThemeRow" msprop:Generator_UserTableName="durados_Theme" msprop:Generator_RowEvArgName="durados_ThemeRowChangeEvent">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="Id" msdata:ReadOnly="true" msdata:AutoIncrement="true" msdata:AutoIncrementSeed="-1" msdata:AutoIncrementStep="-1" msprop:Generator_ColumnVarNameInTable="columnId" msprop:Generator_ColumnPropNameInRow="Id" msprop:Generator_ColumnPropNameInTable="IdColumn" msprop:Generator_UserColumnName="Id" type="xs:int" />
+              <xs:element name="Name" msprop:Generator_ColumnVarNameInTable="columnName" msprop:Generator_ColumnPropNameInRow="Name" msprop:Generator_ColumnPropNameInTable="NameColumn" msprop:Generator_UserColumnName="Name">
+                <xs:simpleType>
+                  <xs:restriction base="xs:string">
+                    <xs:maxLength value="50" />
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:element>
+              <xs:element name="RelativePath" msprop:Generator_ColumnVarNameInTable="columnRelativePath" msprop:Generator_ColumnPropNameInRow="RelativePath" msprop:Generator_ColumnPropNameInTable="RelativePathColumn" msprop:Generator_UserColumnName="RelativePath">
+                <xs:simpleType>
+                  <xs:restriction base="xs:string">
+                    <xs:maxLength value="250" />
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:element>
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="durados_AppStat" msprop:Generator_TableClassName="durados_AppStatDataTable" msprop:Generator_TableVarName="tabledurados_AppStat" msprop:Generator_TablePropName="durados_AppStat" msprop:Generator_RowDeletingName="durados_AppStatRowDeleting" msprop:Generator_RowChangingName="durados_AppStatRowChanging" msprop:Generator_RowEvHandlerName="durados_AppStatRowChangeEventHandler" msprop:Generator_RowDeletedName="durados_AppStatRowDeleted" msprop:Generator_UserTableName="durados_AppStat" msprop:Generator_RowChangedName="durados_AppStatRowChanged" msprop:Generator_RowEvArgName="durados_AppStatRowChangeEvent" msprop:Generator_RowClassName="durados_AppStatRow">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="Id" msprop:Generator_ColumnVarNameInTable="columnId" msprop:Generator_ColumnPropNameInRow="Id" msprop:Generator_ColumnPropNameInTable="IdColumn" msprop:Generator_UserColumnName="Id" type="xs:int" />
+              <xs:element name="AppId" msprop:Generator_ColumnVarNameInTable="columnAppId" msprop:Generator_ColumnPropNameInRow="AppId" msprop:Generator_ColumnPropNameInTable="AppIdColumn" msprop:Generator_UserColumnName="AppId" type="xs:int" minOccurs="0" />
+              <xs:element name="Name" msprop:Generator_ColumnVarNameInTable="columnName" msprop:Generator_ColumnPropNameInRow="Name" msprop:Generator_ColumnPropNameInTable="NameColumn" msprop:Generator_UserColumnName="Name" minOccurs="0">
+                <xs:simpleType>
+                  <xs:restriction base="xs:string">
+                    <xs:maxLength value="50" />
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:element>
+              <xs:element name="Value" msprop:Generator_ColumnVarNameInTable="columnValue" msprop:Generator_ColumnPropNameInRow="Value" msprop:Generator_ColumnPropNameInTable="ValueColumn" msprop:Generator_UserColumnName="Value" type="xs:float" minOccurs="0" />
+              <xs:element name="Date" msprop:Generator_ColumnVarNameInTable="columnDate" msprop:Generator_ColumnPropNameInRow="Date" msprop:Generator_ColumnPropNameInTable="DateColumn" msprop:Generator_UserColumnName="Date" type="xs:dateTime" minOccurs="0" />
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+      </xs:choice>
+    </xs:complexType>
+    <xs:unique name="Constraint1" msdata:PrimaryKey="true">
+      <xs:selector xpath=".//mstns:durados_App" />
+      <xs:field xpath="mstns:Id" />
+    </xs:unique>
+    <xs:unique name="durados_SqlConnection_Constraint1" msdata:ConstraintName="Constraint1" msdata:PrimaryKey="true">
+      <xs:selector xpath=".//mstns:durados_SqlConnection" />
+      <xs:field xpath="mstns:Id" />
+    </xs:unique>
+    <xs:unique name="v_durados_User_Constraint1" msdata:ConstraintName="Constraint1" msdata:PrimaryKey="true">
+      <xs:selector xpath=".//mstns:v_durados_User" />
+      <xs:field xpath="mstns:ID" />
+    </xs:unique>
+    <xs:unique name="durados_UserAlias_Constraint1" msdata:ConstraintName="Constraint1" msdata:PrimaryKey="true">
+      <xs:selector xpath=".//mstns:durados_UserAlias" />
+      <xs:field xpath="mstns:Id" />
+    </xs:unique>
+    <xs:unique name="durados_UserApp_Constraint1" msdata:ConstraintName="Constraint1" msdata:PrimaryKey="true">
+      <xs:selector xpath=".//mstns:durados_UserApp" />
+      <xs:field xpath="mstns:Id" />
+    </xs:unique>
+    <xs:unique name="durados_DataSourceType_Constraint1" msdata:ConstraintName="Constraint1" msdata:PrimaryKey="true">
+      <xs:selector xpath=".//mstns:durados_DataSourceType" />
+      <xs:field xpath="mstns:Id" />
+    </xs:unique>
+    <xs:unique name="durados_DnsAlias_Constraint1" msdata:ConstraintName="Constraint1" msdata:PrimaryKey="true">
+      <xs:selector xpath=".//mstns:durados_DnsAlias" />
+      <xs:field xpath="mstns:Id" />
+    </xs:unique>
+    <xs:unique name="durados_SqlProduct_Constraint1" msdata:ConstraintName="Constraint1" msdata:PrimaryKey="true">
+      <xs:selector xpath=".//mstns:durados_SqlProduct" />
+      <xs:field xpath="mstns:Id" />
+    </xs:unique>
+    <xs:unique name="durados_Theme_Constraint1" msdata:ConstraintName="Constraint1" msdata:PrimaryKey="true">
+      <xs:selector xpath=".//mstns:durados_Theme" />
+      <xs:field xpath="mstns:Id" />
+    </xs:unique>
+    <xs:unique name="durados_AppStat_Constraint1" msdata:ConstraintName="Constraint1" msdata:PrimaryKey="true">
+      <xs:selector xpath=".//mstns:durados_AppStat" />
+      <xs:field xpath="mstns:Id" />
+    </xs:unique>
+  </xs:element>
+  <xs:annotation>
+    <xs:appinfo>
+      <msdata:Relationship name="FK_durados_App_durados_DataSourceType" msdata:parent="durados_DataSourceType" msdata:child="durados_App" msdata:parentkey="Id" msdata:childkey="DataSourceTypeId" msprop:Generator_UserChildTable="durados_App" msprop:Generator_ChildPropName="Getdurados_AppRows" msprop:Generator_UserRelationName="FK_durados_App_durados_DataSourceType" msprop:Generator_RelationVarName="relationFK_durados_App_durados_DataSourceType" msprop:Generator_UserParentTable="durados_DataSourceType" msprop:Generator_ParentPropName="durados_DataSourceTypeRow" />
+      <msdata:Relationship name="FK_durados_App_durados_SqlConnection" msdata:parent="durados_SqlConnection" msdata:child="durados_App" msdata:parentkey="Id" msdata:childkey="SqlConnectionId" msprop:Generator_UserChildTable="durados_App" msprop:Generator_ChildPropName="Getdurados_AppRowsByFK_durados_App_durados_SqlConnection" msprop:Generator_UserRelationName="FK_durados_App_durados_SqlConnection" msprop:Generator_RelationVarName="relationFK_durados_App_durados_SqlConnection" msprop:Generator_UserParentTable="durados_SqlConnection" msprop:Generator_ParentPropName="durados_SqlConnectionRowByFK_durados_App_durados_SqlConnection" />
+      <msdata:Relationship name="FK_durados_App_durados_Template" msdata:parent="durados_App" msdata:child="durados_App" msdata:parentkey="Id" msdata:childkey="TemplateId" msprop:Generator_UserChildTable="durados_App" msprop:Generator_ChildPropName="Getdurados_AppRows" msprop:Generator_UserRelationName="FK_durados_App_durados_Template" msprop:Generator_ParentPropName="durados_AppRowParent" msprop:Generator_RelationVarName="relationFK_durados_App_durados_Template" msprop:Generator_UserParentTable="durados_App" />
+      <msdata:Relationship name="FK_durados_App_durados_User" msdata:parent="v_durados_User" msdata:child="durados_App" msdata:parentkey="ID" msdata:childkey="Creator" msprop:Generator_UserChildTable="durados_App" msprop:Generator_ChildPropName="Getdurados_AppRows" msprop:Generator_UserRelationName="FK_durados_App_durados_User" msprop:Generator_RelationVarName="relationFK_durados_App_durados_User" msprop:Generator_UserParentTable="v_durados_User" msprop:Generator_ParentPropName="v_durados_UserRow" />
+      <msdata:Relationship name="FK_durados_SqlConnection_durados_User" msdata:parent="v_durados_User" msdata:child="durados_SqlConnection" msdata:parentkey="ID" msdata:childkey="DuradosUser" msprop:Generator_UserChildTable="durados_SqlConnection" msprop:Generator_ChildPropName="Getdurados_SqlConnectionRows" msprop:Generator_UserRelationName="FK_durados_SqlConnection_durados_User" msprop:Generator_RelationVarName="relationFK_durados_SqlConnection_durados_User" msprop:Generator_UserParentTable="v_durados_User" msprop:Generator_ParentPropName="v_durados_UserRow" />
+      <msdata:Relationship name="FK_durados_UserAlias_durados_User_Main" msdata:parent="v_durados_User" msdata:child="durados_UserAlias" msdata:parentkey="ID" msdata:childkey="MainUsername" msprop:Generator_UserChildTable="durados_UserAlias" msprop:Generator_ChildPropName="Getdurados_UserAliasRowsByFK_durados_UserAlias_durados_User_Main" msprop:Generator_UserRelationName="FK_durados_UserAlias_durados_User_Main" msprop:Generator_RelationVarName="relationFK_durados_UserAlias_durados_User_Main" msprop:Generator_UserParentTable="v_durados_User" msprop:Generator_ParentPropName="durados_UserRowByFK_durados_UserAlias_durados_User_Main" />
+      <msdata:Relationship name="FK_durados_UserAlias_durados_Usern_Alias" msdata:parent="v_durados_User" msdata:child="durados_UserAlias" msdata:parentkey="ID" msdata:childkey="Alias" msprop:Generator_UserChildTable="durados_UserAlias" msprop:Generator_ChildPropName="Getdurados_UserAliasRowsByFK_durados_UserAlias_durados_Usern_Alias" msprop:Generator_UserRelationName="FK_durados_UserAlias_durados_Usern_Alias" msprop:Generator_RelationVarName="relationFK_durados_UserAlias_durados_Usern_Alias" msprop:Generator_UserParentTable="v_durados_User" msprop:Generator_ParentPropName="durados_UserRowByFK_durados_UserAlias_durados_Usern_Alias" />
+      <msdata:Relationship name="FK_durados_UserApp_durados_App" msdata:parent="durados_App" msdata:child="durados_UserApp" msdata:parentkey="Id" msdata:childkey="AppId" msprop:Generator_UserChildTable="durados_UserApp" msprop:Generator_ChildPropName="Getdurados_UserAppRows" msprop:Generator_UserRelationName="FK_durados_UserApp_durados_App" msprop:Generator_RelationVarName="relationFK_durados_UserApp_durados_App" msprop:Generator_UserParentTable="durados_App" msprop:Generator_ParentPropName="durados_AppRow" />
+      <msdata:Relationship name="FK_durados_UserApp_durados_User" msdata:parent="v_durados_User" msdata:child="durados_UserApp" msdata:parentkey="ID" msdata:childkey="UserId" msprop:Generator_UserChildTable="durados_UserApp" msprop:Generator_ChildPropName="Getdurados_UserAppRows" msprop:Generator_UserRelationName="FK_durados_UserApp_durados_User" msprop:Generator_RelationVarName="relationFK_durados_UserApp_durados_User" msprop:Generator_UserParentTable="v_durados_User" msprop:Generator_ParentPropName="durados_UserRow" />
+      <msdata:Relationship name="FK_durados_App_durados_SqlConnection_Security" msdata:parent="durados_SqlConnection" msdata:child="durados_App" msdata:parentkey="Id" msdata:childkey="SecuritySqlConnectionId" msprop:Generator_UserChildTable="durados_App" msprop:Generator_ChildPropName="Getdurados_AppRowsByFK_durados_App_durados_SqlConnection_Security" msprop:Generator_UserRelationName="FK_durados_App_durados_SqlConnection_Security" msprop:Generator_ParentPropName="durados_SqlConnectionRowByFK_durados_App_durados_SqlConnection_Security" msprop:Generator_RelationVarName="relationFK_durados_App_durados_SqlConnection_Security" msprop:Generator_UserParentTable="durados_SqlConnection" />
+      <msdata:Relationship name="FK_durados_App_durados_SqlConnection_System" msdata:parent="durados_SqlConnection" msdata:child="durados_App" msdata:parentkey="Id" msdata:childkey="SystemSqlConnectionId" msprop:Generator_UserChildTable="durados_App" msprop:Generator_ChildPropName="Getdurados_AppRowsByFK_durados_App_durados_SqlConnection_System" msprop:Generator_UserRelationName="FK_durados_App_durados_SqlConnection_System" msprop:Generator_ParentPropName="durados_SqlConnectionRowByFK_durados_App_durados_SqlConnection_System" msprop:Generator_RelationVarName="relationFK_durados_App_durados_SqlConnection_System" msprop:Generator_UserParentTable="durados_SqlConnection" />
+      <msdata:Relationship name="durados_App_durados_DnsAlias" msdata:parent="durados_App" msdata:child="durados_DnsAlias" msdata:parentkey="Id" msdata:childkey="AppId" msprop:Generator_UserChildTable="durados_DnsAlias" msprop:Generator_ChildPropName="Getdurados_DnsAliasRows" msprop:Generator_UserRelationName="durados_App_durados_DnsAlias" msprop:Generator_RelationVarName="relationdurados_App_durados_DnsAlias" msprop:Generator_UserParentTable="durados_App" msprop:Generator_ParentPropName="durados_AppRow" />
+      <msdata:Relationship name="durados_SqlProduct_durados_SqlConnection" msdata:parent="durados_SqlProduct" msdata:child="durados_SqlConnection" msdata:parentkey="Id" msdata:childkey="SqlProductId" msprop:Generator_UserChildTable="durados_SqlConnection" msprop:Generator_ChildPropName="Getdurados_SqlConnectionRows" msprop:Generator_UserRelationName="durados_SqlProduct_durados_SqlConnection" msprop:Generator_RelationVarName="relationdurados_SqlProduct_durados_SqlConnection" msprop:Generator_UserParentTable="durados_SqlProduct" msprop:Generator_ParentPropName="durados_SqlProductRow" />
+      <msdata:Relationship name="FK_durados_App_durados_Theme" msdata:parent="durados_Theme" msdata:child="durados_App" msdata:parentkey="Id" msdata:childkey="ThemeId" msprop:Generator_UserChildTable="durados_App" msprop:Generator_ChildPropName="Getdurados_AppRows" msprop:Generator_UserRelationName="FK_durados_App_durados_Theme" msprop:Generator_ParentPropName="durados_ThemeRow" msprop:Generator_RelationVarName="relationFK_durados_App_durados_Theme" msprop:Generator_UserParentTable="durados_Theme" />
+      <msdata:Relationship name="FK_durados_AppStat_durados_App" msdata:parent="durados_App" msdata:child="durados_AppStat" msdata:parentkey="Id" msdata:childkey="AppId" msprop:Generator_UserChildTable="durados_AppStat" msprop:Generator_ChildPropName="Getdurados_AppStatRows" msprop:Generator_UserRelationName="FK_durados_AppStat_durados_App" msprop:Generator_ParentPropName="durados_AppRow" msprop:Generator_RelationVarName="relationFK_durados_AppStat_durados_App" msprop:Generator_UserParentTable="durados_App" />
+    </xs:appinfo>
+  </xs:annotation>
+</xs:schema>

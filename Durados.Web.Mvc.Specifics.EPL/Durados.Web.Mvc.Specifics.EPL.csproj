@@ -1,0 +1,162 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="3.5" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>9.0.30729</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{EE8D1960-4AEE-4D1D-B11E-AD1E843BB2B5}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>Durados.Web.Mvc.Specifics.EPL</RootNamespace>
+    <AssemblyName>Durados.Web.Mvc.Specifics.EPL</AssemblyName>
+    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.configuration" />
+    <Reference Include="System.Core">
+      <RequiredTargetFramework>3.5</RequiredTargetFramework>
+    </Reference>
+    <Reference Include="System.Data.Entity">
+      <RequiredTargetFramework>3.5</RequiredTargetFramework>
+    </Reference>
+    <Reference Include="System.Runtime.Serialization">
+      <RequiredTargetFramework>3.0</RequiredTargetFramework>
+    </Reference>
+    <Reference Include="System.Web" />
+    <Reference Include="System.Web.Abstractions">
+      <RequiredTargetFramework>3.5</RequiredTargetFramework>
+    </Reference>
+    <Reference Include="System.Web.Mvc, Version=1.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL" />
+    <Reference Include="System.Web.Routing">
+      <RequiredTargetFramework>3.5</RequiredTargetFramework>
+    </Reference>
+    <Reference Include="System.Xml.Linq">
+      <RequiredTargetFramework>3.5</RequiredTargetFramework>
+    </Reference>
+    <Reference Include="System.Data.DataSetExtensions">
+      <RequiredTargetFramework>3.5</RequiredTargetFramework>
+    </Reference>
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="CrmInfrastructure\CRMInfrastructureBaseController.cs" />
+    <Compile Include="CrmInfrastructure\CRMInfrastructureProposalController.cs" />
+    <Compile Include="CrmInfrastructure\CRMInfrastructureTasksController.cs" />
+    <Compile Include="CRM\Controllers\CRMProposalController.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="CRM\DataAccess\User.cs" />
+    <Compile Include="CRM\Model\Email.cs" />
+    <Compile Include="CRM\Controllers\CRMTradeController.cs" />
+    <Compile Include="CRM\Controllers\CRMHarborsController.cs" />
+    <Compile Include="CRM\Controllers\CRMTasksController.cs" />
+    <Compile Include="CRM\CRMDataSet.cs">
+      <DependentUpon>CRMDataSet.xsd</DependentUpon>
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="CRM\CRMEnums.cs" />
+    <Compile Include="CRM\Controllers\CRMBaseController.cs" />
+    <Compile Include="CRM\Controllers\CRMHomeController.cs" />
+    <Compile Include="CRM\CRMDataSet.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>CRMDataSet.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="CRM\Project.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Properties\Settings.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+      <DependentUpon>Settings.settings</DependentUpon>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="app.config" />
+    <None Include="CRM\CRMDataSet.xsc">
+      <DependentUpon>CRMDataSet.xsd</DependentUpon>
+    </None>
+    <None Include="CRM\CRMDataSet.xsd">
+      <SubType>Designer</SubType>
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>CRMDataSet.Designer.cs</LastGenOutput>
+    </None>
+    <None Include="CRM\CRMDataSet.xss">
+      <DependentUpon>CRMDataSet.xsd</DependentUpon>
+    </None>
+    <None Include="Properties\Settings.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Durados.DataAccess\Durados.DataAccess.csproj">
+      <Project>{FE0D5849-2911-4615-BCC4-C286B213761C}</Project>
+      <Name>Durados.DataAccess</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Durados.Localization\Durados.Localization.csproj">
+      <Project>{721D74D4-AA6C-4B47-B98F-C853FB7BCF9B}</Project>
+      <Name>Durados.Localization</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Durados.Web.Localization\Durados.Web.Localization.csproj">
+      <Project>{B0621DDC-83C4-48A8-A574-B0816B4A6388}</Project>
+      <Name>Durados.Web.Localization</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Durados.Web.Membership\Durados.Web.Membership.csproj">
+      <Project>{59A6657A-6BF8-49C3-BB98-63713C09C578}</Project>
+      <Name>Durados.Web.Membership</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Durados.Web.Mvc.Logging\Durados.Web.Mvc.Logging.csproj">
+      <Project>{729C03BB-33F3-4210-89F4-442E28500ED6}</Project>
+      <Name>Durados.Web.Mvc.Logging</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Durados.Web.Mvc.Specifics\Durados.Web.Mvc.Specifics.csproj">
+      <Project>{1E9202D6-BBD9-4307-B390-4099D84B0FA4}</Project>
+      <Name>Durados.Web.Mvc.Specifics</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Durados.Web.Mvc\Durados.Web.Mvc.csproj">
+      <Project>{79F336B9-C5C5-45FD-84D1-D858825BF330}</Project>
+      <Name>Durados.Web.Mvc</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Durados.Workflow\Durados.Workflow.csproj">
+      <Project>{1EA43A19-3530-4968-B9B8-87F313D6F063}</Project>
+      <Name>Durados.Workflow</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Durados.Xml\Durados.Xml.csproj">
+      <Project>{758CAABE-E74E-4ECB-AF3E-6B18D19B53D1}</Project>
+      <Name>Durados.Xml</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Durados\Durados.csproj">
+      <Project>{04183BAC-B3DA-46EC-BE81-D635768F98F4}</Project>
+      <Name>Durados</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>
