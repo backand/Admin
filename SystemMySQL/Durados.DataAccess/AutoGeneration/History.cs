@@ -45,4 +45,18 @@ namespace Durados.DataAccess.AutoGeneration
 
 
     }
+
+    public class MySqlHistory : History
+    {
+        public MySqlHistory(string connectionString, string schemaGeneratorFileName) :
+            base(connectionString, schemaGeneratorFileName)
+        {
+        }
+        protected override SqlSchema GetNewSqlSchema()
+        {
+            return   new MySqlSchema();
+        }
+
+
+    }
 }

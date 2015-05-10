@@ -156,4 +156,36 @@ namespace Durados.Web.Localization
         }
 
     }
+
+    public class MySqlLocalizer : Durados.Localization.ILocalizer
+    {
+        public string Translate(string key) { return key; }
+
+        public string Direction { get { return string.Empty; } }
+
+        public void UnsetLocalizationConfig() { }
+
+        public void SetCurrentUserLanguageCode(string languageCode) { }
+
+        public Durados.Localization.Model.LocalizationDataSet LocalizationDataSet { get { return new Durados.Localization.Model.LocalizationDataSet(); } }
+
+        public List<Durados.Localization.Model.Language> Languages { get { return new List<Durados.Localization.Model.Language>(); } }
+
+       
+        public void InitLocalizer(Durados.Localization.LocalizationConfig config, string cs, string localizationSchemaGeneratorFileName)
+        {
+            
+        }
+
+
+        public bool IsInitiated
+        {
+            get { return true; }
+        }
+
+        public void Refresh()
+        {
+            
+        }
+    }
 }

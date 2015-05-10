@@ -13,7 +13,10 @@ namespace Durados.DataAccess
         {
             return connectionString.StartsWith("server=");
         }
-
+        public static string GetConnectionStringSchema(bool useSSH)
+        {
+            return (useSSH ? "server=localhost;database={1};User Id={2};password={3}" : "server={0};database={1};User Id={2};password={3}") + ";port={4};convert zero datetime=True;default command timeout=90;Connection Timeout=60;";
+        }
         protected override System.Data.IDbConnection GetNewConnection(string connectionString)
         {
             if (IsMySqlConnectionString(connectionString))
@@ -49,7 +52,17 @@ namespace Durados.DataAccess
             else
                 return base.GetNewParameter(view, parameterName, value);
         }
+        //protected override object ChangeType(DataColumn dataColumn, string value)
+        //{
+        //    if ((value.ToLower() == bool.TrueString.ToLower() || value.ToLower() == bool.FalseString.ToLower()) && dataColumn.DataType.Equals(typeof(int)))
+        //    {
+        //        value = (Convert.ToBoolean(value) ? 1 : 0).ToString();
+        //    }
+            
 
+        //    return Convert.ChangeType(value, dataColumn.DataType);
+        //}
+       
         protected override System.Data.IDataAdapter GetNewAdapter(System.Data.IDbCommand command)
         {
             if (command is MySqlCommand)
@@ -328,7 +341,7 @@ namespace Durados.DataAccess
             }
         }
 
-        private bool IsMySqlConnectionString(string connectionString)
+        public bool IsMySqlConnectionString(string connectionString)
         {
             return connectionString.StartsWith("server=");
         }
@@ -384,7 +397,10 @@ namespace Durados.DataAccess
             else
                 return base.GetCommand(commandText, connection);
         }
-
+        public override IDbCommand GetNewCommand()
+        {
+            return new MySqlCommand();
+        }
         protected override string GetDefaultSchema(IDbCommand command)
         {
             string defaulSchema = "";
@@ -635,6 +651,30 @@ namespace Durados.DataAccess
         {
             return "BASE TABLE";
         }
+
+        public override string GetServerName(string connectionString)
+        {
+            MySqlConnectionStringBuilder builder = new MySqlConnectionStringBuilder(connectionString);
+            return builder.Server;
+        }
+        public override string GetPort(string connectionString)
+        {
+            MySqlConnectionStringBuilder builder = new MySqlConnectionStringBuilder(connectionString);
+            return builder.Port.ToString();
+        }
+        public override string GetSelectForCustomeViewTable()
+        {
+            return "SELECT  `CustomView` FROM `durados_CustomViews` WHERE `UserId` = @UserId AND `ViewName` = @ViewName LIMIT 0,1";
+        }
+        public override IDataParameter GetNewParameter()
+        {
+            return new MySqlParameter();
+        }
+        public override IDataParameter GetNewParameter(string name, object value)
+        {
+            return new MySqlParameter(name, value);
+        }
+      
     }
 
     public class MySqlCopyPaste : CopyPaste
@@ -680,6 +720,37 @@ namespace Durados.DataAccess
         protected override SqlAccess GetNewSqlAccess()
         {
             return new MySqlAccess();
+        }
+    }
+
+    public class MySqlHistory : History
+    {
+        protected override System.Data.IDataParameter GetNewParameter(IDbCommand command, string parameterName, object value)
+        {
+            return new MySqlParameter(parameterName, value);
+        }
+
+        protected override ISqlTextBuilder GetSqlTextBuilder()
+        {
+            return new MySqlTextBuilder();
+        }
+
+        protected override IDbConnection GetConnection(string connectionString)
+        {
+            return new MySqlConnection(connectionString);
+        }
+
+        protected override IDbCommand GetCommand()
+        {
+            return new MySqlCommand();
+        }
+        protected override string GetHistoryOldValueSelect()
+        {
+            return "SELECT  OldValueKey " +
+                                        "FROM      durados_ChangeHistory INNER JOIN " +
+                                        "durados_ChangeHistoryField ON durados_ChangeHistory.id = durados_ChangeHistoryField.ChangeHistoryId " +
+                                        "WHERE  (ViewName = @ViewName) AND (PK = @PK) AND (FieldName = @FieldName) AND (NewValueKey = @NewValue) LIMIT 0,1 " +
+                                        "ORDER BY UpdateDate DESC";
         }
     }
 }

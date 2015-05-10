@@ -53,4 +53,19 @@ namespace Durados.Web.Mvc
             }
         }
     }
+    public class MySqlPersistentSession:PersistentSession
+    {
+        public MySqlPersistentSession(string connectionString, string sessionSchemaGeneratorFileName)
+            : base(connectionString, sessionSchemaGeneratorFileName)
+        {
+        }
+        protected override SqlSchema GetNewSqlSchema()
+        {
+            return new Durados.DataAccess.MySqlSchema();
+        }
+        protected override string GetSessionSelectStatement()
+        {
+            return "select Scalar, TypeCode, SerializedObject, ObjectType from durados_session where SessionID=@SessionID and Name=@Name";
+        }
+    }
 }

@@ -11,7 +11,7 @@
     <ul>
     <%
         
-    Durados.Web.Mvc.View durados_v_MessageBoardView = (Durados.Web.Mvc.View)Map.Database.Views["durados_v_MessageBoard"];
+    //Durados.Web.Mvc.View durados_v_MessageBoardView = (Durados.Web.Mvc.View)Map.Database.Views["durados_v_MessageBoard"];
             
      %>
      <% if (Durados.Web.Mvc.Maps.MultiTenancy)

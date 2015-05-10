@@ -6,7 +6,7 @@ using System.Data.SqlClient;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
-
+using MySql.Data.MySqlClient;
 
 namespace Durados.Web.Mvc.Logging
 {
@@ -107,7 +107,7 @@ namespace Durados.Web.Mvc.Logging
 
             if (System.Web.Configuration.WebConfigurationManager.AppSettings.AllKeys.Contains("logTableFileName"))
                 logTableFileName = Convert.ToString(System.Web.Configuration.WebConfigurationManager.AppSettings["logTableFileName"]);
-
+            logTableFileName = GetSchemaCreateFileNameForProduct(logTableFileName);
             //// deployment sql
             string logClearFileName = GetConfigPath("~/Deployment/", "Sql/logClear.sql");
 
@@ -119,7 +119,8 @@ namespace Durados.Web.Mvc.Logging
 
             if (System.Web.Configuration.WebConfigurationManager.AppSettings.AllKeys.Contains("logInsertFileName"))
                 logInsertFileName = Convert.ToString(System.Web.Configuration.WebConfigurationManager.AppSettings["logInsertFileName"]);
-
+            logInsertFileName = GetSchemaCreateFileNameForProduct(logInsertFileName);
+            
             if (connectionString != null)
             {
                 //connection = new SqlConnection(connectionString);
@@ -127,7 +128,7 @@ namespace Durados.Web.Mvc.Logging
                 if (!SchemaExists(connectionString))
                 {
                     BuildSchema(connectionString, logTableFileName);
-                    BuildSchema(connectionString, logClearFileName);
+                    //BuildSchema(connectionString, logClearFileName);
                     BuildSchema(connectionString, logInsertFileName);
                 }
             }
@@ -149,6 +150,13 @@ namespace Durados.Web.Mvc.Logging
                 }
             }
 
+        }
+
+        private string GetSchemaCreateFileNameForProduct(string logTableFileName)
+        {
+            if (connectionString.StartsWith("server="))
+                logTableFileName = logTableFileName.Replace(".sql", "-Mysql.sql");
+            return logTableFileName;
         }
 
         public bool IsAllEventsAction(string action)
@@ -188,12 +196,12 @@ namespace Durados.Web.Mvc.Logging
 
             FileInfo file = new FileInfo(logSchemaGeneratorFileName);
             string script = file.OpenText().ReadToEnd();
-            SqlConnection conn = new SqlConnection(connectionString);
+            IDbConnection conn = GetConnection(connectionString);
             script = script.Replace("Logs", conn.Database);
             conn.Open();
             try
             {
-                SqlCommand command = new SqlCommand();
+                IDbCommand command = GetCommand(connectionString);
 
                 command.Connection = conn;
                 //command.CommandType = System.Data.CommandType.StoredProcedure;
@@ -206,25 +214,62 @@ namespace Durados.Web.Mvc.Logging
             }
         }
 
+        private  IDbConnection GetConnection(string connectionString)
+        {
+           
+            if (connectionString.StartsWith("server="))
+                return new MySqlConnection(connectionString);
+            return new SqlConnection(connectionString);
+        }
+
+        private  IDbCommand GetCommand(string connectionString)
+        {
+            if (connectionString.StartsWith("server="))
+                return new MySqlCommand();
+            return new SqlCommand();
+             
+        }
+        private  IDbCommand GetCommand(string connectionString,string cmdText)
+        {
+            if (connectionString.StartsWith("server="))
+                return new MySqlCommand(cmdText, new MySqlConnection(connectionString));
+            return new SqlCommand(cmdText,new SqlConnection(connectionString));
+
+        }
+        private  IDbCommand GetCommand(IDbConnection cnn, string cmdText)
+        {
+            if (cnn.ConnectionString.StartsWith("server="))
+                return new MySqlCommand(cmdText, (MySqlConnection)cnn);
+            return new SqlCommand(cmdText, (SqlConnection)cnn);
+
+        }
         private bool SchemaExists(string connectionString)
         {
-            string sql = "SELECT 1 FROM sysobjects  WHERE xtype='u' AND name='Durados_Log'";
-            SqlConnection conn = new SqlConnection(connectionString);
+            string sql = GetSelectForSchemaTable(connectionString, "Durados_Log");
+            IDbConnection conn = GetConnection(connectionString);
             conn.Open();
             try
             {
-                SqlCommand command = new SqlCommand();
+                IDbCommand command =  GetCommand(connectionString);
 
                 command.Connection = conn;
                 //command.CommandType = System.Data.CommandType.StoredProcedure;
                 command.CommandText = sql;
                 object scalar = command.ExecuteScalar();
-                return scalar != null && scalar != DBNull.Value && (int)scalar == 1;
+                return scalar != null && scalar != DBNull.Value && Convert.ToInt32(scalar) == 1;
             }
             finally
             {
                 conn.Close();
             }
+        }
+
+        private  string GetSelectForSchemaTable(string connectionString, string  table)
+        {
+            if (connectionString.StartsWith("server="))
+               return "SELECT 1  FROM INFORMATION_SCHEMA.TABLES  WHERE   table_name = '" + table + "' AND table_schema=DATABASE();";
+            
+            return "SELECT 1 FROM sysobjects  WHERE xtype='u' AND name='"+table+"'";
         }
 
 
@@ -368,9 +413,9 @@ namespace Durados.Web.Mvc.Logging
                 {
                     try
                     {
-                        using (SqlConnection sqlConnection = new SqlConnection(connectionString))
+                        using (IDbConnection sqlConnection = GetConnection(connectionString))
                         {
-                            using (SqlCommand command = new SqlCommand("Durados_LogInsert", sqlConnection))
+                            using (IDbCommand command = GetCommand(sqlConnection,"Durados_LogInsert"))
                             {
                                 command.CommandType = CommandType.StoredProcedure;
 
@@ -472,10 +517,10 @@ namespace Durados.Web.Mvc.Logging
             try
             {
                 string applicationName = System.Web.HttpContext.Current.Request.Headers["Host"];
-                using (SqlConnection cnn = new SqlConnection(connectionString))
+                using (IDbConnection cnn = GetConnection(connectionString))
                 {
                     cnn.Open();
-                    using (SqlCommand command = new SqlCommand("Durados_LogInsert", cnn))
+                    using (IDbCommand command = GetCommand("Durados_LogInsert",connectionString))
                     {
                         command.CommandType = CommandType.StoredProcedure;
                         SetCommandParametrs(command, applicationName, Username, controller, action, method, message, trace, logType, freeText, time, log);
@@ -492,32 +537,32 @@ namespace Durados.Web.Mvc.Logging
             return log;
         }
 
-        private void SetCommandParametrs(SqlCommand cmd, string applicationName, string username, string controller, string action, string method, string message, string trace, int logType, string freeText, DateTime time, Log log)
+        private void SetCommandParametrs(IDbCommand cmd, string applicationName, string username, string controller, string action, string method, string message, string trace, int logType, string freeText, DateTime time, Log log)
         {
             cmd.Parameters.Clear();
-            SqlParameter timeParameter = new SqlParameter("@Time", SqlDbType.DateTime);
+            IDataParameter timeParameter = GetNewParameter(cmd,"Time", SqlDbType.DateTime);
             timeParameter.Value = time;
             log.Time = DateTime.Now;
             cmd.Parameters.Add(timeParameter);
-            SqlParameter applicationNameParameter = new SqlParameter("@ApplicationName", SqlDbType.NVarChar);
+            IDataParameter applicationNameParameter = GetNewParameter(cmd, "ApplicationName", SqlDbType.NVarChar);
             applicationNameParameter.Value = applicationName;
             cmd.Parameters.Add(applicationNameParameter);
-            SqlParameter controllerParameter = new SqlParameter("@Controller", SqlDbType.Text);
+            IDataParameter controllerParameter = GetNewParameter(cmd, "Controller", SqlDbType.Text);
             controllerParameter.Value = controller;
             log.Controller = controller;
             cmd.Parameters.Add(controllerParameter);
-            SqlParameter actionParameter = new SqlParameter("@Action", SqlDbType.Text);
+            IDataParameter actionParameter = GetNewParameter(cmd, "Action", SqlDbType.Text);
             actionParameter.Value = action;
             log.Action = action;
             cmd.Parameters.Add(actionParameter);
-            SqlParameter methodNameParameter = new SqlParameter("@MethodName", SqlDbType.Text);
+            IDataParameter methodNameParameter = GetNewParameter(cmd, "MethodName", SqlDbType.Text);
             methodNameParameter.Value = method;
             log.MethodName = method;
             cmd.Parameters.Add(methodNameParameter);
-            SqlParameter logTypeParameter = new SqlParameter("@LogType", SqlDbType.Int);
+            IDataParameter logTypeParameter = GetNewParameter(cmd, "LogType", SqlDbType.Int);
             logTypeParameter.Value = logType;
             cmd.Parameters.Add(logTypeParameter);
-            SqlParameter exceptionMessageParameter = new SqlParameter("@ExceptionMessage", SqlDbType.Text);
+            IDataParameter exceptionMessageParameter = GetNewParameter(cmd, "ExceptionMessage", SqlDbType.Text);
             //if (exception == null)
             //{
             //    exceptionMessageParameter.Value = null;
@@ -529,7 +574,7 @@ namespace Durados.Web.Mvc.Logging
             log.ExceptionMessage = message;
             //}
             cmd.Parameters.Add(exceptionMessageParameter);
-            SqlParameter traceParameter = new SqlParameter("@Trace", SqlDbType.Text);
+            IDataParameter traceParameter = GetNewParameter(cmd, "Trace", SqlDbType.Text);
             //if (exception == null)
             //{
             //    traceParameter.Value = null;
@@ -542,19 +587,26 @@ namespace Durados.Web.Mvc.Logging
             traceParameter.Value = trace;
             log.Trace = trace;
             cmd.Parameters.Add(traceParameter);
-            SqlParameter serverNameParameter = new SqlParameter("@MachineName", SqlDbType.Text);
+            IDataParameter serverNameParameter = GetNewParameter(cmd, "MachineName", SqlDbType.Text);
             serverNameParameter.Value = machineName;
             log.MachineName = machineName;
             cmd.Parameters.Add(serverNameParameter);
-            SqlParameter usernameParameter = new SqlParameter("@Username", SqlDbType.Text);
+            IDataParameter usernameParameter = GetNewParameter(cmd, "Username", SqlDbType.Text);
             usernameParameter.Value = username;
             cmd.Parameters.Add(usernameParameter);
-            SqlParameter freeTextParameter = new SqlParameter("@FreeText", SqlDbType.Text);
+            IDataParameter freeTextParameter = GetNewParameter(cmd, "FreeText", SqlDbType.Text);
             freeTextParameter.Value = freeText;
             cmd.Parameters.Add(freeTextParameter);
-            SqlParameter guidTextParameter = new SqlParameter("@Guid", SqlDbType.UniqueIdentifier);
+            IDataParameter guidTextParameter = GetNewParameter(cmd, "Guid", SqlDbType.UniqueIdentifier);
             guidTextParameter.Value = Guid.NewGuid();
             cmd.Parameters.Add(guidTextParameter);
+        }
+
+        private IDbDataParameter GetNewParameter(System.Data.IDbCommand command, string parameterName, object value)
+        {
+            if (command is MySqlCommand)
+                return new MySqlParameter() { ParameterName = parameterName };
+            return new SqlParameter("@"+parameterName, value);
         }
 
         public string NowWithMilliseconds()
@@ -569,10 +621,10 @@ namespace Durados.Web.Mvc.Logging
             if (!initiated)
                 Initiate();
 
-            using (SqlConnection connection = new SqlConnection(connectionString))
+            using (IDbConnection connection = GetConnection(connectionString))
             {
                 connection.Open();
-                SqlCommand command = new SqlCommand("Durados_LogClear", connection);
+                IDbCommand command = GetCommand(connection, "truncate table Durados_Log");
                 command.CommandType = CommandType.StoredProcedure;
                 command.ExecuteNonQuery();
             }

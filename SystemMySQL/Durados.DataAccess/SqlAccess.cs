@@ -1090,8 +1090,8 @@ namespace Durados.DataAccess
             object scalar = null;
 
             View view = columnField.View;
-
-            string sql = "SELECT [" + columnField.DataColumn.ColumnName + "] FROM [" + view.DataTable.TableName + "] WHERE " + GetWhereStatement(view);
+            ISqlTextBuilder sqlBuilder = GetSqlTextBuilder(columnField.View);
+            string sql = "SELECT " + sqlBuilder.EscapeDbObjectStart + columnField.DataColumn.ColumnName + sqlBuilder.EscapeDbObjectEnd + " FROM " + sqlBuilder.EscapeDbObjectStart + view.DataTable.TableName + sqlBuilder.EscapeDbObjectEnd + " WHERE " + GetWhereStatement(view);
 
             using (IDbConnection connection = GetNewConnection(view.ConnectionString))
             {
@@ -4080,8 +4080,8 @@ namespace Durados.DataAccess
                     IDbTransaction sysTransaction = null;
                     if (!identicalSystemConnection)
                     {
-                        sysCommand = new SqlCommand();
-                        IDbConnection sysConnection = new SqlConnection(view.Database.SystemConnectionString);
+                        IDbConnection sysConnection = GetNewConnection(view.Database.SystemConnectionString);
+                        sysCommand = GetNewCommand(string.Empty, sysConnection);
                         sysConnection.Open();
                         sysTransaction = sysConnection.BeginTransaction(IsolationLevel.ReadCommitted);
                         sysCommand.Connection = sysConnection;
@@ -7745,7 +7745,10 @@ namespace Durados.DataAccess
             string connectionString = view.SystemView ? view.ConnectionString : view.Database.ConnectionString;
             return GetNewCommand(string.Empty, GetNewConnection(connectionString));
         }
-
+        public virtual IDbCommand GetNewCommand()
+        {
+            return GetNewSqlSchema().GetNewCommand();
+        }
 
         public string GetUserTrackingSql()
         {
@@ -9162,8 +9165,8 @@ namespace Durados.DataAccess
 
         protected virtual int SaveAction(IDbCommand command, string viewName, string pk, int userId, int action, string version, string workspace, string comments)
         {
-            string sql = "insert into durados_ChangeHistory(ViewName, PK, ActionId, UpdateUserId, Version, Workspace, Comments) values (@ViewName, @PK, @ActionId, @UpdateUserId, @Version, @Workspace, @Comments) ";
-            sql += "SELECT IDENT_CURRENT('durados_ChangeHistory') AS ID";
+            string sql = "insert into durados_ChangeHistory(ViewName, PK, ActionId, UpdateUserId, Version, Workspace, Comments) values (@ViewName, @PK, @ActionId, @UpdateUserId, @Version, @Workspace, @Comments); ";
+            sql +=GetSqlTextBuilder().GetLastInsertedRow("durados_ChangeHistory");
 
 
             if (comments == null)
@@ -9186,6 +9189,11 @@ namespace Durados.DataAccess
 
         }
 
+        protected virtual ISqlTextBuilder GetSqlTextBuilder()
+        {
+            return new SqlTextBuilder();
+        }
+
         public static int Save(string viewName, string pk, int userId, int action, string connectionString, string version, string workspace)
         {
             return Save(viewName, pk, userId, action, connectionString, version, workspace, null);
@@ -9193,10 +9201,12 @@ namespace Durados.DataAccess
 
         public static int Save(string viewName, string pk, int userId, int action, string connectionString, string version, string workspace, string comments)
         {
-            History history = new History();
+            SqlProduct sqlProduct = GetProduct(connectionString);
+            
+            History history = GetHistory(sqlProduct);
 
-            SqlCommand command = new SqlCommand();
-            command.Connection = new SqlConnection(connectionString);
+            IDbCommand command =GetCommand(sqlProduct) ;
+            command.Connection =GetConnection(sqlProduct,connectionString);
             try
             {
                 command.Connection.Open();
@@ -9208,13 +9218,46 @@ namespace Durados.DataAccess
             }
         }
 
+        private static IDbConnection GetConnection(SqlProduct sqlProduct, string connectionString)
+        {
+            if (sqlProduct== SqlProduct.MySql)
+                return new MySql.Data.MySqlClient.MySqlConnection();
+            return new SqlConnection(connectionString);
+          
+        }
+
+        private static IDbCommand GetCommand(SqlProduct sqlProduct)
+        {
+            if (sqlProduct== SqlProduct.MySql)
+                return new MySql.Data.MySqlClient.MySqlCommand();
+            return new SqlCommand();
+        }
+
+        public static History GetHistory(SqlProduct sqlProduct)
+        {
+            if (sqlProduct == SqlProduct.MySql)
+                return new MySqlHistory();
+            return new History();
+        }
+
+        public static SqlProduct GetProduct(string connectionString)
+        {
+            if (!string.IsNullOrEmpty(connectionString))
+            {
+                if (MySqlAccess.IsMySqlConnectionString(connectionString))
+                    return SqlProduct.MySql;
+            }
+            return SqlProduct.SqlServer;
+
+        }
+
         public virtual void Commit(Guid guid, int[] ids, string connectionString)
         {
             if (ids == null || ids.Count() == 0)
                 return;
 
-            SqlCommand command = new SqlCommand();
-            command.Connection = new SqlConnection(connectionString);
+            IDbCommand command = GetCommand();
+            command.Connection = GetConnection(connectionString);
             try
             {
                 command.Connection.Open();
@@ -9228,24 +9271,30 @@ namespace Durados.DataAccess
             }
         }
 
+        protected virtual IDbConnection GetConnection(string connectionString)
+        {
+            return new SqlConnection(connectionString);
+        }
+
+        protected virtual IDbCommand GetCommand()
+        {
+            return new SqlCommand();
+        }
+
 
         public string GetPreviousValue(string viewName, string fieldName, string pk, string currentValue, string connectionString)
         {
-            SqlCommand command = new SqlCommand();
-            command.Connection = new SqlConnection(connectionString);
+            IDbCommand command = GetCommand();
+            command.Connection = GetConnection(connectionString); ;
             try
             {
                 command.Connection.Open();
-                string sql = "SELECT TOP (1) OldValueKey " +
-                            "FROM      durados_ChangeHistory INNER JOIN " +
-                            "durados_ChangeHistoryField ON durados_ChangeHistory.id = durados_ChangeHistoryField.ChangeHistoryId " +
-                            "WHERE  (ViewName = @ViewName) AND (PK = @PK) AND (FieldName = @FieldName) AND (NewValueKey = @NewValue) " +
-                            "ORDER BY UpdateDate DESC";
+                string sql = GetHistoryOldValueSelect();
                 command.CommandText = sql;
-                command.Parameters.AddWithValue("@ViewName", viewName);
-                command.Parameters.AddWithValue("@FieldName", fieldName);
-                command.Parameters.AddWithValue("@PK", pk);
-                command.Parameters.AddWithValue("@NewValue", currentValue);
+                command.Parameters.Add(GetNewParameter(command, "@ViewName", viewName));
+                command.Parameters.Add(GetNewParameter(command, "@FieldName", fieldName));
+                command.Parameters.Add(GetNewParameter(command, "@PK", pk));
+                command.Parameters.Add(GetNewParameter(command, "@NewValue", currentValue));
 
                 object scalar = command.ExecuteScalar();
                 if (scalar != null && scalar != DBNull.Value)
@@ -9257,6 +9306,17 @@ namespace Durados.DataAccess
             {
                 command.Connection.Close();
             }
+        }
+
+      
+
+        protected virtual string GetHistoryOldValueSelect()
+        {
+            return "SELECT TOP (1) OldValueKey " +
+                                        "FROM      durados_ChangeHistory INNER JOIN " +
+                                        "durados_ChangeHistoryField ON durados_ChangeHistory.id = durados_ChangeHistoryField.ChangeHistoryId " +
+                                        "WHERE  (ViewName = @ViewName) AND (PK = @PK) AND (FieldName = @FieldName) AND (NewValueKey = @NewValue) " +
+                                        "ORDER BY UpdateDate DESC";
         }
     }
 
@@ -9357,7 +9417,7 @@ namespace Durados.DataAccess
         SqlAccess sqlAccess = null;
         private SqlProduct GetProduct(View view)
         {
-            return view.SystemView ? SqlProduct.SqlServer : view.Database.SqlProduct;
+            return view.SystemView ? view.Database.SystemSqlProduct : view.Database.SqlProduct;
         }
         private SqlAccess GetSqlAccess(View view)
         {
@@ -9387,6 +9447,28 @@ namespace Durados.DataAccess
             }
 
             return sqlAccess;
+        }
+        private SqlAccess GetSqlAccess(SqlProduct sqlProduct)
+        {
+                       
+                switch (sqlProduct)
+                {
+                    case SqlProduct.MySql:
+                        return new MySqlAccess();
+                        break;
+                    case SqlProduct.Postgre:
+                        return new PostgreAccess();
+                        break;
+                    case SqlProduct.Oracle:
+                        return new OracleAccess();
+                        break;
+
+                    default:
+                        return new SqlAccess();
+                        break;
+                }
+            
+           
         }
         protected string Create(View view, Dictionary<string, object> values, string insertAbovePK, IDbCommand command, IDbCommand sysCommand, out int? id, BeforeCreateEventHandler beforeCreateCallback, BeforeCreateInDatabaseEventHandler beforeCreateInDatabaseEventHandler, AfterCreateEventHandler afterCreateBeforeCommitCallback, AfterCreateEventHandler afterCreateAfterCommitCallback)
         {
@@ -9483,8 +9565,8 @@ namespace Durados.DataAccess
                     IDbTransaction sysTransaction = null;
                     if (!identicalSystemConnection)
                     {
-                        sysCommand = new SqlCommand();
-                        IDbConnection sysConnection = new SqlConnection(view.Database.SystemConnectionString);
+                        sysCommand = GetSqlAccess(view.Database.SystemSqlProduct).GetNewCommand();
+                        IDbConnection sysConnection = SqlAccess.GetNewConnection(view.Database.SystemSqlProduct,view.Database.SystemConnectionString);
                         sysConnection.Open();
                         sysTransaction = sysConnection.BeginTransaction(IsolationLevel.ReadCommitted);
                         sysCommand.Connection = sysConnection;
@@ -9654,8 +9736,8 @@ namespace Durados.DataAccess
                     IDbTransaction sysTransaction = null;
                     if (!identicalSystemConnection)
                     {
-                        sysCommand = new SqlCommand();
-                        IDbConnection sysConnection = new SqlConnection(view.Database.SystemConnectionString);
+                        sysCommand = GetSqlAccess(view.Database.SystemSqlProduct).GetNewCommand();
+                        IDbConnection sysConnection = SqlAccess.GetNewConnection(view.Database.SystemSqlProduct, view.Database.SystemConnectionString);
                         sysConnection.Open();
                         sysTransaction = sysConnection.BeginTransaction(IsolationLevel.ReadCommitted);
                         sysCommand.Connection = sysConnection;
@@ -11095,6 +11177,36 @@ public class SqlSchema : ISchema
     {
         return string.Format(sqlTextBuilder.Top("select * from " + sqlTextBuilder.EscapeDbObject("{0}"), 1), tableName);
     }
+    public virtual string GetServerName(string connectionString)
+    {
+        SqlConnectionStringBuilder builder = new SqlConnectionStringBuilder(connectionString);
+        return builder.DataSource;
+    }
+    public virtual string GetPort(string connectionString)
+    {
+        return "1433";
+    }
+
+    public virtual IDbCommand GetNewCommand()
+    {
+        return new SqlCommand();
+    }
+
+
+
+    public virtual string GetSelectForCustomeViewTable()
+    {
+        return "SELECT TOP 1 CustomView FROM [dbo].[durados_CustomViews] WHERE [UserId] = @UserId AND [ViewName] = @ViewName";
+    }
+
+    public virtual IDataParameter GetNewParameter()
+    {
+        return new SqlParameter();
+    }
+    public virtual IDataParameter GetNewParameter(string name, object value)
+    {
+        return new SqlParameter(name, value);
+    }
 }
 
 public class DuradosCommand : System.Data.IDbCommand
@@ -11362,72 +11474,7 @@ public class RowNotFoundException : DuradosException
     }
 }
 
-public interface ISqlTextBuilder
-{
-    string GetQueryForLike();
 
-    string GetQueryTemplateForLike(bool startWith, string match);
-
-    string EscapeDbObject(string Name);
-
-    string EscapeDbObjectStart { get; }
-
-    string EscapeDbObjectEnd { get; }
-
-    string DbTableColumnSeperator { get; }
-
-    string DbEquals { get; }
-
-    string DbAnd { get; }
-
-    string DbOr { get; }
-
-    string AllColumns { get; }
-
-    string WithNolock { get; }
-
-    string GetRowNumber(string orderByColumn);
-
-    string GetRowNumber(string orderByTable, string orderByColumn);
-
-    string GetRowNumber(string orderByTable, string orderByColumn, string sortOrder);
-
-    string GetRowNumberNotEscaped(string orderByColumn, string sortOrder);
-
-    string GetPageOrder(string orderByColumn);
-
-    string GetPage(int page, int rowsCount);
-
-    string GetLastInsertedRow(string tableName);
-    //string GetLastInsertedRow2(string tableName);
-    string GetLastInsertedRow(View view);
-
-    string GetDateDiffDays(string start, string end);
-
-    string GetDateAddDays(string days, string date);
-
-    string GetDateOnly(string date);
-
-    string Top(string sql, int top);
-
-    string GetAlterColumn(string columnName);
-
-
-    string NLS { get; }
-
-    string DbAs { get; }
-
-    string DbParameterPrefix { get; }
-    string DbEndOfStatement { get; }
-
-    string GetLastInsertedRow2(View view);
-
-    string GetConvertDateToVarcharStatement(string escapedColumnName, string dateFormat);
-
-    string mmddyyyy { get; }
-
-    string monddyyyy { get; }
-}
 
 public class SqlTextBuilder : ISqlTextBuilder
 {

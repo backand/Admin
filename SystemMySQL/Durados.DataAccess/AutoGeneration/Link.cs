@@ -21,4 +21,16 @@ namespace Durados.DataAccess.AutoGeneration
             get { return "durados_Link"; }
         }
     }
+
+    public class MySqlLink : Link
+    {
+        public MySqlLink(string connectionString, string schemaGeneratorFileName) :
+            base(connectionString, schemaGeneratorFileName)
+        {
+        }
+        protected override SqlSchema GetNewSqlSchema()
+        {
+            return new MySqlSchema();
+        }
+    }
 }

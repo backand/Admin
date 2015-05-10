@@ -833,7 +833,7 @@ namespace Durados.Web.Mvc.UI.Helpers
         {
             //Durados.Web.Mvc.View view = (Durados.Web.Mvc.View)Map.Database.Views["durados_CustomViews"];            
 
-            string sql = "SELECT TOP 1 CustomView FROM [dbo].[durados_CustomViews] WHERE [UserId] = @UserId AND [ViewName] = @ViewName";
+            string sql = GetSelectForCustomeViewTable();
 
             int UserId = -1;
             if (!defaults) {
@@ -845,7 +845,7 @@ namespace Durados.Web.Mvc.UI.Helpers
             parameters.Add("UserId", UserId);
             parameters.Add("ViewName", viewName);
 
-            DataAccess.SqlAccess da = new DataAccess.SqlAccess();
+            IDataTableAccess da = GetSystemSqlAccess();
 
             string result = da.ExecuteScalar(Map.Database.SystemConnectionString ?? Map.Database.ConnectionString, sql, parameters);
 
@@ -857,6 +857,18 @@ namespace Durados.Web.Mvc.UI.Helpers
             }
 
             return result;
+        }
+
+        private static string GetSelectForCustomeViewTable()
+        {
+           return DataAccessHelper.GetDataTableAccess(Map.systemConnectionString).GetNewSqlSchema().GetSelectForCustomeViewTable();
+            //
+        }
+
+        private static IDataTableAccess GetSystemSqlAccess()
+        {
+            return DataAccessHelper.GetDataTableAccess(Map.systemConnectionString);
+          //  return new DataAccess.SqlAccess();
         }
 
         public static string GetJsonDatesFormats()

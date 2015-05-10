@@ -13,7 +13,10 @@ namespace Durados.DataAccess
         {
             return connectionString.Contains("Encoding=");
         }
-
+        public static string GetConnectionStringSchema(bool useSSL)
+        {
+            return (useSSL ? "server={0};database={1};User Id={2};password={3};SSL=true;SslMode=Require;" : "server={0};database={1};User Id={2};password={3}") + ";port={4};Encoding=UNICODE;CommandTimeout=90;Timeout=60;";
+        }
         protected override System.Data.IDbConnection GetNewConnection(string connectionString)
         {
             if (IsPostgreConnectionString(connectionString))
@@ -486,7 +489,7 @@ namespace Durados.DataAccess
         {
             return "SELECT " + calculatedField + " FROM " + sqlTextBuilder.EscapeDbObject(tableName) + " LIMIT 1 OFFSET 0";
         }
-
+       
     }
 
     public class PostgreCopyPaste : MySqlCopyPaste

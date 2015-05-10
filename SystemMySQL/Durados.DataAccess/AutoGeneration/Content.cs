@@ -21,4 +21,15 @@ namespace Durados.DataAccess.AutoGeneration
             get { return "durados_Html"; }
         }
     }
+    public class MySqlContent : Content
+    {
+        public MySqlContent(string connectionString, string schemaGeneratorFileName) :
+            base(connectionString, schemaGeneratorFileName)
+        {
+        }
+        protected override SqlSchema GetNewSqlSchema()
+        {
+            return new MySqlSchema();
+        }
+    }
 }

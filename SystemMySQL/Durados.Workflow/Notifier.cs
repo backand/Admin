@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Data;
 using System.Data.SqlClient;
+using MySql.Data.MySqlClient;
 
 namespace Durados.Workflow
 {
@@ -68,17 +69,19 @@ namespace Durados.Workflow
 
             if (emails.Count >= 1)
             {
+                Durados.Data.IDataAccess dal = userView.Database.GetDataAccess(userView.ConnectionString);
+                ISqlTextBuilder sqlBuilder = dal.GetSqlBuilder();
                 string emailString = emails.ToArray().Delimited("'","'");
 
-                string sql = "select [" + userView.DataTable.PrimaryKey[0].ColumnName + "] from [" + userView.DataTable.TableName + "] where Email in (" + emailString + ")";
+                string sql = GetSelectPKStatement(userView, sqlBuilder, emailString);
 
-                using (SqlConnection connection = new SqlConnection(userView.ConnectionString))
+                using (IDbConnection connection =dal.GetConnection(userView.ConnectionString))// GetConnection(userView.ConnectionString))
                 {
                     connection.Open();
 
-                    using (SqlCommand command = new SqlCommand(sql, connection))
+                    using (IDbCommand command = dal.GetCommand(connection, sql))
                     {
-                        using (SqlDataReader reader = command.ExecuteReader())
+                        using (IDataReader reader = command.ExecuteReader())
                         {
                             while (reader.Read())
                             {
@@ -94,6 +97,11 @@ namespace Durados.Workflow
             }
 
             return recipients;
+        }
+
+        protected virtual string GetSelectPKStatement(View userView, ISqlTextBuilder sqlBuilder, string emailString)
+        {
+            return "SELECT " + sqlBuilder.EscapeDbObjectStart + userView.DataTable.PrimaryKey[0].ColumnName + sqlBuilder.EscapeDbObjectEnd + " FROM " + sqlBuilder.EscapeDbObjectStart + userView.DataTable.TableName + sqlBuilder.EscapeDbObjectEnd + " where Email in (" + emailString + ")";
         }
 
         protected virtual bool ShouldSaveInMessageBoard(object controller, Dictionary<string, Parameter> parameters, View view, Dictionary<string, object> values, DataRow prevRow, string pk, string siteWithoutQueryString, string connectionString)
@@ -127,6 +135,11 @@ namespace Durados.Workflow
 
             return emailParameters;
         }
+
+        
+
+       
+       
     }
 
     public class DictionaryField

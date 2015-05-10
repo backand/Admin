@@ -22,6 +22,7 @@ namespace Durados
         public static readonly string GuestUsername = "Guest";
         public static readonly string IPAddressPlaceHolder = "[m_CurrentIP]";
         public static readonly string LongProductName = "backand";
+        public static readonly string ProductShorthandName = "b";
         public static readonly string ShortProductName = "Back&";
         public static readonly string SystemRelatedViewPrefix = "enum_";
 
@@ -122,6 +123,7 @@ namespace Durados
         [Durados.Config.Attributes.ColumnProperty(Description = "Registered Users - only the users that registered into system can login, Authenticated Users - users that registered to Durados or other customized authentication tools such as LDAP, can login, All Users - everyone can login.  The default is Registered Users (recommended).")]
         public SecureLevel SecureLevel { get; set; }
 
+        public virtual Durados.Data.IDataAccess GetDataAccess(string connectionString) {   return null; }
         public void SetNextMinorConfigVersion()
         {
             Version version = new Version(ConfigVersion);
@@ -1025,7 +1027,7 @@ namespace Durados
         }
 
         public SqlProduct SqlProduct { get; set; }
-
+        public SqlProduct SystemSqlProduct { get; set; }
 
         [Durados.Config.Attributes.ColumnProperty(Description = "Report Services Username for credentials")]
         public string SsrsUsername { get; set; }

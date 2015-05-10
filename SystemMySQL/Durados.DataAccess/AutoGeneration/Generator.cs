@@ -31,12 +31,12 @@ namespace Durados.DataAccess.AutoGeneration
 
             FileInfo file = new FileInfo(schemaGeneratorFileName);
             string scripts = file.OpenText().ReadToEnd();
-            SqlConnection conn = new SqlConnection(connectionString);
+            IDbConnection conn = GetNewSqlSchema().GetConnection(connectionString);
             scripts = scripts.Replace("__DB_NAME__", conn.Database);
             conn.Open();
             try
             {
-                SqlCommand command = new SqlCommand();
+                IDbCommand command = GetNewSqlSchema().GetCommand();
 
                 command.Connection = conn;
                 //command.CommandType = System.Data.CommandType.StoredProcedure;
@@ -62,12 +62,12 @@ namespace Durados.DataAccess.AutoGeneration
 
         protected virtual bool SchemaExists(string connectionString)
         {
-            string sql = (new SqlSchema()).IsTableOrViewExistsSelectStatement(RootObjectName);
-            SqlConnection conn = new SqlConnection(connectionString);
+            string sql = (GetNewSqlSchema()).IsTableOrViewExistsSelectStatement(RootObjectName);
+            IDbConnection conn = GetNewSqlSchema().GetConnection(connectionString);
             conn.Open();
             try
             {
-                SqlCommand command = new SqlCommand();
+                IDbCommand command = GetNewSqlSchema().GetCommand();
 
                 command.Connection = conn;
                 //command.CommandType = System.Data.CommandType.StoredProcedure;
@@ -84,10 +84,10 @@ namespace Durados.DataAccess.AutoGeneration
 
         public virtual void Clear()
         {
-            using (SqlConnection connection = new SqlConnection(connectionString))
+            using (IDbConnection connection = GetNewSqlSchema().GetConnection(connectionString))
             {
                 connection.Open();
-                SqlCommand command = new SqlCommand("truncate table " + RootObjectName, connection);
+                IDbCommand command = GetNewSqlSchema().GetCommand("truncate table " + RootObjectName, connection);
                 command.ExecuteNonQuery();
             }
         }
@@ -99,9 +99,9 @@ namespace Durados.DataAccess.AutoGeneration
 
         public DataTable CreateTable(string viewName, string editableTableName, string connectionString)
         {
-            using (SqlConnection connection = new SqlConnection(connectionString))
+            using (IDbConnection connection = GetNewSqlSchema().GetConnection(connectionString))
             {
-                using (SqlCommand command = new SqlCommand())
+                using (IDbCommand command = GetNewSqlSchema().GetCommand())
                 {
                     connection.Open();
                     //SqlTransaction transaction = connection.BeginTransaction(IsolationLevel.ReadCommitted);

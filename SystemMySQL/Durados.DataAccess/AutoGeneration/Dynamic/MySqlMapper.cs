@@ -12,7 +12,7 @@ namespace Durados.DataAccess.AutoGeneration.Dynamic
             return new MySqlSchema();
         }
 
-        protected override Generator GetNewGenerator()
+        public override Generator GetNewGenerator()
         {
             return new MySqlGenerator();
         }
@@ -21,6 +21,37 @@ namespace Durados.DataAccess.AutoGeneration.Dynamic
         {
             return new MySqlAccess();
         }
+        public override string GetGenerateScriptFileName(string fileName)
+        {
+            return fileName.Replace(".sql", "-MySql.sql");
+        }
+        public override History GetHistoryGenerator(string systemConnectionString, string historySchemaGeneratorFileName)
+        {
+            return new  MySqlHistory(systemConnectionString, historySchemaGeneratorFileName);
+        }
+        public override Durados.DataAccess.AutoGeneration.PersistentSession GetPersistentSessionGenerator(string systemConnectionString, string sessionSchemaGeneratorFileName)
+        {
+            return new Durados.DataAccess.AutoGeneration.MySqPersistentSession(systemConnectionString, sessionSchemaGeneratorFileName);
+        }
+        public override Content GetPersistentContentGenerator(string systemConnectionString, string contentSchemaGeneratorFileName)
+        {
+            return new Durados.DataAccess.AutoGeneration.MySqlContent(systemConnectionString, contentSchemaGeneratorFileName);
+        }
+        public override Link GetLinkGenerator(string systemConnectionString, string contentSchemaGeneratorFileName)
+        {
+            return new Durados.DataAccess.AutoGeneration.MySqlLink(systemConnectionString, contentSchemaGeneratorFileName);
+        }
+
+        public override CustomViews GetCustomViewsGenerator(string systemConnectionString, string contentSchemaGeneratorFileName)
+        {
+            return new Durados.DataAccess.AutoGeneration.MySqlCustomViews(systemConnectionString, contentSchemaGeneratorFileName);
+        }
+        public override Durados.DataAccess.AutoGeneration.User GetUserGenerator(string systemConnectionString, string contentSchemaGeneratorFileName)
+        {
+            return new Durados.DataAccess.AutoGeneration.MySqlUser(systemConnectionString, contentSchemaGeneratorFileName);
+        }
+
+       
     }
 
     public class MySqlGenerator : Generator

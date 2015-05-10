@@ -378,43 +378,65 @@ namespace Durados.Web.Mvc.Controllers
 
                     string duradosUser = Map.Database.GetUserID();
                     string newPassword = new AccountMembershipService().GetRandomPassword(12);
-                    string newUsername = Maps.DuradosAppPrefix + pk + "User";
-
+                    string newUsername = Durados.Database.ProductShorthandName + pk ;
+                    string serverName   = GetServerName(Maps.Instance.SystemConnectionString);
                     //Dictionary<string, object> values = new Dictionary<string, object>();
                     //values.Add("AppId", Convert.ToInt32(pk));
                     //values.Add("Catalog", Maps.DuradosAppPrefix + pk);
                     //values.Add("SysCatalog", Maps.DuradosAppSysPrefix + pk);
                     //values.Add("DuradosUser", Map.Database.GetUserID());
                     //sqlAccess.ExecuteNoneQueryStoredProcedure(Maps.Instance.ConnectionString, "durados_SetSysConnection", values);
-                    try
+                    SqlProduct systemSqlProduct = GetSystemSqlProduct() ;
+                    int? sysConnId=null;
+                    if (systemSqlProduct == SqlProduct.SqlServer)
                     {
-                        using (SqlConnection connection = new SqlConnection(Maps.Instance.ConnectionString))
+                        try
                         {
-                            connection.Open();
-                            using (SqlCommand command = new SqlCommand())
+                            using (SqlConnection connection = new SqlConnection(Maps.Instance.ConnectionString))
                             {
-                                command.Connection = connection;
-                                sqlAccess.ExecuteNonQuery(e.View, command, "create database " + sysCatalog, null);
+                                connection.Open();
+                                using (SqlCommand command = new SqlCommand())
+                                {
+                                    command.Connection = connection;
+                                    sqlAccess.ExecuteNonQuery(e.View, command, "create database " + sysCatalog, null);
+                                }
                             }
                         }
-                    }
-                    catch (Exception exception)
-                    {
-                        Map.Logger.Log(GetControllerNameForLog(this.ControllerContext), this.ControllerContext.RouteData.Values["action"].ToString(), exception.Source, exception, 1, "Failed to create system database. catalog=" + sysCatalog);
-                        throw new DuradosException("Failed to create database");
-                    }
+                        catch (Exception exception)
+                        {
+                            Map.Logger.Log(GetControllerNameForLog(this.ControllerContext), this.ControllerContext.RouteData.Values["action"].ToString(), exception.Source, exception, 1, "Failed to create system database. catalog=" + sysCatalog);
+                            throw new DuradosException("Failed to create database");
+                        }
 
-                    try
-                    {
-                        CreateDatabaseUser(builder.DataSource, sysCatalog, builder.UserID, builder.Password, builder.IntegratedSecurity, newUsername, newPassword, false);
-                    }
-                    catch (Exception exception)
-                    {
-                        Map.Logger.Log(GetControllerNameForLog(this.ControllerContext), this.ControllerContext.RouteData.Values["action"].ToString(), exception.Source, exception, 1, "Failed to create database user. username=" + newUsername);
-                        throw new DuradosException("Failed to create database user");
-                    }
-                    int? sysConnId = SaveConnection(builder.DataSource, sysCatalog, newUsername, newPassword, duradosUser, SqlProduct.SqlServer);
+                        try
+                        {
+                            CreateDatabaseUser(builder.DataSource, sysCatalog, builder.UserID, builder.Password, builder.IntegratedSecurity, newUsername, newPassword, false);
+                        }
+                        catch (Exception exception)
+                        {
+                            Map.Logger.Log(GetControllerNameForLog(this.ControllerContext), this.ControllerContext.RouteData.Values["action"].ToString(), exception.Source, exception, 1, "Failed to create database user. username=" + newUsername);
+                            throw new DuradosException("Failed to create database user");
+                        }
+                         sysConnId = SaveConnection(builder.DataSource, sysCatalog, newUsername, newPassword, duradosUser, SqlProduct.SqlServer);
 
+                    }
+                    else if (systemSqlProduct == SqlProduct.MySql)
+                    {
+                        try
+                        {
+                            NewDatabaseParameters sysDbParameters = new NewDatabaseParameters { DbName = sysCatalog, Username = newUsername, Password = newPassword };
+                            AppFactory appFactory = new AppFactory();
+                            appFactory.CreateNewSystemSchemaAndUser(Maps.Instance.SystemConnectionString, sysDbParameters);
+                        }
+                        catch (Exception exception)
+                        {
+                            Map.Logger.Log(GetControllerNameForLog(this.ControllerContext), this.ControllerContext.RouteData.Values["action"].ToString(), exception.Source, exception, 1, "Failed to create database user. username=" + newUsername);
+                            throw new DuradosException("Failed to create database user");
+                        }
+
+                        int port = Convert.ToInt32(new MySqlSchema().GetPort(Maps.Instance.SystemConnectionString));
+                         sysConnId = SaveConnection(serverName, sysCatalog, newUsername, newPassword, duradosUser, SqlProduct.MySql, port);
+                    }
                     //Dictionary<string, object> values = new Dictionary<string, object>();
 
                     //values = new Dictionary<string, object>();
@@ -667,6 +689,18 @@ namespace Durados.Web.Mvc.Controllers
             CreateDns(cleanName);
         }
 
+        private SqlProduct GetSystemSqlProduct()
+        {
+            if (MySqlAccess.IsMySqlConnectionString(Maps.Instance.SystemConnectionString))
+                return SqlProduct.MySql;
+            return SqlProduct.SqlServer;
+        }
+
+        private string GetServerName(string connectionString)
+        {
+            return new MySqlSchema().GetServerName(connectionString);
+        }
+
         private void CopyContainer(string sourcePath, string targetPath, bool p)
         {
             //throw new NotImplementedException();
@@ -882,7 +916,10 @@ namespace Durados.Web.Mvc.Controllers
         }
 
         SqlAccess sqlAccess = new SqlAccess();
-
+        private int? SaveConnection(string server, string catalog, string username, string password, string userId, SqlProduct sqlProduct,int port)
+        {
+            return SaveConnection(server, catalog, username, password, userId, sqlProduct, false, false, string.Empty, string.Empty, string.Empty, string.Empty, 0,port);
+        }
         protected int? SaveConnection(string server, string catalog, string username, string password, string userId, SqlProduct sqlProduct)
         {
             return SaveConnection(server, catalog, username, password, userId, sqlProduct, false, false, string.Empty, string.Empty, string.Empty, string.Empty, 0, 0);

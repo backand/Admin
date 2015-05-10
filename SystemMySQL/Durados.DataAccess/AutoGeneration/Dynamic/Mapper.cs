@@ -1385,7 +1385,7 @@ namespace Durados.DataAccess.AutoGeneration.Dynamic
             return CreateTable(name, name, connectionString);
         }
 
-        protected virtual Generator GetNewGenerator()
+        public virtual Generator GetNewGenerator()
         {
             return new Generator();
         }
@@ -3844,6 +3844,46 @@ namespace Durados.DataAccess.AutoGeneration.Dynamic
                 connection.Close();
             }
         }
+
+        public virtual string GetGenerateScriptFileName(string fileName)
+        {
+            return fileName;
+        }
+
+        public virtual History GetHistoryGenerator(string systemConnectionString, string historySchemaGeneratorFileName)
+        {
+           return new Durados.DataAccess.AutoGeneration.History(systemConnectionString, historySchemaGeneratorFileName);
+        }
+
+        public virtual Durados.DataAccess.AutoGeneration.PersistentSession GetPersistentSessionGenerator(string systemConnectionString, string sessionSchemaGeneratorFileName)
+        {
+            return new Durados.DataAccess.AutoGeneration.PersistentSession(systemConnectionString, sessionSchemaGeneratorFileName);
+        }
+
+        public virtual Content GetPersistentContentGenerator(string systemConnectionString, string contentSchemaGeneratorFileName)
+        {
+            return new Durados.DataAccess.AutoGeneration.Content(systemConnectionString, contentSchemaGeneratorFileName);
+        }
+        public virtual Link GetLinkGenerator(string systemConnectionString, string contentSchemaGeneratorFileName)
+        {
+            return new Durados.DataAccess.AutoGeneration.Link(systemConnectionString, contentSchemaGeneratorFileName);
+        }
+
+        public virtual CustomViews GetCustomViewsGenerator(string systemConnectionString, string contentSchemaGeneratorFileName)
+        {
+            return new Durados.DataAccess.AutoGeneration.CustomViews(systemConnectionString, contentSchemaGeneratorFileName);
+        }
+        public virtual Durados.DataAccess.AutoGeneration.User GetUserGenerator(string systemConnectionString, string contentSchemaGeneratorFileName)
+        {
+            return new Durados.DataAccess.AutoGeneration.User(systemConnectionString, contentSchemaGeneratorFileName);
+        }
+
+        //public virtual object GetBoolean(bool b)
+        //{
+        //    if (b)
+        //        return true;
+        //    return false;
+        //}
     }
 
     public enum RelationChange
