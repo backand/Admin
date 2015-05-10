@@ -74,6 +74,7 @@ namespace Durados.Web.Mvc
         public virtual string DownloadActionName { get { return Maps.DownloadActionName; } }
 
         public DataAccess.AutoGeneration.Dynamic.Mapper DynamicMapper { get; private set; }
+        public DataAccess.AutoGeneration.Dynamic.Mapper SystemDynamicMapper { get; private set; }
 
         //public string CreatorUserName { get; set; }
 
@@ -356,7 +357,7 @@ namespace Durados.Web.Mvc
 
         public string selectedProject;
 
-        private Durados.DataAccess.AutoGeneration.Generator systemGenerator = new Durados.DataAccess.AutoGeneration.Generator();
+        private Durados.DataAccess.AutoGeneration.Generator systemGenerator = null;
 
         protected virtual Durados.Web.Mvc.Config.IProject GetProject()
         {
@@ -474,7 +475,14 @@ namespace Durados.Web.Mvc
                 return new Durados.DataAccess.AutoGeneration.Dynamic.Mapper();
 
         }
-
+        protected virtual Durados.DataAccess.AutoGeneration.Dynamic.Mapper GetNewSystemMapper(string connectionString)
+        {
+            if (MySqlAccess.IsMySqlConnectionString(connectionString))
+              return new Durados.DataAccess.AutoGeneration.Dynamic.MySqlMapper();
+             else
+                return new Durados.DataAccess.AutoGeneration.Dynamic.Mapper();
+       }
+        
 
         private bool Initiate(Durados.Web.Mvc.Config.IProject project,bool save)
         {
@@ -491,47 +499,50 @@ namespace Durados.Web.Mvc
 
             //DynamicMapper = new Durados.DataAccess.AutoGeneration.Dynamic.Mapper();
             DynamicMapper = GetNewMapper();
+            SystemDynamicMapper = GetNewSystemMapper(this.systemConnectionString);
+            systemGenerator = SystemDynamicMapper.GetNewGenerator();
             DynamicMapper.Storage = this;
 
             DynamicMapper.Logger = Logger;
             DynamicMapper.ConnectionString = connectionString;
             DynamicMapper.FileName = this.ConfigFileName + ".xml";
 
-            string historySchemaGeneratorFileName = Maps.GetDeploymentPath("Sql/History.sql");
+            string historySchemaGeneratorFileName = SystemDynamicMapper.GetGenerateScriptFileName(Maps.GetDeploymentPath("Sql/History.sql"));
             Durados.DataAccess.AutoGeneration.History history =
-                new Durados.DataAccess.AutoGeneration.History(systemConnectionString, historySchemaGeneratorFileName);
+                SystemDynamicMapper.GetHistoryGenerator(systemConnectionString, historySchemaGeneratorFileName);
 
-            string messageBoardSchemaGeneratorFileName = Maps.GetDeploymentPath("Sql/MessageBoard.sql");
-            Durados.DataAccess.AutoGeneration.MessageBoard persistentMessageBoard =
-                new Durados.DataAccess.AutoGeneration.MessageBoard(systemConnectionString, messageBoardSchemaGeneratorFileName);
+            //string messageBoardSchemaGeneratorFileName = Maps.GetDeploymentPath("Sql/MessageBoard.sql");
+            //Durados.DataAccess.AutoGeneration.MessageBoard persistentMessageBoard =
+            //    new Durados.DataAccess.AutoGeneration.MessageBoard(systemConnectionString, messageBoardSchemaGeneratorFileName);
 
 
-            string sessionSchemaGeneratorFileName = Maps.GetDeploymentPath("Sql/Session.sql");
-            session = new PersistentSession(systemConnectionString, sessionSchemaGeneratorFileName);
-            string contentSchemaGeneratorFileName = Maps.GetDeploymentPath("Sql/Content.sql");
-            Durados.DataAccess.AutoGeneration.Content persistentContent =
-                new Durados.DataAccess.AutoGeneration.Content(systemConnectionString, contentSchemaGeneratorFileName);
+            string sessionSchemaGeneratorFileName = SystemDynamicMapper.GetGenerateScriptFileName(Maps.GetDeploymentPath("Sql/Session.sql"));
+            session = GetPersistentSessionGenerator(SystemDynamicMapper, systemConnectionString, sessionSchemaGeneratorFileName);
 
-            string linkSchemaGeneratorFileName = Maps.GetDeploymentPath("Sql/Link.sql");
-            Durados.DataAccess.AutoGeneration.Link persistentLink =
-                new Durados.DataAccess.AutoGeneration.Link(systemConnectionString, linkSchemaGeneratorFileName);
+            string contentSchemaGeneratorFileName = SystemDynamicMapper.GetGenerateScriptFileName(Maps.GetDeploymentPath("Sql/Content.sql"));
+            Durados.DataAccess.AutoGeneration.Content persistentContent = SystemDynamicMapper.GetPersistentContentGenerator(systemConnectionString, contentSchemaGeneratorFileName);
 
-            string mailingServiceSchemaGeneratorFileName = Maps.GetDeploymentPath("Sql/MailingService.sql");
-            Durados.DataAccess.AutoGeneration.MailingService mailingServiceLink =
-                new Durados.DataAccess.AutoGeneration.MailingService(systemConnectionString, mailingServiceSchemaGeneratorFileName);
 
-            string workFlowSchemaGeneratorFileName = Maps.GetDeploymentPath("Sql/WorkFlowGraph.sql");
+            string linkSchemaGeneratorFileName = SystemDynamicMapper.GetGenerateScriptFileName(Maps.GetDeploymentPath("Sql/Link.sql"));
+            Durados.DataAccess.AutoGeneration.Link persistentLink = SystemDynamicMapper.GetLinkGenerator(systemConnectionString, linkSchemaGeneratorFileName);
+                
 
-            Durados.DataAccess.AutoGeneration.WorkFlowGraph wf = new Durados.DataAccess.AutoGeneration.WorkFlowGraph(systemConnectionString, workFlowSchemaGeneratorFileName);
+            //string mailingServiceSchemaGeneratorFileName = Maps.GetDeploymentPath("Sql/MailingService.sql");
+            //Durados.DataAccess.AutoGeneration.MailingService mailingServiceLink =
+            //    new Durados.DataAccess.AutoGeneration.MailingService(systemConnectionString, mailingServiceSchemaGeneratorFileName);
 
-            string customViewsFileName = Maps.GetDeploymentPath("Sql/CustomViews.sql");
+            //string workFlowSchemaGeneratorFileName = Maps.GetDeploymentPath("Sql/WorkFlowGraph.sql");
 
-            Durados.DataAccess.AutoGeneration.CustomViews cv = new Durados.DataAccess.AutoGeneration.CustomViews(systemConnectionString, customViewsFileName);
+            //Durados.DataAccess.AutoGeneration.WorkFlowGraph wf = new Durados.DataAccess.AutoGeneration.WorkFlowGraph(systemConnectionString, workFlowSchemaGeneratorFileName);
 
-            string userFileName = Maps.GetDeploymentPath("Sql/DuradosUsers.sql");
+            string customViewsFileName = SystemDynamicMapper.GetGenerateScriptFileName(Maps.GetDeploymentPath("Sql/CustomViews.sql"));
+
+            Durados.DataAccess.AutoGeneration.CustomViews cv = SystemDynamicMapper.GetCustomViewsGenerator(systemConnectionString, customViewsFileName);
+
+            string userFileName = SystemDynamicMapper.GetGenerateScriptFileName(Maps.GetDeploymentPath("Sql/DuradosUsers.sql"));
 
             bool firstTime = false;
-            Durados.DataAccess.AutoGeneration.User u = new Durados.DataAccess.AutoGeneration.User(systemConnectionString, userFileName);
+            Durados.DataAccess.AutoGeneration.User u = SystemDynamicMapper.GetUserGenerator(systemConnectionString, userFileName);
             if (!u.Exists())
             {
                 u.Buid();
@@ -652,6 +663,15 @@ namespace Durados.Web.Mvc
             return firstTime;
         }
 
+        private PersistentSession GetPersistentSessionGenerator(DataAccess.AutoGeneration.Dynamic.Mapper mapper, string systemConnectionString, string sessionSchemaGeneratorFileName)
+        {
+            if (mapper is Durados.DataAccess.AutoGeneration.Dynamic.MySqlMapper)
+                return new MySqlPersistentSession(systemConnectionString, sessionSchemaGeneratorFileName);
+           
+            return new PersistentSession(systemConnectionString, sessionSchemaGeneratorFileName);
+        }
+
+      
         private bool HasRule(string ruleName)
         {
             return Database.GetUserView().GetRules().Where(r => r.Name.Equals(ruleName)).Count() > 0;
@@ -1572,17 +1592,18 @@ namespace Durados.Web.Mvc
             AddSystemUploadConfigTable(ds);
             AddSystemContentTable(ds);
             AddSystemUserTables(ds);
-            AddSystemMailingServiceTable(ds);
+            //
             AddSystemHistoryTables(ds);
             AddSystemLinkTable(ds);
-            AddSystemMessageBoardTable(ds);
+            //
             AddSystemLogTable(ds);
             AddSystemSchemaTable(ds);
 
             if (this is DuradosMap && !Maps.PrivateCloud)
             {
                 AddSystemPlugInTable(ds);
-
+                AddSystemMailingServiceTable(ds);
+                AddSystemMessageBoardTable(ds);
             }
         }
 
@@ -1593,15 +1614,19 @@ namespace Durados.Web.Mvc
             ConfigSystemUploadConfigTable();
             ConfigSystemContentTable();
             ConfigSystemUserTable();
-            ConfigSystemMailingServiceTable();
+            //
             ConfigSystemHistoryTables();
             ConfigSystemLinkTable();
-            ConfigSystemMessageBoardTable();
+            //
             ConfigSystemSchemaTable();
             ConfigSystemLogTable();
             ConfigSystemRoleTable();
             ConfigSystemPlugInTable();
-
+            if (this is DuradosMap && !Maps.PrivateCloud)
+            {
+                ConfigSystemMailingServiceTable();
+                ConfigSystemMessageBoardTable();
+            }
             try
             {
                 foreach (View systemView in db.Views.Values.Where(v => v.SystemView))
@@ -1687,13 +1712,14 @@ namespace Durados.Web.Mvc
 
 
             string v_durados_User = "v_durados_User";
+            string durados_User = "durados_User";
             string durados_UserRole = "durados_UserRole";
 
             if (ds.Tables.Contains(v_durados_User))
                 return;
 
             //DataTable v_durados_UserTable = Durados.DataAccess.AutoGeneration.Generator.CreateTable(v_durados_User, systemConnectionString);
-            DataTable v_durados_UserTable = systemGenerator.CreateTable(v_durados_User, systemConnectionString);
+            DataTable v_durados_UserTable = systemGenerator.CreateTable(v_durados_User,durados_User, systemConnectionString);
            
             ds.Tables.Add(v_durados_UserTable);
             v_durados_UserTable.PrimaryKey = new DataColumn[1] { v_durados_UserTable.Columns["ID"] };
@@ -2200,6 +2226,9 @@ namespace Durados.Web.Mvc
                 db.Views["durados_v_ChangeHistory"].Fields["UpdateDate"].DisplayName = "Date";
                 db.Views["durados_v_ChangeHistory"].Fields["OldValue"].DisplayName = "Old";
                 db.Views["durados_v_ChangeHistory"].Fields["NewValue"].DisplayName = "New";
+
+               ((ColumnField)db.Views["durados_v_ChangeHistory"].Fields["Admin"]).DataColumn.DataType = typeof(Int32);
+               (db.Views["durados_v_ChangeHistory"].Fields["Admin"] as ColumnField).DataType = DataType.Numeric;
                 db.Views["durados_v_ChangeHistory"].Fields["ActionHistory_Parent"].DisplayName = "Action";
                 ((ParentField)db.Views["durados_v_ChangeHistory"].Fields["ActionHistory_Parent"]).NoHyperlink = true;
                 ((ParentField)db.Views["durados_v_ChangeHistory"].Fields["ActionHistory_Parent"]).JsonName = "Action";
@@ -2707,7 +2736,7 @@ namespace Durados.Web.Mvc
                 if (!string.IsNullOrEmpty(db.Localization.LocalizationConnectionStringKey))
                     cs = System.Configuration.ConfigurationManager.ConnectionStrings[db.Localization.LocalizationConnectionStringKey].ConnectionString;
             }
-            Durados.Web.Localization.Localizer localizer = new Durados.Web.Localization.Localizer();
+            Durados.Localization.ILocalizer localizer =GetLocalizer(); 
 
             if (db.Localization != null)
             {
@@ -2715,6 +2744,13 @@ namespace Durados.Web.Mvc
             }
 
             Database.Localizer = localizer;
+        }
+
+        private Durados.Localization.ILocalizer GetLocalizer()
+        {
+            if (SystemDynamicMapper is Durados.DataAccess.AutoGeneration.Dynamic.MySqlMapper)
+                return new Durados.Web.Localization.MySqlLocalizer();
+            return new Durados.Web.Localization.Localizer(); 
         }
 
         public SiteInfo SiteInfo { get; set; }
@@ -2756,7 +2792,7 @@ namespace Durados.Web.Mvc
                 //Database.Localizer.UnsetLocalizationConfig();
             }
             db.SqlProduct = SqlProduct;
-           
+            db.SystemSqlProduct = SystemSqlProduct;
             ConfigSystemTables();
 
             List<ChildrenField> fields = CreateCounters();
@@ -2797,7 +2833,7 @@ namespace Durados.Web.Mvc
             }
             if (db.Localization != null)
             {
-                Durados.Web.Localization.Localizer localizer = (Durados.Web.Localization.Localizer)db.Localizer;
+                Durados.Localization.ILocalizer localizer = db.Localizer;
                 if (localizer.IsInitiated)
                     localizer.Refresh();
                 else
@@ -3923,6 +3959,7 @@ namespace Durados.Web.Mvc
         public int Plan { get; set; }
 
         public virtual SqlProduct SqlProduct { get; set; }
+        public virtual SqlProduct SystemSqlProduct { get; set; }
 
         public Guid Guid { get; set; }
 
@@ -4538,6 +4575,8 @@ namespace Durados.Web.Mvc
 
                 IPersistency sqlPersistency = GetNewPersistency();
                 sqlPersistency.ConnectionString = System.Configuration.ConfigurationManager.ConnectionStrings["MapsConnectionString"].ConnectionString;
+                sqlPersistency.SystemConnectionString= System.Configuration.ConfigurationManager.ConnectionStrings["SystemMapsConnectionString"].ConnectionString;
+                
                 persistency = sqlPersistency;
                 builder.ConnectionString = sqlPersistency.ConnectionString;
 
@@ -4833,7 +4872,13 @@ namespace Durados.Web.Mvc
                 return persistency.ConnectionString;
             }
         }
-
+        public string SystemConnectionString
+        {
+            get
+            {
+                return persistency.SystemConnectionString;
+            }
+        }
 
         public static bool MultiTenancy
         {
@@ -5288,14 +5333,18 @@ namespace Durados.Web.Mvc
             //map.connectionString = persistency.GetConnection(appRow, builder).ToString();
 
             int sqlProduct = 1;
-
+            int systemSqlProduct = 1;
             if (appRow.durados_SqlConnectionRowByFK_durados_App_durados_SqlConnection == null)
                 throw new DuradosException("The app " + appName + " is not connected. Please connect your app.");
 
             if (!appRow.durados_SqlConnectionRowByFK_durados_App_durados_SqlConnection.IsSqlProductIdNull())
                 sqlProduct = appRow.durados_SqlConnectionRowByFK_durados_App_durados_SqlConnection.SqlProductId;
 
+            if (!appRow.durados_SqlConnectionRowByFK_durados_App_durados_SqlConnection_System.IsSqlProductIdNull())
+                systemSqlProduct = appRow.durados_SqlConnectionRowByFK_durados_App_durados_SqlConnection_System.SqlProductId;
+
             map.SqlProduct = (SqlProduct)sqlProduct;
+            map.SystemSqlProduct = (SqlProduct)systemSqlProduct;
             if (appsSqlProducts.ContainsKey(appName))
             {
                 appsSqlProducts.Remove(appName);
@@ -6126,6 +6175,7 @@ namespace Durados.Web.Mvc
     public interface IPersistency
     {
         string ConnectionString { get; set; }
+        string SystemConnectionString { get; set; }
         object GetConnection(MapDataSet.durados_AppRow appRow, object builder);
         object GetSqlServerConnection(MapDataSet.durados_AppRow appRow, object builder);
         object GetMySqlConnection(MapDataSet.durados_AppRow appRow, object builder, int localPort);
@@ -6139,6 +6189,7 @@ namespace Durados.Web.Mvc
     public class SqlPersistency : IPersistency
     {
         public string ConnectionString { get; set; }
+        public string SystemConnectionString { get; set; }
 
 
         public object GetConnection(MapDataSet.durados_AppRow appRow, object builder)
@@ -6168,7 +6219,7 @@ namespace Durados.Web.Mvc
 
         public object GetLogConnection(MapDataSet.durados_AppRow appRow, object builder)
         {
-            return GetSystemConnection(appRow, builder) + ";MultipleActiveResultSets=True;Asynchronous Processing=true;";
+            return GetSystemConnection(appRow, builder);// +";MultipleActiveResultSets=True;Asynchronous Processing=true;";
 
         }
 
@@ -6181,7 +6232,15 @@ namespace Durados.Web.Mvc
 
         public object GetConnection(MapDataSet.durados_SqlConnectionRow sqlConnectionRow, int dataSourceTypeId, System.Data.SqlClient.SqlConnectionStringBuilder builder)
         {
-            return GetConnection(sqlConnectionRow, dataSourceTypeId, builder, "Data Source={0};Initial Catalog={1};User ID={2};Password={3};Integrated Security=False;");
+            return GetConnection(sqlConnectionRow, dataSourceTypeId, builder, GetConnectionStringTemplate(sqlConnectionRow));
+        }
+
+        private string GetConnectionStringTemplate(MapDataSet.durados_SqlConnectionRow sqlConnectionRow)
+        {
+            int sqlProductId = sqlConnectionRow.SqlProductId;
+             if (((SqlProduct)sqlProductId)==SqlProduct.MySql)
+                 return ConnectionStringHelper.GetConnectionStringSchema(sqlConnectionRow);
+            return "Data Source={0};Initial Catalog={1};User ID={2};Password={3};Integrated Security=False;";
         }
 
         public object GetSqlServerConnection(MapDataSet.durados_AppRow appRow, object builder)

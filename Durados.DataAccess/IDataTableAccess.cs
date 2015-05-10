@@ -49,7 +49,8 @@ namespace Durados.DataAccess
         Filter GetFilter(View view, Dictionary<string, object> values, LogicCondition logicCondition, bool insideTextSearch, bool? useLike, Field currentField);
 
         DataRow GetNewRow(View view, Dictionary<string, object> values, string insertAbovePK, BeforeCreateEventHandler beforeCreateCallback, BeforeCreateInDatabaseEventHandler beforeCreateInDatabaseEventHandler, AfterCreateEventHandler afterCreateBeforeCommitCallback, AfterCreateEventHandler afterCreateAfterCommitCallback);
-
+        string CreateNewRow(View view, Dictionary<string, object> values, string insertAbovePK, BeforeCreateEventHandler beforeCreateCallback, BeforeCreateInDatabaseEventHandler beforeCreateInDatabaseEventHandler, AfterCreateEventHandler afterCreateBeforeCommitCallback, AfterCreateEventHandler afterCreateAfterCommitCallback);
+       
         //changed by br 3
         Dictionary<string, string> GetSelectOptions(ParentField parentField, bool forFilter, bool useUniqueName, int? top, Filter filter);
 
@@ -87,6 +88,7 @@ namespace Durados.DataAccess
         void ExecuteNonQuery(string connectionString, string sql, SqlProduct sqlProduct);
 
         DataTable ExecuteTable(string connectionString, string sql, Dictionary<string, object> parameters, CommandType commandType);
+        string ExecuteScalar(string connectionString, string sql, Dictionary<string, object> parameters);
 
         SqlSchema GetNewSqlSchema();
 

@@ -80,7 +80,7 @@ namespace Durados.DataAccess
 
         public static string Create(this View view, Dictionary<string, object> values)
         {
-            return (new SqlAccess()).CreateNewRow(view, values, null, null, null, null, null);
+            return (GetDataTableAccess(view)).CreateNewRow(view, values, null, null, null, null, null);
         }
 
         public static DataRow Create(this View view, Dictionary<string, object> values, string insertAbovePK, BeforeCreateEventHandler beforeCreateCallback, BeforeCreateInDatabaseEventHandler beforeCreateInDatabaseEventHandler, AfterCreateEventHandler afterCreateBeforeCommitCallback, AfterCreateEventHandler afterCreateAfterCommitCallback)

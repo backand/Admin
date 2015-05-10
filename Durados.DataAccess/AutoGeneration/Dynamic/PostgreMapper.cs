@@ -12,7 +12,7 @@ namespace Durados.DataAccess.AutoGeneration.Dynamic
             return new PostgreSchema();
         }
 
-        protected override Generator GetNewGenerator()
+        public override Generator GetNewGenerator()
         {
             return new PostgreGenerator();
         }

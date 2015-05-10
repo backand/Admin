@@ -12,7 +12,7 @@ namespace Durados.DataAccess
     {
         private Guid tranGuid = Guid.NewGuid();
         private List<int> pendingHistoryForCommit = new List<int>();
-        private History history = new History();
+        private History history = null;
         /**/
         public ConfigTransaction()
         {
@@ -31,6 +31,7 @@ namespace Durados.DataAccess
 
         public void Commit(string connectionString, DataSet dataSet, string filename, Durados.Diagnostics.ILogger logger)
         {
+            history = DataAccess.History.GetHistory(DataAccess.History.GetProduct(connectionString));
             lock (this)
             {
                 dataSet.AcceptChanges();
@@ -734,8 +735,8 @@ namespace Durados.DataAccess
                 }
                 else
                 {
-                    command = new System.Data.SqlClient.SqlCommand();
-                    command.Connection = new System.Data.SqlClient.SqlConnection(connectionString);
+                    command = GetNewCommand(view);
+                    
                 }
                 command.Connection.Open();
                 try
@@ -1071,15 +1072,15 @@ namespace Durados.DataAccess
                 else
                     connectionString = view.Database.DbConnectionString;
 
-                System.Data.SqlClient.SqlCommand command;
+                System.Data.IDbCommand command;
                 if (editEventArgs != null && editEventArgs.SysCommand != null)
                 {
-                    command = (System.Data.SqlClient.SqlCommand)editEventArgs.SysCommand;
+                    command = editEventArgs.SysCommand;
                 }
                 else
                 {
-                    command = new System.Data.SqlClient.SqlCommand();
-                    command.Connection = new System.Data.SqlClient.SqlConnection(connectionString);
+                    command = GetNewCommand(string.Empty,GetNewConnection(connectionString));
+                   
                 }
                 command.Connection.Open();
                 try
@@ -1144,15 +1145,15 @@ namespace Durados.DataAccess
                 else
                     connectionString = view.Database.DbConnectionString;
 
-                System.Data.SqlClient.SqlCommand command;
+               IDbCommand command;
                 if (deleteEventArgs.Command != null)
                 {
-                    command = (System.Data.SqlClient.SqlCommand)deleteEventArgs.SysCommand;
+                    command = deleteEventArgs.SysCommand;
                 }
                 else
                 {
-                    command = new System.Data.SqlClient.SqlCommand();
-                    command.Connection = new System.Data.SqlClient.SqlConnection(connectionString);
+                    command = GetNewCommand(string.Empty, GetNewConnection(connectionString));
+                  
                 }
                 command.Connection.Open();
                 try
@@ -1645,10 +1646,10 @@ namespace Durados.DataAccess
             sortedPks = sortedPks.Skip(o_pkIndex + 1).Take(d_pkIndex - o_pkIndex).ToList();
 
             connectionString = view.Database.SysDbConnectionString;
-            System.Data.SqlClient.SqlCommand command;
+            IDbCommand command;
 
-            command = new System.Data.SqlClient.SqlCommand();
-            command.Connection = new System.Data.SqlClient.SqlConnection(connectionString);
+            command = GetNewCommand(string.Empty, GetNewConnection(connectionString));
+        
             command.Connection.Open();
 
             try
@@ -1676,10 +1677,10 @@ namespace Durados.DataAccess
         public override void Switch(View view, string o_pk, string d_pk, int userID)
         {
             connectionString = view.Database.SysDbConnectionString;
-            System.Data.SqlClient.SqlCommand command;
+            IDbCommand command;
 
-            command = new System.Data.SqlClient.SqlCommand();
-            command.Connection = new System.Data.SqlClient.SqlConnection(connectionString);
+            command = GetNewCommand(view);
+          
             command.Connection.Open();
 
             try
@@ -1692,7 +1693,7 @@ namespace Durados.DataAccess
             }
         }
 
-        public void ChangeViewsAndPagesWorkspace(View menuView, string menuId, string workspaceId, int userID, System.Data.SqlClient.SqlCommand command)
+        public void ChangeViewsAndPagesWorkspace(View menuView, string menuId, string workspaceId, int userID, IDbCommand command)
         {
             string filename = menuView.Database.ConnectionString;
             DataSet ds = GetDataSet(filename);
@@ -1732,7 +1733,7 @@ namespace Durados.DataAccess
             //DataRow[] pageRows = menuRow.GetChildRows("");
         }
 
-        private void ChangeWorkspace(View view, DataRow[] rows, string workspaceId, string workspaceIdColumnName, int userID, System.Data.SqlClient.SqlCommand command)
+        private void ChangeWorkspace(View view, DataRow[] rows, string workspaceId, string workspaceIdColumnName, int userID, IDbCommand command)
         {
             foreach (DataRow row in rows)
             {
@@ -1774,7 +1775,7 @@ namespace Durados.DataAccess
             ApplyToAll(dataTable.Rows, values);
         }
 
-        public void Switch(View view, string o_pk, string d_pk, int userID, System.Data.SqlClient.SqlCommand command)
+        public void Switch(View view, string o_pk, string d_pk, int userID, IDbCommand command)
         {
             string filename = view.Database.ConnectionString;
             string ordinalColumnName = view.OrdinalColumnName ?? "Order";
@@ -1836,7 +1837,7 @@ namespace Durados.DataAccess
 
         }
 
-        private void SaveHistory(View view, DataRow prevRow, Dictionary<string, object> values, string pk, int userID, System.Data.SqlClient.SqlCommand command)
+        private void SaveHistory(View view, DataRow prevRow, Dictionary<string, object> values, string pk, int userID, IDbCommand command)
         {
             History history = new History();
 

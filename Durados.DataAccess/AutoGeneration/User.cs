@@ -37,5 +37,22 @@ namespace Durados.DataAccess.AutoGeneration
             get { return "durados_User"; }
         }
     }
+        public class MySqlUser : User
+        {
+            public MySqlUser(string connectionString, string schemaGeneratorFileName) :
+                base(connectionString, schemaGeneratorFileName)
+            {
+            }
+            protected override SqlSchema GetNewSqlSchema()
+            {
+                return new MySqlSchema();
+            }
+
+
+            protected override void BuildSchema(string connectionString)
+            {
+                return;
+            }
+        }
 
 }

@@ -25,11 +25,10 @@ namespace Durados.Web.Mvc.UI.Helpers
             return newDbParameters;
 
         }
-        private void CreateNewSchemaAndUser(SqlProduct sqlProduct,out string server,out int port, NewDatabaseParameters newDbParameters,string sampleApp)
+        public void CreateNewSchemaAndUser(SqlProduct sqlProduct,out string server,out int port, NewDatabaseParameters newDbParameters,string sampleApp)
         {
-            string sql =string.Format( @"CREATE  DATABASE IF NOT EXISTS `{0}`;
-                            CREATE USER '{1}'@'%'  IDENTIFIED BY  '{2}';
-                            GRANT ALL ON `{0}`.* TO '{1}'@'%';", newDbParameters.DbName, newDbParameters.Username, newDbParameters.Password);
+
+            string sql = GetCreateNewSchemaAndUserSql(newDbParameters);
             if (!string.IsNullOrEmpty(sampleApp))
             {
                 string scriptFileName = Maps.GetDeploymentPath(string.Format("Sql/SampleApp/{0}.sql",sampleApp));
@@ -43,39 +42,53 @@ namespace Durados.Web.Mvc.UI.Helpers
                 string script = file.OpenText().ReadToEnd();
                 sql += script.Replace("__DB__Name__", newDbParameters.DbName);
             }
+
             using (System.Data.IDbConnection connection = GetExternalAvailableInstanceConnection(sqlProduct, out server,out port))
             {
-                if (connection == null)
-                    throw new Exception("Failed to set a connection to external available instance");
-                if (connection.State == System.Data.ConnectionState.Closed)
-                    connection.Open();
-                using (System.Data.IDbTransaction transaction = connection.BeginTransaction(System.Data.IsolationLevel.ReadCommitted))
-                {
-                   
-                    using (System.Data.IDbCommand command = connection.CreateCommand())
-                    {
-                        command.Transaction = transaction;
-                        command.CommandText = sql;
-                        try
-                        {
-                            //if (command.Connection.State == System.Data.ConnectionState.Closed)
-                            //    command.Connection.Open();
-                            command.ExecuteScalar();
-                            transaction.Commit();
-                        }
-                        catch (Exception ex)
-                        {
-                             if (connection != null && connection.State != System.Data.ConnectionState.Closed)
-                               transaction.Rollback();
-                            
-                            Maps.Instance.DuradosMap.Logger.Log("AppFactory", null, "CreateNewSchemaAndUser", ex, 1, "Faild to create new schema for new rds app");
-                            throw new Exception("Faild to create new schema for new rds app", ex);
-                        }
-                    }
-                }
+                CreateSchemaAndUser(sql, connection);
 
             }
 
+        }
+
+        private  void CreateSchemaAndUser(string sql, System.Data.IDbConnection connection)
+        {
+            if (connection == null)
+                throw new Exception("Failed to set a connection to external available instance");
+            if (connection.State == System.Data.ConnectionState.Closed)
+                connection.Open();
+            using (System.Data.IDbTransaction transaction = connection.BeginTransaction(System.Data.IsolationLevel.ReadCommitted))
+            {
+
+                using (System.Data.IDbCommand command = connection.CreateCommand())
+                {
+                    command.Transaction = transaction;
+                    command.CommandText = sql;
+                    try
+                    {
+                        //if (command.Connection.State == System.Data.ConnectionState.Closed)
+                        //    command.Connection.Open();
+                        command.ExecuteScalar();
+                        transaction.Commit();
+                    }
+                    catch (Exception ex)
+                    {
+                        if (connection != null && connection.State != System.Data.ConnectionState.Closed)
+                            transaction.Rollback();
+
+                        Maps.Instance.DuradosMap.Logger.Log("AppFactory", null, "CreateNewSchemaAndUser", ex, 1, "Faild to create new schema for new rds app");
+                        throw new Exception("Faild to create new schema for new rds app", ex);
+                    }
+                }
+            }
+        }
+
+        private  string GetCreateNewSchemaAndUserSql(NewDatabaseParameters newDbParameters)
+        {
+            string sql = string.Format(@"CREATE  DATABASE IF NOT EXISTS `{0}`;
+                            CREATE USER '{1}'@'%'  IDENTIFIED BY  '{2}';
+                            GRANT ALL ON `{0}`.* TO '{1}'@'%';", newDbParameters.DbName, newDbParameters.Username, newDbParameters.Password);
+            return sql;
         }
         private System.Data.IDbConnection GetExternalAvailableInstanceConnection(SqlProduct product,out string server,out int port)
         {
@@ -143,6 +156,18 @@ namespace Durados.Web.Mvc.UI.Helpers
 
          
         }
+        public void CreateNewSystemSchemaAndUser(string connectionString,  NewDatabaseParameters newDbParameters)
+        {
+            string sql = GetCreateNewSchemaAndUserSql(newDbParameters);
+
+            using (System.Data.IDbConnection connection = ConnectionStringHelper.GetConnection(connectionString)) 
+            {
+                CreateSchemaAndUser(sql, connection);
+
+            }
+            
+        }
+      
         protected virtual View GetView(string viewName)
         {
             return (View)Maps.Instance.DuradosMap.Database.Views[viewName];

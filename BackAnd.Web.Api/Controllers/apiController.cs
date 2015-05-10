@@ -230,6 +230,8 @@ namespace BackAnd.Web.Api.Controllers
         #region callbacks
         protected virtual History GetNewHistory()
         {
+            if (MySqlAccess.IsMySqlConnectionString(Map.Database.SystemConnectionString))
+                return new MySqlHistory();
             return new History();
         }
 
@@ -280,9 +282,9 @@ namespace BackAnd.Web.Api.Controllers
         {
             if (view.Name == view.Database.RoleViewName)
                 if (string.IsNullOrEmpty(filter.WhereStatement))
-                    filter.WhereStatement = "WHERE  1=1 AND ([durados_UserRole].[Name] <> 'Developer' AND [durados_UserRole].[Name] <>'View Owner')";
+                    filter.WhereStatement = "WHERE  1=1 AND (durados_UserRole.Name <> 'Developer' AND durados_UserRole.Name <>'View Owner')";
                 else
-                    filter.WhereStatement += "AND ([durados_UserRole].[Name] <> 'Developer' AND [durados_UserRole].[Name] <>'View Owner')";
+                    filter.WhereStatement += "AND (durados_UserRole.Name <> 'Developer' AND durados_UserRole.Name <>'View Owner')";
         }
 
         protected virtual void SetSql(SelectEventArgs e)
@@ -616,12 +618,12 @@ namespace BackAnd.Web.Api.Controllers
 
                     if (Database.IdenticalSystemConnection)
                     {
-                        e.SysCommand = e.Command;
+                        e.SysCommand = GetCommand(Map.SystemSqlProduct); ;
                     }
                     else
                     {
-                        e.SysCommand = new System.Data.SqlClient.SqlCommand();
-                        e.SysCommand.Connection = new System.Data.SqlClient.SqlConnection(Map.Database.SystemConnectionString);
+                        e.SysCommand = GetCommand(Map.Database.SystemSqlProduct);
+                        e.SysCommand.Connection = GetConnection(Map.Database.SystemSqlProduct,Map.Database.SystemConnectionString);
                     }
                 }
             }

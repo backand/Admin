@@ -231,6 +231,43 @@ namespace Durados.Web.Mvc.UI.Helpers
             return troubleshootInfo;
         }
 
+
+        public static System.Data.IDbConnection GetConnection(string connectionString)
+        {
+
+            if (Durados.DataAccess.OracleAccess.IsOracleConnectionString(connectionString))
+                return new Durados.DataAccess.OracleSchema().GetConnection(connectionString); 
+            else if (Durados.DataAccess.PostgreAccess.IsPostgreConnectionString(connectionString))
+                return new Durados.DataAccess.PostgreSchema().GetConnection(connectionString);
+            else if (Durados.DataAccess.MySqlAccess.IsMySqlConnectionString(connectionString))
+                return new Durados.DataAccess.MySqlSchema().GetConnection(connectionString);
+            return new SqlSchema().GetConnection(connectionString);
+        
+        }
+        public static string GetConnectionStringSchema(MapDataSet.durados_SqlConnectionRow sqlConnectionRow)
+        {
+
+            bool usesSsh = !sqlConnectionRow.IsSshUsesNull() && sqlConnectionRow.SshUses;
+            bool usesSsl = !sqlConnectionRow.IsSslUsesNull() && sqlConnectionRow.SslUses;
+            string localPort = sqlConnectionRow.ProductPort;
+            SqlProduct sqlProductId = (SqlProduct)sqlConnectionRow.SqlProductId;
+           
+            switch ((SqlProduct)sqlProductId)
+            {
+                case SqlProduct.MySql:
+                    return Durados.DataAccess.MySqlAccess.GetConnectionStringSchema(usesSsh);
+                    
+                case SqlProduct.Postgre:
+                    return Durados.DataAccess.PostgreAccess.GetConnectionStringSchema(usesSsl);
+                    
+                case SqlProduct.Oracle:
+                    return Durados.DataAccess.OracleAccess.GetConnectionStringSchema();
+                
+                default:
+                    return "Data Source={0};Initial Catalog={1};User ID={2};Password={3};Integrated Security=False;";
+                    
+            }
+        }
     }
 
     public class TroubleshootInfo

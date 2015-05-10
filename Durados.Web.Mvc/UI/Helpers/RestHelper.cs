@@ -46,7 +46,8 @@ namespace Durados.Web.Mvc.UI.Helpers
 
        public static void AddStat(Dictionary<string, object> item, string appName)
        {
-           Stat stat = new Stat();
+           Stat stat = StatFactory.GetState(Maps.Instance.GetMap(appName).SystemSqlProduct);
+          
            stat.AddStat(item, appName);
        }
 
@@ -2019,7 +2020,7 @@ namespace Durados.Web.Mvc.UI.Helpers
                    else if (field.GetColumnFieldType() == ColumnFieldType.Boolean)
                    {
                        outOperator = null;
-                       if (value.ToLower() == "yes" || value.ToLower() == "true")
+                       if (value.ToLower() == "yes" || value.ToLower() == "true" )
                            filterOut.Add(fieldName, true);
                        else
                            filterOut.Add(fieldName, false);
@@ -2354,8 +2355,11 @@ namespace Durados.Web.Mvc.UI.Helpers
 
    public class Stat
    {
-       SqlAccess sqlAccess = new SqlAccess();
-
+       protected SqlAccess sqlAccess = null;
+       public Stat()
+       {
+           sqlAccess = new SqlAccess();
+       }
        public void AddStat(Dictionary<string, object> item, string appName)
        {
            if (item.ContainsKey("durados_App_Stat"))
@@ -2544,34 +2548,86 @@ namespace Durados.Web.Mvc.UI.Helpers
 
        private object GetLast60Days(string connectionString)
        {
-           string sql = "select count(*) from dbo.Durados_Log with (nolock) where LogType = 3 and Username <> 'dev@devitout.com' and Time >= dateadd(day,-60,getdate())";
+           string sql = GetLast60DaysSelect();
 
            return sqlAccess.ExecuteScalar(connectionString, sql);
        }
 
-       private object GetLast30Days(string connectionString)
+      private object GetLast30Days(string connectionString)
        {
-           string sql = "select count(*) from dbo.Durados_Log with (nolock) where LogType = 3 and Username <> 'dev@devitout.com' and Time >= dateadd(day,-30,getdate())";
+           string sql = GetLast30DaysSelect();
 
            return sqlAccess.ExecuteScalar(connectionString, sql);
        }
 
        private object GetLast48Hours(string connectionString)
        {
-           string sql = "select count(*) from dbo.Durados_Log with (nolock) where LogType = 3 and Username <> 'dev@devitout.com' and Time >= dateadd(hour,-48,getdate())";
+           string sql = GetLast48HoursSelect();
 
            return sqlAccess.ExecuteScalar(connectionString, sql);
        }
 
        private object GetLast24Hours(string connectionString)
        {
-           string sql = "select count(*) from dbo.Durados_Log with (nolock) where LogType = 3 and Username <> 'dev@devitout.com' and Time >= dateadd(hour,-24,getdate())";
+           string sql = GetLast24HoursSelect();
 
            return sqlAccess.ExecuteScalar(connectionString, sql);
 
        } 
+       protected virtual string GetLast60DaysSelect()
+       {
+           return "select count(*) from dbo.Durados_Log with (nolock) where LogType = 3 and Username <> 'dev@devitout.com' and Time >= dateadd(day,-60,getdate())";
+       }
+       protected virtual string GetLast30DaysSelect()
+       {
+           return "select count(*) from dbo.Durados_Log with (nolock) where LogType = 3 and Username <> 'dev@devitout.com' and Time >= dateadd(day,-30,getdate())";
+       }
+       protected virtual string GetLast48HoursSelect()
+       {
+           return "select count(*) from dbo.Durados_Log with (nolock) where LogType = 3 and Username <> 'dev@devitout.com' and Time >= dateadd(hour,-48,getdate())";
+       }
+       protected virtual string GetLast24HoursSelect()
+       {
+           return "select count(*) from dbo.Durados_Log with (nolock) where LogType = 3 and Username <> 'dev@devitout.com' and Time >= dateadd(hour,-24,getdate())";
+       }
+       
+      
    }
+    public class MySqlState:Stat
+    {
+        public MySqlState()
+        {
+            sqlAccess = new MySqlAccess();
+        }
 
+         protected override string GetLast60DaysSelect()
+       {
+           return "select count(*) from Durados_Log  where LogType = 3 and Username <> 'dev@devitout.com' and Time >=  DATE_ADD(CURDATE(),INTERVAL -60 DAY)";
+       }
+       protected override string GetLast30DaysSelect()
+       {
+           return "select count(*) from Durados_Log  where LogType = 3 and Username <> 'dev@devitout.com' and Time >=  DATE_ADD(CURDATE(),INTERVAL -30 DAY)";
+       }
+       protected override string GetLast48HoursSelect()
+       {
+           return "select count(*) from Durados_Log  where LogType = 3 and Username <> 'dev@devitout.com' and Time >= DATE_ADD(CURDATE(),INTERVAL -48 HOUR)";
+       }
+       protected override string GetLast24HoursSelect()
+       {
+
+           return "select count(*) from Durados_Log  where LogType = 3 and Username <> 'dev@devitout.com' and Time >= DATE_ADD(CURDATE(),INTERVAL -24 HOUR)";
+       }
+
+    }
+    public class StatFactory
+    {
+        public static Stat GetState(SqlProduct systemSqlProduct)
+        {
+            if(systemSqlProduct==SqlProduct.MySql)
+                return new MySqlState();
+            return new Stat();
+        }
+    }
    public class Sync
    {
        public virtual Dictionary<string, object> AddNewViewsAndSyncAll(Map map)

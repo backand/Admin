@@ -1150,6 +1150,12 @@ namespace Durados.Web.Mvc
         public string AdminEmail { get; set; }
         [Durados.Config.Attributes.ColumnProperty(Description = "Console Administror Email")]
         public string UserPreviewUrl { get; set; }
+
+        
+        public override Durados.Data.IDataAccess GetDataAccess(string connectionString)
+        {
+            return DataAccessFactory.GetDataAccess(connectionString);
+        }
     }
 
 

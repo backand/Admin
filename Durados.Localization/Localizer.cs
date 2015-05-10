@@ -267,7 +267,7 @@ namespace Durados.Localization
             Refresh();
         }
 
-        public bool IsInitiated
+        public virtual bool IsInitiated
         {
             get
             {
@@ -275,7 +275,7 @@ namespace Durados.Localization
             }
         }
 
-        public void Refresh()
+        public virtual void Refresh()
         {
             translations = GetTranslations(connectionString);
         }
@@ -457,6 +457,11 @@ namespace Durados.Localization
         Durados.Localization.Model.LocalizationDataSet LocalizationDataSet { get; }
 
         List<Durados.Localization.Model.Language> Languages { get; }
-        
+
+        void InitLocalizer(LocalizationConfig localizationConfig, string cs, string localizationSchemaGeneratorFileName);
+       
+        bool IsInitiated {get;}
+       
+        void Refresh();
     }
 }

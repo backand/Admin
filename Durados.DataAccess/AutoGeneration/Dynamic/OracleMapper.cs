@@ -12,7 +12,7 @@ namespace Durados.DataAccess.AutoGeneration.Dynamic
             return new OracleSchema();
         }
 
-        protected override Generator GetNewGenerator()
+        public override Generator GetNewGenerator()
         {
             return new OracleGenerator();
         }

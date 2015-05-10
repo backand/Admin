@@ -22,7 +22,7 @@ namespace Durados.DataAccess.AutoGeneration
         {
             get
             {
-                return "Durados_Session";
+                return "durados_session";
             }
         }
         //private void BuildSchema(string connectionString)
@@ -72,27 +72,30 @@ namespace Durados.DataAccess.AutoGeneration
 
         protected object GetSession(string name, string sessionID)
         {
-            using (SqlConnection connection = new SqlConnection(connectionString))
+            using (IDbConnection connection = GetConnection(connectionString))
             {
                 connection.Open();
 
-                string sql = "select Scalar, TypeCode, SerializedObject, ObjectType from Durados_Session with(nolock) where SessionID=@SessionID and Name=@Name";
+                string sql = GetSessionSelectStatement();
 
-                SqlCommand command = new SqlCommand(sql, connection);
+                IDbCommand command = GetCommand(sql, connection);
 
                 command.CommandText = sql;
 
-                SqlParameter name_parameter = new SqlParameter();
+                IDataParameter name_parameter = GetNewParameter();
 
-                name_parameter.SqlDbType = System.Data.SqlDbType.NVarChar;
+                name_parameter.DbType = System.Data.DbType.String;
                 name_parameter.Value = name;
                 name_parameter.ParameterName = "@Name";
                 command.Parameters.Add(name_parameter);
 
-                command.Parameters.AddWithValue("@SessionID", sessionID);
+                IDataParameter sessionID_parameter = GetParameter("@SessionID", sessionID);
+                command.Parameters.Add(sessionID_parameter);
+
+                //command.Parameters.Add("@SessionID", sessionID);
 
 
-                SqlDataReader reader = command.ExecuteReader();
+                IDataReader reader = command.ExecuteReader();
 
                 if (reader.Read())
                 {
@@ -139,28 +142,30 @@ namespace Durados.DataAccess.AutoGeneration
             }
             else
             {
-                using (SqlConnection connection = new SqlConnection(connectionString))
+                using (IDbConnection connection = GetConnection(connectionString))
                 {
 
                     string sql = "durados_SetSession";
-                    SqlCommand command = new SqlCommand(sql, connection);
-
+                    IDbCommand command = GetCommand(sql, connection);
+                    
                     command.CommandText = sql;
                     command.CommandType = CommandType.StoredProcedure;
 
-                    SqlParameter name_parameter = new SqlParameter();
+                    IDataParameter name_parameter = GetNewParameter();
 
-                    name_parameter.SqlDbType = System.Data.SqlDbType.NVarChar;
+                    name_parameter.DbType = System.Data.DbType.String;
                     name_parameter.Value = name;
                     name_parameter.ParameterName = "@Name";
-                    command.Parameters.AddWithValue("@SessionID", sessionID);
-                    command.Parameters.AddWithValue("@Scalar", value.ToString());
-                    command.Parameters.AddWithValue("@TypeCode", typeCode.ToString());
-                    command.Parameters.Add(name_parameter);
+
+                    command.Parameters.Add(GetParameter("@SessionID", sessionID));
+                    command.Parameters.Add(GetParameter("@Scalar", value.ToString()));
+                    command.Parameters.Add(GetParameter("@TypeCode", typeCode.ToString()));
+
+                     command.Parameters.Add(name_parameter);
 
                     connection.Open();
 
-                    SqlTransaction transaction = connection.BeginTransaction(IsolationLevel.ReadUncommitted);
+                    IDbTransaction transaction = connection.BeginTransaction(IsolationLevel.ReadUncommitted);
                     command.Transaction = transaction;
 
                     command.ExecuteNonQuery();
@@ -169,7 +174,30 @@ namespace Durados.DataAccess.AutoGeneration
                 }
             }
         }
+        protected virtual string GetSessionSelectStatement()
+        {
+            return "select Scalar, TypeCode, SerializedObject, ObjectType from Durados_Session with(nolock) where SessionID=@SessionID and Name=@Name";
+        }
 
+        protected virtual IDataParameter GetNewParameter()
+        {
+            return GetNewSqlSchema().GetNewParameter();
+            //return new SqlParameter();
+        }
+        protected virtual IDataParameter GetParameter(string name, object value)
+        {
+            return GetNewSqlSchema().GetNewParameter(name, value);
+            //return new SqlParameter();
+        }
+        protected virtual IDbCommand GetCommand(string sql, IDbConnection connection)
+        {
+            return GetNewSqlSchema().GetCommand(sql, connection);
+        }
+
+        protected virtual IDbConnection GetConnection(string connectionString)
+        {
+            return GetNewSqlSchema().GetConnection(connectionString);
+        }
         //protected void SetSession(string name, string sessionID, object value)
         //{
         //    TypeCode typeCode = Convert.GetTypeCode(value);
@@ -239,5 +267,19 @@ namespace Durados.DataAccess.AutoGeneration
         //        command.ExecuteNonQuery();
         //    }
         //}
+        
+    }
+    public class MySqPersistentSession : PersistentSession
+    {
+        public MySqPersistentSession(string connectionString, string schemaGeneratorFileName) :
+            base(connectionString, schemaGeneratorFileName)
+        {
+        }
+        protected override SqlSchema GetNewSqlSchema()
+        {
+            return new MySqlSchema();
+        }
+
+        
     }
 }
