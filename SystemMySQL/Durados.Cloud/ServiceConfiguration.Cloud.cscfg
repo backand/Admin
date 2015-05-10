@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ServiceConfiguration serviceName="Durados.Cloud" xmlns="http://schemas.microsoft.com/ServiceHosting/2008/10/ServiceConfiguration" osFamily="1" osVersion="*">
+  <Role name="Durados.Web.Mvc.App">
+    <Instances count="1" />
+    <ConfigurationSettings>
+      <Setting name="ConfigAzureStorage" value="DefaultEndpointsProtocol=https;AccountName=duradosazure;AccountKey=h2BS9+oBoeFE4BIT0zJmV6COaV0S6zb8Z1WZ8kzAiAFWizFHaDABlVVcC3vab/N/eUU4UmF7KFHDVgvApWNAlg==" />
+      <Setting name="Microsoft.WindowsAzure.Plugins.Diagnostics.ConnectionString" value="UseDevelopmentStorage=true" />
+      <Setting name="Microsoft.WindowsAzure.Plugins.RemoteAccess.Enabled" value="true" />
+      <Setting name="Microsoft.WindowsAzure.Plugins.RemoteAccess.AccountUsername" value="durados" />
+      <Setting name="Microsoft.WindowsAzure.Plugins.RemoteAccess.AccountEncryptedPassword" value="MIIBnQYJKoZIhvcNAQcDoIIBjjCCAYoCAQAxggFOMIIBSgIBADAyMB4xHDAaBgNVBAMME1dpbmRvd3MgQXp1cmUgVG9vbHMCEEvyIve8Lq2zS9hOWjoMCfQwDQYJKoZIhvcNAQEBBQAEggEAmvqmV7jz9PAZ7HRxxt3pUjonsxJG59KhGx506TYDtY8fkzSTrVxZs1sm7qzg7IGfnHSPT+Q3TsjyV7AnwGqSJ710j4nvPBfz39EDHeKVzQtF62KHz5MnjPPWoi7miBu5wezks9OwIEkkU7gYraAzlqx5j+K/Z30ZnwUvWDIyIxgLdGL5+yQ2iHMjZNVXdC1k41XncknZpA0yH53e/+wyzmsRy2AuaJrhDXuAlTN4kAHLkF+IDkgbjXnRSqgqs2fDdXA/GyZK5bLtrqbYqWfRJujzZSQnPfd3ahPuxgEwNBxOKxxGTEl73d2WEU+/3na22nkJf1f46srMvZpMifMjGjAzBgkqhkiG9w0BBwEwFAYIKoZIhvcNAwcECE7FkVMMPXzygBDlq0X5qh5DwdxRjua5Npl3" />
+      <Setting name="Microsoft.WindowsAzure.Plugins.RemoteAccess.AccountExpiration" value="2013-05-31T23:59:59.0000000+03:00" />
+      <Setting name="Microsoft.WindowsAzure.Plugins.RemoteForwarder.Enabled" value="true" />
+      <Setting name="configContainer" value="config" />
+    </ConfigurationSettings>
+    <Certificates>
+      <Certificate name="Microsoft.WindowsAzure.Plugins.RemoteAccess.PasswordEncryption" thumbprint="9933AFAF04D8FD5B7C2A319958A34C61027C9B80" thumbprintAlgorithm="sha1" />
+    </Certificates>
+  </Role>
+</ServiceConfiguration>

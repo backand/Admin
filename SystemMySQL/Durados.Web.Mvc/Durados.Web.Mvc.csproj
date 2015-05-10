@@ -1,0 +1,450 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>9.0.30729</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{79F336B9-C5C5-45FD-84D1-D858825BF330}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>Durados.Web.Mvc</RootNamespace>
+    <AssemblyName>Durados.Mvc</AssemblyName>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <FileUpgradeFlags>
+    </FileUpgradeFlags>
+    <OldToolsVersion>3.5</OldToolsVersion>
+    <UpgradeBackupLocation />
+    <PublishUrl>publish\</PublishUrl>
+    <Install>true</Install>
+    <InstallFrom>Disk</InstallFrom>
+    <UpdateEnabled>false</UpdateEnabled>
+    <UpdateMode>Foreground</UpdateMode>
+    <UpdateInterval>7</UpdateInterval>
+    <UpdateIntervalUnits>Days</UpdateIntervalUnits>
+    <UpdatePeriodically>false</UpdatePeriodically>
+    <UpdateRequired>false</UpdateRequired>
+    <MapFileExtensions>true</MapFileExtensions>
+    <ApplicationRevision>0</ApplicationRevision>
+    <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
+    <IsWebBootstrapper>false</IsWebBootstrapper>
+    <UseApplicationTrust>false</UseApplicationTrust>
+    <BootstrapperEnabled>true</BootstrapperEnabled>
+    <SccProjectName>
+    </SccProjectName>
+    <SccLocalPath>
+    </SccLocalPath>
+    <SccAuxPath>
+    </SccAuxPath>
+    <SccProvider>
+    </SccProvider>
+    <TargetFrameworkProfile />
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
+    <Prefer32Bit>false</Prefer32Bit>
+    <DebugSymbols>true</DebugSymbols>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\x64\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <DebugType>full</DebugType>
+    <PlatformTarget>x64</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x64'">
+    <OutputPath>bin\x64\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <Optimize>true</Optimize>
+    <DebugType>pdbonly</DebugType>
+    <PlatformTarget>x64</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="AWSSDK">
+      <HintPath>..\Duradus.Web.Mvc.App\deployment\S3\AWSSDK.dll</HintPath>
+    </Reference>
+    <Reference Include="Ionic.Zip, Version=1.9.1.5, Culture=neutral, PublicKeyToken=edbe51ad942a3f5c, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\Duradus.Web.Mvc.App\deployment\Ionic.Zip.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.ApplicationServer.Caching.AzureClientHelper, Version=1.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.WindowsAzure.Caching.2.2.0.0\lib\net40-full\Microsoft.ApplicationServer.Caching.AzureClientHelper.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.ApplicationServer.Caching.AzureCommon, Version=1.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.WindowsAzure.Caching.2.2.0.0\lib\net40-full\Microsoft.ApplicationServer.Caching.AzureCommon.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.ApplicationServer.Caching.Client, Version=1.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.WindowsAzure.Caching.2.2.0.0\lib\net40-full\Microsoft.ApplicationServer.Caching.Client.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.ApplicationServer.Caching.Core, Version=1.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.WindowsAzure.Caching.2.2.0.0\lib\net40-full\Microsoft.ApplicationServer.Caching.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="Microsoft.Web.DistributedCache, Version=1.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.WindowsAzure.Caching.2.2.0.0\lib\net40-full\Microsoft.Web.DistributedCache.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.WindowsAzure.ServiceRuntime, Version=2.2.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\Duradus.Web.Mvc.App\deployment\Azure\Microsoft.WindowsAzure.ServiceRuntime.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.WindowsAzure.StorageClient, Version=1.7.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\Duradus.Web.Mvc.App\deployment\Azure\Microsoft.WindowsAzure.StorageClient.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.WindowsFabric.Common, Version=1.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.WindowsAzure.Caching.2.2.0.0\lib\net40-full\Microsoft.WindowsFabric.Common.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.WindowsFabric.Data.Common, Version=1.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.WindowsAzure.Caching.2.2.0.0\lib\net40-full\Microsoft.WindowsFabric.Data.Common.dll</HintPath>
+    </Reference>
+    <Reference Include="Mono.Security, Version=4.0.0.0, Culture=neutral, PublicKeyToken=0738eb9f132ed756, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\Npgsql.2.2.5\lib\net45\Mono.Security.dll</HintPath>
+    </Reference>
+    <Reference Include="Mono.Security.Protocol.Tls">
+      <HintPath>..\Duradus.Web.Mvc.App\deployment\Mono.Security.Protocol.Tls.dll</HintPath>
+    </Reference>
+    <Reference Include="MySql.Data, Version=6.4.6.0, Culture=neutral, PublicKeyToken=c5687fc88969c44d, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\Duradus.Web.Mvc.App\deployment\MySql.Data.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="MySql.Web, Version=6.4.6.0, Culture=neutral, PublicKeyToken=c5687fc88969c44d, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\Duradus.Web.Mvc.App\deployment\MySql.Web.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Newtonsoft.Json, Version=6.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\Newtonsoft.Json.6.0.8\lib\net45\Newtonsoft.Json.dll</HintPath>
+    </Reference>
+    <Reference Include="Npgsql, Version=2.2.5.0, Culture=neutral, PublicKeyToken=5d8b90d52f46fda7, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\Npgsql.2.2.5\lib\net45\Npgsql.dll</HintPath>
+    </Reference>
+    <Reference Include="Oracle.ManagedDataAccess, Version=4.121.1.0, Culture=neutral, PublicKeyToken=89b483f429c47342, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\Duradus.Web.Mvc.App\deployment\Oracle.ManagedDataAccess.dll</HintPath>
+    </Reference>
+    <Reference Include="PayPal, Version=1.2.2.0, Culture=neutral, PublicKeyToken=5b4afc1ccaef40fb, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\Duradus.Web.Mvc.App\deployment\PayPal.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.ComponentModel.DataAnnotations" />
+    <Reference Include="System.configuration" />
+    <Reference Include="System.Core">
+      <RequiredTargetFramework>3.5</RequiredTargetFramework>
+    </Reference>
+    <Reference Include="System.DirectoryServices" />
+    <Reference Include="System.DirectoryServices.Protocols" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Net" />
+    <Reference Include="System.Net.Http" />
+    <Reference Include="System.Net.Http.Formatting, Version=4.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL" />
+    <Reference Include="System.Net.Http.WebRequest" />
+    <Reference Include="System.Runtime.Serialization">
+      <RequiredTargetFramework>3.0</RequiredTargetFramework>
+    </Reference>
+    <Reference Include="System.ServiceModel">
+      <RequiredTargetFramework>3.0</RequiredTargetFramework>
+    </Reference>
+    <Reference Include="System.ServiceModel.Web">
+      <RequiredTargetFramework>3.5</RequiredTargetFramework>
+    </Reference>
+    <Reference Include="System.Web" />
+    <Reference Include="System.Web.Abstractions">
+      <RequiredTargetFramework>3.5</RequiredTargetFramework>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System.Web.ApplicationServices" />
+    <Reference Include="System.Web.Extensions" />
+    <Reference Include="System.Web.Http, Version=4.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL" />
+    <Reference Include="System.Web.Mvc, Version=4.0.0.1, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System.Web.Routing">
+      <RequiredTargetFramework>3.5</RequiredTargetFramework>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System.Web.WebPages, Version=2.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL" />
+    <Reference Include="System.Xml.Linq">
+      <RequiredTargetFramework>3.5</RequiredTargetFramework>
+    </Reference>
+    <Reference Include="System.Data.DataSetExtensions">
+      <RequiredTargetFramework>3.5</RequiredTargetFramework>
+    </Reference>
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Azure\Cache.cs" />
+    <Compile Include="Azure\DuradosStorage.cs" />
+    <Compile Include="Azure\StorageHelper.cs" />
+    <Compile Include="ChildrenField.cs" />
+    <Compile Include="ColumnField.cs" />
+    <Compile Include="Config\IProject.cs" />
+    <Compile Include="Controllers\AccountController.cs" />
+    <Compile Include="Controllers\AdminController.cs" />
+    <Compile Include="Controllers\Api\appController.cs" />
+    <Compile Include="Controllers\Api\chartController.cs" />
+    <Compile Include="Controllers\Api\RestTestController.cs" />
+    <Compile Include="Controllers\Api\RestController.cs" />
+    <Compile Include="Controllers\Api\dashboardController.cs" />
+    <Compile Include="Controllers\Api\viewController.cs" />
+    <Compile Include="Controllers\Attributes\PlugInDynamicAuthorizeAttribute.cs" />
+    <Compile Include="Controllers\Attributes\DynamicAuthorizeAttribute.cs" />
+    <Compile Include="Controllers\BaseController.cs" />
+    <Compile Include="Controllers\BlockController.cs" />
+    <Compile Include="Controllers\DuradosController.cs" />
+    <Compile Include="Controllers\DuradosUserController.cs" />
+    <Compile Include="Controllers\MultiTenancy\ConnectionStringController.cs" />
+    <Compile Include="Controllers\LocalizationController.cs" />
+    <Compile Include="Controllers\MultiTenancy\DnsAliasController.cs" />
+    <Compile Include="Controllers\MultiTenancy\DemoController.cs" />
+    <Compile Include="Controllers\MultiTenancy\MultiTenancyController.cs" />
+    <Compile Include="Controllers\MessageBoardController.cs" />
+    <Compile Include="Controllers\HistoryController.cs" />
+    <Compile Include="Controllers\Filters\NoCache.cs" />
+    <Compile Include="Controllers\MultiTenancy\PlugIn\HerokuPlugInController.cs" />
+    <Compile Include="Controllers\MultiTenancy\PlugIn\PlugInController.cs" />
+    <Compile Include="Controllers\MultiTenancy\PlugIn\WixPlugInController.cs" />
+    <Compile Include="Controllers\UtilsController.cs" />
+    <Compile Include="Controllers\CrmController.cs" />
+    <Compile Include="Controllers\ImageOrganizerController.cs" />
+    <Compile Include="FtpAzure.cs" />
+    <Compile Include="FtpUpload.cs" />
+    <Compile Include="Infrastructure\Credentials.cs" />
+    <Compile Include="Infrastructure\CustomError.cs" />
+    <Compile Include="Infrastructure\General.cs" />
+    <Compile Include="Infrastructure\Http.cs" />
+    <Compile Include="Infrastructure\ProductMaintenance.cs" />
+    <Compile Include="Infrastructure\ShortGuid.cs" />
+    <Compile Include="IUpload.cs" />
+    <Compile Include="MapDataSet.cs">
+      <DependentUpon>MapDataSet.xsd</DependentUpon>
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="MapDataSet.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>MapDataSet.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="PersistentSession.cs" />
+    <Compile Include="Properties\Settings.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+      <DependentUpon>Settings.settings</DependentUpon>
+    </Compile>
+    <Compile Include="SiteInfo.cs" />
+    <Compile Include="UI\Charting\BasicChartBuilder.cs" />
+    <Compile Include="UI\CheckList.cs" />
+    <Compile Include="UI\ClientParams.cs" />
+    <Compile Include="UI\ColumnsExcluder.cs" />
+    <Compile Include="UI\FieldValue.cs" />
+    <Compile Include="UI\Gantt.cs" />
+    <Compile Include="UI\Helpers\AppFactory.cs" />
+    <Compile Include="UI\Helpers\FtpHelper.cs" />
+    <Compile Include="UI\Helpers\AmazonS3Helper.cs" />
+    <Compile Include="UI\Helpers\AzureHelper.cs" />
+    <Compile Include="UI\Helpers\ChartHelper.cs" />
+    <Compile Include="UI\Helpers\CmsHelper.cs" />
+    <Compile Include="UI\Helpers\BookmarksHelper.cs" />
+    <Compile Include="UI\Helpers\ConnectionStringHelper.cs" />
+    <Compile Include="UI\Helpers\CronHelper.cs" />
+    <Compile Include="UI\Helpers\Base64CryptoHelper.cs" />
+    <Compile Include="UI\Helpers\CryptorHelper.cs" />
+    <Compile Include="UI\Helpers\ERDHelper.cs" />
+    <Compile Include="UI\Helpers\MailingServiceHelper.cs" />
+    <Compile Include="UI\Helpers\MenuHelper.cs" />
+    <Compile Include="UI\Helpers\NewDatabaseParametersFactory.cs" />
+    <Compile Include="UI\Helpers\OnlinePayments.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="UI\Helpers\PlugInHelper.cs" />
+    <Compile Include="UI\Helpers\PreviewHelper.cs" />
+    <Compile Include="UI\Helpers\RestHelper.cs" />
+    <Compile Include="UI\HistoryTableViewer.cs" />
+    <Compile Include="UI\DataActionFields.cs" />
+    <Compile Include="Database.cs" />
+    <Compile Include="Map.cs" />
+    <Compile Include="ParentField.cs" />
+    <Compile Include="Config\Database.cs" />
+    <Compile Include="UI\Helpers\CheckListHelper.cs" />
+    <Compile Include="UI\Helpers\ImageActionLinkHelper.cs" />
+    <Compile Include="UI\Helpers\LanguageHelper.cs" />
+    <Compile Include="UI\Helpers\PagerHelper.cs" />
+    <Compile Include="UI\Helpers\SecurityHelper.cs" />
+    <Compile Include="UI\Helpers\SortHelper.cs" />
+    <Compile Include="UI\ImageViewerInfo.cs" />
+    <Compile Include="UI\Item.cs" />
+    <Compile Include="UI\JavaScript.cs" />
+    <Compile Include="Config\View.cs" />
+    <Compile Include="UI\Json\AdvancedFilter.cs" />
+    <Compile Include="UI\Json\Chart.cs" />
+    <Compile Include="UI\Json\CustomView.cs" />
+    <Compile Include="UI\Json\CopyPaste.cs" />
+    <Compile Include="UI\Json\Derivation.cs" />
+    <Compile Include="UI\Json\Derived.cs" />
+    <Compile Include="UI\Json\NameValueCollectionSerializer.cs" />
+    <Compile Include="UI\Json\Roles.cs" />
+    <Compile Include="UI\Json\SelectList.cs" />
+    <Compile Include="UI\Json\Settings.cs" />
+    <Compile Include="UI\Json\Translator.cs" />
+    <Compile Include="UI\Json\Tree.cs" />
+    <Compile Include="UI\Json\UploadInfo.cs" />
+    <Compile Include="UI\Json\ViewStyle.cs" />
+    <Compile Include="UI\MultiTenancyTableViewer.cs" />
+    <Compile Include="UI\Parameters.cs" />
+    <Compile Include="UI\RdlcReport.cs" />
+    <Compile Include="UI\Styler.cs" />
+    <Compile Include="UI\TableViewer.cs" />
+    <Compile Include="UI\Views\BaseViewPage.cs">
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="UI\Views\BaseViewUserControl.cs">
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Upload.cs" />
+    <Compile Include="View.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="UI\ChildrenFieldViewer.cs" />
+    <Compile Include="UI\ColumnFieldViewer.cs" />
+    <Compile Include="UI\FieldViewer.cs" />
+    <Compile Include="UI\Helpers\FieldHelper.cs" />
+    <Compile Include="UI\Helpers\ViewHelper.cs" />
+    <Compile Include="UI\Json\Field.cs" />
+    <Compile Include="UI\Json\Filter.cs" />
+    <Compile Include="UI\Json\JsonSerializer.cs" />
+    <Compile Include="UI\Json\View.cs" />
+    <Compile Include="UI\ParentFieldViewer.cs" />
+    <Compile Include="UI\ViewViewer.cs" />
+    <Compile Include="Workflow\WebService.cs" />
+    <Compile Include="Workflow\HistoryNotifier.cs" />
+    <Compile Include="Workflow\Notifier.cs" />
+    <Compile Include="Workflow\Engine.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Durados.Cms\Durados.Cms.csproj">
+      <Project>{813DBBEE-8D4D-4DB8-9E49-B73A0AD6C5CE}</Project>
+      <Name>Durados.Cms</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Durados.Config.Attributes\Durados.Config.Attributes.csproj">
+      <Project>{8B1EB484-4146-4D68-B6F8-8A1C81092576}</Project>
+      <Name>Durados.Config.Attributes</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Durados.Config\Durados.Config.csproj">
+      <Project>{236C76B6-4489-46B7-86B3-0D2651C88F49}</Project>
+      <Name>Durados.Config</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Durados.DataAccess\Durados.DataAccess.csproj">
+      <Project>{FE0D5849-2911-4615-BCC4-C286B213761C}</Project>
+      <Name>Durados.DataAccess</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Durados.Localization\Durados.Localization.csproj">
+      <Project>{721D74D4-AA6C-4B47-B98F-C853FB7BCF9B}</Project>
+      <Name>Durados.Localization</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Durados.Web.Localization\Durados.Web.Localization.csproj">
+      <Project>{B0621DDC-83C4-48A8-A574-B0816B4A6388}</Project>
+      <Name>Durados.Web.Localization</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Durados.Web.Mvc.Logging\Durados.Web.Mvc.Logging.csproj">
+      <Project>{729C03BB-33F3-4210-89F4-442E28500ED6}</Project>
+      <Name>Durados.Web.Mvc.Logging</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Durados.Workflow\Durados.Workflow.csproj">
+      <Project>{1EA43A19-3530-4968-B9B8-87F313D6F063}</Project>
+      <Name>Durados.Workflow</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Durados.Xml\Durados.Xml.csproj">
+      <Project>{758CAABE-E74E-4ECB-AF3E-6B18D19B53D1}</Project>
+      <Name>Durados.Xml</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Durados\Durados.csproj">
+      <Project>{04183BAC-B3DA-46EC-BE81-D635768F98F4}</Project>
+      <Name>Durados</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="app.config" />
+    <None Include="MapDataSet.xsc">
+      <DependentUpon>MapDataSet.xsd</DependentUpon>
+    </None>
+    <None Include="MapDataSet.xsd">
+      <SubType>Designer</SubType>
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>MapDataSet.Designer.cs</LastGenOutput>
+    </None>
+    <None Include="MapDataSet.xss">
+      <DependentUpon>MapDataSet.xsd</DependentUpon>
+    </None>
+    <None Include="Microsoft.WindowsAzure.Caching\ClientPerfCountersInstaller.exe.config">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="packages.config" />
+    <None Include="Properties\Settings.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <BootstrapperPackage Include="Microsoft.Net.Client.3.5">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 3.5 SP1 Client Profile</ProductName>
+      <Install>false</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Net.Framework.3.5.SP1">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 3.5 SP1</ProductName>
+      <Install>true</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Windows.Installer.3.1">
+      <Visible>False</Visible>
+      <ProductName>Windows Installer 3.1</ProductName>
+      <Install>true</Install>
+    </BootstrapperPackage>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Microsoft.WindowsAzure.Caching\ClientPerfCountersInstaller.exe">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="Microsoft.WindowsAzure.Caching\PerformanceCounters.xml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <WCFMetadata Include="Service References\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="bin\" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

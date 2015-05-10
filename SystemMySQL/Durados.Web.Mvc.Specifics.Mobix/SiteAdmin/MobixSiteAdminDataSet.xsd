@@ -1,0 +1,982 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<xs:schema id="MobixSiteAdminDataSet" targetNamespace="http://tempuri.org/MobixSiteAdminDataSet.xsd" xmlns:mstns="http://tempuri.org/MobixSiteAdminDataSet.xsd" xmlns="http://tempuri.org/MobixSiteAdminDataSet.xsd" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata" xmlns:msprop="urn:schemas-microsoft-com:xml-msprop" attributeFormDefault="qualified" elementFormDefault="qualified">
+  <xs:annotation>
+    <xs:appinfo source="urn:schemas-microsoft-com:xml-msdatasource">
+      <DataSource DefaultConnectionIndex="0" FunctionsComponentName="QueriesTableAdapter" Modifier="AutoLayout, AnsiClass, Class, Public" SchemaSerializationMode="IncludeSchema" xmlns="urn:schemas-microsoft-com:xml-msdatasource">
+        <Connections>
+          <Connection AppSettingsObjectName="Settings" AppSettingsPropertyName="CmsProdConnectionString" ConnectionStringObject="" IsAppSettingsProperty="true" Modifier="Assembly" Name="CmsProdConnectionString (Settings)" ParameterPrefix="@" PropertyReference="ApplicationSettings.Durados.Web.Mvc.Specifics.Mobix.Properties.Settings.GlobalReference.Default.CmsProdConnectionString" Provider="System.Data.SqlClient" />
+        </Connections>
+        <Tables>
+          <TableAdapter BaseClass="System.ComponentModel.Component" DataAccessorModifier="AutoLayout, AnsiClass, Class, Public" DataAccessorName="HeaderImagesTableAdapter" GeneratorDataComponentClassName="HeaderImagesTableAdapter" Name="HeaderImages" UserDataComponentName="HeaderImagesTableAdapter">
+            <MainSource>
+              <DbSource ConnectionRef="CmsProdConnectionString (Settings)" DbObjectName="CmsProd.dbo.HeaderImages" DbObjectType="View" FillMethodModifier="Public" FillMethodName="Fill" GenerateMethods="Both" GenerateShortCommands="false" GeneratorGetMethodName="GetData" GeneratorSourceName="Fill" GetMethodModifier="Public" GetMethodName="GetData" QueryType="Rowset" ScalarCallRetval="System.Object, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" UseOptimisticConcurrency="true" UserGetMethodName="GetData" UserSourceName="Fill">
+                <SelectCommand>
+                  <DbCommand CommandType="Text" ModifiedByUser="false">
+                    <CommandText>SELECT Id, ImgSrc, Ordinal FROM dbo.HeaderImages</CommandText>
+                    <Parameters />
+                  </DbCommand>
+                </SelectCommand>
+              </DbSource>
+            </MainSource>
+            <Mappings>
+              <Mapping SourceColumn="Id" DataSetColumn="Id" />
+              <Mapping SourceColumn="ImgSrc" DataSetColumn="ImgSrc" />
+              <Mapping SourceColumn="Ordinal" DataSetColumn="Ordinal" />
+            </Mappings>
+            <Sources />
+          </TableAdapter>
+          <TableAdapter BaseClass="System.ComponentModel.Component" DataAccessorModifier="AutoLayout, AnsiClass, Class, Public" DataAccessorName="HomeBottomImagesTableAdapter" GeneratorDataComponentClassName="HomeBottomImagesTableAdapter" Name="HomeBottomImages" UserDataComponentName="HomeBottomImagesTableAdapter">
+            <MainSource>
+              <DbSource ConnectionRef="CmsProdConnectionString (Settings)" DbObjectName="CmsProd.dbo.HomeBottomImages" DbObjectType="View" FillMethodModifier="Public" FillMethodName="Fill" GenerateMethods="Both" GenerateShortCommands="false" GeneratorGetMethodName="GetData" GeneratorSourceName="Fill" GetMethodModifier="Public" GetMethodName="GetData" QueryType="Rowset" ScalarCallRetval="System.Object, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" UseOptimisticConcurrency="true" UserGetMethodName="GetData" UserSourceName="Fill">
+                <SelectCommand>
+                  <DbCommand CommandType="Text" ModifiedByUser="false">
+                    <CommandText>SELECT Id, ImgSrc, Ordinal FROM dbo.HomeBottomImages</CommandText>
+                    <Parameters />
+                  </DbCommand>
+                </SelectCommand>
+              </DbSource>
+            </MainSource>
+            <Mappings>
+              <Mapping SourceColumn="Id" DataSetColumn="Id" />
+              <Mapping SourceColumn="ImgSrc" DataSetColumn="ImgSrc" />
+              <Mapping SourceColumn="Ordinal" DataSetColumn="Ordinal" />
+            </Mappings>
+            <Sources />
+          </TableAdapter>
+          <TableAdapter BaseClass="System.ComponentModel.Component" DataAccessorModifier="AutoLayout, AnsiClass, Class, Public" DataAccessorName="HomeRightImageTableAdapter" GeneratorDataComponentClassName="HomeRightImageTableAdapter" Name="HomeRightImage" UserDataComponentName="HomeRightImageTableAdapter">
+            <MainSource>
+              <DbSource ConnectionRef="CmsProdConnectionString (Settings)" DbObjectName="CmsProd.dbo.HomeRightImage" DbObjectType="View" FillMethodModifier="Public" FillMethodName="Fill" GenerateMethods="Both" GenerateShortCommands="false" GeneratorGetMethodName="GetData" GeneratorSourceName="Fill" GetMethodModifier="Public" GetMethodName="GetData" QueryType="Rowset" ScalarCallRetval="System.Object, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" UseOptimisticConcurrency="true" UserGetMethodName="GetData" UserSourceName="Fill">
+                <SelectCommand>
+                  <DbCommand CommandType="Text" ModifiedByUser="false">
+                    <CommandText>SELECT Id, ImgSrc FROM dbo.HomeRightImage</CommandText>
+                    <Parameters />
+                  </DbCommand>
+                </SelectCommand>
+              </DbSource>
+            </MainSource>
+            <Mappings>
+              <Mapping SourceColumn="Id" DataSetColumn="Id" />
+              <Mapping SourceColumn="ImgSrc" DataSetColumn="ImgSrc" />
+            </Mappings>
+            <Sources />
+          </TableAdapter>
+          <TableAdapter BaseClass="System.ComponentModel.Component" DataAccessorModifier="AutoLayout, AnsiClass, Class, Public" DataAccessorName="HomeLeftTextTableAdapter" GeneratorDataComponentClassName="HomeLeftTextTableAdapter" Name="HomeLeftText" UserDataComponentName="HomeLeftTextTableAdapter">
+            <MainSource>
+              <DbSource ConnectionRef="CmsProdConnectionString (Settings)" DbObjectName="CmsProd.dbo.HomeLeftText" DbObjectType="View" FillMethodModifier="Public" FillMethodName="Fill" GenerateMethods="Both" GenerateShortCommands="false" GeneratorGetMethodName="GetData" GeneratorSourceName="Fill" GetMethodModifier="Public" GetMethodName="GetData" QueryType="Rowset" ScalarCallRetval="System.Object, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" UseOptimisticConcurrency="true" UserGetMethodName="GetData" UserSourceName="Fill">
+                <SelectCommand>
+                  <DbCommand CommandType="Text" ModifiedByUser="false">
+                    <CommandText>SELECT Id, Text FROM dbo.HomeLeftText</CommandText>
+                    <Parameters />
+                  </DbCommand>
+                </SelectCommand>
+              </DbSource>
+            </MainSource>
+            <Mappings>
+              <Mapping SourceColumn="Id" DataSetColumn="Id" />
+              <Mapping SourceColumn="Text" DataSetColumn="Text" />
+            </Mappings>
+            <Sources />
+          </TableAdapter>
+          <TableAdapter BaseClass="System.ComponentModel.Component" DataAccessorModifier="AutoLayout, AnsiClass, Class, Public" DataAccessorName="AboutUsTableAdapter" GeneratorDataComponentClassName="AboutUsTableAdapter" Name="AboutUs" UserDataComponentName="AboutUsTableAdapter">
+            <MainSource>
+              <DbSource ConnectionRef="CmsProdConnectionString (Settings)" DbObjectName="CmsProd.dbo.AboutUs" DbObjectType="View" FillMethodModifier="Public" FillMethodName="Fill" GenerateMethods="Both" GenerateShortCommands="false" GeneratorGetMethodName="GetData" GeneratorSourceName="Fill" GetMethodModifier="Public" GetMethodName="GetData" QueryType="Rowset" ScalarCallRetval="System.Object, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" UseOptimisticConcurrency="false" UserGetMethodName="GetData" UserSourceName="Fill">
+                <SelectCommand>
+                  <DbCommand CommandType="Text" ModifiedByUser="true">
+                    <CommandText>SELECT Id, Name, Text, ImgSrc
+FROM     AboutUs</CommandText>
+                    <Parameters />
+                  </DbCommand>
+                </SelectCommand>
+              </DbSource>
+            </MainSource>
+            <Mappings>
+              <Mapping SourceColumn="Id" DataSetColumn="Id" />
+              <Mapping SourceColumn="Name" DataSetColumn="Name" />
+              <Mapping SourceColumn="Text" DataSetColumn="Text" />
+              <Mapping SourceColumn="ImgSrc" DataSetColumn="ImgSrc" />
+            </Mappings>
+            <Sources />
+          </TableAdapter>
+          <TableAdapter BaseClass="System.ComponentModel.Component" DataAccessorModifier="AutoLayout, AnsiClass, Class, Public" DataAccessorName="SolutionAmiTableAdapter" GeneratorDataComponentClassName="SolutionAmiTableAdapter" Name="SolutionAmi" UserDataComponentName="SolutionAmiTableAdapter">
+            <MainSource>
+              <DbSource ConnectionRef="CmsProdConnectionString (Settings)" DbObjectName="CmsProd.dbo.SolutionAmi" DbObjectType="View" FillMethodModifier="Public" FillMethodName="Fill" GenerateMethods="Both" GenerateShortCommands="false" GeneratorGetMethodName="GetData" GeneratorSourceName="Fill" GetMethodModifier="Public" GetMethodName="GetData" QueryType="Rowset" ScalarCallRetval="System.Object, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" UseOptimisticConcurrency="false" UserGetMethodName="GetData" UserSourceName="Fill">
+                <SelectCommand>
+                  <DbCommand CommandType="Text" ModifiedByUser="true">
+                    <CommandText>SELECT Id, Name, Ordinal, Text, ImgSrc, ImgSrc2, ImgSrc3, ImgTitle, ImgSrc4, Text2, Text3, PdfFile, Header
+FROM     SolutionAmi</CommandText>
+                    <Parameters />
+                  </DbCommand>
+                </SelectCommand>
+              </DbSource>
+            </MainSource>
+            <Mappings>
+              <Mapping SourceColumn="Id" DataSetColumn="Id" />
+              <Mapping SourceColumn="Name" DataSetColumn="Name" />
+              <Mapping SourceColumn="Ordinal" DataSetColumn="Ordinal" />
+              <Mapping SourceColumn="Text" DataSetColumn="Text" />
+              <Mapping SourceColumn="ImgSrc" DataSetColumn="ImgSrc" />
+              <Mapping SourceColumn="ImgSrc2" DataSetColumn="ImgSrc2" />
+              <Mapping SourceColumn="ImgSrc3" DataSetColumn="ImgSrc3" />
+              <Mapping SourceColumn="ImgTitle" DataSetColumn="ImgTitle" />
+              <Mapping SourceColumn="ImgSrc4" DataSetColumn="ImgSrc4" />
+              <Mapping SourceColumn="Text2" DataSetColumn="Text2" />
+              <Mapping SourceColumn="Text3" DataSetColumn="Text3" />
+              <Mapping SourceColumn="PdfFile" DataSetColumn="PdfFile" />
+              <Mapping SourceColumn="Header" DataSetColumn="Header" />
+            </Mappings>
+            <Sources />
+          </TableAdapter>
+          <TableAdapter BaseClass="System.ComponentModel.Component" DataAccessorModifier="AutoLayout, AnsiClass, Class, Public" DataAccessorName="SolutionPrepaidTableAdapter" GeneratorDataComponentClassName="SolutionPrepaidTableAdapter" Name="SolutionPrepaid" UserDataComponentName="SolutionPrepaidTableAdapter">
+            <MainSource>
+              <DbSource ConnectionRef="CmsProdConnectionString (Settings)" DbObjectName="CmsProd.dbo.SolutionPrepaid" DbObjectType="View" FillMethodModifier="Public" FillMethodName="Fill" GenerateMethods="Both" GenerateShortCommands="false" GeneratorGetMethodName="GetData" GeneratorSourceName="Fill" GetMethodModifier="Public" GetMethodName="GetData" QueryType="Rowset" ScalarCallRetval="System.Object, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" UseOptimisticConcurrency="false" UserGetMethodName="GetData" UserSourceName="Fill">
+                <SelectCommand>
+                  <DbCommand CommandType="Text" ModifiedByUser="true">
+                    <CommandText>SELECT Id, Name, Ordinal, Text, ImgSrc, ImgSrc2, ImgSrc3, ImgTitle, ImgSrc4, Text2, Text3, PdfFile, Header
+FROM     SolutionPrepaid</CommandText>
+                    <Parameters />
+                  </DbCommand>
+                </SelectCommand>
+              </DbSource>
+            </MainSource>
+            <Mappings>
+              <Mapping SourceColumn="Id" DataSetColumn="Id" />
+              <Mapping SourceColumn="Name" DataSetColumn="Name" />
+              <Mapping SourceColumn="Ordinal" DataSetColumn="Ordinal" />
+              <Mapping SourceColumn="Text" DataSetColumn="Text" />
+              <Mapping SourceColumn="ImgSrc" DataSetColumn="ImgSrc" />
+              <Mapping SourceColumn="ImgSrc2" DataSetColumn="ImgSrc2" />
+              <Mapping SourceColumn="ImgSrc3" DataSetColumn="ImgSrc3" />
+              <Mapping SourceColumn="ImgTitle" DataSetColumn="ImgTitle" />
+              <Mapping SourceColumn="ImgSrc4" DataSetColumn="ImgSrc4" />
+              <Mapping SourceColumn="Text2" DataSetColumn="Text2" />
+              <Mapping SourceColumn="Text3" DataSetColumn="Text3" />
+              <Mapping SourceColumn="PdfFile" DataSetColumn="PdfFile" />
+              <Mapping SourceColumn="Header" DataSetColumn="Header" />
+            </Mappings>
+            <Sources />
+          </TableAdapter>
+          <TableAdapter BaseClass="System.ComponentModel.Component" DataAccessorModifier="AutoLayout, AnsiClass, Class, Public" DataAccessorName="SolutionOverviewTableAdapter" GeneratorDataComponentClassName="SolutionOverviewTableAdapter" Name="SolutionOverview" UserDataComponentName="SolutionOverviewTableAdapter">
+            <MainSource>
+              <DbSource ConnectionRef="CmsProdConnectionString (Settings)" DbObjectName="CmsProd.dbo.SolutionOverview" DbObjectType="View" FillMethodModifier="Public" FillMethodName="Fill" GenerateMethods="Both" GenerateShortCommands="false" GeneratorGetMethodName="GetData" GeneratorSourceName="Fill" GetMethodModifier="Public" GetMethodName="GetData" QueryType="Rowset" ScalarCallRetval="System.Object, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" UseOptimisticConcurrency="true" UserGetMethodName="GetData" UserSourceName="Fill">
+                <SelectCommand>
+                  <DbCommand CommandType="Text" ModifiedByUser="false">
+                    <CommandText>SELECT Id, Text FROM dbo.SolutionOverview</CommandText>
+                    <Parameters />
+                  </DbCommand>
+                </SelectCommand>
+              </DbSource>
+            </MainSource>
+            <Mappings>
+              <Mapping SourceColumn="Id" DataSetColumn="Id" />
+              <Mapping SourceColumn="Text" DataSetColumn="Text" />
+            </Mappings>
+            <Sources />
+          </TableAdapter>
+          <TableAdapter BaseClass="System.ComponentModel.Component" DataAccessorModifier="AutoLayout, AnsiClass, Class, Public" DataAccessorName="PartnersTableAdapter" GeneratorDataComponentClassName="PartnersTableAdapter" Name="Partners" UserDataComponentName="PartnersTableAdapter">
+            <MainSource>
+              <DbSource ConnectionRef="CmsProdConnectionString (Settings)" DbObjectName="CmsProd.dbo.Partners" DbObjectType="View" FillMethodModifier="Public" FillMethodName="Fill" GenerateMethods="Both" GenerateShortCommands="false" GeneratorGetMethodName="GetData" GeneratorSourceName="Fill" GetMethodModifier="Public" GetMethodName="GetData" QueryType="Rowset" ScalarCallRetval="System.Object, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" UseOptimisticConcurrency="true" UserGetMethodName="GetData" UserSourceName="Fill">
+                <SelectCommand>
+                  <DbCommand CommandType="Text" ModifiedByUser="false">
+                    <CommandText>SELECT Id, Page, Text, ImgSrc, Text2, Ordinal FROM dbo.Partners</CommandText>
+                    <Parameters />
+                  </DbCommand>
+                </SelectCommand>
+              </DbSource>
+            </MainSource>
+            <Mappings>
+              <Mapping SourceColumn="Id" DataSetColumn="Id" />
+              <Mapping SourceColumn="Page" DataSetColumn="Page" />
+              <Mapping SourceColumn="Text" DataSetColumn="Text" />
+              <Mapping SourceColumn="ImgSrc" DataSetColumn="ImgSrc" />
+              <Mapping SourceColumn="Text2" DataSetColumn="Text2" />
+              <Mapping SourceColumn="Ordinal" DataSetColumn="Ordinal" />
+            </Mappings>
+            <Sources />
+          </TableAdapter>
+          <TableAdapter BaseClass="System.ComponentModel.Component" DataAccessorModifier="AutoLayout, AnsiClass, Class, Public" DataAccessorName="TechnologyNDNetTableAdapter" GeneratorDataComponentClassName="TechnologyNDNetTableAdapter" Name="TechnologyNDNet" UserDataComponentName="TechnologyNDNetTableAdapter">
+            <MainSource>
+              <DbSource ConnectionRef="CmsProdConnectionString (Settings)" DbObjectName="CmsProd.dbo.TechnologyNDNet" DbObjectType="View" FillMethodModifier="Public" FillMethodName="Fill" GenerateMethods="Both" GenerateShortCommands="false" GeneratorGetMethodName="GetData" GeneratorSourceName="Fill" GetMethodModifier="Public" GetMethodName="GetData" QueryType="Rowset" ScalarCallRetval="System.Object, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" UseOptimisticConcurrency="false" UserGetMethodName="GetData" UserSourceName="Fill">
+                <SelectCommand>
+                  <DbCommand CommandType="Text" ModifiedByUser="true">
+                    <CommandText>SELECT Id, Name, Text, ImgSrc, Header
+FROM     TechnologyNDNet</CommandText>
+                    <Parameters />
+                  </DbCommand>
+                </SelectCommand>
+              </DbSource>
+            </MainSource>
+            <Mappings>
+              <Mapping SourceColumn="Id" DataSetColumn="Id" />
+              <Mapping SourceColumn="Name" DataSetColumn="Name" />
+              <Mapping SourceColumn="Text" DataSetColumn="Text" />
+              <Mapping SourceColumn="ImgSrc" DataSetColumn="ImgSrc" />
+              <Mapping SourceColumn="Header" DataSetColumn="Header" />
+            </Mappings>
+            <Sources />
+          </TableAdapter>
+          <TableAdapter BaseClass="System.ComponentModel.Component" DataAccessorModifier="AutoLayout, AnsiClass, Class, Public" DataAccessorName="TechnologyWhitePaperTableAdapter" GeneratorDataComponentClassName="TechnologyWhitePaperTableAdapter" Name="TechnologyWhitePaper" UserDataComponentName="TechnologyWhitePaperTableAdapter">
+            <MainSource>
+              <DbSource ConnectionRef="CmsProdConnectionString (Settings)" DbObjectName="CmsProd.dbo.TechnologyWhitePaper" DbObjectType="View" FillMethodModifier="Public" FillMethodName="Fill" GenerateMethods="Both" GenerateShortCommands="false" GeneratorGetMethodName="GetData" GeneratorSourceName="Fill" GetMethodModifier="Public" GetMethodName="GetData" QueryType="Rowset" ScalarCallRetval="System.Object, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" UseOptimisticConcurrency="true" UserGetMethodName="GetData" UserSourceName="Fill">
+                <SelectCommand>
+                  <DbCommand CommandType="Text" ModifiedByUser="false">
+                    <CommandText>SELECT Id, Name, Link, LongText, PDF FROM dbo.TechnologyWhitePaper</CommandText>
+                    <Parameters />
+                  </DbCommand>
+                </SelectCommand>
+              </DbSource>
+            </MainSource>
+            <Mappings>
+              <Mapping SourceColumn="Id" DataSetColumn="Id" />
+              <Mapping SourceColumn="Name" DataSetColumn="Name" />
+              <Mapping SourceColumn="Link" DataSetColumn="Link" />
+              <Mapping SourceColumn="LongText" DataSetColumn="LongText" />
+              <Mapping SourceColumn="PDF" DataSetColumn="PDF" />
+            </Mappings>
+            <Sources />
+          </TableAdapter>
+          <TableAdapter BaseClass="System.ComponentModel.Component" DataAccessorModifier="AutoLayout, AnsiClass, Class, Public" DataAccessorName="UserTableAdapter" GeneratorDataComponentClassName="UserTableAdapter" Name="User" UserDataComponentName="UserTableAdapter">
+            <MainSource>
+              <DbSource ConnectionRef="CmsProdConnectionString (Settings)" DbObjectName="CmsProd.dbo.[User]" DbObjectType="Table" FillMethodModifier="Public" FillMethodName="Fill" GenerateMethods="Both" GenerateShortCommands="true" GeneratorGetMethodName="GetData" GeneratorSourceName="Fill" GetMethodModifier="Public" GetMethodName="GetData" QueryType="Rowset" ScalarCallRetval="System.Object, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" UseOptimisticConcurrency="true" UserGetMethodName="GetData" UserSourceName="Fill">
+                <DeleteCommand>
+                  <DbCommand CommandType="Text" ModifiedByUser="false">
+                    <CommandText>DELETE FROM [dbo].[User] WHERE (([ID] = @Original_ID) AND ([Username] = @Original_Username) AND ([FirstName] = @Original_FirstName) AND ([LastName] = @Original_LastName) AND ([Email] = @Original_Email) AND ([Password] = @Original_Password) AND ([Role] = @Original_Role) AND ([Guid] = @Original_Guid) AND ((@IsNull_Signature = 1 AND [Signature] IS NULL) OR ([Signature] = @Original_Signature)) AND ((@IsNull_SignatureHTML = 1 AND [SignatureHTML] IS NULL) OR ([SignatureHTML] = @Original_SignatureHTML)))</CommandText>
+                    <Parameters>
+                      <Parameter AllowDbNull="false" AutogeneratedName="" DataSourceName="" DbType="Int32" Direction="Input" ParameterName="@Original_ID" Precision="0" ProviderType="Int" Scale="0" Size="0" SourceColumn="ID" SourceColumnNullMapping="false" SourceVersion="Original" />
+                      <Parameter AllowDbNull="false" AutogeneratedName="" DataSourceName="" DbType="String" Direction="Input" ParameterName="@Original_Username" Precision="0" ProviderType="NVarChar" Scale="0" Size="0" SourceColumn="Username" SourceColumnNullMapping="false" SourceVersion="Original" />
+                      <Parameter AllowDbNull="false" AutogeneratedName="" DataSourceName="" DbType="String" Direction="Input" ParameterName="@Original_FirstName" Precision="0" ProviderType="NVarChar" Scale="0" Size="0" SourceColumn="FirstName" SourceColumnNullMapping="false" SourceVersion="Original" />
+                      <Parameter AllowDbNull="false" AutogeneratedName="" DataSourceName="" DbType="String" Direction="Input" ParameterName="@Original_LastName" Precision="0" ProviderType="NVarChar" Scale="0" Size="0" SourceColumn="LastName" SourceColumnNullMapping="false" SourceVersion="Original" />
+                      <Parameter AllowDbNull="false" AutogeneratedName="" DataSourceName="" DbType="String" Direction="Input" ParameterName="@Original_Email" Precision="0" ProviderType="NVarChar" Scale="0" Size="0" SourceColumn="Email" SourceColumnNullMapping="false" SourceVersion="Original" />
+                      <Parameter AllowDbNull="false" AutogeneratedName="" DataSourceName="" DbType="String" Direction="Input" ParameterName="@Original_Password" Precision="0" ProviderType="NVarChar" Scale="0" Size="0" SourceColumn="Password" SourceColumnNullMapping="false" SourceVersion="Original" />
+                      <Parameter AllowDbNull="false" AutogeneratedName="" DataSourceName="" DbType="String" Direction="Input" ParameterName="@Original_Role" Precision="0" ProviderType="NVarChar" Scale="0" Size="0" SourceColumn="Role" SourceColumnNullMapping="false" SourceVersion="Original" />
+                      <Parameter AllowDbNull="false" AutogeneratedName="" DataSourceName="" DbType="Guid" Direction="Input" ParameterName="@Original_Guid" Precision="0" ProviderType="UniqueIdentifier" Scale="0" Size="0" SourceColumn="Guid" SourceColumnNullMapping="false" SourceVersion="Original" />
+                      <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DbType="Int32" Direction="Input" ParameterName="@IsNull_Signature" Precision="0" ProviderType="Int" Scale="0" Size="0" SourceColumn="Signature" SourceColumnNullMapping="true" SourceVersion="Original" />
+                      <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DbType="String" Direction="Input" ParameterName="@Original_Signature" Precision="0" ProviderType="NVarChar" Scale="0" Size="0" SourceColumn="Signature" SourceColumnNullMapping="false" SourceVersion="Original" />
+                      <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DbType="Int32" Direction="Input" ParameterName="@IsNull_SignatureHTML" Precision="0" ProviderType="Int" Scale="0" Size="0" SourceColumn="SignatureHTML" SourceColumnNullMapping="true" SourceVersion="Original" />
+                      <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DbType="String" Direction="Input" ParameterName="@Original_SignatureHTML" Precision="0" ProviderType="NVarChar" Scale="0" Size="0" SourceColumn="SignatureHTML" SourceColumnNullMapping="false" SourceVersion="Original" />
+                    </Parameters>
+                  </DbCommand>
+                </DeleteCommand>
+                <InsertCommand>
+                  <DbCommand CommandType="Text" ModifiedByUser="false">
+                    <CommandText>INSERT INTO [dbo].[User] ([Username], [FirstName], [LastName], [Email], [Password], [Role], [Guid], [Signature], [SignatureHTML]) VALUES (@Username, @FirstName, @LastName, @Email, @Password, @Role, @Guid, @Signature, @SignatureHTML);
+SELECT ID, Username, FirstName, LastName, Email, Password, Role, Guid, Signature, SignatureHTML FROM [User] WHERE (ID = SCOPE_IDENTITY())</CommandText>
+                    <Parameters>
+                      <Parameter AllowDbNull="false" AutogeneratedName="" DataSourceName="" DbType="String" Direction="Input" ParameterName="@Username" Precision="0" ProviderType="NVarChar" Scale="0" Size="0" SourceColumn="Username" SourceColumnNullMapping="false" SourceVersion="Current" />
+                      <Parameter AllowDbNull="false" AutogeneratedName="" DataSourceName="" DbType="String" Direction="Input" ParameterName="@FirstName" Precision="0" ProviderType="NVarChar" Scale="0" Size="0" SourceColumn="FirstName" SourceColumnNullMapping="false" SourceVersion="Current" />
+                      <Parameter AllowDbNull="false" AutogeneratedName="" DataSourceName="" DbType="String" Direction="Input" ParameterName="@LastName" Precision="0" ProviderType="NVarChar" Scale="0" Size="0" SourceColumn="LastName" SourceColumnNullMapping="false" SourceVersion="Current" />
+                      <Parameter AllowDbNull="false" AutogeneratedName="" DataSourceName="" DbType="String" Direction="Input" ParameterName="@Email" Precision="0" ProviderType="NVarChar" Scale="0" Size="0" SourceColumn="Email" SourceColumnNullMapping="false" SourceVersion="Current" />
+                      <Parameter AllowDbNull="false" AutogeneratedName="" DataSourceName="" DbType="String" Direction="Input" ParameterName="@Password" Precision="0" ProviderType="NVarChar" Scale="0" Size="0" SourceColumn="Password" SourceColumnNullMapping="false" SourceVersion="Current" />
+                      <Parameter AllowDbNull="false" AutogeneratedName="" DataSourceName="" DbType="String" Direction="Input" ParameterName="@Role" Precision="0" ProviderType="NVarChar" Scale="0" Size="0" SourceColumn="Role" SourceColumnNullMapping="false" SourceVersion="Current" />
+                      <Parameter AllowDbNull="false" AutogeneratedName="" DataSourceName="" DbType="Guid" Direction="Input" ParameterName="@Guid" Precision="0" ProviderType="UniqueIdentifier" Scale="0" Size="0" SourceColumn="Guid" SourceColumnNullMapping="false" SourceVersion="Current" />
+                      <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DbType="String" Direction="Input" ParameterName="@Signature" Precision="0" ProviderType="NVarChar" Scale="0" Size="0" SourceColumn="Signature" SourceColumnNullMapping="false" SourceVersion="Current" />
+                      <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DbType="String" Direction="Input" ParameterName="@SignatureHTML" Precision="0" ProviderType="NVarChar" Scale="0" Size="0" SourceColumn="SignatureHTML" SourceColumnNullMapping="false" SourceVersion="Current" />
+                    </Parameters>
+                  </DbCommand>
+                </InsertCommand>
+                <SelectCommand>
+                  <DbCommand CommandType="Text" ModifiedByUser="false">
+                    <CommandText>SELECT ID, Username, FirstName, LastName, Email, Password, Role, Guid, Signature, SignatureHTML FROM dbo.[User]</CommandText>
+                    <Parameters />
+                  </DbCommand>
+                </SelectCommand>
+                <UpdateCommand>
+                  <DbCommand CommandType="Text" ModifiedByUser="false">
+                    <CommandText>UPDATE [dbo].[User] SET [Username] = @Username, [FirstName] = @FirstName, [LastName] = @LastName, [Email] = @Email, [Password] = @Password, [Role] = @Role, [Guid] = @Guid, [Signature] = @Signature, [SignatureHTML] = @SignatureHTML WHERE (([ID] = @Original_ID) AND ([Username] = @Original_Username) AND ([FirstName] = @Original_FirstName) AND ([LastName] = @Original_LastName) AND ([Email] = @Original_Email) AND ([Password] = @Original_Password) AND ([Role] = @Original_Role) AND ([Guid] = @Original_Guid) AND ((@IsNull_Signature = 1 AND [Signature] IS NULL) OR ([Signature] = @Original_Signature)) AND ((@IsNull_SignatureHTML = 1 AND [SignatureHTML] IS NULL) OR ([SignatureHTML] = @Original_SignatureHTML)));
+SELECT ID, Username, FirstName, LastName, Email, Password, Role, Guid, Signature, SignatureHTML FROM [User] WHERE (ID = @ID)</CommandText>
+                    <Parameters>
+                      <Parameter AllowDbNull="false" AutogeneratedName="" DataSourceName="" DbType="String" Direction="Input" ParameterName="@Username" Precision="0" ProviderType="NVarChar" Scale="0" Size="0" SourceColumn="Username" SourceColumnNullMapping="false" SourceVersion="Current" />
+                      <Parameter AllowDbNull="false" AutogeneratedName="" DataSourceName="" DbType="String" Direction="Input" ParameterName="@FirstName" Precision="0" ProviderType="NVarChar" Scale="0" Size="0" SourceColumn="FirstName" SourceColumnNullMapping="false" SourceVersion="Current" />
+                      <Parameter AllowDbNull="false" AutogeneratedName="" DataSourceName="" DbType="String" Direction="Input" ParameterName="@LastName" Precision="0" ProviderType="NVarChar" Scale="0" Size="0" SourceColumn="LastName" SourceColumnNullMapping="false" SourceVersion="Current" />
+                      <Parameter AllowDbNull="false" AutogeneratedName="" DataSourceName="" DbType="String" Direction="Input" ParameterName="@Email" Precision="0" ProviderType="NVarChar" Scale="0" Size="0" SourceColumn="Email" SourceColumnNullMapping="false" SourceVersion="Current" />
+                      <Parameter AllowDbNull="false" AutogeneratedName="" DataSourceName="" DbType="String" Direction="Input" ParameterName="@Password" Precision="0" ProviderType="NVarChar" Scale="0" Size="0" SourceColumn="Password" SourceColumnNullMapping="false" SourceVersion="Current" />
+                      <Parameter AllowDbNull="false" AutogeneratedName="" DataSourceName="" DbType="String" Direction="Input" ParameterName="@Role" Precision="0" ProviderType="NVarChar" Scale="0" Size="0" SourceColumn="Role" SourceColumnNullMapping="false" SourceVersion="Current" />
+                      <Parameter AllowDbNull="false" AutogeneratedName="" DataSourceName="" DbType="Guid" Direction="Input" ParameterName="@Guid" Precision="0" ProviderType="UniqueIdentifier" Scale="0" Size="0" SourceColumn="Guid" SourceColumnNullMapping="false" SourceVersion="Current" />
+                      <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DbType="String" Direction="Input" ParameterName="@Signature" Precision="0" ProviderType="NVarChar" Scale="0" Size="0" SourceColumn="Signature" SourceColumnNullMapping="false" SourceVersion="Current" />
+                      <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DbType="String" Direction="Input" ParameterName="@SignatureHTML" Precision="0" ProviderType="NVarChar" Scale="0" Size="0" SourceColumn="SignatureHTML" SourceColumnNullMapping="false" SourceVersion="Current" />
+                      <Parameter AllowDbNull="false" AutogeneratedName="" DataSourceName="" DbType="Int32" Direction="Input" ParameterName="@Original_ID" Precision="0" ProviderType="Int" Scale="0" Size="0" SourceColumn="ID" SourceColumnNullMapping="false" SourceVersion="Original" />
+                      <Parameter AllowDbNull="false" AutogeneratedName="" DataSourceName="" DbType="String" Direction="Input" ParameterName="@Original_Username" Precision="0" ProviderType="NVarChar" Scale="0" Size="0" SourceColumn="Username" SourceColumnNullMapping="false" SourceVersion="Original" />
+                      <Parameter AllowDbNull="false" AutogeneratedName="" DataSourceName="" DbType="String" Direction="Input" ParameterName="@Original_FirstName" Precision="0" ProviderType="NVarChar" Scale="0" Size="0" SourceColumn="FirstName" SourceColumnNullMapping="false" SourceVersion="Original" />
+                      <Parameter AllowDbNull="false" AutogeneratedName="" DataSourceName="" DbType="String" Direction="Input" ParameterName="@Original_LastName" Precision="0" ProviderType="NVarChar" Scale="0" Size="0" SourceColumn="LastName" SourceColumnNullMapping="false" SourceVersion="Original" />
+                      <Parameter AllowDbNull="false" AutogeneratedName="" DataSourceName="" DbType="String" Direction="Input" ParameterName="@Original_Email" Precision="0" ProviderType="NVarChar" Scale="0" Size="0" SourceColumn="Email" SourceColumnNullMapping="false" SourceVersion="Original" />
+                      <Parameter AllowDbNull="false" AutogeneratedName="" DataSourceName="" DbType="String" Direction="Input" ParameterName="@Original_Password" Precision="0" ProviderType="NVarChar" Scale="0" Size="0" SourceColumn="Password" SourceColumnNullMapping="false" SourceVersion="Original" />
+                      <Parameter AllowDbNull="false" AutogeneratedName="" DataSourceName="" DbType="String" Direction="Input" ParameterName="@Original_Role" Precision="0" ProviderType="NVarChar" Scale="0" Size="0" SourceColumn="Role" SourceColumnNullMapping="false" SourceVersion="Original" />
+                      <Parameter AllowDbNull="false" AutogeneratedName="" DataSourceName="" DbType="Guid" Direction="Input" ParameterName="@Original_Guid" Precision="0" ProviderType="UniqueIdentifier" Scale="0" Size="0" SourceColumn="Guid" SourceColumnNullMapping="false" SourceVersion="Original" />
+                      <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DbType="Int32" Direction="Input" ParameterName="@IsNull_Signature" Precision="0" ProviderType="Int" Scale="0" Size="0" SourceColumn="Signature" SourceColumnNullMapping="true" SourceVersion="Original" />
+                      <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DbType="String" Direction="Input" ParameterName="@Original_Signature" Precision="0" ProviderType="NVarChar" Scale="0" Size="0" SourceColumn="Signature" SourceColumnNullMapping="false" SourceVersion="Original" />
+                      <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DbType="Int32" Direction="Input" ParameterName="@IsNull_SignatureHTML" Precision="0" ProviderType="Int" Scale="0" Size="0" SourceColumn="SignatureHTML" SourceColumnNullMapping="true" SourceVersion="Original" />
+                      <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DbType="String" Direction="Input" ParameterName="@Original_SignatureHTML" Precision="0" ProviderType="NVarChar" Scale="0" Size="0" SourceColumn="SignatureHTML" SourceColumnNullMapping="false" SourceVersion="Original" />
+                      <Parameter AllowDbNull="false" AutogeneratedName="ID" ColumnName="ID" DataSourceName="" DataTypeServer="int" DbType="Int32" Direction="Input" ParameterName="@ID" Precision="0" ProviderType="Int" Scale="0" Size="4" SourceColumn="ID" SourceColumnNullMapping="false" SourceVersion="Current" />
+                    </Parameters>
+                  </DbCommand>
+                </UpdateCommand>
+              </DbSource>
+            </MainSource>
+            <Mappings>
+              <Mapping SourceColumn="ID" DataSetColumn="ID" />
+              <Mapping SourceColumn="Username" DataSetColumn="Username" />
+              <Mapping SourceColumn="FirstName" DataSetColumn="FirstName" />
+              <Mapping SourceColumn="LastName" DataSetColumn="LastName" />
+              <Mapping SourceColumn="Email" DataSetColumn="Email" />
+              <Mapping SourceColumn="Password" DataSetColumn="Password" />
+              <Mapping SourceColumn="Role" DataSetColumn="Role" />
+              <Mapping SourceColumn="Guid" DataSetColumn="Guid" />
+              <Mapping SourceColumn="Signature" DataSetColumn="Signature" />
+              <Mapping SourceColumn="SignatureHTML" DataSetColumn="SignatureHTML" />
+            </Mappings>
+            <Sources />
+          </TableAdapter>
+          <TableAdapter BaseClass="System.ComponentModel.Component" DataAccessorModifier="AutoLayout, AnsiClass, Class, Public" DataAccessorName="UserRoleTableAdapter" GeneratorDataComponentClassName="UserRoleTableAdapter" Name="UserRole" UserDataComponentName="UserRoleTableAdapter">
+            <MainSource>
+              <DbSource ConnectionRef="CmsProdConnectionString (Settings)" DbObjectName="CmsProd.dbo.UserRole" DbObjectType="Table" FillMethodModifier="Public" FillMethodName="Fill" GenerateMethods="Both" GenerateShortCommands="true" GeneratorGetMethodName="GetData" GeneratorSourceName="Fill" GetMethodModifier="Public" GetMethodName="GetData" QueryType="Rowset" ScalarCallRetval="System.Object, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" UseOptimisticConcurrency="true" UserGetMethodName="GetData" UserSourceName="Fill">
+                <DeleteCommand>
+                  <DbCommand CommandType="Text" ModifiedByUser="false">
+                    <CommandText>DELETE FROM [dbo].[UserRole] WHERE (([Name] = @Original_Name) AND ([Description] = @Original_Description))</CommandText>
+                    <Parameters>
+                      <Parameter AllowDbNull="false" AutogeneratedName="" DataSourceName="" DbType="String" Direction="Input" ParameterName="@Original_Name" Precision="0" ProviderType="NVarChar" Scale="0" Size="0" SourceColumn="Name" SourceColumnNullMapping="false" SourceVersion="Original" />
+                      <Parameter AllowDbNull="false" AutogeneratedName="" DataSourceName="" DbType="String" Direction="Input" ParameterName="@Original_Description" Precision="0" ProviderType="NVarChar" Scale="0" Size="0" SourceColumn="Description" SourceColumnNullMapping="false" SourceVersion="Original" />
+                    </Parameters>
+                  </DbCommand>
+                </DeleteCommand>
+                <InsertCommand>
+                  <DbCommand CommandType="Text" ModifiedByUser="false">
+                    <CommandText>INSERT INTO [dbo].[UserRole] ([Name], [Description]) VALUES (@Name, @Description);
+SELECT Name, Description FROM UserRole WHERE (Name = @Name)</CommandText>
+                    <Parameters>
+                      <Parameter AllowDbNull="false" AutogeneratedName="" DataSourceName="" DbType="String" Direction="Input" ParameterName="@Name" Precision="0" ProviderType="NVarChar" Scale="0" Size="0" SourceColumn="Name" SourceColumnNullMapping="false" SourceVersion="Current" />
+                      <Parameter AllowDbNull="false" AutogeneratedName="" DataSourceName="" DbType="String" Direction="Input" ParameterName="@Description" Precision="0" ProviderType="NVarChar" Scale="0" Size="0" SourceColumn="Description" SourceColumnNullMapping="false" SourceVersion="Current" />
+                    </Parameters>
+                  </DbCommand>
+                </InsertCommand>
+                <SelectCommand>
+                  <DbCommand CommandType="Text" ModifiedByUser="false">
+                    <CommandText>SELECT Name, Description FROM dbo.UserRole</CommandText>
+                    <Parameters />
+                  </DbCommand>
+                </SelectCommand>
+                <UpdateCommand>
+                  <DbCommand CommandType="Text" ModifiedByUser="false">
+                    <CommandText>UPDATE [dbo].[UserRole] SET [Name] = @Name, [Description] = @Description WHERE (([Name] = @Original_Name) AND ([Description] = @Original_Description));
+SELECT Name, Description FROM UserRole WHERE (Name = @Name)</CommandText>
+                    <Parameters>
+                      <Parameter AllowDbNull="false" AutogeneratedName="" DataSourceName="" DbType="String" Direction="Input" ParameterName="@Name" Precision="0" ProviderType="NVarChar" Scale="0" Size="0" SourceColumn="Name" SourceColumnNullMapping="false" SourceVersion="Current" />
+                      <Parameter AllowDbNull="false" AutogeneratedName="" DataSourceName="" DbType="String" Direction="Input" ParameterName="@Description" Precision="0" ProviderType="NVarChar" Scale="0" Size="0" SourceColumn="Description" SourceColumnNullMapping="false" SourceVersion="Current" />
+                      <Parameter AllowDbNull="false" AutogeneratedName="" DataSourceName="" DbType="String" Direction="Input" ParameterName="@Original_Name" Precision="0" ProviderType="NVarChar" Scale="0" Size="0" SourceColumn="Name" SourceColumnNullMapping="false" SourceVersion="Original" />
+                      <Parameter AllowDbNull="false" AutogeneratedName="" DataSourceName="" DbType="String" Direction="Input" ParameterName="@Original_Description" Precision="0" ProviderType="NVarChar" Scale="0" Size="0" SourceColumn="Description" SourceColumnNullMapping="false" SourceVersion="Original" />
+                    </Parameters>
+                  </DbCommand>
+                </UpdateCommand>
+              </DbSource>
+            </MainSource>
+            <Mappings>
+              <Mapping SourceColumn="Name" DataSetColumn="Name" />
+              <Mapping SourceColumn="Description" DataSetColumn="Description" />
+            </Mappings>
+            <Sources />
+          </TableAdapter>
+          <TableAdapter BaseClass="System.ComponentModel.Component" DataAccessorModifier="AutoLayout, AnsiClass, Class, Public" DataAccessorName="FooterTableAdapter" GeneratorDataComponentClassName="FooterTableAdapter" Name="Footer" UserDataComponentName="FooterTableAdapter">
+            <MainSource>
+              <DbSource ConnectionRef="CmsProdConnectionString (Settings)" DbObjectName="CmsProd.dbo.Footer" DbObjectType="View" FillMethodModifier="Public" FillMethodName="Fill" GenerateMethods="Both" GenerateShortCommands="false" GeneratorGetMethodName="GetData" GeneratorSourceName="Fill" GetMethodModifier="Public" GetMethodName="GetData" QueryType="Rowset" ScalarCallRetval="System.Object, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" UseOptimisticConcurrency="true" UserGetMethodName="GetData" UserSourceName="Fill">
+                <SelectCommand>
+                  <DbCommand CommandType="Text" ModifiedByUser="false">
+                    <CommandText>SELECT Id, Text FROM dbo.Footer</CommandText>
+                    <Parameters />
+                  </DbCommand>
+                </SelectCommand>
+              </DbSource>
+            </MainSource>
+            <Mappings>
+              <Mapping SourceColumn="Id" DataSetColumn="Id" />
+              <Mapping SourceColumn="Text" DataSetColumn="Text" />
+            </Mappings>
+            <Sources />
+          </TableAdapter>
+          <TableAdapter BaseClass="System.ComponentModel.Component" DataAccessorModifier="AutoLayout, AnsiClass, Class, Public" DataAccessorName="ContactUsRightTableAdapter" GeneratorDataComponentClassName="ContactUsRightTableAdapter" Name="ContactUsRight" UserDataComponentName="ContactUsRightTableAdapter">
+            <MainSource>
+              <DbSource ConnectionRef="CmsProdConnectionString (Settings)" DbObjectName="CmsProd.dbo.ContactUsRight" DbObjectType="View" FillMethodModifier="Public" FillMethodName="Fill" GenerateMethods="Both" GenerateShortCommands="false" GeneratorGetMethodName="GetData" GeneratorSourceName="Fill" GetMethodModifier="Public" GetMethodName="GetData" QueryType="Rowset" ScalarCallRetval="System.Object, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" UseOptimisticConcurrency="true" UserGetMethodName="GetData" UserSourceName="Fill">
+                <SelectCommand>
+                  <DbCommand CommandType="Text" ModifiedByUser="false">
+                    <CommandText>SELECT Id, Page, Text FROM dbo.ContactUsRight</CommandText>
+                    <Parameters />
+                  </DbCommand>
+                </SelectCommand>
+              </DbSource>
+            </MainSource>
+            <Mappings>
+              <Mapping SourceColumn="Id" DataSetColumn="Id" />
+              <Mapping SourceColumn="Page" DataSetColumn="Page" />
+              <Mapping SourceColumn="Text" DataSetColumn="Text" />
+            </Mappings>
+            <Sources />
+          </TableAdapter>
+        </Tables>
+        <Sources />
+      </DataSource>
+    </xs:appinfo>
+  </xs:annotation>
+  <xs:element name="MobixSiteAdminDataSet" msdata:IsDataSet="true" msdata:UseCurrentLocale="true" msprop:Generator_UserDSName="MobixSiteAdminDataSet" msprop:Generator_DataSetName="MobixSiteAdminDataSet" msprop:EnableTableAdapterManager="true">
+    <xs:complexType>
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:element name="HeaderImages" msprop:Generator_UserTableName="HeaderImages" msprop:Generator_RowDeletedName="HeaderImagesRowDeleted" msprop:Generator_RowChangedName="HeaderImagesRowChanged" msprop:Generator_RowClassName="HeaderImagesRow" msprop:Generator_RowChangingName="HeaderImagesRowChanging" msprop:Generator_RowEvArgName="HeaderImagesRowChangeEvent" msprop:Generator_RowEvHandlerName="HeaderImagesRowChangeEventHandler" msprop:Generator_TableClassName="HeaderImagesDataTable" msprop:Generator_TableVarName="tableHeaderImages" msprop:Generator_RowDeletingName="HeaderImagesRowDeleting" msprop:Generator_TablePropName="HeaderImages">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="Id" msdata:ReadOnly="true" msdata:AutoIncrement="true" msdata:AutoIncrementSeed="-1" msdata:AutoIncrementStep="-1" msprop:Generator_UserColumnName="Id" msprop:Generator_ColumnVarNameInTable="columnId" msprop:Generator_ColumnPropNameInRow="Id" msprop:Generator_ColumnPropNameInTable="IdColumn" type="xs:int" />
+              <xs:element name="ImgSrc" msprop:Generator_UserColumnName="ImgSrc" msprop:Generator_ColumnVarNameInTable="columnImgSrc" msprop:Generator_ColumnPropNameInRow="ImgSrc" msprop:Generator_ColumnPropNameInTable="ImgSrcColumn" minOccurs="0">
+                <xs:simpleType>
+                  <xs:restriction base="xs:string">
+                    <xs:maxLength value="50" />
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:element>
+              <xs:element name="Ordinal" msprop:Generator_UserColumnName="Ordinal" msprop:Generator_ColumnVarNameInTable="columnOrdinal" msprop:Generator_ColumnPropNameInRow="Ordinal" msprop:Generator_ColumnPropNameInTable="OrdinalColumn" type="xs:int" minOccurs="0" />
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="HomeBottomImages" msprop:Generator_UserTableName="HomeBottomImages" msprop:Generator_RowDeletedName="HomeBottomImagesRowDeleted" msprop:Generator_RowChangedName="HomeBottomImagesRowChanged" msprop:Generator_RowClassName="HomeBottomImagesRow" msprop:Generator_RowChangingName="HomeBottomImagesRowChanging" msprop:Generator_RowEvArgName="HomeBottomImagesRowChangeEvent" msprop:Generator_RowEvHandlerName="HomeBottomImagesRowChangeEventHandler" msprop:Generator_TableClassName="HomeBottomImagesDataTable" msprop:Generator_TableVarName="tableHomeBottomImages" msprop:Generator_RowDeletingName="HomeBottomImagesRowDeleting" msprop:Generator_TablePropName="HomeBottomImages">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="Id" msdata:ReadOnly="true" msdata:AutoIncrement="true" msdata:AutoIncrementSeed="-1" msdata:AutoIncrementStep="-1" msprop:Generator_UserColumnName="Id" msprop:Generator_ColumnVarNameInTable="columnId" msprop:Generator_ColumnPropNameInRow="Id" msprop:Generator_ColumnPropNameInTable="IdColumn" type="xs:int" />
+              <xs:element name="ImgSrc" msprop:Generator_UserColumnName="ImgSrc" msprop:Generator_ColumnVarNameInTable="columnImgSrc" msprop:Generator_ColumnPropNameInRow="ImgSrc" msprop:Generator_ColumnPropNameInTable="ImgSrcColumn" minOccurs="0">
+                <xs:simpleType>
+                  <xs:restriction base="xs:string">
+                    <xs:maxLength value="50" />
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:element>
+              <xs:element name="Ordinal" msprop:Generator_UserColumnName="Ordinal" msprop:Generator_ColumnVarNameInTable="columnOrdinal" msprop:Generator_ColumnPropNameInRow="Ordinal" msprop:Generator_ColumnPropNameInTable="OrdinalColumn" type="xs:int" minOccurs="0" />
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="HomeRightImage" msprop:Generator_UserTableName="HomeRightImage" msprop:Generator_RowDeletedName="HomeRightImageRowDeleted" msprop:Generator_RowChangedName="HomeRightImageRowChanged" msprop:Generator_RowClassName="HomeRightImageRow" msprop:Generator_RowChangingName="HomeRightImageRowChanging" msprop:Generator_RowEvArgName="HomeRightImageRowChangeEvent" msprop:Generator_RowEvHandlerName="HomeRightImageRowChangeEventHandler" msprop:Generator_TableClassName="HomeRightImageDataTable" msprop:Generator_TableVarName="tableHomeRightImage" msprop:Generator_RowDeletingName="HomeRightImageRowDeleting" msprop:Generator_TablePropName="HomeRightImage">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="Id" msdata:ReadOnly="true" msdata:AutoIncrement="true" msdata:AutoIncrementSeed="-1" msdata:AutoIncrementStep="-1" msprop:Generator_UserColumnName="Id" msprop:Generator_ColumnVarNameInTable="columnId" msprop:Generator_ColumnPropNameInRow="Id" msprop:Generator_ColumnPropNameInTable="IdColumn" type="xs:int" />
+              <xs:element name="ImgSrc" msprop:Generator_UserColumnName="ImgSrc" msprop:Generator_ColumnVarNameInTable="columnImgSrc" msprop:Generator_ColumnPropNameInRow="ImgSrc" msprop:Generator_ColumnPropNameInTable="ImgSrcColumn" minOccurs="0">
+                <xs:simpleType>
+                  <xs:restriction base="xs:string">
+                    <xs:maxLength value="50" />
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:element>
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="HomeLeftText" msprop:Generator_UserTableName="HomeLeftText" msprop:Generator_RowDeletedName="HomeLeftTextRowDeleted" msprop:Generator_RowChangedName="HomeLeftTextRowChanged" msprop:Generator_RowClassName="HomeLeftTextRow" msprop:Generator_RowChangingName="HomeLeftTextRowChanging" msprop:Generator_RowEvArgName="HomeLeftTextRowChangeEvent" msprop:Generator_RowEvHandlerName="HomeLeftTextRowChangeEventHandler" msprop:Generator_TableClassName="HomeLeftTextDataTable" msprop:Generator_TableVarName="tableHomeLeftText" msprop:Generator_RowDeletingName="HomeLeftTextRowDeleting" msprop:Generator_TablePropName="HomeLeftText">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="Id" msdata:ReadOnly="true" msdata:AutoIncrement="true" msdata:AutoIncrementSeed="-1" msdata:AutoIncrementStep="-1" msprop:Generator_UserColumnName="Id" msprop:Generator_ColumnVarNameInTable="columnId" msprop:Generator_ColumnPropNameInRow="Id" msprop:Generator_ColumnPropNameInTable="IdColumn" type="xs:int" />
+              <xs:element name="Text" msprop:Generator_UserColumnName="Text" msprop:Generator_ColumnVarNameInTable="columnText" msprop:Generator_ColumnPropNameInRow="Text" msprop:Generator_ColumnPropNameInTable="TextColumn" minOccurs="0">
+                <xs:simpleType>
+                  <xs:restriction base="xs:string">
+                    <xs:maxLength value="2147483647" />
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:element>
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="AboutUs" msprop:Generator_UserTableName="AboutUs" msprop:Generator_RowDeletedName="AboutUsRowDeleted" msprop:Generator_RowChangedName="AboutUsRowChanged" msprop:Generator_RowClassName="AboutUsRow" msprop:Generator_RowChangingName="AboutUsRowChanging" msprop:Generator_RowEvArgName="AboutUsRowChangeEvent" msprop:Generator_RowEvHandlerName="AboutUsRowChangeEventHandler" msprop:Generator_TableClassName="AboutUsDataTable" msprop:Generator_TableVarName="tableAboutUs" msprop:Generator_RowDeletingName="AboutUsRowDeleting" msprop:Generator_TablePropName="AboutUs">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="Id" msdata:ReadOnly="true" msdata:AutoIncrement="true" msdata:AutoIncrementSeed="-1" msdata:AutoIncrementStep="-1" msprop:Generator_UserColumnName="Id" msprop:Generator_ColumnVarNameInTable="columnId" msprop:Generator_ColumnPropNameInRow="Id" msprop:Generator_ColumnPropNameInTable="IdColumn" type="xs:int" />
+              <xs:element name="Name" msprop:Generator_UserColumnName="Name" msprop:Generator_ColumnVarNameInTable="columnName" msprop:Generator_ColumnPropNameInRow="Name" msprop:Generator_ColumnPropNameInTable="NameColumn" minOccurs="0">
+                <xs:simpleType>
+                  <xs:restriction base="xs:string">
+                    <xs:maxLength value="50" />
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:element>
+              <xs:element name="Text" msprop:Generator_UserColumnName="Text" msprop:Generator_ColumnVarNameInTable="columnText" msprop:Generator_ColumnPropNameInRow="Text" msprop:Generator_ColumnPropNameInTable="TextColumn" minOccurs="0">
+                <xs:simpleType>
+                  <xs:restriction base="xs:string">
+                    <xs:maxLength value="2147483647" />
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:element>
+              <xs:element name="ImgSrc" msprop:Generator_UserColumnName="ImgSrc" msprop:Generator_ColumnVarNameInTable="columnImgSrc" msprop:Generator_ColumnPropNameInRow="ImgSrc" msprop:Generator_ColumnPropNameInTable="ImgSrcColumn" minOccurs="0">
+                <xs:simpleType>
+                  <xs:restriction base="xs:string">
+                    <xs:maxLength value="50" />
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:element>
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="SolutionAmi" msprop:Generator_UserTableName="SolutionAmi" msprop:Generator_RowDeletedName="SolutionAmiRowDeleted" msprop:Generator_RowChangedName="SolutionAmiRowChanged" msprop:Generator_RowClassName="SolutionAmiRow" msprop:Generator_RowChangingName="SolutionAmiRowChanging" msprop:Generator_RowEvArgName="SolutionAmiRowChangeEvent" msprop:Generator_RowEvHandlerName="SolutionAmiRowChangeEventHandler" msprop:Generator_TableClassName="SolutionAmiDataTable" msprop:Generator_TableVarName="tableSolutionAmi" msprop:Generator_RowDeletingName="SolutionAmiRowDeleting" msprop:Generator_TablePropName="SolutionAmi">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="Id" msdata:ReadOnly="true" msdata:AutoIncrement="true" msdata:AutoIncrementSeed="-1" msdata:AutoIncrementStep="-1" msprop:Generator_UserColumnName="Id" msprop:Generator_ColumnVarNameInTable="columnId" msprop:Generator_ColumnPropNameInRow="Id" msprop:Generator_ColumnPropNameInTable="IdColumn" type="xs:int" />
+              <xs:element name="Name" msprop:Generator_UserColumnName="Name" msprop:Generator_ColumnVarNameInTable="columnName" msprop:Generator_ColumnPropNameInRow="Name" msprop:Generator_ColumnPropNameInTable="NameColumn" minOccurs="0">
+                <xs:simpleType>
+                  <xs:restriction base="xs:string">
+                    <xs:maxLength value="50" />
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:element>
+              <xs:element name="Ordinal" msprop:Generator_UserColumnName="Ordinal" msprop:Generator_ColumnVarNameInTable="columnOrdinal" msprop:Generator_ColumnPropNameInRow="Ordinal" msprop:Generator_ColumnPropNameInTable="OrdinalColumn" type="xs:int" minOccurs="0" />
+              <xs:element name="Text" msprop:Generator_UserColumnName="Text" msprop:Generator_ColumnVarNameInTable="columnText" msprop:Generator_ColumnPropNameInRow="Text" msprop:Generator_ColumnPropNameInTable="TextColumn" minOccurs="0">
+                <xs:simpleType>
+                  <xs:restriction base="xs:string">
+                    <xs:maxLength value="2147483647" />
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:element>
+              <xs:element name="ImgSrc" msprop:Generator_UserColumnName="ImgSrc" msprop:Generator_ColumnVarNameInTable="columnImgSrc" msprop:Generator_ColumnPropNameInRow="ImgSrc" msprop:Generator_ColumnPropNameInTable="ImgSrcColumn" minOccurs="0">
+                <xs:simpleType>
+                  <xs:restriction base="xs:string">
+                    <xs:maxLength value="50" />
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:element>
+              <xs:element name="ImgSrc2" msprop:Generator_UserColumnName="ImgSrc2" msprop:Generator_ColumnVarNameInTable="columnImgSrc2" msprop:Generator_ColumnPropNameInRow="ImgSrc2" msprop:Generator_ColumnPropNameInTable="ImgSrc2Column" minOccurs="0">
+                <xs:simpleType>
+                  <xs:restriction base="xs:string">
+                    <xs:maxLength value="50" />
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:element>
+              <xs:element name="ImgSrc3" msprop:Generator_UserColumnName="ImgSrc3" msprop:Generator_ColumnVarNameInTable="columnImgSrc3" msprop:Generator_ColumnPropNameInRow="ImgSrc3" msprop:Generator_ColumnPropNameInTable="ImgSrc3Column" minOccurs="0">
+                <xs:simpleType>
+                  <xs:restriction base="xs:string">
+                    <xs:maxLength value="50" />
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:element>
+              <xs:element name="ImgTitle" msprop:Generator_UserColumnName="ImgTitle" msprop:Generator_ColumnVarNameInTable="columnImgTitle" msprop:Generator_ColumnPropNameInRow="ImgTitle" msprop:Generator_ColumnPropNameInTable="ImgTitleColumn" minOccurs="0">
+                <xs:simpleType>
+                  <xs:restriction base="xs:string">
+                    <xs:maxLength value="50" />
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:element>
+              <xs:element name="ImgSrc4" msprop:Generator_UserColumnName="ImgSrc4" msprop:Generator_ColumnPropNameInRow="ImgSrc4" msprop:Generator_ColumnVarNameInTable="columnImgSrc4" msprop:Generator_ColumnPropNameInTable="ImgSrc4Column" minOccurs="0">
+                <xs:simpleType>
+                  <xs:restriction base="xs:string">
+                    <xs:maxLength value="50" />
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:element>
+              <xs:element name="Text2" msprop:Generator_UserColumnName="Text2" msprop:Generator_ColumnPropNameInRow="Text2" msprop:Generator_ColumnVarNameInTable="columnText2" msprop:Generator_ColumnPropNameInTable="Text2Column" minOccurs="0">
+                <xs:simpleType>
+                  <xs:restriction base="xs:string">
+                    <xs:maxLength value="2147483647" />
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:element>
+              <xs:element name="Text3" msprop:Generator_UserColumnName="Text3" msprop:Generator_ColumnPropNameInRow="Text3" msprop:Generator_ColumnVarNameInTable="columnText3" msprop:Generator_ColumnPropNameInTable="Text3Column" minOccurs="0">
+                <xs:simpleType>
+                  <xs:restriction base="xs:string">
+                    <xs:maxLength value="2147483647" />
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:element>
+              <xs:element name="PdfFile" msprop:Generator_UserColumnName="PdfFile" msprop:Generator_ColumnPropNameInRow="PdfFile" msprop:Generator_ColumnVarNameInTable="columnPdfFile" msprop:Generator_ColumnPropNameInTable="PdfFileColumn" minOccurs="0">
+                <xs:simpleType>
+                  <xs:restriction base="xs:string">
+                    <xs:maxLength value="50" />
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:element>
+              <xs:element name="Header" msprop:Generator_UserColumnName="Header" msprop:Generator_ColumnPropNameInRow="Header" msprop:Generator_ColumnVarNameInTable="columnHeader" msprop:Generator_ColumnPropNameInTable="HeaderColumn" minOccurs="0">
+                <xs:simpleType>
+                  <xs:restriction base="xs:string">
+                    <xs:maxLength value="2147483647" />
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:element>
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="SolutionPrepaid" msprop:Generator_UserTableName="SolutionPrepaid" msprop:Generator_RowDeletedName="SolutionPrepaidRowDeleted" msprop:Generator_RowChangedName="SolutionPrepaidRowChanged" msprop:Generator_RowClassName="SolutionPrepaidRow" msprop:Generator_RowChangingName="SolutionPrepaidRowChanging" msprop:Generator_RowEvArgName="SolutionPrepaidRowChangeEvent" msprop:Generator_RowEvHandlerName="SolutionPrepaidRowChangeEventHandler" msprop:Generator_TableClassName="SolutionPrepaidDataTable" msprop:Generator_TableVarName="tableSolutionPrepaid" msprop:Generator_RowDeletingName="SolutionPrepaidRowDeleting" msprop:Generator_TablePropName="SolutionPrepaid">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="Id" msdata:ReadOnly="true" msdata:AutoIncrement="true" msdata:AutoIncrementSeed="-1" msdata:AutoIncrementStep="-1" msprop:Generator_UserColumnName="Id" msprop:Generator_ColumnVarNameInTable="columnId" msprop:Generator_ColumnPropNameInRow="Id" msprop:Generator_ColumnPropNameInTable="IdColumn" type="xs:int" />
+              <xs:element name="Name" msprop:Generator_UserColumnName="Name" msprop:Generator_ColumnVarNameInTable="columnName" msprop:Generator_ColumnPropNameInRow="Name" msprop:Generator_ColumnPropNameInTable="NameColumn" minOccurs="0">
+                <xs:simpleType>
+                  <xs:restriction base="xs:string">
+                    <xs:maxLength value="50" />
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:element>
+              <xs:element name="Ordinal" msprop:Generator_UserColumnName="Ordinal" msprop:Generator_ColumnVarNameInTable="columnOrdinal" msprop:Generator_ColumnPropNameInRow="Ordinal" msprop:Generator_ColumnPropNameInTable="OrdinalColumn" type="xs:int" minOccurs="0" />
+              <xs:element name="Text" msprop:Generator_UserColumnName="Text" msprop:Generator_ColumnVarNameInTable="columnText" msprop:Generator_ColumnPropNameInRow="Text" msprop:Generator_ColumnPropNameInTable="TextColumn" minOccurs="0">
+                <xs:simpleType>
+                  <xs:restriction base="xs:string">
+                    <xs:maxLength value="2147483647" />
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:element>
+              <xs:element name="ImgSrc" msprop:Generator_UserColumnName="ImgSrc" msprop:Generator_ColumnVarNameInTable="columnImgSrc" msprop:Generator_ColumnPropNameInRow="ImgSrc" msprop:Generator_ColumnPropNameInTable="ImgSrcColumn" minOccurs="0">
+                <xs:simpleType>
+                  <xs:restriction base="xs:string">
+                    <xs:maxLength value="50" />
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:element>
+              <xs:element name="ImgSrc2" msprop:Generator_UserColumnName="ImgSrc2" msprop:Generator_ColumnVarNameInTable="columnImgSrc2" msprop:Generator_ColumnPropNameInRow="ImgSrc2" msprop:Generator_ColumnPropNameInTable="ImgSrc2Column" minOccurs="0">
+                <xs:simpleType>
+                  <xs:restriction base="xs:string">
+                    <xs:maxLength value="50" />
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:element>
+              <xs:element name="ImgSrc3" msprop:Generator_UserColumnName="ImgSrc3" msprop:Generator_ColumnVarNameInTable="columnImgSrc3" msprop:Generator_ColumnPropNameInRow="ImgSrc3" msprop:Generator_ColumnPropNameInTable="ImgSrc3Column" minOccurs="0">
+                <xs:simpleType>
+                  <xs:restriction base="xs:string">
+                    <xs:maxLength value="50" />
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:element>
+              <xs:element name="ImgTitle" msprop:Generator_UserColumnName="ImgTitle" msprop:Generator_ColumnVarNameInTable="columnImgTitle" msprop:Generator_ColumnPropNameInRow="ImgTitle" msprop:Generator_ColumnPropNameInTable="ImgTitleColumn" minOccurs="0">
+                <xs:simpleType>
+                  <xs:restriction base="xs:string">
+                    <xs:maxLength value="50" />
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:element>
+              <xs:element name="ImgSrc4" msprop:Generator_UserColumnName="ImgSrc4" msprop:Generator_ColumnPropNameInRow="ImgSrc4" msprop:Generator_ColumnVarNameInTable="columnImgSrc4" msprop:Generator_ColumnPropNameInTable="ImgSrc4Column" minOccurs="0">
+                <xs:simpleType>
+                  <xs:restriction base="xs:string">
+                    <xs:maxLength value="50" />
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:element>
+              <xs:element name="Text2" msprop:Generator_UserColumnName="Text2" msprop:Generator_ColumnPropNameInRow="Text2" msprop:Generator_ColumnVarNameInTable="columnText2" msprop:Generator_ColumnPropNameInTable="Text2Column" minOccurs="0">
+                <xs:simpleType>
+                  <xs:restriction base="xs:string">
+                    <xs:maxLength value="2147483647" />
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:element>
+              <xs:element name="Text3" msprop:Generator_UserColumnName="Text3" msprop:Generator_ColumnPropNameInRow="Text3" msprop:Generator_ColumnVarNameInTable="columnText3" msprop:Generator_ColumnPropNameInTable="Text3Column" minOccurs="0">
+                <xs:simpleType>
+                  <xs:restriction base="xs:string">
+                    <xs:maxLength value="2147483647" />
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:element>
+              <xs:element name="PdfFile" msprop:Generator_UserColumnName="PdfFile" msprop:Generator_ColumnPropNameInRow="PdfFile" msprop:Generator_ColumnVarNameInTable="columnPdfFile" msprop:Generator_ColumnPropNameInTable="PdfFileColumn" minOccurs="0">
+                <xs:simpleType>
+                  <xs:restriction base="xs:string">
+                    <xs:maxLength value="50" />
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:element>
+              <xs:element name="Header" msprop:Generator_UserColumnName="Header" msprop:Generator_ColumnPropNameInRow="Header" msprop:Generator_ColumnVarNameInTable="columnHeader" msprop:Generator_ColumnPropNameInTable="HeaderColumn" minOccurs="0">
+                <xs:simpleType>
+                  <xs:restriction base="xs:string">
+                    <xs:maxLength value="2147483647" />
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:element>
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="SolutionOverview" msprop:Generator_UserTableName="SolutionOverview" msprop:Generator_RowDeletedName="SolutionOverviewRowDeleted" msprop:Generator_RowChangedName="SolutionOverviewRowChanged" msprop:Generator_RowClassName="SolutionOverviewRow" msprop:Generator_RowChangingName="SolutionOverviewRowChanging" msprop:Generator_RowEvArgName="SolutionOverviewRowChangeEvent" msprop:Generator_RowEvHandlerName="SolutionOverviewRowChangeEventHandler" msprop:Generator_TableClassName="SolutionOverviewDataTable" msprop:Generator_TableVarName="tableSolutionOverview" msprop:Generator_RowDeletingName="SolutionOverviewRowDeleting" msprop:Generator_TablePropName="SolutionOverview">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="Id" msdata:ReadOnly="true" msdata:AutoIncrement="true" msdata:AutoIncrementSeed="-1" msdata:AutoIncrementStep="-1" msprop:Generator_UserColumnName="Id" msprop:Generator_ColumnVarNameInTable="columnId" msprop:Generator_ColumnPropNameInRow="Id" msprop:Generator_ColumnPropNameInTable="IdColumn" type="xs:int" />
+              <xs:element name="Text" msprop:Generator_UserColumnName="Text" msprop:Generator_ColumnVarNameInTable="columnText" msprop:Generator_ColumnPropNameInRow="Text" msprop:Generator_ColumnPropNameInTable="TextColumn" minOccurs="0">
+                <xs:simpleType>
+                  <xs:restriction base="xs:string">
+                    <xs:maxLength value="2147483647" />
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:element>
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="Partners" msprop:Generator_UserTableName="Partners" msprop:Generator_RowDeletedName="PartnersRowDeleted" msprop:Generator_RowChangedName="PartnersRowChanged" msprop:Generator_RowClassName="PartnersRow" msprop:Generator_RowChangingName="PartnersRowChanging" msprop:Generator_RowEvArgName="PartnersRowChangeEvent" msprop:Generator_RowEvHandlerName="PartnersRowChangeEventHandler" msprop:Generator_TableClassName="PartnersDataTable" msprop:Generator_TableVarName="tablePartners" msprop:Generator_RowDeletingName="PartnersRowDeleting" msprop:Generator_TablePropName="Partners">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="Id" msdata:ReadOnly="true" msdata:AutoIncrement="true" msdata:AutoIncrementSeed="-1" msdata:AutoIncrementStep="-1" msprop:Generator_UserColumnName="Id" msprop:Generator_ColumnVarNameInTable="columnId" msprop:Generator_ColumnPropNameInRow="Id" msprop:Generator_ColumnPropNameInTable="IdColumn" type="xs:int" />
+              <xs:element name="Page" msprop:Generator_UserColumnName="Page" msprop:Generator_ColumnVarNameInTable="columnPage" msprop:Generator_ColumnPropNameInRow="Page" msprop:Generator_ColumnPropNameInTable="PageColumn" minOccurs="0">
+                <xs:simpleType>
+                  <xs:restriction base="xs:string">
+                    <xs:maxLength value="10" />
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:element>
+              <xs:element name="Text" msprop:Generator_UserColumnName="Text" msprop:Generator_ColumnVarNameInTable="columnText" msprop:Generator_ColumnPropNameInRow="Text" msprop:Generator_ColumnPropNameInTable="TextColumn" minOccurs="0">
+                <xs:simpleType>
+                  <xs:restriction base="xs:string">
+                    <xs:maxLength value="2147483647" />
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:element>
+              <xs:element name="ImgSrc" msprop:Generator_UserColumnName="ImgSrc" msprop:Generator_ColumnVarNameInTable="columnImgSrc" msprop:Generator_ColumnPropNameInRow="ImgSrc" msprop:Generator_ColumnPropNameInTable="ImgSrcColumn" minOccurs="0">
+                <xs:simpleType>
+                  <xs:restriction base="xs:string">
+                    <xs:maxLength value="50" />
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:element>
+              <xs:element name="Text2" msprop:Generator_UserColumnName="Text2" msprop:Generator_ColumnVarNameInTable="columnText2" msprop:Generator_ColumnPropNameInRow="Text2" msprop:Generator_ColumnPropNameInTable="Text2Column" minOccurs="0">
+                <xs:simpleType>
+                  <xs:restriction base="xs:string">
+                    <xs:maxLength value="2147483647" />
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:element>
+              <xs:element name="Ordinal" msprop:Generator_UserColumnName="Ordinal" msprop:Generator_ColumnVarNameInTable="columnOrdinal" msprop:Generator_ColumnPropNameInRow="Ordinal" msprop:Generator_ColumnPropNameInTable="OrdinalColumn" type="xs:int" minOccurs="0" />
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="TechnologyNDNet" msprop:Generator_UserTableName="TechnologyNDNet" msprop:Generator_RowDeletedName="TechnologyNDNetRowDeleted" msprop:Generator_RowChangedName="TechnologyNDNetRowChanged" msprop:Generator_RowClassName="TechnologyNDNetRow" msprop:Generator_RowChangingName="TechnologyNDNetRowChanging" msprop:Generator_RowEvArgName="TechnologyNDNetRowChangeEvent" msprop:Generator_RowEvHandlerName="TechnologyNDNetRowChangeEventHandler" msprop:Generator_TableClassName="TechnologyNDNetDataTable" msprop:Generator_TableVarName="tableTechnologyNDNet" msprop:Generator_RowDeletingName="TechnologyNDNetRowDeleting" msprop:Generator_TablePropName="TechnologyNDNet">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="Id" msdata:ReadOnly="true" msdata:AutoIncrement="true" msdata:AutoIncrementSeed="-1" msdata:AutoIncrementStep="-1" msprop:Generator_UserColumnName="Id" msprop:Generator_ColumnVarNameInTable="columnId" msprop:Generator_ColumnPropNameInRow="Id" msprop:Generator_ColumnPropNameInTable="IdColumn" type="xs:int" />
+              <xs:element name="Name" msprop:Generator_UserColumnName="Name" msprop:Generator_ColumnVarNameInTable="columnName" msprop:Generator_ColumnPropNameInRow="Name" msprop:Generator_ColumnPropNameInTable="NameColumn" minOccurs="0">
+                <xs:simpleType>
+                  <xs:restriction base="xs:string">
+                    <xs:maxLength value="50" />
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:element>
+              <xs:element name="Text" msprop:Generator_UserColumnName="Text" msprop:Generator_ColumnVarNameInTable="columnText" msprop:Generator_ColumnPropNameInRow="Text" msprop:Generator_ColumnPropNameInTable="TextColumn" minOccurs="0">
+                <xs:simpleType>
+                  <xs:restriction base="xs:string">
+                    <xs:maxLength value="2147483647" />
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:element>
+              <xs:element name="ImgSrc" msprop:Generator_UserColumnName="ImgSrc" msprop:Generator_ColumnVarNameInTable="columnImgSrc" msprop:Generator_ColumnPropNameInRow="ImgSrc" msprop:Generator_ColumnPropNameInTable="ImgSrcColumn" minOccurs="0">
+                <xs:simpleType>
+                  <xs:restriction base="xs:string">
+                    <xs:maxLength value="50" />
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:element>
+              <xs:element name="Header" msprop:Generator_UserColumnName="Header" msprop:Generator_ColumnPropNameInRow="Header" msprop:Generator_ColumnVarNameInTable="columnHeader" msprop:Generator_ColumnPropNameInTable="HeaderColumn" minOccurs="0">
+                <xs:simpleType>
+                  <xs:restriction base="xs:string">
+                    <xs:maxLength value="2147483647" />
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:element>
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="TechnologyWhitePaper" msprop:Generator_UserTableName="TechnologyWhitePaper" msprop:Generator_RowDeletedName="TechnologyWhitePaperRowDeleted" msprop:Generator_RowChangedName="TechnologyWhitePaperRowChanged" msprop:Generator_RowClassName="TechnologyWhitePaperRow" msprop:Generator_RowChangingName="TechnologyWhitePaperRowChanging" msprop:Generator_RowEvArgName="TechnologyWhitePaperRowChangeEvent" msprop:Generator_RowEvHandlerName="TechnologyWhitePaperRowChangeEventHandler" msprop:Generator_TableClassName="TechnologyWhitePaperDataTable" msprop:Generator_TableVarName="tableTechnologyWhitePaper" msprop:Generator_RowDeletingName="TechnologyWhitePaperRowDeleting" msprop:Generator_TablePropName="TechnologyWhitePaper">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="Id" msdata:ReadOnly="true" msdata:AutoIncrement="true" msdata:AutoIncrementSeed="-1" msdata:AutoIncrementStep="-1" msprop:Generator_UserColumnName="Id" msprop:Generator_ColumnVarNameInTable="columnId" msprop:Generator_ColumnPropNameInRow="Id" msprop:Generator_ColumnPropNameInTable="IdColumn" type="xs:int" />
+              <xs:element name="Name" msprop:Generator_UserColumnName="Name" msprop:Generator_ColumnVarNameInTable="columnName" msprop:Generator_ColumnPropNameInRow="Name" msprop:Generator_ColumnPropNameInTable="NameColumn" minOccurs="0">
+                <xs:simpleType>
+                  <xs:restriction base="xs:string">
+                    <xs:maxLength value="50" />
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:element>
+              <xs:element name="Link" msprop:Generator_UserColumnName="Link" msprop:Generator_ColumnVarNameInTable="columnLink" msprop:Generator_ColumnPropNameInRow="Link" msprop:Generator_ColumnPropNameInTable="LinkColumn" minOccurs="0">
+                <xs:simpleType>
+                  <xs:restriction base="xs:string">
+                    <xs:maxLength value="2147483647" />
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:element>
+              <xs:element name="LongText" msprop:Generator_UserColumnName="LongText" msprop:Generator_ColumnVarNameInTable="columnLongText" msprop:Generator_ColumnPropNameInRow="LongText" msprop:Generator_ColumnPropNameInTable="LongTextColumn" minOccurs="0">
+                <xs:simpleType>
+                  <xs:restriction base="xs:string">
+                    <xs:maxLength value="1073741823" />
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:element>
+              <xs:element name="PDF" msprop:Generator_UserColumnName="PDF" msprop:Generator_ColumnVarNameInTable="columnPDF" msprop:Generator_ColumnPropNameInRow="PDF" msprop:Generator_ColumnPropNameInTable="PDFColumn" minOccurs="0">
+                <xs:simpleType>
+                  <xs:restriction base="xs:string">
+                    <xs:maxLength value="2147483647" />
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:element>
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="User" msprop:Generator_UserTableName="User" msprop:Generator_RowDeletedName="UserRowDeleted" msprop:Generator_RowChangedName="UserRowChanged" msprop:Generator_RowClassName="UserRow" msprop:Generator_RowChangingName="UserRowChanging" msprop:Generator_RowEvArgName="UserRowChangeEvent" msprop:Generator_RowEvHandlerName="UserRowChangeEventHandler" msprop:Generator_TableClassName="UserDataTable" msprop:Generator_TableVarName="tableUser" msprop:Generator_RowDeletingName="UserRowDeleting" msprop:Generator_TablePropName="User">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="ID" msdata:ReadOnly="true" msdata:AutoIncrement="true" msdata:AutoIncrementSeed="-1" msdata:AutoIncrementStep="-1" msprop:Generator_UserColumnName="ID" msprop:Generator_ColumnVarNameInTable="columnID" msprop:Generator_ColumnPropNameInRow="ID" msprop:Generator_ColumnPropNameInTable="IDColumn" type="xs:int" />
+              <xs:element name="Username" msprop:Generator_UserColumnName="Username" msprop:Generator_ColumnVarNameInTable="columnUsername" msprop:Generator_ColumnPropNameInRow="Username" msprop:Generator_ColumnPropNameInTable="UsernameColumn">
+                <xs:simpleType>
+                  <xs:restriction base="xs:string">
+                    <xs:maxLength value="50" />
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:element>
+              <xs:element name="FirstName" msprop:Generator_UserColumnName="FirstName" msprop:Generator_ColumnVarNameInTable="columnFirstName" msprop:Generator_ColumnPropNameInRow="FirstName" msprop:Generator_ColumnPropNameInTable="FirstNameColumn">
+                <xs:simpleType>
+                  <xs:restriction base="xs:string">
+                    <xs:maxLength value="50" />
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:element>
+              <xs:element name="LastName" msprop:Generator_UserColumnName="LastName" msprop:Generator_ColumnVarNameInTable="columnLastName" msprop:Generator_ColumnPropNameInRow="LastName" msprop:Generator_ColumnPropNameInTable="LastNameColumn">
+                <xs:simpleType>
+                  <xs:restriction base="xs:string">
+                    <xs:maxLength value="50" />
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:element>
+              <xs:element name="Email" msprop:Generator_UserColumnName="Email" msprop:Generator_ColumnVarNameInTable="columnEmail" msprop:Generator_ColumnPropNameInRow="Email" msprop:Generator_ColumnPropNameInTable="EmailColumn">
+                <xs:simpleType>
+                  <xs:restriction base="xs:string">
+                    <xs:maxLength value="250" />
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:element>
+              <xs:element name="Password" msprop:Generator_UserColumnName="Password" msprop:Generator_ColumnVarNameInTable="columnPassword" msprop:Generator_ColumnPropNameInRow="Password" msprop:Generator_ColumnPropNameInTable="PasswordColumn">
+                <xs:simpleType>
+                  <xs:restriction base="xs:string">
+                    <xs:maxLength value="20" />
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:element>
+              <xs:element name="Role" msprop:Generator_UserColumnName="Role" msprop:Generator_ColumnVarNameInTable="columnRole" msprop:Generator_ColumnPropNameInRow="Role" msprop:Generator_ColumnPropNameInTable="RoleColumn">
+                <xs:simpleType>
+                  <xs:restriction base="xs:string">
+                    <xs:maxLength value="20" />
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:element>
+              <xs:element name="Guid" msdata:DataType="System.Guid, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" msprop:Generator_UserColumnName="Guid" msprop:Generator_ColumnVarNameInTable="columnGuid" msprop:Generator_ColumnPropNameInRow="Guid" msprop:Generator_ColumnPropNameInTable="GuidColumn" type="xs:string" />
+              <xs:element name="Signature" msprop:Generator_UserColumnName="Signature" msprop:Generator_ColumnVarNameInTable="columnSignature" msprop:Generator_ColumnPropNameInRow="Signature" msprop:Generator_ColumnPropNameInTable="SignatureColumn" minOccurs="0">
+                <xs:simpleType>
+                  <xs:restriction base="xs:string">
+                    <xs:maxLength value="4000" />
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:element>
+              <xs:element name="SignatureHTML" msprop:Generator_UserColumnName="SignatureHTML" msprop:Generator_ColumnVarNameInTable="columnSignatureHTML" msprop:Generator_ColumnPropNameInRow="SignatureHTML" msprop:Generator_ColumnPropNameInTable="SignatureHTMLColumn" minOccurs="0">
+                <xs:simpleType>
+                  <xs:restriction base="xs:string">
+                    <xs:maxLength value="4000" />
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:element>
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="UserRole" msprop:Generator_UserTableName="UserRole" msprop:Generator_RowDeletedName="UserRoleRowDeleted" msprop:Generator_RowChangedName="UserRoleRowChanged" msprop:Generator_RowClassName="UserRoleRow" msprop:Generator_RowChangingName="UserRoleRowChanging" msprop:Generator_RowEvArgName="UserRoleRowChangeEvent" msprop:Generator_RowEvHandlerName="UserRoleRowChangeEventHandler" msprop:Generator_TableClassName="UserRoleDataTable" msprop:Generator_TableVarName="tableUserRole" msprop:Generator_RowDeletingName="UserRoleRowDeleting" msprop:Generator_TablePropName="UserRole">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="Name" msprop:Generator_UserColumnName="Name" msprop:Generator_ColumnVarNameInTable="columnName" msprop:Generator_ColumnPropNameInRow="Name" msprop:Generator_ColumnPropNameInTable="NameColumn">
+                <xs:simpleType>
+                  <xs:restriction base="xs:string">
+                    <xs:maxLength value="20" />
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:element>
+              <xs:element name="Description" msprop:Generator_UserColumnName="Description" msprop:Generator_ColumnVarNameInTable="columnDescription" msprop:Generator_ColumnPropNameInRow="Description" msprop:Generator_ColumnPropNameInTable="DescriptionColumn">
+                <xs:simpleType>
+                  <xs:restriction base="xs:string">
+                    <xs:maxLength value="50" />
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:element>
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="Footer" msprop:Generator_UserTableName="Footer" msprop:Generator_RowDeletedName="FooterRowDeleted" msprop:Generator_RowChangedName="FooterRowChanged" msprop:Generator_RowClassName="FooterRow" msprop:Generator_RowChangingName="FooterRowChanging" msprop:Generator_RowEvArgName="FooterRowChangeEvent" msprop:Generator_RowEvHandlerName="FooterRowChangeEventHandler" msprop:Generator_TableClassName="FooterDataTable" msprop:Generator_TableVarName="tableFooter" msprop:Generator_RowDeletingName="FooterRowDeleting" msprop:Generator_TablePropName="Footer">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="Id" msdata:ReadOnly="true" msdata:AutoIncrement="true" msdata:AutoIncrementSeed="-1" msdata:AutoIncrementStep="-1" msprop:Generator_UserColumnName="Id" msprop:Generator_ColumnPropNameInRow="Id" msprop:Generator_ColumnVarNameInTable="columnId" msprop:Generator_ColumnPropNameInTable="IdColumn" type="xs:int" />
+              <xs:element name="Text" msprop:Generator_UserColumnName="Text" msprop:Generator_ColumnPropNameInRow="Text" msprop:Generator_ColumnVarNameInTable="columnText" msprop:Generator_ColumnPropNameInTable="TextColumn" minOccurs="0">
+                <xs:simpleType>
+                  <xs:restriction base="xs:string">
+                    <xs:maxLength value="2147483647" />
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:element>
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="ContactUsRight" msprop:Generator_UserTableName="ContactUsRight" msprop:Generator_RowDeletedName="ContactUsRightRowDeleted" msprop:Generator_RowChangedName="ContactUsRightRowChanged" msprop:Generator_RowClassName="ContactUsRightRow" msprop:Generator_RowChangingName="ContactUsRightRowChanging" msprop:Generator_RowEvArgName="ContactUsRightRowChangeEvent" msprop:Generator_RowEvHandlerName="ContactUsRightRowChangeEventHandler" msprop:Generator_TableClassName="ContactUsRightDataTable" msprop:Generator_TableVarName="tableContactUsRight" msprop:Generator_RowDeletingName="ContactUsRightRowDeleting" msprop:Generator_TablePropName="ContactUsRight">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="Id" msdata:ReadOnly="true" msdata:AutoIncrement="true" msdata:AutoIncrementSeed="-1" msdata:AutoIncrementStep="-1" msprop:Generator_UserColumnName="Id" msprop:Generator_ColumnPropNameInRow="Id" msprop:Generator_ColumnVarNameInTable="columnId" msprop:Generator_ColumnPropNameInTable="IdColumn" type="xs:int" />
+              <xs:element name="Page" msprop:Generator_UserColumnName="Page" msprop:Generator_ColumnPropNameInRow="Page" msprop:Generator_ColumnVarNameInTable="columnPage" msprop:Generator_ColumnPropNameInTable="PageColumn" minOccurs="0">
+                <xs:simpleType>
+                  <xs:restriction base="xs:string">
+                    <xs:maxLength value="10" />
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:element>
+              <xs:element name="Text" msprop:Generator_UserColumnName="Text" msprop:Generator_ColumnPropNameInRow="Text" msprop:Generator_ColumnVarNameInTable="columnText" msprop:Generator_ColumnPropNameInTable="TextColumn" minOccurs="0">
+                <xs:simpleType>
+                  <xs:restriction base="xs:string">
+                    <xs:maxLength value="2147483647" />
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:element>
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+      </xs:choice>
+    </xs:complexType>
+    <xs:unique name="Constraint1" msdata:PrimaryKey="true">
+      <xs:selector xpath=".//mstns:HeaderImages" />
+      <xs:field xpath="mstns:Id" />
+    </xs:unique>
+    <xs:unique name="HomeBottomImages_Constraint1" msdata:ConstraintName="Constraint1" msdata:PrimaryKey="true">
+      <xs:selector xpath=".//mstns:HomeBottomImages" />
+      <xs:field xpath="mstns:Id" />
+    </xs:unique>
+    <xs:unique name="HomeRightImage_Constraint1" msdata:ConstraintName="Constraint1" msdata:PrimaryKey="true">
+      <xs:selector xpath=".//mstns:HomeRightImage" />
+      <xs:field xpath="mstns:Id" />
+    </xs:unique>
+    <xs:unique name="HomeLeftText_Constraint1" msdata:ConstraintName="Constraint1" msdata:PrimaryKey="true">
+      <xs:selector xpath=".//mstns:HomeLeftText" />
+      <xs:field xpath="mstns:Id" />
+    </xs:unique>
+    <xs:unique name="AboutUs_Constraint1" msdata:ConstraintName="Constraint1" msdata:PrimaryKey="true">
+      <xs:selector xpath=".//mstns:AboutUs" />
+      <xs:field xpath="mstns:Id" />
+    </xs:unique>
+    <xs:unique name="SolutionAmi_Constraint1" msdata:ConstraintName="Constraint1" msdata:PrimaryKey="true">
+      <xs:selector xpath=".//mstns:SolutionAmi" />
+      <xs:field xpath="mstns:Id" />
+    </xs:unique>
+    <xs:unique name="SolutionPrepaid_Constraint1" msdata:ConstraintName="Constraint1" msdata:PrimaryKey="true">
+      <xs:selector xpath=".//mstns:SolutionPrepaid" />
+      <xs:field xpath="mstns:Id" />
+    </xs:unique>
+    <xs:unique name="SolutionOverview_Constraint1" msdata:ConstraintName="Constraint1" msdata:PrimaryKey="true">
+      <xs:selector xpath=".//mstns:SolutionOverview" />
+      <xs:field xpath="mstns:Id" />
+    </xs:unique>
+    <xs:unique name="Partners_Constraint1" msdata:ConstraintName="Constraint1" msdata:PrimaryKey="true">
+      <xs:selector xpath=".//mstns:Partners" />
+      <xs:field xpath="mstns:Id" />
+    </xs:unique>
+    <xs:unique name="TechnologyNDNet_Constraint1" msdata:ConstraintName="Constraint1" msdata:PrimaryKey="true">
+      <xs:selector xpath=".//mstns:TechnologyNDNet" />
+      <xs:field xpath="mstns:Id" />
+    </xs:unique>
+    <xs:unique name="TechnologyWhitePaper_Constraint1" msdata:ConstraintName="Constraint1" msdata:PrimaryKey="true">
+      <xs:selector xpath=".//mstns:TechnologyWhitePaper" />
+      <xs:field xpath="mstns:Id" />
+    </xs:unique>
+    <xs:unique name="User_Constraint1" msdata:ConstraintName="Constraint1" msdata:PrimaryKey="true">
+      <xs:selector xpath=".//mstns:User" />
+      <xs:field xpath="mstns:ID" />
+    </xs:unique>
+    <xs:unique name="UserRole_Constraint1" msdata:ConstraintName="Constraint1" msdata:PrimaryKey="true">
+      <xs:selector xpath=".//mstns:UserRole" />
+      <xs:field xpath="mstns:Name" />
+    </xs:unique>
+    <xs:unique name="Footer_Constraint1" msdata:ConstraintName="Constraint1" msdata:PrimaryKey="true">
+      <xs:selector xpath=".//mstns:Footer" />
+      <xs:field xpath="mstns:Id" />
+    </xs:unique>
+    <xs:unique name="ContactUsRight_Constraint1" msdata:ConstraintName="Constraint1" msdata:PrimaryKey="true">
+      <xs:selector xpath=".//mstns:ContactUsRight" />
+      <xs:field xpath="mstns:Id" />
+    </xs:unique>
+  </xs:element>
+  <xs:annotation>
+    <xs:appinfo>
+      <msdata:Relationship name="FK_User_UserRole" msdata:parent="UserRole" msdata:child="User" msdata:parentkey="Name" msdata:childkey="Role" msprop:Generator_UserRelationName="FK_User_UserRole" msprop:Generator_RelationVarName="relationFK_User_UserRole" msprop:Generator_UserChildTable="User" msprop:Generator_UserParentTable="UserRole" msprop:Generator_ParentPropName="UserRoleRow" msprop:Generator_ChildPropName="GetUserRows" />
+    </xs:appinfo>
+  </xs:annotation>
+</xs:schema>

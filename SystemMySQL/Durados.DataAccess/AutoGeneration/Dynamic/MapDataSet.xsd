@@ -1,0 +1,89 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<xs:schema id="MapDataSet" targetNamespace="http://tempuri.org/MapDataSet.xsd" xmlns:mstns="http://tempuri.org/MapDataSet.xsd" xmlns="http://tempuri.org/MapDataSet.xsd" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata" xmlns:msprop="urn:schemas-microsoft-com:xml-msprop" attributeFormDefault="qualified" elementFormDefault="qualified">
+  <xs:annotation>
+    <xs:appinfo source="urn:schemas-microsoft-com:xml-msdatasource">
+      <DataSource DefaultConnectionIndex="0" FunctionsComponentName="QueriesTableAdapter" Modifier="AutoLayout, AnsiClass, Class, Public" SchemaSerializationMode="IncludeSchema" xmlns="urn:schemas-microsoft-com:xml-msdatasource">
+        <Connections />
+        <Tables />
+        <Sources />
+      </DataSource>
+    </xs:appinfo>
+  </xs:annotation>
+  <xs:element name="MapDataSet" msdata:IsDataSet="true" msdata:UseCurrentLocale="true" msprop:Generator_UserDSName="MapDataSet" msprop:Generator_DataSetName="MapDataSet" msprop:EnableTableAdapterManager="true">
+    <xs:complexType>
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:element name="View" msprop:Generator_UserTableName="View" msprop:Generator_RowDeletedName="ViewRowDeleted" msprop:Generator_RowChangedName="ViewRowChanged" msprop:Generator_RowClassName="ViewRow" msprop:Generator_RowChangingName="ViewRowChanging" msprop:Generator_RowEvArgName="ViewRowChangeEvent" msprop:Generator_RowEvHandlerName="ViewRowChangeEventHandler" msprop:Generator_TableClassName="ViewDataTable" msprop:Generator_TableVarName="tableView" msprop:Generator_RowDeletingName="ViewRowDeleting" msprop:Generator_TablePropName="View">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="Id" msdata:AutoIncrement="true" msdata:AutoIncrementSeed="-1" msdata:AutoIncrementStep="-1" msprop:Generator_UserColumnName="Id" msprop:Generator_ColumnPropNameInRow="Id" msprop:Generator_ColumnVarNameInTable="columnId" msprop:Generator_ColumnPropNameInTable="IdColumn" type="xs:int" />
+              <xs:element name="Name" msprop:Generator_UserColumnName="Name" msprop:Generator_ColumnPropNameInRow="Name" msprop:Generator_ColumnVarNameInTable="columnName" msprop:Generator_ColumnPropNameInTable="NameColumn" type="xs:string" minOccurs="0" />
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="Field" msprop:Generator_UserTableName="Field" msprop:Generator_RowDeletedName="FieldRowDeleted" msprop:Generator_RowChangedName="FieldRowChanged" msprop:Generator_RowClassName="FieldRow" msprop:Generator_RowChangingName="FieldRowChanging" msprop:Generator_RowEvArgName="FieldRowChangeEvent" msprop:Generator_RowEvHandlerName="FieldRowChangeEventHandler" msprop:Generator_TableClassName="FieldDataTable" msprop:Generator_TableVarName="tableField" msprop:Generator_RowDeletingName="FieldRowDeleting" msprop:Generator_TablePropName="Field">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="Id" msdata:AutoIncrement="true" msdata:AutoIncrementSeed="-1" msdata:AutoIncrementStep="-1" msprop:Generator_UserColumnName="Id" msprop:Generator_ColumnPropNameInRow="Id" msprop:Generator_ColumnVarNameInTable="columnId" msprop:Generator_ColumnPropNameInTable="IdColumn" type="xs:int" />
+              <xs:element name="ViewId" msprop:Generator_UserColumnName="ViewId" msprop:Generator_ColumnPropNameInRow="ViewId" msprop:Generator_ColumnVarNameInTable="columnViewId" msprop:Generator_ColumnPropNameInTable="ViewIdColumn" type="xs:int" minOccurs="0" />
+              <xs:element name="Name" msprop:Generator_UserColumnName="Name" msprop:Generator_ColumnPropNameInRow="Name" msprop:Generator_ColumnVarNameInTable="columnName" msprop:Generator_ColumnPropNameInTable="NameColumn" type="xs:string" minOccurs="0" />
+              <xs:element name="RelationId" msprop:Generator_UserColumnName="RelationId" msprop:Generator_ColumnPropNameInRow="RelationId" msprop:Generator_ColumnVarNameInTable="columnRelationId" msprop:Generator_ColumnPropNameInTable="RelationIdColumn" type="xs:int" minOccurs="0" />
+              <xs:element name="DbType" msprop:Generator_UserColumnName="DbType" msprop:Generator_ColumnPropNameInRow="DbType" msprop:Generator_ColumnVarNameInTable="columnDbType" msprop:Generator_ColumnPropNameInTable="DbTypeColumn" type="xs:string" minOccurs="0" />
+              <xs:element name="PK" msprop:Generator_UserColumnName="PK" msprop:Generator_ColumnVarNameInTable="columnPK" msprop:Generator_ColumnPropNameInRow="PK" msprop:Generator_ColumnPropNameInTable="PKColumn" type="xs:boolean" minOccurs="0" />
+              <xs:element name="AutoIncrement" msprop:Generator_UserColumnName="AutoIncrement" msprop:Generator_ColumnPropNameInRow="AutoIncrement" msprop:Generator_ColumnVarNameInTable="columnAutoIncrement" msprop:Generator_ColumnPropNameInTable="AutoIncrementColumn" type="xs:boolean" minOccurs="0" />
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="Relation" msprop:Generator_UserTableName="Relation" msprop:Generator_RowDeletedName="RelationRowDeleted" msprop:Generator_RowChangedName="RelationRowChanged" msprop:Generator_RowClassName="RelationRow" msprop:Generator_RowChangingName="RelationRowChanging" msprop:Generator_RowEvArgName="RelationRowChangeEvent" msprop:Generator_RowEvHandlerName="RelationRowChangeEventHandler" msprop:Generator_TableClassName="RelationDataTable" msprop:Generator_TableVarName="tableRelation" msprop:Generator_RowDeletingName="RelationRowDeleting" msprop:Generator_TablePropName="Relation">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="Id" msdata:AutoIncrement="true" msdata:AutoIncrementSeed="-1" msdata:AutoIncrementStep="-1" msprop:Generator_UserColumnName="Id" msprop:Generator_ColumnPropNameInRow="Id" msprop:Generator_ColumnVarNameInTable="columnId" msprop:Generator_ColumnPropNameInTable="IdColumn" type="xs:int" />
+              <xs:element name="RelatedViewName" msprop:Generator_UserColumnName="RelatedViewName" msprop:Generator_ColumnPropNameInRow="RelatedViewName" msprop:Generator_ColumnVarNameInTable="columnRelatedViewName" msprop:Generator_ColumnPropNameInTable="RelatedViewNameColumn" type="xs:string" minOccurs="0" />
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="RelationColumns" msprop:Generator_UserTableName="RelationColumns" msprop:Generator_RowDeletedName="RelationColumnsRowDeleted" msprop:Generator_RowChangedName="RelationColumnsRowChanged" msprop:Generator_RowClassName="RelationColumnsRow" msprop:Generator_RowChangingName="RelationColumnsRowChanging" msprop:Generator_RowEvArgName="RelationColumnsRowChangeEvent" msprop:Generator_RowEvHandlerName="RelationColumnsRowChangeEventHandler" msprop:Generator_TableClassName="RelationColumnsDataTable" msprop:Generator_TableVarName="tableRelationColumns" msprop:Generator_RowDeletingName="RelationColumnsRowDeleting" msprop:Generator_TablePropName="RelationColumns">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="Id" msdata:AutoIncrement="true" msdata:AutoIncrementSeed="-1" msdata:AutoIncrementStep="-1" msprop:Generator_UserColumnName="Id" msprop:Generator_ColumnPropNameInRow="Id" msprop:Generator_ColumnVarNameInTable="columnId" msprop:Generator_ColumnPropNameInTable="IdColumn" type="xs:int" />
+              <xs:element name="RelationId" msprop:Generator_UserColumnName="RelationId" msprop:Generator_ColumnPropNameInRow="RelationId" msprop:Generator_ColumnVarNameInTable="columnRelationId" msprop:Generator_ColumnPropNameInTable="RelationIdColumn" type="xs:int" minOccurs="0" />
+              <xs:element name="FkColumnName" msprop:Generator_UserColumnName="FkColumnName" msprop:Generator_ColumnPropNameInRow="FkColumnName" msprop:Generator_ColumnVarNameInTable="columnFkColumnName" msprop:Generator_ColumnPropNameInTable="FkColumnNameColumn" type="xs:string" minOccurs="0" />
+              <xs:element name="PkColumnName" msprop:Generator_UserColumnName="PkColumnName" msprop:Generator_ColumnPropNameInRow="PkColumnName" msprop:Generator_ColumnVarNameInTable="columnPkColumnName" msprop:Generator_ColumnPropNameInTable="PkColumnNameColumn" type="xs:string" minOccurs="0" />
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+      </xs:choice>
+    </xs:complexType>
+    <xs:unique name="ViewKey1" msdata:PrimaryKey="true">
+      <xs:selector xpath=".//mstns:View" />
+      <xs:field xpath="mstns:Id" />
+    </xs:unique>
+    <xs:unique name="ViewKey2">
+      <xs:selector xpath=".//mstns:View" />
+      <xs:field xpath="mstns:Name" />
+    </xs:unique>
+    <xs:unique name="Constraint1" msdata:PrimaryKey="true">
+      <xs:selector xpath=".//mstns:Field" />
+      <xs:field xpath="mstns:Id" />
+    </xs:unique>
+    <xs:unique name="FieldKey1">
+      <xs:selector xpath=".//mstns:Field" />
+      <xs:field xpath="mstns:ViewId" />
+      <xs:field xpath="mstns:Name" />
+    </xs:unique>
+    <xs:unique name="Relation_Constraint1" msdata:ConstraintName="Constraint1" msdata:PrimaryKey="true">
+      <xs:selector xpath=".//mstns:Relation" />
+      <xs:field xpath="mstns:Id" />
+    </xs:unique>
+    <xs:unique name="RelationColumns_Constraint1" msdata:ConstraintName="Constraint1" msdata:PrimaryKey="true">
+      <xs:selector xpath=".//mstns:RelationColumns" />
+      <xs:field xpath="mstns:Id" />
+    </xs:unique>
+  </xs:element>
+  <xs:annotation>
+    <xs:appinfo>
+      <msdata:Relationship name="View_Field" msdata:parent="View" msdata:child="Field" msdata:parentkey="Id" msdata:childkey="ViewId" msprop:Generator_UserRelationName="View_Field" msprop:Generator_RelationVarName="relationView_Field" msprop:Generator_UserChildTable="Field" msprop:Generator_UserParentTable="View" msprop:Generator_ParentPropName="ViewRow" msprop:Generator_ChildPropName="GetFieldRows" />
+      <msdata:Relationship name="Relation_Field" msdata:parent="Relation" msdata:child="Field" msdata:parentkey="Id" msdata:childkey="RelationId" msprop:Generator_UserRelationName="Relation_Field" msprop:Generator_RelationVarName="relationRelation_Field" msprop:Generator_UserChildTable="Field" msprop:Generator_UserParentTable="Relation" msprop:Generator_ParentPropName="RelationRow" msprop:Generator_ChildPropName="GetFieldRows" />
+      <msdata:Relationship name="Relation_RelationColumns" msdata:parent="Relation" msdata:child="RelationColumns" msdata:parentkey="Id" msdata:childkey="RelationId" msprop:Generator_UserRelationName="Relation_RelationColumns" msprop:Generator_RelationVarName="relationRelation_RelationColumns" msprop:Generator_UserChildTable="RelationColumns" msprop:Generator_UserParentTable="Relation" msprop:Generator_ParentPropName="RelationRow" msprop:Generator_ChildPropName="GetRelationColumnsRows" />
+    </xs:appinfo>
+  </xs:annotation>
+</xs:schema>

@@ -1,0 +1,6 @@
+﻿
+.gridview tr.data-row
+{   
+    line-height: 25px;
+    height: 25px;
+}

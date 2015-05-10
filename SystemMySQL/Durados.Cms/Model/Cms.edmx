@@ -1,0 +1,2485 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="3.0" xmlns:edmx="http://schemas.microsoft.com/ado/2009/11/edmx">
+  <!-- EF Runtime content -->
+  <edmx:Runtime>
+    <!-- SSDL content -->
+    <edmx:StorageModels>
+    <Schema Namespace="Durados.Cms.Model.Store" Alias="Self" Provider="System.Data.SqlClient" ProviderManifestToken="2008" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+        <EntityContainer Name="DuradosCmsModelStoreContainer">
+          <EntitySet Name="durados_Contact" EntityType="Durados.Cms.Model.Store.durados_Contact" store:Type="Tables" Schema="dbo" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" />
+          <EntitySet Name="durados_Content" EntityType="Durados.Cms.Model.Store.durados_Content" store:Type="Tables" Schema="dbo" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" />
+          <EntitySet Name="durados_ContentParameter" EntityType="Durados.Cms.Model.Store.durados_ContentParameter" store:Type="Tables" Schema="dbo" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" />
+          <EntitySet Name="durados_ContentType" EntityType="Durados.Cms.Model.Store.durados_ContentType" store:Type="Tables" Schema="dbo" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" />
+          <EntitySet Name="durados_ContentTypeCss" EntityType="Durados.Cms.Model.Store.durados_ContentTypeCss" store:Type="Tables" Schema="dbo" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" />
+          <EntitySet Name="durados_ContentTypeScript" EntityType="Durados.Cms.Model.Store.durados_ContentTypeScript" store:Type="Tables" Schema="dbo" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" />
+          <EntitySet Name="durados_Css" EntityType="Durados.Cms.Model.Store.durados_Css" store:Type="Tables" Schema="dbo" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" />
+          <EntitySet Name="durados_Fader" EntityType="Durados.Cms.Model.Store.durados_Fader" store:Type="Tables" Schema="dbo" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" />
+          <EntitySet Name="durados_FaderContent" EntityType="Durados.Cms.Model.Store.durados_FaderContent" store:Type="Tables" Schema="dbo" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" />
+          <EntitySet Name="durados_Field" EntityType="Durados.Cms.Model.Store.durados_Field" store:Type="Tables" Schema="dbo" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" />
+          <EntitySet Name="durados_FieldCategory" EntityType="Durados.Cms.Model.Store.durados_FieldCategory" store:Type="Tables" Schema="dbo" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" />
+          <EntitySet Name="durados_FieldCategoryRel" EntityType="Durados.Cms.Model.Store.durados_FieldCategoryRel" store:Type="Tables" Schema="dbo" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" />
+          <EntitySet Name="durados_Form" EntityType="Durados.Cms.Model.Store.durados_Form" store:Type="Tables" Schema="dbo" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" />
+          <EntitySet Name="durados_FormType" EntityType="Durados.Cms.Model.Store.durados_FormType" store:Type="Tables" Schema="dbo" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" />
+          <EntitySet Name="durados_Frame" EntityType="Durados.Cms.Model.Store.durados_Frame" store:Type="Tables" Schema="dbo" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" />
+          <EntitySet Name="durados_Html" EntityType="Durados.Cms.Model.Store.durados_Html" store:Type="Tables" Schema="dbo" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" />
+          <EntitySet Name="durados_HtmlScroller" EntityType="Durados.Cms.Model.Store.durados_HtmlScroller" store:Type="Tables" Schema="dbo" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" />
+          <EntitySet Name="durados_HtmlScrollerContent" EntityType="Durados.Cms.Model.Store.durados_HtmlScrollerContent" store:Type="Tables" Schema="dbo" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" />
+          <EntitySet Name="durados_Image" EntityType="Durados.Cms.Model.Store.durados_Image" store:Type="Tables" Schema="dbo" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" />
+          <EntitySet Name="durados_Link" EntityType="Durados.Cms.Model.Store.durados_Link" store:Type="Tables" Schema="dbo" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" />
+          <EntitySet Name="durados_LinkParameter" EntityType="Durados.Cms.Model.Store.durados_LinkParameter" store:Type="Tables" Schema="dbo" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" />
+          <EntitySet Name="durados_Menu" EntityType="Durados.Cms.Model.Store.durados_Menu" store:Type="Tables" Schema="dbo" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" />
+          <EntitySet Name="durados_MenuItem" EntityType="Durados.Cms.Model.Store.durados_MenuItem" store:Type="Tables" Schema="dbo" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" />
+          <EntitySet Name="durados_Object" EntityType="Durados.Cms.Model.Store.durados_Object" store:Type="Tables" Schema="dbo" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" />
+          <EntitySet Name="durados_Page" EntityType="Durados.Cms.Model.Store.durados_Page" store:Type="Tables" Schema="dbo" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" />
+          <EntitySet Name="durados_PageContent" EntityType="Durados.Cms.Model.Store.durados_PageContent" store:Type="Tables" Schema="dbo" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" />
+          <EntitySet Name="durados_Parameter" EntityType="Durados.Cms.Model.Store.durados_Parameter" store:Type="Tables" Schema="dbo" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" />
+          <EntitySet Name="durados_PlaceHolder" EntityType="Durados.Cms.Model.Store.durados_PlaceHolder" store:Type="Tables" Schema="dbo" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" />
+          <EntitySet Name="durados_Rotator" EntityType="Durados.Cms.Model.Store.durados_Rotator" store:Type="Tables" Schema="dbo" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" />
+          <EntitySet Name="durados_RotatorImage" EntityType="Durados.Cms.Model.Store.durados_RotatorImage" store:Type="Tables" Schema="dbo" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" />
+          <EntitySet Name="durados_Script" EntityType="Durados.Cms.Model.Store.durados_Script" store:Type="Tables" Schema="dbo" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" />
+          <EntitySet Name="durados_Slider" EntityType="Durados.Cms.Model.Store.durados_Slider" store:Type="Tables" Schema="dbo" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" />
+          <EntitySet Name="durados_SliderImage" EntityType="Durados.Cms.Model.Store.durados_SliderImage" store:Type="Tables" Schema="dbo" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" />
+          <EntitySet Name="durados_Template" EntityType="Durados.Cms.Model.Store.durados_Template" store:Type="Tables" Schema="dbo" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" />
+          <EntitySet Name="durados_TemplateCss" EntityType="Durados.Cms.Model.Store.durados_TemplateCss" store:Type="Tables" Schema="dbo" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" />
+          <EntitySet Name="durados_TemplatePlaceHolder" EntityType="Durados.Cms.Model.Store.durados_TemplatePlaceHolder" store:Type="Tables" Schema="dbo" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" />
+          <EntitySet Name="durados_TemplateScript" EntityType="Durados.Cms.Model.Store.durados_TemplateScript" store:Type="Tables" Schema="dbo" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" />
+          <AssociationSet Name="FK_Content_ContentType" Association="Durados.Cms.Model.Store.FK_Content_ContentType">
+            <End Role="durados_ContentType" EntitySet="durados_ContentType" />
+            <End Role="durados_Content" EntitySet="durados_Content" />
+          </AssociationSet>
+          <AssociationSet Name="FK_ContentParameter_Content" Association="Durados.Cms.Model.Store.FK_ContentParameter_Content">
+            <End Role="durados_Content" EntitySet="durados_Content" />
+            <End Role="durados_ContentParameter" EntitySet="durados_ContentParameter" />
+          </AssociationSet>
+          <AssociationSet Name="FK_ContentParameter_Parameter" Association="Durados.Cms.Model.Store.FK_ContentParameter_Parameter">
+            <End Role="durados_Parameter" EntitySet="durados_Parameter" />
+            <End Role="durados_ContentParameter" EntitySet="durados_ContentParameter" />
+          </AssociationSet>
+          <AssociationSet Name="FK_ContentTypeCss_ContentType" Association="Durados.Cms.Model.Store.FK_ContentTypeCss_ContentType">
+            <End Role="durados_ContentType" EntitySet="durados_ContentType" />
+            <End Role="durados_ContentTypeCss" EntitySet="durados_ContentTypeCss" />
+          </AssociationSet>
+          <AssociationSet Name="FK_ContentTypeCss_Css" Association="Durados.Cms.Model.Store.FK_ContentTypeCss_Css">
+            <End Role="durados_Css" EntitySet="durados_Css" />
+            <End Role="durados_ContentTypeCss" EntitySet="durados_ContentTypeCss" />
+          </AssociationSet>
+          <AssociationSet Name="FK_ContentTypeScript_ContentType" Association="Durados.Cms.Model.Store.FK_ContentTypeScript_ContentType">
+            <End Role="durados_ContentType" EntitySet="durados_ContentType" />
+            <End Role="durados_ContentTypeScript" EntitySet="durados_ContentTypeScript" />
+          </AssociationSet>
+          <AssociationSet Name="FK_ContentTypeScript_Script" Association="Durados.Cms.Model.Store.FK_ContentTypeScript_Script">
+            <End Role="durados_Script" EntitySet="durados_Script" />
+            <End Role="durados_ContentTypeScript" EntitySet="durados_ContentTypeScript" />
+          </AssociationSet>
+          <AssociationSet Name="FK_durados_Content_durados_Frame" Association="Durados.Cms.Model.Store.FK_durados_Content_durados_Frame">
+            <End Role="durados_Frame" EntitySet="durados_Frame" />
+            <End Role="durados_Content" EntitySet="durados_Content" />
+          </AssociationSet>
+          <AssociationSet Name="FK_durados_Content_durados_Html" Association="Durados.Cms.Model.Store.FK_durados_Content_durados_Html">
+            <End Role="durados_Html" EntitySet="durados_Html" />
+            <End Role="durados_Content" EntitySet="durados_Content" />
+          </AssociationSet>
+          <AssociationSet Name="FK_durados_Content_durados_Image" Association="Durados.Cms.Model.Store.FK_durados_Content_durados_Image">
+            <End Role="durados_Image" EntitySet="durados_Image" />
+            <End Role="durados_Content" EntitySet="durados_Content" />
+          </AssociationSet>
+          <AssociationSet Name="FK_durados_Field_durados_Object" Association="Durados.Cms.Model.Store.FK_durados_Field_durados_Object">
+            <End Role="durados_Object" EntitySet="durados_Object" />
+            <End Role="durados_Field" EntitySet="durados_Field" />
+          </AssociationSet>
+          <AssociationSet Name="FK_durados_FieldCategory_durados_Object" Association="Durados.Cms.Model.Store.FK_durados_FieldCategory_durados_Object">
+            <End Role="durados_Object" EntitySet="durados_Object" />
+            <End Role="durados_FieldCategory" EntitySet="durados_FieldCategory" />
+          </AssociationSet>
+          <AssociationSet Name="FK_durados_FieldCategoryRel_durados_Field" Association="Durados.Cms.Model.Store.FK_durados_FieldCategoryRel_durados_Field">
+            <End Role="durados_Field" EntitySet="durados_Field" />
+            <End Role="durados_FieldCategoryRel" EntitySet="durados_FieldCategoryRel" />
+          </AssociationSet>
+          <AssociationSet Name="FK_durados_FieldCategoryRel_durados_FieldCategory" Association="Durados.Cms.Model.Store.FK_durados_FieldCategoryRel_durados_FieldCategory">
+            <End Role="durados_FieldCategory" EntitySet="durados_FieldCategory" />
+            <End Role="durados_FieldCategoryRel" EntitySet="durados_FieldCategoryRel" />
+          </AssociationSet>
+          <AssociationSet Name="FK_durados_Form_durados_FormType" Association="Durados.Cms.Model.Store.FK_durados_Form_durados_FormType">
+            <End Role="durados_FormType" EntitySet="durados_FormType" />
+            <End Role="durados_Form" EntitySet="durados_Form" />
+          </AssociationSet>
+          <AssociationSet Name="FK_durados_HtmlScrollerContent_Content" Association="Durados.Cms.Model.Store.FK_durados_HtmlScrollerContent_Content">
+            <End Role="durados_Content" EntitySet="durados_Content" />
+            <End Role="durados_HtmlScrollerContent" EntitySet="durados_HtmlScrollerContent" />
+          </AssociationSet>
+          <AssociationSet Name="FK_durados_HtmlScrollerContent_HtmlScroller" Association="Durados.Cms.Model.Store.FK_durados_HtmlScrollerContent_HtmlScroller">
+            <End Role="durados_HtmlScroller" EntitySet="durados_HtmlScroller" />
+            <End Role="durados_HtmlScrollerContent" EntitySet="durados_HtmlScrollerContent" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Fader_Menu" Association="Durados.Cms.Model.Store.FK_Fader_Menu">
+            <End Role="durados_Menu" EntitySet="durados_Menu" />
+            <End Role="durados_Fader" EntitySet="durados_Fader" />
+          </AssociationSet>
+          <AssociationSet Name="FK_FaderContent_Content" Association="Durados.Cms.Model.Store.FK_FaderContent_Content">
+            <End Role="durados_Content" EntitySet="durados_Content" />
+            <End Role="durados_FaderContent" EntitySet="durados_FaderContent" />
+          </AssociationSet>
+          <AssociationSet Name="FK_FaderContent_Fader" Association="Durados.Cms.Model.Store.FK_FaderContent_Fader">
+            <End Role="durados_Fader" EntitySet="durados_Fader" />
+            <End Role="durados_FaderContent" EntitySet="durados_FaderContent" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Link_Page" Association="Durados.Cms.Model.Store.FK_Link_Page">
+            <End Role="durados_Page" EntitySet="durados_Page" />
+            <End Role="durados_Link" EntitySet="durados_Link" />
+          </AssociationSet>
+          <AssociationSet Name="FK_LinkParameter_Link" Association="Durados.Cms.Model.Store.FK_LinkParameter_Link">
+            <End Role="durados_Link" EntitySet="durados_Link" />
+            <End Role="durados_LinkParameter" EntitySet="durados_LinkParameter" />
+          </AssociationSet>
+          <AssociationSet Name="FK_LinkParameter_Parameter" Association="Durados.Cms.Model.Store.FK_LinkParameter_Parameter">
+            <End Role="durados_Parameter" EntitySet="durados_Parameter" />
+            <End Role="durados_LinkParameter" EntitySet="durados_LinkParameter" />
+          </AssociationSet>
+          <AssociationSet Name="FK_MenuItem_Link" Association="Durados.Cms.Model.Store.FK_MenuItem_Link">
+            <End Role="durados_Link" EntitySet="durados_Link" />
+            <End Role="durados_MenuItem" EntitySet="durados_MenuItem" />
+          </AssociationSet>
+          <AssociationSet Name="FK_MenuItem_Menu" Association="Durados.Cms.Model.Store.FK_MenuItem_Menu">
+            <End Role="durados_Menu" EntitySet="durados_Menu" />
+            <End Role="durados_MenuItem" EntitySet="durados_MenuItem" />
+          </AssociationSet>
+          <AssociationSet Name="FK_MenuItem_MenuItem" Association="Durados.Cms.Model.Store.FK_MenuItem_MenuItem">
+            <End Role="durados_MenuItem" EntitySet="durados_MenuItem" />
+            <End Role="durados_MenuItem1" EntitySet="durados_MenuItem" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Page_Master" Association="Durados.Cms.Model.Store.FK_Page_Master">
+            <End Role="durados_Template" EntitySet="durados_Template" />
+            <End Role="durados_Page" EntitySet="durados_Page" />
+          </AssociationSet>
+          <AssociationSet Name="FK_PageContent_Content" Association="Durados.Cms.Model.Store.FK_PageContent_Content">
+            <End Role="durados_Content" EntitySet="durados_Content" />
+            <End Role="durados_PageContent" EntitySet="durados_PageContent" />
+          </AssociationSet>
+          <AssociationSet Name="FK_PageContent_Page" Association="Durados.Cms.Model.Store.FK_PageContent_Page">
+            <End Role="durados_Page" EntitySet="durados_Page" />
+            <End Role="durados_PageContent" EntitySet="durados_PageContent" />
+          </AssociationSet>
+          <AssociationSet Name="FK_PageContent_PlaceHolder" Association="Durados.Cms.Model.Store.FK_PageContent_PlaceHolder">
+            <End Role="durados_PlaceHolder" EntitySet="durados_PlaceHolder" />
+            <End Role="durados_PageContent" EntitySet="durados_PageContent" />
+          </AssociationSet>
+          <AssociationSet Name="FK_RotatorImage_Rotator" Association="Durados.Cms.Model.Store.FK_RotatorImage_Rotator">
+            <End Role="durados_Rotator" EntitySet="durados_Rotator" />
+            <End Role="durados_RotatorImage" EntitySet="durados_RotatorImage" />
+          </AssociationSet>
+          <AssociationSet Name="FK_SliderImage_Slider" Association="Durados.Cms.Model.Store.FK_SliderImage_Slider">
+            <End Role="durados_Slider" EntitySet="durados_Slider" />
+            <End Role="durados_SliderImage" EntitySet="durados_SliderImage" />
+          </AssociationSet>
+          <AssociationSet Name="FK_TemplateCss_Css" Association="Durados.Cms.Model.Store.FK_TemplateCss_Css">
+            <End Role="durados_Css" EntitySet="durados_Css" />
+            <End Role="durados_TemplateCss" EntitySet="durados_TemplateCss" />
+          </AssociationSet>
+          <AssociationSet Name="FK_TemplateCss_Template" Association="Durados.Cms.Model.Store.FK_TemplateCss_Template">
+            <End Role="durados_Template" EntitySet="durados_Template" />
+            <End Role="durados_TemplateCss" EntitySet="durados_TemplateCss" />
+          </AssociationSet>
+          <AssociationSet Name="FK_TemplatePlaceHolder_PlaceHolder" Association="Durados.Cms.Model.Store.FK_TemplatePlaceHolder_PlaceHolder">
+            <End Role="durados_PlaceHolder" EntitySet="durados_PlaceHolder" />
+            <End Role="durados_TemplatePlaceHolder" EntitySet="durados_TemplatePlaceHolder" />
+          </AssociationSet>
+          <AssociationSet Name="FK_TemplatePlaceHolder_Template" Association="Durados.Cms.Model.Store.FK_TemplatePlaceHolder_Template">
+            <End Role="durados_Template" EntitySet="durados_Template" />
+            <End Role="durados_TemplatePlaceHolder" EntitySet="durados_TemplatePlaceHolder" />
+          </AssociationSet>
+          <AssociationSet Name="FK_TemplateScript_Script" Association="Durados.Cms.Model.Store.FK_TemplateScript_Script">
+            <End Role="durados_Script" EntitySet="durados_Script" />
+            <End Role="durados_TemplateScript" EntitySet="durados_TemplateScript" />
+          </AssociationSet>
+          <AssociationSet Name="FK_TemplateScript_Template" Association="Durados.Cms.Model.Store.FK_TemplateScript_Template">
+            <End Role="durados_Template" EntitySet="durados_Template" />
+            <End Role="durados_TemplateScript" EntitySet="durados_TemplateScript" />
+          </AssociationSet>
+        </EntityContainer>
+        <EntityType Name="durados_Contact">
+          <Key>
+            <PropertyRef Name="ID" />
+          </Key>
+          <Property Name="ID" Type="int" Nullable="false" StoreGeneratedPattern="Identity" />
+          <Property Name="Name" Type="nvarchar" Nullable="false" MaxLength="50" />
+          <Property Name="Subject" Type="nvarchar" Nullable="false" MaxLength="500" />
+          <Property Name="To" Type="nvarchar(max)" Nullable="false" />
+          <Property Name="CC" Type="nvarchar(max)" />
+          <Property Name="SMTP" Type="nvarchar" Nullable="false" MaxLength="50" />
+          <Property Name="Title" Type="nvarchar" Nullable="false" MaxLength="50" />
+          <Property Name="Header" Type="ntext" />
+          <Property Name="Footer" Type="ntext" />
+          <Property Name="FromRequired" Type="bit" />
+          <Property Name="AnonymousEmail" Type="nvarchar" MaxLength="500" />
+        </EntityType>
+        <EntityType Name="durados_Content">
+          <Key>
+            <PropertyRef Name="ID" />
+          </Key>
+          <Property Name="ID" Type="int" Nullable="false" StoreGeneratedPattern="Identity" />
+          <Property Name="Name" Type="nvarchar" Nullable="false" MaxLength="50" />
+          <Property Name="ContentTypeID" Type="int" />
+          <Property Name="HtmlID" Type="int" />
+          <Property Name="FrameID" Type="int" />
+          <Property Name="ImageID" Type="int" />
+          <Property Name="CustomTypeID" Type="int" />
+        </EntityType>
+        <EntityType Name="durados_ContentParameter">
+          <Key>
+            <PropertyRef Name="ID" />
+          </Key>
+          <Property Name="ID" Type="int" Nullable="false" StoreGeneratedPattern="Identity" />
+          <Property Name="ContentID" Type="int" Nullable="false" />
+          <Property Name="ParameterID" Type="int" Nullable="false" />
+        </EntityType>
+        <EntityType Name="durados_ContentType">
+          <Key>
+            <PropertyRef Name="ID" />
+          </Key>
+          <Property Name="ID" Type="int" Nullable="false" StoreGeneratedPattern="Identity" />
+          <Property Name="Name" Type="nvarchar" Nullable="false" MaxLength="50" />
+          <Property Name="Custom" Type="bit" Nullable="false" />
+        </EntityType>
+        <EntityType Name="durados_ContentTypeCss">
+          <Key>
+            <PropertyRef Name="ID" />
+          </Key>
+          <Property Name="ID" Type="int" Nullable="false" StoreGeneratedPattern="Identity" />
+          <Property Name="ContentTypeID" Type="int" Nullable="false" />
+          <Property Name="CssID" Type="int" Nullable="false" />
+        </EntityType>
+        <EntityType Name="durados_ContentTypeScript">
+          <Key>
+            <PropertyRef Name="ID" />
+          </Key>
+          <Property Name="ID" Type="int" Nullable="false" StoreGeneratedPattern="Identity" />
+          <Property Name="ContentTypeID" Type="int" Nullable="false" />
+          <Property Name="ScriptID" Type="int" Nullable="false" />
+          <Property Name="Ordinal" Type="int" />
+        </EntityType>
+        <EntityType Name="durados_Css">
+          <Key>
+            <PropertyRef Name="ID" />
+          </Key>
+          <Property Name="ID" Type="int" Nullable="false" StoreGeneratedPattern="Identity" />
+          <Property Name="Name" Type="nvarchar" Nullable="false" MaxLength="50" />
+          <Property Name="Reference" Type="nvarchar" Nullable="false" MaxLength="350" />
+        </EntityType>
+        <EntityType Name="durados_Fader">
+          <Key>
+            <PropertyRef Name="ID" />
+          </Key>
+          <Property Name="ID" Type="int" Nullable="false" StoreGeneratedPattern="Identity" />
+          <Property Name="Name" Type="nvarchar" Nullable="false" MaxLength="50" />
+          <Property Name="MenuID" Type="int" />
+          <Property Name="Delay" Type="int" Nullable="false" />
+        </EntityType>
+        <EntityType Name="durados_FaderContent">
+          <Key>
+            <PropertyRef Name="ID" />
+          </Key>
+          <Property Name="ID" Type="int" Nullable="false" StoreGeneratedPattern="Identity" />
+          <Property Name="FaderID" Type="int" Nullable="false" />
+          <Property Name="ContentID" Type="int" Nullable="false" />
+          <Property Name="Ordinal" Type="int" Nullable="false" />
+        </EntityType>
+        <EntityType Name="durados_Field">
+          <Key>
+            <PropertyRef Name="ID" />
+          </Key>
+          <Property Name="ID" Type="int" Nullable="false" StoreGeneratedPattern="Identity" />
+          <Property Name="Name" Type="nvarchar" Nullable="false" MaxLength="250" />
+          <Property Name="DisplayName" Type="nvarchar" MaxLength="250" />
+          <Property Name="ObjectID" Type="int" Nullable="false" />
+          <Property Name="Format" Type="nvarchar" MaxLength="50" />
+          <Property Name="RelatedName" Type="nvarchar" MaxLength="250" />
+          <Property Name="BetterIsGreater" Type="bit" />
+          <Property Name="Roles" Type="nvarchar" MaxLength="50" />
+          <Property Name="Tooltip" Type="nvarchar(max)" />
+        </EntityType>
+        <EntityType Name="durados_FieldCategory">
+          <Key>
+            <PropertyRef Name="ID" />
+          </Key>
+          <Property Name="ID" Type="int" Nullable="false" StoreGeneratedPattern="Identity" />
+          <Property Name="Name" Type="nvarchar" Nullable="false" MaxLength="250" />
+          <Property Name="DisplayName" Type="nvarchar" MaxLength="250" />
+          <Property Name="ObjectID" Type="int" Nullable="false" />
+        </EntityType>
+        <EntityType Name="durados_FieldCategoryRel">
+          <Key>
+            <PropertyRef Name="ID" />
+          </Key>
+          <Property Name="ID" Type="int" Nullable="false" StoreGeneratedPattern="Identity" />
+          <Property Name="FieldID" Type="int" Nullable="false" />
+          <Property Name="CategoryID" Type="int" Nullable="false" />
+          <Property Name="Ordinal" Type="int" Nullable="false" />
+        </EntityType>
+        <EntityType Name="durados_Form">
+          <Key>
+            <PropertyRef Name="ID" />
+          </Key>
+          <Property Name="ID" Type="int" Nullable="false" StoreGeneratedPattern="Identity" />
+          <Property Name="Name" Type="nvarchar" Nullable="false" MaxLength="50" />
+          <Property Name="FormTypeID" Type="int" Nullable="false" />
+          <Property Name="ViewName" Type="nvarchar" MaxLength="250" />
+          <Property Name="DataAction" Type="nchar" MaxLength="10" />
+        </EntityType>
+        <EntityType Name="durados_FormType">
+          <Key>
+            <PropertyRef Name="ID" />
+          </Key>
+          <Property Name="ID" Type="int" Nullable="false" StoreGeneratedPattern="Identity" />
+          <Property Name="Name" Type="nvarchar" Nullable="false" MaxLength="50" />
+        </EntityType>
+        <EntityType Name="durados_Frame">
+          <Key>
+            <PropertyRef Name="ID" />
+          </Key>
+          <Property Name="ID" Type="int" Nullable="false" StoreGeneratedPattern="Identity" />
+          <Property Name="Name" Type="nvarchar" Nullable="false" MaxLength="50" />
+          <Property Name="Url" Type="nvarchar" Nullable="false" MaxLength="250" />
+        </EntityType>
+        <EntityType Name="durados_Html">
+          <Key>
+            <PropertyRef Name="ID" />
+          </Key>
+          <Property Name="ID" Type="int" Nullable="false" StoreGeneratedPattern="Identity" />
+          <Property Name="Name" Type="nvarchar" Nullable="false" MaxLength="50" />
+          <Property Name="Text" Type="ntext" Nullable="false" />
+        </EntityType>
+        <EntityType Name="durados_HtmlScroller">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="int" Nullable="false" StoreGeneratedPattern="Identity" />
+          <Property Name="Name" Type="nvarchar" MaxLength="50" />
+        </EntityType>
+        <EntityType Name="durados_HtmlScrollerContent">
+          <Key>
+            <PropertyRef Name="ID" />
+          </Key>
+          <Property Name="ID" Type="int" Nullable="false" StoreGeneratedPattern="Identity" />
+          <Property Name="HtmlScrollerID" Type="int" Nullable="false" />
+          <Property Name="ContentID" Type="int" Nullable="false" />
+          <Property Name="Ordinal" Type="int" Nullable="false" />
+        </EntityType>
+        <EntityType Name="durados_Image">
+          <Key>
+            <PropertyRef Name="ID" />
+          </Key>
+          <Property Name="ID" Type="int" Nullable="false" StoreGeneratedPattern="Identity" />
+          <Property Name="Name" Type="nvarchar" Nullable="false" MaxLength="50" />
+          <Property Name="Src" Type="nvarchar" Nullable="false" MaxLength="250" />
+          <Property Name="ToolTip" Type="nvarchar" MaxLength="250" />
+        </EntityType>
+        <EntityType Name="durados_Link">
+          <Key>
+            <PropertyRef Name="ID" />
+          </Key>
+          <Property Name="ID" Type="int" Nullable="false" StoreGeneratedPattern="Identity" />
+          <Property Name="Name" Type="nvarchar" MaxLength="250" />
+          <Property Name="Url" Type="nvarchar" MaxLength="250" />
+          <Property Name="Action" Type="nvarchar" MaxLength="250" />
+          <Property Name="Controller" Type="nvarchar" MaxLength="250" />
+          <Property Name="Script" Type="nvarchar(max)" />
+          <Property Name="Target" Type="nvarchar" MaxLength="50" />
+          <Property Name="LoginRequired" Type="bit" />
+          <Property Name="Text" Type="nvarchar(max)" />
+          <Property Name="Tooltip" Type="nvarchar(max)" />
+          <Property Name="PageID" Type="int" />
+          <Property Name="ControlName" Type="nvarchar" MaxLength="250" />
+        </EntityType>
+        <EntityType Name="durados_LinkParameter">
+          <Key>
+            <PropertyRef Name="ID" />
+          </Key>
+          <Property Name="ID" Type="int" Nullable="false" StoreGeneratedPattern="Identity" />
+          <Property Name="LinkID" Type="int" Nullable="false" />
+          <Property Name="ParameterID" Type="int" Nullable="false" />
+        </EntityType>
+        <EntityType Name="durados_Menu">
+          <Key>
+            <PropertyRef Name="ID" />
+          </Key>
+          <Property Name="ID" Type="int" Nullable="false" StoreGeneratedPattern="Identity" />
+          <Property Name="Name" Type="nvarchar" Nullable="false" MaxLength="50" />
+          <Property Name="Orientation" Type="nchar" Nullable="false" MaxLength="1" />
+        </EntityType>
+        <EntityType Name="durados_MenuItem">
+          <Key>
+            <PropertyRef Name="ID" />
+          </Key>
+          <Property Name="ID" Type="int" Nullable="false" StoreGeneratedPattern="Identity" />
+          <Property Name="MenuID" Type="int" Nullable="false" />
+          <Property Name="LinkID" Type="int" Nullable="false" />
+          <Property Name="Ordinal" Type="int" Nullable="false" />
+          <Property Name="ParentID" Type="int" />
+        </EntityType>
+        <EntityType Name="durados_Object">
+          <Key>
+            <PropertyRef Name="ID" />
+          </Key>
+          <Property Name="ID" Type="int" Nullable="false" StoreGeneratedPattern="Identity" />
+          <Property Name="Name" Type="nvarchar" Nullable="false" MaxLength="250" />
+          <Property Name="FullName" Type="nvarchar" Nullable="false" MaxLength="400" />
+          <Property Name="DisplayName" Type="nvarchar" MaxLength="250" />
+        </EntityType>
+        <EntityType Name="durados_Page">
+          <Key>
+            <PropertyRef Name="ID" />
+          </Key>
+          <Property Name="ID" Type="int" Nullable="false" StoreGeneratedPattern="Identity" />
+          <Property Name="Name" Type="nvarchar" Nullable="false" MaxLength="50" />
+          <Property Name="Title" Type="nvarchar" Nullable="false" MaxLength="250" />
+          <Property Name="TemplateID" Type="int" Nullable="false" />
+        </EntityType>
+        <EntityType Name="durados_PageContent">
+          <Key>
+            <PropertyRef Name="ID" />
+          </Key>
+          <Property Name="ID" Type="int" Nullable="false" StoreGeneratedPattern="Identity" />
+          <Property Name="PageID" Type="int" Nullable="false" />
+          <Property Name="ContentID" Type="int" Nullable="false" />
+          <Property Name="Ordinal" Type="int" Nullable="false" />
+          <Property Name="PlaceHolderID" Type="int" />
+        </EntityType>
+        <EntityType Name="durados_Parameter">
+          <Key>
+            <PropertyRef Name="ID" />
+          </Key>
+          <Property Name="ID" Type="int" Nullable="false" StoreGeneratedPattern="Identity" />
+          <Property Name="Name" Type="nvarchar" MaxLength="250" />
+          <Property Name="Value" Type="nvarchar" MaxLength="250" />
+        </EntityType>
+        <EntityType Name="durados_PlaceHolder">
+          <Key>
+            <PropertyRef Name="ID" />
+          </Key>
+          <Property Name="ID" Type="int" Nullable="false" StoreGeneratedPattern="Identity" />
+          <Property Name="Name" Type="nvarchar" Nullable="false" MaxLength="50" />
+        </EntityType>
+        <EntityType Name="durados_Rotator">
+          <Key>
+            <PropertyRef Name="ID" />
+          </Key>
+          <Property Name="ID" Type="int" Nullable="false" StoreGeneratedPattern="Identity" />
+          <Property Name="Name" Type="nvarchar" Nullable="false" MaxLength="50" />
+          <Property Name="Delay" Type="int" Nullable="false" />
+          <Property Name="Random" Type="bit" Nullable="false" />
+        </EntityType>
+        <EntityType Name="durados_RotatorImage">
+          <Key>
+            <PropertyRef Name="ID" />
+          </Key>
+          <Property Name="ID" Type="int" Nullable="false" StoreGeneratedPattern="Identity" />
+          <Property Name="RotatorID" Type="int" Nullable="false" />
+          <Property Name="Image" Type="nvarchar" Nullable="false" MaxLength="250" />
+          <Property Name="AdditionalDelay" Type="int" Nullable="false" />
+          <Property Name="Ordinal" Type="int" Nullable="false" />
+        </EntityType>
+        <EntityType Name="durados_Script">
+          <Key>
+            <PropertyRef Name="ID" />
+          </Key>
+          <Property Name="ID" Type="int" Nullable="false" StoreGeneratedPattern="Identity" />
+          <Property Name="Name" Type="nvarchar" Nullable="false" MaxLength="50" />
+          <Property Name="Reference" Type="nvarchar" Nullable="false" MaxLength="350" />
+        </EntityType>
+        <EntityType Name="durados_Slider">
+          <Key>
+            <PropertyRef Name="ID" />
+          </Key>
+          <Property Name="ID" Type="int" Nullable="false" StoreGeneratedPattern="Identity" />
+          <Property Name="Name" Type="nvarchar" MaxLength="50" />
+          <Property Name="Orientation" Type="nchar" Nullable="false" MaxLength="1" />
+        </EntityType>
+        <EntityType Name="durados_SliderImage">
+          <Key>
+            <PropertyRef Name="ID" />
+          </Key>
+          <Property Name="ID" Type="int" Nullable="false" StoreGeneratedPattern="Identity" />
+          <Property Name="SliderID" Type="int" Nullable="false" />
+          <Property Name="SlideImage" Type="nvarchar" Nullable="false" MaxLength="250" />
+          <Property Name="HoverImage" Type="nvarchar" Nullable="false" MaxLength="250" />
+          <Property Name="DisplayImage" Type="nvarchar" Nullable="false" MaxLength="250" />
+          <Property Name="Ordinal" Type="int" Nullable="false" />
+          <Property Name="ToolTip" Type="nvarchar" MaxLength="250" />
+          <Property Name="Html" Type="ntext" />
+        </EntityType>
+        <EntityType Name="durados_Template">
+          <Key>
+            <PropertyRef Name="ID" />
+          </Key>
+          <Property Name="ID" Type="int" Nullable="false" StoreGeneratedPattern="Identity" />
+          <Property Name="Name" Type="nvarchar" Nullable="false" MaxLength="50" />
+        </EntityType>
+        <EntityType Name="durados_TemplateCss">
+          <Key>
+            <PropertyRef Name="ID" />
+          </Key>
+          <Property Name="ID" Type="int" Nullable="false" StoreGeneratedPattern="Identity" />
+          <Property Name="TemplateID" Type="int" Nullable="false" />
+          <Property Name="CssID" Type="int" Nullable="false" />
+        </EntityType>
+        <EntityType Name="durados_TemplatePlaceHolder">
+          <Key>
+            <PropertyRef Name="ID" />
+          </Key>
+          <Property Name="ID" Type="int" Nullable="false" StoreGeneratedPattern="Identity" />
+          <Property Name="TemplateID" Type="int" Nullable="false" />
+          <Property Name="PlaceHolderID" Type="int" Nullable="false" />
+        </EntityType>
+        <EntityType Name="durados_TemplateScript">
+          <Key>
+            <PropertyRef Name="ID" />
+          </Key>
+          <Property Name="ID" Type="int" Nullable="false" StoreGeneratedPattern="Identity" />
+          <Property Name="TemplateID" Type="int" Nullable="false" />
+          <Property Name="ScriptID" Type="int" Nullable="false" />
+        </EntityType>
+        <Association Name="FK_Content_ContentType">
+          <End Role="durados_ContentType" Type="Durados.Cms.Model.Store.durados_ContentType" Multiplicity="0..1" />
+          <End Role="durados_Content" Type="Durados.Cms.Model.Store.durados_Content" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="durados_ContentType">
+              <PropertyRef Name="ID" />
+            </Principal>
+            <Dependent Role="durados_Content">
+              <PropertyRef Name="ContentTypeID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_ContentParameter_Content">
+          <End Role="durados_Content" Type="Durados.Cms.Model.Store.durados_Content" Multiplicity="1" />
+          <End Role="durados_ContentParameter" Type="Durados.Cms.Model.Store.durados_ContentParameter" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="durados_Content">
+              <PropertyRef Name="ID" />
+            </Principal>
+            <Dependent Role="durados_ContentParameter">
+              <PropertyRef Name="ContentID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_ContentParameter_Parameter">
+          <End Role="durados_Parameter" Type="Durados.Cms.Model.Store.durados_Parameter" Multiplicity="1" />
+          <End Role="durados_ContentParameter" Type="Durados.Cms.Model.Store.durados_ContentParameter" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="durados_Parameter">
+              <PropertyRef Name="ID" />
+            </Principal>
+            <Dependent Role="durados_ContentParameter">
+              <PropertyRef Name="ParameterID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_ContentTypeCss_ContentType">
+          <End Role="durados_ContentType" Type="Durados.Cms.Model.Store.durados_ContentType" Multiplicity="1" />
+          <End Role="durados_ContentTypeCss" Type="Durados.Cms.Model.Store.durados_ContentTypeCss" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="durados_ContentType">
+              <PropertyRef Name="ID" />
+            </Principal>
+            <Dependent Role="durados_ContentTypeCss">
+              <PropertyRef Name="ContentTypeID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_ContentTypeCss_Css">
+          <End Role="durados_Css" Type="Durados.Cms.Model.Store.durados_Css" Multiplicity="1" />
+          <End Role="durados_ContentTypeCss" Type="Durados.Cms.Model.Store.durados_ContentTypeCss" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="durados_Css">
+              <PropertyRef Name="ID" />
+            </Principal>
+            <Dependent Role="durados_ContentTypeCss">
+              <PropertyRef Name="CssID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_ContentTypeScript_ContentType">
+          <End Role="durados_ContentType" Type="Durados.Cms.Model.Store.durados_ContentType" Multiplicity="1" />
+          <End Role="durados_ContentTypeScript" Type="Durados.Cms.Model.Store.durados_ContentTypeScript" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="durados_ContentType">
+              <PropertyRef Name="ID" />
+            </Principal>
+            <Dependent Role="durados_ContentTypeScript">
+              <PropertyRef Name="ContentTypeID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_ContentTypeScript_Script">
+          <End Role="durados_Script" Type="Durados.Cms.Model.Store.durados_Script" Multiplicity="1" />
+          <End Role="durados_ContentTypeScript" Type="Durados.Cms.Model.Store.durados_ContentTypeScript" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="durados_Script">
+              <PropertyRef Name="ID" />
+            </Principal>
+            <Dependent Role="durados_ContentTypeScript">
+              <PropertyRef Name="ScriptID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_durados_Content_durados_Frame">
+          <End Role="durados_Frame" Type="Durados.Cms.Model.Store.durados_Frame" Multiplicity="0..1" />
+          <End Role="durados_Content" Type="Durados.Cms.Model.Store.durados_Content" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="durados_Frame">
+              <PropertyRef Name="ID" />
+            </Principal>
+            <Dependent Role="durados_Content">
+              <PropertyRef Name="FrameID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_durados_Content_durados_Html">
+          <End Role="durados_Html" Type="Durados.Cms.Model.Store.durados_Html" Multiplicity="0..1" />
+          <End Role="durados_Content" Type="Durados.Cms.Model.Store.durados_Content" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="durados_Html">
+              <PropertyRef Name="ID" />
+            </Principal>
+            <Dependent Role="durados_Content">
+              <PropertyRef Name="HtmlID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_durados_Content_durados_Image">
+          <End Role="durados_Image" Type="Durados.Cms.Model.Store.durados_Image" Multiplicity="0..1" />
+          <End Role="durados_Content" Type="Durados.Cms.Model.Store.durados_Content" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="durados_Image">
+              <PropertyRef Name="ID" />
+            </Principal>
+            <Dependent Role="durados_Content">
+              <PropertyRef Name="ImageID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_durados_Field_durados_Object">
+          <End Role="durados_Object" Type="Durados.Cms.Model.Store.durados_Object" Multiplicity="1" />
+          <End Role="durados_Field" Type="Durados.Cms.Model.Store.durados_Field" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="durados_Object">
+              <PropertyRef Name="ID" />
+            </Principal>
+            <Dependent Role="durados_Field">
+              <PropertyRef Name="ObjectID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_durados_FieldCategory_durados_Object">
+          <End Role="durados_Object" Type="Durados.Cms.Model.Store.durados_Object" Multiplicity="1" />
+          <End Role="durados_FieldCategory" Type="Durados.Cms.Model.Store.durados_FieldCategory" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="durados_Object">
+              <PropertyRef Name="ID" />
+            </Principal>
+            <Dependent Role="durados_FieldCategory">
+              <PropertyRef Name="ObjectID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_durados_FieldCategoryRel_durados_Field">
+          <End Role="durados_Field" Type="Durados.Cms.Model.Store.durados_Field" Multiplicity="1" />
+          <End Role="durados_FieldCategoryRel" Type="Durados.Cms.Model.Store.durados_FieldCategoryRel" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="durados_Field">
+              <PropertyRef Name="ID" />
+            </Principal>
+            <Dependent Role="durados_FieldCategoryRel">
+              <PropertyRef Name="FieldID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_durados_FieldCategoryRel_durados_FieldCategory">
+          <End Role="durados_FieldCategory" Type="Durados.Cms.Model.Store.durados_FieldCategory" Multiplicity="1" />
+          <End Role="durados_FieldCategoryRel" Type="Durados.Cms.Model.Store.durados_FieldCategoryRel" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="durados_FieldCategory">
+              <PropertyRef Name="ID" />
+            </Principal>
+            <Dependent Role="durados_FieldCategoryRel">
+              <PropertyRef Name="CategoryID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_durados_Form_durados_FormType">
+          <End Role="durados_FormType" Type="Durados.Cms.Model.Store.durados_FormType" Multiplicity="1" />
+          <End Role="durados_Form" Type="Durados.Cms.Model.Store.durados_Form" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="durados_FormType">
+              <PropertyRef Name="ID" />
+            </Principal>
+            <Dependent Role="durados_Form">
+              <PropertyRef Name="FormTypeID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_durados_HtmlScrollerContent_Content">
+          <End Role="durados_Content" Type="Durados.Cms.Model.Store.durados_Content" Multiplicity="1" />
+          <End Role="durados_HtmlScrollerContent" Type="Durados.Cms.Model.Store.durados_HtmlScrollerContent" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="durados_Content">
+              <PropertyRef Name="ID" />
+            </Principal>
+            <Dependent Role="durados_HtmlScrollerContent">
+              <PropertyRef Name="ContentID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_durados_HtmlScrollerContent_HtmlScroller">
+          <End Role="durados_HtmlScroller" Type="Durados.Cms.Model.Store.durados_HtmlScroller" Multiplicity="1" />
+          <End Role="durados_HtmlScrollerContent" Type="Durados.Cms.Model.Store.durados_HtmlScrollerContent" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="durados_HtmlScroller">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="durados_HtmlScrollerContent">
+              <PropertyRef Name="HtmlScrollerID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Fader_Menu">
+          <End Role="durados_Menu" Type="Durados.Cms.Model.Store.durados_Menu" Multiplicity="0..1" />
+          <End Role="durados_Fader" Type="Durados.Cms.Model.Store.durados_Fader" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="durados_Menu">
+              <PropertyRef Name="ID" />
+            </Principal>
+            <Dependent Role="durados_Fader">
+              <PropertyRef Name="MenuID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_FaderContent_Content">
+          <End Role="durados_Content" Type="Durados.Cms.Model.Store.durados_Content" Multiplicity="1" />
+          <End Role="durados_FaderContent" Type="Durados.Cms.Model.Store.durados_FaderContent" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="durados_Content">
+              <PropertyRef Name="ID" />
+            </Principal>
+            <Dependent Role="durados_FaderContent">
+              <PropertyRef Name="ContentID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_FaderContent_Fader">
+          <End Role="durados_Fader" Type="Durados.Cms.Model.Store.durados_Fader" Multiplicity="1" />
+          <End Role="durados_FaderContent" Type="Durados.Cms.Model.Store.durados_FaderContent" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="durados_Fader">
+              <PropertyRef Name="ID" />
+            </Principal>
+            <Dependent Role="durados_FaderContent">
+              <PropertyRef Name="FaderID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Link_Page">
+          <End Role="durados_Page" Type="Durados.Cms.Model.Store.durados_Page" Multiplicity="0..1" />
+          <End Role="durados_Link" Type="Durados.Cms.Model.Store.durados_Link" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="durados_Page">
+              <PropertyRef Name="ID" />
+            </Principal>
+            <Dependent Role="durados_Link">
+              <PropertyRef Name="PageID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_LinkParameter_Link">
+          <End Role="durados_Link" Type="Durados.Cms.Model.Store.durados_Link" Multiplicity="1" />
+          <End Role="durados_LinkParameter" Type="Durados.Cms.Model.Store.durados_LinkParameter" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="durados_Link">
+              <PropertyRef Name="ID" />
+            </Principal>
+            <Dependent Role="durados_LinkParameter">
+              <PropertyRef Name="LinkID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_LinkParameter_Parameter">
+          <End Role="durados_Parameter" Type="Durados.Cms.Model.Store.durados_Parameter" Multiplicity="1" />
+          <End Role="durados_LinkParameter" Type="Durados.Cms.Model.Store.durados_LinkParameter" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="durados_Parameter">
+              <PropertyRef Name="ID" />
+            </Principal>
+            <Dependent Role="durados_LinkParameter">
+              <PropertyRef Name="ParameterID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_MenuItem_Link">
+          <End Role="durados_Link" Type="Durados.Cms.Model.Store.durados_Link" Multiplicity="1" />
+          <End Role="durados_MenuItem" Type="Durados.Cms.Model.Store.durados_MenuItem" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="durados_Link">
+              <PropertyRef Name="ID" />
+            </Principal>
+            <Dependent Role="durados_MenuItem">
+              <PropertyRef Name="LinkID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_MenuItem_Menu">
+          <End Role="durados_Menu" Type="Durados.Cms.Model.Store.durados_Menu" Multiplicity="1" />
+          <End Role="durados_MenuItem" Type="Durados.Cms.Model.Store.durados_MenuItem" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="durados_Menu">
+              <PropertyRef Name="ID" />
+            </Principal>
+            <Dependent Role="durados_MenuItem">
+              <PropertyRef Name="MenuID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_MenuItem_MenuItem">
+          <End Role="durados_MenuItem" Type="Durados.Cms.Model.Store.durados_MenuItem" Multiplicity="0..1" />
+          <End Role="durados_MenuItem1" Type="Durados.Cms.Model.Store.durados_MenuItem" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="durados_MenuItem">
+              <PropertyRef Name="ID" />
+            </Principal>
+            <Dependent Role="durados_MenuItem1">
+              <PropertyRef Name="ParentID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Page_Master">
+          <End Role="durados_Template" Type="Durados.Cms.Model.Store.durados_Template" Multiplicity="1" />
+          <End Role="durados_Page" Type="Durados.Cms.Model.Store.durados_Page" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="durados_Template">
+              <PropertyRef Name="ID" />
+            </Principal>
+            <Dependent Role="durados_Page">
+              <PropertyRef Name="TemplateID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_PageContent_Content">
+          <End Role="durados_Content" Type="Durados.Cms.Model.Store.durados_Content" Multiplicity="1" />
+          <End Role="durados_PageContent" Type="Durados.Cms.Model.Store.durados_PageContent" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="durados_Content">
+              <PropertyRef Name="ID" />
+            </Principal>
+            <Dependent Role="durados_PageContent">
+              <PropertyRef Name="ContentID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_PageContent_Page">
+          <End Role="durados_Page" Type="Durados.Cms.Model.Store.durados_Page" Multiplicity="1" />
+          <End Role="durados_PageContent" Type="Durados.Cms.Model.Store.durados_PageContent" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="durados_Page">
+              <PropertyRef Name="ID" />
+            </Principal>
+            <Dependent Role="durados_PageContent">
+              <PropertyRef Name="PageID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_PageContent_PlaceHolder">
+          <End Role="durados_PlaceHolder" Type="Durados.Cms.Model.Store.durados_PlaceHolder" Multiplicity="0..1" />
+          <End Role="durados_PageContent" Type="Durados.Cms.Model.Store.durados_PageContent" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="durados_PlaceHolder">
+              <PropertyRef Name="ID" />
+            </Principal>
+            <Dependent Role="durados_PageContent">
+              <PropertyRef Name="PlaceHolderID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_RotatorImage_Rotator">
+          <End Role="durados_Rotator" Type="Durados.Cms.Model.Store.durados_Rotator" Multiplicity="1" />
+          <End Role="durados_RotatorImage" Type="Durados.Cms.Model.Store.durados_RotatorImage" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="durados_Rotator">
+              <PropertyRef Name="ID" />
+            </Principal>
+            <Dependent Role="durados_RotatorImage">
+              <PropertyRef Name="RotatorID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_SliderImage_Slider">
+          <End Role="durados_Slider" Type="Durados.Cms.Model.Store.durados_Slider" Multiplicity="1" />
+          <End Role="durados_SliderImage" Type="Durados.Cms.Model.Store.durados_SliderImage" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="durados_Slider">
+              <PropertyRef Name="ID" />
+            </Principal>
+            <Dependent Role="durados_SliderImage">
+              <PropertyRef Name="SliderID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_TemplateCss_Css">
+          <End Role="durados_Css" Type="Durados.Cms.Model.Store.durados_Css" Multiplicity="1" />
+          <End Role="durados_TemplateCss" Type="Durados.Cms.Model.Store.durados_TemplateCss" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="durados_Css">
+              <PropertyRef Name="ID" />
+            </Principal>
+            <Dependent Role="durados_TemplateCss">
+              <PropertyRef Name="CssID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_TemplateCss_Template">
+          <End Role="durados_Template" Type="Durados.Cms.Model.Store.durados_Template" Multiplicity="1" />
+          <End Role="durados_TemplateCss" Type="Durados.Cms.Model.Store.durados_TemplateCss" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="durados_Template">
+              <PropertyRef Name="ID" />
+            </Principal>
+            <Dependent Role="durados_TemplateCss">
+              <PropertyRef Name="TemplateID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_TemplatePlaceHolder_PlaceHolder">
+          <End Role="durados_PlaceHolder" Type="Durados.Cms.Model.Store.durados_PlaceHolder" Multiplicity="1" />
+          <End Role="durados_TemplatePlaceHolder" Type="Durados.Cms.Model.Store.durados_TemplatePlaceHolder" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="durados_PlaceHolder">
+              <PropertyRef Name="ID" />
+            </Principal>
+            <Dependent Role="durados_TemplatePlaceHolder">
+              <PropertyRef Name="PlaceHolderID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_TemplatePlaceHolder_Template">
+          <End Role="durados_Template" Type="Durados.Cms.Model.Store.durados_Template" Multiplicity="1" />
+          <End Role="durados_TemplatePlaceHolder" Type="Durados.Cms.Model.Store.durados_TemplatePlaceHolder" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="durados_Template">
+              <PropertyRef Name="ID" />
+            </Principal>
+            <Dependent Role="durados_TemplatePlaceHolder">
+              <PropertyRef Name="TemplateID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_TemplateScript_Script">
+          <End Role="durados_Script" Type="Durados.Cms.Model.Store.durados_Script" Multiplicity="1" />
+          <End Role="durados_TemplateScript" Type="Durados.Cms.Model.Store.durados_TemplateScript" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="durados_Script">
+              <PropertyRef Name="ID" />
+            </Principal>
+            <Dependent Role="durados_TemplateScript">
+              <PropertyRef Name="ScriptID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_TemplateScript_Template">
+          <End Role="durados_Template" Type="Durados.Cms.Model.Store.durados_Template" Multiplicity="1" />
+          <End Role="durados_TemplateScript" Type="Durados.Cms.Model.Store.durados_TemplateScript" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="durados_Template">
+              <PropertyRef Name="ID" />
+            </Principal>
+            <Dependent Role="durados_TemplateScript">
+              <PropertyRef Name="TemplateID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+      </Schema></edmx:StorageModels>
+    <!-- CSDL content -->
+    <edmx:ConceptualModels>
+      <Schema Namespace="Durados.Cms.Model" Alias="Self" xmlns="http://schemas.microsoft.com/ado/2009/11/edm" annotation:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation">
+        <EntityContainer Name="CmsDB">
+          <EntitySet Name="ContactSet" EntityType="Durados.Cms.Model.Contact" />
+          <EntitySet Name="ContentSet" EntityType="Durados.Cms.Model.Content" />
+          <EntitySet Name="ContentParameterSet" EntityType="Durados.Cms.Model.ContentParameter" />
+          <EntitySet Name="ContentTypeSet" EntityType="Durados.Cms.Model.ContentType" />
+          <EntitySet Name="ContentTypeCssSet" EntityType="Durados.Cms.Model.ContentTypeCss" />
+          <EntitySet Name="ContentTypeScriptSet" EntityType="Durados.Cms.Model.ContentTypeScript" />
+          <EntitySet Name="CssSet" EntityType="Durados.Cms.Model.Css" />
+          <EntitySet Name="FaderSet" EntityType="Durados.Cms.Model.Fader" />
+          <EntitySet Name="FaderContentSet" EntityType="Durados.Cms.Model.FaderContent" />
+          <EntitySet Name="LinkSet" EntityType="Durados.Cms.Model.Link" />
+          <EntitySet Name="LinkParameterSet" EntityType="Durados.Cms.Model.LinkParameter" />
+          <EntitySet Name="MenuSet" EntityType="Durados.Cms.Model.Menu" />
+          <EntitySet Name="MenuItemSet" EntityType="Durados.Cms.Model.MenuItem" />
+          <EntitySet Name="PageSet" EntityType="Durados.Cms.Model.Page" />
+          <EntitySet Name="PageContentSet" EntityType="Durados.Cms.Model.PageContent" />
+          <EntitySet Name="ParameterSet" EntityType="Durados.Cms.Model.Parameter" />
+          <EntitySet Name="PlaceHolderSet" EntityType="Durados.Cms.Model.PlaceHolder" />
+          <EntitySet Name="RotatorSet" EntityType="Durados.Cms.Model.Rotator" />
+          <EntitySet Name="RotatorImageSet" EntityType="Durados.Cms.Model.RotatorImage" />
+          <EntitySet Name="ScriptSet" EntityType="Durados.Cms.Model.Script" />
+          <EntitySet Name="SliderSet" EntityType="Durados.Cms.Model.Slider" />
+          <EntitySet Name="SliderImageSet" EntityType="Durados.Cms.Model.SliderImage" />
+          <EntitySet Name="TemplateSet" EntityType="Durados.Cms.Model.Template" />
+          <EntitySet Name="TemplateCssSet" EntityType="Durados.Cms.Model.TemplateCss" />
+          <EntitySet Name="TemplatePlaceHolderSet" EntityType="Durados.Cms.Model.TemplatePlaceHolder" />
+          <EntitySet Name="TemplateScriptSet" EntityType="Durados.Cms.Model.TemplateScript" />
+          <AssociationSet Name="FK_Content_ContentType" Association="Durados.Cms.Model.FK_Content_ContentType">
+            <End Role="durados_ContentType" EntitySet="ContentTypeSet" />
+            <End Role="durados_Content" EntitySet="ContentSet" />
+          </AssociationSet>
+          <AssociationSet Name="FK_ContentParameter_Content" Association="Durados.Cms.Model.FK_ContentParameter_Content">
+            <End Role="durados_Content" EntitySet="ContentSet" />
+            <End Role="durados_ContentParameter" EntitySet="ContentParameterSet" />
+          </AssociationSet>
+          <AssociationSet Name="FK_FaderContent_Content" Association="Durados.Cms.Model.FK_FaderContent_Content">
+            <End EntitySet="ContentSet" Role="durados_Content" />
+            <End EntitySet="FaderContentSet" Role="durados_FaderContent" />
+          </AssociationSet>
+          <AssociationSet Name="FK_PageContent_Content" Association="Durados.Cms.Model.FK_PageContent_Content">
+            <End Role="durados_Content" EntitySet="ContentSet" />
+            <End Role="durados_PageContent" EntitySet="PageContentSet" />
+          </AssociationSet>
+          <AssociationSet Name="FK_ContentParameter_Parameter" Association="Durados.Cms.Model.FK_ContentParameter_Parameter">
+            <End Role="durados_Parameter" EntitySet="ParameterSet" />
+            <End Role="durados_ContentParameter" EntitySet="ContentParameterSet" />
+          </AssociationSet>
+          <AssociationSet Name="FK_ContentTypeCss_ContentType" Association="Durados.Cms.Model.FK_ContentTypeCss_ContentType">
+            <End Role="durados_ContentType" EntitySet="ContentTypeSet" />
+            <End Role="durados_ContentTypeCss" EntitySet="ContentTypeCssSet" />
+          </AssociationSet>
+          <AssociationSet Name="FK_ContentTypeScript_ContentType" Association="Durados.Cms.Model.FK_ContentTypeScript_ContentType">
+            <End Role="durados_ContentType" EntitySet="ContentTypeSet" />
+            <End Role="durados_ContentTypeScript" EntitySet="ContentTypeScriptSet" />
+          </AssociationSet>
+          <AssociationSet Name="FK_ContentTypeCss_Css" Association="Durados.Cms.Model.FK_ContentTypeCss_Css">
+            <End Role="durados_Css" EntitySet="CssSet" />
+            <End Role="durados_ContentTypeCss" EntitySet="ContentTypeCssSet" />
+          </AssociationSet>
+          <AssociationSet Name="FK_ContentTypeScript_Script" Association="Durados.Cms.Model.FK_ContentTypeScript_Script">
+            <End Role="durados_Script" EntitySet="ScriptSet" />
+            <End Role="durados_ContentTypeScript" EntitySet="ContentTypeScriptSet" />
+          </AssociationSet>
+          <AssociationSet Name="FK_TemplateCss_Css" Association="Durados.Cms.Model.FK_TemplateCss_Css">
+            <End Role="durados_Css" EntitySet="CssSet" />
+            <End Role="durados_TemplateCss" EntitySet="TemplateCssSet" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Fader_Menu" Association="Durados.Cms.Model.FK_Fader_Menu">
+            <End Role="durados_Menu" EntitySet="MenuSet" />
+            <End Role="durados_Fader" EntitySet="FaderSet" />
+          </AssociationSet>
+          <AssociationSet Name="FK_FaderContent_Fader" Association="Durados.Cms.Model.FK_FaderContent_Fader">
+            <End Role="durados_Fader" EntitySet="FaderSet" />
+            <End Role="durados_FaderContent" EntitySet="FaderContentSet" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Link_Page" Association="Durados.Cms.Model.FK_Link_Page">
+            <End Role="durados_Page" EntitySet="PageSet" />
+            <End Role="durados_Link" EntitySet="LinkSet" />
+          </AssociationSet>
+          <AssociationSet Name="FK_LinkParameter_Link" Association="Durados.Cms.Model.FK_LinkParameter_Link">
+            <End Role="durados_Link" EntitySet="LinkSet" />
+            <End Role="durados_LinkParameter" EntitySet="LinkParameterSet" />
+          </AssociationSet>
+          <AssociationSet Name="FK_MenuItem_Link" Association="Durados.Cms.Model.FK_MenuItem_Link">
+            <End Role="durados_Link" EntitySet="LinkSet" />
+            <End Role="durados_MenuItem" EntitySet="MenuItemSet" />
+          </AssociationSet>
+          <AssociationSet Name="FK_LinkParameter_Parameter" Association="Durados.Cms.Model.FK_LinkParameter_Parameter">
+            <End Role="durados_Parameter" EntitySet="ParameterSet" />
+            <End Role="durados_LinkParameter" EntitySet="LinkParameterSet" />
+          </AssociationSet>
+          <AssociationSet Name="FK_MenuItem_Menu" Association="Durados.Cms.Model.FK_MenuItem_Menu">
+            <End Role="durados_Menu" EntitySet="MenuSet" />
+            <End Role="durados_MenuItem" EntitySet="MenuItemSet" />
+          </AssociationSet>
+          <AssociationSet Name="FK_MenuItem_MenuItem" Association="Durados.Cms.Model.FK_MenuItem_MenuItem">
+            <End Role="durados_MenuItem" EntitySet="MenuItemSet" />
+            <End Role="durados_MenuItem1" EntitySet="MenuItemSet" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Page_Master" Association="Durados.Cms.Model.FK_Page_Master">
+            <End Role="durados_Template" EntitySet="TemplateSet" />
+            <End Role="durados_Page" EntitySet="PageSet" />
+          </AssociationSet>
+          <AssociationSet Name="FK_PageContent_Page" Association="Durados.Cms.Model.FK_PageContent_Page">
+            <End Role="durados_Page" EntitySet="PageSet" />
+            <End Role="durados_PageContent" EntitySet="PageContentSet" />
+          </AssociationSet>
+          <AssociationSet Name="FK_PageContent_PlaceHolder" Association="Durados.Cms.Model.FK_PageContent_PlaceHolder">
+            <End Role="durados_PlaceHolder" EntitySet="PlaceHolderSet" />
+            <End Role="durados_PageContent" EntitySet="PageContentSet" />
+          </AssociationSet>
+          <AssociationSet Name="FK_TemplatePlaceHolder_PlaceHolder" Association="Durados.Cms.Model.FK_TemplatePlaceHolder_PlaceHolder">
+            <End Role="durados_PlaceHolder" EntitySet="PlaceHolderSet" />
+            <End Role="durados_TemplatePlaceHolder" EntitySet="TemplatePlaceHolderSet" />
+          </AssociationSet>
+          <AssociationSet Name="FK_RotatorImage_Rotator" Association="Durados.Cms.Model.FK_RotatorImage_Rotator">
+            <End Role="durados_Rotator" EntitySet="RotatorSet" />
+            <End Role="durados_RotatorImage" EntitySet="RotatorImageSet" />
+          </AssociationSet>
+          <AssociationSet Name="FK_TemplateScript_Script" Association="Durados.Cms.Model.FK_TemplateScript_Script">
+            <End Role="durados_Script" EntitySet="ScriptSet" />
+            <End Role="durados_TemplateScript" EntitySet="TemplateScriptSet" />
+          </AssociationSet>
+          <AssociationSet Name="FK_SliderImage_Slider" Association="Durados.Cms.Model.FK_SliderImage_Slider">
+            <End Role="durados_Slider" EntitySet="SliderSet" />
+            <End Role="durados_SliderImage" EntitySet="SliderImageSet" />
+          </AssociationSet>
+          <AssociationSet Name="FK_TemplateCss_Template" Association="Durados.Cms.Model.FK_TemplateCss_Template">
+            <End Role="durados_Template" EntitySet="TemplateSet" />
+            <End Role="durados_TemplateCss" EntitySet="TemplateCssSet" />
+          </AssociationSet>
+          <AssociationSet Name="FK_TemplatePlaceHolder_Template" Association="Durados.Cms.Model.FK_TemplatePlaceHolder_Template">
+            <End Role="durados_Template" EntitySet="TemplateSet" />
+            <End Role="durados_TemplatePlaceHolder" EntitySet="TemplatePlaceHolderSet" />
+          </AssociationSet>
+          <AssociationSet Name="FK_TemplateScript_Template" Association="Durados.Cms.Model.FK_TemplateScript_Template">
+            <End Role="durados_Template" EntitySet="TemplateSet" />
+            <End Role="durados_TemplateScript" EntitySet="TemplateScriptSet" />
+          </AssociationSet>
+          <EntitySet Name="HtmlScrollerSet" EntityType="Durados.Cms.Model.HtmlScroller" />
+          <EntitySet Name="HtmlScrollerContentSet" EntityType="Durados.Cms.Model.HtmlScrollerContent" />
+          <AssociationSet Name="FK_durados_HtmlScrollerContent_Content" Association="Durados.Cms.Model.FK_durados_HtmlScrollerContent_Content">
+            <End EntitySet="ContentSet" Role="Content" />
+            <End EntitySet="HtmlScrollerContentSet" Role="durados_HtmlScrollerContent" /></AssociationSet>
+          <AssociationSet Name="FK_durados_HtmlScrollerContent_HtmlScroller" Association="Durados.Cms.Model.FK_durados_HtmlScrollerContent_HtmlScroller">
+            <End Role="durados_HtmlScroller" EntitySet="HtmlScrollerSet" />
+            <End Role="durados_HtmlScrollerContent" EntitySet="HtmlScrollerContentSet" /></AssociationSet>
+          <EntitySet Name="FrameSet" EntityType="Durados.Cms.Model.Frame" />
+          <EntitySet Name="HtmlSet" EntityType="Durados.Cms.Model.Html" />
+          <EntitySet Name="ImageSet" EntityType="Durados.Cms.Model.Image" />
+          <AssociationSet Name="FK_durados_Content_durados_Frame" Association="Durados.Cms.Model.FK_durados_Content_durados_Frame">
+            <End Role="durados_Frame" EntitySet="FrameSet" />
+            <End Role="Content" EntitySet="ContentSet" /></AssociationSet>
+          <AssociationSet Name="FK_durados_Content_durados_Html" Association="Durados.Cms.Model.FK_durados_Content_durados_Html">
+            <End Role="durados_Html" EntitySet="HtmlSet" />
+            <End Role="Content" EntitySet="ContentSet" /></AssociationSet>
+          <AssociationSet Name="FK_durados_Content_durados_Image" Association="Durados.Cms.Model.FK_durados_Content_durados_Image">
+            <End Role="durados_Image" EntitySet="ImageSet" />
+            <End Role="Content" EntitySet="ContentSet" /></AssociationSet>
+          <EntitySet Name="FormSet" EntityType="Durados.Cms.Model.Form" />
+          <EntitySet Name="FormTypeSet" EntityType="Durados.Cms.Model.FormType" />
+          <AssociationSet Name="FK_durados_Form_durados_FormType" Association="Durados.Cms.Model.FK_durados_Form_durados_FormType">
+            <End Role="durados_FormType" EntitySet="FormTypeSet" />
+            <End Role="durados_Form" EntitySet="FormSet" /></AssociationSet>
+          <EntitySet Name="FieldSet" EntityType="Durados.Cms.Model.Field" />
+          <EntitySet Name="FieldCategorySet" EntityType="Durados.Cms.Model.FieldCategory" />
+          <EntitySet Name="FieldCategoryRelSet" EntityType="Durados.Cms.Model.FieldCategoryRel" />
+          <EntitySet Name="ObjectSet" EntityType="Durados.Cms.Model.Object" />
+          <AssociationSet Name="FK_durados_Field_durados_Object" Association="Durados.Cms.Model.FK_durados_Field_durados_Object">
+            <End Role="durados_Object" EntitySet="ObjectSet" />
+            <End Role="durados_Field" EntitySet="FieldSet" /></AssociationSet>
+          <AssociationSet Name="FK_durados_FieldCategoryRel_durados_Field" Association="Durados.Cms.Model.FK_durados_FieldCategoryRel_durados_Field">
+            <End Role="durados_Field" EntitySet="FieldSet" />
+            <End Role="durados_FieldCategoryRel" EntitySet="FieldCategoryRelSet" /></AssociationSet>
+          <AssociationSet Name="FK_durados_FieldCategory_durados_Object" Association="Durados.Cms.Model.FK_durados_FieldCategory_durados_Object">
+            <End Role="durados_Object" EntitySet="ObjectSet" />
+            <End Role="durados_FieldCategory" EntitySet="FieldCategorySet" /></AssociationSet>
+          <AssociationSet Name="FK_durados_FieldCategoryRel_durados_FieldCategory" Association="Durados.Cms.Model.FK_durados_FieldCategoryRel_durados_FieldCategory">
+            <End Role="durados_FieldCategory" EntitySet="FieldCategorySet" />
+            <End Role="durados_FieldCategoryRel" EntitySet="FieldCategoryRelSet" /></AssociationSet></EntityContainer>
+        <EntityType Name="Contact">
+          <Key>
+            <PropertyRef Name="ID" />
+          </Key>
+          <Property Name="ID" Type="Int32" Nullable="false" />
+          <Property Name="Name" Type="String" Nullable="false" MaxLength="50" Unicode="true" FixedLength="false" />
+          <Property Name="Subject" Type="String" Nullable="false" MaxLength="500" Unicode="true" FixedLength="false" />
+          <Property Name="To" Type="String" Nullable="false" MaxLength="Max" Unicode="true" FixedLength="false" />
+          <Property Name="CC" Type="String" MaxLength="Max" Unicode="true" FixedLength="false" />
+          <Property Name="SMTP" Type="String" Nullable="false" MaxLength="50" Unicode="true" FixedLength="false" />
+          <Property Name="Title" Type="String" Nullable="false" MaxLength="50" Unicode="true" FixedLength="false" />
+          <Property Name="Header" Type="String" MaxLength="Max" Unicode="true" FixedLength="false" />
+          <Property Name="Footer" Type="String" MaxLength="Max" Unicode="true" FixedLength="false" />
+          <Property Name="FromRequired" Type="Boolean" />
+          <Property Name="AnonymousEmail" Type="String" MaxLength="500" Unicode="true" FixedLength="false" />
+        </EntityType>
+        <EntityType Name="Content">
+          <Key>
+            <PropertyRef Name="ID" />
+          </Key>
+          <Property Name="ID" Type="Int32" Nullable="false" />
+          <Property Name="Name" Type="String" Nullable="false" MaxLength="50" Unicode="true" FixedLength="false" />
+          <NavigationProperty Name="ContentType" Relationship="Durados.Cms.Model.FK_Content_ContentType" FromRole="durados_Content" ToRole="durados_ContentType" />
+          <NavigationProperty Name="ContentParameter" Relationship="Durados.Cms.Model.FK_ContentParameter_Content" FromRole="durados_Content" ToRole="durados_ContentParameter" />
+          <NavigationProperty Name="FaderContent" Relationship="Durados.Cms.Model.FK_FaderContent_Content" FromRole="durados_Content" ToRole="durados_FaderContent" />
+          <NavigationProperty Name="PageContent" Relationship="Durados.Cms.Model.FK_PageContent_Content" FromRole="durados_Content" ToRole="durados_PageContent" />
+          <NavigationProperty Name="HtmlScrollerContent" Relationship="Durados.Cms.Model.FK_durados_HtmlScrollerContent_Content" FromRole="Content" ToRole="durados_HtmlScrollerContent" />
+          <NavigationProperty Name="Frame" Relationship="Durados.Cms.Model.FK_durados_Content_durados_Frame" FromRole="Content" ToRole="durados_Frame" />
+          <NavigationProperty Name="Html" Relationship="Durados.Cms.Model.FK_durados_Content_durados_Html" FromRole="Content" ToRole="durados_Html" />
+          <NavigationProperty Name="Image" Relationship="Durados.Cms.Model.FK_durados_Content_durados_Image" FromRole="Content" ToRole="durados_Image" />
+          <Property Name="CustomTypeID" Type="Int32" Nullable="true" /></EntityType>
+        <EntityType Name="ContentParameter">
+          <Key>
+            <PropertyRef Name="ID" />
+          </Key>
+          <Property Name="ID" Type="Int32" Nullable="false" />
+          <NavigationProperty Name="Content" Relationship="Durados.Cms.Model.FK_ContentParameter_Content" FromRole="durados_ContentParameter" ToRole="durados_Content" />
+          <NavigationProperty Name="Parameter" Relationship="Durados.Cms.Model.FK_ContentParameter_Parameter" FromRole="durados_ContentParameter" ToRole="durados_Parameter" />
+        </EntityType>
+        <EntityType Name="ContentType">
+          <Key>
+            <PropertyRef Name="ID" />
+          </Key>
+          <Property Name="ID" Type="Int32" Nullable="false" />
+          <Property Name="Name" Type="String" Nullable="false" MaxLength="50" Unicode="true" FixedLength="false" />
+          <NavigationProperty Name="Content" Relationship="Durados.Cms.Model.FK_Content_ContentType" FromRole="durados_ContentType" ToRole="durados_Content" />
+          <NavigationProperty Name="ContentTypeCss" Relationship="Durados.Cms.Model.FK_ContentTypeCss_ContentType" FromRole="durados_ContentType" ToRole="durados_ContentTypeCss" />
+          <NavigationProperty Name="ContentTypeScript" Relationship="Durados.Cms.Model.FK_ContentTypeScript_ContentType" FromRole="durados_ContentType" ToRole="durados_ContentTypeScript" />
+          <Property Name="Custom" Type="Boolean" Nullable="false" /></EntityType>
+        <EntityType Name="ContentTypeCss">
+          <Key>
+            <PropertyRef Name="ID" />
+          </Key>
+          <Property Name="ID" Type="Int32" Nullable="false" />
+          <NavigationProperty Name="ContentType" Relationship="Durados.Cms.Model.FK_ContentTypeCss_ContentType" FromRole="durados_ContentTypeCss" ToRole="durados_ContentType" />
+          <NavigationProperty Name="Css" Relationship="Durados.Cms.Model.FK_ContentTypeCss_Css" FromRole="durados_ContentTypeCss" ToRole="durados_Css" />
+        </EntityType>
+        <EntityType Name="ContentTypeScript">
+          <Key>
+            <PropertyRef Name="ID" />
+          </Key>
+          <Property Name="ID" Type="Int32" Nullable="false" />
+          <NavigationProperty Name="ContentType" Relationship="Durados.Cms.Model.FK_ContentTypeScript_ContentType" FromRole="durados_ContentTypeScript" ToRole="durados_ContentType" />
+          <NavigationProperty Name="Script" Relationship="Durados.Cms.Model.FK_ContentTypeScript_Script" FromRole="durados_ContentTypeScript" ToRole="durados_Script" />
+          <Property Name="Ordinal" Type="Int32" Nullable="true" /></EntityType>
+        <EntityType Name="Css">
+          <Key>
+            <PropertyRef Name="ID" />
+          </Key>
+          <Property Name="ID" Type="Int32" Nullable="false" />
+          <Property Name="Name" Type="String" Nullable="false" MaxLength="50" Unicode="true" FixedLength="false" />
+          <Property Name="Reference" Type="String" Nullable="false" MaxLength="350" Unicode="true" FixedLength="false" />
+          <NavigationProperty Name="ContentTypeCss" Relationship="Durados.Cms.Model.FK_ContentTypeCss_Css" FromRole="durados_Css" ToRole="durados_ContentTypeCss" />
+          <NavigationProperty Name="TemplateCss" Relationship="Durados.Cms.Model.FK_TemplateCss_Css" FromRole="durados_Css" ToRole="durados_TemplateCss" />
+        </EntityType>
+        <EntityType Name="Fader">
+          <Key>
+            <PropertyRef Name="ID" />
+          </Key>
+          <Property Name="ID" Type="Int32" Nullable="false" />
+          <Property Name="Name" Type="String" Nullable="false" MaxLength="50" Unicode="true" FixedLength="false" />
+          <Property Name="Delay" Type="Int32" Nullable="false" />
+          <NavigationProperty Name="Menu" Relationship="Durados.Cms.Model.FK_Fader_Menu" FromRole="durados_Fader" ToRole="durados_Menu" />
+          <NavigationProperty Name="FaderContent" Relationship="Durados.Cms.Model.FK_FaderContent_Fader" FromRole="durados_Fader" ToRole="durados_FaderContent" />
+        </EntityType>
+        <EntityType Name="FaderContent">
+          <Key>
+            <PropertyRef Name="ID" />
+          </Key>
+          <Property Name="ID" Type="Int32" Nullable="false" />
+          <Property Name="Ordinal" Type="Int32" Nullable="false" />
+          <NavigationProperty Name="Content" Relationship="Durados.Cms.Model.FK_FaderContent_Content" FromRole="durados_FaderContent" ToRole="durados_Content" />
+          <NavigationProperty Name="Fader" Relationship="Durados.Cms.Model.FK_FaderContent_Fader" FromRole="durados_FaderContent" ToRole="durados_Fader" />
+        </EntityType>
+        <EntityType Name="Link">
+          <Key>
+            <PropertyRef Name="ID" />
+          </Key>
+          <Property Name="ID" Type="Int32" Nullable="false" />
+          <Property Name="Name" Type="String" MaxLength="50" Unicode="true" FixedLength="false" />
+          <Property Name="Url" Type="String" MaxLength="250" Unicode="true" FixedLength="false" />
+          <Property Name="Action" Type="String" MaxLength="250" Unicode="true" FixedLength="false" />
+          <Property Name="Controller" Type="String" MaxLength="250" Unicode="true" FixedLength="false" />
+          <Property Name="Script" Type="String" MaxLength="Max" Unicode="true" FixedLength="false" />
+          <Property Name="Target" Type="String" MaxLength="50" Unicode="true" FixedLength="false" />
+          <Property Name="LoginRequired" Type="Boolean" />
+          <Property Name="Text" Type="String" MaxLength="Max" Unicode="true" FixedLength="false" />
+          <Property Name="Tooltip" Type="String" MaxLength="Max" Unicode="true" FixedLength="false" />
+          <NavigationProperty Name="Page" Relationship="Durados.Cms.Model.FK_Link_Page" FromRole="durados_Link" ToRole="durados_Page" />
+          <NavigationProperty Name="LinkParameter" Relationship="Durados.Cms.Model.FK_LinkParameter_Link" FromRole="durados_Link" ToRole="durados_LinkParameter" />
+          <NavigationProperty Name="MenuItem" Relationship="Durados.Cms.Model.FK_MenuItem_Link" FromRole="durados_Link" ToRole="durados_MenuItem" />
+          <Property Name="ControlName" Type="String" Nullable="true" /></EntityType>
+        <EntityType Name="LinkParameter">
+          <Key>
+            <PropertyRef Name="ID" />
+          </Key>
+          <Property Name="ID" Type="Int32" Nullable="false" />
+          <NavigationProperty Name="Link" Relationship="Durados.Cms.Model.FK_LinkParameter_Link" FromRole="durados_LinkParameter" ToRole="durados_Link" />
+          <NavigationProperty Name="Parameter" Relationship="Durados.Cms.Model.FK_LinkParameter_Parameter" FromRole="durados_LinkParameter" ToRole="durados_Parameter" />
+        </EntityType>
+        <EntityType Name="Menu">
+          <Key>
+            <PropertyRef Name="ID" />
+          </Key>
+          <Property Name="ID" Type="Int32" Nullable="false" />
+          <Property Name="Name" Type="String" Nullable="false" MaxLength="50" Unicode="true" FixedLength="false" />
+          <Property Name="Orientation" Type="String" Nullable="false" MaxLength="1" Unicode="true" FixedLength="true" />
+          <NavigationProperty Name="Fader" Relationship="Durados.Cms.Model.FK_Fader_Menu" FromRole="durados_Menu" ToRole="durados_Fader" />
+          <NavigationProperty Name="MenuItem" Relationship="Durados.Cms.Model.FK_MenuItem_Menu" FromRole="durados_Menu" ToRole="durados_MenuItem" />
+        </EntityType>
+        <EntityType Name="MenuItem">
+          <Key>
+            <PropertyRef Name="ID" />
+          </Key>
+          <Property Name="ID" Type="Int32" Nullable="false" />
+          <Property Name="Ordinal" Type="Int32" Nullable="false" />
+          <NavigationProperty Name="Link" Relationship="Durados.Cms.Model.FK_MenuItem_Link" FromRole="durados_MenuItem" ToRole="durados_Link" />
+          <NavigationProperty Name="Menu" Relationship="Durados.Cms.Model.FK_MenuItem_Menu" FromRole="durados_MenuItem" ToRole="durados_Menu" />
+          <NavigationProperty Name="MenuItem1" Relationship="Durados.Cms.Model.FK_MenuItem_MenuItem" FromRole="durados_MenuItem" ToRole="durados_MenuItem1" />
+          <NavigationProperty Name="MenuItem2" Relationship="Durados.Cms.Model.FK_MenuItem_MenuItem" FromRole="durados_MenuItem1" ToRole="durados_MenuItem" />
+        </EntityType>
+        <EntityType Name="Page">
+          <Key>
+            <PropertyRef Name="ID" />
+          </Key>
+          <Property Name="ID" Type="Int32" Nullable="false" />
+          <Property Name="Name" Type="String" Nullable="false" MaxLength="50" Unicode="true" FixedLength="false" />
+          <Property Name="Title" Type="String" Nullable="false" MaxLength="250" Unicode="true" FixedLength="false" />
+          <NavigationProperty Name="Link" Relationship="Durados.Cms.Model.FK_Link_Page" FromRole="durados_Page" ToRole="durados_Link" />
+          <NavigationProperty Name="Template" Relationship="Durados.Cms.Model.FK_Page_Master" FromRole="durados_Page" ToRole="durados_Template" />
+          <NavigationProperty Name="PageContent" Relationship="Durados.Cms.Model.FK_PageContent_Page" FromRole="durados_Page" ToRole="durados_PageContent" />
+        </EntityType>
+        <EntityType Name="PageContent">
+          <Key>
+            <PropertyRef Name="ID" />
+          </Key>
+          <Property Name="ID" Type="Int32" Nullable="false" />
+          <Property Name="Ordinal" Type="Int32" Nullable="false" />
+          <NavigationProperty Name="Content" Relationship="Durados.Cms.Model.FK_PageContent_Content" FromRole="durados_PageContent" ToRole="durados_Content" />
+          <NavigationProperty Name="Page" Relationship="Durados.Cms.Model.FK_PageContent_Page" FromRole="durados_PageContent" ToRole="durados_Page" />
+          <NavigationProperty Name="PlaceHolder" Relationship="Durados.Cms.Model.FK_PageContent_PlaceHolder" FromRole="durados_PageContent" ToRole="durados_PlaceHolder" />
+        </EntityType>
+        <EntityType Name="Parameter">
+          <Key>
+            <PropertyRef Name="ID" />
+          </Key>
+          <Property Name="ID" Type="Int32" Nullable="false" />
+          <Property Name="Name" Type="String" MaxLength="250" Unicode="true" FixedLength="false" />
+          <Property Name="Value" Type="String" MaxLength="250" Unicode="true" FixedLength="false" />
+          <NavigationProperty Name="ContentParameter" Relationship="Durados.Cms.Model.FK_ContentParameter_Parameter" FromRole="durados_Parameter" ToRole="durados_ContentParameter" />
+          <NavigationProperty Name="LinkParameter" Relationship="Durados.Cms.Model.FK_LinkParameter_Parameter" FromRole="durados_Parameter" ToRole="durados_LinkParameter" />
+        </EntityType>
+        <EntityType Name="PlaceHolder">
+          <Key>
+            <PropertyRef Name="ID" />
+          </Key>
+          <Property Name="ID" Type="Int32" Nullable="false" />
+          <Property Name="Name" Type="String" Nullable="false" MaxLength="50" Unicode="true" FixedLength="false" />
+          <NavigationProperty Name="PageContent" Relationship="Durados.Cms.Model.FK_PageContent_PlaceHolder" FromRole="durados_PlaceHolder" ToRole="durados_PageContent" />
+          <NavigationProperty Name="TemplatePlaceHolder" Relationship="Durados.Cms.Model.FK_TemplatePlaceHolder_PlaceHolder" FromRole="durados_PlaceHolder" ToRole="durados_TemplatePlaceHolder" />
+        </EntityType>
+        <EntityType Name="Rotator">
+          <Key>
+            <PropertyRef Name="ID" />
+          </Key>
+          <Property Name="ID" Type="Int32" Nullable="false" />
+          <Property Name="Name" Type="String" Nullable="false" MaxLength="50" Unicode="true" FixedLength="false" />
+          <Property Name="Delay" Type="Int32" Nullable="false" />
+          <NavigationProperty Name="RotatorImage" Relationship="Durados.Cms.Model.FK_RotatorImage_Rotator" FromRole="durados_Rotator" ToRole="durados_RotatorImage" />
+          <Property Name="Random" Type="Boolean" Nullable="false" /></EntityType>
+        <EntityType Name="RotatorImage">
+          <Key>
+            <PropertyRef Name="ID" />
+          </Key>
+          <Property Name="ID" Type="Int32" Nullable="false" />
+          <Property Name="Image" Type="String" Nullable="false" MaxLength="250" Unicode="true" FixedLength="false" />
+          <NavigationProperty Name="Rotator" Relationship="Durados.Cms.Model.FK_RotatorImage_Rotator" FromRole="durados_RotatorImage" ToRole="durados_Rotator" />
+          <Property Name="AdditionalDelay" Type="Int32" Nullable="false" />
+          <Property Name="Ordinal" Type="Int32" Nullable="false" /></EntityType>
+        <EntityType Name="Script">
+          <Key>
+            <PropertyRef Name="ID" />
+          </Key>
+          <Property Name="ID" Type="Int32" Nullable="false" />
+          <Property Name="Name" Type="String" Nullable="false" MaxLength="50" Unicode="true" FixedLength="false" />
+          <Property Name="Reference" Type="String" Nullable="false" MaxLength="350" Unicode="true" FixedLength="false" />
+          <NavigationProperty Name="ContentTypeScript" Relationship="Durados.Cms.Model.FK_ContentTypeScript_Script" FromRole="durados_Script" ToRole="durados_ContentTypeScript" />
+          <NavigationProperty Name="TemplateScript" Relationship="Durados.Cms.Model.FK_TemplateScript_Script" FromRole="durados_Script" ToRole="durados_TemplateScript" />
+        </EntityType>
+        <EntityType Name="Slider">
+          <Key>
+            <PropertyRef Name="ID" />
+          </Key>
+          <Property Name="ID" Type="Int32" Nullable="false" />
+          <Property Name="Name" Type="String" MaxLength="50" Unicode="true" FixedLength="false" />
+          <Property Name="Orientation" Type="String" Nullable="false" MaxLength="1" Unicode="true" FixedLength="true" />
+          <NavigationProperty Name="SliderImage" Relationship="Durados.Cms.Model.FK_SliderImage_Slider" FromRole="durados_Slider" ToRole="durados_SliderImage" />
+        </EntityType>
+        <EntityType Name="SliderImage">
+          <Key>
+            <PropertyRef Name="ID" />
+          </Key>
+          <Property Name="ID" Type="Int32" Nullable="false" />
+          <Property Name="SlideImage" Type="String" Nullable="false" MaxLength="250" Unicode="true" FixedLength="false" />
+          <Property Name="HoverImage" Type="String" Nullable="false" MaxLength="250" Unicode="true" FixedLength="false" />
+          <Property Name="DisplayImage" Type="String" Nullable="false" MaxLength="250" Unicode="true" FixedLength="false" />
+          <Property Name="Ordinal" Type="Int32" Nullable="false" />
+          <Property Name="ToolTip" Type="String" MaxLength="250" Unicode="true" FixedLength="false" />
+          <Property Name="Html" Type="String" MaxLength="Max" Unicode="true" FixedLength="false" />
+          <NavigationProperty Name="Slider" Relationship="Durados.Cms.Model.FK_SliderImage_Slider" FromRole="durados_SliderImage" ToRole="durados_Slider" />
+        </EntityType>
+        <EntityType Name="Template">
+          <Key>
+            <PropertyRef Name="ID" />
+          </Key>
+          <Property Name="ID" Type="Int32" Nullable="false" />
+          <Property Name="Name" Type="String" Nullable="false" MaxLength="50" Unicode="true" FixedLength="false" />
+          <NavigationProperty Name="Page" Relationship="Durados.Cms.Model.FK_Page_Master" FromRole="durados_Template" ToRole="durados_Page" />
+          <NavigationProperty Name="TemplateCss" Relationship="Durados.Cms.Model.FK_TemplateCss_Template" FromRole="durados_Template" ToRole="durados_TemplateCss" />
+          <NavigationProperty Name="TemplatePlaceHolder" Relationship="Durados.Cms.Model.FK_TemplatePlaceHolder_Template" FromRole="durados_Template" ToRole="durados_TemplatePlaceHolder" />
+          <NavigationProperty Name="TemplateScript" Relationship="Durados.Cms.Model.FK_TemplateScript_Template" FromRole="durados_Template" ToRole="durados_TemplateScript" />
+        </EntityType>
+        <EntityType Name="TemplateCss">
+          <Key>
+            <PropertyRef Name="ID" />
+          </Key>
+          <Property Name="ID" Type="Int32" Nullable="false" />
+          <NavigationProperty Name="Css" Relationship="Durados.Cms.Model.FK_TemplateCss_Css" FromRole="durados_TemplateCss" ToRole="durados_Css" />
+          <NavigationProperty Name="Template" Relationship="Durados.Cms.Model.FK_TemplateCss_Template" FromRole="durados_TemplateCss" ToRole="durados_Template" />
+        </EntityType>
+        <EntityType Name="TemplatePlaceHolder">
+          <Key>
+            <PropertyRef Name="ID" />
+          </Key>
+          <Property Name="ID" Type="Int32" Nullable="false" />
+          <NavigationProperty Name="PlaceHolder" Relationship="Durados.Cms.Model.FK_TemplatePlaceHolder_PlaceHolder" FromRole="durados_TemplatePlaceHolder" ToRole="durados_PlaceHolder" />
+          <NavigationProperty Name="Template" Relationship="Durados.Cms.Model.FK_TemplatePlaceHolder_Template" FromRole="durados_TemplatePlaceHolder" ToRole="durados_Template" />
+        </EntityType>
+        <EntityType Name="TemplateScript">
+          <Key>
+            <PropertyRef Name="ID" />
+          </Key>
+          <Property Name="ID" Type="Int32" Nullable="false" />
+          <NavigationProperty Name="Script" Relationship="Durados.Cms.Model.FK_TemplateScript_Script" FromRole="durados_TemplateScript" ToRole="durados_Script" />
+          <NavigationProperty Name="Template" Relationship="Durados.Cms.Model.FK_TemplateScript_Template" FromRole="durados_TemplateScript" ToRole="durados_Template" />
+        </EntityType>
+        <Association Name="FK_Content_ContentType">
+          <End Role="durados_ContentType" Type="Durados.Cms.Model.ContentType" Multiplicity="0..1" />
+          <End Role="durados_Content" Type="Durados.Cms.Model.Content" Multiplicity="*" />
+        </Association>
+        <Association Name="FK_ContentParameter_Content">
+          <End Role="durados_Content" Type="Durados.Cms.Model.Content" Multiplicity="1" />
+          <End Role="durados_ContentParameter" Type="Durados.Cms.Model.ContentParameter" Multiplicity="*" />
+        </Association>
+        <Association Name="FK_FaderContent_Content">
+          <End Type="Durados.Cms.Model.Content" Multiplicity="1" Role="durados_Content" />
+          <End Type="Durados.Cms.Model.FaderContent" Multiplicity="*" Role="durados_FaderContent" />
+        </Association>
+        <Association Name="FK_PageContent_Content">
+          <End Role="durados_Content" Type="Durados.Cms.Model.Content" Multiplicity="1" />
+          <End Role="durados_PageContent" Type="Durados.Cms.Model.PageContent" Multiplicity="*" />
+        </Association>
+        <Association Name="FK_ContentParameter_Parameter">
+          <End Role="durados_Parameter" Type="Durados.Cms.Model.Parameter" Multiplicity="1" />
+          <End Role="durados_ContentParameter" Type="Durados.Cms.Model.ContentParameter" Multiplicity="*" />
+        </Association>
+        <Association Name="FK_ContentTypeCss_ContentType">
+          <End Role="durados_ContentType" Type="Durados.Cms.Model.ContentType" Multiplicity="1" />
+          <End Role="durados_ContentTypeCss" Type="Durados.Cms.Model.ContentTypeCss" Multiplicity="*" />
+        </Association>
+        <Association Name="FK_ContentTypeScript_ContentType">
+          <End Role="durados_ContentType" Type="Durados.Cms.Model.ContentType" Multiplicity="1" />
+          <End Role="durados_ContentTypeScript" Type="Durados.Cms.Model.ContentTypeScript" Multiplicity="*" />
+        </Association>
+        <Association Name="FK_ContentTypeCss_Css">
+          <End Role="durados_Css" Type="Durados.Cms.Model.Css" Multiplicity="1" />
+          <End Role="durados_ContentTypeCss" Type="Durados.Cms.Model.ContentTypeCss" Multiplicity="*" />
+        </Association>
+        <Association Name="FK_ContentTypeScript_Script">
+          <End Role="durados_Script" Type="Durados.Cms.Model.Script" Multiplicity="1" />
+          <End Role="durados_ContentTypeScript" Type="Durados.Cms.Model.ContentTypeScript" Multiplicity="*" />
+        </Association>
+        <Association Name="FK_TemplateCss_Css">
+          <End Role="durados_Css" Type="Durados.Cms.Model.Css" Multiplicity="1" />
+          <End Role="durados_TemplateCss" Type="Durados.Cms.Model.TemplateCss" Multiplicity="*" />
+        </Association>
+        <Association Name="FK_Fader_Menu">
+          <End Role="durados_Menu" Type="Durados.Cms.Model.Menu" Multiplicity="0..1" />
+          <End Role="durados_Fader" Type="Durados.Cms.Model.Fader" Multiplicity="*" />
+        </Association>
+        <Association Name="FK_FaderContent_Fader">
+          <End Role="durados_Fader" Type="Durados.Cms.Model.Fader" Multiplicity="1" />
+          <End Role="durados_FaderContent" Type="Durados.Cms.Model.FaderContent" Multiplicity="*" />
+        </Association>
+        <Association Name="FK_Link_Page">
+          <End Role="durados_Page" Type="Durados.Cms.Model.Page" Multiplicity="0..1" />
+          <End Role="durados_Link" Type="Durados.Cms.Model.Link" Multiplicity="*" />
+        </Association>
+        <Association Name="FK_LinkParameter_Link">
+          <End Role="durados_Link" Type="Durados.Cms.Model.Link" Multiplicity="1" />
+          <End Role="durados_LinkParameter" Type="Durados.Cms.Model.LinkParameter" Multiplicity="*" />
+        </Association>
+        <Association Name="FK_MenuItem_Link">
+          <End Role="durados_Link" Type="Durados.Cms.Model.Link" Multiplicity="1" />
+          <End Role="durados_MenuItem" Type="Durados.Cms.Model.MenuItem" Multiplicity="*" />
+        </Association>
+        <Association Name="FK_LinkParameter_Parameter">
+          <End Role="durados_Parameter" Type="Durados.Cms.Model.Parameter" Multiplicity="1" />
+          <End Role="durados_LinkParameter" Type="Durados.Cms.Model.LinkParameter" Multiplicity="*" />
+        </Association>
+        <Association Name="FK_MenuItem_Menu">
+          <End Role="durados_Menu" Type="Durados.Cms.Model.Menu" Multiplicity="1" />
+          <End Role="durados_MenuItem" Type="Durados.Cms.Model.MenuItem" Multiplicity="*" />
+        </Association>
+        <Association Name="FK_MenuItem_MenuItem">
+          <End Role="durados_MenuItem" Type="Durados.Cms.Model.MenuItem" Multiplicity="0..1" />
+          <End Role="durados_MenuItem1" Type="Durados.Cms.Model.MenuItem" Multiplicity="*" />
+        </Association>
+        <Association Name="FK_Page_Master">
+          <End Role="durados_Template" Type="Durados.Cms.Model.Template" Multiplicity="1" />
+          <End Role="durados_Page" Type="Durados.Cms.Model.Page" Multiplicity="*" />
+        </Association>
+        <Association Name="FK_PageContent_Page">
+          <End Role="durados_Page" Type="Durados.Cms.Model.Page" Multiplicity="1" />
+          <End Role="durados_PageContent" Type="Durados.Cms.Model.PageContent" Multiplicity="*" />
+        </Association>
+        <Association Name="FK_PageContent_PlaceHolder">
+          <End Role="durados_PlaceHolder" Type="Durados.Cms.Model.PlaceHolder" Multiplicity="0..1" />
+          <End Role="durados_PageContent" Type="Durados.Cms.Model.PageContent" Multiplicity="*" />
+        </Association>
+        <Association Name="FK_TemplatePlaceHolder_PlaceHolder">
+          <End Role="durados_PlaceHolder" Type="Durados.Cms.Model.PlaceHolder" Multiplicity="1" />
+          <End Role="durados_TemplatePlaceHolder" Type="Durados.Cms.Model.TemplatePlaceHolder" Multiplicity="*" />
+        </Association>
+        <Association Name="FK_RotatorImage_Rotator">
+          <End Role="durados_Rotator" Type="Durados.Cms.Model.Rotator" Multiplicity="1" />
+          <End Role="durados_RotatorImage" Type="Durados.Cms.Model.RotatorImage" Multiplicity="*" />
+        </Association>
+        <Association Name="FK_TemplateScript_Script">
+          <End Role="durados_Script" Type="Durados.Cms.Model.Script" Multiplicity="1" />
+          <End Role="durados_TemplateScript" Type="Durados.Cms.Model.TemplateScript" Multiplicity="*" />
+        </Association>
+        <Association Name="FK_SliderImage_Slider">
+          <End Role="durados_Slider" Type="Durados.Cms.Model.Slider" Multiplicity="1" />
+          <End Role="durados_SliderImage" Type="Durados.Cms.Model.SliderImage" Multiplicity="*" />
+        </Association>
+        <Association Name="FK_TemplateCss_Template">
+          <End Role="durados_Template" Type="Durados.Cms.Model.Template" Multiplicity="1" />
+          <End Role="durados_TemplateCss" Type="Durados.Cms.Model.TemplateCss" Multiplicity="*" />
+        </Association>
+        <Association Name="FK_TemplatePlaceHolder_Template">
+          <End Role="durados_Template" Type="Durados.Cms.Model.Template" Multiplicity="1" />
+          <End Role="durados_TemplatePlaceHolder" Type="Durados.Cms.Model.TemplatePlaceHolder" Multiplicity="*" />
+        </Association>
+        <Association Name="FK_TemplateScript_Template">
+          <End Role="durados_Template" Type="Durados.Cms.Model.Template" Multiplicity="1" />
+          <End Role="durados_TemplateScript" Type="Durados.Cms.Model.TemplateScript" Multiplicity="*" />
+        </Association>
+        <EntityType Name="HtmlScroller">
+          <Key>
+            <PropertyRef Name="Id" /></Key>
+          <Property Name="Id" Type="Int32" Nullable="false" />
+          <Property Name="Name" Type="String" Nullable="true" />
+          <NavigationProperty Name="HtmlScrollerContent" Relationship="Durados.Cms.Model.FK_durados_HtmlScrollerContent_HtmlScroller" FromRole="durados_HtmlScroller" ToRole="durados_HtmlScrollerContent" />
+          </EntityType>
+        <EntityType Name="HtmlScrollerContent">
+          <Key>
+            <PropertyRef Name="ID" /></Key>
+          <Property Name="ID" Type="Int32" Nullable="false" />
+          <NavigationProperty Name="Content" Relationship="Durados.Cms.Model.FK_durados_HtmlScrollerContent_Content" FromRole="durados_HtmlScrollerContent" ToRole="Content" />
+          <NavigationProperty Name="HtmlScroller" Relationship="Durados.Cms.Model.FK_durados_HtmlScrollerContent_HtmlScroller" FromRole="durados_HtmlScrollerContent" ToRole="durados_HtmlScroller" />
+          <Property Name="Ordinal" Type="Int32" Nullable="false" /></EntityType>
+        <Association Name="FK_durados_HtmlScrollerContent_Content">
+          <End Type="Durados.Cms.Model.Content" Multiplicity="1" Role="Content" />
+          <End Type="Durados.Cms.Model.HtmlScrollerContent" Multiplicity="*" Role="durados_HtmlScrollerContent" /></Association>
+        <Association Name="FK_durados_HtmlScrollerContent_HtmlScroller">
+          <End Type="Durados.Cms.Model.HtmlScroller" Role="durados_HtmlScroller" Multiplicity="1" />
+          <End Type="Durados.Cms.Model.HtmlScrollerContent" Role="durados_HtmlScrollerContent" Multiplicity="*" /></Association>
+        <EntityType Name="Frame">
+          <Key>
+            <PropertyRef Name="ID" /></Key>
+          <Property Name="ID" Type="Int32" Nullable="false" />
+          <Property Name="Name" Type="String" Nullable="false" />
+          <Property Name="Url" Type="String" Nullable="false" />
+          <NavigationProperty Name="Content" Relationship="Durados.Cms.Model.FK_durados_Content_durados_Frame" FromRole="durados_Frame" ToRole="Content" /></EntityType>
+        <EntityType Name="Html">
+          <Key>
+            <PropertyRef Name="ID" /></Key>
+          <Property Name="ID" Type="Int32" Nullable="false" />
+          <Property Name="Name" Type="String" Nullable="false" />
+          <Property Name="Text" Type="String" Nullable="false" />
+          <NavigationProperty Name="Content" Relationship="Durados.Cms.Model.FK_durados_Content_durados_Html" FromRole="durados_Html" ToRole="Content" /></EntityType>
+        <EntityType Name="Image">
+          <Key>
+            <PropertyRef Name="ID" /></Key>
+          <Property Name="ID" Type="Int32" Nullable="false" />
+          <Property Name="Name" Type="String" Nullable="false" />
+          <Property Name="Src" Type="String" Nullable="false" />
+          <NavigationProperty Name="Content" Relationship="Durados.Cms.Model.FK_durados_Content_durados_Image" FromRole="durados_Image" ToRole="Content" />
+          <Property Name="ToolTip" Type="String" Nullable="true" /></EntityType>
+        <Association Name="FK_durados_Content_durados_Frame">
+          <End Type="Durados.Cms.Model.Frame" Role="durados_Frame" Multiplicity="0..1" />
+          <End Type="Durados.Cms.Model.Content" Role="Content" Multiplicity="*" /></Association>
+        <Association Name="FK_durados_Content_durados_Html">
+          <End Type="Durados.Cms.Model.Html" Role="durados_Html" Multiplicity="0..1" />
+          <End Type="Durados.Cms.Model.Content" Role="Content" Multiplicity="*" /></Association>
+        <Association Name="FK_durados_Content_durados_Image">
+          <End Type="Durados.Cms.Model.Image" Role="durados_Image" Multiplicity="0..1" />
+          <End Type="Durados.Cms.Model.Content" Role="Content" Multiplicity="*" /></Association>
+        <EntityType Name="Form">
+          <Key>
+            <PropertyRef Name="ID" /></Key>
+          <Property Name="ID" Type="Int32" Nullable="false" />
+          <Property Name="Name" Type="String" Nullable="false" />
+          <Property Name="ViewName" Type="String" Nullable="true" />
+          <Property Name="DataAction" Type="String" Nullable="true" />
+          <NavigationProperty Name="FormType" Relationship="Durados.Cms.Model.FK_durados_Form_durados_FormType" FromRole="durados_Form" ToRole="durados_FormType" /></EntityType>
+        <EntityType Name="FormType">
+          <Key>
+            <PropertyRef Name="ID" /></Key>
+          <Property Name="ID" Type="Int32" Nullable="false" />
+          <Property Name="Name" Type="String" Nullable="false" />
+          <NavigationProperty Name="Form" Relationship="Durados.Cms.Model.FK_durados_Form_durados_FormType" FromRole="durados_FormType" ToRole="durados_Form" /></EntityType>
+        <Association Name="FK_durados_Form_durados_FormType">
+          <End Type="Durados.Cms.Model.FormType" Role="durados_FormType" Multiplicity="1" />
+          <End Type="Durados.Cms.Model.Form" Role="durados_Form" Multiplicity="*" /></Association>
+        <EntityType Name="Field">
+          <Key>
+            <PropertyRef Name="ID" /></Key>
+          <Property Name="ID" Type="Int32" Nullable="false" />
+          <Property Name="Name" Type="String" Nullable="false" />
+          <Property Name="DisplayName" Type="String" Nullable="true" />
+          <NavigationProperty Name="Object" Relationship="Durados.Cms.Model.FK_durados_Field_durados_Object" FromRole="durados_Field" ToRole="durados_Object" />
+          <NavigationProperty Name="FieldCategoryRel" Relationship="Durados.Cms.Model.FK_durados_FieldCategoryRel_durados_Field" FromRole="durados_Field" ToRole="durados_FieldCategoryRel" />
+          <Property Name="Format" Type="String" Nullable="true" />
+          <Property Name="RelatedName" Type="String" Nullable="true" />
+          <Property Name="BetterIsGreater" Type="Boolean" Nullable="true" />
+          <Property Name="Roles" Type="String" Nullable="true" />
+          <Property Name="Tooltip" Type="String" Nullable="true" /></EntityType>
+        <EntityType Name="FieldCategory">
+          <Key>
+            <PropertyRef Name="ID" /></Key>
+          <Property Name="ID" Type="Int32" Nullable="false" />
+          <Property Name="Name" Type="String" Nullable="false" />
+          <Property Name="DisplayName" Type="String" Nullable="true" />
+          <NavigationProperty Name="Object" Relationship="Durados.Cms.Model.FK_durados_FieldCategory_durados_Object" FromRole="durados_FieldCategory" ToRole="durados_Object" />
+          <NavigationProperty Name="FieldCategoryRel" Relationship="Durados.Cms.Model.FK_durados_FieldCategoryRel_durados_FieldCategory" FromRole="durados_FieldCategory" ToRole="durados_FieldCategoryRel" /></EntityType>
+        <EntityType Name="FieldCategoryRel">
+          <Key>
+            <PropertyRef Name="ID" /></Key>
+          <Property Name="ID" Type="Int32" Nullable="false" />
+          <Property Name="Ordinal" Type="Int32" Nullable="false" />
+          <NavigationProperty Name="Field" Relationship="Durados.Cms.Model.FK_durados_FieldCategoryRel_durados_Field" FromRole="durados_FieldCategoryRel" ToRole="durados_Field" />
+          <NavigationProperty Name="FieldCategory" Relationship="Durados.Cms.Model.FK_durados_FieldCategoryRel_durados_FieldCategory" FromRole="durados_FieldCategoryRel" ToRole="durados_FieldCategory" /></EntityType>
+        <EntityType Name="Object">
+          <Key>
+            <PropertyRef Name="ID" /></Key>
+          <Property Name="ID" Type="Int32" Nullable="false" />
+          <Property Name="Name" Type="String" Nullable="false" />
+          <Property Name="FullName" Type="String" Nullable="false" />
+          <Property Name="DisplayName" Type="String" Nullable="true" />
+          <NavigationProperty Name="Field" Relationship="Durados.Cms.Model.FK_durados_Field_durados_Object" FromRole="durados_Object" ToRole="durados_Field" />
+          <NavigationProperty Name="FieldCategory" Relationship="Durados.Cms.Model.FK_durados_FieldCategory_durados_Object" FromRole="durados_Object" ToRole="durados_FieldCategory" /></EntityType>
+        <Association Name="FK_durados_Field_durados_Object">
+          <End Type="Durados.Cms.Model.Object" Role="durados_Object" Multiplicity="1" />
+          <End Type="Durados.Cms.Model.Field" Role="durados_Field" Multiplicity="*" /></Association>
+        <Association Name="FK_durados_FieldCategoryRel_durados_Field">
+          <End Type="Durados.Cms.Model.Field" Role="durados_Field" Multiplicity="1" />
+          <End Type="Durados.Cms.Model.FieldCategoryRel" Role="durados_FieldCategoryRel" Multiplicity="*" /></Association>
+        <Association Name="FK_durados_FieldCategory_durados_Object">
+          <End Type="Durados.Cms.Model.Object" Role="durados_Object" Multiplicity="1" />
+          <End Type="Durados.Cms.Model.FieldCategory" Role="durados_FieldCategory" Multiplicity="*" /></Association>
+        <Association Name="FK_durados_FieldCategoryRel_durados_FieldCategory">
+          <End Type="Durados.Cms.Model.FieldCategory" Role="durados_FieldCategory" Multiplicity="1" />
+          <End Type="Durados.Cms.Model.FieldCategoryRel" Role="durados_FieldCategoryRel" Multiplicity="*" /></Association></Schema>
+    </edmx:ConceptualModels>
+    <!-- C-S mapping content -->
+    <edmx:Mappings>
+      <Mapping Space="C-S" xmlns="http://schemas.microsoft.com/ado/2009/11/mapping/cs">
+        <EntityContainerMapping StorageEntityContainer="DuradosCmsModelStoreContainer" CdmEntityContainer="CmsDB">
+          <EntitySetMapping Name="ContactSet">
+            <EntityTypeMapping TypeName="IsTypeOf(Durados.Cms.Model.Contact)">
+              <MappingFragment StoreEntitySet="durados_Contact">
+                <ScalarProperty Name="ID" ColumnName="ID" />
+                <ScalarProperty Name="Name" ColumnName="Name" />
+                <ScalarProperty Name="Subject" ColumnName="Subject" />
+                <ScalarProperty Name="To" ColumnName="To" />
+                <ScalarProperty Name="CC" ColumnName="CC" />
+                <ScalarProperty Name="SMTP" ColumnName="SMTP" />
+                <ScalarProperty Name="Title" ColumnName="Title" />
+                <ScalarProperty Name="Header" ColumnName="Header" />
+                <ScalarProperty Name="Footer" ColumnName="Footer" />
+                <ScalarProperty Name="FromRequired" ColumnName="FromRequired" />
+                <ScalarProperty Name="AnonymousEmail" ColumnName="AnonymousEmail" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="ContentSet">
+            <EntityTypeMapping TypeName="IsTypeOf(Durados.Cms.Model.Content)">
+              <MappingFragment StoreEntitySet="durados_Content">
+                <ScalarProperty Name="CustomTypeID" ColumnName="CustomTypeID" />
+                <ScalarProperty Name="ID" ColumnName="ID" />
+                <ScalarProperty Name="Name" ColumnName="Name" />
+                </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="ContentParameterSet">
+            <EntityTypeMapping TypeName="IsTypeOf(Durados.Cms.Model.ContentParameter)">
+              <MappingFragment StoreEntitySet="durados_ContentParameter">
+                <ScalarProperty Name="ID" ColumnName="ID" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="ContentTypeSet">
+            <EntityTypeMapping TypeName="IsTypeOf(Durados.Cms.Model.ContentType)">
+              <MappingFragment StoreEntitySet="durados_ContentType">
+                <ScalarProperty Name="Custom" ColumnName="Custom" />
+                <ScalarProperty Name="ID" ColumnName="ID" />
+                <ScalarProperty Name="Name" ColumnName="Name" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="ContentTypeCssSet">
+            <EntityTypeMapping TypeName="IsTypeOf(Durados.Cms.Model.ContentTypeCss)">
+              <MappingFragment StoreEntitySet="durados_ContentTypeCss">
+                <ScalarProperty Name="ID" ColumnName="ID" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="ContentTypeScriptSet">
+            <EntityTypeMapping TypeName="IsTypeOf(Durados.Cms.Model.ContentTypeScript)">
+              <MappingFragment StoreEntitySet="durados_ContentTypeScript">
+                <ScalarProperty Name="Ordinal" ColumnName="Ordinal" />
+                <ScalarProperty Name="ID" ColumnName="ID" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="CssSet">
+            <EntityTypeMapping TypeName="IsTypeOf(Durados.Cms.Model.Css)">
+              <MappingFragment StoreEntitySet="durados_Css">
+                <ScalarProperty Name="ID" ColumnName="ID" />
+                <ScalarProperty Name="Name" ColumnName="Name" />
+                <ScalarProperty Name="Reference" ColumnName="Reference" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="FaderSet">
+            <EntityTypeMapping TypeName="IsTypeOf(Durados.Cms.Model.Fader)">
+              <MappingFragment StoreEntitySet="durados_Fader">
+                <ScalarProperty Name="ID" ColumnName="ID" />
+                <ScalarProperty Name="Name" ColumnName="Name" />
+                <ScalarProperty Name="Delay" ColumnName="Delay" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="FaderContentSet">
+            <EntityTypeMapping TypeName="IsTypeOf(Durados.Cms.Model.FaderContent)">
+              <MappingFragment StoreEntitySet="durados_FaderContent">
+                <ScalarProperty Name="ID" ColumnName="ID" />
+                <ScalarProperty Name="Ordinal" ColumnName="Ordinal" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="LinkSet">
+            <EntityTypeMapping TypeName="IsTypeOf(Durados.Cms.Model.Link)">
+              <MappingFragment StoreEntitySet="durados_Link">
+                <ScalarProperty Name="ControlName" ColumnName="ControlName" />
+                <ScalarProperty Name="ID" ColumnName="ID" />
+                <ScalarProperty Name="Name" ColumnName="Name" />
+                <ScalarProperty Name="Url" ColumnName="Url" />
+                <ScalarProperty Name="Action" ColumnName="Action" />
+                <ScalarProperty Name="Controller" ColumnName="Controller" />
+                <ScalarProperty Name="Script" ColumnName="Script" />
+                <ScalarProperty Name="Target" ColumnName="Target" />
+                <ScalarProperty Name="LoginRequired" ColumnName="LoginRequired" />
+                <ScalarProperty Name="Text" ColumnName="Text" />
+                <ScalarProperty Name="Tooltip" ColumnName="Tooltip" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="LinkParameterSet">
+            <EntityTypeMapping TypeName="IsTypeOf(Durados.Cms.Model.LinkParameter)">
+              <MappingFragment StoreEntitySet="durados_LinkParameter">
+                <ScalarProperty Name="ID" ColumnName="ID" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="MenuSet">
+            <EntityTypeMapping TypeName="IsTypeOf(Durados.Cms.Model.Menu)">
+              <MappingFragment StoreEntitySet="durados_Menu">
+                <ScalarProperty Name="ID" ColumnName="ID" />
+                <ScalarProperty Name="Name" ColumnName="Name" />
+                <ScalarProperty Name="Orientation" ColumnName="Orientation" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="MenuItemSet">
+            <EntityTypeMapping TypeName="IsTypeOf(Durados.Cms.Model.MenuItem)">
+              <MappingFragment StoreEntitySet="durados_MenuItem">
+                <ScalarProperty Name="ID" ColumnName="ID" />
+                <ScalarProperty Name="Ordinal" ColumnName="Ordinal" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="PageSet">
+            <EntityTypeMapping TypeName="IsTypeOf(Durados.Cms.Model.Page)">
+              <MappingFragment StoreEntitySet="durados_Page">
+                <ScalarProperty Name="ID" ColumnName="ID" />
+                <ScalarProperty Name="Name" ColumnName="Name" />
+                <ScalarProperty Name="Title" ColumnName="Title" />
+                </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="PageContentSet">
+            <EntityTypeMapping TypeName="IsTypeOf(Durados.Cms.Model.PageContent)">
+              <MappingFragment StoreEntitySet="durados_PageContent">
+                <ScalarProperty Name="ID" ColumnName="ID" />
+                <ScalarProperty Name="Ordinal" ColumnName="Ordinal" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="ParameterSet">
+            <EntityTypeMapping TypeName="IsTypeOf(Durados.Cms.Model.Parameter)">
+              <MappingFragment StoreEntitySet="durados_Parameter">
+                <ScalarProperty Name="ID" ColumnName="ID" />
+                <ScalarProperty Name="Name" ColumnName="Name" />
+                <ScalarProperty Name="Value" ColumnName="Value" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="PlaceHolderSet">
+            <EntityTypeMapping TypeName="IsTypeOf(Durados.Cms.Model.PlaceHolder)">
+              <MappingFragment StoreEntitySet="durados_PlaceHolder">
+                <ScalarProperty Name="ID" ColumnName="ID" />
+                <ScalarProperty Name="Name" ColumnName="Name" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="RotatorSet">
+            <EntityTypeMapping TypeName="IsTypeOf(Durados.Cms.Model.Rotator)">
+              <MappingFragment StoreEntitySet="durados_Rotator">
+                <ScalarProperty Name="Random" ColumnName="Random" />
+                <ScalarProperty Name="ID" ColumnName="ID" />
+                <ScalarProperty Name="Name" ColumnName="Name" />
+                <ScalarProperty Name="Delay" ColumnName="Delay" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="RotatorImageSet">
+            <EntityTypeMapping TypeName="IsTypeOf(Durados.Cms.Model.RotatorImage)">
+              <MappingFragment StoreEntitySet="durados_RotatorImage">
+                <ScalarProperty Name="Ordinal" ColumnName="Ordinal" />
+                <ScalarProperty Name="AdditionalDelay" ColumnName="AdditionalDelay" />
+                <ScalarProperty Name="ID" ColumnName="ID" />
+                <ScalarProperty Name="Image" ColumnName="Image" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="ScriptSet">
+            <EntityTypeMapping TypeName="IsTypeOf(Durados.Cms.Model.Script)">
+              <MappingFragment StoreEntitySet="durados_Script">
+                <ScalarProperty Name="ID" ColumnName="ID" />
+                <ScalarProperty Name="Name" ColumnName="Name" />
+                <ScalarProperty Name="Reference" ColumnName="Reference" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="SliderSet">
+            <EntityTypeMapping TypeName="IsTypeOf(Durados.Cms.Model.Slider)">
+              <MappingFragment StoreEntitySet="durados_Slider">
+                <ScalarProperty Name="ID" ColumnName="ID" />
+                <ScalarProperty Name="Name" ColumnName="Name" />
+                <ScalarProperty Name="Orientation" ColumnName="Orientation" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="SliderImageSet">
+            <EntityTypeMapping TypeName="IsTypeOf(Durados.Cms.Model.SliderImage)">
+              <MappingFragment StoreEntitySet="durados_SliderImage">
+                <ScalarProperty Name="ID" ColumnName="ID" />
+                <ScalarProperty Name="SlideImage" ColumnName="SlideImage" />
+                <ScalarProperty Name="HoverImage" ColumnName="HoverImage" />
+                <ScalarProperty Name="DisplayImage" ColumnName="DisplayImage" />
+                <ScalarProperty Name="Ordinal" ColumnName="Ordinal" />
+                <ScalarProperty Name="ToolTip" ColumnName="ToolTip" />
+                <ScalarProperty Name="Html" ColumnName="Html" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="TemplateSet">
+            <EntityTypeMapping TypeName="IsTypeOf(Durados.Cms.Model.Template)">
+              <MappingFragment StoreEntitySet="durados_Template">
+                <ScalarProperty Name="ID" ColumnName="ID" />
+                <ScalarProperty Name="Name" ColumnName="Name" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="TemplateCssSet">
+            <EntityTypeMapping TypeName="IsTypeOf(Durados.Cms.Model.TemplateCss)">
+              <MappingFragment StoreEntitySet="durados_TemplateCss">
+                <ScalarProperty Name="ID" ColumnName="ID" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="TemplatePlaceHolderSet">
+            <EntityTypeMapping TypeName="IsTypeOf(Durados.Cms.Model.TemplatePlaceHolder)">
+              <MappingFragment StoreEntitySet="durados_TemplatePlaceHolder">
+                <ScalarProperty Name="ID" ColumnName="ID" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="TemplateScriptSet">
+            <EntityTypeMapping TypeName="IsTypeOf(Durados.Cms.Model.TemplateScript)">
+              <MappingFragment StoreEntitySet="durados_TemplateScript">
+                <ScalarProperty Name="ID" ColumnName="ID" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <AssociationSetMapping Name="FK_Content_ContentType" TypeName="Durados.Cms.Model.FK_Content_ContentType" StoreEntitySet="durados_Content">
+            <EndProperty Name="durados_ContentType">
+              <ScalarProperty Name="ID" ColumnName="ContentTypeID" />
+            </EndProperty>
+            <EndProperty Name="durados_Content">
+              <ScalarProperty Name="ID" ColumnName="ID" />
+            </EndProperty>
+            <Condition ColumnName="ContentTypeID" IsNull="false" />
+          </AssociationSetMapping>
+          <AssociationSetMapping Name="FK_ContentParameter_Content" TypeName="Durados.Cms.Model.FK_ContentParameter_Content" StoreEntitySet="durados_ContentParameter">
+            <EndProperty Name="durados_Content">
+              <ScalarProperty Name="ID" ColumnName="ContentID" />
+            </EndProperty>
+            <EndProperty Name="durados_ContentParameter">
+              <ScalarProperty Name="ID" ColumnName="ID" />
+            </EndProperty>
+          </AssociationSetMapping>
+          <AssociationSetMapping Name="FK_FaderContent_Content" TypeName="Durados.Cms.Model.FK_FaderContent_Content" StoreEntitySet="durados_FaderContent">
+            <EndProperty Name="durados_Content">
+              <ScalarProperty Name="ID" ColumnName="ContentID" />
+            </EndProperty>
+            <EndProperty Name="durados_FaderContent">
+              <ScalarProperty Name="ID" ColumnName="ID" />
+            </EndProperty>
+          </AssociationSetMapping>
+          <AssociationSetMapping Name="FK_PageContent_Content" TypeName="Durados.Cms.Model.FK_PageContent_Content" StoreEntitySet="durados_PageContent">
+            <EndProperty Name="durados_Content">
+              <ScalarProperty Name="ID" ColumnName="ContentID" />
+            </EndProperty>
+            <EndProperty Name="durados_PageContent">
+              <ScalarProperty Name="ID" ColumnName="ID" />
+            </EndProperty>
+          </AssociationSetMapping>
+          <AssociationSetMapping Name="FK_ContentParameter_Parameter" TypeName="Durados.Cms.Model.FK_ContentParameter_Parameter" StoreEntitySet="durados_ContentParameter">
+            <EndProperty Name="durados_Parameter">
+              <ScalarProperty Name="ID" ColumnName="ParameterID" />
+            </EndProperty>
+            <EndProperty Name="durados_ContentParameter">
+              <ScalarProperty Name="ID" ColumnName="ID" />
+            </EndProperty>
+          </AssociationSetMapping>
+          <AssociationSetMapping Name="FK_ContentTypeCss_ContentType" TypeName="Durados.Cms.Model.FK_ContentTypeCss_ContentType" StoreEntitySet="durados_ContentTypeCss">
+            <EndProperty Name="durados_ContentType">
+              <ScalarProperty Name="ID" ColumnName="ContentTypeID" />
+            </EndProperty>
+            <EndProperty Name="durados_ContentTypeCss">
+              <ScalarProperty Name="ID" ColumnName="ID" />
+            </EndProperty>
+          </AssociationSetMapping>
+          <AssociationSetMapping Name="FK_ContentTypeScript_ContentType" TypeName="Durados.Cms.Model.FK_ContentTypeScript_ContentType" StoreEntitySet="durados_ContentTypeScript">
+            <EndProperty Name="durados_ContentType">
+              <ScalarProperty Name="ID" ColumnName="ContentTypeID" />
+            </EndProperty>
+            <EndProperty Name="durados_ContentTypeScript">
+              <ScalarProperty Name="ID" ColumnName="ID" />
+            </EndProperty>
+          </AssociationSetMapping>
+          <AssociationSetMapping Name="FK_ContentTypeCss_Css" TypeName="Durados.Cms.Model.FK_ContentTypeCss_Css" StoreEntitySet="durados_ContentTypeCss">
+            <EndProperty Name="durados_Css">
+              <ScalarProperty Name="ID" ColumnName="CssID" />
+            </EndProperty>
+            <EndProperty Name="durados_ContentTypeCss">
+              <ScalarProperty Name="ID" ColumnName="ID" />
+            </EndProperty>
+          </AssociationSetMapping>
+          <AssociationSetMapping Name="FK_ContentTypeScript_Script" TypeName="Durados.Cms.Model.FK_ContentTypeScript_Script" StoreEntitySet="durados_ContentTypeScript">
+            <EndProperty Name="durados_Script">
+              <ScalarProperty Name="ID" ColumnName="ScriptID" />
+            </EndProperty>
+            <EndProperty Name="durados_ContentTypeScript">
+              <ScalarProperty Name="ID" ColumnName="ID" />
+            </EndProperty>
+          </AssociationSetMapping>
+          <AssociationSetMapping Name="FK_TemplateCss_Css" TypeName="Durados.Cms.Model.FK_TemplateCss_Css" StoreEntitySet="durados_TemplateCss">
+            <EndProperty Name="durados_Css">
+              <ScalarProperty Name="ID" ColumnName="CssID" />
+            </EndProperty>
+            <EndProperty Name="durados_TemplateCss">
+              <ScalarProperty Name="ID" ColumnName="ID" />
+            </EndProperty>
+          </AssociationSetMapping>
+          <AssociationSetMapping Name="FK_Fader_Menu" TypeName="Durados.Cms.Model.FK_Fader_Menu" StoreEntitySet="durados_Fader">
+            <EndProperty Name="durados_Menu">
+              <ScalarProperty Name="ID" ColumnName="MenuID" />
+            </EndProperty>
+            <EndProperty Name="durados_Fader">
+              <ScalarProperty Name="ID" ColumnName="ID" />
+            </EndProperty>
+            <Condition ColumnName="MenuID" IsNull="false" />
+          </AssociationSetMapping>
+          <AssociationSetMapping Name="FK_FaderContent_Fader" TypeName="Durados.Cms.Model.FK_FaderContent_Fader" StoreEntitySet="durados_FaderContent">
+            <EndProperty Name="durados_Fader">
+              <ScalarProperty Name="ID" ColumnName="FaderID" />
+            </EndProperty>
+            <EndProperty Name="durados_FaderContent">
+              <ScalarProperty Name="ID" ColumnName="ID" />
+            </EndProperty>
+          </AssociationSetMapping>
+          <AssociationSetMapping Name="FK_Link_Page" TypeName="Durados.Cms.Model.FK_Link_Page" StoreEntitySet="durados_Link">
+            <EndProperty Name="durados_Page">
+              <ScalarProperty Name="ID" ColumnName="PageID" />
+            </EndProperty>
+            <EndProperty Name="durados_Link">
+              <ScalarProperty Name="ID" ColumnName="ID" />
+            </EndProperty>
+            <Condition ColumnName="PageID" IsNull="false" />
+          </AssociationSetMapping>
+          <AssociationSetMapping Name="FK_LinkParameter_Link" TypeName="Durados.Cms.Model.FK_LinkParameter_Link" StoreEntitySet="durados_LinkParameter">
+            <EndProperty Name="durados_Link">
+              <ScalarProperty Name="ID" ColumnName="LinkID" />
+            </EndProperty>
+            <EndProperty Name="durados_LinkParameter">
+              <ScalarProperty Name="ID" ColumnName="ID" />
+            </EndProperty>
+          </AssociationSetMapping>
+          <AssociationSetMapping Name="FK_MenuItem_Link" TypeName="Durados.Cms.Model.FK_MenuItem_Link" StoreEntitySet="durados_MenuItem">
+            <EndProperty Name="durados_Link">
+              <ScalarProperty Name="ID" ColumnName="LinkID" />
+            </EndProperty>
+            <EndProperty Name="durados_MenuItem">
+              <ScalarProperty Name="ID" ColumnName="ID" />
+            </EndProperty>
+          </AssociationSetMapping>
+          <AssociationSetMapping Name="FK_LinkParameter_Parameter" TypeName="Durados.Cms.Model.FK_LinkParameter_Parameter" StoreEntitySet="durados_LinkParameter">
+            <EndProperty Name="durados_Parameter">
+              <ScalarProperty Name="ID" ColumnName="ParameterID" />
+            </EndProperty>
+            <EndProperty Name="durados_LinkParameter">
+              <ScalarProperty Name="ID" ColumnName="ID" />
+            </EndProperty>
+          </AssociationSetMapping>
+          <AssociationSetMapping Name="FK_MenuItem_Menu" TypeName="Durados.Cms.Model.FK_MenuItem_Menu" StoreEntitySet="durados_MenuItem">
+            <EndProperty Name="durados_Menu">
+              <ScalarProperty Name="ID" ColumnName="MenuID" />
+            </EndProperty>
+            <EndProperty Name="durados_MenuItem">
+              <ScalarProperty Name="ID" ColumnName="ID" />
+            </EndProperty>
+          </AssociationSetMapping>
+          <AssociationSetMapping Name="FK_MenuItem_MenuItem" TypeName="Durados.Cms.Model.FK_MenuItem_MenuItem" StoreEntitySet="durados_MenuItem">
+            <EndProperty Name="durados_MenuItem">
+              <ScalarProperty Name="ID" ColumnName="ParentID" />
+            </EndProperty>
+            <EndProperty Name="durados_MenuItem1">
+              <ScalarProperty Name="ID" ColumnName="ID" />
+            </EndProperty>
+            <Condition ColumnName="ParentID" IsNull="false" />
+          </AssociationSetMapping>
+          <AssociationSetMapping Name="FK_Page_Master" TypeName="Durados.Cms.Model.FK_Page_Master" StoreEntitySet="durados_Page">
+            <EndProperty Name="durados_Template">
+              <ScalarProperty Name="ID" ColumnName="TemplateID" />
+            </EndProperty>
+            <EndProperty Name="durados_Page">
+              <ScalarProperty Name="ID" ColumnName="ID" />
+            </EndProperty>
+          </AssociationSetMapping>
+          <AssociationSetMapping Name="FK_PageContent_Page" TypeName="Durados.Cms.Model.FK_PageContent_Page" StoreEntitySet="durados_PageContent">
+            <EndProperty Name="durados_Page">
+              <ScalarProperty Name="ID" ColumnName="PageID" />
+            </EndProperty>
+            <EndProperty Name="durados_PageContent">
+              <ScalarProperty Name="ID" ColumnName="ID" />
+            </EndProperty>
+          </AssociationSetMapping>
+          <AssociationSetMapping Name="FK_PageContent_PlaceHolder" TypeName="Durados.Cms.Model.FK_PageContent_PlaceHolder" StoreEntitySet="durados_PageContent">
+            <EndProperty Name="durados_PlaceHolder">
+              <ScalarProperty Name="ID" ColumnName="PlaceHolderID" />
+            </EndProperty>
+            <EndProperty Name="durados_PageContent">
+              <ScalarProperty Name="ID" ColumnName="ID" />
+            </EndProperty>
+            <Condition ColumnName="PlaceHolderID" IsNull="false" />
+          </AssociationSetMapping>
+          <AssociationSetMapping Name="FK_TemplatePlaceHolder_PlaceHolder" TypeName="Durados.Cms.Model.FK_TemplatePlaceHolder_PlaceHolder" StoreEntitySet="durados_TemplatePlaceHolder">
+            <EndProperty Name="durados_PlaceHolder">
+              <ScalarProperty Name="ID" ColumnName="PlaceHolderID" />
+            </EndProperty>
+            <EndProperty Name="durados_TemplatePlaceHolder">
+              <ScalarProperty Name="ID" ColumnName="ID" />
+            </EndProperty>
+          </AssociationSetMapping>
+          <AssociationSetMapping Name="FK_RotatorImage_Rotator" TypeName="Durados.Cms.Model.FK_RotatorImage_Rotator" StoreEntitySet="durados_RotatorImage">
+            <EndProperty Name="durados_Rotator">
+              <ScalarProperty Name="ID" ColumnName="RotatorID" />
+            </EndProperty>
+            <EndProperty Name="durados_RotatorImage">
+              <ScalarProperty Name="ID" ColumnName="ID" />
+            </EndProperty>
+          </AssociationSetMapping>
+          <AssociationSetMapping Name="FK_TemplateScript_Script" TypeName="Durados.Cms.Model.FK_TemplateScript_Script" StoreEntitySet="durados_TemplateScript">
+            <EndProperty Name="durados_Script">
+              <ScalarProperty Name="ID" ColumnName="ScriptID" />
+            </EndProperty>
+            <EndProperty Name="durados_TemplateScript">
+              <ScalarProperty Name="ID" ColumnName="ID" />
+            </EndProperty>
+          </AssociationSetMapping>
+          <AssociationSetMapping Name="FK_SliderImage_Slider" TypeName="Durados.Cms.Model.FK_SliderImage_Slider" StoreEntitySet="durados_SliderImage">
+            <EndProperty Name="durados_Slider">
+              <ScalarProperty Name="ID" ColumnName="SliderID" />
+            </EndProperty>
+            <EndProperty Name="durados_SliderImage">
+              <ScalarProperty Name="ID" ColumnName="ID" />
+            </EndProperty>
+          </AssociationSetMapping>
+          <AssociationSetMapping Name="FK_TemplateCss_Template" TypeName="Durados.Cms.Model.FK_TemplateCss_Template" StoreEntitySet="durados_TemplateCss">
+            <EndProperty Name="durados_Template">
+              <ScalarProperty Name="ID" ColumnName="TemplateID" />
+            </EndProperty>
+            <EndProperty Name="durados_TemplateCss">
+              <ScalarProperty Name="ID" ColumnName="ID" />
+            </EndProperty>
+          </AssociationSetMapping>
+          <AssociationSetMapping Name="FK_TemplatePlaceHolder_Template" TypeName="Durados.Cms.Model.FK_TemplatePlaceHolder_Template" StoreEntitySet="durados_TemplatePlaceHolder">
+            <EndProperty Name="durados_Template">
+              <ScalarProperty Name="ID" ColumnName="TemplateID" />
+            </EndProperty>
+            <EndProperty Name="durados_TemplatePlaceHolder">
+              <ScalarProperty Name="ID" ColumnName="ID" />
+            </EndProperty>
+          </AssociationSetMapping>
+          <AssociationSetMapping Name="FK_TemplateScript_Template" TypeName="Durados.Cms.Model.FK_TemplateScript_Template" StoreEntitySet="durados_TemplateScript">
+            <EndProperty Name="durados_Template">
+              <ScalarProperty Name="ID" ColumnName="TemplateID" />
+            </EndProperty>
+            <EndProperty Name="durados_TemplateScript">
+              <ScalarProperty Name="ID" ColumnName="ID" />
+            </EndProperty>
+          </AssociationSetMapping>
+          <EntitySetMapping Name="HtmlScrollerSet">
+            <EntityTypeMapping TypeName="IsTypeOf(Durados.Cms.Model.HtmlScroller)">
+              <MappingFragment StoreEntitySet="durados_HtmlScroller">
+                <ScalarProperty Name="Name" ColumnName="Name" />
+                <ScalarProperty Name="Id" ColumnName="Id" /></MappingFragment></EntityTypeMapping></EntitySetMapping>
+          <EntitySetMapping Name="HtmlScrollerContentSet">
+            <EntityTypeMapping TypeName="IsTypeOf(Durados.Cms.Model.HtmlScrollerContent)">
+              <MappingFragment StoreEntitySet="durados_HtmlScrollerContent">
+                <ScalarProperty Name="Ordinal" ColumnName="Ordinal" />
+                <ScalarProperty Name="ID" ColumnName="ID" /></MappingFragment></EntityTypeMapping></EntitySetMapping>
+          <AssociationSetMapping Name="FK_durados_HtmlScrollerContent_Content" TypeName="Durados.Cms.Model.FK_durados_HtmlScrollerContent_Content" StoreEntitySet="durados_HtmlScrollerContent">
+            <EndProperty Name="durados_HtmlScrollerContent">
+              <ScalarProperty Name="ID" ColumnName="ID" /></EndProperty>
+            <EndProperty Name="Content">
+              <ScalarProperty Name="ID" ColumnName="ContentID" /></EndProperty></AssociationSetMapping>
+          <AssociationSetMapping Name="FK_durados_HtmlScrollerContent_HtmlScroller" TypeName="Durados.Cms.Model.FK_durados_HtmlScrollerContent_HtmlScroller" StoreEntitySet="durados_HtmlScrollerContent">
+            <EndProperty Name="durados_HtmlScrollerContent">
+              <ScalarProperty Name="ID" ColumnName="ID" /></EndProperty>
+            <EndProperty Name="durados_HtmlScroller">
+              <ScalarProperty Name="Id" ColumnName="HtmlScrollerID" /></EndProperty></AssociationSetMapping>
+          <EntitySetMapping Name="FrameSet">
+            <EntityTypeMapping TypeName="IsTypeOf(Durados.Cms.Model.Frame)">
+              <MappingFragment StoreEntitySet="durados_Frame">
+                <ScalarProperty Name="Url" ColumnName="Url" />
+                <ScalarProperty Name="Name" ColumnName="Name" />
+                <ScalarProperty Name="ID" ColumnName="ID" /></MappingFragment></EntityTypeMapping></EntitySetMapping>
+          <EntitySetMapping Name="HtmlSet">
+            <EntityTypeMapping TypeName="IsTypeOf(Durados.Cms.Model.Html)">
+              <MappingFragment StoreEntitySet="durados_Html">
+                <ScalarProperty Name="Text" ColumnName="Text" />
+                <ScalarProperty Name="Name" ColumnName="Name" />
+                <ScalarProperty Name="ID" ColumnName="ID" /></MappingFragment></EntityTypeMapping></EntitySetMapping>
+          <EntitySetMapping Name="ImageSet">
+            <EntityTypeMapping TypeName="IsTypeOf(Durados.Cms.Model.Image)">
+              <MappingFragment StoreEntitySet="durados_Image">
+                <ScalarProperty Name="ToolTip" ColumnName="ToolTip" />
+                <ScalarProperty Name="Src" ColumnName="Src" />
+                <ScalarProperty Name="Name" ColumnName="Name" />
+                <ScalarProperty Name="ID" ColumnName="ID" /></MappingFragment></EntityTypeMapping></EntitySetMapping>
+          <AssociationSetMapping Name="FK_durados_Content_durados_Frame" TypeName="Durados.Cms.Model.FK_durados_Content_durados_Frame" StoreEntitySet="durados_Content">
+            <EndProperty Name="Content">
+              <ScalarProperty Name="ID" ColumnName="ID" /></EndProperty>
+            <EndProperty Name="durados_Frame">
+              <ScalarProperty Name="ID" ColumnName="FrameID" /></EndProperty>
+            <Condition ColumnName="FrameID" IsNull="false" /></AssociationSetMapping>
+          <AssociationSetMapping Name="FK_durados_Content_durados_Html" TypeName="Durados.Cms.Model.FK_durados_Content_durados_Html" StoreEntitySet="durados_Content">
+            <EndProperty Name="Content">
+              <ScalarProperty Name="ID" ColumnName="ID" /></EndProperty>
+            <EndProperty Name="durados_Html">
+              <ScalarProperty Name="ID" ColumnName="HtmlID" /></EndProperty>
+            <Condition ColumnName="HtmlID" IsNull="false" /></AssociationSetMapping>
+          <AssociationSetMapping Name="FK_durados_Content_durados_Image" TypeName="Durados.Cms.Model.FK_durados_Content_durados_Image" StoreEntitySet="durados_Content">
+            <EndProperty Name="Content">
+              <ScalarProperty Name="ID" ColumnName="ID" /></EndProperty>
+            <EndProperty Name="durados_Image">
+              <ScalarProperty Name="ID" ColumnName="ImageID" /></EndProperty>
+            <Condition ColumnName="ImageID" IsNull="false" /></AssociationSetMapping>
+          <EntitySetMapping Name="FormSet">
+            <EntityTypeMapping TypeName="IsTypeOf(Durados.Cms.Model.Form)">
+              <MappingFragment StoreEntitySet="durados_Form">
+                <ScalarProperty Name="DataAction" ColumnName="DataAction" />
+                <ScalarProperty Name="ViewName" ColumnName="ViewName" />
+                <ScalarProperty Name="Name" ColumnName="Name" />
+                <ScalarProperty Name="ID" ColumnName="ID" /></MappingFragment></EntityTypeMapping></EntitySetMapping>
+          <EntitySetMapping Name="FormTypeSet">
+            <EntityTypeMapping TypeName="IsTypeOf(Durados.Cms.Model.FormType)">
+              <MappingFragment StoreEntitySet="durados_FormType">
+                <ScalarProperty Name="Name" ColumnName="Name" />
+                <ScalarProperty Name="ID" ColumnName="ID" /></MappingFragment></EntityTypeMapping></EntitySetMapping>
+          <AssociationSetMapping Name="FK_durados_Form_durados_FormType" TypeName="Durados.Cms.Model.FK_durados_Form_durados_FormType" StoreEntitySet="durados_Form">
+            <EndProperty Name="durados_Form">
+              <ScalarProperty Name="ID" ColumnName="ID" /></EndProperty>
+            <EndProperty Name="durados_FormType">
+              <ScalarProperty Name="ID" ColumnName="FormTypeID" /></EndProperty></AssociationSetMapping>
+          <EntitySetMapping Name="FieldSet">
+            <EntityTypeMapping TypeName="IsTypeOf(Durados.Cms.Model.Field)">
+              <MappingFragment StoreEntitySet="durados_Field">
+                <ScalarProperty Name="Tooltip" ColumnName="Tooltip" />
+                <ScalarProperty Name="Roles" ColumnName="Roles" />
+                <ScalarProperty Name="BetterIsGreater" ColumnName="BetterIsGreater" />
+                <ScalarProperty Name="RelatedName" ColumnName="RelatedName" />
+                <ScalarProperty Name="Format" ColumnName="Format" />
+                <ScalarProperty Name="DisplayName" ColumnName="DisplayName" />
+                <ScalarProperty Name="Name" ColumnName="Name" />
+                <ScalarProperty Name="ID" ColumnName="ID" /></MappingFragment></EntityTypeMapping></EntitySetMapping>
+          <EntitySetMapping Name="FieldCategorySet">
+            <EntityTypeMapping TypeName="IsTypeOf(Durados.Cms.Model.FieldCategory)">
+              <MappingFragment StoreEntitySet="durados_FieldCategory">
+                <ScalarProperty Name="DisplayName" ColumnName="DisplayName" />
+                <ScalarProperty Name="Name" ColumnName="Name" />
+                <ScalarProperty Name="ID" ColumnName="ID" /></MappingFragment></EntityTypeMapping></EntitySetMapping>
+          <EntitySetMapping Name="FieldCategoryRelSet">
+            <EntityTypeMapping TypeName="IsTypeOf(Durados.Cms.Model.FieldCategoryRel)">
+              <MappingFragment StoreEntitySet="durados_FieldCategoryRel">
+                <ScalarProperty Name="Ordinal" ColumnName="Ordinal" />
+                <ScalarProperty Name="ID" ColumnName="ID" /></MappingFragment></EntityTypeMapping></EntitySetMapping>
+          <EntitySetMapping Name="ObjectSet">
+            <EntityTypeMapping TypeName="IsTypeOf(Durados.Cms.Model.Object)">
+              <MappingFragment StoreEntitySet="durados_Object">
+                <ScalarProperty Name="DisplayName" ColumnName="DisplayName" />
+                <ScalarProperty Name="FullName" ColumnName="FullName" />
+                <ScalarProperty Name="Name" ColumnName="Name" />
+                <ScalarProperty Name="ID" ColumnName="ID" /></MappingFragment></EntityTypeMapping></EntitySetMapping>
+          <AssociationSetMapping Name="FK_durados_Field_durados_Object" TypeName="Durados.Cms.Model.FK_durados_Field_durados_Object" StoreEntitySet="durados_Field">
+            <EndProperty Name="durados_Field">
+              <ScalarProperty Name="ID" ColumnName="ID" /></EndProperty>
+            <EndProperty Name="durados_Object">
+              <ScalarProperty Name="ID" ColumnName="ObjectID" /></EndProperty></AssociationSetMapping>
+          <AssociationSetMapping Name="FK_durados_FieldCategoryRel_durados_Field" TypeName="Durados.Cms.Model.FK_durados_FieldCategoryRel_durados_Field" StoreEntitySet="durados_FieldCategoryRel">
+            <EndProperty Name="durados_FieldCategoryRel">
+              <ScalarProperty Name="ID" ColumnName="ID" /></EndProperty>
+            <EndProperty Name="durados_Field">
+              <ScalarProperty Name="ID" ColumnName="FieldID" /></EndProperty></AssociationSetMapping>
+          <AssociationSetMapping Name="FK_durados_FieldCategory_durados_Object" TypeName="Durados.Cms.Model.FK_durados_FieldCategory_durados_Object" StoreEntitySet="durados_FieldCategory">
+            <EndProperty Name="durados_FieldCategory">
+              <ScalarProperty Name="ID" ColumnName="ID" /></EndProperty>
+            <EndProperty Name="durados_Object">
+              <ScalarProperty Name="ID" ColumnName="ObjectID" /></EndProperty></AssociationSetMapping>
+          <AssociationSetMapping Name="FK_durados_FieldCategoryRel_durados_FieldCategory" TypeName="Durados.Cms.Model.FK_durados_FieldCategoryRel_durados_FieldCategory" StoreEntitySet="durados_FieldCategoryRel">
+            <EndProperty Name="durados_FieldCategoryRel">
+              <ScalarProperty Name="ID" ColumnName="ID" /></EndProperty>
+            <EndProperty Name="durados_FieldCategory">
+              <ScalarProperty Name="ID" ColumnName="CategoryID" /></EndProperty></AssociationSetMapping></EntityContainerMapping>
+      </Mapping>
+    </edmx:Mappings>
+  </edmx:Runtime>
+  <!-- EF Designer content (DO NOT EDIT MANUALLY BELOW HERE) -->
+  <edmx:Designer>
+    <edmx:Connection>
+      <DesignerInfoPropertySet xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
+        <DesignerProperty Name="MetadataArtifactProcessing" Value="EmbedInOutputAssembly" />
+      </DesignerInfoPropertySet>
+    </edmx:Connection>
+    <edmx:Options>
+      <DesignerInfoPropertySet xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
+        <DesignerProperty Name="ValidateOnBuild" Value="true" />
+      </DesignerInfoPropertySet>
+    </edmx:Options>
+    <!-- Diagram content (shape and connector positions) -->
+    <edmx:Diagrams>
+      <Diagram Name="Cms" ZoomLevel="97" xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
+        <EntityTypeShape EntityType="Durados.Cms.Model.Contact" Width="1.5" PointX="13.625" PointY="10.5" Height="2.9070849609375031" IsExpanded="true" />
+        <EntityTypeShape EntityType="Durados.Cms.Model.Content" Width="1.5" PointX="11.75" PointY="7.625" Height="3.9282032144069685" IsExpanded="true" />
+        <EntityTypeShape EntityType="Durados.Cms.Model.ContentParameter" Width="1.5" PointX="9.75" PointY="10.5" Height="1.4279589843749996" IsExpanded="true" />
+        <EntityTypeShape EntityType="Durados.Cms.Model.ContentType" Width="1.5" PointX="7.625" PointY="13.75" Height="1.7566536458333335" IsExpanded="true" />
+        <EntityTypeShape EntityType="Durados.Cms.Model.ContentTypeCss" Width="1.5" PointX="6.375" PointY="15.875" Height="1.4279589843749996" IsExpanded="true" />
+        <EntityTypeShape EntityType="Durados.Cms.Model.ContentTypeScript" Width="1.5" PointX="4.5" PointY="13.625" Height="1.4279589843749996" IsExpanded="true" />
+        <EntityTypeShape EntityType="Durados.Cms.Model.Css" Width="1.5" PointX="4" PointY="15.75" Height="1.7566536458333331" IsExpanded="true" />
+        <EntityTypeShape EntityType="Durados.Cms.Model.Fader" Width="1.5" PointX="6.625" PointY="6.5" Height="1.9210009765624996" IsExpanded="true" />
+        <EntityTypeShape EntityType="Durados.Cms.Model.FaderContent" Width="1.5" PointX="8.625" PointY="8.25" Height="1.5923063151041657" IsExpanded="true" />
+        <EntityTypeShape EntityType="Durados.Cms.Model.Link" Width="1.5" PointX="3.625" PointY="10" Height="3.0714322916666674" IsExpanded="true" />
+        <EntityTypeShape EntityType="Durados.Cms.Model.LinkParameter" Width="1.5" PointX="5.5" PointY="11.75" Height="1.4279589843749996" IsExpanded="true" />
+        <EntityTypeShape EntityType="Durados.Cms.Model.Menu" Width="1.5" PointX="6.125" PointY="9" Height="1.7566536458333335" IsExpanded="true" />
+        <EntityTypeShape EntityType="Durados.Cms.Model.MenuItem" Width="1.5" PointX="4.5" PointY="7.375" Height="1.9210009765625031" IsExpanded="true" />
+        <EntityTypeShape EntityType="Durados.Cms.Model.Page" Width="1.5" PointX="3.25" PointY="4.625" Height="1.9210009765625031" IsExpanded="true" />
+        <EntityTypeShape EntityType="Durados.Cms.Model.PageContent" Width="1.5" PointX="2.875" PointY="0.5" Height="1.7566536458333335" IsExpanded="true" />
+        <EntityTypeShape EntityType="Durados.Cms.Model.Parameter" Width="1.5" PointX="7.625" PointY="11.375" Height="1.7566536458333326" IsExpanded="true" />
+        <EntityTypeShape EntityType="Durados.Cms.Model.PlaceHolder" Width="1.5" PointX="0.5" PointY="0.5" Height="1.5923063151041674" IsExpanded="true" />
+        <EntityTypeShape EntityType="Durados.Cms.Model.Rotator" Width="1.5" PointX="20.5" PointY="8.25" Height="1.7566536458333326" IsExpanded="true" />
+        <EntityTypeShape EntityType="Durados.Cms.Model.RotatorImage" Width="1.5" PointX="20.375" PointY="11.125" Height="1.4279589843750031" IsExpanded="true" />
+        <EntityTypeShape EntityType="Durados.Cms.Model.Script" Width="1.5" PointX="1.625" PointY="13.25" Height="1.7566536458333326" IsExpanded="true" />
+        <EntityTypeShape EntityType="Durados.Cms.Model.Slider" Width="1.5" PointX="15.125" PointY="6.75" Height="1.7566536458333335" IsExpanded="true" />
+        <EntityTypeShape EntityType="Durados.Cms.Model.SliderImage" Width="1.5" PointX="17.25" PointY="6.25" Height="2.2496956380208339" IsExpanded="true" />
+        <EntityTypeShape EntityType="Durados.Cms.Model.Template" Width="1.5" PointX="0.875" PointY="7" Height="1.9210009765625031" IsExpanded="true" />
+        <EntityTypeShape EntityType="Durados.Cms.Model.TemplateCss" Width="1.5" PointX="1.625" PointY="16" Height="1.4279589843749996" IsExpanded="true" />
+        <EntityTypeShape EntityType="Durados.Cms.Model.TemplatePlaceHolder" Width="1.5" PointX="0.5" PointY="3" Height="1.4279589843749996" IsExpanded="true" />
+        <EntityTypeShape EntityType="Durados.Cms.Model.TemplateScript" Width="1.5" PointX="1.625" PointY="11.25" Height="1.4279589843749996" IsExpanded="true" />
+        <AssociationConnector Association="Durados.Cms.Model.FK_Content_ContentType" ManuallyRouted="false">
+          <ConnectorPoint PointX="9.125" PointY="14.745677103201548" />
+          <ConnectorPoint PointX="11.947916666666666" PointY="14.745677103201548" />
+          <ConnectorPoint PointX="12.114583333333334" PointY="14.745677103201548" />
+          <ConnectorPoint PointX="12.758790078125" PointY="14.745677103201548" />
+          <ConnectorPoint PointX="12.758790078125" PointY="11.746888115207353" /></AssociationConnector>
+        <AssociationConnector Association="Durados.Cms.Model.FK_ContentParameter_Content" ManuallyRouted="false">
+          <ConnectorPoint PointX="11.75" PointY="11.123444057603678" />
+          <ConnectorPoint PointX="11.25" PointY="11.123444057603678" />
+          </AssociationConnector>
+        <AssociationConnector ManuallyRouted="false" Association="Durados.Cms.Model.FK_FaderContent_Content">
+          <ConnectorPoint PointX="11.75" PointY="9.1488346528013551" />
+          <ConnectorPoint PointX="10.125" PointY="9.1488346528013551" />
+          </AssociationConnector>
+        <AssociationConnector Association="Durados.Cms.Model.FK_PageContent_Content" ManuallyRouted="false">
+          <ConnectorPoint PointX="12.5" PointY="7.625" />
+          <ConnectorPoint PointX="12.5" PointY="0.65624999999999989" />
+          <ConnectorPoint PointX="4.375" PointY="0.65624999999999989" />
+          </AssociationConnector>
+        <AssociationConnector Association="Durados.Cms.Model.FK_ContentParameter_Parameter" ManuallyRouted="false">
+          <ConnectorPoint PointX="9.125" PointY="11.6514794921875" />
+          <ConnectorPoint PointX="9.75" PointY="11.6514794921875" />
+          </AssociationConnector>
+        <AssociationConnector Association="Durados.Cms.Model.FK_ContentTypeCss_ContentType" ManuallyRouted="false">
+          <ConnectorPoint PointX="8.5000005" PointY="15.506653645833334" />
+          <ConnectorPoint PointX="8.5000005" PointY="16.588979492187498" />
+          <ConnectorPoint PointX="7.875" PointY="16.588979492187498" />
+          </AssociationConnector>
+        <AssociationConnector Association="Durados.Cms.Model.FK_ContentTypeScript_ContentType" ManuallyRouted="false">
+          <ConnectorPoint PointX="7.625" PointY="14.4014794921875" />
+          <ConnectorPoint PointX="6" PointY="14.4014794921875" />
+          </AssociationConnector>
+        <AssociationConnector Association="Durados.Cms.Model.FK_ContentTypeCss_Css" ManuallyRouted="false">
+          <ConnectorPoint PointX="5.5" PointY="16.588979492187498" />
+          <ConnectorPoint PointX="6.375" PointY="16.588979492187498" />
+          </AssociationConnector>
+        <AssociationConnector Association="Durados.Cms.Model.FK_ContentTypeScript_Script" ManuallyRouted="false">
+          <ConnectorPoint PointX="3.125" PointY="14.315826822916666" />
+          <ConnectorPoint PointX="4.5" PointY="14.315826822916666" />
+          </AssociationConnector>
+        <AssociationConnector Association="Durados.Cms.Model.FK_TemplateCss_Css" ManuallyRouted="false">
+          <ConnectorPoint PointX="4" PointY="16.713979492187498" />
+          <ConnectorPoint PointX="3.125" PointY="16.713979492187498" />
+          </AssociationConnector>
+        <AssociationConnector Association="Durados.Cms.Model.FK_Fader_Menu" ManuallyRouted="false">
+          <ConnectorPoint PointX="7.125" PointY="9" />
+          <ConnectorPoint PointX="7.125" PointY="8.4210009765625" />
+          </AssociationConnector>
+        <AssociationConnector Association="Durados.Cms.Model.FK_FaderContent_Fader" ManuallyRouted="false">
+          <ConnectorPoint PointX="7.90625" PointY="8.4210009765625" />
+          <ConnectorPoint PointX="7.90625" PointY="8.7105029882812488" />
+          <ConnectorPoint PointX="8.625" PointY="8.7105029882812488" /></AssociationConnector>
+        <AssociationConnector Association="Durados.Cms.Model.FK_Link_Page" ManuallyRouted="false">
+          <ConnectorPoint PointX="4.03125" PointY="6.5460009765625031" />
+          <ConnectorPoint PointX="4.03125" PointY="10" />
+          </AssociationConnector>
+        <AssociationConnector Association="Durados.Cms.Model.FK_LinkParameter_Link" ManuallyRouted="false">
+          <ConnectorPoint PointX="5.125" PointY="12.410716145833334" />
+          <ConnectorPoint PointX="5.5" PointY="12.410716145833334" />
+          </AssociationConnector>
+        <AssociationConnector Association="Durados.Cms.Model.FK_MenuItem_Link" ManuallyRouted="false">
+          <ConnectorPoint PointX="4.8125" PointY="10" />
+          <ConnectorPoint PointX="4.8125" PointY="9.2960009765625031" />
+          </AssociationConnector>
+        <AssociationConnector Association="Durados.Cms.Model.FK_LinkParameter_Parameter" ManuallyRouted="false">
+          <ConnectorPoint PointX="7.625" PointY="12.440826822916666" />
+          <ConnectorPoint PointX="7" PointY="12.440826822916666" />
+          </AssociationConnector>
+        <AssociationConnector Association="Durados.Cms.Model.FK_MenuItem_Menu" ManuallyRouted="false">
+          <ConnectorPoint PointX="6.34375" PointY="9" />
+          <ConnectorPoint PointX="6.34375" PointY="8.71049798828125" />
+          <ConnectorPoint PointX="6" PointY="8.71049798828125" /></AssociationConnector>
+        <AssociationConnector Association="Durados.Cms.Model.FK_MenuItem_MenuItem" ManuallyRouted="false">
+          <ConnectorPoint PointX="5.0319230769230767" PointY="7.375" />
+          <ConnectorPoint PointX="5.0319230769230767" PointY="7.125" />
+          <ConnectorPoint PointX="5.4784615384615378" PointY="7.125" />
+          <ConnectorPoint PointX="5.4784615384615378" PointY="7.375" /></AssociationConnector>
+        <AssociationConnector Association="Durados.Cms.Model.FK_Page_Master" ManuallyRouted="false">
+          <ConnectorPoint PointX="2.375" PointY="7.40625" />
+          <ConnectorPoint PointX="3.28125" PointY="7.40625" />
+          <ConnectorPoint PointX="3.28125" PointY="6.5460009765625031" /></AssociationConnector>
+        <AssociationConnector Association="Durados.Cms.Model.FK_PageContent_Page" ManuallyRouted="false">
+          <ConnectorPoint PointX="3.8125" PointY="4.625" />
+          <ConnectorPoint PointX="3.8125" PointY="2.2566536458333335" />
+          </AssociationConnector>
+        <AssociationConnector Association="Durados.Cms.Model.FK_PageContent_PlaceHolder" ManuallyRouted="false">
+          <ConnectorPoint PointX="2" PointY="1.3988346528013547" />
+          <ConnectorPoint PointX="2.875" PointY="1.3988346528013547" />
+          </AssociationConnector>
+        <AssociationConnector Association="Durados.Cms.Model.FK_TemplatePlaceHolder_PlaceHolder" ManuallyRouted="false">
+          <ConnectorPoint PointX="1.25" PointY="2.2976693056027093" />
+          <ConnectorPoint PointX="1.25" PointY="3" />
+          </AssociationConnector>
+        <AssociationConnector Association="Durados.Cms.Model.FK_RotatorImage_Rotator" ManuallyRouted="false">
+          <ConnectorPoint PointX="21.1875" PointY="10.006653645833332" />
+          <ConnectorPoint PointX="21.1875" PointY="11.125" />
+          </AssociationConnector>
+        <AssociationConnector Association="Durados.Cms.Model.FK_TemplateScript_Script" ManuallyRouted="false">
+          <ConnectorPoint PointX="2.375" PointY="13.25" />
+          <ConnectorPoint PointX="2.375" PointY="12.677958984375" />
+          </AssociationConnector>
+        <AssociationConnector Association="Durados.Cms.Model.FK_SliderImage_Slider" ManuallyRouted="false">
+          <ConnectorPoint PointX="16.625" PointY="7.6248478190104167" />
+          <ConnectorPoint PointX="17.25" PointY="7.6248478190104167" />
+          </AssociationConnector>
+        <AssociationConnector Association="Durados.Cms.Model.FK_TemplateCss_Template" ManuallyRouted="false">
+          <ConnectorPoint PointX="1.2499995" PointY="8.9210009765625031" />
+          <ConnectorPoint PointX="1.2499995" PointY="16.713979492187498" />
+          <ConnectorPoint PointX="1.625" PointY="16.713979492187498" /></AssociationConnector>
+        <AssociationConnector Association="Durados.Cms.Model.FK_TemplatePlaceHolder_Template" ManuallyRouted="false">
+          <ConnectorPoint PointX="1.4375" PointY="7" />
+          <ConnectorPoint PointX="1.4375" PointY="4.427958984375" />
+          </AssociationConnector>
+        <AssociationConnector Association="Durados.Cms.Model.FK_TemplateScript_Template" ManuallyRouted="false">
+          <ConnectorPoint PointX="2" PointY="8.9210009765625031" />
+          <ConnectorPoint PointX="2" PointY="11.25" />
+          </AssociationConnector>
+        <EntityTypeShape EntityType="Durados.Cms.Model.HtmlScroller" Width="1.5" PointX="17.875" PointY="9.75" Height="1.5923063151041674" />
+        <EntityTypeShape EntityType="Durados.Cms.Model.HtmlScrollerContent" Width="1.5" PointX="15.625" PointY="9.875" Height="1.4279589843749996" />
+        <AssociationConnector Association="Durados.Cms.Model.FK_durados_HtmlScrollerContent_Content">
+          <ConnectorPoint PointX="13.25" PointY="10.15625" />
+          <ConnectorPoint PointX="15.625" PointY="10.15625" />
+          </AssociationConnector>
+        <AssociationConnector Association="Durados.Cms.Model.FK_durados_HtmlScrollerContent_HtmlScroller">
+          <ConnectorPoint PointX="17.875" PointY="10.5889794921875" />
+          <ConnectorPoint PointX="17.125" PointY="10.5889794921875" />
+          </AssociationConnector>
+        <EntityTypeShape EntityType="Durados.Cms.Model.Frame" Width="1.5" PointX="9.5" PointY="4.75" Height="1.7976693056027102" />
+        <EntityTypeShape EntityType="Durados.Cms.Model.Html" Width="1.5" PointX="9.5" PointY="17.25" Height="1.7976693056027102" />
+        <EntityTypeShape EntityType="Durados.Cms.Model.Image" Width="1.5" PointX="5.375" PointY="0.875" Height="1.7976693056027095" />
+        <AssociationConnector Association="Durados.Cms.Model.FK_durados_Content_durados_Frame">
+          <ConnectorPoint PointX="11" PointY="5.6488346528013551" />
+          <ConnectorPoint PointX="12.260008363695146" PointY="5.6488346528013551" />
+          <ConnectorPoint PointX="12.260008363695146" PointY="7.625" />
+          </AssociationConnector>
+        <AssociationConnector Association="Durados.Cms.Model.FK_durados_Content_durados_Html">
+          <ConnectorPoint PointX="11" PointY="18.8351042064031" />
+          <ConnectorPoint PointX="12.03125" PointY="18.8351042064031" />
+          <ConnectorPoint PointX="12.03125" PointY="11.746888115207353" /></AssociationConnector>
+        <AssociationConnector Association="Durados.Cms.Model.FK_durados_Content_durados_Image">
+          <ConnectorPoint PointX="6.875" PointY="1.8706771032015483" />
+          <ConnectorPoint PointX="7.125" PointY="1.8706771032015483" />
+          <ConnectorPoint PointX="7.125" PointY="3.3100391072034832" />
+          <ConnectorPoint PointX="12.526092381518046" PointY="3.3100391072034827" />
+          <ConnectorPoint PointX="12.692759048184714" PointY="3.3100391072034832" />
+          <ConnectorPoint PointX="12.96096485742569" PointY="3.3100391072034832" />
+          <ConnectorPoint PointX="12.96096485742569" PointY="7.625" />
+          </AssociationConnector>
+        <EntityTypeShape EntityType="Durados.Cms.Model.Form" Width="1.5" PointX="9.625" PointY="0.875" Height="2.1850391072034832" />
+        <EntityTypeShape EntityType="Durados.Cms.Model.FormType" Width="1.5" PointX="7.375" PointY="1.25" Height="1.6039844048023222" />
+        <AssociationConnector Association="Durados.Cms.Model.FK_durados_Form_durados_FormType">
+          <ConnectorPoint PointX="8.875" PointY="2.051992202401161" />
+          <ConnectorPoint PointX="9.625" PointY="2.051992202401161" /></AssociationConnector>
+        <EntityTypeShape EntityType="Durados.Cms.Model.Field" Width="1.5" PointX="14.625" PointY="15.125" Height="1.9913542064030949" />
+        <EntityTypeShape EntityType="Durados.Cms.Model.FieldCategory" Width="1.5" PointX="14.625" PointY="17.875" Height="1.9913542064030949" />
+        <EntityTypeShape EntityType="Durados.Cms.Model.FieldCategoryRel" Width="1.5" PointX="16.875" PointY="16.625" Height="1.7976693056027102" />
+        <EntityTypeShape EntityType="Durados.Cms.Model.Object" Width="1.5" PointX="12.375" PointY="16.375" Height="2.1850391072034867" />
+        <AssociationConnector Association="Durados.Cms.Model.FK_durados_Field_durados_Object">
+          <ConnectorPoint PointX="13.875" PointY="16.745677103201547" />
+          <ConnectorPoint PointX="14.625" PointY="16.745677103201547" /></AssociationConnector>
+        <AssociationConnector Association="Durados.Cms.Model.FK_durados_FieldCategoryRel_durados_Field">
+          <ConnectorPoint PointX="16.125" PointY="16.870677103201547" />
+          <ConnectorPoint PointX="16.875" PointY="16.870677103201547" /></AssociationConnector>
+        <AssociationConnector Association="Durados.Cms.Model.FK_durados_FieldCategory_durados_Object">
+          <ConnectorPoint PointX="13.875" PointY="18.217519553601743" />
+          <ConnectorPoint PointX="14.625" PointY="18.217519553601743" /></AssociationConnector>
+        <AssociationConnector Association="Durados.Cms.Model.FK_durados_FieldCategoryRel_durados_FieldCategory">
+          <ConnectorPoint PointX="16.125" PointY="18.148834652801355" />
+          <ConnectorPoint PointX="16.875" PointY="18.148834652801355" /></AssociationConnector></Diagram></edmx:Diagrams>
+  </edmx:Designer>
+</edmx:Edmx>

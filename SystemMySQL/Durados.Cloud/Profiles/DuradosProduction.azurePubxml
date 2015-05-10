@@ -1,0 +1,20 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <AzureCredentials>Durados mng</AzureCredentials>
+    <AzureHostedServiceName>durados2</AzureHostedServiceName>
+    <AzureHostedServiceLabel>Durados2</AzureHostedServiceLabel>
+    <AzureSlot>Production</AzureSlot>
+    <AzureEnableIntelliTrace>False</AzureEnableIntelliTrace>
+    <AzureEnableProfiling>False</AzureEnableProfiling>
+    <AzureEnableWebDeploy>False</AzureEnableWebDeploy>
+    <AzureStorageAccountName>duradosazure</AzureStorageAccountName>
+    <AzureStorageAccountLabel>duradosazure</AzureStorageAccountLabel>
+    <AzureDeploymentLabel>Durados.Cloud</AzureDeploymentLabel>
+    <AzureSolutionConfiguration>Release</AzureSolutionConfiguration>
+    <AzureServiceConfiguration>Cloud</AzureServiceConfiguration>
+    <AzureAppendTimestampToDeploymentLabel>True</AzureAppendTimestampToDeploymentLabel>
+    <AzureAllowUpgrade>True</AzureAllowUpgrade>
+    <AzureEnableRemoteDesktop>True</AzureEnableRemoteDesktop>
+  </PropertyGroup>
+</Project>

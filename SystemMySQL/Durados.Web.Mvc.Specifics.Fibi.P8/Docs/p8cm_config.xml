@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
+<properties>
+	<comment>P8CM application config file</comment>
+	<entry key="uri">http://10.18.188.122:9080/wsi/FNCEWS40MTOM/</entry>
+	<entry key="jaasStanza">FileNetP8WSI</entry>
+	<!--entry key="uri">iiop://10.18.188.122:2809/FileNet/Engine</entry>
+	<entry key="jaasStanza">FileNetP8Server</entry-->
+	<!--entry key="jaasStanza">FileNetP8</entry-->
+	<entry key="workplaceUrl">http://10.18.188.122:9080/WorkplaceXT</entry>
+	<entry key="domainName">BBL5</entry>
+	<entry key="objectStoreName">BBL_OS1</entry>
+	<entry key="maxRows">500</entry>
+	<entry key="timeLimit">20</entry>
+	<entry key="maxUploadSize">10000000</entry>
+</properties>
