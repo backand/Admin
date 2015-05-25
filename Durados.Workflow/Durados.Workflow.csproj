@@ -84,6 +84,12 @@
     <Reference Include="Jint">
       <HintPath>..\Duradus.Web.Mvc.App\deployment\Jint.dll</HintPath>
     </Reference>
+    <Reference Include="MySql.Data">
+      <HintPath>..\Duradus.Web.Mvc.App\deployment\MySql.Data.dll</HintPath>
+    </Reference>
+    <Reference Include="MySql.Web">
+      <HintPath>..\Duradus.Web.Mvc.App\deployment\MySql.Web.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.configuration" />
     <Reference Include="System.Core">

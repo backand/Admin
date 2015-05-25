@@ -52,7 +52,6 @@ INSERT INTO `durados_UserRole` (`Name`,`Description`) values ('User','User');
 INSERT INTO `durados_UserRole` (`Name`,`Description`) values ('Public','Use for internet public access');
 INSERT INTO `durados_UserRole` (`Name`,`Description`) values ('ReadOnly','Read-Only access');
 
-
 CREATE TRIGGER `newUserGuid`
 BEFORE INSERT ON `durados_User`
 FOR EACH ROW
