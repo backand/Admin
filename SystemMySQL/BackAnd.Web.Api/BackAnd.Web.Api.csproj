@@ -81,6 +81,11 @@
     <Reference Include="Microsoft.Owin.Security.OAuth">
       <HintPath>..\packages\Microsoft.Owin.Security.OAuth.2.1.0\lib\net45\Microsoft.Owin.Security.OAuth.dll</HintPath>
     </Reference>
+    <Reference Include="Microsoft.Web.Infrastructure, Version=1.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\Microsoft.Web.Infrastructure.1.0.0.0\lib\net40\Microsoft.Web.Infrastructure.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="Mono.Security, Version=4.0.0.0, Culture=neutral, PublicKeyToken=0738eb9f132ed756, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\Npgsql.2.2.5\lib\net45\Mono.Security.dll</HintPath>
@@ -134,14 +139,12 @@
     <Reference Include="System.Web.Http.Owin">
       <HintPath>..\packages\Microsoft.AspNet.WebApi.Owin.5.1.2\lib\net45\System.Web.Http.Owin.dll</HintPath>
     </Reference>
-    <Reference Include="System.Web.Razor, Version=2.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\Program Files (x86)\Microsoft ASP.NET\ASP.NET Web Pages\v2.0\Assemblies\System.Web.Razor.dll</HintPath>
-    </Reference>
-    <Reference Include="System.Web.WebPages.Razor, Version=2.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\Program Files (x86)\Microsoft ASP.NET\ASP.NET Web Pages\v2.0\Assemblies\System.Web.WebPages.Razor.dll</HintPath>
-    </Reference>
+    <Reference Include="System.Web.WebPages, Version=2.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>C:\Program Files (x86)\Microsoft ASP.NET\ASP.NET Web Pages\v2.0\Assemblies\System.Web.WebPages.dll</HintPath>
+      <Private>True</Private>
+    <Reference Include="System.Web.WebPages.Deployment, Version=2.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.AspNet.WebPages.2.0.20710.0\lib\net40\System.Web.WebPages.Deployment.dll</HintPath>
+      <Private>True</Private>
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Drawing" />
     <Reference Include="System.Web" />
@@ -162,13 +165,19 @@
     <Content Include="Config\backand.xml" />
     <Content Include="Config\backand.xml.xml" />
     <Content Include="deployment\jsInfrastructure.js" />
-    <Content Include="deployment\Sql\Content-MySql.sql" />
+    <Content Include="deployment\Sql\CustomViews-MySql.sql" />
+    <Content Include="deployment\Sql\DuradosUsers-MySql.sql" />
+    <Content Include="deployment\Sql\History-MySql.sql" />
+    <Content Include="deployment\Sql\Link-MySql.sql" />
+    <Content Include="deployment\Sql\logInsert-MySql.sql" />
+    <Content Include="deployment\Sql\logTable-MySql.sql" />
     <Content Include="deployment\Sql\SampleApp\Advertising-System.sql" />
     <Content Include="deployment\Sql\SampleApp\chinook-MySql.sql" />
     <Content Include="deployment\Sql\SampleApp\Email-campaign-MySql.sql" />
     <Content Include="deployment\Sql\SampleApp\OnlineGaming-MySql.sql" />
     <Content Include="deployment\Sql\SampleApp\items-mysql.sql" />
     <Content Include="deployment\Sql\SampleApp\todo-mysql.sql" />
+    <Content Include="deployment\Sql\Session-MySql.sql" />
     <Content Include="deployment\Sql\WorkspaceDefaultDescription.txt" />
     <Content Include="deployment\version.txt" />
     <Content Include="Web.config">
@@ -183,6 +192,7 @@
     <Compile Include="Controllers\accountController.cs" />
     <Compile Include="Controllers\Admin\myAppConnectionController.cs" />
     <Compile Include="Controllers\Admin\myAppsController.cs" />
+    <Compile Include="Controllers\Admin\modelController.cs" />
     <Compile Include="Controllers\bannerController.cs" />
     <Compile Include="Controllers\apiController.cs" />
     <Compile Include="Controllers\configurationTableController.cs" />
@@ -191,6 +201,7 @@
     <Compile Include="Controllers\dashboardConfigController.cs" />
     <Compile Include="Controllers\chartDataController.cs" />
     <Compile Include="Controllers\chartConfigController.cs" />
+    <Compile Include="Controllers\Filters\ResponseHeaderFilterAttribute.cs" />
     <Compile Include="Controllers\Filters\TokenAuthorizeAttribute .cs" />
     <Compile Include="Controllers\Filters\LogActionFilterAttribute.cs" />
     <Compile Include="Controllers\Filters\LogExceptionFilterAttribute .cs" />
@@ -290,7 +301,7 @@
           <AutoAssignPort>True</AutoAssignPort>
           <DevelopmentServerPort>5943</DevelopmentServerPort>
           <DevelopmentServerVPath>/</DevelopmentServerVPath>
-          <IISUrl>http://localhost:8080</IISUrl>
+          <IISUrl>http://localhost:4019</IISUrl>
           <NTLMAuthentication>False</NTLMAuthentication>
           <UseCustomServer>False</UseCustomServer>
           <CustomServerUrl>

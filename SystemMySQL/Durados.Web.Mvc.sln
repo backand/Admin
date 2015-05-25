@@ -182,4 +182,7 @@ Global
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
+	GlobalSection(NDepend) = preSolution
+		Project = ".\Durados.Web.Mvc.ndproj"
+	EndGlobalSection
 EndGlobal

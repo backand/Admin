@@ -1012,9 +1012,9 @@ namespace BackAnd.Web.Api.Controllers
         {
             //Workflow.Engine wfe = CreateWorkflowEngine();
             wfe.PerformActions(this, e.View, TriggerDataAction.AfterEdit, e.Values, e.PrimaryKey, e.PrevRow, Map.Database.ConnectionString, Convert.ToInt32(((Durados.Web.Mvc.Database)e.View.Database).GetUserID()), ((Durados.Web.Mvc.Database)e.View.Database).GetUserRole(), e.Command);
-
+           
             wfe.Notifier.Notify((Durados.Web.Mvc.View)e.View, 1, GetUsername(), e.OldNewValues, e.PrimaryKey, e.PrevRow, this, e.Values, GetSiteWithoutQueryString(), GetMainSiteWithoutQueryString());
-
+             
             const string Active = "Active";
             if (e.View.Name == "Durados_Language")
             {

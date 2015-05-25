@@ -4575,8 +4575,8 @@ namespace Durados.Web.Mvc
 
                 IPersistency sqlPersistency = GetNewPersistency();
                 sqlPersistency.ConnectionString = System.Configuration.ConfigurationManager.ConnectionStrings["MapsConnectionString"].ConnectionString;
-                sqlPersistency.SystemConnectionString= System.Configuration.ConfigurationManager.ConnectionStrings["SystemMapsConnectionString"].ConnectionString;
-                
+                if (System.Configuration.ConfigurationManager.ConnectionStrings["SystemMapsConnectionString"] == null)
+                    throw new DuradosException("Please add SystemMapsConnectionString to the web.config connection strings");
                 persistency = sqlPersistency;
                 builder.ConnectionString = sqlPersistency.ConnectionString;
 

@@ -86,7 +86,7 @@ namespace Durados.Web.Mvc.Workflow
             {
                 if (string.IsNullOrEmpty(view.HistoryNotifyList))
                     return;
-
+                
                 string host = Convert.ToString(System.Configuration.ConfigurationManager.AppSettings["host"]);
                 int port = Convert.ToInt32(System.Configuration.ConfigurationManager.AppSettings["port"]);
                 string username = Convert.ToString(System.Configuration.ConfigurationManager.AppSettings["username"]);
