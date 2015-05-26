@@ -945,8 +945,19 @@ namespace Durados.Web.Mvc.UI.Helpers
             return menuView.GetPkValue(row);
         }
 
+        private static void CacheForeignKeys(Database database)
+        {
+            database.Map.ForeignKeys.Clear();
+
+            IDataTableAccess sqlAccess = DataAccessHelper.GetDataTableAccess(database.ConnectionString);
+
+            sqlAccess.LoadForeignKeys(database.ConnectionString, database.SqlProduct, database.Map.ForeignKeys);
+        }
+
         public static int AddViews(this Database database, string pks, System.Data.DataView dataView, bool autoGeneration, out string errorMessages)
         {
+            CacheForeignKeys(database);
+
             const string EditableTableName = "EditableTableName";
             const string Name = "Name";
             const string viewName = "View";

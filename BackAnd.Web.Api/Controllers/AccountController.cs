@@ -639,7 +639,14 @@ namespace BackAnd.Web.Api.Controllers
                     return Ok();
                 }
                 else
-                    return ResponseMessage(Request.CreateResponse(HttpStatusCode.ExpectationFailed, jsonResponse));
+                {
+                    object message = jsonResponse;
+                    if (jsonResponse.ContainsKey("Message"))
+                    {
+                        message = jsonResponse["Message"].ToString();
+                    }
+                    return ResponseMessage(Request.CreateResponse(HttpStatusCode.ExpectationFailed, message));
+                }
 
             }
             catch (Exception exception)

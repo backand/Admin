@@ -29,7 +29,7 @@ namespace Durados.Web.Mvc.Workflow
 
 
 
-        protected override Durados.Workflow.EmailParameters GetEmailParameters(object controller, Dictionary<string, Parameter> parameters, Durados.View view, Dictionary<string, object> values, DataRow prevRow, string pk, string siteWithoutQueryString, string mainSiteWithoutQueryString, string connectionString)
+        protected override Durados.Workflow.EmailParameters GetEmailParameters(object controller, Dictionary<string, Parameter> parameters, Durados.View view, Dictionary<string, object> values, DataRow prevRow, string pk, string siteWithoutQueryString, string mainSiteWithoutQueryString, string connectionString, string currentUserId, string currentUsername, string currentUserRole)
         {
             Durados.Workflow.EmailParameters emailParameters = new Durados.Workflow.EmailParameters();
 
@@ -55,19 +55,19 @@ namespace Durados.Web.Mvc.Workflow
             }
 
             if (parameters.ContainsKey("to"))
-                foreach (string email in GetEmailsFromParameter((Durados.Workflow.INotifier)controller, parameters["to"].Value, view, values, prevRow, pk, connectionString))
+                foreach (string email in GetEmailsFromParameter((Durados.Workflow.INotifier)controller, parameters["to"].Value, view, values, prevRow, pk, connectionString, currentUserId, currentUsername, currentUserRole))
                     if (!to.ContainsKey(email))
                         to.Add(email, email);
 
             //    emailParameters.To = parameters["to"].Split(';');
             if (parameters.ContainsKey("cc"))
-                foreach (string email in GetEmailsFromParameter((Durados.Workflow.INotifier)controller, parameters["cc"].Value, view, values, prevRow, pk, connectionString))
+                foreach (string email in GetEmailsFromParameter((Durados.Workflow.INotifier)controller, parameters["cc"].Value, view, values, prevRow, pk, connectionString, currentUserId, currentUsername, currentUserRole))
                     if (!cc.ContainsKey(email))
                         cc.Add(email, email);
             //    emailParameters.Cc = parameters["cc"].Split(';');
 
             if (parameters.ContainsKey("bcc"))
-                emailParameters.Bcc = GetEmailsFromParameter((Durados.Workflow.INotifier)controller, parameters["bcc"].Value, view, values, prevRow, pk, connectionString);
+                emailParameters.Bcc = GetEmailsFromParameter((Durados.Workflow.INotifier)controller, parameters["bcc"].Value, view, values, prevRow, pk, connectionString, currentUserId, currentUsername, currentUserRole);
             
             emailParameters.To = to.Values.ToArray();
             emailParameters.Cc = cc.Values.ToArray();
@@ -90,14 +90,15 @@ namespace Durados.Web.Mvc.Workflow
             return emailParameters;
         }
 
-        protected string[] GetEmailsFromParameter(Durados.Workflow.INotifier controller, string parameter, Durados.View view, Dictionary<string, object> values, DataRow prevRow, string pk, string connectionString)
+        protected string[] GetEmailsFromParameter(Durados.Workflow.INotifier controller, string parameter, Durados.View view, Dictionary<string, object> values, DataRow prevRow, string pk, string connectionString, string currentUserId, string currentUsername, string currentUserRole)
         {
             //// replace the tokens in the parameter 
             if (!string.IsNullOrEmpty(pk) && (parameter.Contains('[') && parameter.Contains(']') || parameter.Contains(Database.DictionaryPrefix) && parameter.Contains(Database.DictionaryPostfix)))
             {
-                if (nameValueDictionary.Count == 0)
+                if (nameValueDictionary.Count == 0 && prevRow != null)
                     controller.LoadValues(nameValueDictionary, prevRow, (Durados.Web.Mvc.View)view, null, (Durados.Web.Mvc.View)view, view.DisplayName + ".", "[", "]", dicFields, view.Name + ".");
 
+                parameter = parameter.ReplaceAllTokens(view, values, pk, currentUserId, currentUsername, currentUserRole, prevRow);
                 parameter = parameter.Replace(nameValueDictionary, controller.GetTableViewer(), view);
                 parameter = parameter.Replace(dicFields.ToDictionary(k => k.Key, v => ((Durados.Workflow.DictionaryField)v.Value).Value), controller.GetTableViewer(), view);
                 parameter = parameter.Replace(values, controller.GetTableViewer(), view);

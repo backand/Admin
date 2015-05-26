@@ -10,7 +10,7 @@ namespace Durados.Workflow
 {
     public class Notifier
     {
-        public delegate void DelegateNotify(object controller, Dictionary<string, Parameter> parameters, View view, Dictionary<string, object> values, DataRow prevRow, string pk, string siteWithoutQueryString, string mainSiteWithoutQueryString, string urlAction, string connectionString, int currentUserId, string currentUserRole, IDbCommand command);
+        public delegate void DelegateNotify(object controller, Dictionary<string, Parameter> parameters, View view, Dictionary<string, object> values, DataRow prevRow, string pk, string siteWithoutQueryString, string mainSiteWithoutQueryString, string urlAction, string connectionString, int currentUserId, string currentUsername, string currentUserRole, IDbCommand command);
 
         public virtual void Notify(object controller, Dictionary<string, Parameter> parameters, View view, Dictionary<string, object> values, DataRow prevRow, string pk, string connectionString, int currentUserId, string currentUserRole, IDbCommand command)
         {
@@ -24,18 +24,18 @@ namespace Durados.Workflow
             string urlAction = ((INotifier)controller).GetUrlAction(view, pk);
 
             IAsyncResult tag =
-                delegateNotify.BeginInvoke(controller, parameters, view, values, prevRow, pk, siteWithoutQueryString, mainSiteWithoutQueryString, urlAction, connectionString, currentUserId, currentUserRole, command, null, null);
+                delegateNotify.BeginInvoke(controller, parameters, view, values, prevRow, pk, siteWithoutQueryString, mainSiteWithoutQueryString, urlAction, connectionString, currentUserId, view.Database.GetCurrentUsername(), currentUserRole, command, null, null);
 
         }
 
-        public virtual void NotifyAsync(object controller, Dictionary<string, Parameter> parameters, View view, Dictionary<string, object> values, DataRow prevRow, string pk, string siteWithoutQueryString, string mainSiteWithoutQueryString, string urlAction, string connectionString, int currentUserId, string currentUserRole, IDbCommand command)
+        public virtual void NotifyAsync(object controller, Dictionary<string, Parameter> parameters, View view, Dictionary<string, object> values, DataRow prevRow, string pk, string siteWithoutQueryString, string mainSiteWithoutQueryString, string urlAction, string connectionString, int currentUserId, string currentUsername, string currentUserRole, IDbCommand command)
         {
             string host = Convert.ToString(System.Configuration.ConfigurationManager.AppSettings["host"]);
             int port = Convert.ToInt32(System.Configuration.ConfigurationManager.AppSettings["port"]);
             string username = Convert.ToString(System.Configuration.ConfigurationManager.AppSettings["username"]);
             string password = Convert.ToString(System.Configuration.ConfigurationManager.AppSettings["password"]);
 
-            EmailParameters emailParameters = GetEmailParameters(controller, parameters, view, values, prevRow, pk, siteWithoutQueryString, mainSiteWithoutQueryString, connectionString);
+            EmailParameters emailParameters = GetEmailParameters(controller, parameters, view, values, prevRow, pk, siteWithoutQueryString, mainSiteWithoutQueryString, connectionString, currentUserId.ToString(), currentUsername, currentUserRole);
 
             View userView = view.Database.GetUserView();
             
@@ -114,7 +114,7 @@ namespace Durados.Workflow
             ((INotifier)controller).SaveInMessageBoard(parameters, view, values, prevRow, pk, siteWithoutQueryString, urlAction, subject, message, currentUserId, currentUserRole, recipients);
         }
 
-        protected virtual EmailParameters GetEmailParameters(object controller, Dictionary<string, Parameter> parameters, View view, Dictionary<string, object> values, DataRow prevRow, string pk, string siteWithoutQueryString, string mainSiteWithoutQueryString, string connectionString)
+        protected virtual EmailParameters GetEmailParameters(object controller, Dictionary<string, Parameter> parameters, View view, Dictionary<string, object> values, DataRow prevRow, string pk, string siteWithoutQueryString, string mainSiteWithoutQueryString, string connectionString, string currentUserId, string currentUsername, string currentUserRole)
         {
             EmailParameters emailParameters = new EmailParameters();
 

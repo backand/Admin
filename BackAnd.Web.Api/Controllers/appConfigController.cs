@@ -95,6 +95,26 @@ namespace BackAnd.Web.Api.Controllers
         }
 
         [System.Web.Http.HttpGet]
+        [Route("reload")]
+        public IHttpActionResult reload()
+        {
+            if (!IsAdmin())
+            {
+                return ResponseMessage(Request.CreateResponse(HttpStatusCode.NotFound, Messages.ActionIsUnauthorized));
+            } 
+            
+            try
+            {
+                RefreshConfigCache();
+                return Ok();
+            }
+            catch (Exception exception)
+            {
+                return ResponseMessage(Request.CreateResponse(HttpStatusCode.InternalServerError, exception.Message));
+            }
+        }
+
+        [System.Web.Http.HttpGet]
         [Route("dbStat")]
         public IHttpActionResult dbStat()
         {

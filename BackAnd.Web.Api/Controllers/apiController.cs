@@ -52,6 +52,8 @@ namespace BackAnd.Web.Api.Controllers
 
         public Durados.Database Database { get; private set; }
         protected Durados.Web.Mvc.Workflow.Engine wfe = null;
+        public const string GuidKey = "JsGuid";
+        public const string actionHeaderGuidName = "Action-Guid";
 
         public apiController()
             : base()
@@ -59,7 +61,9 @@ namespace BackAnd.Web.Api.Controllers
             //Init();
         }
 
-        protected virtual string RefreshOldAdmin(string appName)
+        
+
+        protected virtual void RefreshOldAdmin(string appName)
         {
             string id = GetMasterGuid();
 
@@ -71,10 +75,10 @@ namespace BackAnd.Web.Api.Controllers
             string response = string.Empty;
             try
             {
-                response = Durados.Web.Mvc.Infrastructure.Http.GetWebRequest(url);
+                Durados.Web.Mvc.Infrastructure.Http.AsynWebRequest(url, null);
             }
             catch { }
-            return response;
+           
         }
 
         internal protected virtual void Init()

@@ -95,5 +95,7 @@ namespace Durados.DataAccess
         IDbCommand GetNewCommand(View view);
 
         string GetFirstPK(View view);
+
+        void LoadForeignKeys(string connectionString, SqlProduct sqlProduct, Dictionary<string, Dictionary<string, string>> cache);
     }
 }

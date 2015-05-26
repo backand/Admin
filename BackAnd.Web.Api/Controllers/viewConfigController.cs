@@ -1405,7 +1405,7 @@ namespace BackAnd.Web.Api.Controllers
             }
         }
 
-        public virtual IHttpActionResult Put(string name)
+        public virtual IHttpActionResult Put(string name, bool reload = true)
         {
             try
             {
@@ -1451,7 +1451,8 @@ namespace BackAnd.Web.Api.Controllers
                 {
                     UpdateFields(name, (System.Collections.IEnumerable)values["Fields_Children"]);
                 }
-                RefreshConfigCache();
+                if (reload)
+                    RefreshConfigCache();
 
                 var item = RestHelper.Get(view, pk, true, view_BeforeSelect, view_AfterSelect, false, true);
                 

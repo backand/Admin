@@ -240,6 +240,7 @@ namespace BackAnd.Web.Api.Controllers
             }
         }
 
+        [BackAnd.Web.Api.Controllers.Filters.ResponseHeaderFilter]
         public virtual IHttpActionResult Post(string name, bool? deep = null, bool? returnObject = null, string parameters = null)
         {
             try
@@ -353,6 +354,7 @@ namespace BackAnd.Web.Api.Controllers
             return values2;
         }
 
+        [BackAnd.Web.Api.Controllers.Filters.ResponseHeaderFilter]
         public virtual IHttpActionResult Put(string name, string id, bool? deep = null, bool? returnObject = null, string parameters = null, bool? overwrite = null)
         {
             try
@@ -405,6 +407,7 @@ namespace BackAnd.Web.Api.Controllers
             }
         }
 
+        [BackAnd.Web.Api.Controllers.Filters.ResponseHeaderFilter]
         public virtual IHttpActionResult Delete(string name, string id, bool? deep = null, string parameters = null)
         {
             try
@@ -576,6 +579,44 @@ namespace BackAnd.Web.Api.Controllers
             //string name, bool? deep = null, bool? returnObject = null, string parameters = null
             return Ok();
         }
+
+
+        [Route("~/1/bulk")]
+        [HttpPost]
+        // [{method:"string", url:"string", data:"string", parameters:"string", headers:{"string":"string"}}]
+        public virtual IHttpActionResult Bulk()
+        {
+            string json = System.Web.HttpContext.Current.Server.UrlDecode(Request.Content.ReadAsStringAsync().Result);
+
+            Dictionary<string, object>[] requests = null;
+
+            if (!string.IsNullOrEmpty(json) && json != "false" && json != "null" && json != "undefined" && json != "[{}]")
+            {
+                if (json.StartsWith("{"))
+                {
+                    json = "[" + json + "]";
+                }
+                try
+                {
+                    requests = JsonConverter.DeserializeArray(json);
+                }
+                catch (Exception exception)
+                {
+                    Map.Logger.Log("viewData", "bulk", exception.Source, exception, 1, "Deserialize requests " + json);
+                    return ResponseMessage(Request.CreateResponse(HttpStatusCode.NotAcceptable, Messages.StringifyFilter));
+                }
+            }
+
+            IEnumerable<string> headers = Request.Headers.GetValues("Authorization");
+            string authorization = headers.FirstOrDefault();
+            headers = Request.Headers.GetValues("AppName");
+            string appName = headers.FirstOrDefault();
+            var responses = new bulk().Run(requests, authorization, appName);
+
+            return Ok(responses);
+        }
+
+
         #endregion data
 
 

@@ -32,6 +32,8 @@ namespace Durados.Web.Mvc
             }
         }
 
+        public Dictionary<string, Dictionary<string, string>> ForeignKeys = new Dictionary<string, Dictionary<string, string>>();
+
         public DateTime TimeStamp { get; set; }
         public DateTime LastCheck { get; private set; }
         public void UpdateLastCheck()
@@ -1220,7 +1222,7 @@ namespace Durados.Web.Mvc
             values.Add("DataAction", Durados.TriggerDataAction.AfterCreateBeforeCommit.ToString());
             values.Add("WorkflowAction", Durados.WorkflowAction.Execute.ToString());
             values.Add("WhereCondition", "false");
-            values.Add("ExecuteCommand", "insert into " + sqlTextBuilder.EscapeDbObject("<your app users table here>") + " (" + sqlTextBuilder.EscapeDbObject("email") + "," + sqlTextBuilder.EscapeDbObject("name") + "," + sqlTextBuilder.EscapeDbObject("role") + "...) values ('{{Username}}','{{FirstName}}','{{durados_User_Role}}'...)");
+            values.Add("ExecuteCommand", "insert into " + sqlTextBuilder.EscapeDbObject("<your app users table here>") + " (" + sqlTextBuilder.EscapeDbObject("email") + "," + sqlTextBuilder.EscapeDbObject("name") + "," + sqlTextBuilder.EscapeDbObject("role") + "...) values ('{{Username}}','{{FirstName}}','{{Role}}'...)");
             ruleView.Create(values, null, null, null, null, null);
 
             values = new Dictionary<string, object>();
@@ -1229,7 +1231,7 @@ namespace Durados.Web.Mvc
             values.Add("DataAction", Durados.TriggerDataAction.AfterEditBeforeCommit.ToString());
             values.Add("WorkflowAction", Durados.WorkflowAction.Execute.ToString());
             values.Add("WhereCondition", "false");
-            values.Add("ExecuteCommand", "update " + sqlTextBuilder.EscapeDbObject("<your app users table here>") + " set " + sqlTextBuilder.EscapeDbObject("name") + " = '{{FirstName}}', " + sqlTextBuilder.EscapeDbObject("role") + " = '{{durados_User_Role}}' where " + sqlTextBuilder.EscapeDbObject("email") + " = '{{Username}}'");
+            values.Add("ExecuteCommand", "update " + sqlTextBuilder.EscapeDbObject("<your app users table here>") + " set " + sqlTextBuilder.EscapeDbObject("name") + " = '{{FirstName}}', " + sqlTextBuilder.EscapeDbObject("role") + " = '{{Role}}' where " + sqlTextBuilder.EscapeDbObject("email") + " = '{{Username}}'");
             ruleView.Create(values, null, null, null, null, null);
 
             values = new Dictionary<string, object>();
@@ -2531,6 +2533,7 @@ namespace Durados.Web.Mvc
             View userView = (View)db.Views["v_durados_User"];
             userView.SystemView = true;
             userView.DisplayName = "User";
+            userView.JsonName = "backandUsers";
             userView.Controller = "DuradosUser";
 
             userView.EditableTableName = "durados_User";
@@ -2658,6 +2661,7 @@ namespace Durados.Web.Mvc
             if (roleField != null)
             {
                 roleField.DisplayName = "Role";
+                roleField.JsonName = "Role";
             }
 
         }
@@ -2679,6 +2683,7 @@ namespace Durados.Web.Mvc
 
                 View userView = (View)db.Views["durados_UserRole"];
                 userView.DisplayName = "User Role";
+                userView.JsonName = "backandRoles";
                 userView.SystemView = true;
                 userView.GridDisplayType = GridDisplayType.BasedOnColumnWidth;
 

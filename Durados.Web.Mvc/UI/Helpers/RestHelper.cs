@@ -13,6 +13,10 @@ using Microsoft.WindowsAzure;
 using Microsoft.WindowsAzure.StorageClient;
 using System.Web.Security;
 using System.Data.SqlClient;
+using System.Net;
+using System.IO;
+using Durados.Web.Mvc.Infrastructure;
+using System.Threading;
 
 namespace Durados.Web.Mvc.UI.Helpers
 {
@@ -2755,7 +2759,7 @@ namespace Durados.Web.Mvc.UI.Helpers
                        dictionaryType = DictionaryType.DisplayNames;
                    }
                    DataView dataView = GetDataViewForDictionary(view, dictionaryType);
-                   dictionary.Add(view.JsonName, GetDictionary(dataView));
+                   dictionary.Add(view.JsonName, GetDictionary(dataView, view));
                }
            }
 
@@ -2776,7 +2780,7 @@ namespace Durados.Web.Mvc.UI.Helpers
        {
            List<Dictionary<string, object>> dictionary = new List<Dictionary<string, object>>();
 
-           foreach (Field field in view.Fields.Values)
+           foreach (Field field in view.Fields.Values.Where(f => f.FieldType != FieldType.Children && !IsExcluded(f)))
            {
                string label = field.JsonName;
                string token = field.JsonName;
@@ -2786,7 +2790,18 @@ namespace Durados.Web.Mvc.UI.Helpers
            return dictionary.ToArray();
        }
 
-       private Dictionary<string, object>[] GetDictionary(DataView dataView)
+       protected virtual bool IsExcluded(Field field)
+       {
+           if (field.View == field.View.Database.GetUserView())
+           {
+               HashSet<string> exclude = new HashSet<string>() { "Password", "Guid", "Signature", "SignatureHTML", "NewUser", "Comments" };
+
+               return exclude.Contains(field.Name);
+           }
+           return false;
+       }
+
+       private Dictionary<string, object>[] GetDictionary(DataView dataView, View view = null)
        {
            List<Dictionary<string, object>> dictionary = new List<Dictionary<string, object>>();
 
@@ -2794,9 +2809,23 @@ namespace Durados.Web.Mvc.UI.Helpers
            {
                string label = row.Row["Tag"].ToString();
                string token = row.Row["Token"].ToString();
+               if (!IsExcluded(view, label))
+               {
                dictionary.Add(new Dictionary<string, object>() { { "label", label }, { "token", token } });
            }
+           }
            return dictionary.ToArray();
+       }
+
+       protected virtual bool IsExcluded(View view, string label)
+       {
+           if (view != null && view == view.Database.GetUserView())
+           {
+               HashSet<string> exclude = new HashSet<string>() { "User.Password", "User.Guid", "User.Signature", "User.Signature HTML", "User.New User", "User.Comments", "User.Role.Name", "User.Role.Description", "User.Role.First View" };
+
+               return exclude.Contains(label);
+           }
+           return false;
        }
 
        private DataView GetDataViewForDictionary(View view, DictionaryType dictionaryType)
@@ -4028,4 +4057,193 @@ namespace Durados.Web.Mvc.UI.Helpers
 
        }
    }
+    
+   public class bulk
+   {
+
+       public object[] Run(object[] requests, string authorization, string appName)
+       {
+           object[] responses = new object[requests.Length];
+
+           ServicePointManager.DefaultConnectionLimit = 20;//Please test different numbers here
+           var tasks = new List<Task<string>>();
+              
+           for (int index = 0; index < requests.Length; index++)
+           {
+               Dictionary<string, object> request = (Dictionary<string, object>)requests[index];
+               
+
+               string method = "GET";
+               if (request.ContainsKey("method"))
+               {
+                  method= (string)request["method"];
+}
+               if (!request.ContainsKey("url"))
+               {
+                   responses[index] = new ResponseStatusAndData() { status = 417, data = "Missing url in the request" };
+                   continue;
+               }
+               string url = (string)request["url"];
+               Dictionary<string, object> parameters = null;
+               if (request.ContainsKey("parameters"))
+               {
+                   parameters = (Dictionary<string, object>)request["parameters"];
+               }
+               string data = null;
+               if (request.ContainsKey("data"))
+               {
+                   data = new System.Web.Script.Serialization.JavaScriptSerializer().Serialize((Dictionary<string, object>)request["data"]);
+               }
+
+               Dictionary<string, object> headers = null;
+               if (request.ContainsKey("headers"))
+               {
+                   headers = (Dictionary<string, object>)request["headers"];
+               }
+               if (headers == null)
+               {
+                   headers = new Dictionary<string, object>();
+               }
+               if (authorization != null)
+               {
+                   
+                   headers.Add("Authorization", authorization);
+               }
+               if (!string.IsNullOrEmpty(appName))
+               {
+                   headers.Add("AppName", appName);
+               }
+
+               int index2 = index;
+
+               tasks.Add(Task.Factory.StartNew(() =>
+               {
+                   var responseStatusAndData = GetWebResponse(method, url, data, parameters, headers, index2);
+                   responses[responseStatusAndData.index] = responseStatusAndData;
+                   return responseStatusAndData.data;
+               }));
+
+
+               
+               //At this point tasks[0].Result will be the result (The Response) of the first task
+               //tasks[1].Result will be the result of the second task and so on.
+              
+           }
+           Task.WaitAll(tasks.ToArray());
+               
+           return responses;
+       }
+
+       private void setRequestHeader(WebRequest request, Dictionary<string, object> headers)
+       {
+           foreach (string header in headers.Keys)
+           {
+               setRequestHeader(request, header, headers[header].ToString());
+           }
+       }
+       private void setRequestHeader(WebRequest request, string header, string value)
+       {
+           if (header.ToLower() == "content-type" || header.ToLower() == "accept")
+               request.ContentType = value;
+           else
+               request.Headers.Add(header, value);
+
+       }
+
+       public ResponseStatusAndData GetWebResponse(string method, string url, string data, Dictionary<string, object> parameters, Dictionary<string, object> headers, int index)
+       {
+           if (parameters != null)
+           {
+               var sb = new StringBuilder();
+               foreach (var key in parameters.Keys)
+                   sb.Append(key + "=" + parameters[key] + "&");
+
+               if (url.Contains("?"))
+               {
+                   url += "&";
+               }
+               else
+               {
+                   url += "?";
+               }
+
+               url += sb.ToString();
+           }
+
+           var httpWebRequest = (HttpWebRequest)WebRequest.Create(url);
+           httpWebRequest.ContentType = "application/x-www-form-urlencoded";
+           httpWebRequest.Method = method;
+
+           if (headers != null)
+           {
+               setRequestHeader(httpWebRequest, headers);
+           }
+
+           if (!string.IsNullOrEmpty(data) && data != "null")
+           {
+               byte[] bytes;
+               bytes = System.Text.Encoding.ASCII.GetBytes(data);
+               httpWebRequest.ContentLength = bytes.Length;
+
+               using (Stream requestStream = httpWebRequest.GetRequestStream())
+               {
+                   //Writes a sequence of bytes to the current stream 
+                   requestStream.Write(bytes, 0, bytes.Length);
+                   requestStream.Close();//Close stream
+               }
+           }
+
+           Task<WebResponse> responseTask = null;
+           try
+           {
+               responseTask = Task.Factory.FromAsync<WebResponse>(httpWebRequest.BeginGetResponse, httpWebRequest.EndGetResponse, null);
+           }
+           catch (Exception exception)
+           {
+               int status = 500;
+               string message = exception.Message;
+               if (exception is System.Net.WebException)
+               {
+                   status = (int)((System.Net.HttpWebResponse)(((System.Net.WebException)(exception)).Response)).StatusCode;
+               }
+               return new ResponseStatusAndData() { status = status, data = message, index = index };
+           }
+
+           try
+           {
+               using (var responseStream = responseTask.Result.GetResponseStream())
+               {
+                   var reader = new StreamReader(responseStream);
+                   return new ResponseStatusAndData() { status = (int)((HttpWebResponse)responseTask.Result).StatusCode, data = reader.ReadToEnd(), index = index };
+               }
+           }
+           catch (Exception exception)
+           {
+               int status = 500;
+               string message = exception.Message;
+               if (exception.InnerException != null && exception.InnerException is System.Net.WebException)
+               {
+                   status = (int)((System.Net.HttpWebResponse)(((System.Net.WebException)(exception.InnerException)).Response)).StatusCode;
+                   message = exception.InnerException.Message;
+               }
+               return new ResponseStatusAndData() { status = status, data = message, index = index };
+           }
+       }
+
+       public class ResponseStatusAndData
+       {
+           public int status { get; set; }
+           public string data { get; set; }
+           internal int index { get; set; }
+           
+       }
+       
+   }
+
+    
+
+
+
+   
+   
 }

@@ -7828,6 +7828,41 @@ namespace Durados.DataAccess
                 return false;
             }
         }
+
+        public void LoadForeignKeys(string connectionString, SqlProduct sqlProduct, Dictionary<string, Dictionary<string, string>> cache)
+        {
+            SqlSchema schema = GetNewSqlSchema();
+
+            using (IDbConnection connection = GetNewConnection(sqlProduct, connectionString))
+            {
+                connection.Open();
+                using (IDbCommand command = GetNewCommand(schema.GetForeignKeyConstraints(), connection))
+                {
+                    using (IDataReader reader = command.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            string tableName = reader.GetString(reader.GetOrdinal("TableName"));
+                            string columnName = reader.GetString(reader.GetOrdinal("ColumnName"));
+                            string name = reader.GetString(reader.GetOrdinal("name"));
+
+                            if (!cache.ContainsKey(tableName))
+                            {
+                                cache.Add(tableName, new Dictionary<string, string>());
+    }
+                            if (!cache[tableName].ContainsKey(columnName))
+                            {
+                                cache[tableName].Add(columnName, name);
+                            }
+                            else
+                            {
+                                cache[tableName][columnName] = name;
+                            }
+                        }
+                    }
+                }
+            }
+        }
     }
 
     /// <summary>
@@ -10081,14 +10116,6 @@ public class SqlSchema : ISchema
     }
 
 
-    public virtual string GetForeignKeyConstraints()
-    {
-        return "SELECT f.name AS ForeignKey, OBJECT_NAME(f.parent_object_id) AS TableName, COL_NAME(fc.parent_object_id, fc.parent_column_id) AS ColumnName, " +
-                  "OBJECT_NAME(f.referenced_object_id) AS ReferenceTableName, COL_NAME(fc.referenced_object_id, fc.referenced_column_id) AS ReferenceColumnName " +
-                "FROM     sys.foreign_keys AS f INNER JOIN " +
-                  "sys.foreign_key_columns AS fc ON f.object_id = fc.constraint_object_id ";
-    }
-
     public virtual string GetForeignKeyConstraints(string tablesNames)
     {
         return "SELECT f.name AS ForeignKey, OBJECT_NAME(f.parent_object_id) AS TableName, COL_NAME(fc.parent_object_id, fc.parent_column_id) AS ColumnName, " +
@@ -10096,6 +10123,14 @@ public class SqlSchema : ISchema
                 "FROM     sys.foreign_keys AS f INNER JOIN " +
                   "sys.foreign_key_columns AS fc ON f.object_id = fc.constraint_object_id " +
                 "WHERE  (OBJECT_NAME(f.parent_object_id) in (" + tablesNames + ")";
+    }
+
+    public virtual string GetForeignKeyConstraints()
+    {
+        return "SELECT f.name AS name, OBJECT_NAME(f.parent_object_id) AS TableName, COL_NAME(fc.parent_object_id, fc.parent_column_id) AS ColumnName, " +
+                  "OBJECT_NAME(f.referenced_object_id) AS ReferenceTableName, COL_NAME(fc.referenced_object_id, fc.referenced_column_id) AS ReferenceColumnName " +
+                "FROM     sys.foreign_keys AS f INNER JOIN " +
+                  "sys.foreign_key_columns AS fc ON f.object_id = fc.constraint_object_id ";
     }
 
     public virtual string GetForeignKeyConstraint(string tableName, string referenceTableName, string columnName)

@@ -456,6 +456,11 @@ namespace Durados.DataAccess
             return "select table_name as TableName, column_name as ColumnName, referenced_table_name as ReferenceTableName, referenced_column_name as ReferenceColumnName from information_schema.key_column_usage where referenced_table_name is not null and table_schema = DATABASE() and table_name = '" + tableName + "'";
         }
 
+        public override string GetForeignKeyConstraints()
+        {
+            return "select CONSTRAINT_NAME name, TABLE_NAME as TableName, COLUMN_NAME as ColumnName, REFERENCED_TABLE_NAME ReferenceTableName,  REFERENCED_COLUMN_NAME ReferenceColumnName from information_schema.key_column_usage where referenced_table_name is not null and table_schema = DATABASE() ";
+        }
+
         public override string GetForeignKeyConstraint(string tableName, string referenceTableName, string columnName)
         {
             return "select constraint_name as TableName, column_name as ColumnName, referenced_table_name as ReferenceTableName, referenced_column_name as ReferenceColumnName from information_schema.key_column_usage where referenced_table_name is not null and table_schema = DATABASE() and table_name = '" + tableName + "' and referenced_table_name = '" + referenceTableName + "' and column_name ='" + columnName + "'";

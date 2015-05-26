@@ -14,7 +14,8 @@ namespace Durados
     public partial class ChildrenField : Field
     {
         public const string FkCounterPrefix = "FkCounter_";
-
+        public const string _bkname_ = "_bkname_";
+        
         public ChildrenField(View view, DataRelation dataRelation) :
             base(view)
         {
@@ -208,7 +209,27 @@ namespace Durados
 
         protected override string GetInitialDisplayName()
         {
-            return ChildrenView.DisplayName;
+            return GetFromCache() ?? ChildrenView.DisplayName;
+        }
+
+        private string GetFromCache()
+        {
+            ParentField parentField = GetEquivalentParentField();
+            string tableName = parentField.View.DataTable.TableName;
+            string columnName = parentField.GetColumnsNames()[0];
+
+            if (View.Database.ForeignKeys.ContainsKey(tableName) && View.Database.ForeignKeys[tableName].ContainsKey(columnName))
+            {
+                string name = View.Database.ForeignKeys[tableName][columnName];
+                if (name.Contains(_bkname_))
+                {
+                    string[] s = name.Split(_bkname_.ToCharArray());
+                    return s.Last();
+                }
+            }
+
+
+            return null;
         }
 
         public override bool HideInCreate
