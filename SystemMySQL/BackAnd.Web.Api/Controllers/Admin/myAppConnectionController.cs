@@ -573,7 +573,27 @@ namespace BackAnd.Web.Api.Controllers
 
         private int GetDefaultProductPort(Dictionary<string, object> values)
         {
-            Durados.SqlProduct sqlProduct = (Durados.SqlProduct)Enum.Parse(typeof(Durados.SqlProduct), values[Product].ToString());
+            int product = Convert.ToInt32(values[Product]);
+            Durados.SqlProduct sqlProduct = Durados.SqlProduct.MySql;
+            switch (product)
+            {
+                case 4:
+                    sqlProduct = Durados.SqlProduct.MySql;
+                    break;
+                case 1:
+                case 2:
+                    sqlProduct = Durados.SqlProduct.SqlServer;
+                    break;
+                case 8:
+                    sqlProduct = Durados.SqlProduct.Postgre;
+                    break;
+                case 7:
+                    sqlProduct = Durados.SqlProduct.Oracle;
+                    break;
+                default:
+                    sqlProduct = Durados.SqlProduct.MySql;
+                    break;
+            }
             return GetDefaultProductPort(sqlProduct);
         }
 

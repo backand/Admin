@@ -1055,10 +1055,10 @@ namespace Durados.Web.Mvc.Config
 
             //viewView.Fields["EditableTableName"].DisplayName = "";
 
-            viewView.Fields["Order"].HideInTable = true;
-            viewView.Fields["Order"].HideInEdit = true;
+            //viewView.Fields["Order"].HideInTable = true;
+            //viewView.Fields["Order"].HideInEdit = true;
             viewView.Fields["Order"].HideInCreate = true;
-            viewView.Fields["Order"].DisplayName = "Display Order in Menu";
+            viewView.Fields["Order"].DisplayName = "order";
             //configView.Fields["DisplayColumn"].HideInTable = true;
             ColumnField displayColumnField = (ColumnField)viewView.Fields["DisplayColumn"];
             displayColumnField.DisplayName = "Column Display in Title";
@@ -3039,7 +3039,7 @@ namespace Durados.Web.Mvc.Config
             SetRoles(fieldView.Fields["TrimSpaces"], "Developer");
             SetRoles(fieldView.Fields["Custom"], "Developer");
             SetRoles(fieldView.Fields["DisplayField"], "Developer");
-            SetRoles(fieldView.Fields["Order"], "Developer");
+            //SetRoles(fieldView.Fields["Order"], "Developer");
             SetRoles(fieldView.Fields["NoHyperlink"], "Developer");
             SetRoles(fieldView.Fields["GridEditable"], "Developer");
             SetRoles(fieldView.Fields["Searchable"], "Developer");

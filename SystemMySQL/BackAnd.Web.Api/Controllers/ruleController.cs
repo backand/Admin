@@ -123,8 +123,6 @@ namespace BackAnd.Web.Api.Controllers
                      response = Request.CreateResponse(HttpStatusCode.OK);
                  }
 
-                 string GuidKey = "JsGuid";
-                 string actionHeaderGuidName = "Action-Guid";
                  if (System.Web.HttpContext.Current.Items.Contains(GuidKey))
                  {
                      string actionHeaderGuidValue = System.Web.HttpContext.Current.Items[GuidKey].ToString();

@@ -69,6 +69,7 @@ namespace Durados.Web.Mvc.Infrastructure
 
             // Create the request object.
             WebRequest wreq = WebRequest.Create(httpSite);
+            
             wreq.Timeout = 60 * 60 * 1000;
             // Create the state object.
             RequestState rs = new RequestState();

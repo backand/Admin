@@ -57,6 +57,7 @@ namespace Durados
 
         public Durados.Localization.ILocalizer Localizer { get; set; }
         
+        public virtual Dictionary<string, Dictionary<string, string>> ForeignKeys { get; protected set; }
 
         public string DbConnectionString { get; set; }
         public virtual string SysDbConnectionString { get { return null; } }

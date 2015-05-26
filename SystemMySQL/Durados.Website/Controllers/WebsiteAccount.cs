@@ -53,7 +53,7 @@ namespace Durados.Website.Controllers
 
                 if (sql.ExecuteScalar(Map.Database.ConnectionString, "SELECT TOP 1 [Username] FROM [durados_User] WHERE [Username]=@Username", parameters) != string.Empty)
                 {
-                    return Json(new { Success = false, Message =string.Format("Email {0} already exists. If you are already registered with this email, please <a href='/sign-in' >log in</a>. Otherwise, please sign up with a different email address." ,username)});
+                    return Json(new { Success = false, Message =string.Format("{0} is already signed up." ,username)});
                 }
 
                 string email1 = email;

@@ -270,7 +270,7 @@ namespace Durados.Workflow
             {
                 connection.Open();
                 string sql;
-                if (dataAction == TriggerDataAction.BeforeCreate || dataAction == TriggerDataAction.AfterDeleteBeforeCommit || dataAction == TriggerDataAction.AfterDelete)
+                if (dataAction == TriggerDataAction.BeforeCreate || dataAction == TriggerDataAction.AfterCreateBeforeCommit || dataAction == TriggerDataAction.AfterCreate || dataAction == TriggerDataAction.AfterDeleteBeforeCommit || dataAction == TriggerDataAction.AfterDelete)
                     sql = GetSql(rule, view, prevRow, null, currentUserId, currentUserRole);
                 else
                     sql = GetSql(rule, view, prevRow, pk, currentUserId, currentUserRole);

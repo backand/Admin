@@ -15,6 +15,15 @@ namespace Durados.Web.Mvc
 
         public const string DefaultPageContentKey = "DefaultPageContent";
 
+        public override Dictionary<string, Dictionary<string, string>> ForeignKeys
+        {
+            get
+            {
+                return Map.ForeignKeys;
+            }
+            
+        }
+
         public View FirstView
         {
             get

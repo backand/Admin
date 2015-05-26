@@ -386,14 +386,15 @@ namespace Durados
 
         protected override string GetInitialDisplayName()
         {
-            //if (DataRelation.ChildColumns.Count() == 1)
-            //{
-            //    return DataRelation.ChildColumns[0].ColumnName.GetDecamal();
-            //}
-            //else
-            //    return Name;
-
-            return ParentView.DisplayName;
+            if (DataRelation.ChildColumns.Count() == 1)
+            {
+                return DataRelation.ChildColumns[0].ColumnName.GetDecamal();
+            }
+            else
+            {
+                
+                return ParentView.DisplayName;
+            }
         }
 
         [Durados.Config.Attributes.ColumnProperty()]
