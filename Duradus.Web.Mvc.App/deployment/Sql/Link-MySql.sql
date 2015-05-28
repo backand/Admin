@@ -1,6 +1,4 @@
--- use durados_App_11557;
--- SHOW  TABLES like 'Durados_Log' ;
--- SELECT 1  FROM INFORMATION_SCHEMA.TABLES  WHERE   table_name = 'Durados_Log' AND table_schema=DATABASE()
+
  USE `__DB_NAME__`;
 
 /****** Object:  Table `durados_Html`    Script Date: 01/17/2011 11:45:31 ******/
@@ -28,7 +26,7 @@ CREATE TABLE `durados_Link`(
 	`ControllerName` varchar(150) NULL,	
 	`Guid` varchar(150) NULL,
 	`Url` varchar(500) NULL,
-	`Filter` longtext NULL,
+	`Filter` varchar(8000) CHARACTER SET utf8 DEFAULT  NULL,
 	`SortColumn` varchar(150) NULL,
 	`SortDirection` varchar(5) NULL,
 	`PageNo` SMALLINT NOT NULL,

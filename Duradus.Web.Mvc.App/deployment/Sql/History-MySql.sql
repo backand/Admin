@@ -33,7 +33,7 @@ CREATE TABLE `durados_ChangeHistory`(
 	`ActionId` INT NOT NULL,
 	`UpdateDate` DateTime NOT NULL DEFAULT NOW(),
 	`UpdateUserId` INT NOT NULL,
-	`Comments` LONGTEXT NULL,
+	`Comments` varchar(8000) CHARACTER SET utf8 DEFAULT  NULL,
 	`TransactionName` VARCHAR(50) NULL,
 	`Version` VARCHAR(50) NULL,
 	`Workspace` VARCHAR(50) NULL,
@@ -55,10 +55,10 @@ CREATE TABLE `durados_ChangeHistoryField`(
 	`ChangeHistoryId` INT NOT NULL,
 	`FieldName` VARCHAR(500) NOT NULL,
 	`ColumnNames` VARCHAR(500) NOT NULL,
-	`OldValue` LONGTEXT NOT NULL,
-	`NewValue` LONGTEXT NOT NULL,
-	`OldValueKey` LONGTEXT NULL,
-	`NewValueKey` LONGTEXT NULL,
+	`OldValue` varchar(5000) CHARACTER SET utf8  NOT NULL,
+	`NewValue` varchar(5000) CHARACTER SET utf8  NOT NULL,
+	`OldValueKey` varchar(5000) CHARACTER SET utf8  NULL,
+	`NewValueKey` varchar(5000) CHARACTER SET utf8  NULL,
  PRIMARY KEY (`Id`)
 ) ;
 
