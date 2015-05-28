@@ -27,7 +27,7 @@ CREATE TABLE `durados_User` (
   `SignatureHTML` varchar(4000) DEFAULT NULL,
   `IsApproved` bit(1) NOT NULL DEFAULT b'1',
   `NewUser` bit(1) DEFAULT NULL,
-  `Comments` longtext,
+  `Comments` varchar(8000) CHARACTER SET utf8 DEFAULT NULL,
   PRIMARY KEY (`ID`),
   UNIQUE KEY `Guid` (`Guid`),
   UNIQUE KEY `IX_durados_Username` (`Username`(255)),

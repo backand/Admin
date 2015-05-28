@@ -999,7 +999,7 @@ namespace Durados.Web.Mvc.UI.Helpers
             View configView = (View)configDatabase.Views["View"];
             View configField = (View)configDatabase.Views["Field"];
             string menuPk = GetNewViewMenuPK(configAccess, (Database)configDatabase);
-            SqlAccess sqlAccess = new SqlAccess();
+            IDataTableAccess sqlAccess = DataAccessHelper.GetDataTableAccess(db.ConnectionString);
             int autoCompleteLimit = 500;
             int lastOrder = 10;
             View lastView = (View)Map.Database.Views.Values.OrderByDescending(v => v.Order).FirstOrDefault();

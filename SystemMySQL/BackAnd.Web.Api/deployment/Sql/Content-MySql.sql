@@ -5,7 +5,7 @@
 
 CREATE TABLE `durados_Html`(
 	`Name` VARCHAR(50) NOT NULL,
-	`Text` LONGTEXT NOT NULL,
+	`Text` VARCHAR(8000) CHARACTER SET utf8   NOT NULL,
 PRIMARY KEY  
 (
 	`Name` ASC
