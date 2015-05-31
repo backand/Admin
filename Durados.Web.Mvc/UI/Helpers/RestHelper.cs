@@ -2374,7 +2374,11 @@ namespace Durados.Web.Mvc.UI.Helpers
            {
                if (cache.ContainsKey(appName))
                    cache.Remove(appName);
-               cache.Add(appName, new StatAndTime() { Time = DateTime.Now, Stat = GetStat(appName) });
+               try
+               {
+                   cache.Add(appName, new StatAndTime() { Time = DateTime.Now, Stat = GetStat(appName) });
+               }
+               catch { }
            }
            stat = cache[appName].Stat;
            item.Add("stat", stat);

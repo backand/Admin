@@ -75,6 +75,10 @@ namespace BackAnd.Web.Api.Controllers.Filters
                     Durados.Web.Mvc.Controllers.AccountMembershipService accountMembershipService = new Durados.Web.Mvc.Controllers.AccountMembershipService();
                     try
                     {
+                        //if (!IsAppReady()) 
+                        //{
+                        //    throw new Durados.DuradosException("App is not ready yet");
+                        //}
                         if (!accountMembershipService.ValidateUser(username) || !accountMembershipService.IsApproved(username))
                         {
                             HandleUnauthorized(actionContext);
@@ -126,6 +130,26 @@ namespace BackAnd.Web.Api.Controllers.Filters
                 HandleUnauthorized(actionContext);
                 return;
             }
+        }
+
+        private bool IsAppReady()
+        {
+            string appName = Maps.GetCurrentAppName();
+
+            if (appName == Maps.DuradosAppName)
+                return true;
+
+            if (!Maps.Instance.AppInCach(appName))
+            {
+                string appId = Maps.Instance.GetCurrentAppId();
+
+                OnBoardingStatus status = Maps.Instance.GetOnBoardingStatus(appId);
+
+                if (status != OnBoardingStatus.Ready)
+                    return false;
+            }
+
+            return true;
         }
 
         private bool IsAnonymous(System.Web.Http.Controllers.HttpActionContext actionContext)
