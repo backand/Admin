@@ -5947,6 +5947,19 @@ namespace Durados.Web.Mvc
 
             sqlAccess.ExecuteNonQuery(DuradosMap.connectionString, sql);
         }
+
+        public OnBoardingStatus GetOnBoardingStatus(string appId)
+        {
+            string sql = "select DatabaseStatus from dbo.durados_App with (NOLOCK) where id = " + appId;
+            Durados.DataAccess.SqlAccess sqlAccess = new Durados.DataAccess.SqlAccess();
+
+            object scalar = sqlAccess.ExecuteScalar(DuradosMap.connectionString, sql);
+
+            if (scalar.Equals(string.Empty) || scalar == null || scalar == DBNull.Value)
+                return OnBoardingStatus.NotStarted;
+            else
+                return (OnBoardingStatus)Convert.ToInt32(scalar);
+        }
     }
 
     public class FieldProperty

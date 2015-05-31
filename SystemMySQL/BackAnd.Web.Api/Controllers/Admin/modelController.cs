@@ -66,7 +66,7 @@ namespace BackAnd.Web.Api.Controllers
                 ArrayList backandToObjectResult = GetBackandToObject();
 
                 return Ok(backandToObjectResult);
-                
+
             }
             catch (Exception exception)
             {
@@ -84,7 +84,7 @@ namespace BackAnd.Web.Api.Controllers
             {
                 ArrayList backandToObjectResult = GetBackandToObject();
 
-                return Ok(backandToObjectResult); 
+                return Ok(backandToObjectResult);
             }
             catch (Exception exception)
             {
@@ -98,7 +98,16 @@ namespace BackAnd.Web.Api.Controllers
             return GetBackandToObject(Request.Headers.Authorization.ToString());
         }
 
+        private string GetAppName()
+        {
+            string appName = Request.Headers.GetValues("AppName").FirstOrDefault();
+            if (appName == null)
+            {
+                appName = Map.AppName;
+            }
 
+            return appName;
+        }
 
         private ArrayList GetBackandToObject(string token)
         {
@@ -109,12 +118,12 @@ namespace BackAnd.Web.Api.Controllers
 
             bulk bulk = new Durados.Web.Mvc.UI.Helpers.bulk();
 
-            
+
             var tasks = new List<Task<string>>();
             object responses = null;
             tasks.Add(Task.Factory.StartNew(() =>
             {
-                var responseStatusAndData = bulk.GetWebResponse("POST", getNodeUrl, null, null, new Dictionary<string, object>() { { "Content-Type", "application/json" }, { "Authorization", Request.Headers.Authorization.ToString() } }, 0);
+                var responseStatusAndData = bulk.GetWebResponse("POST", getNodeUrl, null, null, new Dictionary<string, object>() { { "Content-Type", "application/json" }, { "Authorization", Request.Headers.Authorization.ToString() }, { "AppName", GetAppName() } }, 0);
                 responses = responseStatusAndData.data;
                 return responseStatusAndData.data;
             }));
@@ -144,7 +153,7 @@ namespace BackAnd.Web.Api.Controllers
                 string viewName = view.Name;
 
                 string vpk = ca.GetViewPK(viewJsonName, Map.GetConfigDatabase().ConnectionString);
-                viewView.Edit(new Dictionary<string, object>() { { "Order", i * 10 } }, vpk, null, null, null, null);
+                viewView.Edit(new Dictionary<string, object>() { { "Order", 10000 + i * 10 } }, vpk, view_BeforeEdit, view_BeforeEditInDatabase, view_AfterEditBeforeCommit, view_AfterEditAfterCommit);
 
                 ArrayList columns = (ArrayList)tableColumns[viewJsonName];
 
@@ -154,7 +163,7 @@ namespace BackAnd.Web.Api.Controllers
                     string fieldName = view.GetFieldsByJsonName(fieldJsonName)[0].Name;
 
                     string fpk = ca.GetFieldPK(viewName, fieldName, Map.GetConfigDatabase().ConnectionString);
-                    fieldView.Edit(new Dictionary<string, object>() { { "Order", j * 10 } }, fpk, null, null, null, null);
+                    fieldView.Edit(new Dictionary<string, object>() { { "Order", 500 + j * 10 } }, fpk, view_BeforeEdit, view_BeforeEditInDatabase, view_AfterEditBeforeCommit, view_AfterEditAfterCommit);
 
                 }
             }
@@ -205,13 +214,13 @@ namespace BackAnd.Web.Api.Controllers
             var result = jss.Deserialize<Dictionary<string, object>>(responses.ToString());
 
             return result;
-            
+
         }
 
         private string GetNodeUrl()
         {
             return System.Configuration.ConfigurationManager.AppSettings["nodeHost"] ?? "http://127.0.0.1:9000";
-           
+
         }
 
         private SqlAccess GetSqlAccess(Durados.SqlProduct sqlProduct)

@@ -735,8 +735,9 @@ namespace Durados.DataAccess
                 }
                 else
                 {
-                    command = GetNewCommand(view);
-                    
+                    //command = GetNewCommand(view);
+                    command = GetNewCommand(string.Empty, GetNewConnection(connectionString));
+                   
                 }
                 command.Connection.Open();
                 try
