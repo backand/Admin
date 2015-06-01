@@ -4224,14 +4224,30 @@ namespace Durados.Web.Mvc.UI.Helpers
            catch (Exception exception)
            {
                int status = 500;
-               string message = exception.Message;
-               if (exception.InnerException != null && exception.InnerException is System.Net.WebException)
+
+               Exception e = exception;
+               string message = null;
+
+               while (e.InnerException != null)
                {
-                   status = (int)((System.Net.HttpWebResponse)(((System.Net.WebException)(exception.InnerException)).Response)).StatusCode;
-                   message = exception.InnerException.Message;
+                   e = e.InnerException;
+
+                   if (e is WebException)
+                   {
+                       WebException webException = e as WebException;
+                       if (webException.Response != null)
+                       {
+                           status = (int)((System.Net.HttpWebResponse)webException.Response).StatusCode;
+                           message = webException.Message;
+                       }
+                   }
                }
+               if (string.IsNullOrEmpty(message))
+                   throw exception;
+
                return new ResponseStatusAndData() { status = status, data = message, index = index };
            }
+           
        }
 
        public class ResponseStatusAndData

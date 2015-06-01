@@ -49,7 +49,18 @@ namespace BackAnd.Web.Api.Controllers
 
                 string sql = string.Join(";", ((System.Collections.ArrayList)transformResult["alter"]).ToArray());
 
-                runSql(sql);
+                if (!string.IsNullOrEmpty(sql))
+                {
+                    try
+                    {
+                        runSql(sql);
+                    }
+                    catch (Exception exception)
+                    {
+                        Sync();
+                        throw exception;
+                    }
+                }
 
                 Dictionary<string, object> syncResult = Sync();
 
@@ -68,8 +79,17 @@ namespace BackAnd.Web.Api.Controllers
                 return Ok(backandToObjectResult);
 
             }
+            catch (WebException exception)
+            {
+                return ResponseMessage(Request.CreateResponse((HttpStatusCode)(int)exception.Status, exception.Message));
+
+            }
             catch (Exception exception)
             {
+                while (exception.InnerException != null)
+                {
+                    exception = exception.InnerException;
+                }
                 throw new BackAndApiUnexpectedResponseException(exception, this);
 
             }
@@ -86,8 +106,17 @@ namespace BackAnd.Web.Api.Controllers
 
                 return Ok(backandToObjectResult);
             }
+            catch (WebException exception)
+            {
+                return ResponseMessage(Request.CreateResponse((HttpStatusCode)(int)exception.Status, exception.Message));
+ 
+            }
             catch (Exception exception)
             {
+                while (exception.InnerException != null)
+                {
+                    exception = exception.InnerException;
+                }
                 throw new BackAndApiUnexpectedResponseException(exception, this);
 
             }
@@ -121,14 +150,21 @@ namespace BackAnd.Web.Api.Controllers
 
             var tasks = new List<Task<string>>();
             object responses = null;
+            int status = 0;
             tasks.Add(Task.Factory.StartNew(() =>
             {
                 var responseStatusAndData = bulk.GetWebResponse("POST", getNodeUrl, null, null, new Dictionary<string, object>() { { "Content-Type", "application/json" }, { "Authorization", Request.Headers.Authorization.ToString() }, { "AppName", GetAppName() } }, 0);
                 responses = responseStatusAndData.data;
+                status = responseStatusAndData.status;
                 return responseStatusAndData.data;
             }));
 
             Task.WaitAll(tasks.ToArray());
+
+            if (status >= 300 || status < 200)
+            {
+                throw new WebException(responses.ToString(), (WebExceptionStatus)status);
+            }
 
             JavaScriptSerializer jss = new JavaScriptSerializer();
             var result = jss.Deserialize<ArrayList>(responses.ToString());

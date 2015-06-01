@@ -124,7 +124,25 @@ namespace BackAnd.Web.Api.Controllers
                 }
                 else
                 {
-                    item.Add("settings", RestHelper.Get(databaseView, "0", true, view_BeforeSelect, view_AfterSelect, true, true));
+                    Dictionary<string, object> db = null;
+
+                    try
+                    {
+                        db = RestHelper.Get(databaseView, "0", true, view_BeforeSelect, view_AfterSelect, true, true);
+                    }
+                    catch
+                    {
+                        if (item["DatabaseStatus"].Equals(2))
+                        {
+                            return Ok(item);
+                        }
+                        else
+                        {
+                            return ResponseMessage(Request.CreateResponse(HttpStatusCode.NotFound, string.Format(Messages.AppNotFound, id)));
+                        }
+                    }
+
+                    item.Add("settings", db);
                 }
 
                 if (deep.HasValue && deep.Value && item["DatabaseStatus"].Equals(1))
