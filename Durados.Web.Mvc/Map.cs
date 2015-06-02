@@ -2798,6 +2798,7 @@ namespace Durados.Web.Mvc
             }
             db.SqlProduct = SqlProduct;
             db.SystemSqlProduct = SystemSqlProduct;
+            configDatabase.SystemSqlProduct = SystemSqlProduct;
             ConfigSystemTables();
 
             List<ChildrenField> fields = CreateCounters();

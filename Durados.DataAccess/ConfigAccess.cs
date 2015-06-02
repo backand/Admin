@@ -736,7 +736,7 @@ namespace Durados.DataAccess
                 else
                 {
                     //command = GetNewCommand(view);
-                    command = GetNewCommand(string.Empty, GetNewConnection(connectionString));
+                    command = GetNewCommand(string.Empty, GetNewConnection(view.Database.SystemSqlProduct, connectionString), view.Database.SystemSqlProduct);
                    
                 }
                 command.Connection.Open();
@@ -1080,7 +1080,7 @@ namespace Durados.DataAccess
                 }
                 else
                 {
-                    command = GetNewCommand(string.Empty,GetNewConnection(connectionString));
+                    command = GetNewCommand(string.Empty, GetNewConnection(view.Database.SystemSqlProduct, connectionString), view.Database.SystemSqlProduct);
                    
                 }
                 command.Connection.Open();
@@ -1153,7 +1153,7 @@ namespace Durados.DataAccess
                 }
                 else
                 {
-                    command = GetNewCommand(string.Empty, GetNewConnection(connectionString));
+                    command = GetNewCommand(string.Empty, GetNewConnection(view.Database.SystemSqlProduct, connectionString), view.Database.SystemSqlProduct);
                   
                 }
                 command.Connection.Open();

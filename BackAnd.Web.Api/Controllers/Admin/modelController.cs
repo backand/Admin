@@ -36,6 +36,26 @@ namespace BackAnd.Web.Api.Controllers
     [BackAnd.Web.Api.Controllers.Filters.BackAndAuthorize("Admin,Developer")]
     public class modelController : apiController
     {
+        [Route("~/1/model/Validate")]
+        [HttpPost]
+        public IHttpActionResult Validate()
+        {
+            string json = System.Web.HttpContext.Current.Server.UrlDecode(Request.Content.ReadAsStringAsync().Result);
+
+
+            Dictionary<string, object> transformResult = Transform(json, false);
+
+            if (!transformResult.ContainsKey("alter"))
+            {
+                return ResponseMessage(Request.CreateResponse(HttpStatusCode.ExpectationFailed, Messages.InvalidSchema));
+
+            }
+
+            string sql = string.Join(";", ((System.Collections.ArrayList)transformResult["alter"]).ToArray());
+
+            return Ok(new { sql = sql });
+        }
+
         [Route("~/1/model")]
         [HttpPost]
         public IHttpActionResult Post()
@@ -46,6 +66,12 @@ namespace BackAnd.Web.Api.Controllers
 
 
                 Dictionary<string, object> transformResult = Transform(json);
+
+                if (!transformResult.ContainsKey("alter"))
+                {
+                    return ResponseMessage(Request.CreateResponse(HttpStatusCode.ExpectationFailed, Messages.InvalidSchema));
+
+                }
 
                 string sql = string.Join(";", ((System.Collections.ArrayList)transformResult["alter"]).ToArray());
 
@@ -216,7 +242,7 @@ namespace BackAnd.Web.Api.Controllers
         {
             return Map.Database.Views.Values.Where(v => !v.SystemView).Count();
         }
-        private Dictionary<string, object> Transform(string json)
+        private Dictionary<string, object> Transform(string json, bool getOldSchema = true)
         {
             string getNodeUrl = GetNodeUrl() + "/transform";
 
@@ -231,7 +257,10 @@ namespace BackAnd.Web.Api.Controllers
                 data.Add("oldSchema", "");
             }
 
-            data["oldSchema"] = GetBackandToObject();
+            if (getOldSchema)
+            {
+                data["oldSchema"] = GetBackandToObject();
+            }
 
             json = jss.Serialize(data);
 
