@@ -1377,6 +1377,7 @@ namespace BackAnd.Web.Api.Controllers
         public static readonly string FailedToGetJsonFromParameters = "Failed to get json from parameters.";
         public static readonly string StringifyFilter = "Please JSON.stringify the filter parameter";
         public static readonly string StringifySort = "Please JSON.stringify the sort parameter";
+        public static readonly string InvalidSchema = "Invalid schema";
         
     }
 }

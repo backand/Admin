@@ -72,6 +72,23 @@ namespace Durados.DataAccess
             return new SqlCommand(cmdText, (SqlConnection)connection);
         }
 
+        protected virtual IDbCommand GetNewCommand(string cmdText, IDbConnection connection, SqlProduct sqlProduct)
+        {
+            if (sqlProduct == SqlProduct.Oracle)
+            {
+                return new Oracle.ManagedDataAccess.Client.OracleCommand(cmdText, (Oracle.ManagedDataAccess.Client.OracleConnection)connection);
+            }
+            else if (sqlProduct == SqlProduct.Postgre)
+            {
+                return new Npgsql.NpgsqlCommand(cmdText, (Npgsql.NpgsqlConnection)connection);
+            }
+            else if (sqlProduct == SqlProduct.MySql)
+                return new MySql.Data.MySqlClient.MySqlCommand(cmdText, (MySql.Data.MySqlClient.MySqlConnection)connection);
+            else
+                return new SqlCommand(cmdText, (SqlConnection)connection);
+
+        }
+
         protected virtual System.Data.IDataParameter GetNewParameter(IDbCommand command, string parameterName, object value)
         {
             return new SqlParameter(parameterName, value);
