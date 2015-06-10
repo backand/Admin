@@ -444,6 +444,46 @@ namespace Durados.Web.Mvc.UI.Helpers
            return dic;
        }
 
+       public static string GetConnectionSource(string appName)
+       {
+           try
+           {
+               if (Maps.Instance.AppInCach(appName))
+               {
+                    Map map = Maps.Instance.GetMap(appName);
+                    if (map == null || map is DuradosMap)
+                    {
+                        return "unknown";
+                    }
+                    else
+                    {
+                        string localDatabaseHost = GetLocalDatabaseHost();
+                        if (map.connectionString.Contains(localDatabaseHost))
+                        {
+                            return "local";
+                        }
+                        else
+                        {
+                            return "external";
+                        }
+                    }
+               }
+               else
+               {
+                   return "unknown";
+               }
+           }
+           catch
+           {
+               return "unknown";
+           }
+       }
+
+       public static string GetLocalDatabaseHost()
+       {
+           return (System.Web.HttpContext.Current.Items["localDatabaseHost"] ?? "yrv-dev.czvbzzd4kpof.eu-central-1.rds.amazonaws.com").ToString();
+       }
+
        private static Dictionary<string, object> GetConfig(View view, string pk, bool deep, BeforeSelectEventHandler beforeSelectCallback, AfterSelectEventHandler afterSelectCallback, bool displayParentValue = false)
        {
            var map = view.Database.Map;
