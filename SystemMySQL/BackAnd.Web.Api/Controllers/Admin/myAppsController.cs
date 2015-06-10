@@ -145,6 +145,9 @@ namespace BackAnd.Web.Api.Controllers
                     item.Add("settings", db);
                 }
 
+                item.Add("connectionSource", RestHelper.GetConnectionSource(id));
+
+
                 if (deep.HasValue && deep.Value && item["DatabaseStatus"].Equals(1))
                 {
                     RestHelper.AddStat(item, id);
