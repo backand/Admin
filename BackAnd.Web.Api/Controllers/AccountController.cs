@@ -655,56 +655,7 @@ namespace BackAnd.Web.Api.Controllers
             }
         }
 
-        // GET api/Account/ExternalLogin
-        [OverrideAuthentication]
-        [HostAuthentication(Startup.ExternalCookieAuthenticationType)]
-        [AllowAnonymous]
-        [Route("ExternalLogin")]
-        [HttpGet]
-        public async Task<IHttpActionResult> ExternalLogin(string provider, string appName, string returnAddress)
-        {
-            if (!User.Identity.IsAuthenticated)
-            {
-                return new ChallengeResult(provider, this);
-            }
-
-            ExternalLoginData externalLogin = ExternalLoginData.FromIdentity(User.Identity as ClaimsIdentity);
-            var result = Request.GetOwinContext().Authentication.AuthenticateAsync(Startup.ExternalCookieAuthenticationType).Result;
-            //            Authentication.SignOut(Startup.ExternalCookieAuthenticationType);
-
-            string email = ExtractEmailAddress(result.Identity);
-
-            if (email != null &&
-                !string.IsNullOrWhiteSpace(appName) &&
-                !string.IsNullOrWhiteSpace(returnAddress) &&
-                new DuradosAuthorizationHelper().IsAppExists(appName))
-            {
-                var identity = new ClaimsIdentity("Bearer");
-                identity.AddClaim(new Claim("username", email));
-                identity.AddClaim(new Claim(ClaimTypes.AuthenticationMethod, provider));
-                identity.AddClaim(new Claim("appname", appName));
-
-                // create token
-                string AccessToken = CreateToken(identity);
-
-                // return token
-                if(returnAddress.Contains('?')) // already have query string
-                {
-                    returnAddress += "&";
-                }
-                else
-                {
-                    returnAddress += "?";
-                }
-
-                return Redirect(returnAddress + "token=" + AccessToken);
-            }
-            else //validation problem
-            {
-                return BadRequest("Email and appname must be valid");
-            };
-        }
-
+        
 
 
         private static string ExtractEmailAddress(ClaimsIdentity result)
@@ -723,7 +674,7 @@ namespace BackAnd.Web.Api.Controllers
             AuthenticationTicket ticket = new AuthenticationTicket(identity, new AuthenticationProperties());
             var currentUtc = new SystemClock().UtcNow;
             ticket.Properties.IssuedUtc = currentUtc;
-            ticket.Properties.ExpiresUtc = currentUtc.Add(TimeSpan.FromMinutes(30));
+            ticket.Properties.ExpiresUtc = currentUtc.Add(TimeSpan.FromMinutes(1440));
             string AccessToken = Startup.OAuthBearerOptions.AccessTokenFormat.Protect(ticket);
             return AccessToken;
         }
@@ -788,52 +739,7 @@ namespace BackAnd.Web.Api.Controllers
             return Convert.ToBase64String(data);
         }
 
-        private class ExternalLoginData
-        {
-            public string LoginProvider { get; set; }
-            public string ProviderKey { get; set; }
-            public string UserName { get; set; }
-
-            public IList<Claim> GetClaims()
-            {
-                IList<Claim> claims = new List<Claim>();
-                claims.Add(new Claim(ClaimTypes.NameIdentifier, ProviderKey, null, LoginProvider));
-
-                if (UserName != null)
-                {
-                    claims.Add(new Claim(ClaimTypes.Name, UserName, null, LoginProvider));
-                }
-
-                return claims;
-            }
-            public static ExternalLoginData FromIdentity(ClaimsIdentity identity)
-            {
-                if (identity == null)
-                {
-                    return null;
-                }
-
-                Claim providerKeyClaim = identity.FindFirst(ClaimTypes.NameIdentifier);
-
-                if (providerKeyClaim == null || String.IsNullOrEmpty(providerKeyClaim.Issuer)
-                    || String.IsNullOrEmpty(providerKeyClaim.Value))
-                {
-                    return null;
-                }
-
-                if (providerKeyClaim.Issuer == ClaimsIdentity.DefaultIssuer)
-                {
-                    return null;
-                }
-
-                return new ExternalLoginData
-                {
-                    LoginProvider = providerKeyClaim.Issuer,
-                    ProviderKey = providerKeyClaim.Value,
-                    UserName = identity.Claims.FirstOrDefault().Value//FindFirstValue(ClaimTypes.Name)
-                };
-            }
-        }
+        
     }
 }
      

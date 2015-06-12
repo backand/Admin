@@ -263,10 +263,13 @@ namespace Durados.Web.Mvc.Infrastructure
 
             return result;
         }
-        public static string GetWebRequest(string url, string header = "", string UserAgent = "")
+        public static string GetWebRequest(string url, string header = "", string UserAgent = "", int? timeout = null)
         {
 
             WebRequest request = WebRequest.Create(url);
+            if (timeout.HasValue)
+                request.Timeout = timeout.Value;
+
             request.Method = "GET";
             if (header != "")
                 request.Headers.Add(header);

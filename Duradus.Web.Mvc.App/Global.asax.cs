@@ -145,8 +145,8 @@ namespace Durados.Web.Mvc.App
             try
             {
 
-                Durados.website.Helpers.UserTrackingHelper userTracker = new Durados.website.Helpers.UserTrackingHelper();
-                userTracker.Init();
+                //Durados.website.Helpers.UserTrackingHelper userTracker = new Durados.website.Helpers.UserTrackingHelper();
+                //userTracker.Init();
                 
             }
             catch (Exception ex)

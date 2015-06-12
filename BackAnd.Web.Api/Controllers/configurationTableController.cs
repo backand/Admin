@@ -30,7 +30,7 @@ namespace BackAnd.Web.Api.Controllers
     [BackAnd.Web.Api.Controllers.Filters.BackAndAuthorize]
     public class configurationTableController : wfController
     {
-         [Route("{id}")]
+         //[Route("{id}")]
         public IHttpActionResult Get(string id)
         {
             return GetItem(id,true);

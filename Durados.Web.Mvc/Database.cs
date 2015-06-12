@@ -202,6 +202,9 @@ namespace Durados.Web.Mvc
         public string SignInRedirectUrl { get; set; }
 
         [Durados.Config.Attributes.ColumnProperty()]
+        public string ForgotPasswordUrl { get; set; }
+
+        [Durados.Config.Attributes.ColumnProperty()]
         public string NewUserDefaultRole { get; set; }
 
         [Durados.Config.Attributes.ColumnProperty()]

@@ -593,6 +593,17 @@ namespace Durados.Web.Mvc
                         AddNewUserVerification();
                         Commit();
                     }
+                    if (!(this is DuradosMap) && !HasRule("beforeSocialSignup"))
+                    {
+                        AddBeforeSocialSignup();
+                        Commit();
+                    }
+                    if (!(this is DuradosMap) && !HasRule("requestResetPassword"))
+                    {
+                        AddSendForgotPassword();
+                        Commit();
+                    }
+                    
                     if (!(this is DuradosMap) && !HasRule("userApproval"))
                     {
                         AddUserApproval();
@@ -674,7 +685,7 @@ namespace Durados.Web.Mvc
         }
 
       
-        private bool HasRule(string ruleName)
+        public bool HasRule(string ruleName)
         {
             return Database.GetUserView().GetRules().Where(r => r.Name.Equals(ruleName)).Count() > 0;
         }
@@ -1190,6 +1201,8 @@ namespace Durados.Web.Mvc
             AddCreator();
             AddDemo();
             AddNewUserVerification();
+            AddBeforeSocialSignup();
+            AddSendForgotPassword();
             AddUserApproval();
             AddSyncUserRules();
             AddNewUserInvitation();
@@ -1440,6 +1453,54 @@ namespace Durados.Web.Mvc
             string rulePK = ruleView.GetPkValue(row);
 
         }
+
+        private void AddSendForgotPassword()
+        {
+            ConfigAccess configAccess = new DataAccess.ConfigAccess();
+            string userViewPK = configAccess.GetViewPK(Database.UserViewName, configDatabase.ConnectionString);
+            View ruleView = (View)configDatabase.Views["Rule"];
+            Dictionary<string, object> values = new Dictionary<string, object>();
+            values.Add("Name", "requestResetPassword");
+            values.Add("Rules_Parent", userViewPK);
+            values.Add("DataAction", Durados.TriggerDataAction.OnDemand.ToString());
+            values.Add("WorkflowAction", Durados.WorkflowAction.Notify.ToString());
+            values.Add("WhereCondition", "1=1");
+
+            values.Add("NotifySubject", "Your password was reset.");
+            values.Add("NotifyMessage", "<div>Hi {{FirstName}},<br><br><br>We received a request to reset the password for your account. If you made this request, click <a href='{{ForgotPasswordUrl}}' >here to reset your password.</a><br>If you didn't make this request, please ignore this email.<br><br>Cheers,<br><br>The {{AppName}} Team</Div>");
+
+            values.Add("NotifyTo", "{{Email}}");
+
+            DataRow row = ruleView.Create(values, null, null, null, null, null);
+            string rulePK = ruleView.GetPkValue(row);
+
+        }
+
+        private void AddBeforeSocialSignup()
+        {
+            ConfigAccess configAccess = new DataAccess.ConfigAccess();
+            string userViewPK = configAccess.GetViewPK(Database.UserViewName, configDatabase.ConnectionString);
+            View ruleView = (View)configDatabase.Views["Rule"];
+            Dictionary<string, object> values = new Dictionary<string, object>();
+            values.Add("Name", "beforeSocialSignup");
+            values.Add("Rules_Parent", userViewPK);
+            values.Add("DataAction", Durados.TriggerDataAction.OnDemand.ToString());
+            values.Add("WorkflowAction", Durados.WorkflowAction.JavaScript.ToString());
+            values.Add("WhereCondition", "false");
+            string  code = "/* globals\\n\\  $http - service for AJAX calls - $http({method:'GET',url:CONSTS.apiUrl + '/1/objects/yourObject' , headers: {'Authorization':userProfile.token}});\n" +
+      "  CONSTS - CONSTS.apiUrl for Backands API URL\n" +
+      "*/\n" +
+      "\'use strict\';\n" +
+      "function backandCallback(userInput, dbRow, parameters, userProfile) {\n" +
+      "}";
+            values.Add("Code", code);
+           
+            DataRow row = ruleView.Create(values, null, null, null, null, null);
+            string rulePK = ruleView.GetPkValue(row);
+
+        }
+
+        
 
         private void AddUserApproval()
         {

@@ -3275,6 +3275,20 @@ namespace Durados.Web.Mvc.Config
                 signInRedirectUrl.Category = rolesCategory;
                 signInRedirectUrl.HideInTable = true;
             }
+            if (databaseView.Fields.ContainsKey("ForgotPasswordUrl"))
+            {
+                ColumnField signInRedirectUrl = (ColumnField)databaseView.Fields["ForgotPasswordUrl"];
+                signInRedirectUrl.Order = 550;
+                signInRedirectUrl.Category = rolesCategory;
+                signInRedirectUrl.HideInTable = true;
+            }
+            if (databaseView.Fields.ContainsKey("SignupEmailVerification"))
+            {
+                ColumnField signInRedirectUrl = (ColumnField)databaseView.Fields["SignupEmailVerification"];
+                signInRedirectUrl.Order = 560;
+                signInRedirectUrl.Category = rolesCategory;
+                signInRedirectUrl.HideInTable = true;
+            }
             
 
             Category generalCategory = new Category() { Name = "General", Ordinal = 30 };
