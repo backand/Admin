@@ -73,6 +73,10 @@ namespace Durados
         public Dictionary<string, Tooltip> Tooltips { get; private set; }
 
         [Durados.Config.Attributes.ColumnProperty()]
+        public bool SignupEmailVerification { get; set; }
+
+
+        [Durados.Config.Attributes.ColumnProperty()]
         public bool AutoCommit { get; set; }
 
         [Durados.Config.Attributes.ColumnProperty()]
@@ -563,6 +567,8 @@ namespace Durados
 
 
             FilterParameterOptions = GetFilterParameterOptions();
+
+            SignupEmailVerification = false;
         }
 
 

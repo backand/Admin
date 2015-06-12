@@ -245,6 +245,7 @@ namespace BackAnd.Web.Api.Controllers
         {
             try
             {
+                id = id.ToLower();
                 Maps.Instance.DuradosMap.Logger.Log(GetControllerNameForLog(ControllerContext), GetActionName(), this.Request.Method.Method, "API Create App started", string.Empty, 3, null, DateTime.Now);
                     
                 View view = GetView(AppViewName);
@@ -617,7 +618,8 @@ namespace BackAnd.Web.Api.Controllers
         {
             try
             {
-
+                id = id.ToLower();
+                
                 View view = GetView(AppViewName);
                 if (view == null)
                 {

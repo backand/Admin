@@ -64,7 +64,7 @@ namespace Durados.Web.Mvc.Controllers.Attributes
         private bool IsConnectingDatabase(HttpContextBase httpContext)
         {
             string action =  ((MvcHandler)httpContext.Handler).RequestContext.RouteData.Values["action"].ToString();
-            if (!(action == "CreateAppGet" || action == "CreateAppGet2" || action == "Restart"))
+            if (!(action == "CreateAppGet" || action == "CreateAppGet2" || action == "Restart" || action == "DeleteApp"))
                 return false;
 
             return GetUsernameFromQueryString(httpContext) != null;

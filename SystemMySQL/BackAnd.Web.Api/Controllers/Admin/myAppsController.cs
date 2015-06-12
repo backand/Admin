@@ -328,7 +328,7 @@ namespace BackAnd.Web.Api.Controllers
                 throw new Durados.DuradosException(Map.Database.Localizer.Translate("The 'Name' is the first part of the URL of the Console.\n\rMaximum 25 characters are allowed."));
 
 
-            return name;
+            return name.ToLower();
         }
 
         Dictionary<string, object> databaseSettings = null;
@@ -562,6 +562,14 @@ namespace BackAnd.Web.Api.Controllers
             }
         }
 
+        private string GetDeleteAppUrl(string appName)
+        {
+            string id = GetMasterGuid();
+
+            string qstring = "id=" + id + "&appName=" + appName; 
+            
+            return RestHelper.GetAppUrl(appName, Maps.OldAdminHttp) + "/Admin/DeleteApp?" + qstring;
+        }
         public virtual IHttpActionResult Delete(string id)
         {
             try
@@ -587,9 +595,28 @@ namespace BackAnd.Web.Api.Controllers
                     return ResponseMessage(Request.CreateResponse(HttpStatusCode.NotFound, string.Format(Messages.ItemWithIdNotFound, id, AppViewName)));
                 }
 
-                view.Delete(appId.ToString(), false, view_BeforeDelete, view_AfterDeleteBeforeCommit, view_AfterDeleteAfterCommit);
+                string guid = GetMasterGuid();
 
-                RefreshOldAdmin(id);
+                string qstring = "id=" + guid;
+                string url = RestHelper.GetAppUrl(id, Maps.OldAdminHttp) + "/Admin/Restart?" + qstring;
+                Durados.Web.Mvc.Infrastructure.Http.GetWebRequest(url, string.Empty, string.Empty, 100000);
+
+                
+                Durados.Web.Mvc.Infrastructure.ProductMaintenance productMaintenece = new Durados.Web.Mvc.Infrastructure.ProductMaintenance();
+                productMaintenece.RemoveApp(id);
+
+                
+
+                //url = GetDeleteAppUrl(id);
+                //string response = Durados.Web.Mvc.Infrastructure.Http.GetWebRequest(url,string.Empty,string.Empty, 100000);
+                //Dictionary<string, object> ret = Durados.Web.Mvc.UI.Json.JsonSerializer.Deserialize(response);
+
+                string sql = "delete durados_App where name = '" + id + "'";
+                (new SqlAccess()).ExecuteNonQuery(Maps.Instance.DuradosMap.connectionString, sql);
+                    
+                Maps.Instance.Restart(id);
+
+                //RefreshOldAdmin(id);
 
                 return Ok();
             }
