@@ -255,6 +255,12 @@ namespace BackAnd.Web.Api
               defaults: new { controller = "myAppConnection", action = "Test" }
           );
 
+            config.Routes.MapHttpRoute(
+              name: "user",
+              routeTemplate: "1/user",
+              defaults: new { controller = "user" }
+          );
+
            
            // config.Routes.MapHttpRoute(
            //    name: "myAppsPost",

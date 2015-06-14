@@ -3884,6 +3884,9 @@ namespace Durados.Web.Mvc.UI.Helpers
 
        protected virtual bool IsActive(string username, string appName)
        {
+           if (appName == Maps.DuradosAppName)
+               return false;
+
            Map map = GetMap(appName);
 
            return Maps.Instance.AppExists(appName, map.Database.GetUserID(username)).HasValue;
@@ -3891,6 +3894,11 @@ namespace Durados.Web.Mvc.UI.Helpers
 
        protected virtual bool IsInvited(string username, string appName)
        {
+           if (appName == Maps.DuradosAppName)
+           {
+               return true;
+           }
+
            Map map = GetMap(appName);
            return map.Database.GetUserRow(username) != null;
        }
@@ -4035,6 +4043,8 @@ namespace Durados.Web.Mvc.UI.Helpers
 
        protected virtual bool IsPrivate(string appName)
        {
+           if (appName == Maps.DuradosAppName)
+               return true;
            Map map = GetMap(appName);
            return !map.Database.EnableUserRegistration;
        }
