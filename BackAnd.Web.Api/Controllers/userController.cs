@@ -475,14 +475,23 @@ namespace BackAnd.Web.Api.Controllers
             if (email != null &&
                 !string.IsNullOrWhiteSpace(appName) &&
                 !string.IsNullOrWhiteSpace(returnAddress) &&
-                new DuradosAuthorizationHelper().IsAppExists(appName))
+                (new DuradosAuthorizationHelper().IsAppExists(appName) || appName == Maps.DuradosAppName))
             {
                 // check if user belongs to app
-                DataRow userRow = Maps.Instance.GetMap(appName).Database.GetUserRow(email);
+                DataRow userRow = null;
+                if (appName == Maps.DuradosAppName)
+                {
+                    userRow = Maps.Instance.DuradosMap.Database.GetUserRow(email);
+                }
+                else
+                {
+                    userRow = Maps.Instance.GetMap(appName).Database.GetUserRow(email);
+                }
                 if (userRow != null)
                 {
                     return BadRequest("The user already signed up to " + appName);
                 }
+                
 
                 Dictionary<string, object> values = new Dictionary<string, object>();
 
