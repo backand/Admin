@@ -195,6 +195,14 @@ namespace Durados.Web.Mvc
             return new Durados.Web.Mvc.View(dataTable, this);
         }
 
+
+        [Durados.Config.Attributes.ColumnProperty()]
+        public string GoogleClientId { get; set; }
+
+        [Durados.Config.Attributes.ColumnProperty()]
+        public string GoogleClientSecret { get; set; }
+        
+
         [Durados.Config.Attributes.ColumnProperty()]
         public string RegistrationRedirectUrl { get; set; }
         
