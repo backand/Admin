@@ -201,6 +201,11 @@ namespace Durados.Web.Mvc
 
         [Durados.Config.Attributes.ColumnProperty()]
         public string GoogleClientSecret { get; set; }
+        [Durados.Config.Attributes.ColumnProperty()]
+        public string GithubClientId { get; set; }
+
+        [Durados.Config.Attributes.ColumnProperty()]
+        public string GithubClientSecret { get; set; }
         
 
         [Durados.Config.Attributes.ColumnProperty()]
