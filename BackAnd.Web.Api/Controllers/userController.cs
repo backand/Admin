@@ -27,6 +27,9 @@ using Durados.Web.Mvc.UI.Helpers;
 using Durados.Web.Mvc;
 using System.Data;
 using System.Web.Script.Serialization;
+using System.Text;
+using System.Globalization;
+using Microsoft.Owin;
 
 
 namespace BackAnd.Web.Api.Controllers
@@ -390,145 +393,300 @@ namespace BackAnd.Web.Api.Controllers
             }
         }
 
+        
+
         [AllowAnonymous]
         [Route("socialSignin")]
         [HttpGet]
         public async Task<IHttpActionResult> socialSignin(string provider, string appName, string returnAddress)
         {
-            Dictionary<string, object> keys = GetGoogleKeys(appName);
-            string clientId = keys["GoogleClientId"].ToString();
-            string redirectUri = Request.RequestUri.Scheme + "://" + Request.RequestUri.Authority + "/1/user/signin/google"; // System.Configuration.ConfigurationManager.AppSettings["RedirectUri"];
-            string scope = "https://www.googleapis.com/auth/userinfo.email+https://www.googleapis.com/auth/userinfo.profile";
 
-            //var state = Durados.Web.Mvc.UI.Json.JsonSerializer.Serialize(new Dictionary<string, object>() { { "appName", appName }, { "returnAddress", System.Web.HttpContext.Current.Server.UrlEncode(returnAddress) } });
-            var state = new { appName = appName, returnAddress = System.Web.HttpContext.Current.Server.UrlEncode(returnAddress) };
-            var jss = new JavaScriptSerializer();
-            string url = string.Format("https://accounts.google.com/o/oauth2/auth?scope={0}&client_id={1}&redirect_uri={2}&response_type=code&access_type=offline&state={3}", scope, clientId, redirectUri, jss.Serialize(state));
 
-            return Redirect(url);
+            
+            if (provider == "twitter")
+            {
+                string RequestTokenEndpoint = "https://api.twitter.com/oauth/request_token";
+                string AuthenticationEndpoint = "https://twitter.com/oauth/authenticate?oauth_token=";
+                string AccessTokenEndpoint = "https://api.twitter.com/oauth/access_token";
+
+                var _httpClient = new HttpClient();
+                //_httpClient.Timeout = Options.BackchannelTimeout;
+                _httpClient.MaxResponseContentBufferSize = 1024 * 1024 * 10; // 10 MB
+                _httpClient.DefaultRequestHeaders.Accept.ParseAdd("*/*");
+                _httpClient.DefaultRequestHeaders.UserAgent.ParseAdd("Microsoft Owin Twitter middleware");
+                _httpClient.DefaultRequestHeaders.ExpectContinue = false;
+
+                string redirectUri = Request.RequestUri.Scheme + "://" + Request.RequestUri.Authority + "/1/user/signin/twitter";
+                string consumerKey = "483ZJ9fxrxovcVeeT27S8yZnn";//  string.Empty;
+                string consumerSecret = "9mrppdnuYFwpbxEW1y9dVdtpE0Tpziou8IJOi6SmmqYW0MFBdd";
+                string nonce = Guid.NewGuid().ToString("N");
+
+                var authorizationParts = new SortedDictionary<string, string>
+            {
+                { "oauth_callback",  redirectUri},
+                { "oauth_consumer_key", consumerKey },
+                { "oauth_nonce", nonce },
+                { "oauth_signature_method", "HMAC-SHA1" },
+                { "oauth_timestamp", GenerateTimeStamp() },
+                { "oauth_version", "1.0" }
+            };
+
+                var parameterBuilder = new StringBuilder();
+                foreach (var authorizationKey in authorizationParts)
+                {
+                    parameterBuilder.AppendFormat("{0}={1}&", Uri.EscapeDataString(authorizationKey.Key), Uri.EscapeDataString(authorizationKey.Value));
+                }
+                parameterBuilder.Length--;
+                string parameterString = parameterBuilder.ToString();
+
+                var canonicalizedRequestBuilder = new StringBuilder();
+                canonicalizedRequestBuilder.Append(HttpMethod.Post.Method);
+                canonicalizedRequestBuilder.Append("&");
+                canonicalizedRequestBuilder.Append(Uri.EscapeDataString(RequestTokenEndpoint));
+                canonicalizedRequestBuilder.Append("&");
+                canonicalizedRequestBuilder.Append(Uri.EscapeDataString(parameterString));
+
+                string signature = ComputeSignature(consumerSecret, null, canonicalizedRequestBuilder.ToString());
+                authorizationParts.Add("oauth_signature", signature);
+
+                var authorizationHeaderBuilder = new StringBuilder();
+                authorizationHeaderBuilder.Append("OAuth ");
+                foreach (var authorizationPart in authorizationParts)
+                {
+                    authorizationHeaderBuilder.AppendFormat(
+                        "{0}=\"{1}\", ", authorizationPart.Key, Uri.EscapeDataString(authorizationPart.Value));
+                }
+                authorizationHeaderBuilder.Length = authorizationHeaderBuilder.Length - 2;
+
+                var request = new HttpRequestMessage(HttpMethod.Post, RequestTokenEndpoint);
+                request.Headers.Add("Authorization", authorizationHeaderBuilder.ToString());
+
+                HttpResponseMessage response = await _httpClient.SendAsync(request, HttpCompletionOption.ResponseContentRead);
+                response.EnsureSuccessStatusCode();
+                string responseText = await response.Content.ReadAsStringAsync();
+
+
+                //respnse = oauth_token=NtNtgwAAAAAAgK3rAAABTfODFzA&oauth_token_secret=LEmAxf4dGL39ZxAyWAwyGh8eFr7CoH81&oauth_callback_confirmed=true
+                var queryString = HttpUtility.ParseQueryString(responseText);
+
+                if (queryString["oauth_callback_confirmed"] != "true")
+                {
+                    return null;
+                }
+
+                var token = queryString["oauth_token"];
+                var tokenSecret = queryString["oauth_token_secret"];
+
+                string twitterAuthenticationEndpoint = AuthenticationEndpoint + token;
+
+                var cookieOptions = new CookieOptions
+                {
+                    HttpOnly = true,
+                    Secure = false // Request.IsSecure
+                };
+
+
+                /*Response.Cookies.Append(StateCookie, request, cookieOptions);
+
+                var redirectContext = new TwitterApplyRedirectContext(
+                    Context, Options,
+                    extra, twitterAuthenticationEndpoint);
+                Options.Provider.ApplyRedirect(redirectContext);*/
+
+
+                /*  IFormCollection responseParameters = WebHelpers.ParseForm(responseText);
+                  if (string.Equals(responseParameters["oauth_callback_confirmed"], "true", StringComparison.InvariantCulture))
+                  {
+                      return new RequestToken { Token = Uri.UnescapeDataString(responseParameters["oauth_token"]), TokenSecret = Uri.UnescapeDataString(responseParameters["oauth_token_secret"]), CallbackConfirmed = true, Properties = properties };
+                  }*/
+
+            }
+            else
+            {
+                try
+                {
+                    Social social = Social.GetSocialProvider(provider);
+                    return Redirect(social.GetAuthUrl(appName, returnAddress, null, "signin"));
+                }
+                catch (Exception exception)
+                {
+                    Map.Logger.Log("user", "socialSignin", exception.Source, exception, 1, null);
+                    return BadRequest(exception.Message);
+                }
+            }
+
+            return null;
            
         }
 
-        private Dictionary<string, object> GetKeys(string provider, string appName)
+        [AllowAnonymous]
+        [Route("socialSignup")]
+        [HttpGet]
+        public async Task<IHttpActionResult> socialSignup(string provider, string appName, string returnAddress, string parameters = null)
         {
-            switch (provider.ToLower())
+            try
             {
-                case "google":
-                    return GetGoogleKeys(appName);
-
-                default:
-                    return null;
+                Social social = Social.GetSocialProvider(provider);
+                return Redirect(social.GetAuthUrl(appName, returnAddress, parameters, "signup"));
+            }
+            catch (Exception exception)
+            {
+                Map.Logger.Log("user", "socialSignin", exception.Source, exception, 1, null);
+                return BadRequest(exception.Message);
             }
         }
 
-        private Dictionary<string, object> GetGoogleKeys(string appName)
+        private static readonly DateTime Epoch = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
+
+        private static string GenerateTimeStamp()
         {
-            string GoogleClientId = System.Configuration.ConfigurationManager.AppSettings["GoogleClientId"];
-            string GoogleClientSecret = System.Configuration.ConfigurationManager.AppSettings["GoogleClientSecret"];
-            Dictionary<string, object> keys = new Dictionary<string, object>();
-            keys.Add("GoogleClientId", GoogleClientId);
-            keys.Add("GoogleClientSecret", GoogleClientSecret);
+            TimeSpan secondsSinceUnixEpocStart = DateTime.UtcNow - Epoch;
+            return Convert.ToInt64(secondsSinceUnixEpocStart.TotalSeconds).ToString(CultureInfo.InvariantCulture);
+        }
 
-            if (appName == Maps.DuradosAppName)
-                return keys;
-
-            Map map = Maps.Instance.GetMap(appName);
-            if (map == null)
-                return keys;
-
-            if (!string.IsNullOrEmpty(map.Database.GoogleClientId))
+        private static string ComputeSignature(string consumerSecret, string tokenSecret, string signatureData)
+        {
+            using (var algorithm = new HMACSHA1())
             {
-                keys["GoogleClientId"] = map.Database.GoogleClientId;
+                algorithm.Key = Encoding.ASCII.GetBytes(
+                    string.Format(CultureInfo.InvariantCulture,
+                        "{0}&{1}",
+                        Uri.EscapeDataString(consumerSecret),
+                        string.IsNullOrEmpty(tokenSecret) ? string.Empty : Uri.EscapeDataString(tokenSecret)));
+                byte[] hash = algorithm.ComputeHash(Encoding.ASCII.GetBytes(signatureData));
+                return Convert.ToBase64String(hash);
             }
-            if (!string.IsNullOrEmpty(map.Database.GoogleClientSecret))
-            {
-                keys["GoogleClientSecret"] = map.Database.GoogleClientSecret;
-            }
-
-            return keys;
         }
 
         [AllowAnonymous]
-        [Route("signin/{provider}")]
+        [Route("signInProviders")]
         [HttpGet]
-        public async Task<IHttpActionResult> signin(string provider)
+        public IHttpActionResult signInProviders(string appName)
         {
-             
-            //get the code from Google and request from access token
-            string code = System.Web.HttpContext.Current.Request.QueryString["code"];
-            string error = System.Web.HttpContext.Current.Request.QueryString["error"];
+            HashSet<string> providers = new HashSet<string> { "google", "github", "facebook" };
 
-            if (code == null || error != null)
+            List<object> providersUrls = new List<object>();
+
+            foreach (string provider in providers)
             {
-                return BadRequest(error);
+                providersUrls.Add(new { name = provider, url = "1/user/socialSignin?provider=" + provider + "&appname=" + appName + "&returnAddress={{a page in your app}}" });
+           
             }
+
+            return Ok(providersUrls);
+        }
+
+
+        [AllowAnonymous]
+        [Route("{provider}/auth")]
+        [HttpGet]
+        public async Task<IHttpActionResult> auth(string provider)
+        {
+            string returnAddress = null;
             try
             {
-                string urlAccessToken = "https://accounts.google.com/o/oauth2/token";
-                string state = System.Web.HttpContext.Current.Request.QueryString["state"];
-                var jss = new JavaScriptSerializer();
-                Dictionary<string, object> stateObject = Durados.Web.Mvc.UI.Json.JsonSerializer.Deserialize(state);
-                if (!stateObject.ContainsKey("appName"))
+                Social social = Social.GetSocialProvider(provider);
+
+                Social.Profile profile = social.Authenticate();
+                returnAddress = profile.returnAddress;
+                    
+                if (profile.activity == "signin")
                 {
-                    return BadRequest("Could not find the app name");
+                    social.Signin(profile);
                 }
-                string appName = stateObject["appName"].ToString();
-                if (!stateObject.ContainsKey("returnAddress"))
+                else if (profile.activity == "signup")
                 {
-                    return BadRequest("Could not find the return address");
-                }
-                string returnAddress = stateObject["returnAddress"].ToString();
+                    string email = profile.email;
+                    string appName = profile.appName;
+                    string parameters = profile.parameters;
 
-                //build the URL to send to Google
-                Dictionary<string, object> keys = GetGoogleKeys(appName);
-                string clientId = keys["GoogleClientId"].ToString();
-                string clientSecret = keys["GoogleClientSecret"].ToString();
+                    System.Web.HttpContext.Current.Items.Add(Durados.Database.AppName, appName);
+                    if (!System.Web.HttpContext.Current.Items.Contains(Durados.Database.RequestId))
+                        System.Web.HttpContext.Current.Items.Add(Durados.Database.RequestId, Guid.NewGuid().ToString());
 
-                string redirectUri = Request.RequestUri.Scheme + "://" + Request.RequestUri.Authority + "/1/user/signin/google"; // System.Configuration.ConfigurationManager.AppSettings["RedirectUri"];
-                
-                string accessTokenData = string.Format("scope=&code={0}&client_id={1}&client_secret={2}&redirect_uri={3}&grant_type=authorization_code", code, clientId, clientSecret, redirectUri);
-                string response = Durados.Web.Mvc.Infrastructure.Http.PostWebRequest(urlAccessToken, accessTokenData);
 
-                //get the access token from the return JSON
-                //JavaScriptSerializer jsonSerializer = new JavaScriptSerializer();
-                //AuthResponse validateResponse = (AuthResponse)jsonSerializer.Deserialize<AuthResponse>(response);
-
-                Dictionary<string, object> validateResponse = Durados.Web.Mvc.UI.Json.JsonSerializer.Deserialize(response);
-
-                //get the Google user profile using the access token
-                string profileUrl = "https://www.googleapis.com/plus/v1/people/me";
-                string profileHeader = "Authorization: Bearer " + validateResponse["access_token"].ToString();
-                string profiel = Durados.Web.Mvc.Infrastructure.Http.GetWebRequest(profileUrl, profileHeader);
-
-                //get the user email out of goolge profile
-                //GoogleProfile googleProfile = (GoogleProfile)jsonSerializer.Deserialize<GoogleProfile>(profiel); ;
-                Dictionary<string, object> googleProfile = Durados.Web.Mvc.UI.Json.JsonSerializer.Deserialize(profiel);
-                string email = ((Dictionary<string, object>)((object[])googleProfile["emails"])[0])["value"].ToString();
-                string name = googleProfile["displayName"].ToString();
-
-                if (email != null &&
-                !string.IsNullOrWhiteSpace(appName) &&
-                !string.IsNullOrWhiteSpace(returnAddress) &&
-                (new DuradosAuthorizationHelper().IsAppExists(appName) || appName == Maps.DuradosAppName))
-                {
-                    // check if user belongs to app
-                    DataRow userRow = null;
-                    if (appName == Maps.DuradosAppName)
+                    if (email != null &&
+                        !string.IsNullOrWhiteSpace(appName) &&
+                        !string.IsNullOrWhiteSpace(returnAddress) &&
+                        (new DuradosAuthorizationHelper().IsAppExists(appName) || appName == Maps.DuradosAppName))
                     {
-                        userRow = Maps.Instance.DuradosMap.Database.GetUserRow(email);
-                        if (userRow == null)
+                        // check if user belongs to app
+                        DataRow userRow = null;
+                        if (appName == Maps.DuradosAppName)
                         {
-                            return BadRequest("The user is not signed up to " + appName);
+                            userRow = Maps.Instance.DuradosMap.Database.GetUserRow(email);
                         }
+                        else
+                        {
+                            userRow = Maps.Instance.GetMap(appName).Database.GetUserRow(email);
+                        }
+                        if (userRow != null)
+                        {
+                            return Redirect(GetErrorUrl(returnAddress, "The user already signed up to " + appName));
+                        }
+
+
+                        Dictionary<string, object> values = new Dictionary<string, object>();
+
+                        if (!string.IsNullOrEmpty(parameters) && parameters != "parameters")
+                        {
+                            try
+                            {
+                                values = Durados.Web.Mvc.Controllers.Api.JsonConverter.Deserialize(parameters);
+                            }
+                            catch (Exception exception)
+                            {
+                                Log(appName, exception, 1);
+                                return Redirect(GetErrorUrl(returnAddress, "Failed to get parameters"));
+                            }
+                        }
+                        if (!values.ContainsKey("socialProfile"))
+                        {
+                            values.Add("socialProfile", profile);
+                        }
+
+                        try
+                        {
+                            CallActionBeforeSignup(appName, email, profile, values);
+                        }
+                        catch (Exception exception)
+                        {
+                            Log(appName, exception, 1);
+                            return Redirect(GetErrorUrl(returnAddress, "Failed to run beforeSocialSignup action"));
+                        }
+
+                        Account account = new Account(this);
+
+                        string firstName = profile.firstName;
+                        if (values.ContainsKey("firstName") && values["firstName"] != null)
+                        {
+                            firstName = values["firstName"].ToString();
+                        }
+
+                        string lastName = profile.lastName;
+                        if (values.ContainsKey("lastName") && values["lastName"] != null)
+                        {
+                            lastName = values["lastName"].ToString();
+                        }
+                        
+                        var password = GeneratePassword(4, 4, 4);
+
+                        account.SignUp(appName, firstName, lastName, email, null, false, password, password, false, values, view_BeforeCreate, view_BeforeCreateInDatabase, view_AfterCreateBeforeCommit, view_AfterCreateAfterCommit, view_BeforeEdit, view_BeforeEditInDatabase, view_AfterEditBeforeCommit, view_AfterEditAfterCommit);
+
                     }
                     else
                     {
-                        userRow = Maps.Instance.GetMap(appName).Database.GetUserRow(email);
-                        if (userRow == null || (!userRow.IsNull("IsApproved") && !(bool)userRow["IsApproved"]))
-                        {
-                            return BadRequest("The user is not signed up to " + appName);
-                        }
+                        return Redirect(GetErrorUrl(returnAddress, "The user does not belong to " + appName));
                     }
+                }
+                else
+                {
+                    return Redirect(GetErrorUrl(returnAddress, "missing activity"));
+                }
+                {
+                    string email = profile.email;
+                    string appName = profile.appName;
+                    
                     //login the user use email
                     //string returnUrl = LoginOrRegister(mode, email, name, "Google", returnUrl);
                     var identity = new ClaimsIdentity("Bearer");
@@ -541,33 +699,53 @@ namespace BackAnd.Web.Api.Controllers
                     string AccessToken = CreateToken(identity);
 
                     // return token
-                    if (returnAddress.Contains('?')) // already have query string
-                    {
-                        returnAddress += "&";
-                    }
-                    else
-                    {
-                        returnAddress += "?";
-                    }
-
-                    return Redirect(returnAddress + "token=" + AccessToken);
+                    return Redirect(GetSuccessUrl(returnAddress, AccessToken, appName, email));
                 }
-                else //validation problem
-                {
-                    return BadRequest("Email and appname must be valid");
-                };
             }
             catch (Exception exception)
             {
-                Map.Logger.Log(this.ControllerContext.RouteData.Values["controller"].ToString(), this.ControllerContext.RouteData.Values["action"].ToString(), exception.Source, exception, 1, null);
-                return BadRequest(exception.Message);
+                Map.Logger.Log("user", "signin", exception.Source, exception, 1, null);
+                if (!string.IsNullOrEmpty(returnAddress))
+                {
+                    return Redirect(GetErrorUrl(returnAddress, exception.Message));
+                }
+                else
+                {
+                    return BadRequest(exception.Message);
+                }
             }
-
-            
-
-
         }
 
+        private string GetSuccessUrl(string url, string accessToken, string appName, string email)
+        {
+            Durados.Web.Mvc.Map map = Durados.Web.Mvc.Maps.Instance.GetMap(appName);
+            string role = map.Database.GetUserRole(email);
+            string userId = map.Database.GetUserID(email).ToString();
+            if (url.Contains('?')) // already have query string
+            {
+                url += "&";
+            }
+            else
+            {
+                url += "?";
+            }
+            return url + "data={\"access_token\":\"" + accessToken + "\",\"token_type\":\"bearer\",\"expires_in\":86399,\"appName\":\"" + appName + "\",\"username\":\"" + email + "\",\"role\":\"" + role + "\",\"userId\":\"" + userId + "\"}";
+        }
+
+        private string GetErrorUrl(string url, string message)
+        {
+            if (url.Contains('?')) // already have query string
+            {
+                url += "&";
+            }
+            else
+            {
+                url += "?";
+            }
+            return url + "error={\"message\":\"" + message + "\"}";
+        }
+
+        /*
         // GET api/Account/socialSignin
         [OverrideAuthentication]
         [HostAuthentication(Startup.ExternalCookieAuthenticationType)]
@@ -581,7 +759,7 @@ namespace BackAnd.Web.Api.Controllers
                 return new ChallengeResult(provider, this);
             }
 
-            ExternalLoginData externalLogin = ExternalLoginData.FromIdentity(User.Identity as ClaimsIdentity);
+            Social.ExternalLoginData externalLogin = Social.ExternalLoginData.FromIdentity(User.Identity as ClaimsIdentity);
             var result = Request.GetOwinContext().Authentication.AuthenticateAsync(Startup.ExternalCookieAuthenticationType).Result;
             //            Authentication.SignOut(Startup.ExternalCookieAuthenticationType);
 
@@ -657,7 +835,7 @@ namespace BackAnd.Web.Api.Controllers
                 System.Web.HttpContext.Current.Items.Add(Durados.Database.RequestId, Guid.NewGuid().ToString());
 
             ClaimsIdentity claimsIdentity = User.Identity as ClaimsIdentity;
-            ExternalLoginData externalLogin = ExternalLoginData.FromIdentity(claimsIdentity);
+            Social.ExternalLoginData externalLogin = Social.ExternalLoginData.FromIdentity(claimsIdentity);
             var result = Request.GetOwinContext().Authentication.AuthenticateAsync(Startup.ExternalCookieAuthenticationType).Result;
             //            Authentication.SignOut(Startup.ExternalCookieAuthenticationType);
 
@@ -767,7 +945,7 @@ namespace BackAnd.Web.Api.Controllers
                 return BadRequest("Email and appname must be valid");
             };
         }
-
+        */
         private string GeneratePassword(int lowercase, int uppercase, int numerics)
         {
             string lowers = "abcdefghijklmnopqrstuvwxyz";
@@ -799,7 +977,27 @@ namespace BackAnd.Web.Api.Controllers
 
         }
 
+        private void CallActionBeforeSignup(string appName, string username, Social.Profile profile, Dictionary<string, object> values)
+        {
+            Map map = Maps.Instance.GetMap(appName);
+            Durados.View view = map.Database.GetUserView();
+            if (view == null)
+                throw new Durados.DuradosException("user view not found");
 
+
+
+            values.Add("firstName".AsToken(), profile.firstName);
+            values.Add("lastName".AsToken(), profile.lastName);
+            values.Add("email".AsToken(), username);
+
+            if (map.HasRule("beforeSocialSignup"))
+            {
+                Durados.Web.Mvc.Workflow.Engine wfe = CreateWorkflowEngine();
+                wfe.PerformActions(this, view, Durados.TriggerDataAction.OnDemand, values, null, null, map.Database.ConnectionString, -1, null, null, "beforeSocialSignup");
+            }
+        }
+
+        /*
         private void CallActionBeforeSignup(string appName, string username, ClaimsIdentity claimsIdentity, Dictionary<string, object> values)
         {
             Map map = Maps.Instance.GetMap(appName);
@@ -852,6 +1050,7 @@ namespace BackAnd.Web.Api.Controllers
 
             return null;
         }
+        */
 
         private static string CreateToken(ClaimsIdentity identity)
         {

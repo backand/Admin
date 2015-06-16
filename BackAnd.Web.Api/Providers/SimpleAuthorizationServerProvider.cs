@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 
 using System.Linq;
 using System.Collections.Generic;
+using Durados.Web.Mvc.UI.Helpers;
 
 namespace BackAnd.Web.Api.Providers
 {
@@ -77,7 +78,7 @@ namespace BackAnd.Web.Api.Providers
             if (!System.Web.HttpContext.Current.Items.Contains(Database.AppName))
                 System.Web.HttpContext.Current.Items.Add(Database.AppName, appname);
 
-            UserValidationError userValidationError = Providers.UserValidationError.Valid;
+            UserValidationError userValidationError = UserValidationError.Valid;
             if (!IsValid(context.UserName, context.Password, out userValidationError))
             {
                 
@@ -162,163 +163,9 @@ namespace BackAnd.Web.Api.Providers
         //}
     }
 
-    public enum UserValidationError
-    {
-        Valid,
-        IncorrectUsernameOrPassword,
-        LockedOut,
-        UserDoesNotBelongToApp,
-        NotRegistered,
-        NotApproved,
-        Unknown
-    }
+    
 
-    public class UserValidationErrorMessages
-    {
-        public static readonly string IncorrectUsernameOrPassword = "The user name or password is incorrect.";
-        public static readonly string LockedOut = "The user is locked because of too many wrong passwords attempts. please contact the administrator.";
-        public static readonly string UserDoesNotBelongToApp = "The user does not belong to this app.";
-        public static readonly string NotRegistered = "The user is not registered to this app.";
-        public static readonly string NotApproved = "The user is not approved for this app.";
-        public static readonly string Unknown = "The server is busy. Please contact your administrator or try again later.";
-        public static readonly string InvalidGrant = "invalid_grant";
-        public static readonly string AppNameNotSupplied = "The app name was not supplied.";
-        public static readonly string AppNameNotExists = "The app {0} does not exist.";
-
-    }
-
-    public class DuradosAuthorizationHelper
-    {
-        public bool IsAppExists(string appname)
-        {
-            if (Durados.Web.Mvc.Maps.Instance.AppInCach(appname))
-                return true;
-            else
-                return Durados.Web.Mvc.Maps.Instance.AppExists(appname).HasValue;
-        }
-
-        public bool IsValid(string username, string password, out UserValidationError userValidationError)
-        {
-            Durados.Web.Mvc.Controllers.AccountMembershipService accountMembershipService = new Durados.Web.Mvc.Controllers.AccountMembershipService();
-            bool valid = accountMembershipService.ValidateUser(username, password);
-            if (valid)
-            {
-                userValidationError = UserValidationError.Valid;
-            }
-            else
-            {
-                bool authenticated = accountMembershipService.AuthenticateUser(username, password);
-                if (authenticated)
-                {
-                    bool belongToApp = accountMembershipService.ValidateUser(username);
-                    if (belongToApp)
-                    {
-                        if (accountMembershipService.IsRegisterd(username))
-                        {
-                            userValidationError = UserValidationError.NotRegistered;
-                        }
-                        else
-                        {
-                            if (accountMembershipService.IsApproved(username))
-                            {
-                                userValidationError = UserValidationError.Unknown;
-                            }
-                            else
-                            {
-                                userValidationError = UserValidationError.NotApproved;
-                            }
-                        }
-                    }
-                    else
-                    {
-                        userValidationError = UserValidationError.UserDoesNotBelongToApp;
-                    }
-                }
-                else
-                {
-                    if (accountMembershipService.IsLockedOut(username))
-                    {
-                        userValidationError = UserValidationError.LockedOut;
-                    }
-                    else
-                    {
-                        userValidationError = UserValidationError.IncorrectUsernameOrPassword;
-                    }
-                }
-            }
-
-            return valid;
-        }
-
-        public bool ValidateLogOnAuthUrl(Durados.Web.Mvc.Map map, System.Collections.Specialized.NameValueCollection formCollecion)
-        {
-            try
-            {
-                System.Collections.Specialized.NameValueCollection nameValueCollection = new System.Collections.Specialized.NameValueCollection();
-
-                foreach (string nv in map.Database.LogOnUrlAuthToken)
-                {
-                    nameValueCollection.Add(nv, formCollecion[nv]);
-                }
-                nameValueCollection.Add("username", formCollecion["username"]);
-
-                string externalValidetionIdentificationKey = System.Configuration.ConfigurationManager.AppSettings["ExternalValidetionIdentificationKey"] ?? "auth";
-                string externalValidetionIdentificationValue = System.Configuration.ConfigurationManager.AppSettings["ExternalValidetionIdentificationValue"] ?? true.ToString();
-
-                nameValueCollection.Add(externalValidetionIdentificationKey, externalValidetionIdentificationValue);
-
-
-                string url = map.Database.LogOnUrlAuthBase + AsEncodedQueryString(nameValueCollection);
-
-                System.Net.HttpWebRequest request = System.Net.WebRequest.Create(url) as System.Net.HttpWebRequest;
-                request.Method = Durados.DataAccess.HttpVerb.GET.ToString();
-
-                using (System.Net.HttpWebResponse response = request.GetResponse() as System.Net.HttpWebResponse)
-                {
-                    if (response.StatusCode != System.Net.HttpStatusCode.OK)
-                        throw new System.Exception(System.String.Format(
-                        "Server error (HTTP {0}: {1}).",
-                        response.StatusCode,
-                        response.StatusDescription));
-                    System.Web.Script.Serialization.JavaScriptSerializer jsonSerializer = new System.Web.Script.Serialization.JavaScriptSerializer();
-                    string responseContent = new System.IO.StreamReader(response.GetResponseStream()).ReadToEnd();
-
-                    SuccessMessageResponse validateResponse = (SuccessMessageResponse)jsonSerializer.Deserialize<SuccessMessageResponse>(responseContent); ;
-
-                    if (validateResponse.Success)
-                        return true;
-                    else
-                    {
-                        //ModelState.AddModelError("_FORM", Map.Database.Localizer.Translate(validateResponse.Message));
-                        return false;
-                    };
-                }
-                // }
-            }
-            catch (System.Exception ex)
-            {
-                //map.Logger.Log(this.ControllerContext.RouteData.Values["controller"].ToString(), this.ControllerContext.RouteData.Values["action"].ToString(), "ValidateLogOnAuthUrl", "Fail to validate through LogOnAuthUrl", ex.StackTrace, 3, "", DateTime.Now);
-                //ModelState.AddModelError("_FORM", Map.Database.Localizer.Translate(ex.Message));
-                return false;
-            }
-
-        }
-
-        private string AsEncodedQueryString(System.Collections.Specialized.NameValueCollection nvc)
-        {
-            return "?"+System.String.Join("&", from item in nvc.AllKeys select item + "=" + nvc[item]);
-           
-        }
-            public class SuccessMessageResponse
-            {
-             
-                public bool Success { get; set; }
-           
-                public string Message { get; set; }
-            }
-
-
-    }
+    
 }
 
    // Refresh token keep it
