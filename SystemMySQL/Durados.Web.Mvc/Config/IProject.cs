@@ -3289,6 +3289,82 @@ namespace Durados.Web.Mvc.Config
                 signInRedirectUrl.Category = rolesCategory;
                 signInRedirectUrl.HideInTable = true;
             }
+            if (databaseView.Fields.ContainsKey("GoogleClientId"))
+            {
+                ColumnField GoogleClientId = (ColumnField)databaseView.Fields["GoogleClientId"];
+                GoogleClientId.Order = 600;
+                GoogleClientId.Category = rolesCategory;
+                GoogleClientId.HideInTable = true;
+            }
+            if (databaseView.Fields.ContainsKey("GoogleClientSecret"))
+            {
+                ColumnField GoogleClientSecret = (ColumnField)databaseView.Fields["GoogleClientSecret"];
+                GoogleClientSecret.Order = 600;
+                GoogleClientSecret.Category = rolesCategory;
+                GoogleClientSecret.HideInTable = true;
+            }
+
+
+
+            if (databaseView.Fields.ContainsKey("GithubClientId"))
+            {
+                ColumnField GithubClientId = (ColumnField)databaseView.Fields["GithubClientId"];
+                GithubClientId.Order = 600;
+                GithubClientId.Category = rolesCategory;
+                GithubClientId.HideInTable = true;
+            }
+            if (databaseView.Fields.ContainsKey("GithubClientSecret"))
+            {
+                ColumnField GithubClientSecret = (ColumnField)databaseView.Fields["GithubClientSecret"];
+                GithubClientSecret.Order = 600;
+                GithubClientSecret.Category = rolesCategory;
+                GithubClientSecret.HideInTable = true;
+            }
+
+            if (databaseView.Fields.ContainsKey("FacebookClientId"))
+            {
+                ColumnField FacebookClientId = (ColumnField)databaseView.Fields["FacebookClientId"];
+                FacebookClientId.Order = 600;
+                FacebookClientId.Category = rolesCategory;
+                FacebookClientId.HideInTable = true;
+            }
+            if (databaseView.Fields.ContainsKey("FacebookClientSecret"))
+            {
+                ColumnField FacebookClientSecret = (ColumnField)databaseView.Fields["FacebookClientSecret"];
+                FacebookClientSecret.Order = 600;
+                FacebookClientSecret.Category = rolesCategory;
+                FacebookClientSecret.HideInTable = true;
+            }
+
+
+            if (databaseView.Fields.ContainsKey("EnableGithub"))
+            {
+                ColumnField EnableGithub = (ColumnField)databaseView.Fields["GoogleClientSecret"];
+                EnableGithub.Order = 600;
+                EnableGithub.Category = rolesCategory;
+                EnableGithub.HideInTable = true;
+            }
+            if (databaseView.Fields.ContainsKey("EnableGoogle"))
+            {
+                ColumnField EnableGoogle = (ColumnField)databaseView.Fields["EnableGoogle"];
+                EnableGoogle.Order = 600;
+                EnableGoogle.Category = rolesCategory;
+                EnableGoogle.HideInTable = true;
+            }
+            if (databaseView.Fields.ContainsKey("EnableFacebook"))
+            {
+                ColumnField EnableFacebook = (ColumnField)databaseView.Fields["EnableFacebook"];
+                EnableFacebook.Order = 600;
+                EnableFacebook.Category = rolesCategory;
+                EnableFacebook.HideInTable = true;
+            }
+            if (databaseView.Fields.ContainsKey("EnableSecretKeyAccess"))
+            {
+                ColumnField EnableSecretKeyAccess = (ColumnField)databaseView.Fields["EnableSecretKeyAccess"];
+                EnableSecretKeyAccess.Order = 600;
+                EnableSecretKeyAccess.Category = rolesCategory;
+                EnableSecretKeyAccess.HideInTable = true;
+            }
             
 
             Category generalCategory = new Category() { Name = "General", Ordinal = 30 };
