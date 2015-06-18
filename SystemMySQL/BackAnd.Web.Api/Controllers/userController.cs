@@ -862,7 +862,7 @@ namespace BackAnd.Web.Api.Controllers
             Durados.Web.Mvc.Map map = Durados.Web.Mvc.Maps.Instance.GetMap(appName);
             string role = map.Database.GetUserRole(email);
             string userId = map.Database.GetUserID(email).ToString();
-            if (!url.EndsWith("#/"))
+            if (!url.Contains("#/"))
                 url += "#/";
             if (url.Contains('?')) // already have query string
             {
