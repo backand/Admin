@@ -20,6 +20,7 @@ using System.Threading;
 using System.Web.Mvc;
 using System.Security.Claims;
 using System.Web.Script.Serialization;
+using System.Net.Http;
 
 namespace Durados.Web.Mvc.UI.Helpers
 {
@@ -820,6 +821,41 @@ namespace Durados.Web.Mvc.UI.Helpers
            
        }
 
+       public static object GetUserKey(string appName)
+       {
+           Map map = Maps.Instance.GetMap(appName);
+           if (map == null || map is DuradosMap)
+           {
+               throw new DuradosException("App not found");
+           }
+
+           string role = map.Database.GetUserRole(map.Database.GetCurrentUsername());
+           if (!(role == "Admin" || role == "Developer"))
+               throw new DuradosException("Only admin can get keys");
+
+           return map.Database.GetUserGuid();
+           
+       }
+
+       public static object ResetUserKey(string appName, BeforeEditInDatabaseEventHandler view_BeforeEditInDatabase)
+       {
+           Map map = Maps.Instance.GetMap(appName);
+           if (map == null || map is DuradosMap)
+           {
+               throw new DuradosException("App not found");
+           }
+
+           string role = map.Database.GetUserRole(map.Database.GetCurrentUsername());
+           if (!(role == "Admin" || role == "Developer"))
+               throw new DuradosException("Only admin can get keys");
+
+           string guid = Guid.NewGuid().ToString();
+           string pk = map.Database.GetUserID();
+           map.Database.GetUserView().Edit(new Dictionary<string, object>() { { "Guid", guid } }, pk, null, view_BeforeEditInDatabase, null, null);
+
+           return guid;
+       }
+
        public static object GetKeys(string appName)
        {
            Map map = Maps.Instance.GetMap(appName);
@@ -856,6 +892,66 @@ namespace Durados.Web.Mvc.UI.Helpers
            }
 
            return keys;
+       }
+
+       public static object ResetKey(string appName, string key)
+       {
+           Map map = Maps.Instance.GetMap(appName);
+           if (map == null || map is DuradosMap)
+           {
+               throw new DuradosException("App not found");
+           }
+
+           string role = map.Database.GetUserRole(map.Database.GetCurrentUsername());
+           if (!(role == "Admin" || role == "Developer"))
+               throw new DuradosException("Only admin can get keys");
+
+
+           string columnName = null;
+           if (key == "general")
+           {
+               columnName = "Guid";
+           }
+           else if (key == "signup")
+           {
+               columnName = "SignUpToken";
+           }
+           else if (key == "anonymous")
+           {
+               columnName = "AnonymousToken";
+           }
+           else
+           {
+               throw new DuradosException("Key not found");
+           }
+
+
+           string val = null;
+
+           using (System.Data.SqlClient.SqlConnection cnn = new System.Data.SqlClient.SqlConnection(Maps.Instance.DuradosMap.Database.ConnectionString))
+           {
+               using (System.Data.SqlClient.SqlCommand command = new System.Data.SqlClient.SqlCommand("", cnn))
+               {
+                   cnn.Open();
+
+                   command.CommandText = string.Format("update [durados_app] set [{1}] = @newGuid  WHERE [Name] = '{0}'", appName, columnName);
+                   command.Parameters.AddWithValue("newGuid", Guid.NewGuid());
+                   command.ExecuteNonQuery();
+
+                   command.Parameters.Clear();
+                   command.CommandText = string.Format("SELECT * FROM [durados_app] WITH(NOLOCK)  WHERE [Name] = '{0}'", appName);
+                   using (System.Data.SqlClient.SqlDataReader reader = command.ExecuteReader())
+                   {
+                       while (reader.Read())
+                       {
+                           val = reader[columnName].ToString();
+                           
+                       }
+                   }
+               }
+           }
+
+           return val;
        }
     }
 
@@ -4530,6 +4626,10 @@ namespace Durados.Web.Mvc.UI.Helpers
        public static readonly string AppNameNotSupplied = "The app name was not supplied.";
        public static readonly string AppNameNotExists = "The app {0} does not exist.";
 
+       public static readonly string MissingUserIdOrAppId = "Missing userId or appId.";
+       public static readonly string WrongUserIdOrAppId = "Wrong userId or appId.";
+       public static readonly string EnableKeysAccess = "Enable keys access.";
+       
    }
    public class DuradosAuthorizationHelper
    {
@@ -4668,6 +4768,7 @@ namespace Durados.Web.Mvc.UI.Helpers
    {
        public abstract string GetAuthUrl(string appName, string returnAddress, string parameters, string activity);
        public abstract Profile Authenticate();
+       public abstract Profile Authenticate(string appName, string code);
 
        public static Social GetSocialProvider(string provider)
        {
@@ -4677,6 +4778,8 @@ namespace Durados.Web.Mvc.UI.Helpers
                    return new Google();
                case "github":
                    return new Github();
+               case "facebook":
+                   return new Facebook();
 
                default:
                    return null;
@@ -4742,9 +4845,17 @@ namespace Durados.Web.Mvc.UI.Helpers
                else
                {
                    userRow = Maps.Instance.GetMap(appName).Database.GetUserRow(email);
-                   if (userRow == null || (!userRow.IsNull("IsApproved") && !(bool)userRow["IsApproved"]))
+                   if (userRow == null)
                    {
                        throw new SocialException("The user is not signed up to " + appName);
+                   }
+                   if (!userRow.IsNull("IsApproved"))
+                   {
+                       object isApproved = userRow["IsApproved"];
+                       if (isApproved.Equals(false) || isApproved.Equals(0))
+                       {
+                           throw new SocialException("The user is not signed up to " + appName);
+                       }
                    }
                }
            }
@@ -4767,12 +4878,7 @@ namespace Durados.Web.Mvc.UI.Helpers
            public abstract string lastName { get; }
 
            public abstract string email { get; }
-
-           public abstract string appName { get; }
-
-           public abstract string returnAddress { get; }
-           public abstract string activity { get; }
-
+           
            public virtual Dictionary<string, object> additionalValues
            {
                get
@@ -4781,7 +4887,26 @@ namespace Durados.Web.Mvc.UI.Helpers
                }
            }
 
-           public abstract string parameters { get; }
+
+           public virtual string appName
+           {
+               get { return dictionary["appName"].ToString(); }
+           }
+
+           public virtual string returnAddress
+           {
+               get { return dictionary["returnAddress"].ToString(); }
+           }
+
+           public virtual string activity
+           {
+               get { return dictionary["activity"].ToString(); }
+           }
+
+           public virtual string parameters
+           {
+               get { return dictionary["parameters"].ToString(); }
+           }
        }
 
        public class Google : Social
@@ -4914,7 +5039,51 @@ namespace Durados.Web.Mvc.UI.Helpers
                }
                catch (Exception exception)
                {
-                   throw new GoogleException(error, exception);
+                   throw new GoogleException(exception.Message, exception);
+               }
+
+           }
+
+
+
+           public override Profile Authenticate(string code, string appName)
+           {
+               try
+               {
+                   string urlAccessToken = "https://accounts.google.com/o/oauth2/token";
+                   
+                   //build the URL to send to Google
+                   Dictionary<string, object> keys = GetKeys(appName);
+                   string clientId = keys["ClientId"].ToString();
+                   string clientSecret = keys["ClientSecret"].ToString();
+
+                   string redirectUri = GetRedirectUrl();
+
+                   string accessTokenData = string.Format("scope=&code={0}&client_id={1}&client_secret={2}&redirect_uri={3}&grant_type=authorization_code", code, clientId, clientSecret, redirectUri);
+                   string response = Durados.Web.Mvc.Infrastructure.Http.PostWebRequest(urlAccessToken, accessTokenData);
+
+                   //get the access token from the return JSON
+                   //JavaScriptSerializer jsonSerializer = new JavaScriptSerializer();
+                   //AuthResponse validateResponse = (AuthResponse)jsonSerializer.Deserialize<AuthResponse>(response);
+
+                   Dictionary<string, object> validateResponse = Durados.Web.Mvc.UI.Json.JsonSerializer.Deserialize(response);
+
+                   //get the Google user profile using the access token
+                   string profileUrl = "https://www.googleapis.com/plus/v1/people/me";
+                   string profileHeader = "Authorization: Bearer " + validateResponse["access_token"].ToString();
+                   string profiel = Durados.Web.Mvc.Infrastructure.Http.GetWebRequest(profileUrl, profileHeader);
+
+                   //get the user email out of goolge profile
+                   //GoogleProfile googleProfile = (GoogleProfile)jsonSerializer.Deserialize<GoogleProfile>(profiel); ;
+                   Dictionary<string, object> googleProfile = Durados.Web.Mvc.UI.Json.JsonSerializer.Deserialize(profiel);
+                   googleProfile.Add("appName", appName);
+                   
+                   return GetNewProfile(googleProfile);
+
+               }
+               catch (Exception exception)
+               {
+                   throw new GoogleException(exception.Message, exception);
                }
 
            }
@@ -4964,25 +5133,7 @@ namespace Durados.Web.Mvc.UI.Helpers
                    get { return ((Dictionary<string, object>)((object[])dictionary["emails"])[0])["value"].ToString(); }
                }
 
-               public override string appName
-               {
-                   get { return dictionary["appName"].ToString(); }
-               }
-
-               public override string returnAddress
-               {
-                   get { return dictionary["returnAddress"].ToString(); }
-               }
-
-               public override string activity
-               {
-                   get { return dictionary["activity"].ToString(); }
-               }
-
-               public override string parameters
-               {
-                   get { return dictionary["parameters"].ToString(); }
-               }
+              
            }
 
            public class GoogleException : SocialException
@@ -4994,6 +5145,268 @@ namespace Durados.Web.Mvc.UI.Helpers
                }
 
                public GoogleException(string message, Exception innerException)
+                   : base(message)
+               {
+
+               }
+           }
+       }
+
+       public class Facebook : Social
+       {
+           protected override Profile GetNewProfile(Dictionary<string, object> dictionary)
+           {
+               return new FacebookProfile(dictionary);
+           }
+
+           protected override string Provider
+           {
+               get { return "facebook"; }
+           }
+           public override string GetAuthUrl(string appName, string returnAddress, string parameters, string activity)
+           {
+               Dictionary<string, object> keys = GetKeys(appName);
+               string clientId = keys["ClientId"].ToString();
+               string redirectUri = GetRedirectUrl();
+               var state = new { appName = appName, returnAddress = System.Web.HttpContext.Current.Server.UrlEncode(returnAddress), activity = activity, parameters = parameters ?? string.Empty };
+               var jss = new JavaScriptSerializer();
+
+               
+               // OAuth2 10.12 CSRF
+               //GenerateCorrelationId(properties);
+
+               // comma separated
+               string scope = "email";
+
+               string authorizationEndpoint =
+                   "https://www.facebook.com/dialog/oauth" +
+                       "?response_type=code" +
+                       "&client_id=" + Uri.EscapeDataString(clientId) +
+                       "&redirect_uri=" + Uri.EscapeDataString(redirectUri) +
+                       "&scope=" + Uri.EscapeDataString(scope) +
+                       "&state=" + Uri.EscapeDataString(jss.Serialize(state));
+               return authorizationEndpoint;
+           }
+
+           protected override Dictionary<string, object> GetKeys(string appName)
+           {
+               return GetFacebookKeys(appName);
+           }
+
+           private Dictionary<string, object> GetFacebookKeys(string appName)
+           {
+               string GoogleClientId = System.Configuration.ConfigurationManager.AppSettings["FacebookClientId"];
+               string GoogleClientSecret = System.Configuration.ConfigurationManager.AppSettings["FacebookClientSecret"];
+               Dictionary<string, object> keys = new Dictionary<string, object>();
+               keys.Add("ClientId", GoogleClientId);
+               keys.Add("ClientSecret", GoogleClientSecret);
+
+               if (appName == Maps.DuradosAppName)
+                   return keys;
+
+               Map map = Maps.Instance.GetMap(appName);
+               if (map == null)
+                   return keys;
+
+               if (!string.IsNullOrEmpty(map.Database.FacebookClientId))
+               {
+                   keys["ClientId"] = map.Database.FacebookClientId;
+               }
+               if (!string.IsNullOrEmpty(map.Database.FacebookClientSecret))
+               {
+                   keys["ClientSecret"] = map.Database.FacebookClientSecret;
+               }
+
+               return keys;
+           }
+
+           public override Profile Authenticate(string appName, string code)
+           {
+               return null;
+           }
+           public override Profile Authenticate()
+           {
+               //get the code from Google and request from access token
+               string code = System.Web.HttpContext.Current.Request.QueryString["code"];
+               string error = System.Web.HttpContext.Current.Request.QueryString["error"];
+
+               if (code == null || error != null)
+               {
+                   throw new FacebookException(error);
+               }
+               try
+               {
+
+                   var _httpClient = new HttpClient();
+                   // _httpClient.Timeout = Options.BackchannelTimeout;
+                   _httpClient.MaxResponseContentBufferSize = 1024 * 1024 * 10; // 10 MB
+
+
+                   string state = System.Web.HttpContext.Current.Request.QueryString["state"];
+                   var jss = new JavaScriptSerializer();
+                   Dictionary<string, object> stateObject = Durados.Web.Mvc.UI.Json.JsonSerializer.Deserialize(state);
+
+                   if (!stateObject.ContainsKey("appName"))
+                   {
+                       throw new FacebookException("Could not find the app name");
+                   }
+                   string appName = stateObject["appName"].ToString();
+                   if (!stateObject.ContainsKey("returnAddress"))
+                   {
+                       throw new FacebookException("Could not find the return address");
+                   }
+                   string returnAddress = System.Web.HttpContext.Current.Server.UrlDecode(stateObject["returnAddress"].ToString());
+                   if (!stateObject.ContainsKey("activity"))
+                   {
+                       throw new FacebookException("Could not find the activity");
+                   }
+                   string activity = stateObject["activity"].ToString();
+                   if (!stateObject.ContainsKey("parameters"))
+                   {
+                       throw new FacebookException("Could not find the parameters");
+                   }
+                   string parameters = stateObject["parameters"].ToString();
+
+
+
+
+                   Dictionary<string, object> keys = GetKeys(appName);
+                   string clientId = keys["ClientId"].ToString();
+                   string clientSecret = keys["ClientSecret"].ToString();
+
+
+                   if (stateObject == null)
+                   {
+                       return null;
+                   }
+
+                   // OAuth2 10.12 CSRF
+                   /*    if (!ValidateCorrelationId(properties, _logger))
+                       {
+                           return new AuthenticationTicket(null, properties);
+                       }
+
+                       if (code == null)
+                       {
+                           // Null if the remote server returns an error.
+                           return new AuthenticationTicket(null, properties);
+                       }
+                   */
+
+
+                   string redirectUri = GetRedirectUrl();
+                   string tokenRequest = "grant_type=authorization_code" +
+                       "&code=" + Uri.EscapeDataString(code) +
+                       "&redirect_uri=" + Uri.EscapeDataString(redirectUri) +
+                       "&client_id=" + Uri.EscapeDataString(clientId) +
+                       "&client_secret=" + Uri.EscapeDataString(clientSecret);
+
+                   string TokenEndpoint = "https://graph.facebook.com/oauth/access_token";
+
+                   string response = Infrastructure.Http.GetWebRequest(TokenEndpoint + "?" + tokenRequest);
+                   var validateResponse = System.Web.HttpUtility.ParseQueryString(response);
+
+                   string accessToken = validateResponse["access_token"].ToString();
+                   string expires = validateResponse["expires"].ToString();
+
+                   string GraphApiEndpoint = "https://graph.facebook.com/me";
+                   string graphAddress = GraphApiEndpoint + "?access_token=" + Uri.EscapeDataString(accessToken);
+
+                   /* if (Options.SendAppSecretProof)
+                    {
+                        graphAddress += "&appsecret_proof=" + GenerateAppSecretProof(accessToken);
+                    }*/
+
+                   string profiel = Durados.Web.Mvc.Infrastructure.Http.GetWebRequest(graphAddress);
+                   Dictionary<string, object> facebookProfile = Durados.Web.Mvc.UI.Json.JsonSerializer.Deserialize(profiel);
+                   facebookProfile.Add("appName", appName);
+                   facebookProfile.Add("returnAddress", returnAddress);
+                   facebookProfile.Add("activity", activity);
+                   facebookProfile.Add("parameters", parameters);
+
+                   return GetNewProfile(facebookProfile);
+
+
+                   //HttpResponseMessage graphResponse = await _httpClient.GetAsync(graphAddress, HttpCompletionOption.ResponseContentRead);
+                   //graphResponse.EnsureSuccessStatusCode();
+                   //text = await graphResponse.Content.ReadAsStringAsync();
+                   //JObject user = JObject.Parse(text);
+
+                   //var email = user["email"].Value<string>();
+                   //var redirectUrl = stateObject.RedirectUri;
+                   //var appName = stateObject.Dictionary["appname"];
+
+
+               }
+               catch (Exception exception)
+               {
+                   throw new FacebookException(exception.Message, exception);
+               }
+
+
+               
+           }
+
+           public class FacebookProfile : Profile
+           {
+               public FacebookProfile(Dictionary<string, object> dictionary) :
+                   base(dictionary)
+               {
+
+               }
+
+               protected virtual string GetPart(string key)
+               {
+                   if (dictionary.ContainsKey(key))
+                   {
+                       return dictionary[key].ToString();
+                   }
+                   else
+                   {
+                       if (key != "email")
+                       {
+                           if (string.IsNullOrEmpty(email))
+                           {
+                               return null;
+                           }
+                           else
+                           {
+                               return email.Split('@').FirstOrDefault();
+                           }
+                       }
+                       else
+                       {
+                           return null;
+                       }
+                   }
+               }
+               public override string firstName
+               {
+                   get { return GetPart("first_name"); }
+               }
+
+               public override string lastName
+               {
+                   get { return GetPart("last_name"); }
+               }
+
+               public override string email
+               {
+                   get { return GetPart("email"); }
+               }
+
+
+           }
+
+           public class FacebookException : SocialException
+           {
+               public FacebookException(string message)
+                   : base(message)
+               {
+
+               }
+
+               public FacebookException(string message, Exception innerException)
                    : base(message)
                {
 
@@ -5034,11 +5447,11 @@ namespace Durados.Web.Mvc.UI.Helpers
 
            private Dictionary<string, object> GetGithubKeys(string appName)
            {
-               string GoogleClientId = System.Configuration.ConfigurationManager.AppSettings["GithubClientId"];
-               string GoogleClientSecret = System.Configuration.ConfigurationManager.AppSettings["GithubClientSecret"];
+               string clientId = System.Configuration.ConfigurationManager.AppSettings["GithubClientId"];
+               string clientSecret = System.Configuration.ConfigurationManager.AppSettings["GithubClientSecret"];
                Dictionary<string, object> keys = new Dictionary<string, object>();
-               keys.Add("ClientId", GoogleClientId);
-               keys.Add("ClientSecret", GoogleClientSecret);
+               keys.Add("ClientId", clientId);
+               keys.Add("ClientSecret", clientSecret);
 
                if (appName == Maps.DuradosAppName)
                    return keys;
@@ -5058,7 +5471,11 @@ namespace Durados.Web.Mvc.UI.Helpers
 
                return keys;
            }
-
+           public override Profile Authenticate(string appName, string code)
+           {
+               return null;
+           }
+           
            public override Profile Authenticate()
            {
                //get the code from Google and request from access token
@@ -5114,7 +5531,7 @@ namespace Durados.Web.Mvc.UI.Helpers
                    string accessToken = accessObject["access_token"].ToString();
 
                    //get the Google user profile using the access token
-                   string profileUrl = "https://api.github.com/user/emails";
+                   string profileUrl = "https://api.github.com/user";
                    string profileHeader = "Authorization: Bearer " + accessToken;
                    string profiel = Infrastructure.Http.GetWebRequest(profileUrl, profileHeader, "https://api.github.com/meta");
 
@@ -5133,7 +5550,7 @@ namespace Durados.Web.Mvc.UI.Helpers
                }
                catch (Exception exception)
                {
-                   throw new GithubException(error, exception);
+                   throw new GithubException(exception.Message, exception);
                }
 
            }
@@ -5148,71 +5565,35 @@ namespace Durados.Web.Mvc.UI.Helpers
 
                protected virtual string GetNamePart(string key)
                {
-                   if (dictionary.ContainsKey("name"))
+                   try
                    {
-                       Dictionary<string, object> names = (Dictionary<string, object>)dictionary["name"];
-                       if (names.ContainsKey(key))
-                           return names[key].ToString();
-                       else
-                           return email.Split('@').FirstOrDefault();
+                       return ((Dictionary<string, object>)dictionary["data"])[key].ToString();
                    }
-                   else
+                   catch
                    {
-                       if (string.IsNullOrEmpty(email))
-                       {
-                           return null;
-                       }
-                       else
-                       {
-                           return email.Split('@').FirstOrDefault();
-                       }
+                       return null;
                    }
                }
                public override string firstName
                {
-                   get { return GetNamePart("givenName"); }
+                   get { return GetNamePart("name") ?? email.Split('@').FirstOrDefault(); }
                }
 
                public override string lastName
                {
-                   get { return GetNamePart("familyName"); }
+                   get { return string.Empty; }
                }
 
                public override string email
                {
                    get
                    {
-                       foreach (Dictionary<string, object> identity in (object[])dictionary["data"])
-                       {
-                           if (identity["primary"].Equals(true))
-                           {
-                               return identity["email"].ToString();
-                           }
-                       }
-                       return null;
+                       return GetNamePart("email");
 
                    }
                }
 
-               public override string appName
-               {
-                   get { return dictionary["appName"].ToString(); }
-               }
-
-               public override string returnAddress
-               {
-                   get { return dictionary["returnAddress"].ToString(); }
-               }
-
-               public override string activity
-               {
-                   get { return dictionary["activity"].ToString(); }
-               }
-
-               public override string parameters
-               {
-                   get { return dictionary["parameters"].ToString(); }
-               }
+               
            }
 
            public class GithubException : SocialException

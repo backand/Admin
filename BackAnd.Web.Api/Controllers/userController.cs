@@ -30,6 +30,9 @@ using System.Web.Script.Serialization;
 using System.Text;
 using System.Globalization;
 using Microsoft.Owin;
+using Newtonsoft.Json;
+using Microsoft.Owin.Helpers;
+using Newtonsoft.Json.Linq;
 
 
 namespace BackAnd.Web.Api.Controllers
@@ -39,6 +42,59 @@ namespace BackAnd.Web.Api.Controllers
     [RoutePrefix("1/user")]
     public class userController : wfController
     {
+        [HttpGet]
+        [BackAnd.Web.Api.Controllers.Filters.BackAndAuthorize]
+        [Route("key/{id}")]
+        public IHttpActionResult key(string id)
+        {
+            if (string.IsNullOrEmpty(id))
+            {
+                return ResponseMessage(Request.CreateResponse(HttpStatusCode.NotFound, Messages.IdIsMissing));
+            }
+
+            try
+            {
+                return Ok(RestHelper.GetUserKey(id));
+
+
+            }
+            catch (Exception exception)
+            {
+                throw new BackAndApiUnexpectedResponseException(exception, this);
+
+            }
+        }
+
+        protected override void BeforeEditInDatabase(Durados.EditEventArgs e)
+        {
+            e.ColumnNames.Add("Guid");
+        }
+
+        [Route("key/reset/{id}")]
+        [BackAnd.Web.Api.Controllers.Filters.BackAndAuthorize]
+        [HttpGet]
+        public IHttpActionResult reset(string id)
+        {
+            if (string.IsNullOrEmpty(id))
+            {
+                return ResponseMessage(Request.CreateResponse(HttpStatusCode.NotFound, Messages.IdIsMissing));
+            }
+
+            try
+            {
+                return Ok(RestHelper.ResetUserKey(id, view_BeforeEditInDatabase));
+
+
+            }
+            catch (Exception exception)
+            {
+                throw new BackAndApiUnexpectedResponseException(exception, this);
+
+            }
+        }
+
+
+
         [HttpGet]
         [BackAnd.Web.Api.Controllers.Filters.BackAndAuthorize]
         [Route("exists")]
@@ -393,141 +449,186 @@ namespace BackAnd.Web.Api.Controllers
             }
         }
 
-        
+        [AllowAnonymous]
+        [Route("signInFacebook")]
+        [HttpGet]
+        public async Task<IHttpActionResult> facebookSignin(string code, string state)
+        {
+             var _httpClient = new HttpClient();
+           // _httpClient.Timeout = Options.BackchannelTimeout;
+            _httpClient.MaxResponseContentBufferSize = 1024 * 1024 * 10; // 10 MB
 
+            var appId = "1106885725994585";
+            var appSecret = "2c0a87bf88bffacd8d9c80b6bd567bc1";
+            var properties = JsonConvert.DeserializeObject<AuthenticationProperties>(state);
+            
+            if (properties == null)
+            {
+                return null;
+            }
+
+                // OAuth2 10.12 CSRF
+            /*    if (!ValidateCorrelationId(properties, _logger))
+                {
+                    return new AuthenticationTicket(null, properties);
+                }
+
+                if (code == null)
+                {
+                    // Null if the remote server returns an error.
+                    return new AuthenticationTicket(null, properties);
+                }
+            */
+                
+                
+                string redirectUri = Request.RequestUri.Scheme + "://" + Request.RequestUri.Authority + "/1/user/signInFacebook";
+                string tokenRequest = "grant_type=authorization_code" +
+                    "&code=" + Uri.EscapeDataString(code) +
+                    "&redirect_uri=" + Uri.EscapeDataString(redirectUri) +
+                    "&client_id=" + Uri.EscapeDataString(appId) +
+                    "&client_secret=" + Uri.EscapeDataString(appSecret);
+
+                HttpResponseMessage tokenResponse = await _httpClient.GetAsync(TokenEndpoint + "?" + tokenRequest, HttpCompletionOption.ResponseContentRead);
+                tokenResponse.EnsureSuccessStatusCode();
+                string text = await tokenResponse.Content.ReadAsStringAsync();
+                IFormCollection form = WebHelpers.ParseForm(text);
+
+                string accessToken = form["access_token"];
+                string expires = form["expires"];
+                string graphAddress = GraphApiEndpoint + "?access_token=" + Uri.EscapeDataString(accessToken);
+                
+               /* if (Options.SendAppSecretProof)
+                {
+                    graphAddress += "&appsecret_proof=" + GenerateAppSecretProof(accessToken);
+                }*/
+
+                HttpResponseMessage graphResponse = await _httpClient.GetAsync(graphAddress,HttpCompletionOption.ResponseContentRead);
+                graphResponse.EnsureSuccessStatusCode();
+                text = await graphResponse.Content.ReadAsStringAsync();
+                JObject user = JObject.Parse(text);
+
+                var email = user["email"].Value<string>();
+                var redirectUrl = properties.RedirectUri;
+                var appName = properties.Dictionary["appname"];
+                
+   
+            // Dear Relly,
+            // You have here the 3 parameters you need to finsih authentification.
+            // So i don't block you for tomorrow.
+            // My todo's are:
+            // 1. Handle unsucessful login
+            // 2. Securize State data
+
+
+                return null;
+                /*var context = new FacebookAuthenticatedContext(Context, user, accessToken, expires);
+                context.Identity = new ClaimsIdentity(
+                    Options.AuthenticationType,
+                    ClaimsIdentity.DefaultNameClaimType,
+                    ClaimsIdentity.DefaultRoleClaimType);
+                if (!string.IsNullOrEmpty(context.Id))
+                {
+                    context.Identity.AddClaim(new Claim(ClaimTypes.NameIdentifier, context.Id, XmlSchemaString, Options.AuthenticationType));
+                }
+                if (!string.IsNullOrEmpty(context.UserName))
+                {
+                    context.Identity.AddClaim(new Claim(ClaimsIdentity.DefaultNameClaimType, context.UserName, XmlSchemaString, Options.AuthenticationType));
+                }
+                if (!string.IsNullOrEmpty(context.Email))
+                {
+                    context.Identity.AddClaim(new Claim(ClaimTypes.Email, context.Email, XmlSchemaString, Options.AuthenticationType));
+                }
+                if (!string.IsNullOrEmpty(context.Name))
+                {
+                    context.Identity.AddClaim(new Claim("urn:facebook:name", context.Name, XmlSchemaString, Options.AuthenticationType));
+
+                    // Many Facebook accounts do not set the UserName field.  Fall back to the Name field instead.
+                    if (string.IsNullOrEmpty(context.UserName))
+                    {
+                        context.Identity.AddClaim(new Claim(ClaimsIdentity.DefaultNameClaimType, context.Name, XmlSchemaString, Options.AuthenticationType));
+                    }
+                }
+                if (!string.IsNullOrEmpty(context.Link))
+                {
+                    context.Identity.AddClaim(new Claim("urn:facebook:link", context.Link, XmlSchemaString, Options.AuthenticationType));
+                }
+                context.Properties = properties;
+
+                await Options.Provider.Authenticated(context);
+
+                return new AuthenticationTicket(context.Identity, context.Properties);
+            */
+        }
+
+        private const string XmlSchemaString = "http://www.w3.org/2001/XMLSchema#string";
+        private const string TokenEndpoint = "https://graph.facebook.com/oauth/access_token";
+        private const string GraphApiEndpoint = "https://graph.facebook.com/me";
         [AllowAnonymous]
         [Route("socialSignin")]
         [HttpGet]
-        public async Task<IHttpActionResult> socialSignin(string provider, string appName, string returnAddress)
+        public async Task<IHttpActionResult> socialSignin(string provider, string appName, string returnAddress = null, string code = null)
         {
 
-
-            
-            if (provider == "twitter")
+            if (code != null)
             {
-                string RequestTokenEndpoint = "https://api.twitter.com/oauth/request_token";
-                string AuthenticationEndpoint = "https://twitter.com/oauth/authenticate?oauth_token=";
-                string AccessTokenEndpoint = "https://api.twitter.com/oauth/access_token";
-
-                var _httpClient = new HttpClient();
-                //_httpClient.Timeout = Options.BackchannelTimeout;
-                _httpClient.MaxResponseContentBufferSize = 1024 * 1024 * 10; // 10 MB
-                _httpClient.DefaultRequestHeaders.Accept.ParseAdd("*/*");
-                _httpClient.DefaultRequestHeaders.UserAgent.ParseAdd("Microsoft Owin Twitter middleware");
-                _httpClient.DefaultRequestHeaders.ExpectContinue = false;
-
-                string redirectUri = Request.RequestUri.Scheme + "://" + Request.RequestUri.Authority + "/1/user/signin/twitter";
-                string consumerKey = "483ZJ9fxrxovcVeeT27S8yZnn";//  string.Empty;
-                string consumerSecret = "9mrppdnuYFwpbxEW1y9dVdtpE0Tpziou8IJOi6SmmqYW0MFBdd";
-                string nonce = Guid.NewGuid().ToString("N");
-
-                var authorizationParts = new SortedDictionary<string, string>
-            {
-                { "oauth_callback",  redirectUri},
-                { "oauth_consumer_key", consumerKey },
-                { "oauth_nonce", nonce },
-                { "oauth_signature_method", "HMAC-SHA1" },
-                { "oauth_timestamp", GenerateTimeStamp() },
-                { "oauth_version", "1.0" }
-            };
-
-                var parameterBuilder = new StringBuilder();
-                foreach (var authorizationKey in authorizationParts)
-                {
-                    parameterBuilder.AppendFormat("{0}={1}&", Uri.EscapeDataString(authorizationKey.Key), Uri.EscapeDataString(authorizationKey.Value));
-                }
-                parameterBuilder.Length--;
-                string parameterString = parameterBuilder.ToString();
-
-                var canonicalizedRequestBuilder = new StringBuilder();
-                canonicalizedRequestBuilder.Append(HttpMethod.Post.Method);
-                canonicalizedRequestBuilder.Append("&");
-                canonicalizedRequestBuilder.Append(Uri.EscapeDataString(RequestTokenEndpoint));
-                canonicalizedRequestBuilder.Append("&");
-                canonicalizedRequestBuilder.Append(Uri.EscapeDataString(parameterString));
-
-                string signature = ComputeSignature(consumerSecret, null, canonicalizedRequestBuilder.ToString());
-                authorizationParts.Add("oauth_signature", signature);
-
-                var authorizationHeaderBuilder = new StringBuilder();
-                authorizationHeaderBuilder.Append("OAuth ");
-                foreach (var authorizationPart in authorizationParts)
-                {
-                    authorizationHeaderBuilder.AppendFormat(
-                        "{0}=\"{1}\", ", authorizationPart.Key, Uri.EscapeDataString(authorizationPart.Value));
-                }
-                authorizationHeaderBuilder.Length = authorizationHeaderBuilder.Length - 2;
-
-                var request = new HttpRequestMessage(HttpMethod.Post, RequestTokenEndpoint);
-                request.Headers.Add("Authorization", authorizationHeaderBuilder.ToString());
-
-                HttpResponseMessage response = await _httpClient.SendAsync(request, HttpCompletionOption.ResponseContentRead);
-                response.EnsureSuccessStatusCode();
-                string responseText = await response.Content.ReadAsStringAsync();
-
-
-                //respnse = oauth_token=NtNtgwAAAAAAgK3rAAABTfODFzA&oauth_token_secret=LEmAxf4dGL39ZxAyWAwyGh8eFr7CoH81&oauth_callback_confirmed=true
-                var queryString = HttpUtility.ParseQueryString(responseText);
-
-                if (queryString["oauth_callback_confirmed"] != "true")
-                {
-                    return null;
-                }
-
-                var token = queryString["oauth_token"];
-                var tokenSecret = queryString["oauth_token_secret"];
-
-                string twitterAuthenticationEndpoint = AuthenticationEndpoint + token;
-
-                var cookieOptions = new CookieOptions
-                {
-                    HttpOnly = true,
-                    Secure = false // Request.IsSecure
-                };
-
-
-                /*Response.Cookies.Append(StateCookie, request, cookieOptions);
-
-                var redirectContext = new TwitterApplyRedirectContext(
-                    Context, Options,
-                    extra, twitterAuthenticationEndpoint);
-                Options.Provider.ApplyRedirect(redirectContext);*/
-
-
-                /*  IFormCollection responseParameters = WebHelpers.ParseForm(responseText);
-                  if (string.Equals(responseParameters["oauth_callback_confirmed"], "true", StringComparison.InvariantCulture))
-                  {
-                      return new RequestToken { Token = Uri.UnescapeDataString(responseParameters["oauth_token"]), TokenSecret = Uri.UnescapeDataString(responseParameters["oauth_token_secret"]), CallbackConfirmed = true, Properties = properties };
-                  }*/
-
+                Social social = Social.GetSocialProvider(provider);
+                Social.Profile profile = social.Authenticate(appName, code);
+                social.Signin(profile);
+                return Ok(GetAccessToken(profile.email, appName, provider));
             }
-            else
+            try
             {
-                try
-                {
-                    Social social = Social.GetSocialProvider(provider);
-                    return Redirect(social.GetAuthUrl(appName, returnAddress, null, "signin"));
-                }
-                catch (Exception exception)
-                {
-                    Map.Logger.Log("user", "socialSignin", exception.Source, exception, 1, null);
-                    return BadRequest(exception.Message);
-                }
+                Social social = Social.GetSocialProvider(provider);
+                return Redirect(social.GetAuthUrl(appName, returnAddress ?? GetCurrentAddress(), null, "signin"));
             }
-
-            return null;
+            catch (Exception exception)
+            {
+                Map.Logger.Log("user", "socialSignin", exception.Source, exception, 1, null);
+                return BadRequest(exception.Message);
+            }
            
+        }
+        
+
+        private string GetCurrentAddress()
+        {
+            return System.Web.HttpContext.Current.Request.UrlReferrer.AbsoluteUri;
         }
 
         [AllowAnonymous]
         [Route("socialSignup")]
         [HttpGet]
-        public async Task<IHttpActionResult> socialSignup(string provider, string appName, string returnAddress, string parameters = null)
+        public async Task<IHttpActionResult> socialSignup(string provider, string appName, string returnAddress = null, string parameters = null)
         {
             try
             {
+                //if (provider == "facebook")
+                //{
+                //    string appId = "1106885725994585";
+                //    string redirectUri = Request.RequestUri.Scheme + "://" + Request.RequestUri.Authority + "/1/user/signInFacebook";
+
+                //    AuthenticationProperties properties = new AuthenticationProperties { RedirectUri = returnAddress, };
+                //    properties.Dictionary.Add("appname", appName);
+                //    // OAuth2 10.12 CSRF
+                //    //GenerateCorrelationId(properties);
+
+                //    // comma separated
+                //    string scope = "email";
+
+                //    string state = JsonConvert.SerializeObject(properties);
+
+                //    string authorizationEndpoint =
+                //        "https://www.facebook.com/dialog/oauth" +
+                //            "?response_type=code" +
+                //            "&client_id=" + Uri.EscapeDataString(appId) +
+                //            "&redirect_uri=" + Uri.EscapeDataString(redirectUri) +
+                //            "&scope=" + Uri.EscapeDataString(scope) +
+                //            "&state=" + Uri.EscapeDataString(state);
+                //    return Redirect(authorizationEndpoint);
+                //}
+
                 Social social = Social.GetSocialProvider(provider);
-                return Redirect(social.GetAuthUrl(appName, returnAddress, parameters, "signup"));
+                return Redirect(social.GetAuthUrl(appName, returnAddress ?? GetCurrentAddress(), parameters, "signup"));
             }
             catch (Exception exception)
             {
@@ -559,17 +660,22 @@ namespace BackAnd.Web.Api.Controllers
         }
 
         [AllowAnonymous]
-        [Route("signInProviders")]
+        [Route("socialProviders")]
         [HttpGet]
-        public IHttpActionResult signInProviders(string appName)
+        public IHttpActionResult socialProviders(string appName, string returnAddress = null)
         {
-            HashSet<string> providers = new HashSet<string> { "google", "github", "facebook" };
+            Map map = Maps.Instance.GetMap(appName);
+
+            HashSet<string> providers = map.Database.GetSocialProviders();
 
             List<object> providersUrls = new List<object>();
 
             foreach (string provider in providers)
             {
-                providersUrls.Add(new { name = provider, url = "1/user/socialSignin?provider=" + provider + "&appname=" + appName + "&returnAddress={{a page in your app}}" });
+                providersUrls.Add(new { name = provider, 
+                    signin = "1/user/socialSignin?provider=" + provider + "&appname=" + appName + (string.IsNullOrEmpty(returnAddress) ? "" : "&returnAddress=" + System.Web.HttpContext.Current.Server.UrlEncode(returnAddress)), 
+                    signup = "1/user/socialSignup?provider=" + provider + "&appname=" + appName + (string.IsNullOrEmpty(returnAddress) ? "" : "&returnAddress=" + System.Web.HttpContext.Current.Server.UrlEncode(returnAddress)) 
+                });
            
             }
 
@@ -705,6 +811,11 @@ namespace BackAnd.Web.Api.Controllers
             catch (Exception exception)
             {
                 Map.Logger.Log("user", "signin", exception.Source, exception, 1, null);
+                if (string.IsNullOrEmpty(returnAddress))
+                {
+                    returnAddress = GetReturnAddress();
+                }
+
                 if (!string.IsNullOrEmpty(returnAddress))
                 {
                     return Redirect(GetErrorUrl(returnAddress, exception.Message));
@@ -716,11 +827,43 @@ namespace BackAnd.Web.Api.Controllers
             }
         }
 
+        private string GetAccessToken(string username, string appName, string provider)
+        {
+            var identity = new ClaimsIdentity("Bearer");
+            identity.AddClaim(new Claim("username", username));
+            identity.AddClaim(new Claim(ClaimTypes.AuthenticationMethod, provider));
+            identity.AddClaim(new Claim("appname", appName));
+
+
+            // create token
+            return CreateToken(identity);
+        }
+
+        private string GetReturnAddress()
+        {
+            string state = System.Web.HttpContext.Current.Request.QueryString["state"];
+            if (state == null)
+                return null;
+
+            var jss = new JavaScriptSerializer();
+            try
+            {
+                Dictionary<string, object> stateObject = Durados.Web.Mvc.UI.Json.JsonSerializer.Deserialize(state);
+                return stateObject["returnAddress"].ToString().Split('?').FirstOrDefault().TrimEnd('/');
+            }
+            catch
+            {
+                return null;
+            }
+        }
+
         private string GetSuccessUrl(string url, string accessToken, string appName, string email)
         {
             Durados.Web.Mvc.Map map = Durados.Web.Mvc.Maps.Instance.GetMap(appName);
             string role = map.Database.GetUserRole(email);
             string userId = map.Database.GetUserID(email).ToString();
+            if (!url.EndsWith("#/"))
+                url += "#/";
             if (url.Contains('?')) // already have query string
             {
                 url += "&";

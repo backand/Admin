@@ -167,6 +167,11 @@ namespace Durados.Web.Mvc
             RoleViewName = "durados_UserRole";
 
             RequiresSSL = true;
+
+            EnableGoogle = true;
+            EnableGithub = true;
+            EnableFacebook = true;
+            EnableSecretKeyAccess = true;
         }
 
         public override bool IsMain()
@@ -206,7 +211,43 @@ namespace Durados.Web.Mvc
 
         [Durados.Config.Attributes.ColumnProperty()]
         public string GithubClientSecret { get; set; }
+        [Durados.Config.Attributes.ColumnProperty()]
+        public bool EnableGithub { get; set; }
+        [Durados.Config.Attributes.ColumnProperty()]
+        public bool EnableGoogle { get; set; }
+
+        [Durados.Config.Attributes.ColumnProperty()]
+        public string FacebookClientId { get; set; }
+
+        [Durados.Config.Attributes.ColumnProperty()]
+        public string FacebookClientSecret { get; set; }
+        [Durados.Config.Attributes.ColumnProperty()]
+        public bool EnableFacebook { get; set; }
         
+
+        [Durados.Config.Attributes.ColumnProperty()]
+        public bool EnableSecretKeyAccess { get; set; }
+
+        public HashSet<string> GetSocialProviders()
+        {
+            HashSet<string> providers = new HashSet<string>();
+
+            if (EnableGoogle)
+            {
+                providers.Add("google");
+            }
+            if (EnableGithub)
+            {
+                providers.Add("github");
+            }
+            if (EnableFacebook)
+            {
+                providers.Add("facebook");
+            }
+
+            return providers;
+        }
+
 
         [Durados.Config.Attributes.ColumnProperty()]
         public string RegistrationRedirectUrl { get; set; }

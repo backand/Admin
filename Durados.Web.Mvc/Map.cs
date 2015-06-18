@@ -5664,6 +5664,21 @@ namespace Durados.Web.Mvc
         {
             return maps.ContainsKey(appName);
         }
+
+        public string GetAppNameByGuid(string guid)
+        {
+            SqlAccess sql = new SqlAccess();
+            string sSqlCommand = "";
+
+            sSqlCommand = "select [name] from durados_App with(nolock) where [Guid] = '" + guid + "'";
+            
+            object scalar = sql.ExecuteScalar(duradosMap.connectionString, sSqlCommand);
+
+            if (scalar.Equals(string.Empty) || scalar == null || scalar == DBNull.Value)
+                return null;
+            else
+                return scalar.ToString();
+        }
         
         public int? AppExists(string appName, int? userId=null)
         {

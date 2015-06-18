@@ -52,6 +52,29 @@ namespace BackAnd.Web.Api.Controllers
 
             }
         }
+
+        [Route("reset/{id}/{key}")]
+        [HttpGet]
+        public IHttpActionResult reset(string id, string key)
+        {
+            if (string.IsNullOrEmpty(id))
+            {
+                return ResponseMessage(Request.CreateResponse(HttpStatusCode.NotFound, Messages.IdIsMissing));
+            }
+
+            try
+            {
+                return Ok(RestHelper.ResetKey(id, key));
+
+
+            }
+            catch (Exception exception)
+            {
+                throw new BackAndApiUnexpectedResponseException(exception, this);
+
+            }
+        }
+
     }
 
     [BackAnd.Web.Api.Controllers.Filters.BackAndAuthorize]
@@ -64,6 +87,8 @@ namespace BackAnd.Web.Api.Controllers
             return (View)Maps.Instance.DuradosMap.Database.Views[AppViewName];
         }
 
+
+        
         public IHttpActionResult Get(string id = null, bool? deep = null, bool? withSelectOptions = null, int? pageNumber = null, int? pageSize = null, string filter = null, string sort = null, string search = null)
         {
             if (id != null)
