@@ -885,7 +885,7 @@ namespace BackAnd.Web.Api.Controllers
             {
                 url += "?";
             }
-            return url + "error={\"message\":\"" + message + "\",\"provider\":" + provider + "}";
+            return url + "error={\"message\":\"" + message + "\",\"provider\":\"" + provider + "\"}";
         }
 
         /*
