@@ -875,7 +875,7 @@ namespace BackAnd.Web.Api.Controllers
             return url + "data={\"access_token\":\"" + accessToken + "\",\"token_type\":\"bearer\",\"expires_in\":86399,\"appName\":\"" + appName + "\",\"username\":\"" + email + "\",\"role\":\"" + role + "\",\"userId\":\"" + userId + "\"}";
         }
 
-        private string GetErrorUrl(string url, string message)
+        private string GetErrorUrl(string url, string message, string provider)
         {
             if (url.Contains('?')) // already have query string
             {
@@ -885,7 +885,7 @@ namespace BackAnd.Web.Api.Controllers
             {
                 url += "?";
             }
-            return url + "error={\"message\":\"" + message + "\"}";
+            return url + "error={\"message\":\"" + message + "\",\"provider\":" + provider + "}";
         }
 
         /*
