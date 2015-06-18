@@ -728,7 +728,7 @@ namespace BackAnd.Web.Api.Controllers
                         }
                         if (userRow != null)
                         {
-                            return Redirect(GetErrorUrl(returnAddress, "The user already signed up to " + appName));
+                            return Redirect(GetErrorUrl(returnAddress, "The user already signed up to " + appName, provider));
                         }
 
 
@@ -743,7 +743,7 @@ namespace BackAnd.Web.Api.Controllers
                             catch (Exception exception)
                             {
                                 Log(appName, exception, 1);
-                                return Redirect(GetErrorUrl(returnAddress, "Failed to get parameters"));
+                                return Redirect(GetErrorUrl(returnAddress, "Failed to get parameters", provider));
                             }
                         }
                         if (!values.ContainsKey("socialProfile"))
@@ -758,7 +758,7 @@ namespace BackAnd.Web.Api.Controllers
                         catch (Exception exception)
                         {
                             Log(appName, exception, 1);
-                            return Redirect(GetErrorUrl(returnAddress, "Failed to run beforeSocialSignup action"));
+                            return Redirect(GetErrorUrl(returnAddress, "Failed to run beforeSocialSignup action", provider));
                         }
 
                         Account account = new Account(this);
@@ -782,12 +782,12 @@ namespace BackAnd.Web.Api.Controllers
                     }
                     else
                     {
-                        return Redirect(GetErrorUrl(returnAddress, "The user does not belong to " + appName));
+                        return Redirect(GetErrorUrl(returnAddress, "The user does not belong to " + appName, provider));
                     }
                 }
                 else
                 {
-                    return Redirect(GetErrorUrl(returnAddress, "missing activity"));
+                    return Redirect(GetErrorUrl(returnAddress, "missing activity", provider));
                 }
                 {
                     string email = profile.email;
@@ -818,7 +818,7 @@ namespace BackAnd.Web.Api.Controllers
 
                 if (!string.IsNullOrEmpty(returnAddress))
                 {
-                    return Redirect(GetErrorUrl(returnAddress, exception.Message));
+                    return Redirect(GetErrorUrl(returnAddress, exception.Message, provider));
                 }
                 else
                 {
