@@ -872,7 +872,7 @@ namespace BackAnd.Web.Api.Controllers
             {
                 url += "?";
             }
-            return url + "data={\"access_token\":\"" + accessToken + "\",\"token_type\":\"bearer\",\"expires_in\":86399,\"appName\":\"" + appName + "\",\"username\":\"" + email + "\",\"role\":\"" + role + "\",\"userId\":\"" + userId + "\"}";
+            return url + System.Web.HttpContext.Current.Server.UrlEncode("data={\"access_token\":\"" + accessToken + "\",\"token_type\":\"bearer\",\"expires_in\":86399,\"appName\":\"" + appName + "\",\"username\":\"" + email + "\",\"role\":\"" + role + "\",\"userId\":\"" + userId + "\"}");
         }
 
         private string GetErrorUrl(string url, string message)
