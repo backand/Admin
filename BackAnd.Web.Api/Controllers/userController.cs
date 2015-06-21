@@ -802,10 +802,12 @@ namespace BackAnd.Web.Api.Controllers
 
 
                     // create token
-                    string AccessToken = CreateToken(identity);
+                    string AccessToken = Durados.Web.Mvc.UI.Helpers.SecurityHelper.GetTmpUserGuidFromGuid(Account.GetUserGuid(email));//CreateToken(identity);
 
                     // return token
-                    return Redirect(GetSuccessUrl(returnAddress, AccessToken, appName, email));
+
+                    string url = GetSuccessUrl(returnAddress, AccessToken, appName, email);
+                    return Redirect(url);
                 }
             }
             catch (Exception exception)

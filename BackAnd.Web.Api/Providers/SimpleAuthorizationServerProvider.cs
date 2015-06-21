@@ -93,6 +93,54 @@ namespace BackAnd.Web.Api.Providers
             Durados.Web.Mvc.Maps.Instance.DuradosMap.Logger.Log("auth-end", appName, username, null, 3, string.Empty);
         }
 
+        private void ValidateByOneTimeAccessToken(OAuthGrantResourceOwnerCredentialsContext context)
+        {
+            if (System.Web.HttpContext.Current.Request.Form["accessToken"] == null)
+            {
+                context.SetError(UserValidationErrorMessages.MissingAccessToken, UserValidationErrorMessages.MissingAccessToken);
+                return;
+            }
+            string accessToken = System.Web.HttpContext.Current.Request.Form["accessToken"];
+
+            string appName = System.Web.HttpContext.Current.Request.Form["appName"];
+            if (appName == null)
+            {
+                context.SetError(UserValidationErrorMessages.AppNameNotSupplied, UserValidationErrorMessages.AppNameNotSupplied);
+                return;
+            }
+            Durados.Web.Mvc.Map map = Durados.Web.Mvc.Maps.Instance.GetMap(appName);
+            if (map == Durados.Web.Mvc.Maps.Instance.DuradosMap)
+            {
+                context.SetError(UserValidationErrorMessages.WrongAppName, UserValidationErrorMessages.WrongAppName);
+                return;
+            }
+
+            string userGuid = Durados.Web.Mvc.UI.Helpers.SecurityHelper.GetUserGuidFromTmpGuid(accessToken);
+
+            string username = Durados.Web.Mvc.Maps.Instance.DuradosMap.Database.GetUsernameByGuid(userGuid);
+            if (username == null)
+            {
+                context.SetError(UserValidationErrorMessages.InvalidAccessToken, UserValidationErrorMessages.InvalidAccessToken);
+                return;
+            }
+
+            Durados.Web.Mvc.Controllers.AccountMembershipService accountMembershipService = new Durados.Web.Mvc.Controllers.AccountMembershipService();
+            if (map.Database.GetUserRow(username) == null)
+            {
+                context.SetError(UserValidationErrorMessages.UserDoesNotBelongToApp, UserValidationErrorMessages.UserDoesNotBelongToApp);
+                return;
+            }
+
+
+            var identity = new ClaimsIdentity(context.Options.AuthenticationType);
+            identity.AddClaim(new Claim(Database.Username, username));
+            identity.AddClaim(new Claim(Database.AppName, appName));
+
+            context.Validated(identity);
+
+            Durados.Web.Mvc.Maps.Instance.DuradosMap.Logger.Log("auth-end", appName, username, null, 3, string.Empty);
+        }
+
         private string GetAppName(string appId)
         {
             return Durados.Web.Mvc.Maps.Instance.GetAppNameByGuid(appId);
@@ -112,6 +160,11 @@ namespace BackAnd.Web.Api.Providers
             if (System.Web.HttpContext.Current.Request.Form["username"] == null && System.Web.HttpContext.Current.Request.Form["userid"] != null)
             {
                 ValidateById(context);
+                return;
+            }
+            else if (System.Web.HttpContext.Current.Request.Form["username"] == null && System.Web.HttpContext.Current.Request.Form["accessToken"] != null)
+            {
+                ValidateByOneTimeAccessToken(context);
                 return;
             }
             string appname = null;
