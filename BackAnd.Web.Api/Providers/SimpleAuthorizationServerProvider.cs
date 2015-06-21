@@ -109,7 +109,7 @@ namespace BackAnd.Web.Api.Providers
                 return;
             }
             Durados.Web.Mvc.Map map = Durados.Web.Mvc.Maps.Instance.GetMap(appName);
-            if (map == Durados.Web.Mvc.Maps.Instance.DuradosMap)
+            if (map == null || (appName != Durados.Web.Mvc.Maps.DuradosAppName && map == Durados.Web.Mvc.Maps.Instance.DuradosMap))
             {
                 context.SetError(UserValidationErrorMessages.WrongAppName, UserValidationErrorMessages.WrongAppName);
                 return;
