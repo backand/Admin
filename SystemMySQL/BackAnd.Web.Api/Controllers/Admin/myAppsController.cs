@@ -624,8 +624,14 @@ namespace BackAnd.Web.Api.Controllers
 
                 string qstring = "id=" + guid;
                 string url = RestHelper.GetAppUrl(id, Maps.OldAdminHttp) + "/Admin/Restart?" + qstring;
-                Durados.Web.Mvc.Infrastructure.Http.GetWebRequest(url, string.Empty, string.Empty, 100000);
+                try
+                {
+                    Durados.Web.Mvc.Infrastructure.Http.GetWebRequest(url, string.Empty, string.Empty, 100000);
+                }
+                catch
+                {
 
+                }
                 
                 Durados.Web.Mvc.Infrastructure.ProductMaintenance productMaintenece = new Durados.Web.Mvc.Infrastructure.ProductMaintenance();
                 productMaintenece.RemoveApp(id);
