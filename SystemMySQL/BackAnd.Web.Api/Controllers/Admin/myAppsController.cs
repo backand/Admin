@@ -632,11 +632,17 @@ namespace BackAnd.Web.Api.Controllers
                 {
 
                 }
-                
-                Durados.Web.Mvc.Infrastructure.ProductMaintenance productMaintenece = new Durados.Web.Mvc.Infrastructure.ProductMaintenance();
-                productMaintenece.RemoveApp(id);
 
-                
+                try
+                {
+                    Durados.Web.Mvc.Infrastructure.ProductMaintenance productMaintenece = new Durados.Web.Mvc.Infrastructure.ProductMaintenance();
+                    productMaintenece.RemoveApp(id);
+
+                }
+                catch
+                {
+
+                }
 
                 //url = GetDeleteAppUrl(id);
                 //string response = Durados.Web.Mvc.Infrastructure.Http.GetWebRequest(url,string.Empty,string.Empty, 100000);
