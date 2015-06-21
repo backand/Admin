@@ -80,7 +80,7 @@ namespace Durados.Web.Mvc.Infrastructure
             //}
             bool success = false;
             Map map = null;
-            string configFileName=string.Empty;
+            string configFileName = string.Empty;
             try
             {
                 map = Maps.Instance.GetMap(app.Name);
@@ -90,60 +90,61 @@ namespace Durados.Web.Mvc.Infrastructure
             {
                 configFileName = Maps.DuradosAppPrefix + app.AppId + ".xml";
             }
-            SqlServerManager manager = Connections.GetSqlServerManager(app.Server);
-            SqlServerManager sysManager = Connections.GetSqlServerManager(app.SystemServer);
-            switch (app.AppType)
+            try
             {
-                case 0:
+                SqlServerManager manager = Connections.GetSqlServerManager(app.Server);
+                SqlServerManager sysManager = Connections.GetSqlServerManager(app.SystemServer);
+                switch (app.AppType)
+                {
+                    case 0:
 
-                    break;
+                        break;
 
-                case 2: //free
+                    case 2: //free
 
-                case 3: //northwind
-                    if (manager == null)
-                        Maps.Instance.DuradosMap.Logger.Log("ProductMaintenance", null, "RemoveApp", null, 2, string.Format("Could not drop main db from app {0}, the database server was not found, the app type is {1}", app.Name,app.AppType.ToString()));
-                    else
-                        manager.DropDB(app.Server, app.Catalog);
-                    goto case 1;
-                case 1:// console
-                    if (sysManager == null)
-                        Maps.Instance.DuradosMap.Logger.Log("ProductMaintenance", null, "RemoveApp", null, 2, string.Format("Could not drop system db from app {0}, the database server was not found the app type is {1}", app.Name, app.AppType.ToString()));
-                    else
-                    {
-                        try
+                    case 3: //northwind
+                        if (manager == null)
+                            Maps.Instance.DuradosMap.Logger.Log("ProductMaintenance", null, "RemoveApp", null, 2, string.Format("Could not drop main db from app {0}, the database server was not found, the app type is {1}", app.Name, app.AppType.ToString()));
+                        else
+                            manager.DropDB(app.Server, app.Catalog);
+                        goto case 1;
+                    case 1:// console
+                        if (sysManager == null)
+                            Maps.Instance.DuradosMap.Logger.Log("ProductMaintenance", null, "RemoveApp", null, 2, string.Format("Could not drop system db from app {0}, the database server was not found the app type is {1}", app.Name, app.AppType.ToString()));
+                        else
                         {
+
                             sysManager.DropDB(app.SystemServer, app.SystemCatalog);
+
                         }
-                        catch (Exception exception)
+
+                        break;
+                    case 4://wix
+                        if (map != null)
                         {
-                            Maps.Instance.DuradosMap.Logger.Log("ProductMaintenance", null, "RemoveApp", exception, 1, app.Name);
+                            foreach (View view in map.Database.Views.Values)
+                                if (!view.SystemView)
+                                    sysManager.DropTable(view);
                         }
-                    }
-
-                    break;
-                case 4://wix
-                    if (map != null)
-                    {
-                        foreach (View view in map.Database.Views.Values)
-                            if (!view.SystemView)
-                                sysManager.DropTable(view);
-                    }
-                    break;
-                case 5:
-                    break;
-                default:
-                    break;
+                        break;
+                    case 5:
+                        break;
+                    default:
+                        break;
+                }
             }
-
+            catch (Exception exception)
+            {
+                Maps.Instance.DuradosMap.Logger.Log("ProductMaintenance", null, "RemoveApp", exception, 1, app.Name);
+            }
             DeleteConfiguration(configFileName);
             Maps.Instance.DuradosMap.Logger.Log("ProductMaintenance", "RemoveApp", "RemoveApp", null, 3, "configuration files " + configFileName + " was remove from storage");
             UpdateDeletedApp(app.AppId);
             success = true;
-            Maps.Instance.DuradosMap.Logger.Log("ProductMaintenance", "RemoveApp", "RemoveApp", null, 3, "App name: "+ app.Name+" Number: "+app.AppId +" was completly removed");
+            Maps.Instance.DuradosMap.Logger.Log("ProductMaintenance", "RemoveApp", "RemoveApp", null, 3, "App name: " + app.Name + " Number: " + app.AppId + " was completly removed");
             return success;
 
-           // Maps.Instance.RemoveMap(app.Name);
+            // Maps.Instance.RemoveMap(app.Name);
         }
         private void DeleteConfiguration(string configFileName)
         {
