@@ -110,7 +110,17 @@ namespace Durados.Web.Mvc.Infrastructure
                     if (sysManager == null)
                         Maps.Instance.DuradosMap.Logger.Log("ProductMaintenance", null, "RemoveApp", null, 2, string.Format("Could not drop system db from app {0}, the database server was not found the app type is {1}", app.Name, app.AppType.ToString()));
                     else
-                        sysManager.DropDB(app.SystemServer, app.SystemCatalog);
+                    {
+                        try
+                        {
+                            sysManager.DropDB(app.SystemServer, app.SystemCatalog);
+                        }
+                        catch (Exception exception)
+                        {
+                            Maps.Instance.DuradosMap.Logger.Log("ProductMaintenance", null, "RemoveApp", exception, 1, app.Name);
+                        }
+                    }
+
                     break;
                 case 4://wix
                     if (map != null)
