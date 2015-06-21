@@ -47,19 +47,27 @@ namespace BackAnd.Web.Api.Controllers
         [Route("backand")]
         public IHttpActionResult Delete(string username)
         {
-            if (Maps.Instance.DuradosMap.Database.GetUserRole() != "Developer")
+            try
             {
-                return ResponseMessage(Request.CreateResponse(HttpStatusCode.Unauthorized, Messages.ActionIsUnauthorized));
-            }
+                if (Maps.Instance.DuradosMap.Database.GetUserRole() != "Developer")
+                {
+                    return ResponseMessage(Request.CreateResponse(HttpStatusCode.Unauthorized, Messages.ActionIsUnauthorized));
+                }
 
-            Account account = new Account(this);
-            string appName = null;
-            if (map != Maps.Instance.DuradosMap)
-            {
-                appName = map.AppName;
+                Account account = new Account(this);
+                string appName = null;
+                if (map != Maps.Instance.DuradosMap)
+                {
+                    appName = map.AppName;
+                }
+                account.DeleteUser(username, appName);
+                return Ok();
             }
-            account.DeleteUser(username, appName);
-            return Ok();
+            catch (Exception exception)
+            {
+                throw new BackAndApiUnexpectedResponseException(exception, this);
+
+            }
         }
 
         [HttpGet]
