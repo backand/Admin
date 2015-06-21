@@ -42,6 +42,21 @@ namespace BackAnd.Web.Api.Controllers
     [RoutePrefix("1/user")]
     public class userController : wfController
     {
+        [HttpDelete]
+        [BackAnd.Web.Api.Controllers.Filters.BackAndAuthorize]
+        [Route("backand")]
+        public IHttpActionResult Delete(string username)
+        {
+            if (Maps.Instance.DuradosMap.Database.GetUserRole() != "Developer")
+            {
+                return ResponseMessage(Request.CreateResponse(HttpStatusCode.Unauthorized, Messages.ActionIsUnauthorized));
+            }
+
+            Account account = new Account(this);
+            account.DeleteUser(username, map.AppName);
+            return Ok();
+        }
+
         [HttpGet]
         [BackAnd.Web.Api.Controllers.Filters.BackAndAuthorize]
         [Route("key/{id}")]

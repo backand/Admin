@@ -4374,6 +4374,72 @@ namespace Durados.Web.Mvc.UI.Helpers
 
             return sqlAccess.ExecuteScalar(Maps.Instance.ConnectionString, sqlDuradosSys, parameters);
         }
+
+        public void DeleteUser(string username, string appName)
+        {
+            if (UserHasApps(username))
+                throw new DuradosException("user has apps");
+
+            if (UserBelongToMoreThanOneApp(username, appName))
+                throw new DuradosException("user belong to more than one app");
+
+            Map map = Maps.Instance.GetMap(appName);
+            if (map == null)
+                throw new DuradosException("app not found");
+
+            if (Maps.Instance.DuradosMap.Database.GetUserRow() == null)
+                throw new DuradosException("user does not exist");
+
+            Durados.DataAccess.SqlAccess sqlAccess = new Durados.DataAccess.SqlAccess();
+            Dictionary<string, object> parameters = new Dictionary<string, object>();
+
+            parameters.Add("@username", username);
+
+            
+            string sql = string.Format("delete FROM durados_user WHERE [username]=@username");
+
+            sqlAccess.ExecuteNonQuery(map.Database.GetUserView().ConnectionString, sql, parameters, null);
+            sqlAccess.ExecuteNonQuery(Maps.Instance.DuradosMap.connectionString, sql, parameters, null);
+
+            System.Web.Security.Membership.Provider.DeleteUser(username, true);
+
+        }
+
+        private bool UserBelongToMoreThanOneApp(string username, string appName)
+        {
+            int id = Maps.Instance.DuradosMap.Database.GetUserID(username);
+
+            Map map = Maps.Instance.GetMap(appName);
+            
+            Durados.DataAccess.SqlAccess sqlAccess = new Durados.DataAccess.SqlAccess();
+            Dictionary<string, object> parameters = new Dictionary<string, object>();
+
+            parameters.Add("@appid", map.Id);
+
+            parameters.Add("@userid", id);
+
+            string sql = string.Format("select id FROM durados_userapp WHERE [userid]=@userid and appid<>@appid");
+
+            return !sqlAccess.ExecuteScalar(Maps.Instance.DuradosMap.connectionString, sql, parameters).Equals(string.Empty);
+            
+            
+            
+        }
+
+        private bool UserHasApps(string username)
+        {
+            int id = Maps.Instance.DuradosMap.Database.GetUserID(username);
+
+            Durados.DataAccess.SqlAccess sqlAccess = new Durados.DataAccess.SqlAccess();
+
+            Dictionary<string, object> parameters = new Dictionary<string, object>();
+
+            parameters.Add("@id", id);
+
+            string sql = string.Format("SELECT TOP 1 id FROM durados_app WITH(NOLOCK)  WHERE creator=@id");
+
+            return !sqlAccess.ExecuteScalar(Maps.Instance.DuradosMap.connectionString, sql, parameters).Equals(string.Empty);
+        }
     }
 
     public class FilterException : DuradosException
