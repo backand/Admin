@@ -53,7 +53,12 @@ namespace BackAnd.Web.Api.Controllers
             }
 
             Account account = new Account(this);
-            account.DeleteUser(username, map.AppName);
+            string appName = null;
+            if (map != Maps.Instance.DuradosMap)
+            {
+                appName = map.AppName;
+            }
+            account.DeleteUser(username, appName);
             return Ok();
         }
 
