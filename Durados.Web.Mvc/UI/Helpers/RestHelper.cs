@@ -4383,10 +4383,8 @@ namespace Durados.Web.Mvc.UI.Helpers
             if (UserBelongToMoreThanOneApp(username, appName))
                 throw new DuradosException("user belong to more than one app");
 
-            Map map = Maps.Instance.GetMap(appName);
-            if (map == null)
-                throw new DuradosException("app not found");
 
+            
             if (Maps.Instance.DuradosMap.Database.GetUserRow() == null)
                 throw new DuradosException("user does not exist");
 
@@ -4398,7 +4396,14 @@ namespace Durados.Web.Mvc.UI.Helpers
             
             string sql = string.Format("delete FROM durados_user WHERE [username]=@username");
 
-            sqlAccess.ExecuteNonQuery(map.Database.GetUserView().ConnectionString, sql, parameters, null);
+            if (appName != null && appName != Maps.DuradosAppName)
+            {
+                Map map = Maps.Instance.GetMap(appName);
+                if (map == null || map == Maps.Instance.DuradosMap)
+                    throw new DuradosException("app not found");
+
+                sqlAccess.ExecuteNonQuery(map.Database.GetUserView().ConnectionString, sql, parameters, null);
+            }
             sqlAccess.ExecuteNonQuery(Maps.Instance.DuradosMap.connectionString, sql, parameters, null);
 
             System.Web.Security.Membership.Provider.DeleteUser(username, true);
@@ -4409,12 +4414,17 @@ namespace Durados.Web.Mvc.UI.Helpers
         {
             int id = Maps.Instance.DuradosMap.Database.GetUserID(username);
 
-            Map map = Maps.Instance.GetMap(appName);
+            int appId = 0;
+            if (appName != null && appName != Maps.DuradosAppName)
+            {
+                Map map = Maps.Instance.GetMap(appName);
+                appId = Convert.ToInt32(map.Id);
+            }
             
             Durados.DataAccess.SqlAccess sqlAccess = new Durados.DataAccess.SqlAccess();
             Dictionary<string, object> parameters = new Dictionary<string, object>();
 
-            parameters.Add("@appid", map.Id);
+            parameters.Add("@appid", appId);
 
             parameters.Add("@userid", id);
 
