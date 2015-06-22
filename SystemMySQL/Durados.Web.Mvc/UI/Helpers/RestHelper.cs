@@ -5633,7 +5633,8 @@ namespace Durados.Web.Mvc.UI.Helpers
                     string accessToken = accessObject["access_token"].ToString();
 
                     //get the Google user profile using the access token
-                    string profileUrl = "https://api.github.com/user";
+                    //string profileUrl = "https://api.github.com/user";
+                    string profileUrl = "https://api.github.com/user/emails";
                     string profileHeader = "Authorization: Bearer " + accessToken;
                     string profiel = Infrastructure.Http.GetWebRequest(profileUrl, profileHeader, "https://api.github.com/meta");
 
@@ -5678,7 +5679,7 @@ namespace Durados.Web.Mvc.UI.Helpers
                 }
                 public override string firstName
                 {
-                    get { return GetNamePart("name") ?? email.Split('@').FirstOrDefault(); }
+                    get { return email.Split('@').FirstOrDefault(); }
                 }
 
                 public override string lastName
@@ -5690,8 +5691,14 @@ namespace Durados.Web.Mvc.UI.Helpers
                 {
                     get
                     {
-                        return GetNamePart("email");
-
+                        foreach (Dictionary<string, object> emailItem in (object[])dictionary["data"])
+                        {
+                            if (emailItem["primary"].Equals(true))
+                            {
+                                return emailItem["email"].ToString();
+                            }
+                        }
+                        return null;
                     }
                 }
 
