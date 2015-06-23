@@ -217,8 +217,7 @@ namespace Durados.Web.Mvc.UI.Helpers
                     Dictionary<string, object> jsonRow = new Dictionary<string, object>();
                     foreach (DataColumn column in table.Columns)
                     {
-                        if (!row.IsNull(column))
-                            jsonRow.Add(column.ColumnName, row[column]);
+                        jsonRow.Add(column.ColumnName, row.IsNull(column) ? null : row[column]);
                     }
                     list.Add(jsonRow);
                 }

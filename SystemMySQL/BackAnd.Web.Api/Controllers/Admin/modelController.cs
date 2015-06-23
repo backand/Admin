@@ -74,7 +74,7 @@ namespace BackAnd.Web.Api.Controllers
                 }
 
                 string sql = string.Join(";", ((System.Collections.ArrayList)transformResult["alter"]).ToArray());
-
+                sql = sql.Replace("int unsigned", "int(11)");
                 if (!string.IsNullOrEmpty(sql))
                 {
                     try
@@ -276,9 +276,19 @@ namespace BackAnd.Web.Api.Controllers
 
             Task.WaitAll(tasks.ToArray());
 
-            var result = jss.Deserialize<Dictionary<string, object>>(responses.ToString());
-
+            Dictionary<string, object> result = null;
+            try
+            {
+                result = jss.Deserialize<Dictionary<string, object>>(responses.ToString());
+            }
+            catch
+            {
+                throw new DuradosException(responses.ToString());
+            }    
+            
             return result;
+            
+
 
         }
 
