@@ -632,11 +632,11 @@ namespace BackAnd.Web.Api.Controllers
                 {
 
                 }
-
+                
                 try
                 {
-                    Durados.Web.Mvc.Infrastructure.ProductMaintenance productMaintenece = new Durados.Web.Mvc.Infrastructure.ProductMaintenance();
-                    productMaintenece.RemoveApp(id);
+                Durados.Web.Mvc.Infrastructure.ProductMaintenance productMaintenece = new Durados.Web.Mvc.Infrastructure.ProductMaintenance();
+                productMaintenece.RemoveApp(id);
 
                 }
                 catch
