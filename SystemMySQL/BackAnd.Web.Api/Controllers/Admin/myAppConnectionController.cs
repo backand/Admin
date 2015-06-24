@@ -373,6 +373,10 @@ namespace BackAnd.Web.Api.Controllers
 
                          string schemaJson = new JavaScriptSerializer().Serialize(schema);
 
+                         if (map.AllKindOfCache[Durados.Database.CreateSchema].ContainsKey(id))
+                         {
+                             map.AllKindOfCache[Durados.Database.CreateSchema].Remove(id);
+                         }
                          map.AllKindOfCache[Durados.Database.CreateSchema].Add(id, schemaJson);
                      }
 
@@ -501,7 +505,7 @@ namespace BackAnd.Web.Api.Controllers
             }
         }
 
-        private Dictionary<string, object> CallHttpRequestToCreateTheSchema(string appName, string json)
+        private void CallHttpRequestToCreateTheSchema(string appName, string json)
         {
             json = "{newSchema: " + json + ", severity: 0}";
             
@@ -509,8 +513,8 @@ namespace BackAnd.Web.Api.Controllers
             string url = GetUrl();
             Dictionary<string, string> headers = GetHeaders(appName);
             string response = Durados.Web.Mvc.Infrastructure.Http.WebRequestingJson(url, json, headers);
-            Dictionary<string, object> ret = Durados.Web.Mvc.UI.Json.JsonSerializer.Deserialize(response);
-            return ret;
+            //Dictionary<string, object> ret = Durados.Web.Mvc.UI.Json.JsonSerializer.Deserialize(response);
+            //return ret;
         }
 
         private Dictionary<string, string> GetHeaders(string appName)
