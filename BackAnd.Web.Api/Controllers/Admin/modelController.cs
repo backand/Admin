@@ -75,6 +75,7 @@ namespace BackAnd.Web.Api.Controllers
 
                 string sql = string.Join(";", ((System.Collections.ArrayList)transformResult["alter"]).ToArray());
                 sql = sql.Replace("int unsigned", "int(11)");
+                sql = new Squeezer().Squeeze(sql);
                 if (!string.IsNullOrEmpty(sql))
                 {
                     try
@@ -335,5 +336,78 @@ namespace BackAnd.Web.Api.Controllers
             sqlAccess.ExecuteNonQuery(connectionString, sql, Map.SqlProduct, null, null);
         }
     }
+    public class Squeezer
+    {
+        string _bkname_ = "_bkname_";
 
+
+        public string Squeeze(string sql)
+        {
+            int limit = 64;
+            string[] foreignKeys = GetFk(sql);
+            string[] longForeignKeys = GetLongFk(foreignKeys, limit);
+            Dictionary<string, string> shortForeignKeys = ShortenForeignKeys(longForeignKeys);
+            foreach (string longForeignKey in shortForeignKeys.Keys)
+            {
+                sql = sql.Replace(longForeignKey, shortForeignKeys[longForeignKey]);
+            }
+
+            return sql;
+        }
+
+        string[] GetFk(string sql)
+        {
+            string addConstraint = "add constraint";
+            string foreignKey = "foreign key";
+            List<string> foreignKeys = new List<string>();
+
+            string[] s1 = sql.Split(new string[] { addConstraint }, StringSplitOptions.None);
+            foreach (string s in s1)
+            {
+                string[] s2 = s.Split(new string[] { foreignKey }, StringSplitOptions.None);
+                string fk = s2.FirstOrDefault();
+                if (fk.Contains(_bkname_))
+                {
+                    foreignKeys.Add(fk.Trim());
+                }
+            }
+
+            return foreignKeys.ToArray();
+        }
+
+        string[] GetLongFk(string[] foreignKeys, int len)
+        {
+            List<string> longForeignKeys = new List<string>();
+
+            foreach (string fk in foreignKeys)
+            {
+                if (fk != null && fk.Length >= len)
+                {
+                    longForeignKeys.Add(fk);
+                }
+            }
+
+            return longForeignKeys.ToArray();
+        }
+
+        Dictionary<string, string> ShortenForeignKeys(string[] longForeignKeys)
+        {
+            Dictionary<string, string> shortForeignKeys = new Dictionary<string, string>();
+
+            foreach (string longForeignKey in longForeignKeys)
+            {
+                shortForeignKeys.Add(longForeignKey, ShortenForeignKey(longForeignKey));
+            }
+
+
+            return shortForeignKeys;
+        }
+
+        string ShortenForeignKey(string longForeignKey)
+        {
+            return "b" + Guid.NewGuid().ToString().Replace("-", "") + _bkname_ + longForeignKey.Split(new string[] { _bkname_ }, StringSplitOptions.None).LastOrDefault();
+        }
+
+
+    }
 }
