@@ -47,7 +47,7 @@ namespace BackAnd.Web.Api.Controllers
 
             if (!transformResult.ContainsKey("alter"))
             {
-                return ResponseMessage(Request.CreateResponse(HttpStatusCode.ExpectationFailed, Messages.InvalidSchema));
+                return ResponseMessage(Request.CreateResponse(HttpStatusCode.ExpectationFailed, Messages.InvalidSchema + ": " + transformResult));
 
             }
 

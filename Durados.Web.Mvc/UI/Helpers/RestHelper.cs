@@ -2698,8 +2698,8 @@ namespace Durados.Web.Mvc.UI.Helpers
 
         private SqlProduct? GetSqlProduct(string appName)
         {
-            if (!Maps.Instance.AppInCach(appName))
-                return null;
+            //if (!Maps.Instance.AppInCach(appName))
+            //    return null;
 
             Map map = Maps.Instance.GetMap(appName);
             if (map == null)
@@ -2710,8 +2710,8 @@ namespace Durados.Web.Mvc.UI.Helpers
 
         private string GetConnectionString(string appName)
         {
-            if (!Maps.Instance.AppInCach(appName))
-                return null;
+            //if (!Maps.Instance.AppInCach(appName))
+            //    return null;
 
             Map map = Maps.Instance.GetMap(appName);
             if (map == null)
@@ -2722,8 +2722,8 @@ namespace Durados.Web.Mvc.UI.Helpers
 
         private string GetSystemConnectionString(string appName)
         {
-            if (!Maps.Instance.AppInCach(appName))
-                return null;
+            //if (!Maps.Instance.AppInCach(appName))
+            //    return null;
 
             Map map = Maps.Instance.GetMap(appName);
             if (map == null)
