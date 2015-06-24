@@ -20,6 +20,7 @@ using Durados.Web.Mvc.Infrastructure;
 using MySql.Data.MySqlClient;
 using Durados;
 using System.Collections;
+using System.Data;
 /*
  HTTP Verb	|Entire Collection (e.g. /customers)	                                                        |Specific Item (e.g. /customers/{id})
 -----------------------------------------------------------------------------------------------------------------------------------------------
@@ -78,6 +79,9 @@ namespace BackAnd.Web.Api.Controllers
                 sql = new Squeezer().Squeeze(sql);
                 if (!string.IsNullOrEmpty(sql))
                 {
+
+                    LogSQL(Map.AppName, json, sql);
+
                     try
                     {
                         runSql(sql);
@@ -97,7 +101,7 @@ namespace BackAnd.Web.Api.Controllers
                 }
                 catch (Exception exception)
                 {
-                    map.Logger.Log("model", "OrderViewAndColumns", Map.AppName + ": " + exception.Source, exception, 1, Request.RequestUri.ToString());
+                    map.Logger.Log("model", "Post", Map.AppName + ": " + exception.Source, exception, 1, Request.RequestUri.ToString());
 
                 }
 
@@ -120,6 +124,112 @@ namespace BackAnd.Web.Api.Controllers
                 throw new BackAndApiUnexpectedResponseException(exception, this);
 
             }
+        }
+
+        private void LogSQL(string appName, string model, string sql)
+        {
+            try
+            {
+                int logType = -611;
+                Guid guid = Guid.NewGuid();
+                DateTime timestamp = DateTime.Now;
+                int max = 4000;
+                int modelParts = model.Length / max;
+                int sqlParts = sql.Length / max;
+
+                if (modelParts == 0 && sqlParts == 0)
+                {
+                    LogSQL(appName, model, sql, 0, timestamp, logType);
+                    return;
+                }
+
+                int maxParts;
+                if (modelParts >= sqlParts)
+                {
+                    maxParts = modelParts;
+                }
+                else
+                {
+                    maxParts = sqlParts;
+                }
+
+                string[] modelPartsArray = ChunksUpto(model, max).ToArray();
+                string[] sqlPartsArray = ChunksUpto(sql, max).ToArray();
+
+                for (int i = 0; i < maxParts; i++)
+                {
+                    string modelChunk = string.Empty;
+                    string sqlChunk = string.Empty;
+
+                    if (modelPartsArray.Length < i)
+                    {
+                        modelChunk = modelPartsArray[i];
+                    }
+                    if (sqlPartsArray.Length < i)
+                    {
+                        sqlChunk = sqlPartsArray[i];
+                    }
+                    LogSQL(guid.ToString(), modelChunk, sqlChunk, i, timestamp, logType);
+                    
+                }
+            }
+            catch { }
+            //Math.Max()
+
+        }
+
+        [Route("~/1/model/last")]
+        [HttpGet]
+        public IHttpActionResult Last()
+        {
+            SqlAccess sa = new SqlAccess();
+
+            Durados.Web.Mvc.View logView = (Durados.Web.Mvc.View)map.Database.Views["Durados_Log"];
+
+            Dictionary<string, object> values = new Dictionary<string, object>();
+            values.Add(logView.GetFieldByColumnNames("LogType").Name, "-611");
+            int rowCount = 0;
+            DataView dataView = logView.FillPage(1, 1, values, false, new Dictionary<string, SortDirection>() { { "ID", SortDirection.Desc } }, out rowCount, null, null);
+
+            if (dataView.Count == 0)
+                return NotFound();
+
+            string guid = (string)dataView[0]["Action"];
+            DateTime timestamp = (DateTime)dataView[0]["Time"];
+            values = new Dictionary<string, object>();
+            values.Add(logView.GetFieldByColumnNames("LogType").Name, "-611");
+            values.Add(logView.GetFieldByColumnNames("Action").Name, guid);
+            rowCount = 0;
+            dataView = logView.FillPage(1, 1, values, false, new Dictionary<string, SortDirection>() { { "MethodName", SortDirection.Asc } }, out rowCount, null, null);
+
+            string model = string.Empty;
+            string sql = string.Empty;
+
+            foreach (System.Data.DataRowView row in dataView)
+            {
+                if (!row.Row.IsNull("Trace"))
+                {
+                    model += row["Trace"].ToString();
+                }
+
+                if (!row.Row.IsNull("FreeText"))
+                {
+                    sql += row["FreeText"].ToString();
+                }
+            }
+
+            return Ok(new { model = model, sql = sql, timestamp = timestamp });
+        }
+
+        private IEnumerable<string> ChunksUpto(string str, int maxChunkSize)
+        {
+            for (int i = 0; i < str.Length; i += maxChunkSize)
+                yield return str.Substring(i, Math.Min(maxChunkSize, str.Length - i));
+        }
+
+        private void LogSQL(string guid, string model, string sql, int counter, DateTime timestamp, int logType)
+        {
+            map.Logger.Log("model", guid, counter.ToString(), "sql", model, logType, sql, timestamp);
         }
 
 
