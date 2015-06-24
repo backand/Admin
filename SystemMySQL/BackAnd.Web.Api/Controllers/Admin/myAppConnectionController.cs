@@ -361,8 +361,10 @@ namespace BackAnd.Web.Api.Controllers
                      if (values.ContainsKey("schema"))
                      {
                          object schema = values["schema"];
-                         SchemaGenerator sg = new SchemaGenerator();
-                         sg.Validate(Map, (IEnumerable<object>)schema);
+                         //SchemaGenerator sg = new SchemaGenerator();
+
+                         ValidateSchema(schema, id);
+                         //sg.Validate(Map, (IEnumerable<object>)schema);
 
                          if (!map.AllKindOfCache.ContainsKey(Durados.Database.CreateSchema))
                          {
@@ -411,6 +413,19 @@ namespace BackAnd.Web.Api.Controllers
                 throw new BackAndApiUnexpectedResponseException(exception, this);
 
             }
+        }
+
+        private void ValidateSchema(object schema, string appName)
+        {
+            string url = this.Request.RequestUri.OriginalString.Split(new string[1] { "admin" }, StringSplitOptions.RemoveEmptyEntries)[0] + "1/model/validate"; 
+            Dictionary<string, string> headers = GetHeaders(appName);
+            headers.Remove("AppName");
+
+            string json = "{newSchema: " + new JavaScriptSerializer().Serialize(schema) + ", severity: 0}";
+            
+            string response = Durados.Web.Mvc.Infrastructure.Http.WebRequestingJson(url, json, headers);
+            Dictionary<string, object> ret = Durados.Web.Mvc.UI.Json.JsonSerializer.Deserialize(response);
+            
         }
 
         private static bool IsNewDatabase(string template)
@@ -488,6 +503,9 @@ namespace BackAnd.Web.Api.Controllers
 
         private Dictionary<string, object> CallHttpRequestToCreateTheSchema(string appName, string json)
         {
+            json = "{newSchema: " + json + ", severity: 0}";
+            
+
             string url = GetUrl();
             Dictionary<string, string> headers = GetHeaders(appName);
             string response = Durados.Web.Mvc.Infrastructure.Http.WebRequestingJson(url, json, headers);
@@ -507,7 +525,7 @@ namespace BackAnd.Web.Api.Controllers
 
         private string GetUrl()
         {
-            return this.Request.RequestUri.OriginalString.Split(new string[1] { "admin" }, StringSplitOptions.RemoveEmptyEntries)[0] + "1/table/config/template";
+            return this.Request.RequestUri.OriginalString.Split(new string[1] { "admin" }, StringSplitOptions.RemoveEmptyEntries)[0] + "1/model";//"1/table/config/template";
         }
 
 
