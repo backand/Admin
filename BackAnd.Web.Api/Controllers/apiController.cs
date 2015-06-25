@@ -17,6 +17,8 @@ using Durados.DataAccess;
 using System.Data;
 using Durados.Web.Mvc.Controllers;
 using BackAnd.Web.Api.Controllers.Filters;
+using System.Threading.Tasks;
+using System.Collections;
 
 /*
  HTTP Verb	|Entire Collection (e.g. /customers)	                                                        |Specific Item (e.g. /customers/{id})
@@ -61,7 +63,132 @@ namespace BackAnd.Web.Api.Controllers
             //Init();
         }
 
+        protected virtual string GetWarnings(Dictionary<string, object> transformResult)
+        {
+            string warnings = string.Empty;
+            if (!transformResult.ContainsKey("warnings"))
+            {
+                return warnings;
+            }
+
+            int i = 1;
+            foreach (string warning in (ArrayList)transformResult["warnings"])
+            {
+
+                warnings += "(" + i++ + ") " + warning + ";\n";
+            }
+            return warnings;
+        }
+
+        protected virtual Dictionary<string, object> Transform(string json, bool getOldSchema = true)
+        {
+            string getNodeUrl = GetNodeUrl() + "/transform";
+
+            bulk bulk = new Durados.Web.Mvc.UI.Helpers.bulk();
+
+            JavaScriptSerializer jss = new JavaScriptSerializer();
+
+            var data = jss.Deserialize<Dictionary<string, object>>(json);
+
+            if (!data.ContainsKey("oldSchema"))
+            {
+                data.Add("oldSchema", "");
+            }
+
+            if (getOldSchema)
+            {
+                data["oldSchema"] = GetBackandToObject();
+            }
+
+            json = jss.Serialize(data);
+
+            var tasks = new List<Task<string>>();
+            object responses = null;
+            tasks.Add(Task.Factory.StartNew(() =>
+            {
+                //, { "Authorization", Request.Headers.Authorization.ToString() }
+                var responseStatusAndData = bulk.GetWebResponse("POST", getNodeUrl, json, null, new Dictionary<string, object>() { { "Content-Type", "application/json" } }, 0);
+                responses = responseStatusAndData.data;
+                return responseStatusAndData.data;
+            }));
+
+            Task.WaitAll(tasks.ToArray());
+
+            Dictionary<string, object> result = null;
+            try
+            {
+                result = jss.Deserialize<Dictionary<string, object>>(responses.ToString());
+            }
+            catch
+            {
+                throw new DuradosException(responses.ToString());
+            }
+
+            return result;
+
+
+
+        }
+
+        protected virtual string GetNodeUrl()
+        {
+            return System.Configuration.ConfigurationManager.AppSettings["nodeHost"] ?? "http://127.0.0.1:9000";
+
+        }
+
+        protected virtual int CountViews()
+        {
+            return Map.Database.Views.Values.Where(v => !v.SystemView).Count();
+        }
         
+        protected virtual ArrayList GetBackandToObject()
+        {
+            return GetBackandToObject(Request.Headers.Authorization.ToString());
+        }
+
+        protected virtual string GetAppName()
+        {
+            string appName = Request.Headers.GetValues("AppName").FirstOrDefault();
+            if (appName == null)
+            {
+                appName = Map.AppName;
+            }
+
+            return appName;
+        }
+        protected virtual ArrayList GetBackandToObject(string token)
+        {
+            if (CountViews() == 0)
+                return new ArrayList();
+
+            string getNodeUrl = GetNodeUrl() + "/json";
+
+            bulk bulk = new Durados.Web.Mvc.UI.Helpers.bulk();
+
+
+            var tasks = new List<Task<string>>();
+            object responses = null;
+            int status = 0;
+            tasks.Add(Task.Factory.StartNew(() =>
+            {
+                var responseStatusAndData = bulk.GetWebResponse("POST", getNodeUrl, null, null, new Dictionary<string, object>() { { "Content-Type", "application/json" }, { "Authorization", Request.Headers.Authorization.ToString() }, { "AppName", GetAppName() } }, 0);
+                responses = responseStatusAndData.data;
+                status = responseStatusAndData.status;
+                return responseStatusAndData.data;
+            }));
+
+            Task.WaitAll(tasks.ToArray());
+
+            if (status >= 300 || status < 200)
+            {
+                throw new WebException(responses.ToString(), (WebExceptionStatus)status);
+            }
+
+            JavaScriptSerializer jss = new JavaScriptSerializer();
+            var result = jss.Deserialize<ArrayList>(responses.ToString());
+
+            return result;
+        }
 
         protected virtual void RefreshOldAdmin(string appName)
         {

@@ -363,7 +363,14 @@ namespace BackAnd.Web.Api.Controllers
                          object schema = values["schema"];
                          //SchemaGenerator sg = new SchemaGenerator();
 
-                         ValidateSchema(schema, id);
+                         //ValidateSchema(schema, id);
+                         Dictionary<string, object> transformResult = Transform("{newSchema: " + new JavaScriptSerializer().Serialize(schema) + ", severity: 0}", false);
+
+                         if (!transformResult.ContainsKey("alter"))
+                         {
+                             return ResponseMessage(Request.CreateResponse(HttpStatusCode.ExpectationFailed, Messages.InvalidSchema + ": " + GetWarnings(transformResult)));
+
+                         }
                          //sg.Validate(Map, (IEnumerable<object>)schema);
 
                          if (!map.AllKindOfCache.ContainsKey(Durados.Database.CreateSchema))
