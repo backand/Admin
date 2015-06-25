@@ -66,16 +66,24 @@ namespace BackAnd.Web.Api.Controllers
         protected virtual string GetWarnings(Dictionary<string, object> transformResult)
         {
             string warnings = string.Empty;
-            if (!transformResult.ContainsKey("warnings"))
+            try
             {
-                return warnings;
+
+                if (!transformResult.ContainsKey("warnings"))
+                {
+                    return warnings;
+                }
+
+                int i = 1;
+                foreach (object warning in (ArrayList)transformResult["warnings"])
+                {
+
+                    warnings += "(" + i++ + ") " + (warning is string ? warning.ToString() : new JavaScriptSerializer().Serialize(warning)) + ";\n";
+                }
             }
-
-            int i = 1;
-            foreach (string warning in (ArrayList)transformResult["warnings"])
+            catch
             {
-
-                warnings += "(" + i++ + ") " + warning + ";\n";
+                warnings = new JavaScriptSerializer().Serialize(transformResult);
             }
             return warnings;
         }
