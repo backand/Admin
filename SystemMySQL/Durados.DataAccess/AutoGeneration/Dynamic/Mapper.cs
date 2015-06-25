@@ -1811,7 +1811,7 @@ namespace Durados.DataAccess.AutoGeneration.Dynamic
 
                         if (fieldRow == null)
                         {
-                            fieldRow = MapDataSet.Field.AddFieldRow(viewRow, columnName, relationRow, column.DataType.FullName, pk, false);
+                            fieldRow = MapDataSet.Field.AddFieldRow(viewRow, columnName, relationRow, column.DataType.FullName, pk, false, column.MaxLength);
                         }
                         else if (fieldRow.RelationRow == null && relationRow != null)
                         {
@@ -1822,7 +1822,7 @@ namespace Durados.DataAccess.AutoGeneration.Dynamic
                     {
                         if (fieldRow == null)
                         {
-                            MapDataSet.Field.AddFieldRow(viewRow, column.ColumnName, null, column.DataType.FullName, pk, autoIncrement);
+                            MapDataSet.Field.AddFieldRow(viewRow, column.ColumnName, null, column.DataType.FullName, pk, autoIncrement, column.MaxLength);
                         }
                     }
                 }
@@ -1830,7 +1830,7 @@ namespace Durados.DataAccess.AutoGeneration.Dynamic
                 {
                     if (fieldRow == null)
                     {
-                        MapDataSet.Field.AddFieldRow(viewRow, column.ColumnName, null, column.DataType.FullName, pk, autoIncrement);
+                        MapDataSet.Field.AddFieldRow(viewRow, column.ColumnName, null, column.DataType.FullName, pk, autoIncrement, column.MaxLength);
                     }
                 }
             }
@@ -1847,7 +1847,7 @@ namespace Durados.DataAccess.AutoGeneration.Dynamic
 
             foreach (DataColumn column in newColumns)
             {
-                MapDataSet.Field.AddFieldRow(viewRow, column.ColumnName, null, column.DataType.FullName, IsColumnPartOfPK(column), false);
+                MapDataSet.Field.AddFieldRow(viewRow, column.ColumnName, null, column.DataType.FullName, IsColumnPartOfPK(column), false, column.MaxLength);
             }
 
             foreach (DataColumn column in deletedColumns)
@@ -1943,7 +1943,7 @@ namespace Durados.DataAccess.AutoGeneration.Dynamic
                 relationRow = MapDataSet.Relation.AddRelationRow(parentViewName);
             }
 
-            fieldRow = MapDataSet.Field.AddFieldRow(viewRow, columnName, relationRow, dbType, pk, autoIncrement);
+            fieldRow = MapDataSet.Field.AddFieldRow(viewRow, columnName, relationRow, dbType, pk, autoIncrement, -1);
 
             //MapDataSet.RelationColumns.AddRelationColumnsRow(relationRow, fieldName, 
 
@@ -2035,6 +2035,7 @@ namespace Durados.DataAccess.AutoGeneration.Dynamic
             string fieldName = fieldRow.Name;
             Type dbType = System.Type.GetType(fieldRow.DbType);
             bool isParent = fieldRow.RelationRow != null;
+            int maxLength = fieldRow.IsMaxLengthNull() ? -1 : fieldRow.MaxLength;
 
             if (isParent)
             {
@@ -2162,6 +2163,7 @@ namespace Durados.DataAccess.AutoGeneration.Dynamic
                 if (!table.Columns.Contains(fieldName))
                 {
                     DataColumn column = table.Columns.Add(fieldName, dbType);
+                    column.MaxLength = maxLength;
                     columns.Add(column);
                 }
             }
