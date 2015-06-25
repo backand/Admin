@@ -76,6 +76,9 @@ namespace BackAnd.Web.Api.Controllers
 
                 string sql = string.Join(";", ((System.Collections.ArrayList)transformResult["alter"]).ToArray());
                 sql = sql.Replace("int unsigned", "int(11)");
+                sql = sql.Replace(" boolean,", " bit,");
+                sql = sql.Replace(" boolean)", " bit)");
+                sql = sql.Replace(" boolean;", " bit;");
                 sql = new Squeezer().Squeeze(sql);
                 if (!string.IsNullOrEmpty(sql))
                 {
