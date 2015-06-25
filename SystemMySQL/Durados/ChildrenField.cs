@@ -223,7 +223,7 @@ namespace Durados
                 string name = View.Database.ForeignKeys[tableName][columnName];
                 if (name.Contains(_bkname_))
                 {
-                    string[] s = name.Split(_bkname_.ToCharArray());
+                    string[] s = name.Split(new string[] { _bkname_ }, StringSplitOptions.None);
                     return s.Last();
                 }
             }
