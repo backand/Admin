@@ -41,20 +41,29 @@ namespace BackAnd.Web.Api.Controllers
         [HttpPost]
         public IHttpActionResult Validate()
         {
-            string json = System.Web.HttpContext.Current.Server.UrlDecode(Request.Content.ReadAsStringAsync().Result);
-
-
-            Dictionary<string, object> transformResult = Transform(json, false);
-
-            if (!transformResult.ContainsKey("alter"))
+            try
             {
-                return ResponseMessage(Request.CreateResponse(HttpStatusCode.ExpectationFailed, Messages.InvalidSchema + ": " + GetWarnings(transformResult)));
+                string json = System.Web.HttpContext.Current.Server.UrlDecode(Request.Content.ReadAsStringAsync().Result);
+
+
+                Dictionary<string, object> transformResult = Transform(json, false);
+
+                return Ok(transformResult);
+            }
+            catch (WebException exception)
+            {
+                return ResponseMessage(Request.CreateResponse((HttpStatusCode)(int)exception.Status, exception.Message));
 
             }
+            catch (Exception exception)
+            {
+                while (exception.InnerException != null)
+                {
+                    exception = exception.InnerException;
+                }
+                throw new BackAndApiUnexpectedResponseException(exception, this);
 
-            string sql = string.Join(";", ((System.Collections.ArrayList)transformResult["alter"]).ToArray());
-
-            return Ok(new { sql = sql });
+            }
         }
 
         
