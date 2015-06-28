@@ -45,8 +45,10 @@ namespace BackAnd.Web.Api.Controllers
             {
                 string json = System.Web.HttpContext.Current.Server.UrlDecode(Request.Content.ReadAsStringAsync().Result);
 
-
                 Dictionary<string, object> transformResult = Transform(json, false);
+
+                LogModel(json, new JavaScriptSerializer().Serialize(transformResult), transformResult.ContainsKey("valid") ? transformResult["valid"].ToString() : string.Empty);
+
 
                 return Ok(transformResult);
             }
@@ -63,6 +65,40 @@ namespace BackAnd.Web.Api.Controllers
                 }
                 throw new BackAndApiUnexpectedResponseException(exception, this);
 
+            }
+        }
+
+        private void LogModel(string input, string output, string valid)
+        {
+            try
+            {
+                LogModel(Map.AppName, Map.Database.GetCurrentUsername(), DateTime.Now, input, output, valid);
+            }
+            catch (Exception exception)
+            {
+                Map.Logger.Log("Model", "Validate", "LogModel", exception, 1, null);
+            }
+        }
+
+        private void LogModel(string appName, string username, DateTime timestamp, string input, string output, string valid)
+        {
+            using (System.Data.SqlClient.SqlConnection connection = new System.Data.SqlClient.SqlConnection(Maps.Instance.DuradosMap.connectionString))
+            {
+                connection.Open();
+                string sql = "insert into [backand_model] ([appName], [username], [timestamp], [input], [output], [valid]) values (@appName, @username, @timestamp, @input, @output, @valid)";
+
+                using (System.Data.SqlClient.SqlCommand command = new System.Data.SqlClient.SqlCommand(sql, connection))
+                {
+                    command.Parameters.AddWithValue("appName", appName);
+                    command.Parameters.AddWithValue("username", username);
+                    command.Parameters.AddWithValue("timestamp", timestamp);
+                    command.Parameters.AddWithValue("input", input);
+                    command.Parameters.AddWithValue("output", output);
+                    command.Parameters.AddWithValue("valid", valid);
+                    command.ExecuteNonQuery();
+                }
+
+                connection.Close();
             }
         }
 
