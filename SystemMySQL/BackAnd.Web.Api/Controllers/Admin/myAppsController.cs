@@ -133,6 +133,12 @@ namespace BackAnd.Web.Api.Controllers
                     return ResponseMessage(Request.CreateResponse(HttpStatusCode.NotFound, string.Format(Messages.AppNotFound, id)));
                 }
 
+                if (!BlobExists(id, appId.ToString()))
+                {
+                    item["DatabaseStatus"] = 2;
+                    return Ok(item);
+                }
+
                 View databaseView = null;
                 try
                 {
@@ -216,6 +222,19 @@ namespace BackAnd.Web.Api.Controllers
                 throw new BackAndApiUnexpectedResponseException(exception, this);
 
             }
+        }
+
+        private bool BlobExists(string appName, string appId)
+        {
+            if (Maps.Instance.AppInCach(appName))
+                return true;
+
+            bool blobExists = (new Durados.Web.Mvc.Azure.DuradosStorage()).Exists(Maps.GetConfigPath(Maps.DuradosAppPrefix + appId.ToString() + ".xml"));
+
+            if (!blobExists)
+                return false;
+
+            return true;
         }
 
         private IHttpActionResult Get(bool? withSelectOptions = null, int? pageNumber = null, int? pageSize = null, string filter = null, string sort = null, string search = null)
