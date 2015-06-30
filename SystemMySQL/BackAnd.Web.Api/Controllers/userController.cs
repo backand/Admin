@@ -806,7 +806,11 @@ namespace BackAnd.Web.Api.Controllers
                         var password = GeneratePassword(4, 4, 4);
 
                         account.SignUp(appName, firstName, lastName, email, null, false, password, password, false, values, view_BeforeCreate, view_BeforeCreateInDatabase, view_AfterCreateBeforeCommit, view_AfterCreateAfterCommit, view_BeforeEdit, view_BeforeEditInDatabase, view_AfterEditBeforeCommit, view_AfterEditAfterCommit);
-
+                        if (appName == Maps.DuradosAppName)
+                        {
+                            Account.SendRegistrationRequest(firstName, lastName, email, string.Empty, email, string.Empty, Maps.Instance.DuradosMap, DontSend);
+                        }
+ 
                     }
                     else
                     {

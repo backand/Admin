@@ -133,18 +133,18 @@ namespace Durados.Web.Mvc.UI.Helpers
             }
 
             // temporary ignore datetime
-            foreach (ColumnField field in view.Fields.Values.Where(f => f.FieldType == FieldType.Column))
-            {
-                if (field.IsDateTime)
-                {
-                    if (values.ContainsKey(field.JsonName))
-                    {
-                        values.Remove(field.JsonName);
-                    }
-                }
-            }
+            //foreach (ColumnField field in view.Fields.Values.Where(f => f.FieldType == FieldType.Column))
+            //{
+            //    if (field.IsDateTime)
+            //    {
+            //        if (values.ContainsKey(field.JsonName))
+            //        {
+            //            values.Remove(field.JsonName);
+            //        }
+            //    }
+            //}
 
-            System.Web.Script.Serialization.JavaScriptSerializer javaScriptSerializer = new System.Web.Script.Serialization.JavaScriptSerializer();
+            //System.Web.Script.Serialization.JavaScriptSerializer javaScriptSerializer = new System.Web.Script.Serialization.JavaScriptSerializer();
             foreach (ColumnField field in view.Fields.Values.Where(f => f.FieldType == FieldType.Column))
             {
                 if (field.DataColumn.DataType.Equals(typeof(DateTime)) || field.DataColumn.DataType.Equals(typeof(DateTimeOffset)))
@@ -3786,6 +3786,42 @@ namespace Durados.Web.Mvc.UI.Helpers
             {
                 throw new DuradosException("Failed to invite admin before signup", exception);
             }
+        }
+
+        public static void SendRegistrationRequest(string firstName, string lastName, string email, string guid, string username, string password, Map Map, bool DontSend)
+        {
+            string host = Convert.ToString(System.Configuration.ConfigurationManager.AppSettings["host"]);
+            int port = Convert.ToInt32(System.Configuration.ConfigurationManager.AppSettings["port"]);
+            string smtpUsername = Convert.ToString(System.Configuration.ConfigurationManager.AppSettings["username"]);
+            string smtpPassword = Convert.ToString(System.Configuration.ConfigurationManager.AppSettings["password"]);
+
+            string from = Convert.ToString(System.Configuration.ConfigurationManager.AppSettings["fromAlert"]);
+            string subject = Map.Database.Localizer.Translate(CmsHelper.GetHtml("registrationConfirmationSubject"));
+            string message = Map.Database.Localizer.Translate(CmsHelper.GetHtml("registrationConfirmationMessage"));
+
+            string siteWithoutQueryString = System.Web.HttpContext.Current.Request.Url.Scheme + "://" + System.Web.HttpContext.Current.Request.Url.Authority;
+
+            message = message.Replace("[FirstName]", firstName);
+            message = message.Replace("[LastName]", lastName);
+            message = message.Replace("[Guid]", guid);
+            message = message.Replace("[Url]", siteWithoutQueryString);
+            message = message.Replace("[Username]", username ?? email);
+            message = message.Replace("[Password]", password);
+            if (Maps.Skin)
+            {
+                message = message.Replace("[Product]", Map.Database.SiteInfo.GetTitle());
+            }
+            else
+            {
+                message = message.Replace("[Product]", Maps.Instance.DuradosMap.Database.SiteInfo.GetTitle());
+            }
+
+            string to = email;
+
+
+
+            Durados.Cms.DataAccess.Email.Send(host, Map.Database.UseSmtpDefaultCredentials, port, smtpUsername, smtpPassword, false, to.Split(';'), new string[0], new string[1] { from }, subject, message, from, null, null, DontSend, null, Map.Database.Logger, true);
+
         }
 
         public virtual void InviteAdminAfterSignUp(string username)

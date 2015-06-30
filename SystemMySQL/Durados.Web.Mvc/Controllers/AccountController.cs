@@ -273,45 +273,11 @@ namespace Durados.Web.Mvc.Controllers
 
         protected override void SendRegistrationRequest(FormCollection collection)
         {
-            SendRegistrationRequest(collection["First_Name"], collection["Last_Name"], collection["Email"], collection["Guid"], collection["Username"], collection["Password"]);
+            Account.SendRegistrationRequest(collection["First_Name"], collection["Last_Name"], collection["Email"], collection["Guid"], collection["Username"], collection["Password"], Map, DontSend);
         }
 
 
-        protected void SendRegistrationRequest(string firstName, string lastName, string email, string guid, string username, string password)
-        {
-            string host = Convert.ToString(System.Configuration.ConfigurationManager.AppSettings["host"]);
-            int port = Convert.ToInt32(System.Configuration.ConfigurationManager.AppSettings["port"]);
-            string smtpUsername = Convert.ToString(System.Configuration.ConfigurationManager.AppSettings["username"]);
-            string smtpPassword = Convert.ToString(System.Configuration.ConfigurationManager.AppSettings["password"]);
-
-            string from = Convert.ToString(System.Configuration.ConfigurationManager.AppSettings["fromAlert"]);
-            string subject = Map.Database.Localizer.Translate(CmsHelper.GetHtml("registrationConfirmationSubject"));
-            string message = Map.Database.Localizer.Translate(CmsHelper.GetHtml("registrationConfirmationMessage"));
-
-            string siteWithoutQueryString = System.Web.HttpContext.Current.Request.Url.Scheme + "://" + System.Web.HttpContext.Current.Request.Url.Authority;
-
-            message = message.Replace("[FirstName]", firstName);
-            message = message.Replace("[LastName]", lastName);
-            message = message.Replace("[Guid]", guid);
-            message = message.Replace("[Url]", siteWithoutQueryString);
-            message = message.Replace("[Username]", username ?? email);
-            message = message.Replace("[Password]", password);
-            if (Maps.Skin)
-            {
-                message = message.Replace("[Product]", Map.Database.SiteInfo.GetTitle());
-            }
-            else
-            {
-                message = message.Replace("[Product]", Maps.Instance.DuradosMap.Database.SiteInfo.GetTitle());
-            }
-
-            string to = email;
-
-
-
-            Durados.Cms.DataAccess.Email.Send(host, Map.Database.UseSmtpDefaultCredentials, port, smtpUsername, smtpPassword, false, to.Split(';'), new string[0], new string[1]{from}, subject, message, from, null, null, DontSend, null, Map.Database.Logger, true);
-
-        }
+        
 
         protected override void SendPasswordResetEmail(FormCollection collection)
         {

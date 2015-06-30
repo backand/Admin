@@ -116,7 +116,7 @@ namespace Durados.Website.Controllers
                 sendEmail = send != null && send == "true";
 
                 if (sendEmail)
-                    SendRegistrationRequest(fullname, lastName, email, guid.ToString(), username, password);
+                    Durados.Web.Mvc.UI.Helpers.Account.SendRegistrationRequest(fullname, lastName, email, guid.ToString(), username, password, Map, DontSend);
 
                 try
                 {
