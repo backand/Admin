@@ -5251,7 +5251,7 @@ namespace Durados.Web.Mvc
                 bool newStructure = false;
                 if (IsApi())
                 {
-                    if (!BlobExists(appName))
+                    if (appName != duradosAppName && !BlobExists(appName))
                     {
                         duradosMap.Logger.Log("uue", "get map", "appName: " + appName, null, -754, "5256");
                         throw new DuradosException("Blob is not ready yet.");
