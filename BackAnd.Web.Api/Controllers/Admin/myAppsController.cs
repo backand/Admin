@@ -135,7 +135,8 @@ namespace BackAnd.Web.Api.Controllers
 
                 if (!BlobExists(id, appId.ToString()))
                 {
-                    item["DatabaseStatus"] = 2;
+                    if (item["DatabaseStatus"].Equals(1))
+                        item["DatabaseStatus"] = 2;
                     return Ok(item);
                 }
 
