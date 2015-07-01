@@ -5227,7 +5227,14 @@ namespace Durados.Web.Mvc
         public Map GetMap(string appName)
         {
             if (appName == null || ReservedAppNames.Contains(appName))
+            {
+                if (IsApi())
+                {
+                    duradosMap.Logger.Log("uue", "get map", "appName: " + appName, null, -754, "5231");
+                }
                 return duradosMap;
+            }
+                
             Map map = null;
 
             if (maps.ContainsKey(appName))
@@ -5242,6 +5249,14 @@ namespace Durados.Web.Mvc
             if (map == null)
             {
                 bool newStructure = false;
+                if (IsApi())
+                {
+                    if (!BlobExists(appName))
+                    {
+                        duradosMap.Logger.Log("uue", "get map", "appName: " + appName, null, -754, "5256");
+                        throw new DuradosException("Blob is not ready yet.");
+                    }
+                }
                 map = CreateMap(appName, out newStructure) ?? duradosMap;
 
                 if (!newStructure)
@@ -5252,7 +5267,30 @@ namespace Durados.Web.Mvc
 
             return map;
         }
-       
+
+        private bool IsApi()
+        {
+            string s = System.Configuration.ConfigurationManager.AppSettings["GoogleClientId"];
+            return !string.IsNullOrEmpty(s);
+        }
+
+        private bool BlobExists(string appName)
+        {
+            int? appId = AppExists(appName);
+            if (!appId.HasValue)
+                return false;
+
+            if (Maps.Instance.AppInCach(appName))
+                return true;
+
+            bool blobExists = (new Durados.Web.Mvc.Azure.DuradosStorage()).Exists(Maps.GetConfigPath(Maps.DuradosAppPrefix + appId.ToString() + ".xml"));
+
+            if (!blobExists)
+                return false;
+
+            return true;
+        }
+
         private  Map GetMapFromSession(Map map)
         {
 
