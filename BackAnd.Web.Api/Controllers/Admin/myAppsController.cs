@@ -133,10 +133,13 @@ namespace BackAnd.Web.Api.Controllers
                     return ResponseMessage(Request.CreateResponse(HttpStatusCode.NotFound, string.Format(Messages.AppNotFound, id)));
                 }
 
-                if (!BlobExists(id, appId.ToString()))
+                if (id != Maps.DuradosAppName && !BlobExists(id, appId.ToString()))
                 {
                     if (item["DatabaseStatus"].Equals(1))
+                    {
                         item["DatabaseStatus"] = 2;
+                        Maps.Instance.DuradosMap.Logger.Log("uue", "myApps", "appName: " + id, null, -754, "141");
+                    }
                     return Ok(item);
                 }
 
