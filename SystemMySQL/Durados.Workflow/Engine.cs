@@ -195,6 +195,10 @@ namespace Durados.Workflow
 
         public virtual bool Check(View view, Durados.Rule rule, Durados.TriggerDataAction dataAction, Dictionary<string, object> values, string pk, DataRow prevRow, bool useSqlPareser, string connectionString, int currentUserId, string currentUserRole)
         {
+            if (string.IsNullOrEmpty(pk) && rule.WhereCondition.Equals("true"))
+            {
+                return true;
+            }
             if (useSqlPareser && view != view.Database.GetUserView())
                 return CheckUsingSql(view, rule, dataAction, values, pk, prevRow, connectionString, currentUserId, currentUserRole);
             else
