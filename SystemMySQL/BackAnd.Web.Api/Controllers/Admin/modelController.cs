@@ -397,9 +397,14 @@ namespace BackAnd.Web.Api.Controllers
     {
         string _bkname_ = "_bkname_";
 
-
+        string addConstraint = "add constraint";
+        string foreignKey = "foreign key";
+            
         public string Squeeze(string sql)
         {
+            if (!sql.Contains(addConstraint))
+                return sql;
+
             int limit = 64;
             string[] foreignKeys = GetFk(sql);
             string[] longForeignKeys = GetLongFk(foreignKeys, limit);
@@ -414,8 +419,6 @@ namespace BackAnd.Web.Api.Controllers
 
         string[] GetFk(string sql)
         {
-            string addConstraint = "add constraint";
-            string foreignKey = "foreign key";
             List<string> foreignKeys = new List<string>();
 
             string[] s1 = sql.Split(new string[] { addConstraint }, StringSplitOptions.None);
