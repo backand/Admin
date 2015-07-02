@@ -177,9 +177,9 @@ namespace Durados.Web.Mvc.UI.Helpers
         {
             string sql = query.SQL.Replace(Durados.Workflow.Engine.AsToken(values));
 
-            string currentUsetId = query.Database.GetUserID();
-            string currentUsername = query.Database.GetCurrentUsername();
-            string currentUserRole = ((Database)query.Database).GetUserRole();
+            string currentUsetId = query.Database.GetUserID() ?? string.Empty;
+            string currentUsername = query.Database.GetCurrentUsername() ?? string.Empty;
+            string currentUserRole = ((Database)query.Database).GetUserRole() ?? string.Empty;
 
             sql = sql.Replace(Durados.Database.UserPlaceHolder, currentUsetId, false).Replace(Durados.Database.SysUserPlaceHolder.AsToken(), currentUsetId, false)
                   .Replace(Durados.Database.UsernamePlaceHolder, currentUsername, false).Replace(Durados.Database.SysUsernamePlaceHolder.AsToken(), currentUsername)
