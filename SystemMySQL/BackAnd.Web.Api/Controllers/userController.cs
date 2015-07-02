@@ -828,7 +828,7 @@ namespace BackAnd.Web.Api.Controllers
                             //Insert into website users
                             try
                             {
-                                Account.InsertContactUsUsers(email, firstName + " " + lastName, null, string.Empty, 10, 0, null); //10=welcome email
+                                Account.InsertContactUsUsers(email, firstName + " " + lastName, null, string.Empty, 10, 100, null); //10=welcome email
                             }
                             catch (Exception ex)
                             {
