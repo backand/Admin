@@ -3824,6 +3824,86 @@ namespace Durados.Web.Mvc.UI.Helpers
 
         }
 
+        /// <summary>
+        /// Update the cookie guid for each new user registration
+        /// </summary>
+        /// <param name="username"></param>
+        /// <param name="userId"></param>
+        public static void UpdateWebsiteUsers(string username, int userId)
+        {
+            SqlAccess sqlAccess = new SqlAccess();
+            string sql = @"INSERT INTO [website_UsersCookie]([UserId],[CookieGuid],[CreateDate]) 
+                            VALUES(@UserId,@CookieGuid,@CreateDate)";
+            Dictionary<string, object> parameters = new Dictionary<string, object>();
+            parameters.Add("@UserId", userId);
+            object orgGuid = GetTrackingCookieGuid();
+            if (orgGuid != null)
+                parameters.Add("@CookieGuid", orgGuid);
+            else
+                parameters.Add("@CookieGuid", DBNull.Value);
+            parameters.Add("@CreateDate", DateTime.Now);
+            sqlAccess.ExecuteNonQuery(Maps.Instance.DuradosMap.connectionString, sql, parameters, null);
+
+        }
+
+        /// <summary>
+        /// Save users that sent email by contact us and asscociate the cookie guid
+        /// </summary>
+        /// <param name="email"></param>
+        /// <param name="fullname"></param>
+        /// <param name="comments"></param>
+        public static void InsertContactUsUsers(string email, string fullname, string comments, string phone, int requestSubjectId, int? dbType, string dbOther)
+        {
+            SqlAccess sqlAccess = new SqlAccess();
+            Dictionary<string, object> parameters = new Dictionary<string, object>();
+            parameters.Add("@Email", email);
+            if (fullname == null)
+                parameters.Add("@FullName", DBNull.Value);
+            else
+                parameters.Add("@FullName", fullname);
+            if (comments == null)
+                parameters.Add("@Comments", DBNull.Value);
+            else
+                parameters.Add("@Comments", comments);
+            object orgGuid = GetTrackingCookieGuid();
+            if (orgGuid != null)
+                parameters.Add("@CookieGuid", orgGuid);
+            else
+                parameters.Add("@CookieGuid", DBNull.Value);
+            if (phone != null)
+                parameters.Add("@Phone", phone);
+            else
+                parameters.Add("@Phone", DBNull.Value);
+
+
+            parameters.Add("@RequestSubject", requestSubjectId);
+            if (dbType == null)
+                parameters.Add("@DBtype", DBNull.Value);
+            else
+                parameters.Add("@DBtype", dbType);
+            if (dbOther == null)
+                parameters.Add("@DBother", DBNull.Value);
+            else
+                parameters.Add("@DBother", dbOther);
+
+            sqlAccess.ExecuteNonQuery(Maps.Instance.DuradosMap.connectionString, "dbo.website_AddEditUser @Email,@FullName,@Comments,@CookieGuid,@Phone,@RequestSubject,@DBtype,@DBother", parameters, null);
+
+        }
+
+        /// <summary>
+        /// Retrun the GUID stored in the tracking cookie
+        /// </summary>
+        /// <returns></returns>
+        public static object GetTrackingCookieGuid()
+        {
+            string cookieTrackingName = "ModuBizTracking";
+            System.Web.HttpCookie trackingCookie = System.Web.HttpContext.Current.Request.Cookies[cookieTrackingName];
+            if (trackingCookie == null)
+                return null;
+            return trackingCookie.Values["guid"];
+
+        }
+
         public virtual void InviteAdminAfterSignUp(string username)
         {
             try

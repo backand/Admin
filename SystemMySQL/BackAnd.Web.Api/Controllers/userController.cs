@@ -815,6 +815,26 @@ namespace BackAnd.Web.Api.Controllers
                         if (appName == Maps.DuradosAppName)
                         {
                             Account.SendRegistrationRequest(firstName, lastName, email, string.Empty, email, string.Empty, Maps.Instance.DuradosMap, DontSend);
+                            try
+                            {
+                                Account.UpdateWebsiteUsers(email, Convert.ToInt32(Maps.Instance.GetMap(appName).Database.GetUserID()));
+                            }
+                            catch (Exception ex)
+                            {
+                                Maps.Instance.DuradosMap.Logger.Log("user", "SignUp", "SignUp", ex, 1, "failed to update websiteusercookie with userid");
+
+                            }
+
+                            //Insert into website users
+                            try
+                            {
+                                Account.InsertContactUsUsers(email, firstName + " " + lastName, null, string.Empty, 10, 0, null); //10=welcome email
+                            }
+                            catch (Exception ex)
+                            {
+                                Maps.Instance.DuradosMap.Logger.Log("user", "SignUp", "SignUp", ex, 1, "failed to update websiteuser in ContactUs");
+
+                            }
                         }
  
                     }
