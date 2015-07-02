@@ -120,7 +120,7 @@ namespace Durados.Website.Controllers
 
                 try
                 {
-                    UpdateWebsiteUsers(username, identity);
+                    Durados.Web.Mvc.UI.Helpers.Account.UpdateWebsiteUsers(username, identity);
                 }
                 catch (Exception ex)
                 {
@@ -131,7 +131,7 @@ namespace Durados.Website.Controllers
                 //Insert into website users
                 try
                 {
-                    InsertContactUsUsers(username, fullname, null, phone, 10, int.Parse(dbtype),dbother); //10=welcome email
+                    Durados.Web.Mvc.UI.Helpers.Account.InsertContactUsUsers(username, fullname, null, phone, 10, int.Parse(dbtype), dbother); //10=welcome email
                 }
                 catch (Exception ex)
                 {
@@ -160,7 +160,7 @@ namespace Durados.Website.Controllers
         {
             try
             {
-                object cookieGuid = GetTrackingCookieGuid();
+                object cookieGuid = Durados.Web.Mvc.UI.Helpers.Account.GetTrackingCookieGuid();
                 if (cookieGuid == null)
                     return Json(false);
 
@@ -221,85 +221,9 @@ namespace Durados.Website.Controllers
             }
         }
 
-        /// <summary>
-        /// Update the cookie guid for each new user registration
-        /// </summary>
-        /// <param name="username"></param>
-        /// <param name="userId"></param>
-        private void UpdateWebsiteUsers(string username, int userId)
-        {
-            SqlAccess sqlAccess = new SqlAccess();
-            string sql = @"INSERT INTO [website_UsersCookie]([UserId],[CookieGuid],[CreateDate]) 
-                            VALUES(@UserId,@CookieGuid,@CreateDate)";
-            Dictionary<string, object> parameters = new Dictionary<string, object>();
-            parameters.Add("@UserId", userId);
-            object orgGuid = GetTrackingCookieGuid();
-            if (orgGuid != null)
-                parameters.Add("@CookieGuid", orgGuid);
-            else
-                parameters.Add("@CookieGuid", DBNull.Value);
-            parameters.Add("@CreateDate", DateTime.Now);
-            sqlAccess.ExecuteNonQuery(Maps.Instance.DuradosMap.connectionString, sql, parameters, null);
+        
 
-        }
-
-        /// <summary>
-        /// Save users that sent email by contact us and asscociate the cookie guid
-        /// </summary>
-        /// <param name="email"></param>
-        /// <param name="fullname"></param>
-        /// <param name="comments"></param>
-        private void InsertContactUsUsers(string email, string fullname, string comments, string phone, int requestSubjectId, int? dbType, string dbOther)
-        {
-            SqlAccess sqlAccess = new SqlAccess();
-            Dictionary<string, object> parameters = new Dictionary<string, object>();
-            parameters.Add("@Email", email);
-            if (fullname == null)
-                parameters.Add("@FullName", DBNull.Value);
-            else
-                parameters.Add("@FullName", fullname);
-            if (comments == null)
-                parameters.Add("@Comments", DBNull.Value);
-            else
-                parameters.Add("@Comments", comments);
-            object orgGuid = GetTrackingCookieGuid();
-            if (orgGuid != null)
-                parameters.Add("@CookieGuid", orgGuid);
-            else
-                parameters.Add("@CookieGuid", DBNull.Value);
-            if (phone != null)
-                parameters.Add("@Phone", phone);
-            else
-                parameters.Add("@Phone", DBNull.Value);
-
-            
-            parameters.Add("@RequestSubject", requestSubjectId);
-            if (dbType == null)
-                parameters.Add("@DBtype", DBNull.Value);
-            else
-                parameters.Add("@DBtype", dbType);
-            if (dbOther == null)
-                parameters.Add("@DBother", DBNull.Value);
-            else
-                parameters.Add("@DBother", dbOther);
-
-            sqlAccess.ExecuteNonQuery(Maps.Instance.DuradosMap.connectionString, "dbo.website_AddEditUser @Email,@FullName,@Comments,@CookieGuid,@Phone,@RequestSubject,@DBtype,@DBother", parameters, null);
-
-        }
-
-        /// <summary>
-        /// Retrun the GUID stored in the tracking cookie
-        /// </summary>
-        /// <returns></returns>
-        private object GetTrackingCookieGuid()
-        {
-            string cookieTrackingName = "ModuBizTracking";
-            HttpCookie trackingCookie = Request.Cookies[cookieTrackingName];
-            if (trackingCookie == null)
-                return null;
-            return trackingCookie.Values["guid"];
-
-        }
+        
         //private void CreatePendingDatabase(int identity)
         //{
         //    if (Maps.DemoCreatePending)
@@ -394,7 +318,7 @@ namespace Durados.Website.Controllers
 
                 try
                 {
-                    InsertContactUsUsers(from, name, comments, phone, 100 + int.Parse(requestSubjectId),null,null);
+                    Durados.Web.Mvc.UI.Helpers.Account.InsertContactUsUsers(from, name, comments, phone, 100 + int.Parse(requestSubjectId), null, null);
                 }
                 catch (Exception ex)
                 {
@@ -416,7 +340,7 @@ namespace Durados.Website.Controllers
            
                 try
                 {
-                    InsertContactUsUsers(email, null, comments, null,  int.Parse(actionId), null, null);
+                    Durados.Web.Mvc.UI.Helpers.Account.InsertContactUsUsers(email, null, comments, null, int.Parse(actionId), null, null);
                 }
                 catch (Exception ex)
                 {
