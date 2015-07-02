@@ -95,7 +95,13 @@ namespace BackAnd.Web.Api.Controllers
 
         protected override void BeforeEditInDatabase(Durados.EditEventArgs e)
         {
-            e.ColumnNames.Add("Guid");
+            if (e.Values.ContainsKey("Guid"))
+            {
+                if (!e.ColumnNames.Contains("Guid"))
+                {
+                    e.ColumnNames.Add("Guid");
+                }
+            }
         }
 
         [Route("key/reset/{id}")]
