@@ -1223,8 +1223,37 @@ namespace Durados.Web.Mvc
             }
         }
 
+        public string GetLocalDatabaseHost()
+        {
+            return (System.Configuration.ConfigurationManager.AppSettings["localDatabaseHost"] ?? "yrv-dev.czvbzzd4kpof.eu-central-1.rds.amazonaws.com").ToString();
+        }
+        public string GetConnectionSource()
+        {
+            try
+            {
+                string localDatabaseHost = GetLocalDatabaseHost();
+                if (connectionString.Contains(localDatabaseHost))
+                {
+                    return "local";
+                }
+                else
+                {
+                    return "external";
+                }
+
+            }
+            catch
+            {
+                return "unknown";
+            }
+        }
+
         private void AddSyncUserRules()
         {
+            const string  USERS = "users";
+
+            string whereCondition = GetConnectionSource() == "local" ? "true" : "false";
+
             ISqlTextBuilder sqlTextBuilder = GetSqlTextBuilder();
             ConfigAccess configAccess = new DataAccess.ConfigAccess();
             string userViewPK = configAccess.GetViewPK(Database.UserViewName, configDatabase.ConnectionString);
@@ -1234,8 +1263,9 @@ namespace Durados.Web.Mvc
             values.Add("Rules_Parent", userViewPK);
             values.Add("DataAction", Durados.TriggerDataAction.AfterCreateBeforeCommit.ToString());
             values.Add("WorkflowAction", Durados.WorkflowAction.Execute.ToString());
-            values.Add("WhereCondition", "false");
-            values.Add("ExecuteCommand", "insert into " + sqlTextBuilder.EscapeDbObject("<your app users table here>") + " (" + sqlTextBuilder.EscapeDbObject("email") + "," + sqlTextBuilder.EscapeDbObject("name") + "," + sqlTextBuilder.EscapeDbObject("role") + "...) values ('{{Username}}','{{FirstName}}','{{Role}}'...)");
+            values.Add("WhereCondition", whereCondition);
+            values.Add("ExecuteMessage", "Your objects do not contain a users object. Please set the where condition to false in the Security & Auth action \"Create My App User\".");
+            values.Add("ExecuteCommand", "insert into " + sqlTextBuilder.EscapeDbObject(USERS) + " (" + sqlTextBuilder.EscapeDbObject("email") + "," + sqlTextBuilder.EscapeDbObject("firstName") + "," + sqlTextBuilder.EscapeDbObject("lastName") + "," + sqlTextBuilder.EscapeDbObject("role") + ") values ('{{Username}}','{{FirstName}}','{{LastName}}','{{Role}}')");
             ruleView.Create(values, null, null, null, null, null);
 
             values = new Dictionary<string, object>();
@@ -1243,8 +1273,9 @@ namespace Durados.Web.Mvc
             values.Add("Rules_Parent", userViewPK);
             values.Add("DataAction", Durados.TriggerDataAction.AfterEditBeforeCommit.ToString());
             values.Add("WorkflowAction", Durados.WorkflowAction.Execute.ToString());
-            values.Add("WhereCondition", "false");
-            values.Add("ExecuteCommand", "update " + sqlTextBuilder.EscapeDbObject("<your app users table here>") + " set " + sqlTextBuilder.EscapeDbObject("name") + " = '{{FirstName}}', " + sqlTextBuilder.EscapeDbObject("role") + " = '{{Role}}' where " + sqlTextBuilder.EscapeDbObject("email") + " = '{{Username}}'");
+            values.Add("WhereCondition", whereCondition);
+            values.Add("ExecuteMessage", "Your objects do not contain a users object. Please set the where condition to false in the Security & Auth action \"Update My App User\".");
+            values.Add("ExecuteCommand", "update " + sqlTextBuilder.EscapeDbObject(USERS) + " set " + sqlTextBuilder.EscapeDbObject("firstName") + " = '{{FirstName}}', " + sqlTextBuilder.EscapeDbObject("lastName") + " = '{{lastName}}', " + sqlTextBuilder.EscapeDbObject("role") + " = '{{Role}}' where " + sqlTextBuilder.EscapeDbObject("email") + " = '{{Username}}'");
             ruleView.Create(values, null, null, null, null, null);
 
             values = new Dictionary<string, object>();
@@ -1252,8 +1283,9 @@ namespace Durados.Web.Mvc
             values.Add("Rules_Parent", userViewPK);
             values.Add("DataAction", Durados.TriggerDataAction.AfterDeleteBeforeCommit.ToString());
             values.Add("WorkflowAction", Durados.WorkflowAction.Execute.ToString());
-            values.Add("WhereCondition", "false");
-            values.Add("ExecuteCommand", "delete " + sqlTextBuilder.EscapeDbObject("<your app users table here>") + " where " + sqlTextBuilder.EscapeDbObject("email") + " = '{{Username}}'");
+            values.Add("WhereCondition", whereCondition);
+            values.Add("ExecuteMessage", "Your objects do not contain a users object. Please set the where condition to false in the Security & Auth action \"Delete My App User\".");
+            values.Add("ExecuteCommand", "delete " + sqlTextBuilder.EscapeDbObject(USERS) + " where " + sqlTextBuilder.EscapeDbObject("email") + " = '{{Username}}'");
             ruleView.Create(values, null, null, null, null, null);
         }
 
@@ -5228,10 +5260,10 @@ namespace Durados.Web.Mvc
         {
             if (appName == null || ReservedAppNames.Contains(appName))
             {
-                if (IsApi())
-                {
-                    duradosMap.Logger.Log("uue", "get map", "appName: " + appName, null, -754, "5231");
-                }
+                //if (IsApi())
+                //{
+                //    duradosMap.Logger.Log("uue", "get map", "appName: " + appName, null, -754, "5231");
+                //}
                 return duradosMap;
             }
                 
@@ -5268,7 +5300,7 @@ namespace Durados.Web.Mvc
             return map;
         }
 
-        private bool IsApi()
+        public bool IsApi()
         {
             string s = System.Configuration.ConfigurationManager.AppSettings["GoogleClientId"];
             return !string.IsNullOrEmpty(s);

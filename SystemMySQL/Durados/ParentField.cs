@@ -721,6 +721,13 @@ namespace Durados
             return DisplayName.ReplaceNonAlphaNumeric2();
         }
 
+        protected override object GetDbDefaultValue()
+        {
+            if (DataRelation.ChildColumns.Length != 1)
+                return null;
+
+            return DataRelation.ChildColumns[0].DefaultValue;
+        }
     }
 
 

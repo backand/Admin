@@ -699,6 +699,10 @@ namespace Durados.DataAccess.AutoGeneration.Dynamic {
             
             private global::System.Data.DataColumn columnMaxLength;
             
+            private global::System.Data.DataColumn columnRequired;
+            
+            private global::System.Data.DataColumn columnDefaultValue;
+            
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
             public FieldDataTable() {
@@ -798,6 +802,22 @@ namespace Durados.DataAccess.AutoGeneration.Dynamic {
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
+            public global::System.Data.DataColumn RequiredColumn {
+                get {
+                    return this.columnRequired;
+                }
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
+            public global::System.Data.DataColumn DefaultValueColumn {
+                get {
+                    return this.columnDefaultValue;
+                }
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
             [global::System.ComponentModel.Browsable(false)]
             public int Count {
                 get {
@@ -833,7 +853,7 @@ namespace Durados.DataAccess.AutoGeneration.Dynamic {
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
-            public FieldRow AddFieldRow(ViewRow parentViewRowByView_Field, string Name, RelationRow parentRelationRowByRelation_Field, string DbType, bool PK, bool AutoIncrement, int MaxLength) {
+            public FieldRow AddFieldRow(ViewRow parentViewRowByView_Field, string Name, RelationRow parentRelationRowByRelation_Field, string DbType, bool PK, bool AutoIncrement, int MaxLength, bool Required, string DefaultValue) {
                 FieldRow rowFieldRow = ((FieldRow)(this.NewRow()));
                 object[] columnValuesArray = new object[] {
                         null,
@@ -843,7 +863,9 @@ namespace Durados.DataAccess.AutoGeneration.Dynamic {
                         DbType,
                         PK,
                         AutoIncrement,
-                        MaxLength};
+                        MaxLength,
+                        Required,
+                        DefaultValue};
                 if ((parentViewRowByView_Field != null)) {
                     columnValuesArray[1] = parentViewRowByView_Field[0];
                 }
@@ -887,6 +909,8 @@ namespace Durados.DataAccess.AutoGeneration.Dynamic {
                 this.columnPK = base.Columns["PK"];
                 this.columnAutoIncrement = base.Columns["AutoIncrement"];
                 this.columnMaxLength = base.Columns["MaxLength"];
+                this.columnRequired = base.Columns["Required"];
+                this.columnDefaultValue = base.Columns["DefaultValue"];
             }
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
@@ -908,6 +932,10 @@ namespace Durados.DataAccess.AutoGeneration.Dynamic {
                 base.Columns.Add(this.columnAutoIncrement);
                 this.columnMaxLength = new global::System.Data.DataColumn("MaxLength", typeof(int), null, global::System.Data.MappingType.Element);
                 base.Columns.Add(this.columnMaxLength);
+                this.columnRequired = new global::System.Data.DataColumn("Required", typeof(bool), null, global::System.Data.MappingType.Element);
+                base.Columns.Add(this.columnRequired);
+                this.columnDefaultValue = new global::System.Data.DataColumn("DefaultValue", typeof(string), null, global::System.Data.MappingType.Element);
+                base.Columns.Add(this.columnDefaultValue);
                 this.Constraints.Add(new global::System.Data.UniqueConstraint("Constraint1", new global::System.Data.DataColumn[] {
                                 this.columnId}, true));
                 this.Constraints.Add(new global::System.Data.UniqueConstraint("FieldKey1", new global::System.Data.DataColumn[] {
@@ -1829,6 +1857,38 @@ namespace Durados.DataAccess.AutoGeneration.Dynamic {
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
+            public bool Required {
+                get {
+                    try {
+                        return ((bool)(this[this.tableField.RequiredColumn]));
+                    }
+                    catch (global::System.InvalidCastException e) {
+                        throw new global::System.Data.StrongTypingException("The value for column \'Required\' in table \'Field\' is DBNull.", e);
+                    }
+                }
+                set {
+                    this[this.tableField.RequiredColumn] = value;
+                }
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
+            public string DefaultValue {
+                get {
+                    try {
+                        return ((string)(this[this.tableField.DefaultValueColumn]));
+                    }
+                    catch (global::System.InvalidCastException e) {
+                        throw new global::System.Data.StrongTypingException("The value for column \'DefaultValue\' in table \'Field\' is DBNull.", e);
+                    }
+                }
+                set {
+                    this[this.tableField.DefaultValueColumn] = value;
+                }
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
             public ViewRow ViewRow {
                 get {
                     return ((ViewRow)(this.GetParentRow(this.Table.ParentRelations["View_Field"])));
@@ -1931,6 +1991,30 @@ namespace Durados.DataAccess.AutoGeneration.Dynamic {
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
             public void SetMaxLengthNull() {
                 this[this.tableField.MaxLengthColumn] = global::System.Convert.DBNull;
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
+            public bool IsRequiredNull() {
+                return this.IsNull(this.tableField.RequiredColumn);
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
+            public void SetRequiredNull() {
+                this[this.tableField.RequiredColumn] = global::System.Convert.DBNull;
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
+            public bool IsDefaultValueNull() {
+                return this.IsNull(this.tableField.DefaultValueColumn);
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
+            public void SetDefaultValueNull() {
+                this[this.tableField.DefaultValueColumn] = global::System.Convert.DBNull;
             }
         }
         

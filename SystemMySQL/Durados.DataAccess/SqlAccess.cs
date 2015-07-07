@@ -10110,7 +10110,7 @@ public class SqlSchema : ISchema
 
     public virtual string GetColumnsSelectStatement(string tableName)
     {
-        return "select column_name, data_type, character_maximum_length, is_nullable from information_schema.columns where table_name = N'" + tableName + "'";
+        return "select column_name, data_type, character_maximum_length, is_nullable, column_default from information_schema.columns where table_name = N'" + tableName + "'";
 
     }
 

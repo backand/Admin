@@ -73,7 +73,7 @@ namespace BackAnd.Web.Api.Controllers
 
         [Route("~/1/model")]
         [HttpPost]
-        public IHttpActionResult Post()
+        public IHttpActionResult Post(bool? firstTime = false)
         {
             try
             {
@@ -105,12 +105,18 @@ namespace BackAnd.Web.Api.Controllers
                     }
                     catch (Exception exception)
                     {
+                        UpdateLogModel(exception);
                         Sync();
                         throw exception;
                     }
                 }
 
                 Dictionary<string, object> syncResult = Sync();
+
+                if (firstTime.HasValue && firstTime.Value)
+                {
+                    HandleFirstTime();
+                }
 
                 try
                 {
@@ -142,6 +148,21 @@ namespace BackAnd.Web.Api.Controllers
 
             }
         }
+
+        private void HandleFirstTime()
+        {
+            try
+            {
+                Account.DefaultUsersTable.HandleFirstTime(Map);
+                RefreshConfigCache(Map);
+            }
+            catch (Exception exception)
+            {
+                Maps.Instance.DuradosMap.Logger.Log("Model", "Post", "HandleFirstTime", exception, 1, null);
+            }
+        }
+
+       
 
         private void LogSQL(string appName, string model, string sql)
         {

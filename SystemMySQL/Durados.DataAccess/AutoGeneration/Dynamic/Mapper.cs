@@ -652,6 +652,10 @@ namespace Durados.DataAccess.AutoGeneration.Dynamic
                 DataColumn originalColumn = dataset.Tables[viewName].Columns[changedColumn.ColumnName];
                 originalColumn.DataType = changedColumn.DataType;
                 originalColumn.AutoIncrement = changedColumn.AutoIncrement;
+                originalColumn.MaxLength = changedColumn.MaxLength;
+                originalColumn.ReadOnly = changedColumn.ReadOnly;
+                originalColumn.AllowDBNull = changedColumn.AllowDBNull;
+               
                 LoadExtendedProperties(changedColumn, originalColumn);
             }
 
@@ -813,7 +817,7 @@ namespace Durados.DataAccess.AutoGeneration.Dynamic
                 if (oldTable.Columns.Contains(newColumn.ColumnName))
                 {
                     DataColumn oldColumn = oldTable.Columns[newColumn.ColumnName];
-                    if (!oldColumn.DataType.Equals(newColumn.DataType) || !oldColumn.AutoIncrement.Equals(newColumn.AutoIncrement) || !IsColumnPartOfPK(oldColumn).Equals(IsColumnPartOfPK(newColumn)))
+                    if (!oldColumn.AllowDBNull.Equals(newColumn.AllowDBNull) || !oldColumn.DefaultValue.Equals(newColumn.DefaultValue) || !oldColumn.DataType.Equals(newColumn.DataType) || !oldColumn.AutoIncrement.Equals(newColumn.AutoIncrement) || !IsColumnPartOfPK(oldColumn).Equals(IsColumnPartOfPK(newColumn)))
                     {
                         changedColumns.Add(newColumn);
                     }
@@ -1811,7 +1815,7 @@ namespace Durados.DataAccess.AutoGeneration.Dynamic
 
                         if (fieldRow == null)
                         {
-                            fieldRow = MapDataSet.Field.AddFieldRow(viewRow, columnName, relationRow, column.DataType.FullName, pk, false, column.MaxLength);
+                            fieldRow = MapDataSet.Field.AddFieldRow(viewRow, columnName, relationRow, column.DataType.FullName, pk, false, column.MaxLength, column.AllowDBNull, column.DefaultValue == null ? string.Empty : column.DefaultValue.ToString());
                         }
                         else if (fieldRow.RelationRow == null && relationRow != null)
                         {
@@ -1822,7 +1826,7 @@ namespace Durados.DataAccess.AutoGeneration.Dynamic
                     {
                         if (fieldRow == null)
                         {
-                            MapDataSet.Field.AddFieldRow(viewRow, column.ColumnName, null, column.DataType.FullName, pk, autoIncrement, column.MaxLength);
+                            MapDataSet.Field.AddFieldRow(viewRow, column.ColumnName, null, column.DataType.FullName, pk, autoIncrement, column.MaxLength, column.AllowDBNull, column.DefaultValue == null ? string.Empty : column.DefaultValue.ToString());
                         }
                     }
                 }
@@ -1830,7 +1834,7 @@ namespace Durados.DataAccess.AutoGeneration.Dynamic
                 {
                     if (fieldRow == null)
                     {
-                        MapDataSet.Field.AddFieldRow(viewRow, column.ColumnName, null, column.DataType.FullName, pk, autoIncrement, column.MaxLength);
+                        MapDataSet.Field.AddFieldRow(viewRow, column.ColumnName, null, column.DataType.FullName, pk, autoIncrement, column.MaxLength, column.AllowDBNull, column.DefaultValue == null ? string.Empty : column.DefaultValue.ToString());
                     }
                 }
             }
@@ -1847,7 +1851,7 @@ namespace Durados.DataAccess.AutoGeneration.Dynamic
 
             foreach (DataColumn column in newColumns)
             {
-                MapDataSet.Field.AddFieldRow(viewRow, column.ColumnName, null, column.DataType.FullName, IsColumnPartOfPK(column), false, column.MaxLength);
+                MapDataSet.Field.AddFieldRow(viewRow, column.ColumnName, null, column.DataType.FullName, IsColumnPartOfPK(column), false, column.MaxLength, column.AllowDBNull, column.DefaultValue == null ? string.Empty : column.DefaultValue.ToString());
             }
 
             foreach (DataColumn column in deletedColumns)
@@ -1868,6 +1872,9 @@ namespace Durados.DataAccess.AutoGeneration.Dynamic
                 MapDataSet.FieldRow fieldRow = MapDataSet.Field.Where(r => r.ViewRow != null && r.ViewRow.Name == viewRow.Name && r.Name == column.ColumnName).FirstOrDefault();
                 if (fieldRow != null)
                 {
+                    fieldRow.MaxLength = column.MaxLength;
+                    fieldRow.DefaultValue = column.DefaultValue == null ? null : column.DefaultValue.ToString();
+                    fieldRow.Required = !column.AllowDBNull;
                     fieldRow.DbType = column.DataType.FullName;
                     fieldRow.PK = IsColumnPartOfPK(column);
                 }
@@ -1943,7 +1950,7 @@ namespace Durados.DataAccess.AutoGeneration.Dynamic
                 relationRow = MapDataSet.Relation.AddRelationRow(parentViewName);
             }
 
-            fieldRow = MapDataSet.Field.AddFieldRow(viewRow, columnName, relationRow, dbType, pk, autoIncrement, -1);
+            fieldRow = MapDataSet.Field.AddFieldRow(viewRow, columnName, relationRow, dbType, pk, autoIncrement, -1, false, null);
 
             //MapDataSet.RelationColumns.AddRelationColumnsRow(relationRow, fieldName, 
 
@@ -2036,6 +2043,8 @@ namespace Durados.DataAccess.AutoGeneration.Dynamic
             Type dbType = System.Type.GetType(fieldRow.DbType);
             bool isParent = fieldRow.RelationRow != null;
             int maxLength = fieldRow.IsMaxLengthNull() ? -1 : fieldRow.MaxLength;
+            bool required = fieldRow.IsRequiredNull() ? false : fieldRow.Required;
+            string defaultValue = fieldRow.IsDefaultValueNull() ? null : fieldRow.DefaultValue;
 
             if (isParent)
             {
@@ -2070,6 +2079,15 @@ namespace Durados.DataAccess.AutoGeneration.Dynamic
                     if (!table.Columns.Contains(fieldName))
                     {
                         DataColumn column = table.Columns.Add(fieldName, dbType);
+                        try
+                        {
+                            if (defaultValue != null)
+                            {
+                                column.DefaultValue = Convert.ChangeType(defaultValue, column.DataType);
+                            }
+                        }
+                        catch { }
+                        column.AllowDBNull = !required;
                         DataColumn pkColumn = null;
                         if (parentTable.PrimaryKey.Length > 1)
                         {
@@ -2164,6 +2182,18 @@ namespace Durados.DataAccess.AutoGeneration.Dynamic
                 {
                     DataColumn column = table.Columns.Add(fieldName, dbType);
                     column.MaxLength = maxLength;
+                    try
+                    {
+                        if (!string.IsNullOrEmpty(defaultValue))
+                        {
+                            column.DefaultValue = Convert.ChangeType(defaultValue, column.DataType);
+                        }
+                    }
+                    catch
+                    {
+
+                    }
+                    column.AllowDBNull = !required;
                     columns.Add(column);
                 }
             }

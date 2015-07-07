@@ -148,16 +148,49 @@ namespace BackAnd.Web.Api.Controllers
             }
             catch (Exception exception)
             {
-                Map.Logger.Log("Model", "Validate", "LogModel", exception, 1, null);
+                Maps.Instance.DuradosMap.Logger.Log("Model", "Validate", "LogModel", exception, 1, null);
             }
         }
+
+        protected void UpdateLogModel(Exception exception)
+        {
+            try
+            {
+                if (logModelId.HasValue)
+                {
+                    using (System.Data.SqlClient.SqlConnection connection = new System.Data.SqlClient.SqlConnection(Maps.Instance.DuradosMap.connectionString))
+                    {
+                        connection.Open();
+                        string sql = "update [backand_model] set errorMessage = @errorMessage, errorTrace = @errorTrace where id=@id";
+
+                        using (System.Data.SqlClient.SqlCommand command = new System.Data.SqlClient.SqlCommand(sql, connection))
+                        {
+                            command.Parameters.AddWithValue("errorMessage", exception.Message);
+                            command.Parameters.AddWithValue("errorTrace", exception.StackTrace);
+                            command.Parameters.AddWithValue("id", logModelId.Value);
+                            command.ExecuteNonQuery();
+
+                        }
+
+                        connection.Close();
+                    }
+                }
+            }
+            catch (Exception exception2)
+            {
+                Maps.Instance.DuradosMap.Logger.Log("Model", "Validate", "LogModel", exception, 1, null);
+                Maps.Instance.DuradosMap.Logger.Log("Model", "Validate", "LogModel", exception2, 1, null);
+            }
+        }
+
+        protected int? logModelId = null;
 
         private void LogModel(string appName, string username, DateTime timestamp, string input, string output, string valid)
         {
             using (System.Data.SqlClient.SqlConnection connection = new System.Data.SqlClient.SqlConnection(Maps.Instance.DuradosMap.connectionString))
             {
                 connection.Open();
-                string sql = "insert into [backand_model] ([appName], [username], [timestamp], [input], [output], [valid]) values (@appName, @username, @timestamp, @input, @output, @valid)";
+                string sql = "insert into [backand_model] ([appName], [username], [timestamp], [input], [output], [valid]) values (@appName, @username, @timestamp, @input, @output, @valid); SELECT IDENT_CURRENT(N'backand_model') AS ID";
 
                 using (System.Data.SqlClient.SqlCommand command = new System.Data.SqlClient.SqlCommand(sql, connection))
                 {
@@ -167,7 +200,8 @@ namespace BackAnd.Web.Api.Controllers
                     command.Parameters.AddWithValue("input", input);
                     command.Parameters.AddWithValue("output", output);
                     command.Parameters.AddWithValue("valid", valid);
-                    command.ExecuteNonQuery();
+                    object scalar = command.ExecuteScalar();
+                    logModelId = Convert.ToInt32(scalar);
                 }
 
                 connection.Close();
@@ -1420,7 +1454,7 @@ namespace BackAnd.Web.Api.Controllers
             : base(new HttpResponseMessage()
             {
                 StatusCode = exception is DuradosException ? HttpStatusCode.ExpectationFailed : HttpStatusCode.InternalServerError,
-                Content = new StringContent(exception is DuradosException ? exception.Message : string.Format(Messages.Unexpected, exception.Message)),
+                Content = new StringContent(exception is DuradosException ? (exception.InnerException != null && exception.InnerException is Durados.Workflow.WorkflowEngineException ? exception.InnerException.Message : exception.Message) : string.Format(Messages.Unexpected, exception.Message)),
                 ReasonPhrase = Messages.Critical
             })
         {

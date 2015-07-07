@@ -621,6 +621,11 @@ namespace Durados
         {
             return Name.ReplaceNonAlphaNumeric2();
         }
+
+        protected override object GetDbDefaultValue()
+        {
+            return DataColumn.DefaultValue;
+        }
     }
 
     

@@ -1114,6 +1114,16 @@ namespace Durados
         {
             return false;
         }
+
+        public virtual bool IsApi()
+        {
+            throw new NotImplementedException();
+        }
+
+        public virtual string GetConnectionSource()
+        {
+            throw new NotImplementedException();
+        }
     }
 
     public class IlegalDateFormatException : DuradosException

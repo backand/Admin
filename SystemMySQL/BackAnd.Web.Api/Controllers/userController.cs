@@ -273,6 +273,14 @@ namespace BackAnd.Web.Api.Controllers
             }
             catch (Exception exception)
             {
+                //if (exception.InnerException != null && (exception.InnerException).Message.Contains("users' doesn't exist"))
+                //{
+                //    return ResponseMessage(Request.CreateResponse(HttpStatusCode.NotFound, "Your objects do not contain a users object. Please set the where condition to false in the following Security & Auth actions: Create My App User, Update My App User and Delete My App User."));
+                //}
+                //if (exception.InnerException != null && exception.InnerException is Durados.Workflow.WorkflowEngineException)
+                //{
+                //    return ResponseMessage(Request.CreateResponse(HttpStatusCode.NotFound, "Please check the following Security & Auth actions: Create My App User, Update My App User and Delete My App User."));
+                //}
                 throw new BackAndApiUnexpectedResponseException(exception, this);
             }
         }
