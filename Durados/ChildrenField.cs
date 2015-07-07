@@ -539,6 +539,11 @@ namespace Durados
         {
             return DisplayName.ReplaceNonAlphaNumeric2();
         }
+
+        protected override object GetDbDefaultValue()
+        {
+            return null;
+        }
     }
 
     public enum UpdateParent

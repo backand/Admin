@@ -536,7 +536,7 @@ namespace BackAnd.Web.Api.Controllers
 
         private string GetUrl()
         {
-            return this.Request.RequestUri.OriginalString.Split(new string[1] { "admin" }, StringSplitOptions.RemoveEmptyEntries)[0] + "1/model";//"1/table/config/template";
+            return this.Request.RequestUri.OriginalString.Split(new string[1] { "admin" }, StringSplitOptions.RemoveEmptyEntries)[0] + "1/model?firstTime=true";//"1/table/config/template";
         }
 
 
@@ -575,13 +575,13 @@ namespace BackAnd.Web.Api.Controllers
             string server = null;
             if (values.ContainsKey("server"))
             {
-                string[] serverAndPort = values["server"].ToString().Split(new char[1]{':'}, StringSplitOptions.RemoveEmptyEntries);
+                string[] serverAndPort = values["server"].ToString().Split(GetDefaultProductPortSpliter(values).ToCharArray(), StringSplitOptions.RemoveEmptyEntries);
                 if (serverAndPort.Length > 1)
                 {
                     string portString = serverAndPort[serverAndPort.Length - 1];
                     if (Int32.TryParse(portString, out port))
                     {
-                        server = string.Join(":", serverAndPort, 0, serverAndPort.Length - 1);
+                        server = string.Join(GetDefaultProductPortSpliter(values), serverAndPort, 0, serverAndPort.Length - 1);
                     }
                     else
                     {
@@ -599,6 +599,33 @@ namespace BackAnd.Web.Api.Controllers
                 port = GetDefaultProductPort(values);
 
             return new object[2] { server, port };
+        }
+
+        private string GetDefaultProductPortSpliter(Dictionary<string, object> values)
+        {
+            int product = Convert.ToInt32(values[Product]);
+            string spliter = ":";
+
+            switch (product)
+            {
+                case 4:
+                    spliter = ":";
+                    break;
+                case 1:
+                case 2:
+                    spliter = ";";
+                    break;
+                case 8:
+                    spliter = ":";
+                    break;
+                case 7:
+                    spliter = ":";
+                    break;
+                default:
+                    spliter = ":";
+                    break;
+            }
+            return spliter;
         }
 
         private int GetDefaultProductPort(Dictionary<string, object> values)

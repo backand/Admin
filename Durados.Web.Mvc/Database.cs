@@ -1222,6 +1222,16 @@ namespace Durados.Web.Mvc
         {
             return DataAccessFactory.GetDataAccess(connectionString);
         }
+
+        public override bool IsApi()
+        {
+            return Maps.Instance.IsApi();
+        }
+
+        public override string GetConnectionSource()
+        {
+            return RestHelper.GetConnectionSource(Map.AppName);
+        }
     }
 
 

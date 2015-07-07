@@ -191,6 +191,15 @@ namespace Durados.DataAccess.AutoGeneration
                 string columnName = reader.GetString(reader.GetOrdinal("column_name"));
                 string dataType = reader.GetString(reader.GetOrdinal("data_type"));
                 bool isNullable = reader.GetString(reader.GetOrdinal("is_nullable")).Equals("YES");
+                string defaultValue = null;
+                try
+                {
+                    if (!viewName.ToLower().Contains("durados"))
+                    {
+                        defaultValue = reader.IsDBNull(reader.GetOrdinal("column_default")) ? null : reader.GetString(reader.GetOrdinal("column_default"));
+                    }
+                }
+                catch { }
 
                 DataColumn column = new DataColumn();
                 column.ColumnName = columnName;
@@ -208,6 +217,28 @@ namespace Durados.DataAccess.AutoGeneration
                 {
                     column.DataType = type;
                     column.AllowDBNull = isNullable;
+                    try
+                    {
+                        if (defaultValue != null)
+                        {
+                            if (type == typeof(bool))
+                            {
+                                if (!string.IsNullOrEmpty(defaultValue))
+                                {
+                                    column.DefaultValue = !defaultValue.Equals("b'0'");
+                                }
+                            }
+                            else if (type == typeof(DateTime))
+                            {
+                                column.DefaultValue = Convert.ChangeType(defaultValue, type);
+                            }
+                            else
+                            {
+                                column.DefaultValue = Convert.ChangeType(defaultValue, type);
+                            }
+                        }
+                    }
+                    catch { }
                     if (column.DataType == typeof(string))
                     {
                         int? maxLength = int.MaxValue;

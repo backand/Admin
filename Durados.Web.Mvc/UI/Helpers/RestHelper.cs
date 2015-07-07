@@ -1245,7 +1245,7 @@ namespace Durados.Web.Mvc.UI.Helpers
                             {
                                 if (value.ToString().ToLower() != "now")
                                 {
-                                    return Convert.ToDateTime(value).ToUniversalTime().ToString("u");
+                                    return Convert.ToDateTime(value).ToString("u").TrimEnd('Z');
                                 }
                             }
                             catch (Exception exception)
@@ -1259,7 +1259,7 @@ namespace Durados.Web.Mvc.UI.Helpers
                         {
                             try
                             {
-                                if (value.Equals("0") || value.ToString().ToLower() == "true" || value.ToString().ToLower() == "yes")
+                                if (value.Equals("0") || value.ToString().ToLower() == "false" || value.ToString().ToLower() == "no")
                                 {
                                     return false;
                                 }
@@ -4564,6 +4564,72 @@ namespace Durados.Web.Mvc.UI.Helpers
             string sql = string.Format("SELECT TOP 1 id FROM durados_app WITH(NOLOCK)  WHERE creator=@id");
 
             return !sqlAccess.ExecuteScalar(Maps.Instance.DuradosMap.connectionString, sql, parameters).Equals(string.Empty);
+        }
+
+        public class DefaultUsersTable
+        {
+            public static void HandleFirstTime(Map map)
+            {
+                HandleCreator(map);
+                HandleActions(map);
+            }
+            public static void HandleCreator(Map map)
+            {
+                if (IsExist(map))
+                {
+                    if (!IsContainCreator(map))
+                    {
+                        AddCreator(map);
+                    }
+                }
+            }
+
+            private static void AddCreator(Map map)
+            {
+                DataRow creatorRow = map.Database.GetUserRow();
+                View usersView = (View)map.Database.Views["users"];
+                usersView.Create(new Dictionary<string, object>() { { "email", creatorRow["Username"].ToString() }, { "firstName", creatorRow["FirstName"].ToString() }, { "lastName", creatorRow["LastName"].ToString() }, { "role", creatorRow["Role"].ToString() } });
+            }
+
+            private static bool IsContainCreator(Map map)
+            {
+                View usersView = (View)map.Database.Views["users"];
+                int rowCount = 0;
+                DataView dataView = usersView.FillPage(1, 1, null, false, null, out rowCount, null, null);
+                return rowCount > 0;
+            }
+
+            private static bool IsExist(Map map)
+            {
+                return map.Database.Views.ContainsKey("users");
+            }
+
+            public static void HandleActions(Map map)
+            {
+                if (!IsExist(map))
+                {
+                    DisableAction(map, "Create My App User");
+                    DisableAction(map, "Update My App User");
+                    DisableAction(map, "Delete My App User");
+                }
+            }
+
+            private static void DisableAction(Map map, string actionName)
+            {
+                View ruleView = (View)map.GetConfigDatabase().Views["Rule"];
+                View backandUsersView = (View)map.Database.Views["v_durados_User"];
+                Durados.Rule rule = backandUsersView.GetRules().Where(r => r.Name.Equals(actionName)).FirstOrDefault();
+                if (rule != null)
+                {
+                    if (rule.WhereCondition == "true")
+                    {
+                        string id = rule.ID.ToString();
+
+                        ruleView.Edit(new Dictionary<string, object>() { { "WhereCondition", "false" } }, id, null, null, null, null);
+
+                    }
+                }
+            }
         }
     }
 

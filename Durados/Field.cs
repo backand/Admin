@@ -429,9 +429,31 @@ namespace Durados
         [Durados.Config.Attributes.ColumnProperty(Description = "If updated in sub grid then it updates the parent row. Need also to set the Update Parent in the Parent View Children Field.")]
         public virtual bool UpdateParentInGrid { get; set; }
 
-        [Durados.Config.Attributes.ColumnProperty(DoNotCopy = true, Description = "Default value in New dialog")]
-        public object DefaultValue { get; set; }
+        //[Durados.Config.Attributes.ColumnProperty(DoNotCopy = true, Description = "Default value in New dialog")]
+        //public object DefaultValue { get; set; }
 
+        private object defaultValue;
+        [Durados.Config.Attributes.ColumnProperty(DoNotCopy = true, Description = "Default value in New dialog")]
+        public object DefaultValue
+        {
+            get
+            {
+                if (View.Database.IsApi())
+                {
+                    return GetDbDefaultValue();
+                }
+
+                return defaultValue;
+
+            }
+            set
+            {
+                defaultValue = value;
+            }
+        }
+
+        protected abstract object GetDbDefaultValue();
+        
         [Durados.Config.Attributes.ColumnProperty(Description = "Enable grid editing")]
         public virtual bool GridEditable { get; set; }
 
@@ -727,8 +749,36 @@ namespace Durados
         public abstract bool GetDbRequired();
         public abstract bool GetDbNotEditable();
 
+        private bool required;
         [Durados.Config.Attributes.ColumnProperty(DoNotCopy = true, Description = "Field is required in New / Edit dialog")]
-        public bool Required { get; set; }
+        public bool Required
+        {
+            get
+            {
+                if (View.Database.IsApi())
+                {
+                    return GetDbRequired();
+                }
+
+                if (GetDbRequired())
+                {
+                    return true;
+                }
+                return required;
+                
+            }
+            set
+            {
+                if (GetDbRequired())
+                {
+                    required = true;
+                }
+                else
+                {
+                    required = value;
+                }
+            }
+        }
 
         [Durados.Config.Attributes.ColumnProperty(DoNotCopy = true, Description = "Refresh the field value when user select the Tab. Use to refresh the display data in a field that has dependency in another Tab")]
         public bool Refresh { get; set; }
