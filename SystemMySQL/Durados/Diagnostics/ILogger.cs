@@ -11,6 +11,7 @@ namespace Durados.Diagnostics
         ILog Log(string controller, string action, string method, Exception exception, int logType, string freeText);
         ILog Log(string controller, string action, string method, Exception exception, int logType, string freeText, DateTime time);
         ILog Log(string controller, string action, string method, string message, string trace, int logType, string freeText, DateTime time);
+        ILog Log(string controller, string action, string method, string message, string trace, int logType, string freeText, DateTime time, Guid? guid);
 
         void WriteToEventLog(string sEvent, EventLogEntryType eventLogEntryType, int id);
         void WriteToEventLog(string controller, string action, string method, string message, string trace, int logType, string freeText);

@@ -4254,6 +4254,15 @@ namespace Durados.DataAccess
             bool autoIdentity = view.IsAutoIdentity;
             bool guidIdentity = view.IsGuidIdentity;
 
+            if (view.DataTable.PrimaryKey.Length == 1)
+            {
+                DataColumn pkColumn = view.DataTable.PrimaryKey[0];
+                if (pkColumn.DataType == typeof(string) && !values.ContainsKey(pkColumn.ColumnName) && pkColumn.MaxLength > 35)
+                {
+                    guidIdentity = true;
+                }
+            }
+
             if (guidIdentity)
             {
                 string guidName = view.DataTable.PrimaryKey[0].ColumnName;
@@ -4263,7 +4272,7 @@ namespace Durados.DataAccess
                 }
                 if (!values.ContainsKey(guidName))
                 {
-                    values.Add(guidName, Guid.NewGuid());
+                    values.Add(guidName, Durados.Security.GuidGenerator.GenerateTimeBasedGuid());
                 }
             }
 
@@ -4273,7 +4282,7 @@ namespace Durados.DataAccess
             string delimitedColumns = GetDelimitedColumns(columnNames, view);
             if (string.IsNullOrEmpty(delimitedColumns))
             {
-                sql = string.Format("insert into " + sqlTextBuilder.EscapeDbObject("{0}") + " default values"+sqlTextBuilder.DbEndOfStatement, tableName);
+                sql = string.Format("insert into " + sqlTextBuilder.EscapeDbObject("{0}") + sqlTextBuilder.InsertWithoutColumns() + sqlTextBuilder.DbEndOfStatement, tableName);
             }
             else
             {
@@ -11732,4 +11741,10 @@ public class SqlTextBuilder : ISqlTextBuilder
     {
         get { return "107"; }
     }
+
+    public virtual string InsertWithoutColumns()
+    {
+        return " default values ";
+    }
+
 }

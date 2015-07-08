@@ -375,13 +375,18 @@ namespace Durados.Web.Mvc.Logging
 
         public Durados.Diagnostics.ILog Log(string controller, string action, string method, string message, string trace, int logType, string freeText, DateTime time)
         {
+            return Log(controller, action, method, message, trace, logType, freeText, time, null);
+        }
+
+        public Durados.Diagnostics.ILog Log(string controller, string action, string method, string message, string trace, int logType, string freeText, DateTime time, Guid? guid)
+        {
            
 
             if (!initiated)
                 Initiate();
 
             Log log = new Log();
-            if (LogType < logType)
+            if (LogType < logType && logType != 500 && logType != 501)
                 return null;
 
             //if (LogFailed)
@@ -421,7 +426,7 @@ namespace Durados.Web.Mvc.Logging
 
                                 sqlConnection.Open();
 
-                                SetCommandParametrs(command, applicationName, username, controller, action, method, message, trace, logType, freeText, time, log);
+                                SetCommandParametrs(command, applicationName, username, controller, action, method, message, trace, logType, freeText, time, log, guid);
 
                                 command.ExecuteNonQuery();
                             }
@@ -537,7 +542,7 @@ namespace Durados.Web.Mvc.Logging
             return log;
         }
 
-        private void SetCommandParametrs(IDbCommand cmd, string applicationName, string username, string controller, string action, string method, string message, string trace, int logType, string freeText, DateTime time, Log log)
+        private void SetCommandParametrs(IDbCommand cmd, string applicationName, string username, string controller, string action, string method, string message, string trace, int logType, string freeText, DateTime time, Log log, Guid? guid = null)
         {
             cmd.Parameters.Clear();
             IDataParameter timeParameter = GetNewParameter(cmd,"Time", SqlDbType.DateTime);
@@ -598,7 +603,7 @@ namespace Durados.Web.Mvc.Logging
             freeTextParameter.Value = freeText;
             cmd.Parameters.Add(freeTextParameter);
             IDataParameter guidTextParameter = GetNewParameter(cmd, "Guid", SqlDbType.UniqueIdentifier);
-            guidTextParameter.Value = Guid.NewGuid();
+            guidTextParameter.Value = guid.HasValue ? guid.Value : Guid.NewGuid();
             cmd.Parameters.Add(guidTextParameter);
         }
 

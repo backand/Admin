@@ -127,19 +127,23 @@ namespace Backand
                 return;
 
             CheckLimit();
-            using (System.Data.SqlClient.SqlConnection connection = new System.Data.SqlClient.SqlConnection(Durados.Workflow.JavaScript.GetCacheInCurrentRequest(Durados.Workflow.JavaScript.ConnectionStringKey).ToString()))
-            {
-                connection.Open();
-                string sql = "insert into durados_log ([Time], [LogType], [FreeText], [Guid]) values(@Time,@LogType,@FreeText,@Guid)";
-                using (System.Data.SqlClient.SqlCommand command = new System.Data.SqlClient.SqlCommand(sql, connection))
-                {
-                    command.Parameters.Add(new System.Data.SqlClient.SqlParameter("Time", DateTime.Now));
-                    command.Parameters.Add(new System.Data.SqlClient.SqlParameter("LogType", logType));
-                    command.Parameters.Add(new System.Data.SqlClient.SqlParameter("FreeText", message));
-                    command.Parameters.Add(new System.Data.SqlClient.SqlParameter("Guid", Durados.Workflow.JavaScript.GetCacheInCurrentRequest(Durados.Workflow.JavaScript.GuidKey)));
-                    command.ExecuteNonQuery();
-                }
-            }
+
+            Durados.Database database = Durados.Workflow.Engine.GetCurrentDatabase();
+
+            database.Logger.Log("", "", "", "", "", logType, message, DateTime.Now, (Guid)(Durados.Workflow.JavaScript.GetCacheInCurrentRequest(Durados.Workflow.JavaScript.GuidKey) ?? Guid.NewGuid()));
+            //using (System.Data.SqlClient.SqlConnection connection = new System.Data.SqlClient.SqlConnection(Durados.Workflow.JavaScript.GetCacheInCurrentRequest(Durados.Workflow.JavaScript.ConnectionStringKey).ToString()))
+            //{
+            //    connection.Open();
+            //    string sql = "insert into durados_log ([Time], [LogType], [FreeText], [Guid]) values(@Time,@LogType,@FreeText,@Guid)";
+            //    using (System.Data.SqlClient.SqlCommand command = new System.Data.SqlClient.SqlCommand(sql, connection))
+            //    {
+            //        command.Parameters.Add(new System.Data.SqlClient.SqlParameter("Time", DateTime.Now));
+            //        command.Parameters.Add(new System.Data.SqlClient.SqlParameter("LogType", logType));
+            //        command.Parameters.Add(new System.Data.SqlClient.SqlParameter("FreeText", message));
+            //        command.Parameters.Add(new System.Data.SqlClient.SqlParameter("Guid", Durados.Workflow.JavaScript.GetCacheInCurrentRequest(Durados.Workflow.JavaScript.GuidKey)));
+            //        command.ExecuteNonQuery();
+            //    }
+            //}
         }
 
         private static bool IsDebug()

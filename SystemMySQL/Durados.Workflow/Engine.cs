@@ -19,6 +19,8 @@ namespace Durados.Workflow
         protected Validator validator;
         protected LogicalParser parser;
         protected Step step;
+
+        private static Dictionary<string, Database> CurrentDatabases = new Dictionary<string, Database>();
        
         public Engine()
         {
@@ -90,6 +92,7 @@ namespace Durados.Workflow
 
         public virtual void PerformActions(object controller, Durados.View view, Durados.TriggerDataAction dataAction, Dictionary<string, object> values, string pk, DataRow prevRow, string connectionString, int currentUserId, string currentUserRole, IDbCommand command, string ruleName = null)
         {
+            SetCurrentDatabase(view);
 
             IEnumerable<Rule> rules = view.GetRules().Where(r => r.ShouldTrigger(dataAction)).OrderBy(r => r.Name).ToList();
             if (ruleName != null)
@@ -142,6 +145,35 @@ namespace Durados.Workflow
                 throw new WorkflowEngineException(exceptions.ToArray(), failedRules.ToArray());
             }
 
+        }
+
+        private static void SetCurrentDatabase(View view)
+        {
+            try
+            {
+                string appName = view.Database.GetCurrentAppName();
+                if (appName == null)
+                    return;
+                if (!CurrentDatabases.ContainsKey(appName))
+                {
+                    CurrentDatabases.Add(appName, view.Database);
+                }
+            }
+            catch { }
+        }
+
+        public static Database GetCurrentDatabase()
+        {
+            if (System.Web.HttpContext.Current.Items[Database.AppName] != null)
+            {
+                string appName = System.Web.HttpContext.Current.Items[Database.AppName].ToString();
+                if (CurrentDatabases.ContainsKey(appName))
+                {
+                    return CurrentDatabases[appName];
+                }
+                return null;
+            }
+            return null;
         }
 
         public static Dictionary<string, object> AsToken(Dictionary<string, object> values)

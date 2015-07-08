@@ -528,6 +528,12 @@ namespace System
         {
             return Durados.Security.CipherUtility.Decrypt<System.Security.Cryptography.AesManaged>(password, database.DefaultMasterKeyPassword, database.Salt);
         }
+
+        public static bool OnlyOnce(this string full, string part)
+        {
+            var first = full.IndexOf(part);
+            return first != -1 && first == full.LastIndexOf(part);
+        }
     }
 
     public static class FileHelper

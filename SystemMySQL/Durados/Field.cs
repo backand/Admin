@@ -1055,6 +1055,14 @@ namespace Durados
             {
                 return new Guid(value.Substring(0, 36));
             }
+            else if (type == typeof(int) && value.Equals("true"))
+            {
+                return 1;
+            }
+            else if (type == typeof(int) && value.Equals("false"))
+            {
+                return 0;
+            }
             else
             {
                 return Convert.ChangeType(value, type);

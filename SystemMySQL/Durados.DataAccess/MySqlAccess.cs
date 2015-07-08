@@ -303,6 +303,11 @@ namespace Durados.DataAccess
         {
             get { return "%m/%d/%Y"; }
         }
+
+        public override string InsertWithoutColumns()
+        {
+            return " () values () ";
+        }
     }
 
     public class MySqlSchema : SqlSchema
