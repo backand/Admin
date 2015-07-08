@@ -82,6 +82,33 @@ namespace Durados.Workflow
             return System.Convert.ToBoolean(Durados.Workflow.JavaScript.GetCacheInCurrentRequest(Durados.Workflow.JavaScript.Debug) ?? false);
         }
 
+        private string HandleLineCodes(string message)
+        {
+            string[] segments = message.Split(new string[] { ":" }, StringSplitOptions.None);
+            
+            foreach(string segment in segments)
+            {
+                if (segment.Contains("Line"))
+                {
+                    string[] subsegments = segment.Split(new string[] { " " }, StringSplitOptions.None);
+                    foreach (string subsegment in subsegments)
+                    {
+                        int number = -1;
+                        if (int.TryParse(subsegment, out number))
+                        {
+                            int adjustedNumber = number - 157;
+                            return message.Replace(number.ToString(), adjustedNumber.ToString());
+                            
+                        }
+                    }
+                }
+            }
+
+            return message;
+
+            // "The follwoing action: "aaa" failed to perform: Failed to load the javascript code: Line 166: Unexpected token }"
+        }
+
         public virtual void Execute(object controller, Dictionary<string, Parameter> parameters, View view, Dictionary<string, object> values, DataRow prevRow, string pk, string connectionString, int currentUsetId, string currentUserRole, IDbCommand command)
         {
             SetCacheInCurrentRequest(ConnectionStringKey, view.Database.SysDbConnectionString);
@@ -103,6 +130,10 @@ namespace Durados.Workflow
             Dictionary<string, object> oldRow = new Dictionary<string, object>();
             Dictionary<string, object> userProfile = new Dictionary<string, object>();
 
+            //if (System.Web.HttpContext.Current.Request.Files.Count > 0){
+            //    clientParameters.Add("__bko_file", System.Web.HttpContext.Current.Request.Files[0].InputStream.)
+            //System.Web.HttpContext.Current.Request.Files[0].InputStream
+            //}
             bool debug = false;
             if (values != null)
             {
@@ -171,7 +202,7 @@ namespace Durados.Workflow
             catch (Exception exception)
             {
                 Backand.Logger.Log(exception.Message, 501);
-                throw new DuradosException("Failed to load the javascript code: " + exception.Message, exception);
+                throw new DuradosException("Failed to load the javascript code: " + HandleLineCodes(exception.Message), exception); 
             }
             object r = null;
             try

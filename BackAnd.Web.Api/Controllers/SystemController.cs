@@ -20,7 +20,18 @@ namespace BackAnd.Web.Api.Controllers
         {
             try
             {
-                return Ok(new { version = Durados.Web.Mvc.Infrastructure.General.Version() });
+                string json = "{\"newSchema\":[],\"oldSchema\":[],\"severity\":0}";
+                string node = "node is running";
+
+                try
+                {
+                    Dictionary<string, object> transformResult = Transform(json, false);
+                }
+                catch (Exception exception)
+                {
+                    node = exception.InnerException == null ? exception.Message : exception.InnerException.Message;
+                }
+                return Ok(new { version = Durados.Web.Mvc.Infrastructure.General.Version(), node = node });
       
             }
             catch (Exception exception)

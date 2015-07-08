@@ -63,4 +63,6 @@
     string mmddyyyy { get; }
 
     string monddyyyy { get; }
+
+    string InsertWithoutColumns();
 }

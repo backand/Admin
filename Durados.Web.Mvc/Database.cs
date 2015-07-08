@@ -1155,6 +1155,9 @@ namespace Durados.Web.Mvc
             if (Map != null && !string.IsNullOrEmpty(Map.AppName))
                 return Map.AppName;
 
+            if (System.Web.HttpContext.Current.Items[Database.AppName] == null)
+                return null;
+
             return System.Web.HttpContext.Current.Items[Database.AppName].ToString();
         }
         public override bool IsAllow(Durados.Services.ISecurable securable)
