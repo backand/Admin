@@ -188,15 +188,26 @@ namespace Durados.Workflow
 
             var call = new Jint.Engine(cfg => cfg.AllowClr(typeof(Backand.XMLHttpRequest).Assembly));
 
+            
             var CONSTS = new Dictionary<string, object>() { { "apiUrl", System.Web.HttpContext.Current.Request.Url.Scheme + "://" + System.Web.HttpContext.Current.Request.Url.Host + ":" + System.Web.HttpContext.Current.Request.Url.Port + System.Web.HttpContext.Current.Request.ApplicationPath } };
+
+
+            var parser = new Jint.Native.Json.JsonParser(call);
+            var userInput = parser.Parse(new System.Web.Script.Serialization.JavaScriptSerializer().Serialize(newRow));
+            var parameters2 = parser.Parse(new System.Web.Script.Serialization.JavaScriptSerializer().Serialize(clientParameters));
+            var dbRow = parser.Parse(new System.Web.Script.Serialization.JavaScriptSerializer().Serialize(oldRow));
+            var userProfile2 = parser.Parse(new System.Web.Script.Serialization.JavaScriptSerializer().Serialize(userProfile));
+            var CONSTS2 = parser.Parse(new System.Web.Script.Serialization.JavaScriptSerializer().Serialize(CONSTS));
+
+
             try
             {
-                call.SetValue("userInput", newRow)
+                call.SetValue("userInput", userInput)
                 .SetValue("btoa", new btoaHandler(Backand.Convert.btoa))
-                .SetValue("dbRow", oldRow)
-                .SetValue("parameters", clientParameters)
-                .SetValue("userProfile", userProfile)
-                .SetValue("CONSTS", CONSTS)
+                .SetValue("dbRow", dbRow)
+                .SetValue("parameters", parameters2)
+                .SetValue("userProfile", userProfile2)
+                .SetValue("CONSTS", CONSTS2)
                 .Execute(GetXhrWrapper() + code + "; function call(){return backandCallback(userInput, dbRow, parameters, userProfile);}");
             }
             catch (Exception exception)
