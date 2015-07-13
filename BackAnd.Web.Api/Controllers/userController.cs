@@ -166,6 +166,7 @@ namespace BackAnd.Web.Api.Controllers
 
         [HttpPost]
         [BackAnd.Web.Api.Controllers.Filters.BackAndAuthorize]
+        [Route("")]
         public virtual IHttpActionResult Post()
         {
             if (!IsAdmin())
