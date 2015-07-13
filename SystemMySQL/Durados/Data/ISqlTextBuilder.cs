@@ -65,4 +65,6 @@
     string monddyyyy { get; }
 
     string InsertWithoutColumns();
+
+    string FromDual();
 }

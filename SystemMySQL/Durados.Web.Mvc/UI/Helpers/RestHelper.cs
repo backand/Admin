@@ -3513,7 +3513,8 @@ namespace Durados.Web.Mvc.UI.Helpers
         {
             try
             {
-                System.Web.HttpContext.Current.Items[Database.Username] = username;
+                if (System.Web.HttpContext.Current.Items[Database.Username] == null)
+                    System.Web.HttpContext.Current.Items[Database.Username] = username;
 
                 if (!password.Equals(confirmPassword))
                 {
@@ -3737,7 +3738,7 @@ namespace Durados.Web.Mvc.UI.Helpers
 
             string userId = row["ID"].ToString();
 
-            map.Database.GetUserView().Edit(values, userId, beforeEditCallback, beforeEditInDatabaseCallback, afterEditBeforeCommitCallback, afterEditAfterCommitCallback);
+            map.Database.GetUserView().Edit(values, userId, null, null, null, null);//, beforeEditCallback, beforeEditInDatabaseCallback, afterEditBeforeCommitCallback, afterEditAfterCommitCallback);
 
             //SendApprovalEmail(username, appName);
         }

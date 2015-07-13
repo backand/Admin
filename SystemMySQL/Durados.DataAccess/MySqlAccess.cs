@@ -209,6 +209,11 @@ namespace Durados.DataAccess
 
     public class MySqlTextBuilder : SqlTextBuilder
     {
+        public override string FromDual()
+        {
+            return " FROM DUAL ";
+        }
+
         public override string GetAlterColumn(string columnName)
         {
             return " CHANGE COLUMN " + columnName + " ";
