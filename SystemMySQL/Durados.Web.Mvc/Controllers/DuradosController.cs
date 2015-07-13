@@ -5869,8 +5869,8 @@ namespace Durados.Web.Mvc.Controllers
                     }
                     else
                     {
-                        e.SysCommand = new System.Data.SqlClient.SqlCommand();
-                        e.SysCommand.Connection = new System.Data.SqlClient.SqlConnection(Map.Database.SystemConnectionString);
+                        e.SysCommand = GetCommand(Map.Database.SystemSqlProduct);// new System.Data.SqlClient.SqlCommand();
+                        e.SysCommand.Connection = GetConnection(Map.Database.SystemSqlProduct,Map.Database.SystemConnectionString);// new System.Data.SqlClient.SqlConnection();
                     }
                 }
             }
@@ -5954,8 +5954,8 @@ namespace Durados.Web.Mvc.Controllers
                         }
                         else
                         {
-                            e.SysCommand = new System.Data.SqlClient.SqlCommand();
-                            e.SysCommand.Connection = new System.Data.SqlClient.SqlConnection(Map.Database.SystemConnectionString);
+                            e.SysCommand = GetCommand(Map.Database.SystemSqlProduct);// new System.Data.SqlClient.SqlCommand();
+                            e.SysCommand.Connection = GetConnection(Map.Database.SystemSqlProduct,Map.Database.SystemConnectionString);
                         }
                     }
                 }

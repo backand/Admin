@@ -1087,7 +1087,7 @@ namespace Durados.DataAccess
                 try
                 {
                     OldNewValue[] oldNewValues = null;
-                    int? id = ((History)history).SaveEdit(command, view, prevRow, values, pk, userId.Value, out oldNewValues, view.Database.SwVersion, view.GetWorkspaceName());
+                    int? id = DataAccess.History.GetHistory(view.Database.SystemSqlProduct).SaveEdit(command, view, prevRow, values, pk, userId.Value, out oldNewValues, view.Database.SwVersion, view.GetWorkspaceName()); //((History)history).SaveEdit(command, view, prevRow, values, pk, userId.Value, out oldNewValues, view.Database.SwVersion, view.GetWorkspaceName());
                     if (id.HasValue)
                         configTransaction.AddPendingHistoryId(id.Value);
                 }
