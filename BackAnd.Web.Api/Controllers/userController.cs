@@ -71,6 +71,27 @@ namespace BackAnd.Web.Api.Controllers
         }
 
         [HttpGet]
+        [Route("")]
+        [BackAnd.Web.Api.Controllers.Filters.BackAndAuthorize]
+        public IHttpActionResult Get()
+        {
+            DataRow row = Map.Database.GetUserRow();
+            if (row == null)
+            {
+                return ResponseMessage(Request.CreateResponse(HttpStatusCode.NotFound, "User not found"));
+            }
+            try
+            {
+                return Ok(new Dictionary<string, object>() { { "firstName", row.IsNull("firstName") ? null : row["FirstName"].ToString() }, { "lastName", row.IsNull("lastName") ? null : row["lastName"].ToString() }, { "email", row.IsNull("Email") ? null : row["Email"].ToString() }, { "role", row.IsNull("Role") ? null : row["Role"].ToString() } });
+            }
+            catch (Exception exception)
+            {
+                throw new BackAndApiUnexpectedResponseException(exception, this);
+
+            }
+        }
+
+        [HttpGet]
         [BackAnd.Web.Api.Controllers.Filters.BackAndAuthorize]
         [Route("key/{id}")]
         public IHttpActionResult key(string id)
