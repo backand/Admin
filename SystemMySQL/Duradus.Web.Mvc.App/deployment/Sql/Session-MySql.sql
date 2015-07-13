@@ -40,14 +40,14 @@ CREATE PROCEDURE `durados_setsession`
 BEGIN
 	   
 
-	IF ( SELECT EXISTS ( SELECT 1 from durados_session  where `durados_session`.`SessionID`=SessionID  and `durados_session`.`Name`=Name)) THEN
+	IF ( SELECT EXISTS ( SELECT 1 FROM durados_session  WHERE `durados_session`.`SessionID`=SessionID  and `durados_session`.`Name`=Name)) THEN
 	
-       update `durados_session` set `Scalar`=Scalar, `TypeCode`=TypeCode, `SerializedObject`=null, `ObjectType`=null where `SessionID`=SessionID  and `durados_session`.`Name`=Name;
+       UPDATE `durados_session` set `Scalar`=Scalar, `TypeCode`=TypeCode, `SerializedObject`=null, `ObjectType`=NULL WHERE `SessionID`=SessionID  and `durados_session`.`Name`=Name;
       
 	
 	ELSE
 	
-		 INSERT INTO `durados_session`(`SessionID`, `Name`, `Scalar`, `TypeCode`) values (SessionID, Name, Scalar, TypeCode);
+		 INSERT INTO `durados_session`(`SessionID`, `Name`, `Scalar`, `TypeCode`) VALUES (SessionID, Name, Scalar, TypeCode);
 END IF;
 
  
