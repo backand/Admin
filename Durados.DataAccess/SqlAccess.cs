@@ -5442,6 +5442,8 @@ namespace Durados.DataAccess
                     else
                         return table.Rows[table.Rows.Count - 1];
                 }
+                else if (table.Rows.Count == 0)
+                    return null;
                 else
                     return table.Rows[0];
 
@@ -9592,10 +9594,7 @@ namespace Durados.DataAccess
                 SqlAccess.Cache.Clear(view.Name);
             }
 
-            createEventArgs = new CreateEventArgs(view, values, pk, null, null);
-            if (afterCreateAfterCommitCallback != null)
-                afterCreateAfterCommitCallback(this, createEventArgs);
-
+            
             return pk;
         }
 
@@ -9665,6 +9664,14 @@ namespace Durados.DataAccess
                     {
                         sysTransaction.Commit();
                     }
+
+                    foreach (var deepObject in deepObjects)
+                    {
+                        CreateEventArgs createEventArgs = new CreateEventArgs(view, GetValues(view, deepObject), pk, null, null);
+                        if (afterCreateAfterCommitCallback != null)
+                            afterCreateAfterCommitCallback(this, createEventArgs);
+                    }
+
                     SqlAccess.Cache.Clear(view.Name);
                 }
             }
@@ -9712,7 +9719,7 @@ namespace Durados.DataAccess
             return field;
         }
 
-        protected virtual string Create(View view, Dictionary<string, object> deepObject, bool deep, IDbCommand command, IDbCommand sysCommand, BeforeCreateEventHandler beforeCreateCallback, BeforeCreateInDatabaseEventHandler beforeCreateInDatabaseCallback, AfterCreateEventHandler afterCreateBeforeCommitCallback, AfterCreateEventHandler afterCreateAfterCommitCallback)
+        protected virtual Dictionary<string, object> GetValues(View view, Dictionary<string, object> deepObject)
         {
             Dictionary<string, object> values = new Dictionary<string, object>();
 
@@ -9733,6 +9740,13 @@ namespace Durados.DataAccess
                     values.Add(key, deepObject[key]);
                 }
             }
+
+            return values;
+        }
+
+        protected virtual string Create(View view, Dictionary<string, object> deepObject, bool deep, IDbCommand command, IDbCommand sysCommand, BeforeCreateEventHandler beforeCreateCallback, BeforeCreateInDatabaseEventHandler beforeCreateInDatabaseCallback, AfterCreateEventHandler afterCreateBeforeCommitCallback, AfterCreateEventHandler afterCreateAfterCommitCallback)
+        {
+            Dictionary<string, object> values = GetValues(view, deepObject);
 
             int? id = null;
 
@@ -11683,6 +11697,11 @@ public class SqlTextBuilder : ISqlTextBuilder
         {
             return sql;
         }
+    }
+
+    public virtual string FromDual()
+    {
+        return string.Empty;
     }
 
     public virtual string NLS

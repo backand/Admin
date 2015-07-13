@@ -1208,6 +1208,7 @@ namespace Durados.Web.Mvc
             AddNewUserInvitation();
             AddNewAdminInvitation();
             ConfigWorkspace();
+            SetDefaultNewUserDefaultRole();
             //ConfigCategory();
             Commit();
             //CopyDefaultPage();
@@ -1221,6 +1222,13 @@ namespace Durados.Web.Mvc
             {
                 Logger.Log("Map", "Initiate", "UpdateOnBoardingStatus", exception, 1, "Failed to Update OnBoarding Status");
             }
+        }
+
+        private void SetDefaultNewUserDefaultRole()
+        {
+            View databaseView = (View)configDatabase.Views["Database"];
+
+            databaseView.Edit(new Dictionary<string, object>() { { "NewUserDefaultRole", "User"} }, "0", null, null, null, null);
         }
 
         public string GetLocalDatabaseHost()
@@ -1265,7 +1273,7 @@ namespace Durados.Web.Mvc
             values.Add("WorkflowAction", Durados.WorkflowAction.Execute.ToString());
             values.Add("WhereCondition", whereCondition);
             values.Add("ExecuteMessage", "Your objects do not contain a users object. Please set the where condition to false in the Security & Auth action \"Create My App User\".");
-            values.Add("ExecuteCommand", "insert into " + sqlTextBuilder.EscapeDbObject(USERS) + " (" + sqlTextBuilder.EscapeDbObject("email") + "," + sqlTextBuilder.EscapeDbObject("firstName") + "," + sqlTextBuilder.EscapeDbObject("lastName") + "," + sqlTextBuilder.EscapeDbObject("role") + ") values ('{{Username}}','{{FirstName}}','{{LastName}}','{{Role}}')");
+            values.Add("ExecuteCommand", "insert into " + sqlTextBuilder.EscapeDbObject(USERS) + " (" + sqlTextBuilder.EscapeDbObject("email") + "," + sqlTextBuilder.EscapeDbObject("firstName") + "," + sqlTextBuilder.EscapeDbObject("lastName") + ") " + sqlTextBuilder.Top("select '{{Username}}','{{FirstName}}','{{LastName}}' " + sqlTextBuilder.FromDual() + " WHERE NOT EXISTS (SELECT * FROM " + sqlTextBuilder.EscapeDbObject(USERS) + " WHERE " + sqlTextBuilder.EscapeDbObject("email") + "='{{Username}}' ) ", 1));
             ruleView.Create(values, null, null, null, null, null);
 
             values = new Dictionary<string, object>();
@@ -1275,7 +1283,7 @@ namespace Durados.Web.Mvc
             values.Add("WorkflowAction", Durados.WorkflowAction.Execute.ToString());
             values.Add("WhereCondition", whereCondition);
             values.Add("ExecuteMessage", "Your objects do not contain a users object. Please set the where condition to false in the Security & Auth action \"Update My App User\".");
-            values.Add("ExecuteCommand", "update " + sqlTextBuilder.EscapeDbObject(USERS) + " set " + sqlTextBuilder.EscapeDbObject("firstName") + " = '{{FirstName}}', " + sqlTextBuilder.EscapeDbObject("lastName") + " = '{{lastName}}', " + sqlTextBuilder.EscapeDbObject("role") + " = '{{Role}}' where " + sqlTextBuilder.EscapeDbObject("email") + " = '{{Username}}'");
+            values.Add("ExecuteCommand", "update " + sqlTextBuilder.EscapeDbObject(USERS) + " set " + sqlTextBuilder.EscapeDbObject("firstName") + " = '{{FirstName}}', " + sqlTextBuilder.EscapeDbObject("lastName") + " = '{{lastName}}' where " + sqlTextBuilder.EscapeDbObject("email") + " = '{{Username}}'");
             ruleView.Create(values, null, null, null, null, null);
 
             values = new Dictionary<string, object>();

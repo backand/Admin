@@ -40,16 +40,23 @@ namespace Durados.Web.Mvc
             }
             set
             {
-                if (System.Web.HttpContext.Current.Session == null)
+                try
                 {
-                    System.Web.HttpContext.Current.Items[name] = value;
-                    base.SetSession(name, System.Web.HttpContext.Current.Items[Database.RequestId].ToString(), value);
+                    if (System.Web.HttpContext.Current.Session == null)
+                    {
+                        System.Web.HttpContext.Current.Items[name] = value;
+                        if (System.Web.HttpContext.Current.Items[Database.RequestId] != null)
+                        {
+                            base.SetSession(name, System.Web.HttpContext.Current.Items[Database.RequestId].ToString(), value);
+                        }
+                    }
+                    else
+                    {
+                        System.Web.HttpContext.Current.Session[name] = value;
+                        base.SetSession(name, System.Web.HttpContext.Current.Session.SessionID, value);
+                    }
                 }
-                else
-                {
-                    System.Web.HttpContext.Current.Session[name] = value;
-                    base.SetSession(name, System.Web.HttpContext.Current.Session.SessionID, value);
-                }
+                catch { }
             }
         }
     }
