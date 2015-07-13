@@ -4572,7 +4572,8 @@ namespace Durados.Web.Mvc.UI.Helpers
             public static void HandleFirstTime(Map map)
             {
                 HandleCreator(map);
-                HandleActions(map);
+                HandleBackandUsersActions(map);
+                HandleModelUsersActions(map);
             }
             public static void HandleCreator(Map map)
             {
@@ -4605,13 +4606,60 @@ namespace Durados.Web.Mvc.UI.Helpers
                 return map.Database.Views.ContainsKey("users");
             }
 
-            public static void HandleActions(Map map)
+            public static void HandleBackandUsersActions(Map map)
             {
                 if (!IsExist(map))
                 {
                     DisableAction(map, "Create My App User");
                     DisableAction(map, "Update My App User");
                     DisableAction(map, "Delete My App User");
+                }
+            }
+
+            private static string signupActionFileName = Path.GetDirectoryName(AppDomain.CurrentDomain.BaseDirectory) + @"\deployment\signupAction.js";
+
+            private static string signupActionCode = null;
+            private static string GetSignupActionCode()
+            {
+                if (signupActionCode == null)
+                {
+                    if (File.Exists(signupActionFileName))
+                    {
+                        signupActionCode = File.ReadAllText(signupActionFileName);
+                    }
+                    else
+                    {
+                        throw new System.IO.FileNotFoundException("The js infrastructure file was not found", signupActionFileName);
+                    }
+                }
+                return signupActionCode;
+            }
+
+            public static void HandleModelUsersActions(Map map)
+            {
+                if (!IsExist(map))
+                {
+                    string code = GetSignupActionCode();
+
+
+                    const string USERS = "users";
+
+                    string whereCondition = "true";
+
+                    Database configDatabase = map.GetConfigDatabase();
+                    ConfigAccess configAccess = new DataAccess.ConfigAccess();
+                    string userViewPK = configAccess.GetViewPK(USERS, configDatabase.ConnectionString);
+                    View ruleView = (View)configDatabase.Views["Rule"];
+                    Dictionary<string, object> values = new Dictionary<string, object>();
+                    values.Add("Name", "Create My App User");
+                    values.Add("Rules_Parent", userViewPK);
+                    values.Add("DataAction", Durados.TriggerDataAction.AfterCreate.ToString());
+                    values.Add("WorkflowAction", Durados.WorkflowAction.JavaScript.ToString());
+                    values.Add("WhereCondition", whereCondition);
+                    values.Add("Code", code);
+                    ruleView.Create(values, null, null, null, null, null);
+
+                    
                 }
             }
 
