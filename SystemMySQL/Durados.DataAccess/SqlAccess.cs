@@ -4363,7 +4363,7 @@ namespace Durados.DataAccess
 
             if (history != null && view.Database.SwVersion != null)
             {
-                ((History)history).SaveCreate(sysCommand, view, pk, userId.Value, view.Database.SwVersion, view.GetWorkspaceName());
+                DataAccess.History.GetHistory(view.Database.SystemSqlProduct).SaveCreate(sysCommand, view, pk, userId.Value, view.Database.SwVersion, view.GetWorkspaceName());
             }
 
             var checkLists = view.Fields.Values.Where(f => f.FieldType == FieldType.Children && ((ChildrenField)f).Persist);
@@ -5169,7 +5169,7 @@ namespace Durados.DataAccess
                     {
                         view.Database.Logger.Log(view.Name, "Start", "history", "DataAccess", "", 10, view.Database.Logger.NowWithMilliseconds(), DateTime.Now);
                     }
-                    ((History)history).SaveEdit(sysCommand, view, prevRow, values, pk, userId.Value, out oldNewValues, view.Database.SwVersion, view.GetWorkspaceName());
+                    DataAccess.History.GetHistory(view.Database.SystemSqlProduct).SaveEdit(sysCommand, view, prevRow, values, pk, userId.Value, out oldNewValues, view.Database.SwVersion, view.GetWorkspaceName());
                     if (view.Database.Logger != null)
                     {
                         view.Database.Logger.Log(view.Name, "End", "history", "DataAccess", "", 10, view.Database.Logger.NowWithMilliseconds(), DateTime.Now);

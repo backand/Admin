@@ -742,7 +742,7 @@ namespace Durados.DataAccess
                 command.Connection.Open();
                 try
                 {
-                    int id = ((History)history).SaveCreate(command, view, pk, userId.Value, view.Database.SwVersion, view.GetWorkspaceName());
+                    int id = DataAccess.History.GetHistory(view.Database.SystemSqlProduct).SaveCreate(command, view, pk, userId.Value, view.Database.SwVersion, view.GetWorkspaceName());
                     configTransaction.AddPendingHistoryId(id);
                 }
                 finally
@@ -1159,7 +1159,7 @@ namespace Durados.DataAccess
                 command.Connection.Open();
                 try
                 {
-                    int id = ((History)history).SaveDelete(command, view, pk, userId.Value, view.Database.SwVersion, view.GetWorkspaceName(), prevRow);
+                    int id = DataAccess.History.GetHistory(view.Database.SystemSqlProduct).SaveDelete(command, view, pk, userId.Value, view.Database.SwVersion, view.GetWorkspaceName(), prevRow);
                     configTransaction.AddPendingHistoryId(id);
                 }
                 finally

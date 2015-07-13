@@ -38,20 +38,18 @@ CREATE PROCEDURE `durados_setsession`
 	)
 	
 BEGIN
-	DECLARE isExist varchar(250);
-   
-	-- SELECT _Name; -- from durados_session;
-	select    `Name` INTO isExist  from durados_session s where s.`SessionID`=SessionID  and s.`Name`=Name;
+	   
 
- IF isExist IS NOT NULL THEN
- 	
-          update durados_session set `Scalar`=Scalar, `TypeCode`=TypeCode, `SerializedObject`=null, `ObjectType`=null where `SessionID`=SessionID and `Name`=isExist; 
+	IF ( SELECT EXISTS ( SELECT 1 from durados_session  where `durados_session`.`SessionID`=SessionID  and `durados_session`.`Name`=Name)) THEN
+	
+       update `durados_session` set `Scalar`=Scalar, `TypeCode`=TypeCode, `SerializedObject`=null, `ObjectType`=null where `SessionID`=SessionID  and `durados_session`.`Name`=Name;
       
-  	
-  	 ELSE
-  	
- 		INSERT INTO durados_session(`SessionID`, `Name`, `Scalar`, `TypeCode`) values (SessionID, Name, Scalar, TypeCode);
-  END IF;
+	
+	ELSE
+	
+		 INSERT INTO `durados_session`(`SessionID`, `Name`, `Scalar`, `TypeCode`) values (SessionID, Name, Scalar, TypeCode);
+END IF;
+
  
 END -- $$
 -- DELIMITER ;
