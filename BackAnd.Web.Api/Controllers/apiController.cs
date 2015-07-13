@@ -527,7 +527,16 @@ namespace BackAnd.Web.Api.Controllers
             HandleSpecialDefaults((Durados.Web.Mvc.View)e.View, e.Values);
 
             int currentUserId = Convert.ToInt32(Map.Database.GetUserID());
-            string currentUserRole = Map.Database.GetUserRole();
+            string currentUserRole = null;
+
+            try
+            {
+                currentUserRole = Map.Database.GetUserRole();
+            }
+            catch
+            {
+                currentUserRole = Map.Database.DefaultGuestRole ?? Map.Database.NewUserDefaultRole;
+            }
 
             if (e.View.SaveHistory)
             {
@@ -745,8 +754,18 @@ namespace BackAnd.Web.Api.Controllers
                     e.Values.Add("SignInRedirectUrl".AsToken(), Map.Database.SignInRedirectUrl);
                 }
             }
+            string currentUserRole = null;
 
-            wfe.PerformActions(this, e.View, TriggerDataAction.AfterCreateBeforeCommit, e.Values, e.PrimaryKey, null, Map.Database.ConnectionString, Convert.ToInt32(((Durados.Web.Mvc.Database)e.View.Database).GetUserID()), ((Durados.Web.Mvc.Database)e.View.Database).GetUserRole(), e.Command);
+            try
+            {
+                currentUserRole = Map.Database.GetUserRole();
+            }
+            catch
+            {
+                currentUserRole = Map.Database.DefaultGuestRole ?? Map.Database.NewUserDefaultRole;
+            }
+
+            wfe.PerformActions(this, e.View, TriggerDataAction.AfterCreateBeforeCommit, e.Values, e.PrimaryKey, null, Map.Database.ConnectionString, Convert.ToInt32(((Durados.Web.Mvc.Database)e.View.Database).GetUserID()), currentUserRole, e.Command);
 
 
         }
@@ -759,7 +778,18 @@ namespace BackAnd.Web.Api.Controllers
         protected virtual void AfterCreateAfterCommit(CreateEventArgs e)
         {
             //Workflow.Engine wfe = CreateWorkflowEngine();
-            wfe.PerformActions(this, e.View, TriggerDataAction.AfterCreate, e.Values, e.PrimaryKey, null, Map.Database.ConnectionString, Convert.ToInt32(((Durados.Web.Mvc.Database)e.View.Database).GetUserID()), ((Durados.Web.Mvc.Database)e.View.Database).GetUserRole(), e.Command);
+            string currentUserRole = null;
+
+            try
+            {
+                currentUserRole = Map.Database.GetUserRole();
+            }
+            catch
+            {
+                currentUserRole = Map.Database.DefaultGuestRole ?? Map.Database.NewUserDefaultRole;
+            }
+
+            wfe.PerformActions(this, e.View, TriggerDataAction.AfterCreate, e.Values, e.PrimaryKey, null, Map.Database.ConnectionString, Convert.ToInt32(((Durados.Web.Mvc.Database)e.View.Database).GetUserID()), currentUserRole, e.Command);
 
 
         }
