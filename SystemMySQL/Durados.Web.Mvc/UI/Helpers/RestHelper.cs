@@ -4637,7 +4637,7 @@ namespace Durados.Web.Mvc.UI.Helpers
 
             public static void HandleModelUsersActions(Map map)
             {
-                if (!IsExist(map))
+                if (IsExist(map))
                 {
                     string code = GetSignupActionCode();
 
