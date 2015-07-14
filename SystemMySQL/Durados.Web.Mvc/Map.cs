@@ -1293,7 +1293,7 @@ namespace Durados.Web.Mvc
             values.Add("WorkflowAction", Durados.WorkflowAction.Execute.ToString());
             values.Add("WhereCondition", whereCondition);
             values.Add("ExecuteMessage", "Your objects do not contain a users object. Please set the where condition to false in the Security & Auth action \"Delete My App User\".");
-            values.Add("ExecuteCommand", "delete " + sqlTextBuilder.EscapeDbObject(USERS) + " where " + sqlTextBuilder.EscapeDbObject("email") + " = '{{Username}}'");
+            values.Add("ExecuteCommand", "delete from " + sqlTextBuilder.EscapeDbObject(USERS) + " where " + sqlTextBuilder.EscapeDbObject("email") + " = '{{Username}}'");
             ruleView.Create(values, null, null, null, null, null);
         }
 
