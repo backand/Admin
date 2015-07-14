@@ -86,6 +86,9 @@ namespace BackAnd.Web.Api.Controllers
         
         public virtual string SaveInMessageBoard(Dictionary<string, Durados.Parameter> parameters, View view, Dictionary<string, object> values, System.Data.DataRow prevRow, string pk, string siteWithoutQueryString, string urlAction, string subject, string message, int currentUserId, Dictionary<int, bool> recipients)
         {
+            if (view.Database.IsApi())
+                return null;
+
             string id = null;
             try
             {

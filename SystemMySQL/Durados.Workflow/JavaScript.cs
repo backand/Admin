@@ -224,7 +224,7 @@ namespace Durados.Workflow
             }
             catch (Exception exception)
             {
-                string message = "Failed to invoke the javascript code: " + ((exception.InnerException == null) ? exception.Message : exception.InnerException.Message);
+                string message = (exception.InnerException == null) ? exception.Message : exception.InnerException.Message;
                 Exception e = new DuradosException(message, exception);
                 Backand.Logger.Log("417 " + e.Message, 501);
                 if (IsDebug())

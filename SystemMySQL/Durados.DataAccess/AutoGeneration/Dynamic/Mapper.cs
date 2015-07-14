@@ -1851,7 +1851,7 @@ namespace Durados.DataAccess.AutoGeneration.Dynamic
 
             foreach (DataColumn column in newColumns)
             {
-                MapDataSet.Field.AddFieldRow(viewRow, column.ColumnName, null, column.DataType.FullName, IsColumnPartOfPK(column), false, column.MaxLength, column.AllowDBNull, column.DefaultValue == null ? string.Empty : column.DefaultValue.ToString());
+                MapDataSet.Field.AddFieldRow(viewRow, column.ColumnName, null, column.DataType.FullName, IsColumnPartOfPK(column), false, column.MaxLength, !column.AllowDBNull, column.DefaultValue == null ? string.Empty : column.DefaultValue.ToString());
             }
 
             foreach (DataColumn column in deletedColumns)
