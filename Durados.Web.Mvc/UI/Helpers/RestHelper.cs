@@ -4616,10 +4616,12 @@ namespace Durados.Web.Mvc.UI.Helpers
                 }
             }
 
-            private static string signupActionFileName = Path.GetDirectoryName(AppDomain.CurrentDomain.BaseDirectory) + @"\deployment\signupAction.js";
+            private static string signupBeforeActionFileName = Path.GetDirectoryName(AppDomain.CurrentDomain.BaseDirectory) + @"\deployment\signupBeforeAction.js";
+            private static string signupAfterActionFileName = Path.GetDirectoryName(AppDomain.CurrentDomain.BaseDirectory) + @"\deployment\signupAfterAction.js";
 
-            private static string signupActionCode = null;
-            private static string GetSignupActionCode()
+            private static string signupBeforeActionCode = null;
+            private static string signupAfterActionCode = null;
+            private static string GetSignupActionCode(string signupActionFileName, string signupActionCode)
             {
                 if (signupActionCode == null)
                 {
@@ -4639,10 +4641,9 @@ namespace Durados.Web.Mvc.UI.Helpers
             {
                 if (IsExist(map))
                 {
-                    string code = GetSignupActionCode();
-
-
                     const string USERS = "users";
+
+                    string code = GetSignupActionCode(signupBeforeActionFileName, signupBeforeActionCode);
 
                     string whereCondition = "true";
 
@@ -4651,7 +4652,18 @@ namespace Durados.Web.Mvc.UI.Helpers
                     string userViewPK = configAccess.GetViewPK(USERS, configDatabase.ConnectionString);
                     View ruleView = (View)configDatabase.Views["Rule"];
                     Dictionary<string, object> values = new Dictionary<string, object>();
-                    values.Add("Name", "Create My App User");
+                    values.Add("Name", "Validate Backand Register User");
+                    values.Add("Rules_Parent", userViewPK);
+                    values.Add("DataAction", Durados.TriggerDataAction.BeforeCreate.ToString());
+                    values.Add("WorkflowAction", Durados.WorkflowAction.JavaScript.ToString());
+                    values.Add("WhereCondition", whereCondition);
+                    values.Add("Code", code);
+                    ruleView.Create(values, null, null, null, null, null);
+
+
+                    code = GetSignupActionCode(signupAfterActionFileName, signupAfterActionCode);
+                    values = new Dictionary<string, object>();
+                    values.Add("Name", "Create Backand Register User");
                     values.Add("Rules_Parent", userViewPK);
                     values.Add("DataAction", Durados.TriggerDataAction.AfterCreate.ToString());
                     values.Add("WorkflowAction", Durados.WorkflowAction.JavaScript.ToString());
@@ -4659,7 +4671,6 @@ namespace Durados.Web.Mvc.UI.Helpers
                     values.Add("Code", code);
                     ruleView.Create(values, null, null, null, null, null);
 
-                    
                 }
             }
 
