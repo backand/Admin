@@ -360,7 +360,7 @@ namespace BackAnd.Web.Api.Controllers
             try
             {
 
-                if (string.IsNullOrEmpty(id))
+                if (string.IsNullOrEmpty(id) || id.Equals("undefined"))
                 {
                     return ResponseMessage(Request.CreateResponse(HttpStatusCode.NotFound, Messages.IdIsMissing));
                 }
