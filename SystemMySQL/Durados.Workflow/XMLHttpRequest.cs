@@ -70,6 +70,25 @@ namespace Backand
 
             try
             {
+                if (Durados.Workflow.JavaScript.IsDebug())
+                {
+                    string appName = (Durados.Workflow.JavaScript.GetCacheInCurrentRequest(Durados.Database.AppName) ?? string.Empty).ToString();
+                    if (!string.IsNullOrEmpty(appName))
+                    {
+                        if (request.Headers["AppName"] == null && request.Headers["appName"] == null && request.Headers["appname"] == null)
+                        {
+                            request.Headers.Add("AppName", appName);
+                        }
+                    }
+                }
+            }
+            catch
+            {
+
+            }
+
+            try
+            {
                 response = (HttpWebResponse)request.GetResponse();
 
                 status = (int)response.StatusCode;
