@@ -238,9 +238,9 @@ namespace Durados.Workflow
 
             var v = call.GetValue("userInput").ToObject();
 
-            if (v != null && v is Dictionary<string, object>)
+            if (v != null && v is System.Dynamic.ExpandoObject)
             {
-                Dictionary<string, object> newValues = (Dictionary<string, object>)v;
+                IDictionary<string, object> newValues = v as IDictionary<string, object>;
                 foreach (string key in newValues.Keys)
                 {
                     if (values.ContainsKey(key))

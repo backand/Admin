@@ -588,6 +588,7 @@ namespace Durados.Web.Mvc
                         ConfigWorkspace();
                     }
 
+
                     if (!(this is DuradosMap) && !HasRule("newUserVerification"))
                     {
                         AddNewUserVerification();
@@ -2864,8 +2865,32 @@ namespace Durados.Web.Mvc
         public void Refresh()
         {
             IsConfigChanged = true;
-
-            DataSet ds1 = dataset.Clone();
+            DataSet ds1 = null;
+            try
+            {
+                ds1 = dataset.Clone();
+            }
+            catch (Exception exception)
+            {
+                if (exception.Message == "MaxLength applies to string data type only. You cannot set Column 'id' property MaxLength to be non-negative number.")
+                {
+                    foreach (DataTable table in dataset.Tables)
+                    {
+                        foreach (DataColumn column in table.Columns)
+                        {
+                            if (column.DataType != typeof(string) && column.MaxLength >= 0)
+                            {
+                                Type datatype = column.DataType;
+                                column.DataType = typeof(string);
+                                column.MaxLength = -1;
+                                column.DataType = datatype;
+                            }
+                        }
+                    }
+                    ds1 = dataset.Clone();
+                }
+                else throw exception;
+            }
             Database tempDb = new Database(ds1, this);
             tempDb.ConnectionString = connectionString;
             tempDb.SystemConnectionString = systemConnectionString;

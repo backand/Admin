@@ -652,7 +652,10 @@ namespace Durados.DataAccess.AutoGeneration.Dynamic
                 DataColumn originalColumn = dataset.Tables[viewName].Columns[changedColumn.ColumnName];
                 originalColumn.DataType = changedColumn.DataType;
                 originalColumn.AutoIncrement = changedColumn.AutoIncrement;
-                originalColumn.MaxLength = changedColumn.MaxLength;
+                if (originalColumn.DataType.Equals(typeof(string)))
+                {
+                    originalColumn.MaxLength = changedColumn.MaxLength;
+                }
                 originalColumn.ReadOnly = changedColumn.ReadOnly;
                 originalColumn.AllowDBNull = changedColumn.AllowDBNull;
                
@@ -670,7 +673,10 @@ namespace Durados.DataAccess.AutoGeneration.Dynamic
             foreach (DataColumn column in newColumns)
             {
                 DataColumn newColumn = new DataColumn(column.ColumnName, column.DataType);
-                newColumn.MaxLength = column.MaxLength;
+                if (newColumn.DataType.Equals(typeof(string)))
+                {
+                    newColumn.MaxLength = column.MaxLength;
+                }
                 newColumn.ReadOnly = column.ReadOnly;
                 newColumn.AllowDBNull = column.AllowDBNull;
                 newColumn.Unique = column.Unique;
@@ -2181,7 +2187,11 @@ namespace Durados.DataAccess.AutoGeneration.Dynamic
                 if (!table.Columns.Contains(fieldName))
                 {
                     DataColumn column = table.Columns.Add(fieldName, dbType);
-                    column.MaxLength = maxLength;
+
+                    if (column.DataType.Equals(typeof(string)))
+                    {
+                        column.MaxLength = maxLength;
+                    }
                     try
                     {
                         if (!string.IsNullOrEmpty(defaultValue))
