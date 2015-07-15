@@ -77,7 +77,7 @@ namespace Durados.Workflow
             return null;
         }
 
-        private static bool IsDebug()
+        public static bool IsDebug()
         {
             return System.Convert.ToBoolean(Durados.Workflow.JavaScript.GetCacheInCurrentRequest(Durados.Workflow.JavaScript.Debug) ?? false);
         }
