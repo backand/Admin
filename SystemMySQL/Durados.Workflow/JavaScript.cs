@@ -192,9 +192,18 @@ namespace Durados.Workflow
             var CONSTS = new Dictionary<string, object>() { { "apiUrl", System.Web.HttpContext.Current.Request.Url.Scheme + "://" + System.Web.HttpContext.Current.Request.Url.Host + ":" + System.Web.HttpContext.Current.Request.Url.Port + System.Web.HttpContext.Current.Request.ApplicationPath } };
 
 
+            var theJavaScriptSerializer = new System.Web.Script.Serialization.JavaScriptSerializer();
             var parser = new Jint.Native.Json.JsonParser(call);
             var userInput = parser.Parse(new System.Web.Script.Serialization.JavaScriptSerializer().Serialize(newRow));
-            var parameters2 = parser.Parse(new System.Web.Script.Serialization.JavaScriptSerializer().Serialize(clientParameters));
+            Object clientParametersToSend = null;
+            if (!clientParameters.ContainsKey("filedata"))
+            {
+                clientParametersToSend = parser.Parse(theJavaScriptSerializer.Serialize(clientParameters));
+            }
+            else
+            {
+                clientParametersToSend = clientParameters;
+            }
             var dbRow = parser.Parse(new System.Web.Script.Serialization.JavaScriptSerializer().Serialize(oldRow));
             var userProfile2 = parser.Parse(new System.Web.Script.Serialization.JavaScriptSerializer().Serialize(userProfile));
             var CONSTS2 = parser.Parse(new System.Web.Script.Serialization.JavaScriptSerializer().Serialize(CONSTS));
@@ -205,7 +214,7 @@ namespace Durados.Workflow
                 call.SetValue("userInput", userInput)
                 .SetValue("btoa", new btoaHandler(Backand.Convert.btoa))
                 .SetValue("dbRow", dbRow)
-                .SetValue("parameters", parameters2)
+                .SetValue("parameters", clientParametersToSend)
                 .SetValue("userProfile", userProfile2)
                 .SetValue("CONSTS", CONSTS2)
                 .Execute(GetXhrWrapper() + code + "; function call(){return backandCallback(userInput, dbRow, parameters, userProfile);}");
