@@ -5214,7 +5214,7 @@ namespace Durados.DataAccess
                     view.Database.Logger.Log(view.Name, "wf after commit start", "Edit", "DataAccess", "", 3, view.Database.Logger.NowWithMilliseconds(), DateTime.Now);
                 }
 
-                editEventArgs = new EditEventArgs(view, values, pk, null, null);
+                editEventArgs = new EditEventArgs(view, values, pk, command, sysCommand);
                 editEventArgs.PrevRow = prevRow;
                 editEventArgs.OldNewValues = oldNewValues;
 
