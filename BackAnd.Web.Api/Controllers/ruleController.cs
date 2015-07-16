@@ -37,6 +37,7 @@ namespace BackAnd.Web.Api.Controllers
         [Route("table/rule/{viewName}/{id}")]
         [Route("table/action/{viewName}/{id}")]
         [Route("objects/action/{viewName}/{id}")]
+        [HttpPost]
         [HttpGet]
         public virtual HttpResponseMessage Perform(string viewName, string id = null, string name = null, string actionName = null, string parameters = null)
          {
@@ -107,6 +108,24 @@ namespace BackAnd.Web.Api.Controllers
                          Map.Logger.Log(GetControllerName(), GetActionName(), "get parameters json", exception, 2, string.Empty);
                          return Request.CreateResponse(HttpStatusCode.ExpectationFailed, Messages.FailedToGetJsonFromParameters);
                      }
+                 }
+
+                 try
+                 {
+                     string jsonPost = Request.Content.ReadAsStringAsync().Result;
+                     if (jsonPost != "")
+                     {
+                         Dictionary<string, object> jsonPostDict = view.Deserialize(jsonPost);
+                         foreach (string key in jsonPostDict.Keys)
+                         {
+                             if (!values.ContainsKey(key))
+                                 values.Add(key, jsonPostDict[key]);
+                         }
+                     }
+                 }
+                 catch (Exception exception)
+                 {
+                     throw new Durados.DuradosException("POST body processing error", exception);
                  }
 
                  wfe.PerformActions(this, view, Durados.TriggerDataAction.OnDemand, values, id, row, Map.Database.ConnectionString, Convert.ToInt32(((Durados.Web.Mvc.Database)view.Database).GetUserID()), ((Durados.Web.Mvc.Database)view.Database).GetUserRole(), null, name);

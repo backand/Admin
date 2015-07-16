@@ -22,6 +22,12 @@ namespace BackAnd.Web.Api
             config.MapHttpAttributeRoutes();
 
             config.Routes.MapHttpRoute(
+                name: "uploadFile",
+                routeTemplate: "1/file/{provider}",
+                defaults: new { controller = "file", action = "putObject" }
+            );
+
+            config.Routes.MapHttpRoute(
                 name: "dashboardData",
                 routeTemplate: "1/dashboard/data/{id}",
                 defaults: new { controller = "dashboardData" }

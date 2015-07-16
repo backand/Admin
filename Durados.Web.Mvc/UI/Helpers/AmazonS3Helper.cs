@@ -34,7 +34,8 @@ namespace Durados.Web.Mvc.UI.Helpers
                 //Console.WriteLine("Upload 2 completed");
 
                 // 3. Upload data from a type of System.IO.Stream.
-                string keyName =System.IO.Path.GetFileNameWithoutExtension(strFileName) + "_" + Guid.NewGuid() + System.IO.Path.GetExtension(strFileName);
+                //string keyName =System.IO.Path.GetFileNameWithoutExtension(strFileName) + "_" + Guid.NewGuid() + System.IO.Path.GetExtension(strFileName);
+                string keyName = strFileName;
                 fileTransferUtility.Upload(stream, existingBucketName, keyName);
 
                 Console.WriteLine("Upload 3 completed");

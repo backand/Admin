@@ -29,7 +29,34 @@ namespace BackAnd.Web.Api.Controllers
     [BackAnd.Web.Api.Controllers.Filters.BackAndAuthorize]
     public class fileController : apiController
     {
-        
+       
+        [HttpPut]
+        public IHttpActionResult putObject(String provider)
+        {
+            try
+            {
+                string jsonPost = Request.Content.ReadAsStringAsync().Result;
+                Dictionary<string, object> jsonPostDict = Durados.Web.Mvc.UI.Json.JsonSerializer.Deserialize(jsonPost);
+                String key = (String)jsonPostDict["key"];
+                String secret = (String)jsonPostDict["secret"];
+                String bucket = (String)jsonPostDict["bucket"];
+                String region = (String)jsonPostDict["region"];
+                String filename = (String)jsonPostDict["filename"];
+                String filedata = (String)jsonPostDict["filedata"];
+                
+                byte[] bytes = Convert.FromBase64String(filedata);
+                string url = string.Empty;
+                using (var dataStream = new MemoryStream(bytes))
+                {
+                    url = AmazonS3Helper.SaveUploadedFileToAws(key, secret, bucket, filename, null, dataStream);
+                }
+                return Ok(new { url = url });
+            }
+            catch (Exception exception)
+            {
+                throw new BackAndApiUnexpectedResponseException(exception, this);
+            }
+        }
 
 
         [HttpPost] // This is from System.Web.Http, and not from System.Web.Mvc
