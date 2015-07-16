@@ -340,7 +340,7 @@ namespace System
                 return content;
             foreach (Durados.Field field in view.Fields.Values)
             {
-                string name = field.Name;
+                string name = view.Name + "." + field.Name;
                 object value = string.Empty;
                 if (nameValueDictionary.ContainsKey(name))
                     value = nameValueDictionary[name];
