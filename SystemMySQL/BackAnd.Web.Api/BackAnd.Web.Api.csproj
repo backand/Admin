@@ -167,6 +167,8 @@
     <Content Include="Config\backand.xml" />
     <Content Include="Config\backand.xml.xml" />
     <Content Include="deployment\jsInfrastructure.js" />
+    <Content Include="deployment\signupAfterAction.js" />
+    <Content Include="deployment\signupBeforeAction.js" />
     <Content Include="deployment\Sql\SampleApp\Advertising-System.sql" />
     <Content Include="deployment\Sql\SampleApp\chinook-MySql.sql" />
     <Content Include="deployment\Sql\SampleApp\Email-campaign-MySql.sql" />
