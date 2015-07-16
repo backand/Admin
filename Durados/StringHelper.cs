@@ -340,38 +340,44 @@ namespace System
                 return content;
             foreach (Durados.Field field in view.Fields.Values)
             {
-                string name = view.Name + "." + field.Name;
+                string name = field.Name;
                 object value = string.Empty;
                 if (nameValueDictionary.ContainsKey(name))
+                {
                     value = nameValueDictionary[name];
+                    content = ReplaceNameValue(content, name, value, prefixChar, view, field);
+                }
+
+                if (row != null)
+                {
+                    name = view.Name + "." + field.Name;
+                    value = field.GetValue(row);
+                    content = ReplaceNameValue(content, name, value, prefixChar, view, field);
+                }
+            }
+
+            return content;
+        }
+
+        private static string ReplaceNameValue(string content, string name, object value, string prefixChar, View view, Field field)
+        {
+            if (value is string)
+            {
+                string s;
+                if (view.Fields.ContainsKey(name) && view.Fields[name].FieldType == Durados.FieldType.Column && view.Fields[name].GetColumnFieldType() == Durados.ColumnFieldType.Boolean && value.Equals(string.Empty))
+                    s = "False";
                 else
-                {
-                    if (row != null)
-                    {
-                        value = field.GetValue(row);
-                    }
 
-                }
+                    s = value.ToString();
+                content = content.ReplaceDictionaryTokens(prefixChar, field.JsonName, s);
+                content = content.ReplaceDictionaryTokens(prefixChar, name, s);
 
+            }
+            else if (value != null)
+            {
+                content = content.ReplaceDictionaryTokens(prefixChar, field.JsonName, value.ToString());
+                content = content.ReplaceDictionaryTokens(prefixChar, name, value.ToString());
 
-                if (value is string)
-                {
-                    string s;
-                    if (view.Fields.ContainsKey(name) && view.Fields[name].FieldType == Durados.FieldType.Column && view.Fields[name].GetColumnFieldType() == Durados.ColumnFieldType.Boolean && value.Equals(string.Empty))
-                        s = "False";
-                    else
-
-                        s = value.ToString();
-                    content = content.ReplaceDictionaryTokens(prefixChar, field.JsonName, s);
-                    content = content.ReplaceDictionaryTokens(prefixChar, name, s);
-                    
-                }
-                else if (value != null)
-                {
-                    content = content.ReplaceDictionaryTokens(prefixChar, field.JsonName, value.ToString());
-                    content = content.ReplaceDictionaryTokens(prefixChar, name, value.ToString());
-
-                }
             }
 
             return content;
