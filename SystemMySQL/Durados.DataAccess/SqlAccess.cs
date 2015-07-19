@@ -6656,7 +6656,11 @@ namespace Durados.DataAccess
                                         {
                                             date = values[field.Name];
                                         }
-                                        parameter = GetNewSqlParameter(view, GetVarFromName(dataColumn.ColumnName), Convert.ChangeType(date, typeof(DateTime)));
+                                        else
+                                        {
+                                            date = Convert.ChangeType(date, typeof(DateTime));
+                                        }
+                                        parameter = GetNewSqlParameter(view, GetVarFromName(dataColumn.ColumnName), date);
                                     }
                                     else
                                     {
