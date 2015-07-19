@@ -6649,9 +6649,9 @@ namespace Durados.DataAccess
                                     {
                                         parameter = GetNewSqlParameter(view, GetVarFromName(dataColumn.ColumnName), new Guid(value));
                                     }
-                                    else if (dataColumn.DataType.Equals(typeof(DateTimeOffset)))
+                                    else if (dataColumn.DataType.Equals(typeof(DateTimeOffset)) || dataColumn.DataType.Equals(typeof(DateTime)))
                                     {
-                                        parameter = GetNewSqlParameter(view, GetVarFromName(dataColumn.ColumnName), Convert.ChangeType(value, typeof(DateTime)));
+                                        parameter = GetNewSqlParameter(view, GetVarFromName(dataColumn.ColumnName), Convert.ToDateTime(value));
                                     }
                                     else
                                     {
