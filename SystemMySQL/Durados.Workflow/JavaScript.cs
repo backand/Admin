@@ -247,14 +247,6 @@ namespace Durados.Workflow
 
             var v = call.GetValue("userInput").ToObject();
 
-
-            //var serialize = function (data) { return JSON.stringify(data); }; var userInputJson = null; var serializeUserInput = function () { userInputJson = serialize(userInput) };
-            call.Execute("serializeUserInput()");
-
-            var vj = call.GetValue("userInputJson").ToObject();
-            var vjDic = new System.Web.Script.Serialization.JavaScriptSerializer().Deserialize<dynamic>(vj.ToString()) as Dictionary<string,object>;
-
-
             if (v != null && v is System.Dynamic.ExpandoObject)
             {
                 IDictionary<string, object> newValues = v as IDictionary<string, object>;
@@ -272,7 +264,9 @@ namespace Durados.Workflow
                                 {
                                     try
                                     {
-                                        val = Convert.ToDateTime(vjDic[key]);
+                                        long l = Convert.ToInt64(val.ToString().Replace("/Date(", "").Replace(")/", ""));
+                                        view.Database.Logger.Log("!date", "", "", null, -14, l.ToString());
+                                        val = new DateTime(1970, 1, 1).AddTicks(l * 10000); 
                                     }
                                     catch { }
                                 }
@@ -286,26 +280,13 @@ namespace Durados.Workflow
                         if (fields.Length > 0)
                         {
                             string fieldName = fields[0].Name;
-                            object val = newValues[key];
-                            if (fields[0].DataType == DataType.DateTime)
-                            {
-                                if (!(val is DateTime))
-                                {
-                                    try
-                                    {
-                                        val = Convert.ToDateTime(val);
-                                    }
-                                    catch { }
-                                }
-                            }
-
                             if (values.ContainsKey(fieldName))
                             {
-                                values[fieldName] = val;
+                                values[fieldName] = newValues[key];
                             }
                             else
                             {
-                                values.Add(fieldName, val);
+                                values.Add(fieldName, newValues[key]);
                             }
                         }
                         else

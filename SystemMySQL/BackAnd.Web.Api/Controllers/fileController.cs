@@ -41,14 +41,14 @@ namespace BackAnd.Web.Api.Controllers
                 String secret = (String)jsonPostDict["secret"];
                 String bucket = (String)jsonPostDict["bucket"];
                 String region = (String)jsonPostDict["region"];
-                String filename = (String)jsonPostDict["filename"];
+                String filename = System.Web.HttpContext.Current.Server.UrlDecode((String)jsonPostDict["filename"]);
                 String filedata = (String)jsonPostDict["filedata"];
                 
                 byte[] bytes = Convert.FromBase64String(filedata);
                 string url = string.Empty;
                 using (var dataStream = new MemoryStream(bytes))
                 {
-                    url = AmazonS3Helper.SaveUploadedFileToAws(key, secret, bucket, filename, null, dataStream);
+                    url = AmazonS3Helper.SaveUploadedFileToAws(key, secret, bucket, filename.Replace(" ","-"), null, dataStream);
                 }
                 return Ok(new { url = url });
             }
