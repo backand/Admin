@@ -2087,7 +2087,7 @@ namespace Durados.DataAccess.AutoGeneration.Dynamic
                         DataColumn column = table.Columns.Add(fieldName, dbType);
                         try
                         {
-                            if (defaultValue != null)
+                            if (!string.IsNullOrEmpty(defaultValue))
                             {
                                 column.DefaultValue = Convert.ChangeType(defaultValue, column.DataType);
                             }

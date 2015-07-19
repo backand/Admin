@@ -247,6 +247,12 @@ namespace Durados.Workflow
 
             var v = call.GetValue("userInput").ToObject();
 
+
+            //var serialize = function (data) { return JSON.stringify(data); }; var userInputJson = null; var serializeUserInput = function () { userInputJson = serialize(userInput) };
+            //call.Execute("serializeUserInput()");
+
+            //var vj = call.GetValue("userInputJson").ToObject();
+
             if (v != null && v is System.Dynamic.ExpandoObject)
             {
                 IDictionary<string, object> newValues = v as IDictionary<string, object>;
@@ -254,7 +260,20 @@ namespace Durados.Workflow
                 {
                     if (values.ContainsKey(key))
                     {
-                        values[key] = newValues[key];
+                        object val = newValues[key];
+                        Field[] fields = view.GetFieldsByJsonName(key);
+                        if (fields[0].DataType == DataType.DateTime)
+                        {
+                            if (!(val is DateTime))
+                            {
+                                try
+                                {
+                                    val = Convert.ToDateTime(val);
+                                }
+                                catch { }
+                            }
+                        }
+                        values[key] = val;
                     }
                     else
                     {
@@ -262,13 +281,26 @@ namespace Durados.Workflow
                         if (fields.Length > 0)
                         {
                             string fieldName = fields[0].Name;
+                            object val = newValues[key];
+                            if (fields[0].DataType == DataType.DateTime)
+                            {
+                                if (!(val is DateTime))
+                                {
+                                    try
+                                    {
+                                        val = Convert.ToDateTime(val);
+                                    }
+                                    catch { }
+                                }
+                            }
+
                             if (values.ContainsKey(fieldName))
                             {
-                                values[fieldName] = newValues[key];
+                                values[fieldName] = val;
                             }
                             else
                             {
-                                values.Add(fieldName, newValues[key]);
+                                values.Add(fieldName, val);
                             }
                         }
                         else
