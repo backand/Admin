@@ -6651,7 +6651,7 @@ namespace Durados.DataAccess
                                     }
                                     else if (dataColumn.DataType.Equals(typeof(DateTimeOffset)) || dataColumn.DataType.Equals(typeof(DateTime)))
                                     {
-                                        parameter = GetNewSqlParameter(view, GetVarFromName(dataColumn.ColumnName), Convert.ToDateTime(value));
+                                        parameter = GetNewSqlParameter(view, GetVarFromName(dataColumn.ColumnName), Convert.ToDateTime(value, System.Globalization.CultureInfo.InvariantCulture));
                                     }
                                     else
                                     {
