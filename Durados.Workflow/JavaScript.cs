@@ -266,11 +266,14 @@ namespace Durados.Workflow
                         {
                             if (!(val is DateTime))
                             {
-                                try
+                                if (val.ToString().StartsWith("/Date("))
                                 {
-                                    val = Convert.ToDateTime(val);
+                                    try
+                                    {
+                                        val = Convert.ToDateTime(Convert.ToDouble(val.ToString().Replace("/Date(", "").Replace(")/", "")));
+                                    }
+                                    catch { }
                                 }
-                                catch { }
                             }
                         }
                         values[key] = val;
