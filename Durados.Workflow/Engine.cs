@@ -307,9 +307,9 @@ namespace Durados.Workflow
                 connection.Open();
                 string sql;
                 if (dataAction == TriggerDataAction.BeforeCreate || dataAction == TriggerDataAction.AfterCreateBeforeCommit || dataAction == TriggerDataAction.AfterCreate || dataAction == TriggerDataAction.AfterDeleteBeforeCommit || dataAction == TriggerDataAction.AfterDelete)
-                    sql = GetSql(rule, view, prevRow, null, currentUserId, currentUserRole);
+                    sql = GetSql(rule, view, prevRow, null, currentUserId, currentUserRole, values);
                 else
-                    sql = GetSql(rule, view, prevRow, pk, currentUserId, currentUserRole);
+                    sql = GetSql(rule, view, prevRow, pk, currentUserId, currentUserRole, values);
                 sql = sql.ReplaceWithDollar(view, values);
                 sql = sql.ReplaceWithSharp(view, null, prevRow);
 
@@ -347,7 +347,7 @@ namespace Durados.Workflow
             }
         }
 
-        protected virtual string GetSql(Rule rule, View view, DataRow prevRow, string pk, int currentUserId, string currentUserRole)
+        protected virtual string GetSql(Rule rule, View view, DataRow prevRow, string pk, int currentUserId, string currentUserRole, Dictionary<string,object> values)
         {
             string viewName = rule.DatabaseViewName;
             if (string.IsNullOrEmpty(viewName))
@@ -372,6 +372,11 @@ namespace Durados.Workflow
                  .Replace(Durados.Database.UsernamePlaceHolder, currentUsername, false).Replace(Durados.Database.SysUsernamePlaceHolder.AsToken(), currentUsername)
                  .Replace(Durados.Database.RolePlaceHolder, currentUserRole, false).Replace(Durados.Database.SysRolePlaceHolder.AsToken(), currentUserRole);
 
+            try
+            {
+                whereCondition = whereCondition.ReplaceAllTokens(view, values, pk, currentUserId.ToString(), currentUsername, currentUserRole, prevRow);
+            }
+            catch { }
             //if (prevRow != null)
             //{
             //    whereCondition = whereCondition.Replace(prevRow);
