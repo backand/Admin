@@ -249,9 +249,11 @@ namespace Durados.Workflow
 
 
             //var serialize = function (data) { return JSON.stringify(data); }; var userInputJson = null; var serializeUserInput = function () { userInputJson = serialize(userInput) };
-            //call.Execute("serializeUserInput()");
+            call.Execute("serializeUserInput()");
 
-            //var vj = call.GetValue("userInputJson").ToObject();
+            var vj = call.GetValue("userInputJson").ToObject();
+            var vjDic = new System.Web.Script.Serialization.JavaScriptSerializer().Deserialize<dynamic>(vj.ToString()) as Dictionary<string,object>;
+
 
             if (v != null && v is System.Dynamic.ExpandoObject)
             {
@@ -270,7 +272,7 @@ namespace Durados.Workflow
                                 {
                                     try
                                     {
-                                        val = Convert.ToDateTime(Convert.ToDouble(val.ToString().Replace("/Date(", "").Replace(")/", "")));
+                                        val = Convert.ToDateTime(vjDic[key]);
                                     }
                                     catch { }
                                 }

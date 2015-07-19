@@ -152,6 +152,6 @@ var console = new Backand.console();
     };
     return exports;
 });
-var $http = atomic;
+var $http = atomic; var serialize = function (data) { return JSON.stringify(data); }; var userInputJson = null; var serializeUserInput = function () { userInputJson = serialize(userInput) };
 
 
