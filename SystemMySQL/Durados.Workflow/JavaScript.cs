@@ -280,13 +280,30 @@ namespace Durados.Workflow
                         if (fields.Length > 0)
                         {
                             string fieldName = fields[0].Name;
+                            object val = newValues[key];
+                            if (fields[0].DataType == DataType.DateTime)
+                            {
+                                if (!(val is DateTime))
+                                {
+                                    if (val.ToString().StartsWith("/Date("))
+                                    {
+                                        try
+                                        {
+                                            long l = Convert.ToInt64(val.ToString().Replace("/Date(", "").Replace(")/", ""));
+                                            view.Database.Logger.Log("!date", "", "", null, -14, l.ToString());
+                                            val = new DateTime(1970, 1, 1).AddTicks(l * 10000);
+                                        }
+                                        catch { }
+                                    }
+                                }
+                            }
                             if (values.ContainsKey(fieldName))
                             {
-                                values[fieldName] = newValues[key];
+                                values[fieldName] = val;
                             }
                             else
                             {
-                                values.Add(fieldName, newValues[key]);
+                                values.Add(fieldName, val);
                             }
                         }
                         else
