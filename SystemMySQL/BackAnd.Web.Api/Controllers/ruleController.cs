@@ -127,9 +127,14 @@ namespace BackAnd.Web.Api.Controllers
                  {
                      throw new Durados.DuradosException("POST body processing error", exception);
                  }
-
-                 wfe.PerformActions(this, view, Durados.TriggerDataAction.OnDemand, values, id, row, Map.Database.ConnectionString, Convert.ToInt32(((Durados.Web.Mvc.Database)view.Database).GetUserID()), ((Durados.Web.Mvc.Database)view.Database).GetUserRole(), null, name);
-
+                 using (System.Data.IDbConnection connection = GetConnection(Map.Database.SqlProduct, Map.Database.ConnectionString ))
+                 {
+                     using (System.Data.IDbCommand command = GetCommand(Map.Database.SqlProduct))
+                     {
+                         command.Connection= connection;
+                        wfe.PerformActions(this, view, Durados.TriggerDataAction.OnDemand, values, id, row, connection.ConnectionString, Convert.ToInt32(((Durados.Web.Mvc.Database)view.Database).GetUserID()), ((Durados.Web.Mvc.Database)view.Database).GetUserRole(), command, name);
+                     }
+                 }
                  HttpResponseMessage response = null;
 
                  if (values.ContainsKey(Durados.Workflow.JavaScript.ReturnedValueKey))
