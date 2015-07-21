@@ -51,9 +51,19 @@ namespace Backand
         {
             if (!string.IsNullOrEmpty(data) && data != "null")
             {
+                if (request.RequestUri.AbsolutePath.Contains("1/file"))
+                {
+                    ((HttpWebRequest)request).AllowWriteStreamBuffering = false;
+                    if (System.Web.HttpContext.Current.Items["file_stream"] != null)
+                    {
+                        data = data.Replace("file_stream", System.Web.HttpContext.Current.Items["file_stream"].ToString());
+                    }
+                }
+
                 byte[] bytes;
                 bytes = System.Text.Encoding.ASCII.GetBytes(data);
                 request.ContentLength = bytes.Length;
+                
                 if (request.ContentType == null)
                 {
                     request.ContentType = "application/x-www-form-urlencoded";

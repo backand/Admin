@@ -202,6 +202,8 @@ namespace Durados.Workflow
             }
             else
             {
+                System.Web.HttpContext.Current.Items["file_stream"] = clientParameters["filedata"];
+                clientParameters["filedata"] = "file_stream";
                 clientParametersToSend = clientParameters;
             }
             var dbRow = parser.Parse(new System.Web.Script.Serialization.JavaScriptSerializer().Serialize(oldRow));

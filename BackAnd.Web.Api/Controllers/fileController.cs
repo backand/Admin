@@ -37,11 +37,22 @@ namespace BackAnd.Web.Api.Controllers
             {
                 string jsonPost = Request.Content.ReadAsStringAsync().Result;
                 Dictionary<string, object> jsonPostDict = Durados.Web.Mvc.UI.Json.JsonSerializer.Deserialize(jsonPost);
+
+                if (!jsonPostDict.ContainsKey("key"))
+                    return ResponseMessage(Request.CreateResponse(HttpStatusCode.Conflict, "You must send the key parameter"));
                 String key = (String)jsonPostDict["key"];
+                if (!jsonPostDict.ContainsKey("secret"))
+                    return ResponseMessage(Request.CreateResponse(HttpStatusCode.Conflict, "You must send the secret parameter"));
                 String secret = (String)jsonPostDict["secret"];
+                if (!jsonPostDict.ContainsKey("bucket"))
+                    return ResponseMessage(Request.CreateResponse(HttpStatusCode.Conflict, "You must send the bucket parameter"));
                 String bucket = (String)jsonPostDict["bucket"];
-                String region = (String)jsonPostDict["region"];
+                //String region = (String)jsonPostDict["region"];
+                if (!jsonPostDict.ContainsKey("filename"))
+                    return ResponseMessage(Request.CreateResponse(HttpStatusCode.Conflict, "You must send the filename parameter"));
                 String filename = System.Web.HttpContext.Current.Server.UrlDecode((String)jsonPostDict["filename"]);
+                if (!jsonPostDict.ContainsKey("filedata"))
+                    return ResponseMessage(Request.CreateResponse(HttpStatusCode.Conflict, "You must send the filedata parameter"));
                 String filedata = (String)jsonPostDict["filedata"];
                 
                 byte[] bytes = Convert.FromBase64String(filedata);

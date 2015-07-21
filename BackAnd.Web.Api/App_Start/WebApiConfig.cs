@@ -9,6 +9,9 @@ using System.Web.Http;
 using Newtonsoft.Json.Serialization;
 using System.Net.Http;
 using System.Threading;
+using System.Web.Http.WebHost;
+using System.Web;
+using System.Web.Http.Hosting;
 
 namespace BackAnd.Web.Api
 {
@@ -304,7 +307,42 @@ namespace BackAnd.Web.Api
             */
             config.Formatters.Add(new TextPlainFormatter());
             config.MessageHandlers.Add(new MethodOverrideHandler());
+
+            config.Services.Replace(typeof(IHostBufferPolicySelector), new NoBufferPolicySelector());
+
  
+        }
+    }
+
+    public class NoBufferPolicySelector : WebHostBufferPolicySelector
+    {
+        public override bool UseBufferedInputStream(object hostContext)
+        {
+            var context = hostContext as HttpContextBase;
+
+            string url = null;
+            try
+            {
+                url = (((Microsoft.Owin.OwinContext)(hostContext)).Request).Uri.AbsolutePath;
+            }
+            catch { }
+
+            if (url != null)
+            {
+                if (url.Contains("1/file"))
+                    return false;
+
+                string method = (((Microsoft.Owin.OwinContext)(hostContext)).Request).Method;
+                if (url.Contains("/action/") && method.ToUpper().Equals("POST"))
+                    return false;
+            }
+
+            return true;
+        }
+
+        public override bool UseBufferedOutputStream(HttpResponseMessage response)
+        {
+            return base.UseBufferedOutputStream(response);
         }
     }
 
