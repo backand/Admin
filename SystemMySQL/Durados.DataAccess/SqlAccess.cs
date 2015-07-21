@@ -6683,6 +6683,10 @@ namespace Durados.DataAccess
                     }
                     else if (field is ParentField)
                     {
+                        if (values[field.Name] == null)
+                        {
+                            values[field.Name] = string.Empty;
+                        }
                         if (values[field.Name] != null)
                         {
                             string delimitedValue = values[field.Name].ToString();

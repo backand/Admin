@@ -10,6 +10,9 @@ using System.Web.Http;
 using WebApiContrib.Formatting.Jsonp;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
+using System.Web.Http.WebHost;
+using System.Net.Http;
+using System.Web.Http.Hosting;
 
 namespace WebApplication1
 {
@@ -19,6 +22,7 @@ namespace WebApplication1
         {
             //GlobalConfiguration.Configuration.AddJsonpFormatter();
             FormatterConfig.RegisterFormatters(GlobalConfiguration.Configuration.Formatters);
+            
             //// Code that runs on application startup
             //AreaRegistration.RegisterAllAreas();
             //GlobalConfiguration.Configure(WebApiConfig.Register);
@@ -53,4 +57,6 @@ namespace WebApplication1
             formatters.Insert(0, jsonpFormatter);
         }
     }
+
+
 }
