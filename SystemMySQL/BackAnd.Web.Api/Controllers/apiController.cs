@@ -468,7 +468,7 @@ namespace BackAnd.Web.Api.Controllers
                 return connection;
             }
             else if (sqlProduct == SqlProduct.MySql)
-                return new MySql.Data.MySqlClient.MySqlConnection(connectionString +"Allow User Variables=True;");
+                return new MySql.Data.MySqlClient.MySqlConnection(connectionString );
             else
                 return new System.Data.SqlClient.SqlConnection(connectionString);
         }
