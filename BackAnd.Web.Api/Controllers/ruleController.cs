@@ -132,7 +132,7 @@ namespace BackAnd.Web.Api.Controllers
                      using (System.Data.IDbCommand command = GetCommand(Map.Database.SqlProduct))
                      {
                          command.Connection= connection;
-                        wfe.PerformActions(this, view, Durados.TriggerDataAction.OnDemand, values, id, row, connection.ConnectionString, Convert.ToInt32(((Durados.Web.Mvc.Database)view.Database).GetUserID()), ((Durados.Web.Mvc.Database)view.Database).GetUserRole(), command, name);
+                         wfe.PerformActions(this, view, Durados.TriggerDataAction.OnDemand, values, id, row, Map.Database.ConnectionString, Convert.ToInt32(((Durados.Web.Mvc.Database)view.Database).GetUserID()), ((Durados.Web.Mvc.Database)view.Database).GetUserRole(), command, name);
                      }
                  }
                  HttpResponseMessage response = null;
