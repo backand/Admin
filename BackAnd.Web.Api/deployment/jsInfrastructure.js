@@ -122,15 +122,18 @@ var console = new Backand.console();
         if (parameters && parameters.params) params = parameters.params;
 
         if (params) {
-            var prefix = url.indexOf('?') ? '&' : '?';
+            var prefix = url.indexOf('?') === -1 ? '?' : '&';
             var qs = '';
             for (var property in params) {
                 if (params.hasOwnProperty(property)) {
-                    qs += prefix + encodeURIComponent(property) + '=' + encodeURIComponent(params[property]);
+                    var val = params[property];
+                    if (typeof val === 'object')
+                        val = JSON.stringify(val);
+                    qs += prefix + encodeURIComponent(property) + '=' + encodeURIComponent(val);
                     prefix = '&';
                 }
             }
-            
+            url = url + qs;
         }
         return xhr(method, url, data ? (isString(data) ? data : JSON.stringify(data)) : null, false, headers);
     };

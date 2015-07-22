@@ -96,7 +96,7 @@ namespace Durados.Workflow
                         int number = -1;
                         if (int.TryParse(subsegment, out number))
                         {
-                            int adjustedNumber = number - 157;
+                            int adjustedNumber = number - 160;
                             return message.Replace(number.ToString(), adjustedNumber.ToString());
                             
                         }
