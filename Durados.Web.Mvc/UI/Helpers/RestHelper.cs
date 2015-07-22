@@ -3013,6 +3013,7 @@ namespace Durados.Web.Mvc.UI.Helpers
         private DataView GetDataViewForDictionary(View view, DictionaryType dictionaryType)
         {
             DataView dataView = null;
+            string pk = null;
             string cacheKey = null;
             string viewDictionary = "viewDictionary";
             if (view != null)
@@ -3036,7 +3037,7 @@ namespace Durados.Web.Mvc.UI.Helpers
 
 
                 default:
-                    string pk = GetFirstPK(view);
+                    pk = GetFirstPK(view);
                     dataView = GetDisplayNameDictionary(view, pk);
                     break;
             }
@@ -3051,7 +3052,8 @@ namespace Durados.Web.Mvc.UI.Helpers
                 {
                     view.Database.Map.AllKindOfCache[viewDictionary].Remove(cacheKey);
                 }
-                view.Database.Map.AllKindOfCache[viewDictionary].Add(cacheKey, dataView);
+                if (pk != null)
+                    view.Database.Map.AllKindOfCache[viewDictionary].Add(cacheKey, dataView);
             }
 
 

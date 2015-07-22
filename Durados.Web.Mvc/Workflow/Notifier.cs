@@ -101,9 +101,10 @@ namespace Durados.Web.Mvc.Workflow
                 parameter = parameter.ReplaceAllTokens(view, values, pk, currentUserId, currentUsername, currentUserRole, prevRow);
                 parameter = parameter.Replace(nameValueDictionary, controller.GetTableViewer(), view);
                 parameter = parameter.Replace(dicFields.ToDictionary(k => k.Key, v => ((Durados.Workflow.DictionaryField)v.Value).Value), controller.GetTableViewer(), view);
-                parameter = parameter.Replace(values, controller.GetTableViewer(), view);
             }
-   
+
+            parameter = parameter.Replace(values, controller.GetTableViewer(), view);
+  
             string[] parameters = parameter.Split(';');
             Dictionary<string, string> emails = new Dictionary<string, string>();
             if (parameters != null)

@@ -673,7 +673,8 @@ namespace BackAnd.Web.Api.Controllers
 
                 string sql = "delete durados_App where name = '" + id + "'";
                 (new SqlAccess()).ExecuteNonQuery(Maps.Instance.DuradosMap.connectionString, sql);
-                    
+
+                Maps.Instance.DuradosMap.Logger.Log("myApps", "delete", "", null, 1, "The app " + id + " was deleted");
                 Maps.Instance.Restart(id);
 
                 //RefreshOldAdmin(id);
