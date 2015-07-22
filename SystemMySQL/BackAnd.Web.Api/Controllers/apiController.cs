@@ -308,6 +308,7 @@ namespace BackAnd.Web.Api.Controllers
                 Map.SaveDynamicMapping();
                 Map.Refresh();
                 Map.JsonConfigCache.Clear();
+                Map.AllKindOfCache.Clear();
                 RefreshOldAdmin(Map.AppName);
             }
         }

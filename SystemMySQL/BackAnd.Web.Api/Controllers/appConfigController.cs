@@ -105,7 +105,10 @@ namespace BackAnd.Web.Api.Controllers
             
             try
             {
-                RefreshConfigCache();
+                //RefreshConfigCache();
+                string appName = System.Web.HttpContext.Current.Items[Durados.Database.AppName].ToString();
+                RestHelper.Refresh(appName);
+
                 return Ok();
             }
             catch (Exception exception)

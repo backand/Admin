@@ -49,6 +49,25 @@ namespace Backand
 
         public void send(string data)
         {
+            try
+            {
+                if (Durados.Workflow.JavaScript.IsDebug())
+                {
+                    string appName = (Durados.Workflow.JavaScript.GetCacheInCurrentRequest(Durados.Database.AppName) ?? string.Empty).ToString();
+                    if (!string.IsNullOrEmpty(appName))
+                    {
+                        if (request.Headers["AppName"] == null && request.Headers["appName"] == null && request.Headers["appname"] == null)
+                        {
+                            request.Headers.Add("AppName", appName);
+                        }
+                    }
+                }
+            }
+            catch
+            {
+
+            }
+
             if (!string.IsNullOrEmpty(data) && data != "null")
             {
                 if (request.RequestUri.AbsolutePath.Contains("1/file"))
@@ -78,24 +97,7 @@ namespace Backand
 
             HttpWebResponse response = null;
 
-            try
-            {
-                if (Durados.Workflow.JavaScript.IsDebug())
-                {
-                    string appName = (Durados.Workflow.JavaScript.GetCacheInCurrentRequest(Durados.Database.AppName) ?? string.Empty).ToString();
-                    if (!string.IsNullOrEmpty(appName))
-                    {
-                        if (request.Headers["AppName"] == null && request.Headers["appName"] == null && request.Headers["appname"] == null)
-                        {
-                            request.Headers.Add("AppName", appName);
-                        }
-                    }
-                }
-            }
-            catch
-            {
-
-            }
+            
 
             try
             {
