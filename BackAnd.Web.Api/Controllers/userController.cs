@@ -198,11 +198,24 @@ namespace BackAnd.Web.Api.Controllers
             return AddNewUser(null);
         }
 
+        private bool IsValidEmail(string email)
+        {
+            try
+            {
+                var addr = new System.Net.Mail.MailAddress(email);
+                return addr.Address == email;
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
         protected virtual IHttpActionResult AddNewUser(bool? isSignupEmailVerification, string role = null, bool byAdmin = false)
         {
             try
             {
-                string json = System.Web.HttpContext.Current.Server.UrlDecode(Request.Content.ReadAsStringAsync().Result);
+                string json = Request.Content.ReadAsStringAsync().Result;
                 Dictionary<string, object> values = Durados.Web.Mvc.UI.Json.JsonSerializer.Deserialize(json);
 
                 if (!values.ContainsKey("firstName"))
@@ -220,6 +233,10 @@ namespace BackAnd.Web.Api.Controllers
                 }
 
                 string email = values["email"].ToString();
+                if (!IsValidEmail(email))
+                {
+                    return ResponseMessage(Request.CreateResponse(HttpStatusCode.NotAcceptable, "The email is not valid"));
+                }
 
                 if (!values.ContainsKey("lastName"))
                 {
