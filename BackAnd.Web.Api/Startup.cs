@@ -37,6 +37,18 @@ namespace BackAnd.Web.Api
             app.UseCors(Microsoft.Owin.Cors.CorsOptions.AllowAll);
             app.UseWebApi(config);
 
+            //Durados.Web.Mvc.Maps.Instance.DuradosMap.Logger.Log("", "", "", null, -16, "start");
+           
+            //var context = new OwinContext(app.Properties);
+            //var token = context.Get<System.Threading.CancellationToken>("host.OnAppDisposing");
+            //if (token != System.Threading.CancellationToken.None)
+            //{
+            //    token.Register(() =>
+            //    {
+            //        Durados.Web.Mvc.Maps.Instance.DuradosMap.Logger.Log("", "", "", null, -16, "end");
+           
+            //    });
+            //}
 
         }
 

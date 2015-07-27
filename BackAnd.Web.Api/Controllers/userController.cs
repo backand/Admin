@@ -984,6 +984,7 @@ namespace BackAnd.Web.Api.Controllers
 
         private string GetErrorUrl(string url, string message, string provider)
         {
+            url = System.Web.HttpUtility.UrlDecode(url);
             if (url.Contains('?')) // already have query string
             {
                 url += "&";

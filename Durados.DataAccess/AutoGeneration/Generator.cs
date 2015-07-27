@@ -284,6 +284,8 @@ namespace Durados.DataAccess.AutoGeneration
                     string columnName = reader.GetString(reader.GetOrdinal("COLUMN_NAME"));
                     if (table.Columns.Contains(columnName))
                     {
+                        if (table.Columns[columnName].DefaultValue != null)
+                            table.Columns[columnName].DefaultValue = null;
                         table.Columns[columnName].AutoIncrement = true;
                     }
                 }
