@@ -1302,6 +1302,18 @@ namespace BackAnd.Web.Api.Controllers
             int currentUserId = Convert.ToInt32(Map.Database.GetUserID());
             string currentUserRole = Map.Database.GetUserRole();
 
+            if (e.View.Equals(e.View.Database.GetUserView()))
+            {
+                if (e.PrimaryKey.Equals(Map.Database.GetUserID()))
+                {
+                    throw new DuradosException("You can not delete yourself because you will not be able to sign in again");
+                }
+                if (Map.GetUserEmail(e.PrimaryKey).Equals(Maps.Instance.DuradosMap.Database.GetCreatorUsername(Convert.ToInt32(Map.Id))))
+                {
+                    throw new DuradosException("You can not delete the creator of the app.");
+                }
+            }
+
             if (e.View.SaveHistory)
             {
                 e.History = GetNewHistory();
