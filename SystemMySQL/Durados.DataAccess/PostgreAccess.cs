@@ -388,6 +388,11 @@ namespace Durados.DataAccess
             return "SELECT tc.table_name as TableName, kcu.column_name as ColumnName, ccu.table_name AS ReferenceTableName, ccu.column_name AS ReferenceColumnName FROM information_schema.table_constraints AS tc JOIN information_schema.key_column_usage AS kcu ON tc.constraint_name = kcu.constraint_name JOIN information_schema.constraint_column_usage AS ccu ON ccu.constraint_name = tc.constraint_name WHERE constraint_type = 'FOREIGN KEY' AND tc.table_name='" + tableName + "'";
         }
 
+        public override string GetForeignKeyConstraints()
+        {
+            return "SELECT tc.constraint_name as name, tc.table_name as TableName, kcu.column_name as ColumnName, ccu.table_name AS ReferenceTableName, ccu.column_name AS ReferenceColumnName FROM information_schema.table_constraints AS tc JOIN information_schema.key_column_usage AS kcu ON tc.constraint_name = kcu.constraint_name JOIN information_schema.constraint_column_usage AS ccu ON ccu.constraint_name = tc.constraint_name WHERE constraint_type = 'FOREIGN KEY' ";
+        }
+
         public override string GetForeignKeyConstraintsToMe(string tableName)
         {
             return "SELECT tc.table_name as TableName, kcu.column_name as ColumnName, ccu.table_name AS ReferenceTableName, ccu.column_name AS ReferenceColumnName FROM information_schema.table_constraints AS tc JOIN information_schema.key_column_usage AS kcu ON tc.constraint_name = kcu.constraint_name JOIN information_schema.constraint_column_usage AS ccu ON ccu.constraint_name = tc.constraint_name WHERE constraint_type = 'FOREIGN KEY' AND ccu.table_name='" + tableName + "'";
