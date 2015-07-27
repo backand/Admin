@@ -6040,7 +6040,175 @@ namespace Durados.Web.Mvc.UI.Helpers
         public string access_type { get; set; }
     }
 
+    public class FarmCaching
+    {
+        private static FarmCaching instance = null;
+        static FarmCaching()
+        {
+            instance = new FarmCaching();
+        }
 
+        public FarmCaching()
+        {
+
+        }
+
+        public static FarmCaching Instance
+        {
+            get
+            {
+                return instance;
+            }
+        }
+
+        private void LoadInternalAddresses()
+        {
+            HashSet<string> h = new HashSet<string>();
+
+            using (System.Data.SqlClient.SqlConnection connection = new SqlConnection(Maps.Instance.DuradosMap.connectionString))
+            {
+                connection.Open();
+
+                string sql = "select address from backand_farm";
+                using (System.Data.SqlClient.SqlCommand command = new SqlCommand(sql, connection))
+                {
+                    using (System.Data.SqlClient.SqlDataReader reader = command.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            string address = reader.GetString(0);
+                            if (!string.IsNullOrEmpty(address) && !address.Equals(GetMyAddress()) && !h.Contains(address))
+                            {
+                                h.Add(address);
+                            }
+                        }
+                    }
+                }
+
+                connection.Close();
+            }
+
+            internalAddresses = h.ToArray();
+        }
+
+        public void ClearInternalAddresses()
+        {
+            internalAddresses = null;
+        }
+
+        string[] internalAddresses = null;
+
+        string myAddress = null;
+
+        private string GetMyAddress()
+        {
+            if (myAddress == null)
+            {
+                myAddress = Http.LocalIPAddress();
+            }
+
+            return myAddress;
+        }
+
+        private string[] GetInternalAddresses()
+        {
+            if (internalAddresses == null)
+            {
+                LoadInternalAddresses();
+            }
+
+            return internalAddresses;
+        }
+
+        
+
+        
+
+        private void ClearMachinesCache(string[] addresses = null)
+        {
+            if (addresses == null)
+            {
+                addresses = GetInternalAddresses();
+            }
+            bulk bulk = new bulk();
+            List<Dictionary<string, object>> requests = new List<Dictionary<string, object>>();
+            
+            foreach (string address in addresses)
+            {
+                Dictionary<string, object> request = new Dictionary<string, object>();
+
+                string url = GetSchema() + address + "";
+                request.Add("url", url);
+
+                requests.Add(request);
+            }
+
+            bulk.Run(requests.ToArray(), GetAuthorization(), null);
+            
+        }
+
+        private string GetAuthorization()
+        {
+            throw new NotImplementedException();
+        }
+
+        private string GetSchema()
+        {
+            throw new NotImplementedException();
+        }
+
+        private void ClearMachinesAddresses(string[] addresses = null)
+        {
+            if (addresses == null)
+            {
+                addresses = GetInternalAddresses();
+            }
+
+            foreach (string address in addresses)
+            {
+                
+            }
+        }
+
+        private void AddMeToList()
+        {
+
+        }
+
+        private void RemoveMeFromList()
+        {
+            RemoveFromList(GetMyAddress());
+        }
+
+        private void RemoveFromList(string address)
+        {
+
+        }
+
+        public void AppStarted()
+        {
+            AddMeToList();
+            ClearMachinesAddresses();
+            LogStart();
+        }
+
+        private void LogStart()
+        {
+            throw new NotImplementedException();
+        }
+
+        public void AppEnded()
+        {
+            RemoveMeFromList();
+            ClearMachinesAddresses();
+            LogEnd();
+        }
+
+        private void LogEnd()
+        {
+            throw new NotImplementedException();
+        }
+    }
 
 
 

@@ -152,6 +152,44 @@ namespace BackAnd.Web.Api.Providers
             return map.Database.GetUsernameByGuid(userId);
         }
 
+        private System.Collections.Specialized.NameValueCollection GetFixedForm()
+        {
+            string temp1 = "_$temp1$_";
+            string temp2 = "_$temp2$_";
+
+            string eq = "=";
+            string amp = "&";
+
+            string originalForm = System.Web.HttpContext.Current.Request.Form.ToString();
+
+            string tempFrom = originalForm;
+            foreach (string key in System.Web.HttpContext.Current.Request.Form.Keys)
+            {
+                tempFrom = tempFrom.Replace(amp + key + eq, temp1 + key);
+            }
+            foreach (string key in System.Web.HttpContext.Current.Request.Form.Keys)
+            {
+                tempFrom = tempFrom.Replace(key + eq, temp2 + key);
+            }
+
+            tempFrom = tempFrom.Replace("&", "%26").Replace("=", "%3D").Replace("+", "%2B");
+
+            foreach (string key in System.Web.HttpContext.Current.Request.Form.Keys)
+            {
+                tempFrom = tempFrom.Replace(temp1 + key, amp + key + eq);
+            }
+
+            foreach (string key in System.Web.HttpContext.Current.Request.Form.Keys)
+            {
+                tempFrom = tempFrom.Replace(temp2 + key, key + eq);
+            }
+
+            System.Collections.Specialized.NameValueCollection form = System.Web.HttpUtility.ParseQueryString(tempFrom);
+
+            return form;
+
+        }
+
         public override async Task GrantResourceOwnerCredentials(OAuthGrantResourceOwnerCredentialsContext context)
         {
             
@@ -182,14 +220,33 @@ namespace BackAnd.Web.Api.Providers
                 return;
             }
 
-            Durados.Web.Mvc.Maps.Instance.DuradosMap.Logger.Log("auth-start", appname, context.UserName, null, 3, string.Empty);
+            System.Collections.Specialized.NameValueCollection form = GetFixedForm();
+
+            string username = context.UserName;
+
+            try
+            {
+                username = form["username"];
+            }
+            catch { }
+
+            string password = context.Password;
+
+            try
+            {
+                password = form["password"];
+            }
+            catch { }
+
+
+            Durados.Web.Mvc.Maps.Instance.DuradosMap.Logger.Log("auth-start", appname, username, null, 3, string.Empty);
 
 
             if (!System.Web.HttpContext.Current.Items.Contains(Database.AppName))
                 System.Web.HttpContext.Current.Items.Add(Database.AppName, appname);
 
             UserValidationError userValidationError = UserValidationError.Valid;
-            if (!IsValid(context.UserName, context.Password, out userValidationError))
+            if (!IsValid(username, password, out userValidationError))
             {
                 
                 
@@ -223,7 +280,7 @@ namespace BackAnd.Web.Api.Providers
 
                 context.SetError(UserValidationErrorMessages.InvalidGrant, message);
 
-                Durados.Web.Mvc.Maps.Instance.DuradosMap.Logger.Log("auth-end-failure", appname, context.UserName, null, 3, message);
+                Durados.Web.Mvc.Maps.Instance.DuradosMap.Logger.Log("auth-end-failure", appname, username, null, 3, message);
 
                 return;
             }
@@ -235,18 +292,18 @@ namespace BackAnd.Web.Api.Providers
                 string message="External authentication failer";
                 context.SetError(UserValidationErrorMessages.InvalidGrant, message);
 
-                Durados.Web.Mvc.Maps.Instance.DuradosMap.Logger.Log("auth-end-failure", appname, context.UserName, null, 3, message);
+                Durados.Web.Mvc.Maps.Instance.DuradosMap.Logger.Log("auth-end-failure", appname, username, null, 3, message);
 
                 return;
             }
 
             var identity = new ClaimsIdentity(context.Options.AuthenticationType);
-            identity.AddClaim(new Claim(Database.Username, context.UserName));
+            identity.AddClaim(new Claim(Database.Username, username));
             identity.AddClaim(new Claim(Database.AppName, appname));
 
             context.Validated(identity);
 
-            Durados.Web.Mvc.Maps.Instance.DuradosMap.Logger.Log("auth-end", appname, context.UserName, null, 3, string.Empty);
+            Durados.Web.Mvc.Maps.Instance.DuradosMap.Logger.Log("auth-end", appname, username, null, 3, string.Empty);
         }
 
         public static bool IsAppExists(string appname)

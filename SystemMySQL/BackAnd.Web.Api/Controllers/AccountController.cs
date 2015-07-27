@@ -578,7 +578,7 @@ namespace BackAnd.Web.Api.Controllers
 
         protected virtual Dictionary<string, object> SignUp(string fullName, string email, string password)
         {
-            string data = string.Format("fullname={0}&username={1}&Password={2}&send=true&phone=&dbtype=100&dbother=", fullName, email, password);
+            string data = string.Format("fullname={0}&username={1}&Password={2}&send=true&phone=&dbtype=100&dbother=", System.Web.HttpUtility.UrlEncode(fullName), System.Web.HttpUtility.UrlEncode(email), System.Web.HttpUtility.UrlEncode(password));
             string url = Durados.Web.Mvc.UI.Helpers.RestHelper.GetAppUrl(Durados.Web.Mvc.Maps.DuradosAppName, Durados.Web.Mvc.Maps.OldAdminHttp) + "/WebsiteAccount/SignUp?" + data;
 
             Durados.Web.Mvc.Maps.Instance.DuradosMap.Logger.Log("Account", "SignUp", "Post", "SignUp call", url, 3, null, DateTime.Now);
@@ -593,7 +593,7 @@ namespace BackAnd.Web.Api.Controllers
         {
             try
             {
-                string json = System.Web.HttpContext.Current.Server.UrlDecode(Request.Content.ReadAsStringAsync().Result);
+                string json = Request.Content.ReadAsStringAsync().Result;
                 Dictionary<string, object> values = Durados.Web.Mvc.UI.Json.JsonSerializer.Deserialize(json);
 
                 if (!values.ContainsKey("fullName"))
