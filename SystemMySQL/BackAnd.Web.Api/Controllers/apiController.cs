@@ -1345,6 +1345,8 @@ namespace BackAnd.Web.Api.Controllers
         protected virtual void AfterDeleteBeforeCommit(DeleteEventArgs e)
         {
             //Workflow.Engine wfe = CreateWorkflowEngine();
+            if (Database == null)
+                Database = Map.Database;
             string userViewName = ((Durados.Web.Mvc.Database)Database).UserViewName;
             if (e.View.Name == userViewName)
             {
@@ -1366,6 +1368,9 @@ namespace BackAnd.Web.Api.Controllers
                 }
                 catch { }
             }
+            if (wfe == null)
+                wfe = CreateWorkflowEngine();
+
             wfe.PerformActions(this, e.View, TriggerDataAction.AfterDeleteBeforeCommit, e.Values, e.PrimaryKey, e.PrevRow, Map.Database.ConnectionString, Convert.ToInt32(Map.Database.GetUserID()), ((Durados.Web.Mvc.Database)e.View.Database).GetUserRole(), e.Command);
 
         }
