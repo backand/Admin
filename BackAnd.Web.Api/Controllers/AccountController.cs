@@ -139,7 +139,7 @@ namespace BackAnd.Web.Api.Controllers
 
         protected virtual Dictionary<string, object> changePassword(string newPassword, string confirmPassword, string userSysGuid)
         {
-            string data = string.Format("newPassword={0}&confirmPassword={1}&userSysGuid={2}", newPassword, confirmPassword, userSysGuid);
+            string data = string.Format("newPassword={0}&confirmPassword={1}&userSysGuid={2}", System.Web.HttpUtility.UrlEncode(newPassword), System.Web.HttpUtility.UrlEncode(confirmPassword), userSysGuid);
             string url = Durados.Web.Mvc.UI.Helpers.RestHelper.GetAppUrl(Durados.Web.Mvc.Maps.DuradosAppName, Durados.Web.Mvc.Maps.OldAdminHttp) + "/Account/ForgotPassword?" + data;
 
             Durados.Web.Mvc.Maps.Instance.DuradosMap.Logger.Log("Account", "changePassword", "Post", "changePassword call", url, 3, null, DateTime.Now);
@@ -154,7 +154,7 @@ namespace BackAnd.Web.Api.Controllers
         {
             try
             {
-                string json = System.Web.HttpContext.Current.Server.UrlDecode(Request.Content.ReadAsStringAsync().Result);
+                string json = System.Web.HttpContext.Current.Server.UrlDecode(Request.Content.ReadAsStringAsync().Result.Replace("+", "%2B"));
                 Dictionary<string, object> values = Durados.Web.Mvc.UI.Json.JsonSerializer.Deserialize(json);
 
 
