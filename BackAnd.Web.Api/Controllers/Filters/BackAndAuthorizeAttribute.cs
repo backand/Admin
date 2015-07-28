@@ -406,4 +406,9 @@ namespace BackAnd.Web.Api.Controllers.Filters
     {
         public MissingOrIncorrectSignUpToken() : base("Missing or incorrect SignUpToken") { }
     }
+
+    public class MissingOrIncorrectMasterToken : ServerAuthorizationFailureException
+    {
+        public MissingOrIncorrectMasterToken() : base("Missing or incorrect master key") { }
+    }
 }

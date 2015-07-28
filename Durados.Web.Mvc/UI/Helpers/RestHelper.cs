@@ -6137,7 +6137,7 @@ namespace Durados.Web.Mvc.UI.Helpers
             {
                 Dictionary<string, object> request = new Dictionary<string, object>();
 
-                string url = GetSchema() + address + "";
+                string url = GetSchema() + address + "/";
                 request.Add("url", url);
 
                 requests.Add(request);
@@ -6147,9 +6147,9 @@ namespace Durados.Web.Mvc.UI.Helpers
             
         }
 
-        private string GetAuthorization()
+        public string GetAuthorization()
         {
-            throw new NotImplementedException();
+            return (System.Configuration.ConfigurationManager.AppSettings["farmAuth"] ?? "69F77115-495F-4C83-A9EC-0AA46714482E").ToString();
         }
 
         private string GetSchema()
