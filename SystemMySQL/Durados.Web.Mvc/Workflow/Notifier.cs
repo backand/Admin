@@ -93,7 +93,7 @@ namespace Durados.Web.Mvc.Workflow
         protected string[] GetEmailsFromParameter(Durados.Workflow.INotifier controller, string parameter, Durados.View view, Dictionary<string, object> values, DataRow prevRow, string pk, string connectionString, string currentUserId, string currentUsername, string currentUserRole)
         {
             //// replace the tokens in the parameter 
-            if (!string.IsNullOrEmpty(pk) && (parameter.Contains('[') && parameter.Contains(']') || parameter.Contains(Database.DictionaryPrefix) && parameter.Contains(Database.DictionaryPostfix)))
+            if (!string.IsNullOrEmpty(pk) && ((parameter.Contains('[') && parameter.Contains(']')) || (parameter.Contains(Database.DictionaryPrefix) && parameter.Contains(Database.DictionaryPostfix)) || parameter.Contains('$')))
             {
                 if (nameValueDictionary.Count == 0 && prevRow != null)
                     controller.LoadValues(nameValueDictionary, prevRow, (Durados.Web.Mvc.View)view, null, (Durados.Web.Mvc.View)view, view.DisplayName + ".", "[", "]", dicFields, view.Name + ".");

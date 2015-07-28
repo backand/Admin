@@ -199,7 +199,7 @@ namespace BackAnd.Web.Api.Controllers
 
         protected virtual Dictionary<string, object> SendChangePasswordLink(string username)
         {
-            string data = string.Format("userName={0}", username);
+            string data = string.Format("userName={0}", System.Web.HttpUtility.UrlEncode(username));
             string url = Durados.Web.Mvc.UI.Helpers.RestHelper.GetAppUrl(Durados.Web.Mvc.Maps.DuradosAppName, Durados.Web.Mvc.Maps.OldAdminHttp) + "/Account/PasswordReset?" + data;
 
             Durados.Web.Mvc.Maps.Instance.DuradosMap.Logger.Log("Account", "SendChangePasswordLink", "Post", "SendChangePasswordLink call", url, 3, null, DateTime.Now);
@@ -214,7 +214,7 @@ namespace BackAnd.Web.Api.Controllers
         {
             try
             {
-                string json = System.Web.HttpContext.Current.Server.UrlDecode(Request.Content.ReadAsStringAsync().Result);
+                string json = System.Web.HttpContext.Current.Server.UrlDecode(Request.Content.ReadAsStringAsync().Result.Replace("+", "%2B"));
                 Dictionary<string, object> values = Durados.Web.Mvc.UI.Json.JsonSerializer.Deserialize(json);
 
 
