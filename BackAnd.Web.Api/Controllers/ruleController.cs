@@ -131,8 +131,16 @@ namespace BackAnd.Web.Api.Controllers
                  {
                      using (System.Data.IDbCommand command = GetCommand(Map.Database.SqlProduct))
                      {
-                         command.Connection= connection;
-                         wfe.PerformActions(this, view, Durados.TriggerDataAction.OnDemand, values, id, row, Map.Database.ConnectionString, Convert.ToInt32(((Durados.Web.Mvc.Database)view.Database).GetUserID()), ((Durados.Web.Mvc.Database)view.Database).GetUserRole(), command, name);
+                         command.Connection = connection;
+                         int userID = -1;
+                         try
+                         {
+                             userID = Convert.ToInt32(((Durados.Web.Mvc.Database)view.Database).GetUserID());
+                         }
+                         catch { }
+                         if (wfe == null)
+                             wfe = CreateWorkflowEngine();
+                         wfe.PerformActions(this, view, Durados.TriggerDataAction.OnDemand, values, id, row, Map.Database.ConnectionString, userID, ((Durados.Web.Mvc.Database)view.Database).GetUserRole(), command, name);
                      }
                  }
                  HttpResponseMessage response = null;
