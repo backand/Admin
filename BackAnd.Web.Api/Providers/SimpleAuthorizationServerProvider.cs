@@ -287,6 +287,17 @@ namespace BackAnd.Web.Api.Providers
 
             Durados.Web.Mvc.Map map = Durados.Web.Mvc.Maps.Instance.GetMap(appname);
             
+            if (map.Database.SecureLevel == SecureLevel.AllUsers){
+                if (!(new Durados.Web.Mvc.Controllers.AccountMembershipService().AuthenticateUser(username, password)))
+                {
+                    context.SetError(UserValidationErrorMessages.InvalidGrant, UserValidationErrorMessages.IncorrectUsernameOrPassword);
+
+                    Durados.Web.Mvc.Maps.Instance.DuradosMap.Logger.Log("auth-end-failure", appname, username, null, 3, UserValidationErrorMessages.IncorrectUsernameOrPassword);
+
+                    return;
+                }
+            }
+
             if (!string.IsNullOrEmpty(map.Database.LogOnUrlAuth) && !new DuradosAuthorizationHelper().ValidateLogOnAuthUrl(map, System.Web.HttpContext.Current.Request.Form))
             {
                 string message="External authentication failer";

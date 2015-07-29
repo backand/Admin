@@ -27,7 +27,14 @@ namespace WebApplication1
             //AreaRegistration.RegisterAllAreas();
             //GlobalConfiguration.Configure(WebApiConfig.Register);
             //RouteConfig.RegisterRoutes(RouteTable.Routes);            
+            Durados.Web.Mvc.Maps.Instance.DuradosMap.Logger.Log("", "", "", null, -13, "start");
         }
+
+        void Application_End(object sender, EventArgs e)
+        {
+            Durados.Web.Mvc.Maps.Instance.DuradosMap.Logger.Log("", "", "", null, -13, "end");
+        }
+        
 
         //public override void Init()
         //{

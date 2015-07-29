@@ -311,6 +311,8 @@ namespace BackAnd.Web.Api.Controllers
                 Map.AllKindOfCache.Clear();
                 RefreshOldAdmin(Map.AppName);
             }
+            FarmCaching.Instance.ClearMachinesCache(Map.AppName);
+
         }
 
         protected void RefreshConfigCache(Map map)
@@ -330,6 +332,8 @@ namespace BackAnd.Web.Api.Controllers
                 }
                 catch { }
             }
+            FarmCaching.Instance.ClearMachinesCache(map.AppName);
+
         }
 
         protected bool IsAdmin()
