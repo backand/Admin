@@ -259,7 +259,7 @@ namespace BackAnd.Web.Api.Controllers
                     return ResponseMessage(Request.CreateResponse(HttpStatusCode.Forbidden, Messages.ActionIsUnauthorized));
                 }
 
-                string json = System.Web.HttpContext.Current.Server.UrlDecode(Request.Content.ReadAsStringAsync().Result.Replace("+", "%2B"));
+                string json = System.Web.HttpContext.Current.Server.UrlDecode(Request.Content.ReadAsStringAsync().Result.Replace("%22", "%2522").Replace("%2B", "%252B").Replace("+", "%2B"));
 
                 Dictionary<string, object>[] values = GetParameters(parameters, view, json);
 
@@ -379,7 +379,7 @@ namespace BackAnd.Web.Api.Controllers
                     return ResponseMessage(Request.CreateResponse(HttpStatusCode.Forbidden, Messages.ActionIsUnauthorized));
                 }
 
-                string json = System.Web.HttpContext.Current.Server.UrlDecode(Request.Content.ReadAsStringAsync().Result.Replace("+", "%2B"));
+                string json = System.Web.HttpContext.Current.Server.UrlDecode(Request.Content.ReadAsStringAsync().Result.Replace("%22", "%2522").Replace("%2B", "%252B").Replace("+", "%2B"));
 
                 if (string.IsNullOrEmpty(json))
                 {

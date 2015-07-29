@@ -6096,6 +6096,12 @@ namespace Durados.Web.Mvc.UI.Helpers
             internalAddresses = null;
         }
 
+        public void ClearInternalCache(string appName)
+        {
+            if (Maps.Instance.AppInCach(appName))
+                RestHelper.Refresh(appName);
+        }
+
         string[] internalAddresses = null;
 
         string myAddress = null;
@@ -6124,26 +6130,9 @@ namespace Durados.Web.Mvc.UI.Helpers
 
         
 
-        private void ClearMachinesCache(string[] addresses = null)
+        public void ClearMachinesCache(string appName)
         {
-            if (addresses == null)
-            {
-                addresses = GetInternalAddresses();
-            }
-            bulk bulk = new bulk();
-            List<Dictionary<string, object>> requests = new List<Dictionary<string, object>>();
-            
-            foreach (string address in addresses)
-            {
-                Dictionary<string, object> request = new Dictionary<string, object>();
-
-                string url = GetSchema() + address + "/";
-                request.Add("url", url);
-
-                requests.Add(request);
-            }
-
-            bulk.Run(requests.ToArray(), GetAuthorization(), null);
+            RunBulk(appName);
             
         }
 
@@ -6154,25 +6143,70 @@ namespace Durados.Web.Mvc.UI.Helpers
 
         private string GetSchema()
         {
-            throw new NotImplementedException();
+            return (System.Configuration.ConfigurationManager.AppSettings["farmSchema"] ?? "https").ToString();
         }
 
-        private void ClearMachinesAddresses(string[] addresses = null)
+        private string GetPort()
+        {
+            return (System.Configuration.ConfigurationManager.AppSettings["farmPort"] ?? "").ToString();
+        }
+
+        private Dictionary<string, object> GetRequest(string address, string appName)
+        {
+            Dictionary<string, object> request = new Dictionary<string, object>();
+
+            string port = GetPort();
+            if (!string.IsNullOrEmpty(port))
+            {
+                port = ":" + port;
+            }
+
+            string url = GetSchema() + "://" + address + port + "/farm/reload/" + appName ?? string.Empty;
+            request.Add("url", url);
+
+            return request;
+        }
+
+        public void ClearMachinesAddresses()
+        {
+            RunBulk();
+        }
+
+        private void RunBulk(string appName = null, string[] addresses = null)
         {
             if (addresses == null)
             {
                 addresses = GetInternalAddresses();
             }
 
+            bulk bulk = new bulk();
+            List<Dictionary<string, object>> requests = new List<Dictionary<string, object>>();
+           
             foreach (string address in addresses)
             {
-                
+                requests.Add(GetRequest(address, appName));
             }
+
+            bulk.Run(requests.ToArray(), GetAuthorization(), null);
+            
         }
 
         private void AddMeToList()
         {
+            using (System.Data.SqlClient.SqlConnection connection = new SqlConnection(Maps.Instance.DuradosMap.connectionString))
+            {
+                connection.Open();
 
+                string sql = "insert into backand_farm ([address]) values (@address)";
+                using (System.Data.SqlClient.SqlCommand command = new SqlCommand(sql, connection))
+                {
+                    command.Parameters.AddWithValue("address", GetMyAddress());
+                    command.ExecuteNonQuery();
+                    
+                }
+
+                connection.Close();
+            }
         }
 
         private void RemoveMeFromList()
@@ -6182,31 +6216,107 @@ namespace Durados.Web.Mvc.UI.Helpers
 
         private void RemoveFromList(string address)
         {
+            using (System.Data.SqlClient.SqlConnection connection = new SqlConnection(Maps.Instance.DuradosMap.connectionString))
+            {
+                connection.Open();
 
+                string sql = "delete from backand_farm where [address] = @address";
+                using (System.Data.SqlClient.SqlCommand command = new SqlCommand(sql, connection))
+                {
+                    command.Parameters.AddWithValue("address", GetMyAddress());
+                    command.ExecuteNonQuery();
+
+                }
+
+                connection.Close();
+            }
         }
 
         public void AppStarted()
         {
-            AddMeToList();
-            ClearMachinesAddresses();
-            LogStart();
+            try
+            {
+                AddMeToList();
+            }
+            catch (Exception exception)
+            {
+                Maps.Instance.DuradosMap.Logger.Log("FarmCaching", "AppStarted", "AddMeToList", exception, 1, "");
+            }
+
+            try
+            {
+                ClearMachinesAddresses();
+            }
+            catch (Exception exception)
+            {
+                Maps.Instance.DuradosMap.Logger.Log("FarmCaching", "AppStarted", "ClearMachinesAddresses", exception, 1, "");
+            }
+            try
+            {
+                LogStart();
+            }
+            catch (Exception exception)
+            {
+                Maps.Instance.DuradosMap.Logger.Log("FarmCaching", "AppStarted", "LogStart", exception, 1, "");
+            }
         }
 
         private void LogStart()
         {
-            throw new NotImplementedException();
+            Log("started");
+        }
+
+        private void Log(string ev)
+        {
+            using (System.Data.SqlClient.SqlConnection connection = new SqlConnection(Maps.Instance.DuradosMap.connectionString))
+            {
+                connection.Open();
+
+                string sql = "insert into backand_farmLog ([address], [event]) values (@address, @event)";
+                using (System.Data.SqlClient.SqlCommand command = new SqlCommand(sql, connection))
+                {
+                    command.Parameters.AddWithValue("address", GetMyAddress());
+                    command.Parameters.AddWithValue("event", ev);
+                    command.ExecuteNonQuery();
+
+                }
+
+                connection.Close();
+            }
         }
 
         public void AppEnded()
         {
-            RemoveMeFromList();
-            ClearMachinesAddresses();
-            LogEnd();
+            try
+            {
+                RemoveMeFromList();
+            }
+            catch (Exception exception)
+            {
+                Maps.Instance.DuradosMap.Logger.Log("FarmCaching", "AppStarted", "RemoveMeFromList", exception, 1, "");
+            }
+
+            try
+            {
+                ClearMachinesAddresses();
+            }
+            catch (Exception exception)
+            {
+                Maps.Instance.DuradosMap.Logger.Log("FarmCaching", "AppStarted", "ClearMachinesAddresses", exception, 1, "");
+            }
+            try
+            {
+                LogEnd();
+            }
+            catch (Exception exception)
+            {
+                Maps.Instance.DuradosMap.Logger.Log("FarmCaching", "AppStarted", "LogEnd", exception, 1, "");
+            }
         }
 
         private void LogEnd()
         {
-            throw new NotImplementedException();
+            Log("ended");
         }
     }
 

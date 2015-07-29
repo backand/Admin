@@ -483,6 +483,18 @@ namespace BackAnd.Web.Api.Controllers
                 string appName = values["appName"].ToString();
                 string username = values["username"].ToString();
 
+                Map map2 = Maps.Instance.GetMap(appName);
+                if (map2 == null)
+                {
+                    return ResponseMessage(Request.CreateResponse(HttpStatusCode.NotFound, Messages.AppNotFound));
+                }
+
+
+                if (map.Database.GetUserRow(username) == null)
+                {
+                    return ResponseMessage(Request.CreateResponse(HttpStatusCode.NotFound, "The username is not correct or does not belong to this app."));
+                }
+
                 Account account = new Account(this);
 
                 account.SendForgotPasswordToken(appName, username);

@@ -187,6 +187,7 @@
     <Compile Include="AuthRepository.cs" />
     <Compile Include="ChallengeResult.cs" />
     <Compile Include="Controllers\accountController.cs" />
+    <Compile Include="Controllers\Admin\farmController.cs" />
     <Compile Include="Controllers\Admin\myAppConnectionController.cs" />
     <Compile Include="Controllers\Admin\myAppsController.cs" />
     <Compile Include="Controllers\Admin\modelController.cs" />
@@ -199,6 +200,7 @@
     <Compile Include="Controllers\chartDataController.cs" />
     <Compile Include="Controllers\chartConfigController.cs" />
     <Compile Include="Controllers\Filters\ResponseHeaderFilterAttribute.cs" />
+    <Compile Include="Controllers\Filters\MasterKeyAuthorize.cs" />
     <Compile Include="Controllers\Filters\TokenAuthorizeAttribute .cs" />
     <Compile Include="Controllers\Filters\LogActionFilterAttribute.cs" />
     <Compile Include="Controllers\Filters\LogExceptionFilterAttribute .cs" />
@@ -298,7 +300,7 @@
           <AutoAssignPort>True</AutoAssignPort>
           <DevelopmentServerPort>5943</DevelopmentServerPort>
           <DevelopmentServerVPath>/</DevelopmentServerVPath>
-          <IISUrl>http://localhost:4019</IISUrl>
+          <IISUrl>http://localhost:4110</IISUrl>
           <NTLMAuthentication>False</NTLMAuthentication>
           <UseCustomServer>False</UseCustomServer>
           <CustomServerUrl>
