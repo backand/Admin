@@ -30,8 +30,14 @@ namespace BackAnd.Web.Api.Providers
                     Durados.Web.Mvc.Map map = Durados.Web.Mvc.Maps.Instance.GetMap(appname);
                     string role = map.Database.GetUserRole(username);
                     string userId = map.Database.GetUserID(username).ToString();
-
+                    
                     context.AdditionalResponseParameters.Add("role", role);
+                    try
+                    {
+                        string fullName = map.Database.GetUserFullName(username).ToString();
+                        context.AdditionalResponseParameters.Add("fullName", fullName);
+                    }
+                    catch { }
                     context.AdditionalResponseParameters.Add("userId", userId);
                 }
                 catch { }
