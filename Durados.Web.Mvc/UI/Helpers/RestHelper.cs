@@ -4782,7 +4782,8 @@ namespace Durados.Web.Mvc.UI.Helpers
                 }
 
                 int index2 = index;
-
+                Maps.Instance.DuradosMap.Logger.Log("FarmCaching", "RefreshCash", "RunBulkIterate", null, 3, string.Format("ethod:{0}, url:{1}, data:{2}, parameters:{3}, headers:{4}, index2:{4}", method, url, data, parameters, headers, index2));
+                    
                 tasks.Add(Task.Factory.StartNew(() =>
                 {
                     var responseStatusAndData = GetWebResponse(method, url, data, parameters, headers, index2);
@@ -4796,8 +4797,16 @@ namespace Durados.Web.Mvc.UI.Helpers
                 //tasks[1].Result will be the result of the second task and so on.
 
             }
-            Task.WaitAll(tasks.ToArray());
-
+            try
+            {
+                Task.WaitAll(tasks.ToArray());
+            }
+            catch (Exception ex)
+            {
+                Maps.Instance.DuradosMap.Logger.Log("FarmCaching", "AppStarted", "AddMeToList", ex, 1, "");
+                if (ex.InnerException != null)
+                    Maps.Instance.DuradosMap.Logger.Log("FarmCaching", "AppStarted", "AddMeToList", ex.InnerException, 1, "");
+            }
             return responses;
         }
 
