@@ -4732,7 +4732,7 @@ namespace Durados.Web.Mvc.UI.Helpers
         {
             object[] responses = new object[requests.Length];
 
-            ServicePointManager.DefaultConnectionLimit = 20;//Please test different numbers here
+            ServicePointManager.DefaultConnectionLimit = 30;//Please test different numbers here
             var tasks = new List<Task<string>>();
 
             for (int index = 0; index < requests.Length; index++)
@@ -4782,7 +4782,7 @@ namespace Durados.Web.Mvc.UI.Helpers
                 }
 
                 int index2 = index;
-                Maps.Instance.DuradosMap.Logger.Log("FarmCaching", "RefreshCash", "RunBulkIterate", null, 3, string.Format("ethod:{0}, url:{1}, data:{2}, parameters:{3}, headers:{4}, index2:{4}", method, url, data, parameters, headers, index2));
+               // Maps.Instance.DuradosMap.Logger.Log("FarmCaching", "RefreshCash", "RunBulkIterate", null, 3, string.Format("ethod:{0}, url:{1}, data:{2}, parameters:{3}, headers:{4}, index2:{4}", method, url, data, parameters, headers, index2));
                     
                 tasks.Add(Task.Factory.StartNew(() =>
                 {
