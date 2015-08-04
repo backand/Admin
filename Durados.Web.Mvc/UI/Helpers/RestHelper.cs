@@ -4803,9 +4803,10 @@ namespace Durados.Web.Mvc.UI.Helpers
             }
             catch (Exception ex)
             {
-                Maps.Instance.DuradosMap.Logger.Log("FarmCaching", "AppStarted", "AddMeToList", ex, 1, "");
+                Maps.Instance.DuradosMap.Logger.Log("FarmCaching", "RefreshCash", "Task.Run", ex, 1, "");
                 if (ex.InnerException != null)
-                    Maps.Instance.DuradosMap.Logger.Log("FarmCaching", "AppStarted", "AddMeToList", ex.InnerException, 1, "");
+                    Maps.Instance.DuradosMap.Logger.Log("FarmCaching", "RefreshCash", "Task.Run", ex.InnerException, 1, "");
+                throw new DuradosException("Bulk Config cash refresh failed!");
             }
             return responses;
         }
