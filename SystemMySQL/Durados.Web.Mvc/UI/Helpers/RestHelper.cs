@@ -4782,7 +4782,7 @@ namespace Durados.Web.Mvc.UI.Helpers
                 }
 
                 int index2 = index;
-                //Maps.Instance.DuradosMap.Logger.Log("FarmCaching", "RefreshCash", "RunBulkIterate", null, 3, string.Format("method:{0}, url:{1}, data:{2}, parameters:{3}, headers:{4}, index2:{4}", method, url, data, parameters, headers, index2));
+                Maps.Instance.DuradosMap.Logger.Log("FarmCaching", "RefreshCash", "RunBulkIterate", null, 3, string.Format("method:{0}, url:{1},  headers:{2}, index2:{3}", method, url,   string.Join(";",headers.Select(x=>x.Key+"="+x.Value ).ToArray()),  index2));
                     
                 tasks.Add(Task.Factory.StartNew(() =>
                 {
@@ -4800,11 +4800,11 @@ namespace Durados.Web.Mvc.UI.Helpers
             try
             {
                 Task.WaitAll(tasks.ToArray());
-                for(int index2=0; index2<responses.Length; index2++)
+                for(int index3=0; index3<responses.Length; index3++)
                 {
-                    if (((int)HttpStatusCode.OK) !=((ResponseStatusAndData)responses[index2]).status  )
+                    if (((int)HttpStatusCode.OK) !=((ResponseStatusAndData)responses[index3]).status  )
                     {
-                        throw new DuradosException(string.Format("Config cash refresh return {0} to server {1}", ((ResponseStatusAndData)responses[index2]).status.ToString(),(string)((Dictionary<string, object>)requests[index2])["url"]));
+                        throw new DuradosException(string.Format("Config cash refresh return {0} to server {1}", ((ResponseStatusAndData)responses[index3]).status.ToString(),(string)((Dictionary<string, object>)requests[index3])["url"]));
                     }
                 }
             }
@@ -6174,16 +6174,17 @@ namespace Durados.Web.Mvc.UI.Helpers
         private Dictionary<string, object> GetRequest(string address, string appName)
         {
             Dictionary<string, object> request = new Dictionary<string, object>();
-
+            Dictionary<string, object> headers = new Dictionary<string, object>();
+            headers.Add("appname", appName ?? string.Empty);
             string port = GetPort();
             if (!string.IsNullOrEmpty(port))
             {
                 port = ":" + port;
             }
 
-            string url = GetSchema() + "://" + address + port + "/1/app/reload";// +appName ?? string.Empty;
+            string url = GetSchema() + "://" + address + port + "/1/app/reload";
             request.Add("url", url);
-
+            request.Add("headers", headers);
             return request;
         }
 
