@@ -4782,7 +4782,7 @@ namespace Durados.Web.Mvc.UI.Helpers
                 }
 
                 int index2 = index;
-               // Maps.Instance.DuradosMap.Logger.Log("FarmCaching", "RefreshCash", "RunBulkIterate", null, 3, string.Format("ethod:{0}, url:{1}, data:{2}, parameters:{3}, headers:{4}, index2:{4}", method, url, data, parameters, headers, index2));
+                //Maps.Instance.DuradosMap.Logger.Log("FarmCaching", "RefreshCash", "RunBulkIterate", null, 3, string.Format("method:{0}, url:{1}, data:{2}, parameters:{3}, headers:{4}, index2:{4}", method, url, data, parameters, headers, index2));
                     
                 tasks.Add(Task.Factory.StartNew(() =>
                 {
@@ -4800,13 +4800,21 @@ namespace Durados.Web.Mvc.UI.Helpers
             try
             {
                 Task.WaitAll(tasks.ToArray());
+                for(int index2=0; index2<responses.Length; index2++)
+                {
+                    if (((int)HttpStatusCode.OK) !=((ResponseStatusAndData)responses[index2]).status  )
+                    {
+                        throw new DuradosException(string.Format("Config cash refresh return {0} to server {1}", ((ResponseStatusAndData)responses[index2]).status.ToString(),(string)((Dictionary<string, object>)requests[index2])["url"]));
+                    }
+                }
             }
             catch (Exception ex)
             {
+                string message = ex.Message + (ex.InnerException != null ? "." + ex.InnerException.Message : string.Empty);
                 Maps.Instance.DuradosMap.Logger.Log("FarmCaching", "RefreshCash", "Task.Run", ex, 1, "");
                 if (ex.InnerException != null)
                     Maps.Instance.DuradosMap.Logger.Log("FarmCaching", "RefreshCash", "Task.Run", ex.InnerException, 1, "");
-                throw new DuradosException("Bulk Config cash refresh failed!");
+                throw new DuradosException("failed to refresh farm instances cash." );
             }
             return responses;
         }
@@ -6148,7 +6156,9 @@ namespace Durados.Web.Mvc.UI.Helpers
 
         public string GetAuthorization()
         {
-            return (System.Configuration.ConfigurationManager.AppSettings["farmAuth"] ?? "69F77115-495F-4C83-A9EC-0AA46714482E").ToString();
+            //return (System.Configuration.ConfigurationManager.AppSettings["farmAuth"] ?? "69F77115-495F-4C83-A9EC-0AA46714482E").ToString();
+            string accessToken= System.Web.HttpContext.Current.Request.Headers["Authorization"];
+            return accessToken == null ? string.Empty : accessToken.ToString();
         }
 
         private string GetSchema()
@@ -6171,7 +6181,7 @@ namespace Durados.Web.Mvc.UI.Helpers
                 port = ":" + port;
             }
 
-            string url = GetSchema() + "://" + address + port + "/farm/reload/" + appName ?? string.Empty;
+            string url = GetSchema() + "://" + address + port + "/1/app/reload";// +appName ?? string.Empty;
             request.Add("url", url);
 
             return request;

@@ -108,6 +108,7 @@ namespace BackAnd.Web.Api.Controllers
                 //RefreshConfigCache();
                 string appName = System.Web.HttpContext.Current.Items[Durados.Database.AppName].ToString();
                 RestHelper.Refresh(appName);
+                Maps.Instance.DuradosMap.Logger.Log(GetControllerNameForLog(ControllerContext), GetActionName(), this.Request.Method.Method, "Reload " + appName, "", 3, null, DateTime.Now);
 
                 return Ok();
             }
