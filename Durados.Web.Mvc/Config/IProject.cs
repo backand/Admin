@@ -3339,7 +3339,7 @@ namespace Durados.Web.Mvc.Config
 
             if (databaseView.Fields.ContainsKey("EnableGithub"))
             {
-                ColumnField EnableGithub = (ColumnField)databaseView.Fields["GoogleClientSecret"];
+                ColumnField EnableGithub = (ColumnField)databaseView.Fields["EnableGithub"];
                 EnableGithub.Order = 600;
                 EnableGithub.Category = rolesCategory;
                 EnableGithub.HideInTable = true;

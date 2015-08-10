@@ -863,7 +863,7 @@ namespace Durados.Web.Mvc
 
             object role = null;
             string sessionKey = GetSessionKey("-role");
-            if (string.IsNullOrEmpty(System.Web.HttpContext.Current.Request.Headers["Authorization"]) && !string.IsNullOrEmpty(System.Web.HttpContext.Current.Request.Headers[Database.AnonymousToken]))
+            if ((string.IsNullOrEmpty(System.Web.HttpContext.Current.Request.Headers["Authorization"]) && !string.IsNullOrEmpty(System.Web.HttpContext.Current.Request.Headers[Database.AnonymousToken])) || (!string.IsNullOrEmpty(System.Web.HttpContext.Current.Request.Headers["Authorization"]) && System.Web.HttpContext.Current.Request.Headers["Authorization"].Contains("anonymous")))
             {
                 if (SecureLevel != Durados.SecureLevel.AllUsers)
                 {

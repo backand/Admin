@@ -35,6 +35,15 @@ namespace BackAnd.Web.Api.Controllers.Filters
 
             ClaimsPrincipal principal = actionContext.Request.GetRequestContext().Principal as ClaimsPrincipal;
 
+            var ci = principal.Identity as ClaimsIdentity;
+            if (!ci.IsAuthenticated)
+            {
+                actionContext.Response = actionContext.Request.CreateErrorResponse(
+                        HttpStatusCode.Unauthorized,
+                        new AuthorizationTokenExpiredException());
+                return;
+            }
+
             try
             {
                 var usernameObj = principal.Claims.Where(c => c.Type == Database.Username).Single();
@@ -212,12 +221,16 @@ namespace BackAnd.Web.Api.Controllers.Filters
             {
                 return actionContext.Request.Headers.GetValues(Database.AnonymousToken).FirstOrDefault();
             }
+            else if (actionContext.Request.Headers.Contains("Authorization") && (actionContext.Request.Headers.Authorization.ToString().Contains("anonymous")))
+            {
+                return actionContext.Request.Headers.Authorization.ToString().Replace("anonymous-", "");
+            }
             return null;
         }
 
         private bool HasAccessToken(System.Web.Http.Controllers.HttpActionContext actionContext)
         {
-            return (actionContext.Request.Headers.Contains("Authorization"));
+            return (actionContext.Request.Headers.Contains("Authorization") && !(actionContext.Request.Headers.Authorization.ToString().Contains("anonymous")));
             
         }
 
@@ -385,6 +398,11 @@ namespace BackAnd.Web.Api.Controllers.Filters
     public class AppnameIsEmptyServerAuthorizationFailureException : ServerAuthorizationFailureException
     {
         public AppnameIsEmptyServerAuthorizationFailureException() : base("appname is empty") { }
+    }
+
+    public class AuthorizationTokenExpiredException : ServerAuthorizationFailureException
+    {
+        public AuthorizationTokenExpiredException() : base("invalid or expired token") { }
     }
 
     public class AppNotInCacheServerAuthorizationFailureException : ServerAuthorizationFailureException

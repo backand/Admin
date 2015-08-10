@@ -72,9 +72,12 @@ namespace Durados.Web.Mvc.Workflow
             emailParameters.To = to.Values.ToArray();
             emailParameters.Cc = cc.Values.ToArray();
 
-
-            if (parameters.ContainsKey("from")) 
-                emailParameters.From = parameters["from"].Value;
+            try
+            {
+                if (parameters.ContainsKey("from"))
+                    emailParameters.From = GetEmailsFromParameter((Durados.Workflow.INotifier)controller, parameters["from"].Value, view, values, prevRow, pk, connectionString, currentUserId, currentUsername, currentUserRole).FirstOrDefault();
+            }
+            catch { }
 
             if (parameters.ContainsKey("subject"))
                 emailParameters.Subject = GetMessage((Durados.Workflow.INotifier)controller, parameters["subject"].Value, view, values, pk, siteWithoutQueryString, mainSiteWithoutQueryString);

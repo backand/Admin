@@ -412,68 +412,86 @@ namespace Durados.Web.Mvc.Logging
             if (username.Equals(superDeveloper) && System.Web.Configuration.WebConfigurationManager.ConnectionStrings["LogConnectionString"].ConnectionString != connectionString)
                 return null;
 
-            try
+            if (guid != null)
             {
-                System.Threading.ThreadPool.QueueUserWorkItem(delegate
+                using (IDbConnection sqlConnection = GetConnection(connectionString))
                 {
-                    try
+                    using (IDbCommand command = GetCommand(sqlConnection, "Durados_LogInsert"))
                     {
-                        using (IDbConnection sqlConnection = GetConnection(connectionString))
-                        {
-                            using (IDbCommand command = GetCommand(sqlConnection,"Durados_LogInsert"))
-                            {
-                                command.CommandType = CommandType.StoredProcedure;
+                        command.CommandType = CommandType.StoredProcedure;
 
-                                sqlConnection.Open();
+                        sqlConnection.Open();
 
-                                SetCommandParametrs(command, applicationName, username, controller, action, method, message, trace, logType, freeText, time, log, guid);
+                        SetCommandParametrs(command, applicationName, username, controller, action, method, message, trace, logType, freeText, time, log, guid);
 
-                                command.ExecuteNonQuery();
-                            }
-                        }
+                        command.ExecuteNonQuery();
                     }
-                    catch (InvalidOperationException)
+                }
+            }
+            else
+            {
+                try
+                {
+                    System.Threading.ThreadPool.QueueUserWorkItem(delegate
                     {
                         try
                         {
-                            LogFailed = true;
-                            //SetCommandParametrs(command, controller, action, method, message, trace, logType, freeText, time, log);
-                            LogSync(controller, action, method, message, trace, logType, freeText, time);
+                            using (IDbConnection sqlConnection = GetConnection(connectionString))
+                            {
+                                using (IDbCommand command = GetCommand(sqlConnection, "Durados_LogInsert"))
+                                {
+                                    command.CommandType = CommandType.StoredProcedure;
+
+                                    sqlConnection.Open();
+
+                                    SetCommandParametrs(command, applicationName, username, controller, action, method, message, trace, logType, freeText, time, log, guid);
+
+                                    command.ExecuteNonQuery();
+                                }
+                            }
                         }
-                        catch (Exception logException)
+                        catch (InvalidOperationException)
                         {
-                            WriteToEventLog(logException.Message, EventLogEntryType.FailureAudit, 1);
-                            WriteToEventLog(controller, action, method, message, trace, logType, freeText);
+                            try
+                            {
+                                LogFailed = true;
+                                //SetCommandParametrs(command, controller, action, method, message, trace, logType, freeText, time, log);
+                                LogSync(controller, action, method, message, trace, logType, freeText, time);
+                            }
+                            catch (Exception logException)
+                            {
+                                WriteToEventLog(logException.Message, EventLogEntryType.FailureAudit, 1);
+                                WriteToEventLog(controller, action, method, message, trace, logType, freeText);
+                            }
                         }
-                    }
-            
 
-                });
-                ////using (SqlConnection connection = new SqlConnection(connectionString))
-                ////{
-                //SetCommandParametrs(command, controller, action, method, message, trace, logType, freeText, time, log); 
-                
-                //if (command.Connection.State != ConnectionState.Open)
-                //{
-                //    connection.Open();
-                //}
-                //IAsyncResult result = command.BeginExecuteNonQuery();
-                ////if (result.IsCompleted)
-                //    command.EndExecuteNonQuery(result);
-                ////else
-                //  //  throw new InvalidOperationException();
-                ////}
-                //    if (writeToEventViewer == WriteToEventViewer.AllTheTime || (writeToEventViewer == WriteToEventViewer.OnlyExceptionsAndIfDbFails && logType == 1))
-                //    {
-                //        WriteToEventLog(controller, action, method, message, trace, logType, freeText);
-                //    }
-            }
-            catch (Exception logException) 
-            {
-                WriteToEventLog(logException.Message, EventLogEntryType.FailureAudit, 1); 
-                WriteToEventLog(controller, action, method, message, trace, logType, freeText);
-            }
 
+                    });
+                    ////using (SqlConnection connection = new SqlConnection(connectionString))
+                    ////{
+                    //SetCommandParametrs(command, controller, action, method, message, trace, logType, freeText, time, log); 
+
+                    //if (command.Connection.State != ConnectionState.Open)
+                    //{
+                    //    connection.Open();
+                    //}
+                    //IAsyncResult result = command.BeginExecuteNonQuery();
+                    ////if (result.IsCompleted)
+                    //    command.EndExecuteNonQuery(result);
+                    ////else
+                    //  //  throw new InvalidOperationException();
+                    ////}
+                    //    if (writeToEventViewer == WriteToEventViewer.AllTheTime || (writeToEventViewer == WriteToEventViewer.OnlyExceptionsAndIfDbFails && logType == 1))
+                    //    {
+                    //        WriteToEventLog(controller, action, method, message, trace, logType, freeText);
+                    //    }
+                }
+                catch (Exception logException)
+                {
+                    WriteToEventLog(logException.Message, EventLogEntryType.FailureAudit, 1);
+                    WriteToEventLog(controller, action, method, message, trace, logType, freeText);
+                }
+            }
             return log;
         }
 

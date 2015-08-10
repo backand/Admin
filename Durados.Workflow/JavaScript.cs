@@ -184,7 +184,7 @@ namespace Durados.Workflow
             userProfile.Add("username", view.Database.GetCurrentUsername());
             userProfile.Add("role", currentUserRole);
             userProfile.Add("app", view.Database.GetCurrentAppName());
-            userProfile.Add("token", System.Web.HttpContext.Current.Request.Headers["Authorization"]);
+            userProfile.Add("token", System.Web.HttpContext.Current.Request.Headers["Authorization"] ?? "anonymous-" + System.Web.HttpContext.Current.Request.Headers["AnonymousToken"]);
 
             var call = new Jint.Engine(cfg => cfg.AllowClr(typeof(Backand.XMLHttpRequest).Assembly));
 
