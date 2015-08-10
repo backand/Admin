@@ -1483,7 +1483,7 @@ namespace Durados.Web.Mvc
             values.Add("Rules_Parent", userViewPK);
             values.Add("DataAction", Durados.TriggerDataAction.OnDemand.ToString());
             values.Add("WorkflowAction", Durados.WorkflowAction.Notify.ToString());
-            values.Add("WhereCondition", "1=1");
+            values.Add("WhereCondition", "true");
 
             values.Add("NotifySubject", "Wellcome to {{AppName}}");
             values.Add("NotifyMessage", GetUserVerificationMessage());
@@ -1505,7 +1505,7 @@ namespace Durados.Web.Mvc
             values.Add("Rules_Parent", userViewPK);
             values.Add("DataAction", Durados.TriggerDataAction.OnDemand.ToString());
             values.Add("WorkflowAction", Durados.WorkflowAction.Notify.ToString());
-            values.Add("WhereCondition", "1=1");
+            values.Add("WhereCondition", "true");
 
             values.Add("NotifySubject", "Your password was reset.");
             values.Add("NotifyMessage", "<div>Hi {{FirstName}},<br><br><br>We received a request to reset the password for your account. If you made this request, click <a href='{{ForgotPasswordUrl}}' >here to reset your password.</a><br>If you didn't make this request, please ignore this email.<br><br>Cheers,<br><br>The {{AppName}} Team</Div>");
@@ -1553,7 +1553,7 @@ namespace Durados.Web.Mvc
             values.Add("Rules_Parent", userViewPK);
             values.Add("DataAction", Durados.TriggerDataAction.OnDemand.ToString());
             values.Add("WorkflowAction", Durados.WorkflowAction.Notify.ToString());
-            values.Add("WhereCondition", "1=1");
+            values.Add("WhereCondition", "true");
 
             values.Add("NotifySubject", "Wellcome to [Product]");
             values.Add("NotifyMessage", GetUserApprovalMessage());

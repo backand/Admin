@@ -22,7 +22,7 @@ namespace BackAnd.Web.Api.Controllers.Filters
         public override void OnAuthorization(System.Web.Http.Controllers.HttpActionContext actionContext)
         {
             string token = GetToken(actionContext.Request, HeaderToken.ToString());
-            if (!string.IsNullOrEmpty(token))
+            if (!string.IsNullOrEmpty(token) && token != "null")
             {
 
                 string appName = GetAppName(token);

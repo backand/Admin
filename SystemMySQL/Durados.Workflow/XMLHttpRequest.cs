@@ -80,7 +80,24 @@ namespace Backand
                 }
 
                 byte[] bytes;
-                bytes = System.Text.Encoding.ASCII.GetBytes(data);
+                if (request.ContentType.ToLower().Contains("multipart/form-data"))
+                {
+                    if (!request.ContentType.Contains("boundary="))
+                    {
+                        request.ContentType += "; boundary=" + Boundary;
+                    }
+                    //((HttpWebRequest)request).Accept = "*/*";
+                    //((HttpWebRequest)request).UserAgent = "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/535.1 (KHTML, like Gecko) Chrome/13.0.782.220 Safari/535.1";
+                    //ServicePointManager.Expect100Continue = false;
+                    //request.Proxy = null;
+                    //request.PreAuthenticate = true;
+
+                    bytes = GetMultipartFormData(data);
+                }
+                else
+                {
+                    bytes = System.Text.Encoding.ASCII.GetBytes(data);
+                }
                 request.ContentLength = bytes.Length;
                 
                 if (request.ContentType == null)
@@ -92,6 +109,16 @@ namespace Backand
                     //Writes a sequence of bytes to the current stream 
                     requestStream.Write(bytes, 0, bytes.Length);
                     requestStream.Close();//Close stream
+                }
+
+                if (Durados.Workflow.JavaScript.IsDebug())
+                {
+                    try
+                    {
+                        string requestBody = System.Text.Encoding.ASCII.GetString(bytes); 
+
+                    }
+                    catch { }
                 }
             }
 
@@ -140,6 +167,95 @@ namespace Backand
                 response = null;
                 request = null;
             }
+        }
+
+        private static readonly Encoding encoding = Encoding.UTF8;
+        private static readonly string boundaryPrefix = "----WebKitFormBoundary";
+        private static string _boundary = null;
+        private static string Boundary
+        {
+            get
+            {
+                if (_boundary == null)
+                {
+                    _boundary = boundaryPrefix + Guid.NewGuid().ToString().Substring(0, 8);
+                }
+                return _boundary;
+            }
+        }
+        private byte[] GetMultipartFormData(string json)
+        {
+            var theJavaScriptSerializer = new System.Web.Script.Serialization.JavaScriptSerializer();
+            Dictionary<string, object> postParameters = (Dictionary<string, object>)theJavaScriptSerializer.Deserialize<Dictionary<string, object>>(json);
+            return GetMultipartFormData(postParameters, Boundary);
+        }
+
+        private byte[] GetMultipartFormData(Dictionary<string, object> postParameters, string boundary)
+        {
+            Stream formDataStream = new System.IO.MemoryStream();
+            bool needsCLRF = false;
+
+            foreach (var param in postParameters)
+            {
+                // Thanks to feedback from commenters, add a CRLF to allow multiple parameters to be added.
+                // Skip it on the first parameter, add it to subsequent parameters.
+                if (needsCLRF)
+                    formDataStream.Write(encoding.GetBytes("\r\n"), 0, encoding.GetByteCount("\r\n"));
+
+                needsCLRF = true;
+
+                if (param.Value is FileParameter)
+                {
+                    FileParameter fileToUpload = (FileParameter)param.Value;
+
+                    // Add just the first part of this param, since we will write the file data directly to the Stream
+                    string header = string.Format("--{0}\r\nContent-Disposition: form-data; name=\"{1}\"; filename=\"{2}\";\r\nContent-Type: {3}\r\n\r\n",
+                        boundary,
+                        param.Key,
+                        fileToUpload.FileName ?? param.Key,
+                        fileToUpload.ContentType ?? "application/octet-stream");
+
+                    formDataStream.Write(encoding.GetBytes(header), 0, encoding.GetByteCount(header));
+
+                    // Write the file data directly to the Stream, rather than serializing it to a string.
+                    formDataStream.Write(fileToUpload.File, 0, fileToUpload.File.Length);
+                }
+                else
+                {
+                    string postData = string.Format("--{0}\r\nContent-Disposition: form-data; name=\"{1}\"\r\n\r\n{2}",
+                        boundary,
+                        param.Key,
+                        param.Value);
+                    formDataStream.Write(encoding.GetBytes(postData), 0, encoding.GetByteCount(postData));
+                }
+            }
+
+            // Add the end of the request.  Start with a newline
+            string footer = "\r\n--" + boundary + "--\r\n";
+            formDataStream.Write(encoding.GetBytes(footer), 0, encoding.GetByteCount(footer));
+
+            // Dump the Stream into a byte[]
+            formDataStream.Position = 0;
+            byte[] formData = new byte[formDataStream.Length];
+            formDataStream.Read(formData, 0, formData.Length);
+            formDataStream.Close();
+
+            return formData;
+        }
+    }
+
+    public class FileParameter
+    {
+        public byte[] File { get; set; }
+        public string FileName { get; set; }
+        public string ContentType { get; set; }
+        public FileParameter(byte[] file) : this(file, null) { }
+        public FileParameter(byte[] file, string filename) : this(file, filename, null) { }
+        public FileParameter(byte[] file, string filename, string contenttype)
+        {
+            File = file;
+            FileName = filename;
+            ContentType = contenttype;
         }
     }
 

@@ -5204,7 +5204,7 @@ namespace Durados.Web.Mvc.UI.Helpers
                         object isApproved = userRow["IsApproved"];
                         if (isApproved.Equals(false) || isApproved.Equals(0))
                         {
-                            throw new SocialException("The user is not signed up to " + appName);
+                            throw new SocialException("The user did not finish signing up to " + appName);
                         }
                     }
                 }
