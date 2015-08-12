@@ -132,6 +132,7 @@
     <Reference Include="System.Core" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="System.Web.Extensions" />
+    <Reference Include="System.Web.Helpers, Version=2.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL" />
     <Reference Include="System.Web.Http, Version=5.1.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\Microsoft.AspNet.WebApi.Core.5.1.2\lib\net45\System.Web.Http.dll</HintPath>
@@ -187,6 +188,7 @@
     <Compile Include="AuthRepository.cs" />
     <Compile Include="ChallengeResult.cs" />
     <Compile Include="Controllers\accountController.cs" />
+    <Compile Include="Controllers\Admin\actionTemplateController.cs" />
     <Compile Include="Controllers\Admin\farmController.cs" />
     <Compile Include="Controllers\Admin\myAppConnectionController.cs" />
     <Compile Include="Controllers\Admin\myAppsController.cs" />
