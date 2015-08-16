@@ -31,6 +31,9 @@ namespace Durados.Web.Mvc.Logging
         string eventViewerLog = "Application";
         WriteToEventViewer writeToEventViewer = WriteToEventViewer.OnlyExceptionsAndIfDbFails;
 
+        string reportConnectionString = null;
+        bool writeToReport = false;
+       
         private WritingEvents events;
         public WritingEvents Events
         {
@@ -83,6 +86,13 @@ namespace Durados.Web.Mvc.Logging
         private void Initiate()
         {
             initiated = true;
+
+            writeToReport = Convert.ToBoolean(System.Configuration.ConfigurationManager.AppSettings["writeToReport"] ?? "true");
+            reportConnectionString = Convert.ToString(System.Configuration.ConfigurationManager.AppSettings["reportConnectionString"] ?? "true");
+            if (System.Web.Configuration.WebConfigurationManager.ConnectionStrings["reportConnectionString"] != null)
+                reportConnectionString = System.Web.Configuration.WebConfigurationManager.ConnectionStrings["reportConnectionString"].ConnectionString;
+            else
+                writeToReport = false;
 
             machineName = (System.Web.HttpContext.Current !=null)?System.Web.HttpContext.Current.Server.MachineName:System.Environment.MachineName;
             superDeveloper = Convert.ToString(System.Configuration.ConfigurationManager.AppSettings["superDeveloper"] ?? "dev@devitout.com").ToLower();
@@ -467,6 +477,27 @@ namespace Durados.Web.Mvc.Logging
 
 
                     });
+
+                    if (writeToReport)
+                    {
+                        try
+                        {
+                            using (IDbConnection sqlConnection = GetConnection(reportConnectionString))
+                            {
+                                using (IDbCommand command = GetCommand(sqlConnection, "Durados_LogInsert"))
+                                {
+                                    command.CommandType = CommandType.StoredProcedure;
+
+                                    sqlConnection.Open();
+
+                                    SetCommandParametrs(command, applicationName, username, controller, action, method, message, trace, logType, freeText, time, log, guid);
+
+                                    command.ExecuteNonQuery();
+                                }
+                            }
+                        }
+                        catch { }
+                    }
                     ////using (SqlConnection connection = new SqlConnection(connectionString))
                     ////{
                     //SetCommandParametrs(command, controller, action, method, message, trace, logType, freeText, time, log); 
