@@ -4624,6 +4624,8 @@ namespace Durados.Web.Mvc {
             
             private global::System.Data.DataColumn columncontributors;
             
+            private global::System.Data.DataColumn columnCategory;
+            
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
             public backand_ActionTemplateDataTable() {
@@ -4835,6 +4837,14 @@ namespace Durados.Web.Mvc {
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
+            public global::System.Data.DataColumn CategoryColumn {
+                get {
+                    return this.columnCategory;
+                }
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
             [global::System.ComponentModel.Browsable(false)]
             public int Count {
                 get {
@@ -4891,7 +4901,8 @@ namespace Durados.Web.Mvc {
                         bool backands, 
                         bool approved, 
                         System.DateTime approvedDate, 
-                        string contributors) {
+                        string contributors, 
+                        int Category) {
                 backand_ActionTemplateRow rowbackand_ActionTemplateRow = ((backand_ActionTemplateRow)(this.NewRow()));
                 object[] columnValuesArray = new object[] {
                         null,
@@ -4915,7 +4926,8 @@ namespace Durados.Web.Mvc {
                         backands,
                         approved,
                         approvedDate,
-                        contributors};
+                        contributors,
+                        Category};
                 rowbackand_ActionTemplateRow.ItemArray = columnValuesArray;
                 this.Rows.Add(rowbackand_ActionTemplateRow);
                 return rowbackand_ActionTemplateRow;
@@ -4967,6 +4979,7 @@ namespace Durados.Web.Mvc {
                 this.columnapproved = base.Columns["approved"];
                 this.columnapprovedDate = base.Columns["approvedDate"];
                 this.columncontributors = base.Columns["contributors"];
+                this.columnCategory = base.Columns["Category"];
             }
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
@@ -5016,6 +5029,8 @@ namespace Durados.Web.Mvc {
                 base.Columns.Add(this.columnapprovedDate);
                 this.columncontributors = new global::System.Data.DataColumn("contributors", typeof(string), null, global::System.Data.MappingType.Element);
                 base.Columns.Add(this.columncontributors);
+                this.columnCategory = new global::System.Data.DataColumn("Category", typeof(int), null, global::System.Data.MappingType.Element);
+                base.Columns.Add(this.columnCategory);
                 this.Constraints.Add(new global::System.Data.UniqueConstraint("Constraint1", new global::System.Data.DataColumn[] {
                                 this.columnid}, true));
                 this.columnid.AutoIncrement = true;
@@ -7991,6 +8006,22 @@ namespace Durados.Web.Mvc {
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
+            public int Category {
+                get {
+                    try {
+                        return ((int)(this[this.tablebackand_ActionTemplate.CategoryColumn]));
+                    }
+                    catch (global::System.InvalidCastException e) {
+                        throw new global::System.Data.StrongTypingException("The value for column \'Category\' in table \'backand_ActionTemplate\' is DBNull.", e);
+                    }
+                }
+                set {
+                    this[this.tablebackand_ActionTemplate.CategoryColumn] = value;
+                }
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
             public bool IsshortDescriptionNull() {
                 return this.IsNull(this.tablebackand_ActionTemplate.shortDescriptionColumn);
             }
@@ -8227,6 +8258,18 @@ namespace Durados.Web.Mvc {
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
             public void SetcontributorsNull() {
                 this[this.tablebackand_ActionTemplate.contributorsColumn] = global::System.Convert.DBNull;
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
+            public bool IsCategoryNull() {
+                return this.IsNull(this.tablebackand_ActionTemplate.CategoryColumn);
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
+            public void SetCategoryNull() {
+                this[this.tablebackand_ActionTemplate.CategoryColumn] = global::System.Convert.DBNull;
             }
         }
         
