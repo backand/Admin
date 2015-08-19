@@ -742,7 +742,8 @@ namespace Durados.DataAccess
                 command.Connection.Open();
                 try
                 {
-                    int id = DataAccess.History.GetHistory(view.Database.SystemSqlProduct).SaveCreate(command, view, pk, userId.Value, view.Database.SwVersion, view.GetWorkspaceName());
+                    string objectName = pk;
+                    int id = DataAccess.History.GetHistory(view.Database.SystemSqlProduct).SaveCreate(command, view, objectName, userId.Value, view.Database.SwVersion, view.GetWorkspaceName());
                     configTransaction.AddPendingHistoryId(id);
                 }
                 finally
@@ -1074,7 +1075,7 @@ namespace Durados.DataAccess
                     connectionString = view.Database.DbConnectionString;
 
                 System.Data.IDbCommand command;
-                if (editEventArgs != null && editEventArgs.SysCommand != null)
+                if (editEventArgs != null && editEventArgs.SysCommand != null && editEventArgs.SysCommand.Connection != null)
                 {
                     command = editEventArgs.SysCommand;
                 }
@@ -1083,17 +1084,23 @@ namespace Durados.DataAccess
                     command = GetNewCommand(string.Empty, GetNewConnection(view.Database.SystemSqlProduct, connectionString), view.Database.SystemSqlProduct);
                    
                 }
-                command.Connection.Open();
                 try
                 {
+                    command.Connection.Open();
                     OldNewValue[] oldNewValues = null;
-                    int? id = DataAccess.History.GetHistory(view.Database.SystemSqlProduct).SaveEdit(command, view, prevRow, values, pk, userId.Value, out oldNewValues, view.Database.SwVersion, view.GetWorkspaceName()); //((History)history).SaveEdit(command, view, prevRow, values, pk, userId.Value, out oldNewValues, view.Database.SwVersion, view.GetWorkspaceName());
+                    string objectName = pk;
+                    
+                    int? id = DataAccess.History.GetHistory(view.Database.SystemSqlProduct).SaveEdit(command, view, prevRow, values, objectName, userId.Value, out oldNewValues, view.Database.SwVersion, view.GetWorkspaceName()); //((History)history).SaveEdit(command, view, prevRow, values, pk, userId.Value, out oldNewValues, view.Database.SwVersion, view.GetWorkspaceName());
                     if (id.HasValue)
                         configTransaction.AddPendingHistoryId(id.Value);
                 }
                 finally
                 {
-                    command.Connection.Close();
+                    try
+                    {
+                        command.Connection.Close();
+                    }
+                    catch { }
                 }
             }
 
@@ -1159,7 +1166,9 @@ namespace Durados.DataAccess
                 command.Connection.Open();
                 try
                 {
-                    int id = DataAccess.History.GetHistory(view.Database.SystemSqlProduct).SaveDelete(command, view, pk, userId.Value, view.Database.SwVersion, view.GetWorkspaceName(), prevRow);
+                    string objectName = pk;
+                    
+                    int id = DataAccess.History.GetHistory(view.Database.SystemSqlProduct).SaveDelete(command, view, objectName, userId.Value, view.Database.SwVersion, view.GetWorkspaceName(), prevRow);
                     configTransaction.AddPendingHistoryId(id);
                 }
                 finally

@@ -21,14 +21,24 @@ namespace BackAnd.Web.Api
 
         public async Task CreateAsync(AuthenticationTokenCreateContext context)
         {
-            var guid = Guid.NewGuid().ToString();
+            try
+            {
+                Durados.Web.Mvc.Map map =  Durados.Web.Mvc.Maps.Instance.GetMap();
+                if (map.Database.UseRefreshToken || map.Equals(Durados.Web.Mvc.Maps.Instance.DuradosMap))
+                {
+                    //var guid = Guid.NewGuid().ToString();
 
-            // maybe only create a handle the first time, then re-use for same client
-            /*var refreshToken = System.Web.Helpers.Crypto.HashPassword(guid);
-            _refreshTokens.TryAdd(refreshToken, context.Ticket);
+                    //// maybe only create a handle the first time, then re-use for same client
+                    //var refreshToken = System.Web.Helpers.Crypto.HashPassword(guid);
+                    //_refreshTokens.TryAdd(refreshToken, context.Ticket);
 
-            // consider storing only the hash of the handle
-            context.SetToken(refreshToken);*/
+                    // consider storing only the hash of the handle
+                    string username = map.Database.GetCurrentUsername();
+
+                    context.SetToken(Durados.Web.Mvc.UI.Helpers.RefreshToken.Get(map.Equals(Durados.Web.Mvc.Maps.Instance.DuradosMap) ? Durados.Web.Mvc.Maps.DuradosAppName : map.AppName, username));
+                }
+            }
+            catch { }
         }
 
         public void Receive(AuthenticationTokenReceiveContext context)

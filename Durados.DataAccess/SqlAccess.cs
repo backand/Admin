@@ -9914,8 +9914,29 @@ namespace Durados.DataAccess
                     }
                     else
                     {
+                        if (field.IsCheckList())
+                        {
+                            try
+                            {
+                                ParentField parentField = ((ChildrenField)field).GetFirstNonEquivalentParentField();
+                                if (parentField != null)
+                                {
+                                    List<string> clItems = new List<string>();
+                                    foreach (Dictionary<string, object> child in (System.Collections.IEnumerable)deepObject[key])
+                                    {
+                                        if (child.ContainsKey(parentField.JsonName))
+                                        {
+                                            string clItem = ((Dictionary<string, object>)((Dictionary<string, object>)child[parentField.JsonName])["__metadata"])["id"].ToString();
+                                            clItems.Add(clItem);
+                                        }
+                                    }
+                                    values.Add(field.Name, clItems.ToArray().Delimited());
+                                }
+                            }
+                            catch { }
+                        }
                         // handle parents?
-                        if (!(field.FieldType == FieldType.Parent && deepObject[key] is Dictionary<string, object>))
+                        else if (!(field.FieldType == FieldType.Parent && deepObject[key] is Dictionary<string, object>))
                             values.Add(field.Name, deepObject[key]);
                     }
                 }

@@ -855,11 +855,20 @@ namespace BackAnd.Web.Api.Controllers
 
             int currentUserId = Convert.ToInt32(Map.Database.GetUserID());
             string currentUserRole = Map.Database.GetUserRole();
-
+            
             if (e.View.SaveHistory)
             {
                 e.History = GetNewHistory();
                 e.UserId = currentUserId;
+                if (e.View.Name == "Database" && e.View.Database.IsConfig && Map is DuradosMap)
+                {
+                    try
+                    {
+                        Map map = Maps.Instance.GetMap(System.Web.HttpContext.Current.Items[Durados.Database.AppName].ToString());
+                        e.UserId = Convert.ToInt32(map.Database.GetUserID());
+                    }
+                    catch { }
+                }
                 if (e.View.Database is Durados.Web.Mvc.Config.Database)
                 {
                     e.Command = GetCommand(Map.Database.SqlProduct);
@@ -984,6 +993,16 @@ namespace BackAnd.Web.Api.Controllers
             {
                 userId = Convert.ToInt32(e.PrimaryKey);
             }
+
+            //if (e.View.Name == "durados_App" && e.View.Database.IsMain())
+            //{
+            //    try
+            //    {
+            //        Map map = Maps.Instance.GetMap(e.PrevRow["Name"].ToString());
+            //        userId = Convert.ToInt32(map.Database.GetUserID());
+            //    }
+            //    catch { }
+            //}
 
             wfe.PerformActions(this, e.View, TriggerDataAction.AfterEditBeforeCommit, e.Values, e.PrimaryKey, e.PrevRow, Map.Database.ConnectionString, userId, ((Durados.Web.Mvc.Database)e.View.Database).GetUserRole(), e.Command);
 

@@ -451,7 +451,7 @@ namespace BackAnd.Web.Api.Controllers
                         System.Web.HttpContext.Current.Items.Add(Durados.Database.AppName, appName);
 
                     View view = (View)map.GetConfigDatabase().Views["Database"];
-                    view.Edit(GetAdjustedValues(view, databaseSettings), "0", null, null, null, null);
+                    view.Edit(GetAdjustedValues(view, databaseSettings), "0", view_BeforeEdit, view_BeforeEditInDatabase, view_AfterEditBeforeCommit, view_AfterEditAfterCommit);
                     if (newAppName != null)
                     {
                         map.AppName = newAppName;
@@ -473,7 +473,7 @@ namespace BackAnd.Web.Api.Controllers
         protected override void AfterEditAfterCommit(Durados.EditEventArgs e)
         {
             base.AfterEditAfterCommit(e);
-            if (e.Values.ContainsKey("Name"))
+            if (e.Values != null && e.Values.ContainsKey("Name"))
             {
                 MapDataSet.durados_AppRow appRow = (MapDataSet.durados_AppRow)e.PrevRow;
                 string oldName = appRow.Name;

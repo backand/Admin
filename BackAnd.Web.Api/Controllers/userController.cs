@@ -93,17 +93,17 @@ namespace BackAnd.Web.Api.Controllers
 
         [HttpGet]
         [BackAnd.Web.Api.Controllers.Filters.BackAndAuthorize]
-        [Route("key/{id}")]
-        public IHttpActionResult key(string id)
+        [Route("key")]
+        public IHttpActionResult key(string username)
         {
-            if (string.IsNullOrEmpty(id))
+            if (string.IsNullOrEmpty(username))
             {
-                return ResponseMessage(Request.CreateResponse(HttpStatusCode.NotFound, Messages.IdIsMissing));
+                return ResponseMessage(Request.CreateResponse(HttpStatusCode.NotFound, "username is missing"));
             }
 
             try
             {
-                return Ok(RestHelper.GetUserKey(id));
+                return Ok(RestHelper.GetUserKey(username));
 
 
             }
@@ -125,20 +125,27 @@ namespace BackAnd.Web.Api.Controllers
             }
         }
 
-        [Route("key/reset/{id}")]
+        [Route("key/reset")]
         [BackAnd.Web.Api.Controllers.Filters.BackAndAuthorize]
-        [HttpGet]
-        public IHttpActionResult reset(string id)
+        [HttpPut]
+        public IHttpActionResult reset(string username)
         {
-            if (string.IsNullOrEmpty(id))
+            if (string.IsNullOrEmpty(username))
             {
-                return ResponseMessage(Request.CreateResponse(HttpStatusCode.NotFound, Messages.IdIsMissing));
+                return ResponseMessage(Request.CreateResponse(HttpStatusCode.NotFound, "username is missing"));
             }
+
+            string role = map.Database.GetUserRole(map.Database.GetCurrentUsername());
+            if (!(role == "Admin" || role == "Developer"))
+                return ResponseMessage(Request.CreateResponse(HttpStatusCode.Forbidden,"Only admin can get keys"));
 
             try
             {
-                return Ok(RestHelper.ResetUserKey(id, view_BeforeEditInDatabase));
-
+                return Ok(RestHelper.ResetUserKey(username, view_BeforeEditInDatabase));
+            }
+            catch (Durados.UserNotFoundException exception)
+            {
+                return ResponseMessage(Request.CreateResponse(HttpStatusCode.NotFound, exception.Message));
 
             }
             catch (Exception exception)
@@ -533,6 +540,8 @@ namespace BackAnd.Web.Api.Controllers
                 Account account = new Account(this);
 
                 account.ChangePassword(token, password);
+
+                RestHelper.ResetUserKey(map.Database.GetCurrentUsername(), null);
 
                 return Ok();
             }
@@ -1318,9 +1327,11 @@ namespace BackAnd.Web.Api.Controllers
         private static string CreateToken(ClaimsIdentity identity)
         {
             AuthenticationTicket ticket = new AuthenticationTicket(identity, new AuthenticationProperties());
+            Durados.Web.Mvc.Map map = Durados.Web.Mvc.Maps.Instance.GetMap(System.Web.HttpContext.Current.Items[Durados.Web.Mvc.Database.AppName].ToString());
+           
             var currentUtc = new SystemClock().UtcNow;
             ticket.Properties.IssuedUtc = currentUtc;
-            ticket.Properties.ExpiresUtc = currentUtc.Add(TimeSpan.FromMinutes(1440));
+            ticket.Properties.ExpiresUtc = currentUtc.Add(TimeSpan.FromSeconds(map.Database.TokenExpiration));
             string AccessToken = Startup.OAuthBearerOptions.AccessTokenFormat.Protect(ticket);
             return AccessToken;
         }

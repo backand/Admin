@@ -821,9 +821,9 @@ namespace Durados.Web.Mvc.UI.Helpers
 
         }
 
-        public static object GetUserKey(string appName)
+        public static object GetUserKey(string username)
         {
-            Map map = Maps.Instance.GetMap(appName);
+            Map map = Maps.Instance.GetMap();
             if (map == null || map is DuradosMap)
             {
                 throw new DuradosException("App not found");
@@ -833,26 +833,26 @@ namespace Durados.Web.Mvc.UI.Helpers
             if (!(role == "Admin" || role == "Developer"))
                 throw new DuradosException("Only admin can get keys");
 
-            return map.Database.GetUserGuid();
+            return map.Database.GetUserRow(username)["Guid"].ToString();
 
         }
 
-        public static object ResetUserKey(string appName, BeforeEditInDatabaseEventHandler view_BeforeEditInDatabase)
+        public static object ResetUserKey(string username, BeforeEditInDatabaseEventHandler view_BeforeEditInDatabase)
         {
-            Map map = Maps.Instance.GetMap(appName);
+            Map map = Maps.Instance.GetMap();
             if (map == null || map is DuradosMap)
             {
                 throw new DuradosException("App not found");
             }
 
-            string role = map.Database.GetUserRole(map.Database.GetCurrentUsername());
-            if (!(role == "Admin" || role == "Developer"))
-                throw new DuradosException("Only admin can get keys");
-
             string guid = Guid.NewGuid().ToString();
-            string pk = map.Database.GetUserID();
-            map.Database.GetUserView().Edit(new Dictionary<string, object>() { { "Guid", guid } }, pk, null, view_BeforeEditInDatabase, null, null);
-
+            int pk = map.Database.GetUserID(username);
+            if (pk == -1)
+            {
+                throw new UserNotFoundException(username);
+            }
+            map.Database.GetUserView().Edit(new Dictionary<string, object>() { { "Guid", guid } }, pk.ToString(), null, view_BeforeEditInDatabase, null, null);
+            RefreshToken.Clear();
             return guid;
         }
 
@@ -1191,6 +1191,18 @@ namespace Durados.Web.Mvc.UI.Helpers
                     Field realField = GetFieldFromFieldRow(view, dataRow);
 
                     return !realField.IsVisibleForCreate();
+                }
+                if (columnField.Name == "ExcludeInInsert" || columnField.Name == "ExcludeInUpdate")
+                {
+                    Field realField = GetFieldFromFieldRow(view, dataRow);
+                    if (realField.FieldType == FieldType.Column)
+                        if (((ColumnField)realField).DataColumn.AutoIncrement)
+                            return true;
+                }
+                if (columnField.Name == "Required")
+                {
+                    Field realField = GetFieldFromFieldRow(view, dataRow);
+                    return realField.Required;
                 }
                 else if (columnField.Name == "HideInEdit")
                 {
@@ -1755,7 +1767,67 @@ namespace Durados.Web.Mvc.UI.Helpers
                 metadata.Add("dates", dates);
             }
 
+            HandleMetadataExceptions(metadata, view, row, tableViewer, descriptive);
+
             return metadata;
+        }
+
+        private void HandleMetadataExceptions(Dictionary<string, object> metadata, View view, DataRow row, TableViewer tableViewer, bool descriptive)
+        {
+            if (view.Name == "durados_v_ChangeHistory")
+            {
+                HandleMetadataHistoryExceptions(metadata, view, row, tableViewer, descriptive);
+            }
+        }
+
+        private void HandleMetadataHistoryExceptions(Dictionary<string, object> metadata, View view, DataRow row, TableViewer tableViewer, bool descriptive)
+        {
+            Dictionary<string, object> descriptives = (Dictionary<string, object>)metadata["descriptives"];
+
+            Field field = view.Fields["PK"];
+            string value = field.GetValue(row);
+            string label = value;
+            if (value == "0")
+            {
+                label = "settings";
+            }
+            else
+            {
+                if (!row.IsNull("ViewName"))
+                {
+                    string configViewName = row["ViewName"].ToString();
+                    View configView = (View)view.Database.Map.GetConfigDatabase().Views[configViewName];
+                    if (configView != null)
+                    {
+                        DataRow configRow = configView.GetDataRow(value);
+                        if (configRow != null)
+                        {
+                            label = configView.GetDisplayValue(configRow);
+                        }
+                    }
+                }
+            }
+            descriptives.Add(GetName(field), new Dictionary<string, object>() { { "label", label }, { "value", value } });
+
+            field = view.Fields["ViewName"];
+            value = field.GetValue(row);
+            label = value;
+            if (value == "View")
+            {
+                label = "Object";
+            }
+            else if (value == "Database")
+            {
+                label = "App";
+            }
+            else if (value == "Rule")
+            {
+                label = "Action";
+            }
+            descriptives.Add(GetName(field), new Dictionary<string, object>() { { "label", label }, { "value", value } });
+
+
+            
         }
 
         public virtual string GetName(Durados.Field field)
@@ -4931,7 +5003,7 @@ namespace Durados.Web.Mvc.UI.Helpers
                     }
                 }
                 if (string.IsNullOrEmpty(message))
-                    throw exception;
+                    message = (exception.InnerException ?? exception).Message;
 
                 return new ResponseStatusAndData() { status = status, data = message, index = index };
             }
@@ -4979,7 +5051,8 @@ namespace Durados.Web.Mvc.UI.Helpers
         public static readonly string MissingAccessToken = "Missing accessToken.";
         public static readonly string InvalidAccessToken = "Invalid accessToken.";
         public static readonly string WrongAppName = "Wrong appName.";
-
+        public static readonly string InvalidRefreshToken = "Invalid refreshToken.";
+        
     }
     public class DuradosAuthorizationHelper
     {
@@ -6155,9 +6228,19 @@ namespace Durados.Web.Mvc.UI.Helpers
 
         
 
-        public void ClearMachinesCache(string appName)
+        public void ClearMachinesCache(string appName, bool async = true)
         {
-            RunBulk(appName);
+            if (async)
+            {
+                System.Threading.ThreadPool.QueueUserWorkItem(delegate
+                {
+                    RunBulk(appName);
+                });
+            }
+            else
+            {
+                RunBulk(appName);
+            }
             
         }
 
@@ -6347,6 +6430,77 @@ namespace Durados.Web.Mvc.UI.Helpers
     }
 
 
+    public class RefreshToken
+    {
+        static SqlAccess sql = new SqlAccess();
+        static string key = "RefreshToken";
+        static RefreshToken()
+        {
+            if (!Maps.Instance.DuradosMap.AllKindOfCache.ContainsKey(key))
+            {
+                Maps.Instance.DuradosMap.AllKindOfCache.Add(key, new Dictionary<string, object>());
+            }
+        }
 
+        public static string Get(string appName, string username)
+        {
+            Map map = GetMap(appName);
+            string appGuid = map.Guid.ToString();
+            string userGuid = map.Database.GetGuidByUsername(username);
+            return System.Web.Helpers.Crypto.HashPassword(appGuid + userGuid);
+        }
+
+        private static Map GetMap(string appName)
+        {
+            Map map = null;
+
+            if (appName == Maps.DuradosAppName)
+            {
+                map = Maps.Instance.DuradosMap;
+            }
+            else
+            {
+                map = Maps.Instance.GetMap(appName);
+                if (map == null || map == Maps.Instance.DuradosMap)
+                {
+                    throw new AppNotFoundException(appName);
+                }
+            }
+           
+            return map;
+        }
+
+        public static bool Validate(string appName, string refreshToken, string username)
+        {
+            if (!Maps.Instance.DuradosMap.AllKindOfCache[key].ContainsKey(refreshToken))
+            {
+                Map map = GetMap(appName);
+                if (!map.Database.UseRefreshToken && !map.Equals(Maps.Instance.DuradosMap))
+                    return false;
+
+                string appGuid = map.Guid.ToString();
+                string userGuid = map.Database.GetGuidByUsername(username);
+                if (System.Web.Helpers.Crypto.VerifyHashedPassword(refreshToken, appGuid + userGuid))
+                {
+                    Maps.Instance.DuradosMap.AllKindOfCache[key].Add(refreshToken, new Dictionary<string, string>() { { "username", username }, { "appName", appName } });
+                }
+                else
+                {
+                    return false;
+                }
+            }
+            return true;
+        }
+
+        public static void Clear()
+        {
+            Clear(Maps.Instance.GetMap().AppName);
+        }
+        public static void Clear(string appName)
+        {
+            Maps.Instance.DuradosMap.AllKindOfCache[key].Clear();
+            FarmCaching.Instance.ClearMachinesCache(appName, true);
+        }
+    }
 
 }

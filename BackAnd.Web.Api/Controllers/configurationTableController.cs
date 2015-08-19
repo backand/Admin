@@ -145,7 +145,7 @@ namespace BackAnd.Web.Api.Controllers
                 var result = ValidateInputForUpdate(id, view, values);
                 if (result != null)
                     return result;
-                view.Edit(values, id, null, null, null, null);
+                view.Edit(values, id, view_BeforeEdit, view_BeforeEditInDatabase, view_AfterEditBeforeCommit, view_AfterEditAfterCommit);
 
                 HandelChildViewsForUpdate(id, values);
 
@@ -216,7 +216,7 @@ namespace BackAnd.Web.Api.Controllers
                 var result= ValidateInputForPost(view, values);
                 if (result != null)
                     return result;
-                System.Data.DataRow row = view.Create(values, null, null, null, null, null);
+                System.Data.DataRow row = view.Create(values, null, view_BeforeCreate, view_BeforeCreateInDatabase, view_AfterCreateBeforeCommit, view_AfterCreateAfterCommit);
                 
                 var pk = row["ID"].ToString();
 
@@ -301,9 +301,9 @@ namespace BackAnd.Web.Api.Controllers
                     return ResponseMessage(Request.CreateResponse(HttpStatusCode.NotFound, string.Format(Messages.RuleNotFound)));
                 }
 
-               
 
-                view.Delete(id, null, null, null);
+
+                view.Delete(id, view_BeforeDelete, view_AfterDeleteBeforeCommit, view_AfterDeleteAfterCommit);
                 RefreshConfigCache();
 
                 return Ok(new { __metadata = new { id = id } });

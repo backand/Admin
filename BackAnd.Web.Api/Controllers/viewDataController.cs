@@ -79,6 +79,8 @@ namespace BackAnd.Web.Api.Controllers
             {
                 return false;
             }
+            if (Map.Database.GetCurrentUsername() == Durados.Database.GuestUsername && (view.Database.IsConfig || view.SystemView))
+                return false;
             return view.IsAllow();
         }
 
