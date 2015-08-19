@@ -3305,7 +3305,20 @@ namespace Durados.Web.Mvc.Config
             }
 
 
-
+            if (databaseView.Fields.ContainsKey("TokenExpiration"))
+            {
+                ColumnField TokenExpiration = (ColumnField)databaseView.Fields["TokenExpiration"];
+                TokenExpiration.Order = 600;
+                TokenExpiration.Category = rolesCategory;
+                TokenExpiration.HideInTable = true;
+            }
+            if (databaseView.Fields.ContainsKey("UseRefreshToken"))
+            {
+                ColumnField UseRefreshToken = (ColumnField)databaseView.Fields["UseRefreshToken"];
+                UseRefreshToken.Order = 600;
+                UseRefreshToken.Category = rolesCategory;
+                UseRefreshToken.HideInTable = true;
+            }
             if (databaseView.Fields.ContainsKey("GithubClientId"))
             {
                 ColumnField GithubClientId = (ColumnField)databaseView.Fields["GithubClientId"];

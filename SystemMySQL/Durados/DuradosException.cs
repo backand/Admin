@@ -47,6 +47,32 @@ namespace Durados
         }
     }
 
+    public class AppNotFoundException : DuradosException
+    {
+        public AppNotFoundException()
+            : base("App was not found.")
+        {
+        }
+
+        public AppNotFoundException(string appName)
+            : base(String.Format("The app \"{0}\" was not found", appName))
+        {
+        }
+    }
+
+    public class UserNotFoundException : DuradosException
+    {
+        public UserNotFoundException()
+            : base("User was not found.")
+        {
+        }
+
+        public UserNotFoundException(string username)
+            : base(String.Format("The user \"{0}\" was not found", username))
+        {
+        }
+    }
+
     public class DuradosAccessViolationException : DuradosException
     {
         public DuradosAccessViolationException()

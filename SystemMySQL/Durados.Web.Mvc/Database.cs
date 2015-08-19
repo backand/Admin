@@ -172,6 +172,8 @@ namespace Durados.Web.Mvc
             EnableGithub = true;
             EnableFacebook = true;
             EnableSecretKeyAccess = true;
+            TokenExpiration = 8640;
+            UseRefreshToken = false;
         }
 
         public override bool IsMain()
@@ -199,6 +201,12 @@ namespace Durados.Web.Mvc
         {
             return new Durados.Web.Mvc.View(dataTable, this);
         }
+
+        [Durados.Config.Attributes.ColumnProperty()]
+        public int TokenExpiration { get; set; }
+
+        [Durados.Config.Attributes.ColumnProperty()]
+        public bool UseRefreshToken { get; set; }
 
 
         [Durados.Config.Attributes.ColumnProperty()]

@@ -260,7 +260,7 @@ namespace Durados.Workflow
                         Field[] fields = view.GetFieldsByJsonName(key);
                         if (fields[0].DataType == DataType.DateTime)
                         {
-                            if (!(val is DateTime))
+                            if (val != null && !(val is DateTime))
                             {
                                 if (val.ToString().StartsWith("/Date("))
                                 {
