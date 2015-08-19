@@ -25,6 +25,10 @@ namespace BackAnd.Web.Api.Controllers.Filters
         }
         public override void OnAuthorization(System.Web.Http.Controllers.HttpActionContext actionContext)
         {
+
+            if (IsBasicAuthorized(actionContext))
+                return;
+
             if (IsServerAuthorized(actionContext))
                 return;
 
@@ -139,6 +143,80 @@ namespace BackAnd.Web.Api.Controllers.Filters
                 HandleUnauthorized(actionContext);
                 return;
             }
+        }
+
+        public class BasicAuthenticationIdentity
+        {
+            public string AppGuid { get; private set; }
+            public string UserGuid { get; private set; }
+            public BasicAuthenticationIdentity(string appGuid, string userGuid)
+            {
+                AppGuid = appGuid;
+                UserGuid = userGuid;
+            }
+        }
+
+        private bool IsBasicAuthorized(System.Web.Http.Controllers.HttpActionContext actionContext)
+        {
+            if (!IsBasicAuthentication(actionContext))
+                return false;
+            string username = null;
+            string appName = null;
+            BasicAuthenticationIdentity basicAuthenticationIdentity = GetBasicAuthenticationIdentity(actionContext);
+            if (!IsBasicAuthorized(basicAuthenticationIdentity, out username, out appName))
+            {
+                actionContext.Response = actionContext.Request.CreateErrorResponse(
+                        HttpStatusCode.Unauthorized,
+                        new BasicAuthorizationException());
+                return true;
+            }
+
+            if (!System.Web.HttpContext.Current.Items.Contains(Database.Username))
+                System.Web.HttpContext.Current.Items.Add(Database.Username, username);
+
+            if (!System.Web.HttpContext.Current.Items.Contains(Database.AppName))
+                System.Web.HttpContext.Current.Items.Add(Database.AppName, appName);
+
+            if (!System.Web.HttpContext.Current.Items.Contains(Database.RequestId))
+                System.Web.HttpContext.Current.Items.Add(Database.RequestId, Guid.NewGuid().ToString());
+
+            return true;
+        }
+
+        private bool IsBasicAuthorized(BasicAuthenticationIdentity basicAuthenticationIdentity, out string username, out string appName)
+        {
+            appName = Maps.Instance.GetAppNameByGuid(basicAuthenticationIdentity.AppGuid);
+            Map map = Maps.Instance.GetMap(appName);
+            if (map == null || map.IsMainMap)
+            {
+                username = null;
+                return false;
+            }
+
+            username = map.Database.GetUsernameByGuid(basicAuthenticationIdentity.UserGuid);
+
+            if (string.IsNullOrEmpty(username))
+                return false;
+
+            return true;
+        }
+
+        private bool IsBasicAuthentication(System.Web.Http.Controllers.HttpActionContext actionContext)
+        {
+            return actionContext.Request.Headers.Authorization != null && actionContext.Request.Headers.Authorization.Scheme.ToLower() == "basic";
+        }
+        
+        private BasicAuthenticationIdentity GetBasicAuthenticationIdentity(System.Web.Http.Controllers.HttpActionContext actionContext)
+        {
+            string authHeaderValue = null;
+            var authRequest = actionContext.Request.Headers.Authorization;
+            if (authRequest != null && !String.IsNullOrEmpty(authRequest.Scheme) && authRequest.Scheme.ToLower() == "basic")
+                authHeaderValue = authRequest.Parameter;
+            if (string.IsNullOrEmpty(authHeaderValue))
+                return null;
+            authHeaderValue = System.Text.Encoding.Default.GetString(Convert.FromBase64String(authHeaderValue));
+            var credentials = authHeaderValue.Split(':');
+            return credentials.Length < 2 ? null : new BasicAuthenticationIdentity(credentials[0], credentials[1]);
         }
 
         private bool IsAppReady()
@@ -403,6 +481,11 @@ namespace BackAnd.Web.Api.Controllers.Filters
     public class AuthorizationTokenExpiredException : ServerAuthorizationFailureException
     {
         public AuthorizationTokenExpiredException() : base("invalid or expired token") { }
+    }
+
+    public class BasicAuthorizationException : ServerAuthorizationFailureException
+    {
+        public BasicAuthorizationException() : base("invalid credentials") { }
     }
 
     public class AppNotInCacheServerAuthorizationFailureException : ServerAuthorizationFailureException
