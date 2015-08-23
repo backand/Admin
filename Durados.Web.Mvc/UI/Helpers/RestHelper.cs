@@ -837,9 +837,10 @@ namespace Durados.Web.Mvc.UI.Helpers
 
         }
 
-        public static object ResetUserKey(string username, BeforeEditInDatabaseEventHandler view_BeforeEditInDatabase)
+        public static object ResetUserKey(string username, BeforeEditInDatabaseEventHandler view_BeforeEditInDatabase, Map map = null)
         {
-            Map map = Maps.Instance.GetMap();
+            if (map == null)
+                map = Maps.Instance.GetMap();   
             if (map == null || map is DuradosMap)
             {
                 throw new DuradosException("App not found");
@@ -3151,7 +3152,7 @@ namespace Durados.Web.Mvc.UI.Helpers
         private DataView GetPlaceHolderDictionary()
         {
             DataTable dt = GetDictionarySchema();
-            dt.Rows.Add("User Id", Durados.Database.SysUserPlaceHolder, DataType.Numeric);
+            //dt.Rows.Add("User Id", Durados.Database.SysUserPlaceHolder, DataType.Numeric);
             dt.Rows.Add("User Role", Durados.Database.SysRolePlaceHolder, DataType.ShortText);
             dt.Rows.Add("Username", Durados.Database.SysUsernamePlaceHolder, DataType.ShortText);
             //   dt.Rows.Add("Current Date", Durados.Database.CurrentDatePlaceHolder);
@@ -4535,7 +4536,7 @@ namespace Durados.Web.Mvc.UI.Helpers
 
 
 
-        public void ChangePassword(Guid token, string password)
+        public string ChangePassword(Guid token, string password)
         {
             string userSysGuid = SecurityHelper.GetUserGuidFromTmpGuid(token.ToString());
             if (string.IsNullOrEmpty(userSysGuid))
@@ -4550,6 +4551,8 @@ namespace Durados.Web.Mvc.UI.Helpers
             }
 
             ChangePassword(username, password);
+
+            return username;
         }
 
         private string GetUsername(string guid)

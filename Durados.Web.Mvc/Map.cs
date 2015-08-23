@@ -6634,7 +6634,7 @@ namespace Durados.Web.Mvc
             Dictionary<string, string> apps = new Dictionary<string, string>();
             foreach (System.Data.DataRow row in table.Rows)
             {
-                apps.Add(row["Id"].ToString(), row["Title"].ToString());
+                apps.Add(row["Id"].ToString(), row["Name"].ToString());
             }
 
             return apps;

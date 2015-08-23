@@ -539,10 +539,22 @@ namespace BackAnd.Web.Api.Controllers
 
                 Account account = new Account(this);
 
-                account.ChangePassword(token, password);
+               string  userName = account.ChangePassword(token, password);
 
-                RestHelper.ResetUserKey(map.Database.GetCurrentUsername(), null);
+                try
+                {
+                    int userId = Maps.Instance.DuradosMap.Database.GetUserID(userName);
 
+                    Dictionary<string, string> apps = ((DuradosMap)Maps.Instance.DuradosMap).GetUserApps(userId);
+                    foreach (string appName in apps.Values)
+                    {
+                        RestHelper.ResetUserKey(map.Database.GetCurrentUsername(), null, Maps.Instance.GetMap(appName));
+                    }
+                }
+                catch
+                {
+
+                }
                 return Ok();
             }
             catch (Exception exception)
