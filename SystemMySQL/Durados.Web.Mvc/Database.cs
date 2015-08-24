@@ -172,7 +172,7 @@ namespace Durados.Web.Mvc
             EnableGithub = true;
             EnableFacebook = true;
             EnableSecretKeyAccess = true;
-            TokenExpiration = 8640;
+            TokenExpiration = 86400;
             UseRefreshToken = false;
         }
 

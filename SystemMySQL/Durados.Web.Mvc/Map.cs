@@ -620,7 +620,8 @@ namespace Durados.Web.Mvc
                         AddNewAdminInvitation();
                         Commit();
                     }
-                                        
+
+                    
                     //if (!ConfigAccess.ContainsCategoryName("General", configDatabase.ConnectionString))
                     //{
                     //    ConfigCategory();
