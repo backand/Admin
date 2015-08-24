@@ -127,7 +127,12 @@ namespace Durados.Workflow
                     }
                     catch (WorkflowEngineException workflowEngineException)
                     {
-                        throw workflowEngineException;
+                        if ((rule.Name == "Create My App User" || rule.Name == "Update My App User" || rule.Name == "Delete My App User") && !view.Database.Views.ContainsKey("users"))
+                        {
+
+                        }
+                        else
+                            throw workflowEngineException;
                     }
                     catch (Exception exception)
                     {

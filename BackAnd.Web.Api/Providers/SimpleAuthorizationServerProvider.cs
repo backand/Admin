@@ -31,8 +31,11 @@ namespace BackAnd.Web.Api.Providers
                     Durados.Web.Mvc.Map map = Durados.Web.Mvc.Maps.Instance.GetMap(appname);
                     var currentUtc = new Microsoft.Owin.Infrastructure.SystemClock().UtcNow;
 
+                    int expiration = map.Database.TokenExpiration;
+                    if (expiration == 0 || expiration == 8640)
+                        expiration = 86400;
                     context.Properties.IssuedUtc = currentUtc;
-                    context.Properties.ExpiresUtc = currentUtc.Add(System.TimeSpan.FromSeconds(map.Database.TokenExpiration));
+                    context.Properties.ExpiresUtc = currentUtc.Add(System.TimeSpan.FromSeconds(expiration));
 
                     string role = map.Database.GetUserRole(username);
                     string userId = map.Database.GetUserID(username).ToString();
