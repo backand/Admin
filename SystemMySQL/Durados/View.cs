@@ -233,6 +233,10 @@ namespace Durados
         [Durados.Config.Attributes.ColumnProperty(Description = "Choose how grid area in table mode sould be displayed")]
         public GridDisplayType GridDisplayType { get; set; }
 
+        [Durados.Config.Attributes.ColumnProperty(Description = "Send socket event")]
+        public bool SendRealTimeEvents { get; set; }
+
+
         //Colors design
 
         private bool applyColorDesignToAllViews = false;
@@ -1295,6 +1299,8 @@ namespace Durados
             UseLikeInFilter = true;
 
             Send = true;
+
+            SendRealTimeEvents = false;
             //JsonName = name.ReplaceNonAlphaNumeric();
 
         }
@@ -2027,6 +2033,11 @@ namespace Durados
                 return (this.Fields.Values.Select(f => f.JsonName).Contains(jsonName));
             return false;
 
+        }
+
+        public virtual void SendRealTimeEvent(string pk, Crud crud)
+        {
+            throw new NotImplementedException();
         }
     }
 
