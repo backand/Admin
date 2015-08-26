@@ -15,12 +15,12 @@ namespace Backand
             return (System.Web.HttpContext.Current.Items[Durados.Database.AppName] ?? string.Empty).ToString();
         }
 
-        public virtual object emit(string eventName, string data)
+        public virtual object emit(string eventName, object data)
         {
             return emit(eventName, data, null);
         }
 
-        public virtual object emit(string eventName, string data, string appName)
+        public virtual object emit(string eventName, object data, string appName)
         {
             try
             {
@@ -34,7 +34,8 @@ namespace Backand
                 object json = data;
                 try
                 {
-                    json = serializer.Deserialize<Dictionary<string, object>>(data);
+                    if (data != null && data is string)
+                    json = serializer.Deserialize<Dictionary<string, object>>((string)data);
                 }
                 catch
                 {
@@ -53,6 +54,6 @@ namespace Backand
 
     public interface ISocket
     {
-        object emit(string eventName, string data);
+        object emit(string eventName, object data);
     }
 }
