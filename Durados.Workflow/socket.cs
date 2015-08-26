@@ -17,7 +17,7 @@ namespace Backand
 
         public virtual object emit(string eventName, string data)
         {
-            return emit(eventName, data);
+            return emit(eventName, data, null);
         }
 
         public virtual object emit(string eventName, string data, string appName)
@@ -31,7 +31,16 @@ namespace Backand
                 System.Web.Script.Serialization.JavaScriptSerializer serializer = new System.Web.Script.Serialization.JavaScriptSerializer();
                 Dictionary<string, object> newData = new Dictionary<string, object>();
                 newData.Add("eventName", eventName);
-                newData.Add("data", serializer.Deserialize<Dictionary<string, object>>(data));
+                object json = data;
+                try
+                {
+                    json = serializer.Deserialize<Dictionary<string, object>>(data);
+                }
+                catch
+                {
+
+                }
+                newData.Add("data", json);
                 xmlHttpRequest.send(serializer.Serialize(newData));
                 return new { status = xmlHttpRequest.status, message = xmlHttpRequest.responseText };
             }
