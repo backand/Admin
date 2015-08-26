@@ -27,11 +27,11 @@ namespace Backand
     {
         internal static object Read(string key)
         {
-            using (System.Data.SqlClient.SqlConnection connection = new System.Data.SqlClient.SqlConnection(Durados.Workflow.JavaScript.GetCacheInCurrentRequest(Durados.Workflow.JavaScript.ConnectionStringKey).ToString()))
+            using (System.Data.IDbConnection connection = GetConnection(Durados.Workflow.JavaScript.GetCacheInCurrentRequest(Durados.Workflow.JavaScript.ConnectionStringKey).ToString()))
             {
                 connection.Open();
                 string sql = string.Format("select scalar from durados_session where sessionId = '{0}' and [name] = '{1}'", key, System.Web.HttpContext.Current.Items[Durados.Database.Username].ToString());
-                using (System.Data.SqlClient.SqlCommand command = new System.Data.SqlClient.SqlCommand(sql, connection))
+                using (System.Data.IDbCommand command = GetCommand(sql, connection))
                 {
                     object scalar = command.ExecuteScalar();
                     if (scalar == null || scalar == DBNull.Value)
@@ -42,25 +42,27 @@ namespace Backand
             }
         }
 
+       
         internal static void Update(string key, object value)
         {
-            using (System.Data.SqlClient.SqlConnection connection = new System.Data.SqlClient.SqlConnection(Durados.Workflow.JavaScript.GetCacheInCurrentRequest(Durados.Workflow.JavaScript.ConnectionStringKey).ToString()))
+            using (System.Data.IDbConnection connection = GetConnection(Durados.Workflow.JavaScript.GetCacheInCurrentRequest(Durados.Workflow.JavaScript.ConnectionStringKey).ToString()))
             {
                 connection.Open();
                 string sql = string.Format("update durados_session set scalar = '{1}' where sessionId = '{0}' and [name] = '{2}'", key, value, System.Web.HttpContext.Current.Items[Durados.Database.Username].ToString());
-                using (System.Data.SqlClient.SqlCommand command = new System.Data.SqlClient.SqlCommand(sql, connection))
+                using (System.Data.IDbCommand command = GetCommand(sql,connection ))
                 {
                     command.ExecuteNonQuery();
                 }
             }
         }
+        
         internal static void Create(string key, object value)
         {
-            using (System.Data.SqlClient.SqlConnection connection = new System.Data.SqlClient.SqlConnection(Durados.Workflow.JavaScript.GetCacheInCurrentRequest(Durados.Workflow.JavaScript.ConnectionStringKey).ToString()))
+            using (System.Data.IDbConnection connection = GetConnection(Durados.Workflow.JavaScript.GetCacheInCurrentRequest(Durados.Workflow.JavaScript.ConnectionStringKey).ToString()))
             {
                 connection.Open();
                 string sql = string.Format("insert into durados_session (sessionId, [name], scalar, TypeCode) values('{0}','{2}','{1}','String')", key, value, System.Web.HttpContext.Current.Items[Durados.Database.Username].ToString());
-                using (System.Data.SqlClient.SqlCommand command = new System.Data.SqlClient.SqlCommand(sql, connection))
+                using (System.Data.IDbCommand command = GetCommand(sql, connection))
                 {
                     command.ExecuteNonQuery();
                 }
@@ -82,15 +84,28 @@ namespace Backand
 
         public static void Delete(string key)
         {
-            using (System.Data.SqlClient.SqlConnection connection = new System.Data.SqlClient.SqlConnection(Durados.Workflow.JavaScript.GetCacheInCurrentRequest(Durados.Workflow.JavaScript.ConnectionStringKey).ToString()))
+            using (System.Data.IDbConnection connection = GetConnection(Durados.Workflow.JavaScript.GetCacheInCurrentRequest(Durados.Workflow.JavaScript.ConnectionStringKey).ToString()))
             {
                 connection.Open();
-                string sql = string.Format("delete durados_session where sessionId = '{0}' and [name] = '{1}'", key, System.Web.HttpContext.Current.Items[Durados.Database.Username].ToString());
-                using (System.Data.SqlClient.SqlCommand command = new System.Data.SqlClient.SqlCommand(sql, connection))
+                string sql = string.Format("delete from durados_session where sessionId = '{0}' and [name] = '{1}'", key, System.Web.HttpContext.Current.Items[Durados.Database.Username].ToString());
+                using (System.Data.IDbCommand command = GetCommand( sql,connection))
                 {
                     command.ExecuteNonQuery();
                 }
             }
+        }
+        private static System.Data.IDbConnection GetConnection(string connectionString)
+        {
+            if (connectionString.StartsWith("server="))
+                return new MySql.Data.MySqlClient.MySqlConnection(connectionString+"sqlservermode=True;");
+            return new System.Data.SqlClient.SqlConnection(connectionString);
+        }
+
+        private static System.Data.IDbCommand GetCommand(string sql,System.Data.IDbConnection connection)
+        {
+            if (connection is MySql.Data.MySqlClient.MySqlConnection)
+                return new MySql.Data.MySqlClient.MySqlCommand(sql, (MySql.Data.MySqlClient.MySqlConnection)connection);
+            return new System.Data.SqlClient.SqlCommand(sql, (System.Data.SqlClient.SqlConnection)connection);
         }
     }
 
