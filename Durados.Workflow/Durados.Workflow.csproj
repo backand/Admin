@@ -114,6 +114,7 @@
     <Compile Include="console.cs" />
     <Compile Include="Cookie.cs" />
     <Compile Include="JavaScript.cs" />
+    <Compile Include="socket.cs" />
     <Compile Include="WebService.cs" />
     <Compile Include="Graph.cs" />
     <Compile Include="Step.cs" />

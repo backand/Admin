@@ -4978,6 +4978,8 @@ namespace Durados.DataAccess
             if (afterDeleteAfterCommitCallback != null)
                 afterDeleteAfterCommitCallback(this, deleteEventArgs);
 
+            view.SendRealTimeEvent(pk, Crud.delete);
+
 
         }
 
@@ -5220,6 +5222,9 @@ namespace Durados.DataAccess
 
                 if (afterEditAfterCommitCallback != null)
                     afterEditAfterCommitCallback(this, editEventArgs);
+
+                view.SendRealTimeEvent(pk, Crud.update);
+
                 if (view.Database.Logger != null)
                 {
                     view.Database.Logger.Log(view.Name, "wf after commit end", "Edit", "DataAccess", "", 3, view.Database.Logger.NowWithMilliseconds(), DateTime.Now);
@@ -9683,6 +9688,7 @@ namespace Durados.DataAccess
                         CreateEventArgs createEventArgs = new CreateEventArgs(view, GetValues(view, deepObject), pk, null, null);
                         if (afterCreateAfterCommitCallback != null)
                             afterCreateAfterCommitCallback(this, createEventArgs);
+                        view.SendRealTimeEvent(pk, Crud.create);
                     }
 
                     SqlAccess.Cache.Clear(view.Name);

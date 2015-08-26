@@ -71,8 +71,12 @@ namespace Durados.Workflow
 
         public static object GetCacheInCurrentRequest(string key)
         {
-            if (System.Web.HttpContext.Current.Items.Contains(key))
-                return System.Web.HttpContext.Current.Items[key];
+            try
+            {
+                if (System.Web.HttpContext.Current.Items.Contains(key))
+                    return System.Web.HttpContext.Current.Items[key];
+            }
+            catch { }
 
             return null;
         }

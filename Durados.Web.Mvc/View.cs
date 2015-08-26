@@ -9,7 +9,7 @@ using Durados.Web.Mvc.UI.Helpers;
 
 namespace Durados.Web.Mvc
 {
-    public partial class View : Durados.View,Durados.Services.IStyleable
+    public partial class View : Durados.View, Durados.Services.IStyleable
     {
         private Map map = null;
         public Map Map
@@ -24,16 +24,16 @@ namespace Durados.Web.Mvc
 
         [Durados.Config.Attributes.ColumnProperty(DoNotCopy = true)]
         public string Controller { get; set; }
-        
+
         [Durados.Config.Attributes.ColumnProperty()]
         public string IndexAction { get; set; }
-        
+
         [Durados.Config.Attributes.ColumnProperty()]
         public string CheckListAction { get; set; }
-        
+
         [Durados.Config.Attributes.ColumnProperty()]
         public string SetLanguageAction { get; set; }
-        
+
         [Durados.Config.Attributes.ColumnProperty()]
         public string CreateAction { get; set; }
 
@@ -42,7 +42,7 @@ namespace Durados.Web.Mvc
 
         [Durados.Config.Attributes.ColumnProperty()]
         public string CreateOnlyAction { get; set; }
-        
+
         [Durados.Config.Attributes.ColumnProperty()]
         public string EditAction { get; set; }
 
@@ -60,7 +60,7 @@ namespace Durados.Web.Mvc
 
         [Durados.Config.Attributes.ColumnProperty()]
         public string EditOnlyAction { get; set; }
-        
+
 
         [Durados.Config.Attributes.ColumnProperty()]
         public string GetJsonViewAction { get; set; }
@@ -77,7 +77,7 @@ namespace Durados.Web.Mvc
 
         [Durados.Config.Attributes.ColumnProperty()]
         public string InlineAddingCreateAction { get; set; }
-        
+
         [Durados.Config.Attributes.ColumnProperty()]
         public string InlineEditingEditAction { get; set; }
 
@@ -89,7 +89,7 @@ namespace Durados.Web.Mvc
 
         [Durados.Config.Attributes.ColumnProperty()]
         public string InlineSearchDialogAction { get; set; }
-        
+
         [Durados.Config.Attributes.ColumnProperty()]
         public string DeleteAction { get; set; }
 
@@ -98,7 +98,7 @@ namespace Durados.Web.Mvc
 
         [Durados.Config.Attributes.ColumnProperty()]
         public string EditSelectionAction { get; set; }
-        
+
         [Durados.Config.Attributes.ColumnProperty()]
         public string FilterAction { get; set; }
 
@@ -107,16 +107,16 @@ namespace Durados.Web.Mvc
 
         [Durados.Config.Attributes.ColumnProperty()]
         public string UploadAction { get; set; }
-        
+
         [Durados.Config.Attributes.ColumnProperty()]
         public string ExportToCsvAction { get; set; }
-        
+
         [Durados.Config.Attributes.ColumnProperty()]
         public string PrintAction { get; set; }
-        
+
         [Durados.Config.Attributes.ColumnProperty()]
         public string AutoCompleteAction { get; set; }
-        
+
         [Durados.Config.Attributes.ColumnProperty()]
         public string AutoCompleteController { get; set; }
 
@@ -131,21 +131,21 @@ namespace Durados.Web.Mvc
 
         [Durados.Config.Attributes.ColumnProperty()]
         public string StyleSheets { get; set; }
-        
+
         [Durados.Config.Attributes.ColumnProperty()]
         public bool ExportToCsv { get; set; }
 
         [Durados.Config.Attributes.ColumnProperty()]
         public bool ImportFromExcel { get; set; }
-        
+
         [Durados.Config.Attributes.ColumnProperty()]
         public bool Print { get; set; }
 
         [Durados.Config.Attributes.ColumnProperty()]
         public bool MultiSelect { get; set; }
-        
-        
-        [Durados.Config.Attributes.ColumnProperty(Default=DataRowView.Tabs)]
+
+
+        [Durados.Config.Attributes.ColumnProperty(Default = DataRowView.Tabs)]
         public DataRowView DataRowView { get; set; }
 
         [Durados.Config.Attributes.ColumnProperty()]
@@ -157,7 +157,7 @@ namespace Durados.Web.Mvc
         [Durados.Config.Attributes.ColumnProperty()]
         public bool RefreshOnClose { get; set; }
 
-        [Durados.Config.Attributes.ColumnProperty(Description="The name of the promote buttun in the dialog and the context menu")]
+        [Durados.Config.Attributes.ColumnProperty(Description = "The name of the promote buttun in the dialog and the context menu")]
         public string PromoteButtonName { get; set; }
 
         [Durados.Config.Attributes.ColumnProperty(Description = "The tooltip of the promote buttun in the context menu")]
@@ -210,8 +210,8 @@ namespace Durados.Web.Mvc
         public ReloadPage ReloadPage { get; set; }
 
         public string DataDashboardView { get; set; }
-       
-        
+
+
         public new Database Database
         {
             get
@@ -224,11 +224,11 @@ namespace Durados.Web.Mvc
             : this(dataTable, database, null)
         {
         }
-        
+
         public View(DataTable dataTable, Durados.Web.Mvc.Database database, string name) :
             base(dataTable, database, name)
         {
-            
+
             Controller = Database.DefaultController;
             IndexAction = Database.DefaultIndexAction;
             CheckListAction = Database.DefaultCheckListAction;
@@ -237,13 +237,13 @@ namespace Durados.Web.Mvc
             CreateOnlyAction = Database.DefaultCreateOnlyAction;
             EditAction = Database.DefaultEditAction;
             DuplicateAction = Database.DefaultDuplicateAction;
-            
+
             EditRichAction = Database.DefaultEditRichAction;
             GetRichAction = Database.DefaultGetRichAction;
             EditOnlyAction = Database.DefaultEditOnlyAction;
             GetJsonViewAction = Database.DefaultGetJsonViewAction;
             GetSelectListAction = Database.DefaultGetSelectListAction;
-            
+
             DeleteAction = Database.DefaultDeleteAction;
             DeleteSelectionAction = Database.DefaultDeleteSelectionAction;
             EditSelectionAction = Database.DefaultEditSelectionAction;
@@ -262,7 +262,7 @@ namespace Durados.Web.Mvc
             InlineDuplicateAction = Database.DefaultInlineDuplicateAction;
             InlineSearchDialogAction = Database.DefaultInlineSearchDialogAction;
             AllFilterValuesAction = Database.DefaultAllFilterValuesAction;
-            
+
             ExportToCsv = true;
             Print = false;
             DataRowView = DataRowView.Tabs;
@@ -385,12 +385,12 @@ namespace Durados.Web.Mvc
 
             if (permanentFilter.ToLower().Contains(Database.SysUsernamePlaceHolder.ToLower().AsToken()))
                 permanentFilter = permanentFilter.Replace(Database.SysUsernamePlaceHolder.AsToken(), this.Database.GetCurrentUsername(), false);
-            
-            
-            
+
+
+
             if (permanentFilter.Contains(Database.SysRolePlaceHolder.AsToken()) || permanentFilter.ToLower().Contains(Database.SysRolePlaceHolder.ToLower().AsToken()))
                 permanentFilter = permanentFilter.Replace(Database.SysRolePlaceHolder.AsToken(), Database.GetUserRole(), false);
-            
+
             return permanentFilter;
         }
 
@@ -426,7 +426,7 @@ namespace Durados.Web.Mvc
         public bool IsEditable(string guid)
         {
             if (AllowEdit)
-                return (!UI.Helpers.SecurityHelper.IsDenied(DenyEditRoles, AllowEditRoles) || IsViewOwner() )&& !IsDisabled(guid);
+                return (!UI.Helpers.SecurityHelper.IsDenied(DenyEditRoles, AllowEditRoles) || IsViewOwner()) && !IsDisabled(guid);
             else
                 return false;
         }
@@ -451,7 +451,7 @@ namespace Durados.Web.Mvc
         {
             get
             {
-                return Fields.Values.Where(f => f.IsVisibleForTable()).OrderBy(f=>f.Order).ToList();
+                return Fields.Values.Where(f => f.IsVisibleForTable()).OrderBy(f => f.Order).ToList();
             }
         }
 
@@ -459,7 +459,7 @@ namespace Durados.Web.Mvc
         {
             get
             {
-                return Fields.Values.Where(f => f.IsVisibleForTable()).Where(f=>f.FieldType!=FieldType.Children || !this.HasChildrenRow).OrderBy(f => f.Order).ToList();
+                return Fields.Values.Where(f => f.IsVisibleForTable()).Where(f => f.FieldType != FieldType.Children || !this.HasChildrenRow).OrderBy(f => f.Order).ToList();
             }
         }
 
@@ -508,7 +508,7 @@ namespace Durados.Web.Mvc
         {
             get
             {
-                return VisibleFieldsForFilter.Where(field=>field.FieldType!=FieldType.Column).OrderBy(f => f.Order).ToList();
+                return VisibleFieldsForFilter.Where(field => field.FieldType != FieldType.Column).OrderBy(f => f.Order).ToList();
             }
         }
 
@@ -609,7 +609,7 @@ namespace Durados.Web.Mvc
                 return true;
             }
 
-            
+
 
             foreach (string role in viewOwners.Where(r => !string.IsNullOrEmpty(r)))
                 if (role.Equals(userRole))
@@ -649,14 +649,14 @@ namespace Durados.Web.Mvc
         {
             string s = string.Empty;
 
-            foreach (Field field in Fields.Values.Where(f=>f.HiddenAttribute))
+            foreach (Field field in Fields.Values.Where(f => f.HiddenAttribute))
             {
                 string name = field.Name;
                 string value = string.Empty;
                 if (field.FieldType == FieldType.Parent)
                     value = System.Web.HttpContext.Current.Server.HtmlEncode(((ParentField)field).ConvertToString(row));
                 else
-                    value = System.Web.HttpContext.Current.Server.HtmlEncode(field.GetValue(row)); 
+                    value = System.Web.HttpContext.Current.Server.HtmlEncode(field.GetValue(row));
 
                 s += prefix + name + "='" + value + "' ";
             }
@@ -664,7 +664,28 @@ namespace Durados.Web.Mvc
             return s;
         }
 
-       
+        public override void SendRealTimeEvent(string pk, Crud crud)
+        {
+            Backand.socket socket = new Backand.socket();
+            string eventName = crud.ToString() + "d";
+            string appName = (System.Web.HttpContext.Current.Items[Durados.Database.AppName] ?? string.Empty).ToString();
+            if (SendRealTimeEvents)
+            {
+                System.Threading.ThreadPool.QueueUserWorkItem(delegate
+                    {
+                        try
+                        {
+
+                            socket.emit(JsonName + "." + eventName, string.Format("{{\"id\":\"{0}\", \"objectName\":\"{1}\", \"event\":\"{2}\"}}", pk, JsonName, eventName), appName);
+
+                        }
+                        catch (Exception exception)
+                        {
+                            Database.Logger.Log("view", "socket", "emit", exception, 1, crud.ToString());
+                        }
+                    });
+            }
+        }
     }
 
 
