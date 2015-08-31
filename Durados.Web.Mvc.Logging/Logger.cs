@@ -34,6 +34,11 @@ namespace Durados.Web.Mvc.Logging
         string reportConnectionString = null;
         bool writeToReport = false;
        
+            
+        string logStashServer = null;
+        int logStashPort ;
+        bool writeToLogStash = false;
+       
         private WritingEvents events;
         public WritingEvents Events
         {
@@ -93,6 +98,16 @@ namespace Durados.Web.Mvc.Logging
                 reportConnectionString = System.Web.Configuration.WebConfigurationManager.ConnectionStrings["reportConnectionString"].ConnectionString;
             else
                 writeToReport = false;
+
+            writeToLogStash = Convert.ToBoolean(System.Configuration.ConfigurationManager.AppSettings["writeToLogStash"] ?? "true");
+            //logStashConnectionString = Convert.ToString(System.Configuration.ConfigurationManager.AppSettings["LogStashConnectionString"] ?? "true");
+            if (!string.IsNullOrEmpty(System.Configuration.ConfigurationManager.AppSettings["logStashServer"]) && Convert.ToInt32(System.Configuration.ConfigurationManager.AppSettings["logStashPort"] ?? "-1") > 0)
+            {
+                logStashServer = System.Configuration.ConfigurationManager.AppSettings["logStashServer"];
+                logStashPort = Convert.ToInt32(System.Configuration.ConfigurationManager.AppSettings["logStashPort"]);
+            }
+            else
+                writeToLogStash = false;
 
             machineName = (System.Web.HttpContext.Current !=null)?System.Web.HttpContext.Current.Server.MachineName:System.Environment.MachineName;
             superDeveloper = Convert.ToString(System.Configuration.ConfigurationManager.AppSettings["superDeveloper"] ?? "dev@devitout.com").ToLower();
@@ -498,6 +513,22 @@ namespace Durados.Web.Mvc.Logging
                         }
                         catch { }
                     }
+                    if (writeToLogStash)
+                    {
+                        try
+                        {
+                            System.Threading.ThreadPool.QueueUserWorkItem(delegate
+                            {
+                                try
+                                {
+                                    //Guid guid2 = Guid.NewGuid();
+                                    SendLogMessage(applicationName, username, controller, action, method, message, trace, logType, freeText, time, log, guid);
+                                }
+                                catch { }
+                            });
+                        }
+                        catch { }
+                    }
                     ////using (SqlConnection connection = new SqlConnection(connectionString))
                     ////{
                     //SetCommandParametrs(command, controller, action, method, message, trace, logType, freeText, time, log); 
@@ -526,6 +557,7 @@ namespace Durados.Web.Mvc.Logging
             return log;
         }
 
+       
         public void WriteToEventLog(string controller, string action, string method, string message, string trace, int logType, string freeText)
         {
             string sEvent = string.Format("controller: {0}; action: {1}; Method {2}; Message: {3}; trace: {4}; freeText: {5} ", controller, action, method, message, trace,  freeText);
@@ -699,6 +731,93 @@ namespace Durados.Web.Mvc.Logging
                 this.AfterResult = afterResult;
             }
         }
+
+
+        void SendLogMessage(string applicationName, string username, string controller, string action, string method, string message, string trace, int logType, string freeText, DateTime time, Logging.Log log, Guid? guid2)
+        {
+            if (guid2 == null)
+                guid2 = Guid.NewGuid();
+            SendLogMessage(string.Empty, applicationName, username, machineName, time.ToString(), controller, action, method, LogType.ToString(), message, trace, freeText, guid2.ToString());
+            
+            
+        }
+
+        void SendLogMessage(
+             string ID,
+             string ApplicationName,
+             string Username,
+             string MachineName,
+             string Time,
+             string Controller,
+             string Action,
+             string MethodName,
+             string LogType,
+             string ExceptionMessage,
+             string Trace,
+             string FreeText,
+             string Guid
+        )
+        {
+            LogMessage message = new LogMessage { 
+                ID=ID, 
+                ApplicationName=ApplicationName, 
+                Username=Username, 
+                MachineName=MachineName, 
+                Time=Time, 
+                Controller=Controller,
+                Action=Action,
+                MethodName=MethodName,
+                LogType=LogType,
+                ExceptionMessage=ExceptionMessage,
+                Trace=Trace,
+                FreeText=FreeText,
+                Guid=Guid
+            };
+            var javaScriptSerializer = new System.Web.Script.Serialization.JavaScriptSerializer();
+            string jsonString = javaScriptSerializer.Serialize(message);
+            Connect(logStashServer, logStashPort, jsonString);
+            
+        }
+
+
+         void Connect(String server, Int32 port, String message)
+        {
+            try
+            {
+                // Create a TcpClient. 
+                // Note, for this client to work you need to have a TcpServer  
+                // connected to the same address as specified by the server, port 
+                // combination.
+
+                System.Net.Sockets.TcpClient client = new System.Net.Sockets.TcpClient(server, port);
+
+                // Translate the passed message into ASCII and store it as a Byte array.
+                Byte[] data = System.Text.Encoding.ASCII.GetBytes(message);
+
+                System.Net.Sockets.NetworkStream stream = client.GetStream();
+
+                // Send the message to the connected TcpServer. 
+                stream.Write(data, 0, data.Length);
+
+                Console.WriteLine("Sent: {0}", message);
+
+                // Close everything.
+                stream.Close();
+                client.Close();
+            }
+            catch (ArgumentNullException e)
+            {
+                WriteToEventLog( e.Message, EventLogEntryType.FailureAudit, 1);
+            }
+            catch (System.Net.Sockets.SocketException e)
+            {
+                WriteToEventLog(string.Format("SocketException: {0}",e.Message),EventLogEntryType.Error,1);
+            }
+
+
+        }
+
+        
     }
 }
 
