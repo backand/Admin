@@ -42,9 +42,11 @@ namespace BackAnd.Web.Api.Controllers.Filters
             var ci = principal.Identity as ClaimsIdentity;
             if (!ci.IsAuthenticated)
             {
+                AuthorizationTokenExpiredException authorizationTokenExpiredException = new AuthorizationTokenExpiredException();
                 actionContext.Response = actionContext.Request.CreateErrorResponse(
                         HttpStatusCode.Unauthorized,
-                        new AuthorizationTokenExpiredException());
+                        authorizationTokenExpiredException.Message,
+                        authorizationTokenExpiredException);
                 return;
             }
 

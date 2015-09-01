@@ -61,7 +61,7 @@ namespace BackAnd.Web.Api.Controllers
                     return ResponseMessage(Request.CreateResponse(HttpStatusCode.Forbidden, Messages.ViewIsUnauthorized));
                 }
 
-                var item = RestHelper.Get(view, id, false, view_BeforeSelect, view_AfterSelect);
+                var item = RestHelper.Get(view, id, false, view_BeforeSelect, view_AfterSelect, false, false, true);
 
                 if (item == null)
                 {
@@ -153,7 +153,7 @@ namespace BackAnd.Web.Api.Controllers
                 if (search == "null" || search == "undefined")
                     search = null;
 
-                var items = RestHelper.Get(view, false, false, pageNumber ?? 1, pageSize ?? 20, filterArray, search, sortArray, out rowCount, deep ?? false, view_BeforeSelect, view_AfterSelect, false, descriptive);
+                var items = RestHelper.Get(view, false, false, pageNumber ?? 1, pageSize ?? 200, filterArray, search, sortArray, out rowCount, deep ?? false, view_BeforeSelect, view_AfterSelect, false, descriptive, true);
 
                 return Ok(items);
 
@@ -195,7 +195,7 @@ namespace BackAnd.Web.Api.Controllers
 
                 Dictionary<string, object>[] values = GetParameters(parameters, view, json);
 
-                string pk = view.Create(values, false, view_BeforeCreate, view_BeforeCreateInDatabase, view_AfterCreateBeforeCommit, view_AfterCreateAfterCommit);
+                string pk = view.Create(values, false, view_BeforeCreate, view_BeforeCreateInDatabase, view_AfterCreateBeforeCommit, view_AfterCreateAfterCommit, true);
 
                 string[] pkArray = pk.Split(';');
                 int pkArrayLength = pkArray.Length;
@@ -322,7 +322,7 @@ namespace BackAnd.Web.Api.Controllers
 
                 Dictionary<string, object> values = GetParameters(parameters, view, values2);
 
-                view.Update(values, id, false, view_BeforeEdit, view_BeforeEditInDatabase, view_AfterEditBeforeCommit, view_AfterEditAfterCommit, view_BeforeCreate, view_BeforeCreateInDatabase, view_AfterCreateBeforeCommit, view_AfterCreateAfterCommit, false, view_BeforeDelete, view_AfterDeleteBeforeCommit, view_AfterDeleteAfterCommit);
+                view.Update(values, id, false, view_BeforeEdit, view_BeforeEditInDatabase, view_AfterEditBeforeCommit, view_AfterEditAfterCommit, view_BeforeCreate, view_BeforeCreateInDatabase, view_AfterCreateBeforeCommit, view_AfterCreateAfterCommit, false, view_BeforeDelete, view_AfterDeleteBeforeCommit, view_AfterDeleteAfterCommit, true);
 
                 if (returnObject.HasValue && returnObject.Value)
                 {
@@ -375,7 +375,7 @@ namespace BackAnd.Web.Api.Controllers
                     }
                 }
 
-                view.Delete(id, false, view_BeforeDelete, view_AfterDeleteBeforeCommit, view_AfterDeleteAfterCommit, values);
+                view.Delete(id, false, view_BeforeDelete, view_AfterDeleteBeforeCommit, view_AfterDeleteAfterCommit, values, true);
 
 
                 return Ok(new { __metadata = new { id = id } });

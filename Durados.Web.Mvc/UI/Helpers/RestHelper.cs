@@ -105,9 +105,27 @@ namespace Durados.Web.Mvc.UI.Helpers
             return GetRest(view).Create(view, values, deep, beforeCreateCallback, beforeCreateInDatabaseEventHandler, afterCreateBeforeCommitCallback, afterCreateAfterCommitCallback);
         }
 
-        public static string Create(this View view, Dictionary<string, object>[] values, bool deep, BeforeCreateEventHandler beforeCreateCallback, BeforeCreateInDatabaseEventHandler beforeCreateInDatabaseEventHandler, AfterCreateEventHandler afterCreateBeforeCommitCallback, AfterCreateEventHandler afterCreateAfterCommitCallback)
+        public static string Create(this View view, Dictionary<string, object>[] values, bool deep, BeforeCreateEventHandler beforeCreateCallback, BeforeCreateInDatabaseEventHandler beforeCreateInDatabaseEventHandler, AfterCreateEventHandler afterCreateBeforeCommitCallback, AfterCreateEventHandler afterCreateAfterCommitCallback, bool clearCache = false)
         {
+            if (clearCache)
+            {
+                ClearCache();
+            }
             return GetRest(view).Create(view, values, deep, beforeCreateCallback, beforeCreateInDatabaseEventHandler, afterCreateBeforeCommitCallback, afterCreateAfterCommitCallback);
+        }
+
+        const string RestDataCache = "RestDataCache";
+        private static void ClearCache()
+        {
+            try
+            {
+                Map map = Maps.Instance.GetMap();
+                if (map.AllKindOfCache.ContainsKey(RestDataCache))
+                {
+                    ((Dictionary<string, object>)map.AllKindOfCache[RestDataCache]).Clear();
+                }
+            }
+            catch { }
         }
 
         public static void Update(this View view, string json, string pk, bool deep, BeforeEditEventHandler beforeEditCallback, BeforeEditInDatabaseEventHandler beforeEditInDatabaseCallback, AfterEditEventHandler afteEditBeforeCommitCallback, AfterEditEventHandler afterEditAfterCommitCallback)
@@ -115,8 +133,13 @@ namespace Durados.Web.Mvc.UI.Helpers
             Update(view, Deserialize(view, json), pk, deep, beforeEditCallback, beforeEditInDatabaseCallback, afteEditBeforeCommitCallback, afterEditAfterCommitCallback);
         }
 
-        public static void Update(this View view, Dictionary<string, object> values, string pk, bool deep, BeforeEditEventHandler beforeEditCallback, BeforeEditInDatabaseEventHandler beforeEditInDatabaseCallback, AfterEditEventHandler afteEditBeforeCommitCallback, AfterEditEventHandler afterEditAfterCommitCallback, BeforeCreateEventHandler beforeCreateCallback = null, BeforeCreateInDatabaseEventHandler beforeCreateInDatabaseCallback = null, AfterCreateEventHandler afterCreateBeforeCommitCallback = null, AfterCreateEventHandler afterCreateAfterCommitCallback = null, bool overwrite = false, BeforeDeleteEventHandler beforeDeleteCallback = null, AfterDeleteEventHandler afterDeleteBeforeCommitCallback = null, AfterDeleteEventHandler afterDeleteAfterCommitCallback = null)
+        public static void Update(this View view, Dictionary<string, object> values, string pk, bool deep, BeforeEditEventHandler beforeEditCallback, BeforeEditInDatabaseEventHandler beforeEditInDatabaseCallback, AfterEditEventHandler afteEditBeforeCommitCallback, AfterEditEventHandler afterEditAfterCommitCallback, BeforeCreateEventHandler beforeCreateCallback = null, BeforeCreateInDatabaseEventHandler beforeCreateInDatabaseCallback = null, AfterCreateEventHandler afterCreateBeforeCommitCallback = null, AfterCreateEventHandler afterCreateAfterCommitCallback = null, bool overwrite = false, BeforeDeleteEventHandler beforeDeleteCallback = null, AfterDeleteEventHandler afterDeleteBeforeCommitCallback = null, AfterDeleteEventHandler afterDeleteAfterCommitCallback = null, bool clearCache = false)
         {
+            if (clearCache)
+            {
+                ClearCache();
+            }
+            
             GetRest(view).Update(view, values, pk, deep, beforeEditCallback, beforeEditInDatabaseCallback, afteEditBeforeCommitCallback, afterEditAfterCommitCallback, beforeCreateCallback, beforeCreateInDatabaseCallback, afterCreateBeforeCommitCallback, afterCreateAfterCommitCallback, overwrite, beforeDeleteCallback, afterDeleteBeforeCommitCallback, afterDeleteAfterCommitCallback);
         }
 
@@ -168,8 +191,12 @@ namespace Durados.Web.Mvc.UI.Helpers
             return values;
         }
 
-        public static void Delete(this View view, string pk, bool deep, BeforeDeleteEventHandler beforeDeleteCallback, AfterDeleteEventHandler afteDeleteBeforeCommitCallback, AfterDeleteEventHandler afterDeleteAfterCommitCallback, Dictionary<string, object> values = null)
+        public static void Delete(this View view, string pk, bool deep, BeforeDeleteEventHandler beforeDeleteCallback, AfterDeleteEventHandler afteDeleteBeforeCommitCallback, AfterDeleteEventHandler afterDeleteAfterCommitCallback, Dictionary<string, object> values = null, bool clearCache = false)
         {
+            if (clearCache)
+            {
+                ClearCache();
+            }
             GetRest(view).Delete(view, pk, deep, beforeDeleteCallback, afteDeleteBeforeCommitCallback, afterDeleteAfterCommitCallback, null, null, values);
         }
 
@@ -227,8 +254,22 @@ namespace Durados.Web.Mvc.UI.Helpers
             return list;
         }
 
-        public static object Get(this View view, bool withSelectOptions, bool withFilterOptions, int page, int pageSize, Dictionary<string, object>[] filter, string search, Dictionary<string, object>[] sort, out int rowCount, bool deep, BeforeSelectEventHandler beforeSelectCallback, AfterSelectEventHandler afterSelectCallback, bool returnDataView = false, bool descriptive = true)
+        private static string GetRestDataCacheKey()
         {
+            return System.Web.HttpContext.Current.Request.Url.PathAndQuery;
+        }
+
+        public static object Get(this View view, bool withSelectOptions, bool withFilterOptions, int page, int pageSize, Dictionary<string, object>[] filter, string search, Dictionary<string, object>[] sort, out int rowCount, bool deep, BeforeSelectEventHandler beforeSelectCallback, AfterSelectEventHandler afterSelectCallback, bool returnDataView = false, bool descriptive = true, bool useCache = false)
+        {
+            if (useCache)
+            {
+                object cachedObject = null;
+                if (ExistsInCache(out cachedObject))
+                {
+                    rowCount = 0;
+                    return cachedObject;
+                }
+            }
             Dictionary<string, object> values = null;
             if (filter != null)
             {
@@ -279,8 +320,63 @@ namespace Durados.Web.Mvc.UI.Helpers
             {
                 json.Add("filterOptions", GetFilterOptions(view));
             }
+
+            if (useCache)
+            {
+                SetInCache(json);
+            }
+
             return json;
 
+        }
+
+        private static void SetInCache(object json)
+        {
+            try
+            {
+                Map map = Maps.Instance.GetMap();
+                if (!map.AllKindOfCache.ContainsKey(RestDataCache))
+                {
+                    map.AllKindOfCache.Add(RestDataCache, new Dictionary<string, object>());
+                }
+
+                Dictionary<string, object> restDataCacheDictionary = (Dictionary<string, object>)map.AllKindOfCache[RestDataCache];
+                if (restDataCacheDictionary.ContainsKey(GetRestDataCacheKey()))
+                {
+                    restDataCacheDictionary[GetRestDataCacheKey()] = json;
+                }
+                else
+                {
+                    restDataCacheDictionary.Add(GetRestDataCacheKey(), json);
+                }
+            }
+            catch { }
+
+        }
+
+        private static bool ExistsInCache(out object cachedObject)
+        {
+            cachedObject = null;
+
+            try
+            {
+                
+                Map map = Maps.Instance.GetMap();
+                if (map.AllKindOfCache.ContainsKey(RestDataCache))
+                {
+                    Dictionary<string, object> restDataCacheDictionary = (Dictionary<string, object>)map.AllKindOfCache[RestDataCache];
+                    if (restDataCacheDictionary.ContainsKey(GetRestDataCacheKey()))
+                    {
+                        cachedObject = restDataCacheDictionary[GetRestDataCacheKey()];
+                        return true;
+                    }
+                }
+                return false;
+            }
+            catch
+            {
+                return false;
+            }
         }
 
         private static void AddSearch(View view, Dictionary<string, object> values, string search)
@@ -422,8 +518,20 @@ namespace Durados.Web.Mvc.UI.Helpers
 
         }
 
-        public static Dictionary<string, object> Get(this View view, string pk, bool deep, BeforeSelectEventHandler beforeSelectCallback, AfterSelectEventHandler afterSelectCallback, bool displayParentValue = false, bool ignoreConfig = false)
+        public static Dictionary<string, object> Get(this View view, string pk, bool deep, BeforeSelectEventHandler beforeSelectCallback, AfterSelectEventHandler afterSelectCallback, bool displayParentValue = false, bool ignoreConfig = false, bool useCache = false)
         {
+            try
+            {
+                if (useCache)
+                {
+                    object cachedObject = null;
+                    if (ExistsInCache(out cachedObject))
+                    {
+                        return (Dictionary<string, object>)cachedObject;
+                    }
+                }
+            }
+            catch { }
             if (view.Database.IsConfig && !ignoreConfig)
             {
                 return GetConfig(view, pk, deep, beforeSelectCallback, afterSelectCallback, displayParentValue);
@@ -444,6 +552,11 @@ namespace Durados.Web.Mvc.UI.Helpers
             Dictionary<string, object> dic = RowToDictionary(view, dataRow, pk, deep);
 
             map.Logger.Log(view.Name, pk, "after row to json", null, 5, null);
+
+            if (useCache)
+            {
+                SetInCache(dic);
+            }
 
             return dic;
         }

@@ -155,6 +155,10 @@ namespace BackAnd.Web.Api.Providers
                 return;
             }
 
+            System.Web.HttpContext.Current.Items.Add(Database.AppName, appName);
+
+            System.Web.HttpContext.Current.Items.Add(Database.Username, username);
+
 
             var identity = new ClaimsIdentity(context.Options.AuthenticationType);
             identity.AddClaim(new Claim(Database.Username, username));

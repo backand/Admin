@@ -1012,7 +1012,12 @@ namespace BackAnd.Web.Api.Controllers
             {
                 url += "?";
             }
-            return url + "data={\"access_token\":\"" + accessToken + "\",\"token_type\":\"bearer\",\"expires_in\":86399,\"appName\":\"" + appName + "\",\"username\":\"" + email + "\",\"role\":\"" + role + "\",\"userId\":\"" + userId + "\"}";
+
+            int expiration = map.Database.TokenExpiration;
+            if (expiration == 0 || expiration == 8640)
+                expiration = 86400;
+
+            return url + "data={\"access_token\":\"" + accessToken + "\",\"token_type\":\"bearer\",\"expires_in\":" + expiration + ",\"appName\":\"" + appName + "\",\"username\":\"" + email + "\",\"role\":\"" + role + "\",\"userId\":\"" + userId + "\"}";
         }
 
         private string GetErrorUrl(string url, string message, string provider)
