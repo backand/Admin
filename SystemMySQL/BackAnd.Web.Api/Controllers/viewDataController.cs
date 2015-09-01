@@ -245,6 +245,7 @@ namespace BackAnd.Web.Api.Controllers
         [BackAnd.Web.Api.Controllers.Filters.ResponseHeaderFilter]
         public virtual IHttpActionResult Post(string name, bool? deep = null, bool? returnObject = null, string parameters = null)
         {
+            Dictionary<string, object>[] values = null;
             try
             {
                 if (string.IsNullOrEmpty(name))
@@ -263,7 +264,7 @@ namespace BackAnd.Web.Api.Controllers
 
                 string json = System.Web.HttpContext.Current.Server.UrlDecode(Request.Content.ReadAsStringAsync().Result.Replace("%22", "%2522").Replace("%2B", "%252B").Replace("+", "%2B"));
 
-                Dictionary<string, object>[] values = GetParameters(parameters, view, json);
+                values = GetParameters(parameters, view, json);
 
                 string pk = view.Create(values, deep ?? false, view_BeforeCreate, view_BeforeCreateInDatabase, view_AfterCreateBeforeCommit, view_AfterCreateAfterCommit);
 
@@ -300,8 +301,25 @@ namespace BackAnd.Web.Api.Controllers
             }
             catch (Exception exception)
             {
-                throw new BackAndApiUnexpectedResponseException(exception, this);
+                
+                //if (System.Web.HttpContext.Current.Items.Contains(GuidKey))
+                //{
+                //    string actionHeaderGuidValue = System.Web.HttpContext.Current.Items[GuidKey].ToString();
+                //    this.ActionContext.Response.Headers.Add(actionHeaderGuidName, actionHeaderGuidValue);
+                //}
 
+                //if (values[0].ContainsKey(Durados.Workflow.JavaScript.ReturnedValueKey))
+                //{
+                //    var returnedValue = values[0][Durados.Workflow.JavaScript.ReturnedValueKey];
+                //    return Ok(returnedValue);
+                //}
+                //else
+                //{
+                    throw new BackAndApiUnexpectedResponseException(exception, this);
+                //}
+
+                
+                
             }
         }
 

@@ -4094,7 +4094,7 @@ namespace Durados.Web.Mvc
         public virtual SqlProduct SqlProduct { get; set; }
         public virtual SqlProduct SystemSqlProduct { get; set; }
 
-        public Guid Guid { get; set; }
+        public virtual Guid Guid { get; set; }
 
         public bool AsyncOperationRuning { get; set; }
 
@@ -6587,7 +6587,7 @@ namespace Durados.Web.Mvc
             }
 
             AddSslAndAahKeyColumnConfig();
-            
+
             Dictionary<string, string> apps = new Dictionary<string, string>();
             foreach (System.Data.DataRowView row in dataView)
             {
@@ -6668,8 +6668,18 @@ namespace Durados.Web.Mvc
             }
         }
 
+        public override Guid Guid
+        {
+            get
+            {
+                return Guid.Parse(System.Configuration.ConfigurationManager.AppSettings["masterGuid"] ?? Guid.Empty.ToString());
+            }
+            set
+            {
+                base.Guid = value;
+            }
+        }
     }
-
 
     public class MapCache : Durados.Web.Mvc.Azure.Cache
     {
