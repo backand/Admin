@@ -1570,7 +1570,7 @@ namespace Durados.Web.Mvc.UI.Helpers
             return Maps.Instance.FieldProperty.IsInType(fieldName, fieldType);
         }
 
-        protected override void AddAdditionalProperties(View view, DataRow dataRow, bool withChildren, HashSet<string> pks, Dictionary<string, object> dictionary)
+        protected override void AddAdditionalProperties(View view, DataRow dataRow, bool withChildren, Dictionary<string, object> pks, Dictionary<string, object> dictionary)
         {
             base.AddAdditionalProperties(view, dataRow, withChildren, pks, dictionary);
             if (!view.Database.IsConfig)
@@ -1995,22 +1995,23 @@ namespace Durados.Web.Mvc.UI.Helpers
 
         public Dictionary<string, object> RowToDeepDictionary(View view, DataRow row)
         {
-            return RowToDeepDictionary(view, row, true, new HashSet<string>());
+            return RowToDeepDictionary(view, row, true, new Dictionary<string, object>());
         }
 
-        public virtual Dictionary<string, object> RowToDeepDictionary(View view, DataRow dataRow, bool withChildren, HashSet<string> pks)
+        public virtual Dictionary<string, object> RowToDeepDictionary(View view, DataRow dataRow, bool withChildren, Dictionary<string, object> pks)
         {
             if (dataRow == null)
                 return null;
 
             string pk = view.Name + view.GetPkValue(dataRow);
 
-            if (pks.Contains(pk))
-                return null;
-            else
-                pks.Add(pk);
-
             Dictionary<string, object> dictionary = new Dictionary<string, object>();
+
+            if (pks.ContainsKey(pk)) { }
+            //return ((Dictionary<string, object>)pks[pk]);
+            else
+                pks.Add(pk, dictionary);
+
             dictionary.Add(Database.__metadata, GetRowMetadata(view, dataRow));
 
             var fields = GetFields(view);
@@ -2099,7 +2100,7 @@ namespace Durados.Web.Mvc.UI.Helpers
             return view.GetVisibleFieldsForRow(DataAction.Edit);
         }
 
-        protected virtual void AddAdditionalProperties(View view, DataRow dataRow, bool withChildren, HashSet<string> pks, Dictionary<string, object> dictionary)
+        protected virtual void AddAdditionalProperties(View view, DataRow dataRow, bool withChildren, Dictionary<string, object> pks, Dictionary<string, object> dictionary)
         {
 
         }
