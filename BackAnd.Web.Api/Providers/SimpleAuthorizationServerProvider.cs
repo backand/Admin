@@ -300,7 +300,7 @@ namespace BackAnd.Web.Api.Providers
             catch { }
 
 
-            Durados.Web.Mvc.Maps.Instance.DuradosMap.Logger.Log("auth-start", appname, username, null, 3, string.Empty);
+           
 
 
             if (!System.Web.HttpContext.Current.Items.Contains(Database.AppName))
@@ -308,7 +308,9 @@ namespace BackAnd.Web.Api.Providers
 
             if (!System.Web.HttpContext.Current.Items.Contains(Database.Username))
                 System.Web.HttpContext.Current.Items.Add(Database.Username, username);
-
+            
+            Durados.Web.Mvc.Maps.Instance.DuradosMap.Logger.Log("auth-start", appname, username, null, 3, string.Empty);
+            
             UserValidationError userValidationError = UserValidationError.Valid;
             if (!IsValid(username, password, out userValidationError))
             {

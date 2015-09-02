@@ -424,11 +424,14 @@ namespace Durados.Web.Mvc.Logging
             //}
 
             string applicationName = string.Empty;
+            string appName =null ;
             try
             {
                 applicationName =System.Web.HttpContext.Current == null?string.Empty: System.Web.HttpContext.Current.Request.Headers["Host"];
             }
             catch{}
+            appName = GetAppName();
+
             string username = Username;
 
             if (string.IsNullOrEmpty(username))
@@ -505,7 +508,7 @@ namespace Durados.Web.Mvc.Logging
 
                                     sqlConnection.Open();
 
-                                    SetCommandParametrs(command, applicationName, username, controller, action, method, message, trace, logType, freeText, time, log, guid);
+                                    SetCommandParametrs(command, applicationName, username, controller, action, method, message, trace, logType, freeText, time, log, appName, guid);
 
                                     command.ExecuteNonQuery();
                                 }
@@ -521,8 +524,7 @@ namespace Durados.Web.Mvc.Logging
                             {
                                 try
                                 {
-                                    //Guid guid2 = Guid.NewGuid();
-                                    SendLogMessage(applicationName, username, controller, action, method, message, trace, logType, freeText, time, log, guid);
+                                    SendLogMessage(applicationName, appName, username, controller, action, method, message, trace, logType, freeText, time, log, guid);
                                 }
                                 catch { }
                             });
@@ -556,6 +558,21 @@ namespace Durados.Web.Mvc.Logging
             }
             return log;
         }
+
+        private string GetAppName()
+        {
+            string appName = string.Empty;
+            
+            try
+            {
+                //appId = System.Web.HttpContext.Current == null || System.Web.HttpContext.Current.Items[Database.AppId] == null ? appId: int.TryParse(System.Web.HttpContext.Current.Items[Database.AppId].ToString(),out appId)?appId:appId;
+                 appName = System.Web.HttpContext.Current.Items[Database.AppName].ToString();
+            }
+            catch { }
+            return appName;
+        }
+
+       
 
        
         public void WriteToEventLog(string controller, string action, string method, string message, string trace, int logType, string freeText)
@@ -622,7 +639,13 @@ namespace Durados.Web.Mvc.Logging
             }
             return log;
         }
-
+        private void SetCommandParametrs(IDbCommand cmd, string applicationName, string username, string controller, string action, string method, string message, string trace, int logType, string freeText, DateTime time, Log log, string appName,Guid? guid = null)
+        {
+            SetCommandParametrs(cmd, applicationName, username, controller, action, method, message, trace, logType, freeText, time, log, guid);
+            IDataParameter appNameParameter = GetNewParameter(cmd, "AppName", SqlDbType.NVarChar);
+            appNameParameter.Value = appName;
+            cmd.Parameters.Add(appNameParameter);
+        }
         private void SetCommandParametrs(IDbCommand cmd, string applicationName, string username, string controller, string action, string method, string message, string trace, int logType, string freeText, DateTime time, Log log, Guid? guid = null)
         {
             cmd.Parameters.Clear();
@@ -733,11 +756,11 @@ namespace Durados.Web.Mvc.Logging
         }
 
 
-        void SendLogMessage(string applicationName, string username, string controller, string action, string method, string message, string trace, int logType, string freeText, DateTime time, Logging.Log log, Guid? guid2)
+        void SendLogMessage(string applicationName, string appName, string username, string controller, string action, string method, string message, string trace, int logType, string freeText, DateTime time, Logging.Log log, Guid? guid2)
         {
             if (guid2 == null)
                 guid2 = Guid.NewGuid();
-            SendLogMessage(string.Empty, applicationName, username, machineName, time.ToString(), controller, action, method, LogType.ToString(), message, trace, freeText, guid2.ToString());
+            SendLogMessage(appName, applicationName, username, machineName, time.ToString(), controller, action, method, LogType.ToString(), message, trace, freeText, guid2.ToString());
             
             
         }
