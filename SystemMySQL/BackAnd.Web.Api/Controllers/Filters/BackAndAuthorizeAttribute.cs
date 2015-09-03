@@ -27,7 +27,10 @@ namespace BackAnd.Web.Api.Controllers.Filters
         {
 
             if (IsBasicAuthorized(actionContext))
+            {
+                ((apiController)actionContext.ControllerContext.Controller).Init();
                 return;
+            }
 
             if (IsServerAuthorized(actionContext))
                 return;

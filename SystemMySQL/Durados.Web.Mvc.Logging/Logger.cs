@@ -566,7 +566,8 @@ namespace Durados.Web.Mvc.Logging
             try
             {
                 //appId = System.Web.HttpContext.Current == null || System.Web.HttpContext.Current.Items[Database.AppId] == null ? appId: int.TryParse(System.Web.HttpContext.Current.Items[Database.AppId].ToString(),out appId)?appId:appId;
-                 appName = System.Web.HttpContext.Current.Items[Database.AppName].ToString();
+                if (System.Web.HttpContext.Current != null && System.Web.HttpContext.Current.Items.Contains(Database.AppName))
+                    appName = System.Web.HttpContext.Current.Items[Database.AppName].ToString();
             }
             catch { }
             return appName;

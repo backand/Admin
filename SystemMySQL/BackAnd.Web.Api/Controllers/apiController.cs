@@ -798,8 +798,9 @@ namespace BackAnd.Web.Api.Controllers
             {
                 currentUserRole = Map.Database.DefaultGuestRole ?? Map.Database.NewUserDefaultRole;
             }
-            if (wfe != null)
-                wfe.PerformActions(this, e.View, TriggerDataAction.AfterCreate, e.Values, e.PrimaryKey, null, Map.Database.ConnectionString, Convert.ToInt32(((Durados.Web.Mvc.Database)e.View.Database).GetUserID()), currentUserRole, e.Command);
+            if (wfe == null)
+                wfe = CreateWorkflowEngine();
+            wfe.PerformActions(this, e.View, TriggerDataAction.AfterCreate, e.Values, e.PrimaryKey, null, Map.Database.ConnectionString, Convert.ToInt32(((Durados.Web.Mvc.Database)e.View.Database).GetUserID()), currentUserRole, e.Command);
 
 
         }
@@ -874,15 +875,21 @@ namespace BackAnd.Web.Api.Controllers
                     e.Command = GetCommand(Map.Database.SqlProduct);
                     e.Command.Connection = GetConnection(Map.Database.SqlProduct, Map.Database.ConnectionString);
 
-                    if (Database.IdenticalSystemConnection)
+                    try
                     {
-                        e.SysCommand = GetCommand(Map.SystemSqlProduct); ;
+                        if (Database == null)
+                            Database = Maps.Instance.GetMap(System.Web.HttpContext.Current.Items[Durados.Database.AppName].ToString()).Database;
+                        if (Database.IdenticalSystemConnection)
+                        {
+                            e.SysCommand = GetCommand(Map.SystemSqlProduct); ;
+                        }
+                        else
+                        {
+                            e.SysCommand = GetCommand(Map.Database.SystemSqlProduct);
+                            e.SysCommand.Connection = GetConnection(Map.Database.SystemSqlProduct, Map.Database.SystemConnectionString);
+                        }
                     }
-                    else
-                    {
-                        e.SysCommand = GetCommand(Map.Database.SystemSqlProduct);
-                        e.SysCommand.Connection = GetConnection(Map.Database.SystemSqlProduct,Map.Database.SystemConnectionString);
-                    }
+                    catch { }
                 }
             }
             if (e.View.GetRules().Count() > 0)
@@ -1279,6 +1286,9 @@ namespace BackAnd.Web.Api.Controllers
         protected virtual void AfterEditAfterCommit(EditEventArgs e)
         {
             //Workflow.Engine wfe = CreateWorkflowEngine();
+            if (wfe == null)
+                wfe = CreateWorkflowEngine();
+
             wfe.PerformActions(this, e.View, TriggerDataAction.AfterEdit, e.Values, e.PrimaryKey, e.PrevRow, Map.Database.ConnectionString, Convert.ToInt32(((Durados.Web.Mvc.Database)e.View.Database).GetUserID()), ((Durados.Web.Mvc.Database)e.View.Database).GetUserRole(), e.Command);
            
             wfe.Notifier.Notify((Durados.Web.Mvc.View)e.View, 1, GetUsername(), e.OldNewValues, e.PrimaryKey, e.PrevRow, this, e.Values, GetSiteWithoutQueryString(), GetMainSiteWithoutQueryString());
