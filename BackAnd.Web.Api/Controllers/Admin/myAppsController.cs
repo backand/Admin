@@ -122,6 +122,8 @@ namespace BackAnd.Web.Api.Controllers
                     return ResponseMessage(Request.CreateResponse(HttpStatusCode.NotFound, string.Format(Messages.AppNotFound, id)));
                 }
 
+                SetRequestItemCurrentAppName(id);
+
                 Map.Logger.Log(GetControllerNameForLog(ControllerContext), "myApp", "before get item", null, 5, null);
  
                 var item = RestHelper.Get(view, appId.Value.ToString(), deep ?? false, view_BeforeSelect, view_AfterSelect);
@@ -334,9 +336,11 @@ namespace BackAnd.Web.Api.Controllers
                 values.Add(Creator, view.Database.GetUserID());
                 values.Add(DatabaseStatus, (int)OnBoardingStatus.NotStarted);
 
-
+                
 
                 string key = view.Create(values, false, view_BeforeCreate, view_BeforeCreateInDatabase, view_AfterCreateBeforeCommit, view_AfterCreateAfterCommit);
+
+               
 
                 return Ok(new { __metadata = new { id = key } });
             }
