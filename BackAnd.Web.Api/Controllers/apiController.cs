@@ -798,8 +798,8 @@ namespace BackAnd.Web.Api.Controllers
             {
                 currentUserRole = Map.Database.DefaultGuestRole ?? Map.Database.NewUserDefaultRole;
             }
-
-            wfe.PerformActions(this, e.View, TriggerDataAction.AfterCreate, e.Values, e.PrimaryKey, null, Map.Database.ConnectionString, Convert.ToInt32(((Durados.Web.Mvc.Database)e.View.Database).GetUserID()), currentUserRole, e.Command);
+            if (wfe != null)
+                wfe.PerformActions(this, e.View, TriggerDataAction.AfterCreate, e.Values, e.PrimaryKey, null, Map.Database.ConnectionString, Convert.ToInt32(((Durados.Web.Mvc.Database)e.View.Database).GetUserID()), currentUserRole, e.Command);
 
 
         }
