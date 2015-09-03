@@ -256,13 +256,15 @@ namespace BackAnd.Web.Api.Providers
             }
             else if (System.Web.HttpContext.Current.Request.Form["username"] != null && System.Web.HttpContext.Current.Request.Form["refreshToken"] != null)
             {
-                ValidateByRefreshToken(context, System.Web.HttpContext.Current.Request.Form["username"], System.Web.HttpContext.Current.Request.Form[Database.AppName], System.Web.HttpContext.Current.Request.Form["refreshToken"]);
+                
                 if (!System.Web.HttpContext.Current.Items.Contains(Database.AppName))
                     System.Web.HttpContext.Current.Items.Add(Database.AppName, System.Web.HttpContext.Current.Request.Form[Database.AppName]);
 
                 if (!System.Web.HttpContext.Current.Items.Contains(Database.Username))
                     System.Web.HttpContext.Current.Items.Add(Database.Username, System.Web.HttpContext.Current.Request.Form["username"]);
-
+                
+                ValidateByRefreshToken(context, System.Web.HttpContext.Current.Request.Form["username"], System.Web.HttpContext.Current.Request.Form[Database.AppName], System.Web.HttpContext.Current.Request.Form["refreshToken"]);
+                
                 return;
             }
 

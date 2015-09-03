@@ -37,6 +37,7 @@ namespace BackAnd.Web.Api.Controllers
     [BackAnd.Web.Api.Controllers.Filters.BackAndAuthorize("Admin,Developer")]
     public class modelController : apiController
     {
+        
         [Route("~/1/model/Validate")]
         [HttpPost]
         public IHttpActionResult Validate()
@@ -66,10 +67,6 @@ namespace BackAnd.Web.Api.Controllers
 
             }
         }
-
-        
-
-        
 
         [Route("~/1/model")]
         [HttpPost]
@@ -161,8 +158,7 @@ namespace BackAnd.Web.Api.Controllers
                 Maps.Instance.DuradosMap.Logger.Log("Model", "Post", "HandleFirstTime", exception, 1, null);
             }
         }
-
-       
+     
 
         private void LogSQL(string appName, string model, string sql)
         {
@@ -296,11 +292,7 @@ namespace BackAnd.Web.Api.Controllers
 
             }
         }
-
-        
-       
-
-        
+  
 
         private void OrderViewAndColumns(Dictionary<string, object> transformResult)
         {
@@ -341,8 +333,7 @@ namespace BackAnd.Web.Api.Controllers
         {
             return (new Sync()).AddNewViewsAndSyncAll(Map);
         }
-
-        
+       
 
         private SqlAccess GetSqlAccess(Durados.SqlProduct sqlProduct)
         {

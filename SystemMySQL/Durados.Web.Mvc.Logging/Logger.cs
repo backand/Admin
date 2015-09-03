@@ -493,44 +493,41 @@ namespace Durados.Web.Mvc.Logging
                             }
                         }
 
-
-                    });
-
-                    if (writeToReport)
-                    {
-                        try
+                        if (writeToReport)
                         {
-                            using (IDbConnection sqlConnection = GetConnection(reportConnectionString))
+                            try
                             {
-                                using (IDbCommand command = GetCommand(sqlConnection, "Durados_LogInsert"))
+                                using (IDbConnection sqlConnection = GetConnection(reportConnectionString))
                                 {
-                                    command.CommandType = CommandType.StoredProcedure;
+                                    using (IDbCommand command = GetCommand(sqlConnection, "Durados_LogInsert"))
+                                    {
+                                        command.CommandType = CommandType.StoredProcedure;
 
-                                    sqlConnection.Open();
+                                        sqlConnection.Open();
 
-                                    SetCommandParametrs(command, applicationName, username, controller, action, method, message, trace, logType, freeText, time, log, appName, guid);
+                                        SetCommandParametrs(command, applicationName, username, controller, action, method, message, trace, logType, freeText, time, log, appName, guid);
 
-                                    command.ExecuteNonQuery();
+                                        command.ExecuteNonQuery();
+                                    }
                                 }
                             }
+                            catch { }
                         }
-                        catch { }
-                    }
-                    if (writeToLogStash)
-                    {
-                        try
+                        if (writeToLogStash)
                         {
-                            System.Threading.ThreadPool.QueueUserWorkItem(delegate
+                            try
                             {
+
                                 try
                                 {
                                     SendLogMessage(applicationName, appName, username, controller, action, method, message, trace, logType, freeText, time, log, guid);
                                 }
                                 catch { }
-                            });
+
+                            }
+                            catch { }
                         }
-                        catch { }
-                    }
+                    });
                     ////using (SqlConnection connection = new SqlConnection(connectionString))
                     ////{
                     //SetCommandParametrs(command, controller, action, method, message, trace, logType, freeText, time, log); 
@@ -566,8 +563,11 @@ namespace Durados.Web.Mvc.Logging
             try
             {
                 //appId = System.Web.HttpContext.Current == null || System.Web.HttpContext.Current.Items[Database.AppId] == null ? appId: int.TryParse(System.Web.HttpContext.Current.Items[Database.AppId].ToString(),out appId)?appId:appId;
-                if (System.Web.HttpContext.Current != null && System.Web.HttpContext.Current.Items.Contains(Database.AppName))
+                if (System.Web.HttpContext.Current.Items.Contains(Database.AppName))
                     appName = System.Web.HttpContext.Current.Items[Database.AppName].ToString();
+
+                if (appName == (System.Configuration.ConfigurationManager.AppSettings["durados_appName"] ?? "bko") && System.Web.HttpContext.Current.Items.Contains(Durados.Database.CurAppName))
+                         appName = System.Web.HttpContext.Current.Items[Durados.Database.CurAppName].ToString() ; 
             }
             catch { }
             return appName;

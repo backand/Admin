@@ -1521,7 +1521,17 @@ namespace BackAnd.Web.Api.Controllers
 
             return key;
         }
-
+        protected virtual void SetRequestItemCurrentAppName( string appName)
+        {
+            try
+                {
+                    if (System.Web.HttpContext.Current.Items.Contains(Durados.Database.CurAppName))
+                        System.Web.HttpContext.Current.Items[Durados.Database.CurAppName] = appName;
+                    else 
+                        System.Web.HttpContext.Current.Items.Add(Durados.Database.CurAppName, appName);
+                }
+                catch { }
+        }
     }
 
 
