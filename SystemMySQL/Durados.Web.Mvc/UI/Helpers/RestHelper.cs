@@ -298,19 +298,19 @@ namespace Durados.Web.Mvc.UI.Helpers
             json.Add("totalRows", rowCount);
             json.Add("data", TableToDictionary(view, dataView, deep, descriptive));
 
-            if (deep)
-            {
-                Dictionary<string, Dictionary<string, Dictionary<string, object>>> referenceTables = new Dictionary<string, Dictionary<string, Dictionary<string, object>>>();
-                foreach (DataTable table in dataView.Table.DataSet.Tables)
-                {
-                    if (table.TableName != dataView.Table.TableName && table.Rows.Count > 0)
-                    {
-                        View referenceView = (View)view.Database.Views[table.TableName];
-                        referenceTables.Add(referenceView.JsonName, ReferenceTableToDictionary(referenceView, new DataView(table), deep));
-                    }
-                }
-                json.Add("relatedTables", referenceTables);
-            }
+            //if (deep)
+            //{
+            //    Dictionary<string, Dictionary<string, Dictionary<string, object>>> referenceTables = new Dictionary<string, Dictionary<string, Dictionary<string, object>>>();
+            //    foreach (DataTable table in dataView.Table.DataSet.Tables)
+            //    {
+            //        if (table.TableName != dataView.Table.TableName && table.Rows.Count > 0)
+            //        {
+            //            View referenceView = (View)view.Database.Views[table.TableName];
+            //            referenceTables.Add(referenceView.JsonName, ReferenceTableToDictionary(referenceView, new DataView(table), deep));
+            //        }
+            //    }
+            //    json.Add("relatedTables", referenceTables);
+            //}
 
             if (withSelectOptions)
             {
@@ -1701,7 +1701,14 @@ namespace Durados.Web.Mvc.UI.Helpers
 
             foreach (System.Data.DataRowView row in dataView)
             {
-                list.Add(RowToDictionary(view, dataView, tableViewer, row, deep, descriptive));
+                if (deep)
+                {
+                    list.Add(RowToDictionary(view, row.Row, view.GetPkValue(row.Row), deep, false));
+                }
+                else
+                {
+                    list.Add(RowToDictionary(view, dataView, tableViewer, row, deep, descriptive));
+                }
             }
             return list.ToArray();
         }
