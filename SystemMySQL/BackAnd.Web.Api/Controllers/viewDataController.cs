@@ -152,7 +152,7 @@ namespace BackAnd.Web.Api.Controllers
         }
 
 
-        public virtual IHttpActionResult Get(string name, bool? withSelectOptions = null, bool? withFilterOptions = null, int? pageNumber = null, int? pageSize = null, string filter = null, string sort = null, string search = null, bool? deep = null, bool descriptive = true)
+        public virtual IHttpActionResult Get(string name, bool? withSelectOptions = null, bool? withFilterOptions = null, int? pageNumber = null, int? pageSize = null, string filter = null, string sort = null, string search = null, bool? deep = null, bool descriptive = true, bool? relatedObjects = false)
         {
             
             try
@@ -222,7 +222,7 @@ namespace BackAnd.Web.Api.Controllers
                 if (search == "null" || search == "undefined")
                     search = null;
 
-                var items = RestHelper.Get(view, withSelectOptions ?? false, withFilterOptions ?? false, pageNumber ?? 1, pageSize ?? 20, filterArray, search, sortArray, out rowCount, deep ?? false, view_BeforeSelect, view_AfterSelect, false, descriptive);
+                var items = RestHelper.Get(view, withSelectOptions ?? false, withFilterOptions ?? false, pageNumber ?? 1, pageSize ?? 20, filterArray, search, sortArray, out rowCount, deep ?? false, view_BeforeSelect, view_AfterSelect, false, descriptive, false, relatedObjects ?? false);
                 
                 return Ok(items);
                 
