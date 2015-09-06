@@ -66,9 +66,9 @@ namespace Durados.Web.Mvc.UI.Helpers
         }
 
 
-        public static Dictionary<string, object>[] TableToDictionary(View view, DataView dataView, bool deep = false, bool descriptive = true)
+        public static Dictionary<string, object>[] TableToDictionary(View view, DataView dataView, bool deep = false, bool descriptive = true, bool relatedObjects = false)
         {
-            return new DictionaryConverter().TableToDictionary(view, dataView, deep, descriptive);
+            return new DictionaryConverter().TableToDictionary(view, dataView, deep, descriptive, relatedObjects);
         }
 
         public static Dictionary<string, object> RowToDictionary(View view, DataRow row, string pk, bool deep, bool displayParentValue = false)
@@ -259,7 +259,7 @@ namespace Durados.Web.Mvc.UI.Helpers
             return System.Web.HttpContext.Current.Request.Url.PathAndQuery;
         }
 
-        public static object Get(this View view, bool withSelectOptions, bool withFilterOptions, int page, int pageSize, Dictionary<string, object>[] filter, string search, Dictionary<string, object>[] sort, out int rowCount, bool deep, BeforeSelectEventHandler beforeSelectCallback, AfterSelectEventHandler afterSelectCallback, bool returnDataView = false, bool descriptive = true, bool useCache = false)
+        public static object Get(this View view, bool withSelectOptions, bool withFilterOptions, int page, int pageSize, Dictionary<string, object>[] filter, string search, Dictionary<string, object>[] sort, out int rowCount, bool deep, BeforeSelectEventHandler beforeSelectCallback, AfterSelectEventHandler afterSelectCallback, bool returnDataView = false, bool descriptive = true, bool useCache = false, bool relatedObjects = false)
         {
             if (useCache)
             {
@@ -296,21 +296,21 @@ namespace Durados.Web.Mvc.UI.Helpers
 
             Dictionary<string, object> json = new Dictionary<string, object>();
             json.Add("totalRows", rowCount);
-            json.Add("data", TableToDictionary(view, dataView, deep, descriptive));
+            json.Add("data", TableToDictionary(view, dataView, deep, descriptive, relatedObjects));
 
-            //if (deep)
-            //{
-            //    Dictionary<string, Dictionary<string, Dictionary<string, object>>> referenceTables = new Dictionary<string, Dictionary<string, Dictionary<string, object>>>();
-            //    foreach (DataTable table in dataView.Table.DataSet.Tables)
-            //    {
-            //        if (table.TableName != dataView.Table.TableName && table.Rows.Count > 0)
-            //        {
-            //            View referenceView = (View)view.Database.Views[table.TableName];
-            //            referenceTables.Add(referenceView.JsonName, ReferenceTableToDictionary(referenceView, new DataView(table), deep));
-            //        }
-            //    }
-            //    json.Add("relatedTables", referenceTables);
-            //}
+            if (relatedObjects)
+            {
+                Dictionary<string, Dictionary<string, Dictionary<string, object>>> referenceTables = new Dictionary<string, Dictionary<string, Dictionary<string, object>>>();
+                foreach (DataTable table in dataView.Table.DataSet.Tables)
+                {
+                    if (table.TableName != dataView.Table.TableName && table.Rows.Count > 0)
+                    {
+                        View referenceView = (View)view.Database.Views[table.TableName];
+                        referenceTables.Add(referenceView.JsonName, ReferenceTableToDictionary(referenceView, new DataView(table), deep));
+                    }
+                }
+                json.Add("relatedObjects", referenceTables);
+            }
 
             if (withSelectOptions)
             {
@@ -1690,7 +1690,7 @@ namespace Durados.Web.Mvc.UI.Helpers
 
         }
 
-        public Dictionary<string, object>[] TableToDictionary(View view, DataView dataView, bool deep = false, bool descriptive = true)
+        public Dictionary<string, object>[] TableToDictionary(View view, DataView dataView, bool deep = false, bool descriptive = true, bool relatedObjects = false)
         {
             List<Dictionary<string, object>> list = new List<Dictionary<string, object>>();
 
@@ -1701,7 +1701,7 @@ namespace Durados.Web.Mvc.UI.Helpers
 
             foreach (System.Data.DataRowView row in dataView)
             {
-                if (deep)
+                if (deep && !relatedObjects)
                 {
                     list.Add(RowToDictionary(view, row.Row, view.GetPkValue(row.Row), deep, false));
                 }
