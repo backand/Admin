@@ -167,6 +167,7 @@ namespace BackAnd.Web.Api.Controllers.Filters
                 return false;
             string username = null;
             string appName = null;
+
             BasicAuthenticationIdentity basicAuthenticationIdentity = GetBasicAuthenticationIdentity(actionContext);
             if (!IsBasicAuthorized(basicAuthenticationIdentity, out username, out appName))
             {
@@ -175,6 +176,15 @@ namespace BackAnd.Web.Api.Controllers.Filters
                         new BasicAuthorizationException());
                 return true;
             }
+
+            if (!Maps.Instance.GetMap(appName).Database.EnableBasicAuth)
+            {
+                actionContext.Response = actionContext.Request.CreateErrorResponse(
+                        HttpStatusCode.Unauthorized,
+                        new BasicAuthorizationDisabledException());
+                return true;
+            }
+            
 
             if (!System.Web.HttpContext.Current.Items.Contains(Database.Username))
                 System.Web.HttpContext.Current.Items.Add(Database.Username, username);
@@ -491,6 +501,11 @@ namespace BackAnd.Web.Api.Controllers.Filters
     public class BasicAuthorizationException : ServerAuthorizationFailureException
     {
         public BasicAuthorizationException() : base("invalid credentials") { }
+    }
+
+    public class BasicAuthorizationDisabledException : ServerAuthorizationFailureException
+    {
+        public BasicAuthorizationDisabledException() : base("Basic auth is disabled") { }
     }
 
     public class AppNotInCacheServerAuthorizationFailureException : ServerAuthorizationFailureException
