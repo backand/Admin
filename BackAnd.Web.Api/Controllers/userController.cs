@@ -314,7 +314,7 @@ namespace BackAnd.Web.Api.Controllers
                 catch (Durados.Web.Mvc.UI.Helpers.Account.SignUpException exception)
                 {
                     Log(appName, exception, 3);
-                    return ResponseMessage(Request.CreateResponse(HttpStatusCode.NotAcceptable, exception.Message));
+                    return ResponseMessage(Request.CreateResponse(HttpStatusCode.NotAcceptable, exception.GetJsonError("signup_error")));
                 }
             }
             catch (Exception exception)
