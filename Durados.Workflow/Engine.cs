@@ -510,7 +510,7 @@ namespace Durados.Workflow
         }
 
         public WorkflowEngineException(Exception[] exceptions, Rule[] rules)
-            : base("The follwoing action: " + GetNames(rules) + " failed to perform: " + GetException(exceptions).Message, GetException(exceptions))
+            : base("The following action: " + GetNames(rules) + " failed to perform: " + GetException(exceptions).Message, GetException(exceptions))
         {
             this.exceptions = exceptions;
         }
