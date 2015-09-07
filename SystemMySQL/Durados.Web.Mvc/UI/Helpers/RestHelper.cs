@@ -4464,7 +4464,7 @@ namespace Durados.Web.Mvc.UI.Helpers
             return Maps.Instance.AppInCach(appName) || Maps.Instance.AppExists(appName).HasValue;
         }
 
-        public class SignUpException : DuradosException
+        public class SignUpException : RestException
         {
             public SignUpException(string message, Exception innerException) : base(message, innerException) { }
             public SignUpException(Exception exception)
@@ -5014,7 +5014,7 @@ namespace Durados.Web.Mvc.UI.Helpers
             catch (Exception ex)
             {
                 string message = ex.Message + (ex.InnerException != null ? "." + ex.InnerException.Message : string.Empty);
-                Maps.Instance.DuradosMap.Logger.Log("FarmCaching", "RefreshCash", "Task.Run", ex, 1, "");
+                Maps.Instance.DuradosMap.Logger.Log(appName, "RefreshCash", "Task.Run", ex, 1, "");
                 if (ex.InnerException != null)
                     Maps.Instance.DuradosMap.Logger.Log("FarmCaching", "RefreshCash", "Task.Run", ex.InnerException, 1, "");
               //  throw new DuradosException("failed to refresh farm instances cash." );
@@ -6627,4 +6627,20 @@ namespace Durados.Web.Mvc.UI.Helpers
         }
     }
 
+    
+    public class RestException : DuradosException
+    {
+        public RestException(string message, Exception innerException) : base(message, innerException) { }
+        
+        public RestException(string message)
+            : base(message)
+        {
+
+        }
+
+        public object GetJsonError(string error)
+        {
+            return new { error = error, error_description = this.Message };
+        }
+    }
 }

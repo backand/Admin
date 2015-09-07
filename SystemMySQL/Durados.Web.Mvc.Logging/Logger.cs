@@ -559,7 +559,8 @@ namespace Durados.Web.Mvc.Logging
         private string GetAppName()
         {
             string appName = string.Empty;
-            
+            if (System.Web.HttpContext.Current == null)
+                return appName;
             try
             {
                 //appId = System.Web.HttpContext.Current == null || System.Web.HttpContext.Current.Items[Database.AppId] == null ? appId: int.TryParse(System.Web.HttpContext.Current.Items[Database.AppId].ToString(),out appId)?appId:appId;
