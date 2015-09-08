@@ -3319,13 +3319,6 @@ namespace Durados.Web.Mvc.Config
                 UseRefreshToken.Category = rolesCategory;
                 UseRefreshToken.HideInTable = true;
             }
-            if (databaseView.Fields.ContainsKey("EnableBasicAuth"))
-            {
-                ColumnField EnableBasicAuth = (ColumnField)databaseView.Fields["EnableBasicAuth"];
-                EnableBasicAuth.Order = 600;
-                EnableBasicAuth.Category = rolesCategory;
-                EnableBasicAuth.HideInTable = true;
-            }
             if (databaseView.Fields.ContainsKey("GithubClientId"))
             {
                 ColumnField GithubClientId = (ColumnField)databaseView.Fields["GithubClientId"];

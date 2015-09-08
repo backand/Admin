@@ -174,7 +174,6 @@ namespace Durados.Web.Mvc
             EnableSecretKeyAccess = true;
             TokenExpiration = 86400;
             UseRefreshToken = false;
-            EnableBasicAuth = true;
             
         }
 
@@ -209,9 +208,6 @@ namespace Durados.Web.Mvc
 
         [Durados.Config.Attributes.ColumnProperty()]
         public bool UseRefreshToken { get; set; }
-
-        [Durados.Config.Attributes.ColumnProperty()]
-        public bool EnableBasicAuth { get; set; }
 
         [Durados.Config.Attributes.ColumnProperty()]
         public string GoogleClientId { get; set; }
