@@ -177,7 +177,7 @@ namespace BackAnd.Web.Api.Controllers.Filters
                 return true;
             }
 
-            if (!Maps.Instance.GetMap(appName).Database.EnableBasicAuth)
+            if (!Maps.Instance.GetMap(appName).Database.EnableSecretKeyAccess)
             {
                 actionContext.Response = actionContext.Request.CreateErrorResponse(
                         HttpStatusCode.Unauthorized,
