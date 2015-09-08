@@ -9932,7 +9932,19 @@ namespace Durados.DataAccess
                                     {
                                         if (child.ContainsKey(parentField.JsonName))
                                         {
-                                            string clItem = ((Dictionary<string, object>)((Dictionary<string, object>)child[parentField.JsonName])["__metadata"])["id"].ToString();
+                                            string clItem = null;
+                                            if (child[parentField.JsonName] is Dictionary<string, object>)
+                                            {
+                                                clItem = ((Dictionary<string, object>)((Dictionary<string, object>)child[parentField.JsonName])["__metadata"])["id"].ToString();
+                                            }
+                                            else if (child[parentField.JsonName] is string || child[parentField.JsonName] is int)
+                                            {
+                                                clItem = child[parentField.JsonName].ToString();
+                                            }
+                                            else
+                                            {
+                                                continue;
+                                            }
                                             clItems.Add(clItem);
                                         }
                                     }
