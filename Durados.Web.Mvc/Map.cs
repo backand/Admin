@@ -5522,7 +5522,11 @@ namespace Durados.Web.Mvc
             {
                 appsSqlProducts.Remove(appName);
             }
-            appsSqlProducts.Add(appName, (SqlProduct)sqlProduct);
+            try
+            {
+                appsSqlProducts.Add(appName, (SqlProduct)sqlProduct);
+            }
+            catch { }
 
             int localPort = 0;
             if (sqlProduct == (int)SqlProduct.MySql)

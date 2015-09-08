@@ -506,7 +506,9 @@ namespace Durados
             View view = View;
             View parentView = null;
 
-            foreach (ParentField field in childrenView.Fields.Values.Where(f => f.FieldType == FieldType.Parent))
+            var parentFields = childrenView.Fields.Values.Where(f => f.FieldType == FieldType.Parent);
+
+            foreach (ParentField field in parentFields)
             {
                 if (!field.ParentView.Base.Equals(view.Base))
                 {
@@ -516,6 +518,30 @@ namespace Durados
                 else
                 {
                     fkField = field;
+                }
+            }
+
+            if (parentView == null)
+            {
+                if (parentFields.Count() == 2)
+                {
+                    if (((ParentField)parentFields.FirstOrDefault()).ParentView.Equals(((ParentField)parentFields.LastOrDefault()).ParentView))
+                    {
+                        ParentField p1 = (ParentField)parentFields.FirstOrDefault();
+                        ParentField p2 = (ParentField)parentFields.LastOrDefault();
+
+                        if (!p1.DataRelation.ChildColumns[0].Equals(this.DataRelation.ChildColumns[0]))
+                        {
+                            parentField = p1;
+                            fkField = p2;
+                        }
+                        else
+                        {
+                            parentField = p2;
+                            fkField = p1;
+                        }
+                        parentView = parentField.ParentView;
+                    }
                 }
             }
 
