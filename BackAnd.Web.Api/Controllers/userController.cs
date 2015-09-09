@@ -1348,7 +1348,11 @@ namespace BackAnd.Web.Api.Controllers
            
             var currentUtc = new SystemClock().UtcNow;
             ticket.Properties.IssuedUtc = currentUtc;
-            ticket.Properties.ExpiresUtc = currentUtc.Add(TimeSpan.FromSeconds(map.Database.TokenExpiration));
+            int expiration = map.Database.TokenExpiration;
+            if (expiration == 0 || expiration == 8640)
+                expiration = 86400;
+
+            ticket.Properties.ExpiresUtc = currentUtc.Add(TimeSpan.FromSeconds(expiration));
             string AccessToken = Startup.OAuthBearerOptions.AccessTokenFormat.Protect(ticket);
             return AccessToken;
         }

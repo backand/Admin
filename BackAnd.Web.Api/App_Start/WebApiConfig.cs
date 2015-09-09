@@ -74,10 +74,16 @@ namespace BackAnd.Web.Api
 
 
             config.Routes.MapHttpRoute(
+               name: "objectWithIdAndCollection",
+               routeTemplate: "1/objects/{name}/{id}/{collection}",
+               defaults: new { controller = "viewData", name = RouteParameter.Optional, id = RouteParameter.Optional, collection = RouteParameter.Optional }
+            );
+
+            config.Routes.MapHttpRoute(
                name: "objectWithId",
                routeTemplate: "1/objects/{name}/{id}",
                defaults: new { controller = "viewData", name = RouteParameter.Optional, id = RouteParameter.Optional }
-           );
+            );
 
             config.Routes.MapHttpRoute(
                 name: "viewData",
