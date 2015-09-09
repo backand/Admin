@@ -31,6 +31,147 @@ namespace BackAnd.Web.Api.Controllers
     {
         #region data
 
+        public virtual IHttpActionResult Get(string name, string id, string collection, bool? withSelectOptions = null, bool? withFilterOptions = null, int? pageNumber = null, int? pageSize = null, string filter = null, string sort = null, string search = null, bool? deep = null, bool descriptive = true, bool? relatedObjects = false)
+        {
+            try
+            {
+                if (string.IsNullOrEmpty(name))
+                {
+                    return ResponseMessage(Request.CreateResponse(HttpStatusCode.NotFound, Messages.ViewNameIsMissing));
+                }
+                View view = GetView(name);
+                if (view == null)
+                {
+                    return ResponseMessage(Request.CreateResponse(HttpStatusCode.NotFound, string.Format(Messages.ViewNameNotFound, name)));
+                }
+                if (!IsAllow(view))
+                {
+                    return ResponseMessage(Request.CreateResponse(HttpStatusCode.Forbidden, Messages.ViewIsUnauthorized));
+                }
+
+                if (string.IsNullOrEmpty(id))
+                {
+                    return ResponseMessage(Request.CreateResponse(HttpStatusCode.NotFound, Messages.IdIsMissing));
+                }
+
+                if (string.IsNullOrEmpty(collection))
+                {
+                    return ResponseMessage(Request.CreateResponse(HttpStatusCode.NotFound, Messages.CollectionIsMissing));
+                }
+
+                Durados.Field[] fileds = view.GetFieldsByJsonName(collection);
+                if (fileds.Length == 0)
+                {
+                    return ResponseMessage(Request.CreateResponse(HttpStatusCode.NotFound, Messages.CollectionNotFound));
+                }
+                if (fileds.Length > 1)
+                {
+                    return ResponseMessage(Request.CreateResponse(HttpStatusCode.NotFound, Messages.DuplicateCollectionName));
+                }
+
+                ChildrenField childrenField = (ChildrenField)fileds[0];
+
+                View childrenView = (View)childrenField.ChildrenView;
+                if (!IsAllow(childrenView))
+                {
+                    return ResponseMessage(Request.CreateResponse(HttpStatusCode.Forbidden, Messages.ViewIsUnauthorized));
+                }
+
+                int rowCount = 0;
+
+                Dictionary<string, object>[] filterArray = null;
+
+                if (!string.IsNullOrEmpty(filter) && filter != "filter" && filter != "false" && filter != "null" && filter != "undefined" && filter != "[{}]")
+                {
+                    if (filter == "(Collection)")
+                    {
+                        filter = "[" + System.Web.HttpContext.Current.Request.Params["filter"] + "]";
+                    }
+                    if (filter.StartsWith("{"))
+                    {
+                        filter = "[" + filter + "]";
+                    }
+                    try
+                    {
+                        filterArray = JsonConverter.DeserializeArray(filter);
+                    }
+                    catch (Exception exception)
+                    {
+                        Map.Logger.Log(GetControllerNameForLog(this.ControllerContext), this.ControllerContext.RouteData.Values["action"].ToString(), exception.Source, exception, 1, "Deserialize filter " + filter + ", original: " + System.Web.HttpContext.Current.Request.Params["filter"]);
+                        return ResponseMessage(Request.CreateResponse(HttpStatusCode.NotAcceptable, Messages.StringifyFilter));
+                    }
+                }
+
+                Dictionary<string, object> collectionFilter = new Dictionary<string, object>();
+                string parentFieldName = childrenField.GetEquivalentParentField().JsonName;
+                collectionFilter.Add("fieldName", parentFieldName);
+                collectionFilter.Add("operator", "in");
+                collectionFilter.Add("value", id);
+                
+                if (filterArray == null)
+                {
+                    filterArray = new Dictionary<string, object>[1] { collectionFilter };
+                }
+                else
+                {
+                    List<Dictionary<string, object>> filterList = filterArray.ToList();
+                    for (int i = 0; i < filterList.Count; i++)
+                    {
+                        if (filterList[i].ContainsKey("fieldName") && filterList[i]["fieldName"].Equals(collectionFilter["fieldName"]))
+                        {
+                            return ResponseMessage(Request.CreateResponse(HttpStatusCode.NotAcceptable, "Ambiguous filter. Please remove the filter item with the fieldName \"" + parentFieldName + "\"."));
+                        }
+                    }
+                    filterList.Add(collectionFilter);
+                    filterArray = filterList.ToArray();
+                }
+
+                Dictionary<string, object>[] sortArray = null;
+
+                if (!string.IsNullOrEmpty(sort) && sort != "sort" && sort != "false" && sort != "null" && sort != "undefined" && sort != "[{}]")
+                {
+                    if (sort == "(Collection)")
+                    {
+                        sort = "[" + System.Web.HttpContext.Current.Request.Params["sort"] + "]";
+                    }
+                    if (sort.StartsWith("{"))
+                    {
+                        sort = "[" + sort + "]";
+                    }
+                    try
+                    {
+                        sortArray = JsonConverter.DeserializeArray(sort);
+                    }
+                    catch (Exception exception)
+                    {
+                        Map.Logger.Log(GetControllerNameForLog(this.ControllerContext), this.ControllerContext.RouteData.Values["action"].ToString(), exception.Source, exception, 1, "Deserialize sort " + sort + ", original: " + System.Web.HttpContext.Current.Request.Params["sort"]);
+                        return ResponseMessage(Request.CreateResponse(HttpStatusCode.NotAcceptable, Messages.StringifySort));
+                    }
+                }
+
+                if (search == "null" || search == "undefined")
+                    search = null;
+
+                var items = RestHelper.Get(childrenView, withSelectOptions ?? false, withFilterOptions ?? false, pageNumber ?? 1, pageSize ?? 20, filterArray, search, sortArray, out rowCount, deep ?? false, view_BeforeSelect, view_AfterSelect, false, descriptive, false, relatedObjects ?? false);
+                
+                return Ok(items);
+
+            }
+            catch (FilterException exception)
+            {
+                return ResponseMessage(Request.CreateResponse(HttpStatusCode.NotAcceptable, exception.Message));
+            }
+            catch (SortException exception)
+            {
+                return ResponseMessage(Request.CreateResponse(HttpStatusCode.NotAcceptable, exception.Message));
+            }
+            catch (Exception exception)
+            {
+                throw new BackAndApiUnexpectedResponseException(exception, this);
+
+            }
+        }
+
         public virtual IHttpActionResult Get(string name, string id, bool? deep = null)
         {
             try

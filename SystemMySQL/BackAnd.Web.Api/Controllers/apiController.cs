@@ -1648,6 +1648,9 @@ namespace BackAnd.Web.Api.Controllers
         public static readonly string ViewNameIsMissing = "The Table name is missing.";
         public static readonly string FieldNameIsMissing = "The field name is missing.";
         public static readonly string IdIsMissing = "The id is missing.";
+        public static readonly string CollectionIsMissing = "The collection is missing.";
+        public static readonly string CollectionNotFound = "The collection was not found.";
+        public static readonly string DuplicateCollectionName = "The collection name exists more than once.";
         public static readonly string ViewIsUnauthorized = "The Table is unauthorized for this current user role.";
         public static readonly string ViewNameNotFound = "The Table \"{0}\" was not found.";
         public static readonly string MissingObjectToUpdate = "The object to update is missing.";
