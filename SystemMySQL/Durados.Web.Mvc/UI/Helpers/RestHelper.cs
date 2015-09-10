@@ -296,6 +296,8 @@ namespace Durados.Web.Mvc.UI.Helpers
 
             Dictionary<string, object> json = new Dictionary<string, object>();
             json.Add("totalRows", rowCount);
+            if (!relatedObjects)
+                relatedObjects = deep;
             json.Add("data", TableToDictionary(view, dataView, deep, descriptive, relatedObjects));
 
             if (relatedObjects)
@@ -1917,13 +1919,16 @@ namespace Durados.Web.Mvc.UI.Helpers
                 if (!row.IsNull("ViewName"))
                 {
                     string configViewName = row["ViewName"].ToString();
-                    View configView = (View)view.Database.Map.GetConfigDatabase().Views[configViewName];
-                    if (configView != null)
+                    if (view.Database.Map.GetConfigDatabase().Views.ContainsKey(configViewName))
                     {
-                        DataRow configRow = configView.GetDataRow(value);
-                        if (configRow != null)
+                        View configView = (View)view.Database.Map.GetConfigDatabase().Views[configViewName];
+                        if (configView != null)
                         {
-                            label = configView.GetDisplayValue(configRow);
+                            DataRow configRow = configView.GetDataRow(value);
+                            if (configRow != null)
+                            {
+                                label = configView.GetDisplayValue(configRow);
+                            }
                         }
                     }
                 }
@@ -2005,6 +2010,9 @@ namespace Durados.Web.Mvc.UI.Helpers
             return RowToDeepDictionary(view, row, true, new Dictionary<string, object>());
         }
 
+
+        //System.Threading.Tasks.Task.Run(() =>Send(host, useDefaultCredentials, port, username, password, useSsl, to, cc, bcc, subject, message, fromEmail, fromNick, anonymousEmail, dontSend, files, logger, false));
+
         public virtual Dictionary<string, object> RowToDeepDictionary(View view, DataRow dataRow, bool withChildren, Dictionary<string, object> pks)
         {
             if (dataRow == null)
@@ -2048,13 +2056,17 @@ namespace Durados.Web.Mvc.UI.Helpers
                         if (!IsJsonable(childrenField, childRow.Row))
                             continue;
 
+
                         Dictionary<string, object> childDictionary = RowToDeepDictionary(childrenView, childRow.Row, true, pks);
 
                         if (childDictionary != null)
                         {
                             list.Add(childDictionary);
                         }
+
+
                     }
+
                     AddToDictionary(dictionary, field, list.ToArray());
 
                 }
