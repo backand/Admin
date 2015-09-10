@@ -540,6 +540,11 @@ namespace System
             var first = full.IndexOf(part);
             return first != -1 && first == full.LastIndexOf(part);
         }
+
+        public static string EscapeApostrophe(this string text)
+        {
+            return text.Replace("'", "''");
+        }
     }
 
     public static class FileHelper
