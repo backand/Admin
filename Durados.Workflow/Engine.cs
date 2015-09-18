@@ -20,7 +20,7 @@ namespace Durados.Workflow
         protected LogicalParser parser;
         protected Step step;
 
-        private static Dictionary<string, Database> CurrentDatabases = new Dictionary<string, Database>();
+        public static Dictionary<string, Database> CurrentDatabases = new Dictionary<string, Database>();
        
         public Engine()
         {
