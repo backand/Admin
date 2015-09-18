@@ -1680,6 +1680,7 @@ namespace BackAnd.Web.Api.Controllers
         public static readonly string NotImplemented = "The action is not implemented yet.";
         public static readonly string FailedToGetJsonFromParameters = "Failed to get json from parameters.";
         public static readonly string StringifyFilter = "Please JSON.stringify the filter parameter";
+        public static readonly string GetFilterError = "Failed to translate filter";
         public static readonly string StringifySort = "Please JSON.stringify the sort parameter";
         public static readonly string InvalidSchema = "Invalid schema";
         

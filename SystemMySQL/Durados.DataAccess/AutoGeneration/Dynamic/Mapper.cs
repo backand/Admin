@@ -2012,7 +2012,11 @@ namespace Durados.DataAccess.AutoGeneration.Dynamic
                     {
                         table.PrimaryKey = pk.ToArray();
                         if (pk.Count == 1)
+                        {
+                            if (table.PrimaryKey[0].DefaultValue != null)
+                                table.PrimaryKey[0].DefaultValue = null;
                             table.PrimaryKey[0].AutoIncrement = autoIncrement;
+                        }
                     }
                 }
             }

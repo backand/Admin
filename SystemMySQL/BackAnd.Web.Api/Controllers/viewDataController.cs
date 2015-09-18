@@ -102,11 +102,48 @@ namespace BackAnd.Web.Api.Controllers
                     }
                 }
 
+                Filter inFilter = null;
+
+                object filterValue = id;
+
+                if (IsFilter(id))
+                {
+                    Dictionary<string, object>[] routeFilterArray = null;
+                    string routeFilter = System.Web.HttpContext.Current.Request.Params[id];
+                    if (string.IsNullOrEmpty(routeFilter))
+                    {
+                        return ResponseMessage(Request.CreateResponse(HttpStatusCode.NotAcceptable, Messages.StringifyFilter));
+                    }
+                    if (routeFilter.StartsWith("{"))
+                    {
+                        routeFilter = "[" + routeFilter + "]";
+                    }
+                    try
+                    {
+                        routeFilterArray = JsonConverter.DeserializeArray(routeFilter);
+                    }
+                    catch (Exception exception)
+                    {
+                        Map.Logger.Log(GetControllerNameForLog(this.ControllerContext), this.ControllerContext.RouteData.Values["action"].ToString(), exception.Source, exception, 1, "Deserialize route filter " + filter + ", original: " + id);
+                        return ResponseMessage(Request.CreateResponse(HttpStatusCode.NotAcceptable, Messages.StringifyFilter));
+                    }
+                    try
+                    {
+                        inFilter = GetFilter(view, routeFilterArray, collection);
+                        filterValue = inFilter;
+                    }
+                    catch (Exception exception)
+                    {
+                        Map.Logger.Log(GetControllerNameForLog(this.ControllerContext), this.ControllerContext.RouteData.Values["action"].ToString(), exception.Source, exception, 1, "Get route filter " + filter + ", original: " + id);
+                        return ResponseMessage(Request.CreateResponse(HttpStatusCode.NotAcceptable, Messages.StringifyFilter));
+                    }
+                }
+                
                 Dictionary<string, object> collectionFilter = new Dictionary<string, object>();
                 string parentFieldName = childrenField.GetEquivalentParentField().JsonName;
                 collectionFilter.Add("fieldName", parentFieldName);
                 collectionFilter.Add("operator", "in");
-                collectionFilter.Add("value", id);
+                collectionFilter.Add("value", filterValue);
                 
                 if (filterArray == null)
                 {
@@ -172,7 +209,17 @@ namespace BackAnd.Web.Api.Controllers
             }
         }
 
-        public virtual IHttpActionResult Get(string name, string id, bool? deep = null)
+        private Filter GetFilter(View view, Dictionary<string, object>[] filter, string childrenFieldName)
+        {
+            return RestHelper.GetFilter(view, filter, childrenFieldName);
+        }
+
+        private bool IsFilter(string filter)
+        {
+            return (filter.StartsWith("filter"));
+        }
+
+        public virtual IHttpActionResult Get(string name, string id, bool? deep = null, int? level = null)
         {
             try
             {
@@ -196,7 +243,7 @@ namespace BackAnd.Web.Api.Controllers
                     return ResponseMessage(Request.CreateResponse(HttpStatusCode.Forbidden, Messages.ViewIsUnauthorized));
                 }
 
-                var item = RestHelper.Get(view, id, deep ?? false, view_BeforeSelect, view_AfterSelect);
+                var item = RestHelper.Get(view, id, deep ?? false, view_BeforeSelect, view_AfterSelect, false, false, false, level ?? 3);
                 
                 if (item == null)
                 {

@@ -40,6 +40,14 @@ namespace Durados.Web.Mvc.UI.Helpers
             string fileName = Maps.Instance.GetMap(appname).GetConfigDatabase().ConnectionString;
             Maps.Instance.Restart(appname);
             Durados.DataAccess.ConfigAccess.Restart(fileName);
+            if (Workflow.Engine.CurrentDatabases != null && Workflow.Engine.CurrentDatabases.ContainsKey(appname))
+            {
+                try
+                {
+                    Workflow.Engine.CurrentDatabases.Remove(appname);
+                }
+                catch { }
+            }
 
             string blobName = Maps.GetStorageBlobName(fileName);
             if (Maps.Instance.StorageCache.ContainsKey(blobName))
@@ -71,9 +79,9 @@ namespace Durados.Web.Mvc.UI.Helpers
             return new DictionaryConverter().TableToDictionary(view, dataView, deep, descriptive, relatedObjects);
         }
 
-        public static Dictionary<string, object> RowToDictionary(View view, DataRow row, string pk, bool deep, bool displayParentValue = false)
+        public static Dictionary<string, object> RowToDictionary(View view, DataRow row, string pk, bool deep, bool displayParentValue = false, int level = 3)
         {
-            return GetDictionaryConverter(view).RowToDictionary(view, row, pk, deep, displayParentValue);
+            return GetDictionaryConverter(view).RowToDictionary(view, row, pk, deep, displayParentValue, level);
 
         }
 
@@ -520,7 +528,7 @@ namespace Durados.Web.Mvc.UI.Helpers
 
         }
 
-        public static Dictionary<string, object> Get(this View view, string pk, bool deep, BeforeSelectEventHandler beforeSelectCallback, AfterSelectEventHandler afterSelectCallback, bool displayParentValue = false, bool ignoreConfig = false, bool useCache = false)
+        public static Dictionary<string, object> Get(this View view, string pk, bool deep, BeforeSelectEventHandler beforeSelectCallback, AfterSelectEventHandler afterSelectCallback, bool displayParentValue = false, bool ignoreConfig = false, bool useCache = false, int level = 3)
         {
             try
             {
@@ -551,7 +559,7 @@ namespace Durados.Web.Mvc.UI.Helpers
 
             map.Logger.Log(view.Name, pk, "before row to json", null, 5, null);
 
-            Dictionary<string, object> dic = RowToDictionary(view, dataRow, pk, deep);
+            Dictionary<string, object> dic = RowToDictionary(view, dataRow, pk, deep, false, level);
 
             map.Logger.Log(view.Name, pk, "after row to json", null, 5, null);
 
@@ -1068,6 +1076,13 @@ namespace Durados.Web.Mvc.UI.Helpers
             }
 
             return val;
+        }
+
+        public static Durados.DataAccess.Filter GetFilter(View view, Dictionary<string, object>[] filter, string childrenFieldName)
+        {
+            SqlAccess sql = GetSqlAccess(view.Database.SqlProduct);
+
+            return sql.GetInFilter(view, (new FilterAdapter()).ReplaceFilterOperands(view, filter), childrenFieldName);
         }
     }
 
@@ -1692,7 +1707,7 @@ namespace Durados.Web.Mvc.UI.Helpers
 
         }
 
-        public Dictionary<string, object>[] TableToDictionary(View view, DataView dataView, bool deep = false, bool descriptive = true, bool relatedObjects = false)
+        public Dictionary<string, object>[] TableToDictionary(View view, DataView dataView, bool deep = false, bool descriptive = true, bool relatedObjects = false, int level = 3)
         {
             List<Dictionary<string, object>> list = new List<Dictionary<string, object>>();
 
@@ -1705,7 +1720,7 @@ namespace Durados.Web.Mvc.UI.Helpers
             {
                 if (deep && !relatedObjects)
                 {
-                    list.Add(RowToDictionary(view, row.Row, view.GetPkValue(row.Row), deep, false));
+                    list.Add(RowToDictionary(view, row.Row, view.GetPkValue(row.Row), deep, false, level));
                 }
                 else
                 {
@@ -1996,24 +2011,24 @@ namespace Durados.Web.Mvc.UI.Helpers
             return "Err!";
         }
 
-        public Dictionary<string, object> RowToDictionary(View view, DataRow row, string pk, bool deep, bool displayParentValue)
+        public Dictionary<string, object> RowToDictionary(View view, DataRow row, string pk, bool deep, bool displayParentValue, int level)
         {
             if (deep)
-                return RowToDeepDictionary(view, row);
+                return RowToDeepDictionary(view, row, level);
             else
                 return RowToShallowDictionary(view, row, pk, displayParentValue);
 
         }
 
-        public Dictionary<string, object> RowToDeepDictionary(View view, DataRow row)
+        public Dictionary<string, object> RowToDeepDictionary(View view, DataRow row, int level)
         {
-            return RowToDeepDictionary(view, row, true, new Dictionary<string, object>());
+            return RowToDeepDictionary(view, row, true, new Dictionary<string, object>(), level, 0);
         }
 
 
         //System.Threading.Tasks.Task.Run(() =>Send(host, useDefaultCredentials, port, username, password, useSsl, to, cc, bcc, subject, message, fromEmail, fromNick, anonymousEmail, dontSend, files, logger, false));
 
-        public virtual Dictionary<string, object> RowToDeepDictionary(View view, DataRow dataRow, bool withChildren, Dictionary<string, object> pks)
+        public virtual Dictionary<string, object> RowToDeepDictionary(View view, DataRow dataRow, bool withChildren, Dictionary<string, object> pks, int level, int currentLevel)
         {
             if (dataRow == null)
                 return null;
@@ -2050,6 +2065,9 @@ namespace Durados.Web.Mvc.UI.Helpers
                     if (!IsJsonable(childrenField, dataRow))
                         continue;
 
+                    if (currentLevel >= level)
+                        continue;
+
                     List<Dictionary<string, object>> list = new List<Dictionary<string, object>>();
                     foreach (System.Data.DataRowView childRow in childTable)
                     {
@@ -2057,7 +2075,7 @@ namespace Durados.Web.Mvc.UI.Helpers
                             continue;
 
 
-                        Dictionary<string, object> childDictionary = RowToDeepDictionary(childrenView, childRow.Row, true, pks);
+                        Dictionary<string, object> childDictionary = RowToDeepDictionary(childrenView, childRow.Row, true, pks, level, currentLevel++);
 
                         if (childDictionary != null)
                         {
@@ -2088,7 +2106,7 @@ namespace Durados.Web.Mvc.UI.Helpers
                         continue;
                     }
 
-                    Dictionary<string, object> parentDictionary = RowToDeepDictionary(parentView, parentRow, false, pks);
+                    Dictionary<string, object> parentDictionary = RowToDeepDictionary(parentView, parentRow, false, pks, level, 0);
 
                     if (parentDictionary != null)
                     {
@@ -2344,7 +2362,13 @@ namespace Durados.Web.Mvc.UI.Helpers
                 {
                     try
                     {
-                        value = param["value"].ToString();
+                        if (param["value"] is Durados.DataAccess.Filter)
+                        {
+                        }
+                        else
+                        {
+                            value = param["value"].ToString();
+                        }
                     }
                     catch
                     {
@@ -2436,6 +2460,10 @@ namespace Durados.Web.Mvc.UI.Helpers
                         throw new FilterException("The simple filter can only contain one item per field. Please Use a Query.");
                     }
                     filterOut.Add(fieldName, outOperator + space + value);
+                }
+                if (param["value"] is Durados.DataAccess.Filter)
+                {
+                    filterOut.Add(fieldName, param["value"]);
                 }
             }
 
@@ -5903,7 +5931,16 @@ namespace Durados.Web.Mvc.UI.Helpers
                     facebookProfile.Add("activity", activity);
                     facebookProfile.Add("parameters", parameters);
 
-                    return GetNewProfile(facebookProfile);
+                    Profile profile = GetNewProfile(facebookProfile);
+
+                    if (string.IsNullOrEmpty(profile.email))
+                    {
+                        Exception exception = new FacebookException("Facebook account authenticated but did not return an email.");
+                        Maps.Instance.DuradosMap.Logger.Log("userController", "Authenticate", "email", exception, 1, "");
+                        throw exception;
+                    }
+
+                    return profile;
 
 
                     //HttpResponseMessage graphResponse = await _httpClient.GetAsync(graphAddress, HttpCompletionOption.ResponseContentRead);

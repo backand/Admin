@@ -726,7 +726,7 @@ namespace Durados.DataAccess
             else
             {
                 bool isSearch = search.HasValue && search.Value;
-                if (!string.IsNullOrEmpty(whereStatement) && !whereStatement.Contains( sqlTextBuilder.DbParameterPrefix ) && !isSearch && whereStatement.Length < 1000)
+                if (!string.IsNullOrEmpty(whereStatement) && !whereStatement.Contains(sqlTextBuilder.DbParameterPrefix) && !isSearch && whereStatement.Length < 1000 && !whereStatement.Contains(" in "))
                 {
                     try
                     {
@@ -5617,6 +5617,24 @@ namespace Durados.DataAccess
             return str;
         }
 
+        public Filter GetInFilter(View view, Dictionary<string, object> values, string childrenFieldName)
+        {
+            Filter filter = GetFilter(view, values);
+            ISqlTextBuilder sqlTextBuilder = GetSqlTextBuilder(view);
+
+            string where = "(select " + GetDelimitedColumns(view.GetPkColumnNames().ToList(), view) + " from " + sqlTextBuilder.EscapeDbObject(view.Name) + sqlTextBuilder.WithNolock + " " + filter.WhereStatement + ")";
+            for (int i = 0; i < filter.Parameters.Length; i++)
+            {
+                IDataParameter parameter = filter.Parameters[i];
+                string oldName = parameter.ParameterName;
+                string newName = "@" + childrenFieldName + oldName.TrimStart('@');
+                where = where.Replace(oldName, newName);
+                filter.WhereStatement = where;
+                parameter.ParameterName = newName;
+            }
+            return filter;
+        }
+
         protected Filter GetFilter(View view, Dictionary<string, object> values, bool useLike, LogicCondition logicCondition, bool insideTextSearch, bool usePermanentFilter, Field currentField)
         {
             ISqlTextBuilder sqlTextBuilder = GetSqlTextBuilder(view);
@@ -6337,6 +6355,16 @@ namespace Durados.DataAccess
                                         {
                                             whereStatement += sqlTextBuilder.EscapeDbObject(view.DataTable.TableName) + sqlTextBuilder.DbTableColumnSeperator + sqlTextBuilder.EscapeDbObject(columnName) + " is null " + LogicCondition.And.ToString() + " ";
                                             whereStatementWithoutTablePrefix += "[" + columnName + "]" + " is null " + LogicCondition.And.ToString() + " ";
+                                        }
+                                        if (values[field.Name] is Filter)
+                                        {
+                                            Filter filter = (Filter)values[field.Name];
+                                            whereStatement += sqlTextBuilder.EscapeDbObject(view.DataTable.TableName) + sqlTextBuilder.DbTableColumnSeperator + sqlTextBuilder.EscapeDbObject(columnName) + " in " + filter.WhereStatement + " " + LogicCondition.And.ToString() + " ";
+                                            whereStatementWithoutTablePrefix += "[" + columnName + "]" + " in " + filter.WhereStatement + " " + LogicCondition.And.ToString() + " ";
+                                            foreach (IDataParameter parameter in filter.Parameters)
+                                            {
+                                                parameters.Add(parameter.ParameterName, GetNewSqlParameter(view, parameter.ParameterName, parameter.Value));
+                                            }
                                         }
                                         else if (!fk[i].Contains(Filter.TOKEN))
                                         {
