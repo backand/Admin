@@ -72,7 +72,11 @@ namespace Durados.Workflow
                         //        valuesCopy.Add(field.Name, val);
                         //    }
                         //}
-                        EscapeApostrophe(values);
+                        try
+                        {
+                            EscapeApostrophe(values);
+                        }
+                        catch { }
                         spCommand.CommandText = ReplaceAllTokens(view, values, prevRow, pk, currentUsetId, currentUserRole, expression);
                         spCommand.CommandText = spCommand.CommandText.Replace(Engine.AsToken(values), ((Durados.Workflow.INotifier)controller).GetTableViewer(), view);
                 
@@ -199,6 +203,8 @@ namespace Durados.Workflow
 
         private void EscapeApostrophe(Dictionary<string, object> values)
         {
+            if (values == null || values.Count == 0)
+                return;
             List<string> keys = new List<string>();
 
             foreach (string key in values.Keys)
