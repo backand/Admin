@@ -51,7 +51,7 @@ namespace Backand
         {
             try
             {
-                if (Durados.Workflow.JavaScript.IsDebug())
+                if (Durados.Workflow.JavaScript.IsDebug() || request.RequestUri.AbsoluteUri.Contains("localhost") || request.RequestUri.AbsoluteUri.ToLower().Contains("backand"))
                 {
                     string appName = (Durados.Workflow.JavaScript.GetCacheInCurrentRequest(Durados.Database.AppName) ?? string.Empty).ToString();
                     if (!string.IsNullOrEmpty(appName))
