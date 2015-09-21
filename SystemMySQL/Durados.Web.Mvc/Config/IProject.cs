@@ -3378,6 +3378,14 @@ namespace Durados.Web.Mvc.Config
                 EnableSecretKeyAccess.Category = rolesCategory;
                 EnableSecretKeyAccess.HideInTable = true;
             }
+
+            if (databaseView.Fields.ContainsKey("DefaultLevelOfDept"))
+            {
+                ColumnField DefaultLevelOfDept = (ColumnField)databaseView.Fields["DefaultLevelOfDept"];
+                DefaultLevelOfDept.Order = 600;
+                DefaultLevelOfDept.Category = displayCategory;
+                DefaultLevelOfDept.HideInTable = true;
+            }
             
 
             Category generalCategory = new Category() { Name = "General", Ordinal = 30 };

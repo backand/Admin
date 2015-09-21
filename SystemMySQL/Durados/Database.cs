@@ -129,6 +129,22 @@ namespace Durados
         [Durados.Config.Attributes.ColumnProperty(Description = "Registered Users - only the users that registered into system can login, Authenticated Users - users that registered to Durados or other customized authentication tools such as LDAP, can login, All Users - everyone can login.  The default is Registered Users (recommended).")]
         public SecureLevel SecureLevel { get; set; }
 
+        private int defaultLevelOfDept;
+        [Durados.Config.Attributes.ColumnProperty(Description = "The default level of dept 3.")]
+        public int DefaultLevelOfDept
+        {
+            get
+            {
+                return GetDefaultLevelOfDept();
+            }
+            set 
+            { 
+                if (value <= 0) 
+                    throw new DuradosException();
+                defaultLevelOfDept = value;
+            }
+        }
+
         public virtual Durados.Data.IDataAccess GetDataAccess(string connectionString) {   return null; }
         public void SetNextMinorConfigVersion()
         {
@@ -556,6 +572,8 @@ namespace Durados
 
             SecureLevel = Durados.SecureLevel.RegisteredUsers;
 
+            DefaultLevelOfDept = 3;
+
             Pages = new Dictionary<int, Page>();
 
             GeneralErrorMessage = "Oops it seems something went wrong, please contact your system admin";
@@ -572,7 +590,12 @@ namespace Durados
             SignupEmailVerification = false;
         }
 
-
+        private int GetDefaultLevelOfDept()
+        {
+            if (defaultLevelOfDept <= 0)
+                return 3;
+            return defaultLevelOfDept;
+        }
 
         private FilterParameterOption[] GetFilterParameterOptions()
         {

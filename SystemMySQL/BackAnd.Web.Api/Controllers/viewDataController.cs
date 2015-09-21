@@ -243,7 +243,12 @@ namespace BackAnd.Web.Api.Controllers
                     return ResponseMessage(Request.CreateResponse(HttpStatusCode.Forbidden, Messages.ViewIsUnauthorized));
                 }
 
-                var item = RestHelper.Get(view, id, deep ?? false, view_BeforeSelect, view_AfterSelect, false, false, false, level ?? 3);
+                if (level.HasValue && level <= 0)
+                {
+                    return ResponseMessage(Request.CreateResponse(HttpStatusCode.NotAcceptable, "The level must be more than 0."));
+                }
+
+                var item = RestHelper.Get(view, id, deep ?? false, view_BeforeSelect, view_AfterSelect, false, false, false, level ?? view.Database.DefaultLevelOfDept);
                 
                 if (item == null)
                 {
