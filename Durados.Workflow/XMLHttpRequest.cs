@@ -22,6 +22,32 @@ namespace Backand
         public string responseText { get; private set; }
         public void open(string type, string url, bool async)
         {
+            if (url.Contains("objects/action") && System.Web.HttpContext.Current.Request.RawUrl.Contains("$$debug$$") && !url.Contains("url.Contains"))
+            {
+                if (url.Contains("&parameters="))
+                {
+                    if (url.Contains("&parameters=%7B%7D"))
+                    {
+                        url = url.Replace("&parameters=%7B%7D", "&parameters=%7B%22$$debug$$%22:true%7D");
+                    }
+                    else
+                    {
+                        url = url.Replace("&parameters=%7B", "&parameters=%7B%22$$debug$$%22:true,");
+                    }
+                }
+                else
+                {
+                    if (url.Contains("?"))
+                    {
+                        url += "&parameters=%7B%22$$debug$$%22:true%7D";
+                    }
+                    else
+                    {
+                        url += "?parameters=%7B%22$$debug$$%22:true%7D";
+                    }
+                }
+                url += "&" + Durados.Workflow.JavaScript.GuidKey + "=" + Durados.Workflow.JavaScript.GetCacheInCurrentRequest(Durados.Workflow.JavaScript.GuidKey);
+            }
             request = WebRequest.Create(url);
             request.Method = type;
         }

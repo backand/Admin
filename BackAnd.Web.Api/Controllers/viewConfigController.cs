@@ -2009,6 +2009,51 @@ namespace BackAnd.Web.Api.Controllers
         }
 
         #endregion config
+
+        [Route("1/table/predefined/{name}")]
+        [HttpGet]
+        public virtual IHttpActionResult predefined(string name, string usersObjectName = null, string emailFieldName = null, int? maxLevel = null)
+        {
+            try
+            {
+                if (!IsAdmin())
+                {
+                    return ResponseMessage(Request.CreateResponse(HttpStatusCode.Forbidden, Messages.ActionIsUnauthorized));
+                }
+
+                View view = null;
+                if (!string.IsNullOrEmpty(name))
+                {
+                    view = GetView(name);
+                    if (view == null)
+                    {
+                        return ResponseMessage(Request.CreateResponse(HttpStatusCode.NotFound, string.Format(Messages.ViewNameNotFound, name)));
+                    }
+
+                }
+
+                Dictionary<string, object> dictionary = new Dictionary<string, object>();
+
+                try
+                {
+                    string where = new UserRelation().GetWhere(view, usersObjectName ?? "users", emailFieldName ?? "email", maxLevel ?? 3);
+                    dictionary.Add("valid", "always");
+                    dictionary.Add("where", where);
+                }
+                catch (UserRelation.UserRelationException exception)
+                {
+                    dictionary.Add("valid", "never");
+                    dictionary.Add("warnings", new string[1] { exception.Message });
+                }
+                return Ok(dictionary);
+
+            }
+            catch (Exception exception)
+            {
+                throw new BackAndApiUnexpectedResponseException(exception, this);
+
+            }
+        } 
         
     }
 
