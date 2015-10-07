@@ -3129,7 +3129,7 @@ namespace Durados.Web.Mvc.UI.Helpers
             }
         }
 
-        protected virtual void Initiate(Map map)
+        public virtual void Initiate(Map map)
         {
             lock (map)
             {
@@ -6673,6 +6673,162 @@ namespace Durados.Web.Mvc.UI.Helpers
         {
             Maps.Instance.DuradosMap.AllKindOfCache[key].Clear();
             FarmCaching.Instance.ClearMachinesCache(appName, true);
+        }
+    }
+
+    public class UserRelation
+    {
+        public class UserRelationException : Durados.DuradosException
+        {
+            public UserRelationException(string message, Exception innerException):
+                base(message, innerException)
+            {
+
+            }
+        }
+
+        public class UserViewNotFound : UserRelationException
+        {
+            public UserViewNotFound() : base("The users object was not found", null) { }
+        }
+
+        public class EmailFieldNotFound : UserRelationException
+        {
+            public EmailFieldNotFound() : base("The email field was not found", null) { }
+        }
+
+        public class RelationNotFound : UserRelationException
+        {
+            public RelationNotFound() : base("A relation to users was not found", null) { }
+        }
+
+        const string SysUsername = "{{sys::username}}";
+        private View GetUsersView(View view, string usersObjectName)
+        {
+            if (view.Name == usersObjectName)
+                return view;
+            else
+                return GetUsersView(view.Database, usersObjectName);
+        }
+        private View GetUsersView(Database database, string usersObjectName)
+        {
+            if (database.Views.ContainsKey(usersObjectName))
+                return (View)database.Views[usersObjectName];
+
+            return null;
+        }
+
+        private bool HasEmailField(View userView, string emailFieldName)
+        {
+            return userView.Fields.ContainsKey(emailFieldName);
+        }
+
+        public string GetWhere(View view, string usersObjectName, string emailFieldName, int maxLevel)
+        {
+            View usersView = GetUsersView(view, usersObjectName);
+            if (usersView == null)
+                throw new UserViewNotFound();
+            if (!HasEmailField(usersView, emailFieldName))
+                throw new EmailFieldNotFound();
+
+            string where = string.Empty;
+
+            List<Field> fields = new List<Field>();
+
+            Field field = GetUserRelatedField(usersView, view, fields, 0, maxLevel);
+            if (field == null)
+                throw new RelationNotFound();
+
+            ISqlTextBuilder sqlTextBuilder = view.Database.GetSqlTextBuilder();
+
+            return GetWhere(fields, usersObjectName, emailFieldName, fields.Count - 1, string.Empty, sqlTextBuilder);
+        }
+
+        private string GetWhere(List<Field> fields, string usersObjectName, string emailFieldName, int i, string where, ISqlTextBuilder sqlTextBuilder)
+        {
+            string next = null;
+            if (i == 0)
+            {
+                next = string.Format("{0} = '{1}'", sqlTextBuilder.EscapeDbObject(usersObjectName) + sqlTextBuilder.DbTableColumnSeperator + sqlTextBuilder.EscapeDbObject(emailFieldName), SysUsername);
+            }
+            else
+            {
+                next = GetWhere(fields, usersObjectName, emailFieldName, i - 1, where, sqlTextBuilder);
+            }
+            Field field = fields[i];
+            if (field.FieldType == FieldType.Parent)
+            {
+                ParentField parentField = (ParentField)field;
+                where += string.Format("{0} in (select {1} from {2}" + sqlTextBuilder.WithNolock + " where {3})", sqlTextBuilder.EscapeDbObject(parentField.View.Name) + sqlTextBuilder.DbTableColumnSeperator + sqlTextBuilder.EscapeDbObject(parentField.GetColumnsNames()[0]), sqlTextBuilder.EscapeDbObject(parentField.ParentView.Name) + sqlTextBuilder.DbTableColumnSeperator + sqlTextBuilder.EscapeDbObject(parentField.ParentView.GetPkColumnNames()[0]), sqlTextBuilder.EscapeDbObject(parentField.ParentView.Name), next);
+            }
+            else if (field.FieldType == FieldType.Children)
+            {
+                ChildrenField childrenField = (ChildrenField)field;
+                //where += string.Format("{0} in (select {1} from {2}" + sqlTextBuilder.WithNolock + " inner join {3} on {4} = {5} where {6})", sqlTextBuilder.EscapeDbObject(childrenField.View.Name) + sqlTextBuilder.DbTableColumnSeperator + sqlTextBuilder.EscapeDbObject(childrenField.GetColumnsNames()[0]), sqlTextBuilder.EscapeDbObject(childrenField.ChildrenView.Name) + sqlTextBuilder.DbTableColumnSeperator + sqlTextBuilder.EscapeDbObject(childrenField.GetEquivalentParentField().GetColumnsNames()[0]), sqlTextBuilder.EscapeDbObject(childrenField.ChildrenView.Name), sqlTextBuilder.EscapeDbObject(childrenField.GetFirstNonEquivalentParentField().ParentView.Name), sqlTextBuilder.EscapeDbObject(childrenField.ChildrenView.Name) + sqlTextBuilder.DbTableColumnSeperator + sqlTextBuilder.EscapeDbObject(childrenField.GetFirstNonEquivalentParentField().GetColumnsNames()[0]), sqlTextBuilder.EscapeDbObject(childrenField.GetFirstNonEquivalentParentField().ParentView.Name) + sqlTextBuilder.DbTableColumnSeperator + sqlTextBuilder.EscapeDbObject(childrenField.GetFirstNonEquivalentParentField().ParentView.GetPkColumnNames()[0]), next);
+                where += string.Format("{0} in (select {1} from {2}" + sqlTextBuilder.WithNolock + " where {3} in (select {4} from {5}  where {6}))", 
+                    sqlTextBuilder.EscapeDbObject(childrenField.View.Name) + sqlTextBuilder.DbTableColumnSeperator + sqlTextBuilder.EscapeDbObject(childrenField.GetColumnsNames()[0]), 
+                    sqlTextBuilder.EscapeDbObject(childrenField.ChildrenView.Name) + sqlTextBuilder.DbTableColumnSeperator + sqlTextBuilder.EscapeDbObject(childrenField.GetEquivalentParentField().GetColumnsNames()[0]), 
+                    sqlTextBuilder.EscapeDbObject(childrenField.ChildrenView.Name),
+                    sqlTextBuilder.EscapeDbObject(childrenField.ChildrenView.Name) + sqlTextBuilder.DbTableColumnSeperator + sqlTextBuilder.EscapeDbObject(childrenField.GetFirstNonEquivalentParentField().GetColumnsNames()[0]),
+                    sqlTextBuilder.EscapeDbObject(childrenField.GetFirstNonEquivalentParentField().ParentView.Name) + sqlTextBuilder.DbTableColumnSeperator + sqlTextBuilder.EscapeDbObject(childrenField.GetFirstNonEquivalentParentField().ParentView.GetPkColumnNames()[0]),
+                    sqlTextBuilder.EscapeDbObject(childrenField.GetFirstNonEquivalentParentField().ParentView.Name), 
+                    next);
+            }
+
+            return where;
+        }
+
+        private Field GetUserRelatedField(View usersView, View view, List<Field> fields, int level, int max)
+        {
+            if (level >= max)
+                return null;
+
+            foreach (ParentField parentField in view.Fields.Values.Where(f => f.FieldType == FieldType.Parent))
+            {
+                if (parentField.ParentView == usersView)
+                {
+                    fields.Add(parentField);
+                    return parentField;
+                }
+            }
+
+            foreach (ChildrenField childrenField in view.Fields.Values.Where(f => f.FieldType == FieldType.Children))
+            {
+                Durados.ParentField parentField = null;
+                Durados.ParentField fkField = null;
+                if (childrenField.GetOtherParentView(out parentField, out fkField) == usersView)
+                {
+                    fields.Add(childrenField);
+                    return parentField;
+                }
+            }
+
+            level++;
+
+            foreach (ParentField parentField in view.Fields.Values.Where(f => f.FieldType == FieldType.Parent))
+            {
+                Field ancestorField = GetUserRelatedField(usersView, (View)parentField.ParentView, fields, level, max);
+                if (ancestorField != null)
+                {
+                    fields.Add(parentField);
+                    return ancestorField;
+                }
+            }
+
+            foreach (ChildrenField childrenField in view.Fields.Values.Where(f => f.FieldType == FieldType.Children))
+            {
+                Durados.ParentField parentField = null;
+                Durados.ParentField fkField = null;
+                View parentView = (View)childrenField.GetOtherParentView(out parentField, out fkField);
+                Field ancestorField = GetUserRelatedField(usersView, (View)parentField.ParentView, fields, level, max);
+                if (ancestorField != null)
+                {
+                    fields.Add(childrenField);
+                    return parentField;
+                }
+            }
+
+            return null;
         }
     }
 

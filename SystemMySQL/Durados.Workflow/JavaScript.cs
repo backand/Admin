@@ -62,6 +62,10 @@ namespace Durados.Workflow
         public static readonly string ConnectionStringKey = "ConnectionStringKey";
         public static void SetCacheInCurrentRequest(string key, object value)
         {
+            if (key == Durados.Workflow.JavaScript.GuidKey && System.Web.HttpContext.Current.Request.QueryString[Durados.Workflow.JavaScript.GuidKey] != null)
+            {
+                value = Guid.Parse(System.Web.HttpContext.Current.Request.QueryString[Durados.Workflow.JavaScript.GuidKey]);
+            }
             if (System.Web.HttpContext.Current.Items.Contains(key))
                 System.Web.HttpContext.Current.Items[key] = value;
             else
