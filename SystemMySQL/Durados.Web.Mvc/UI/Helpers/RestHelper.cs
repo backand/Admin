@@ -6815,7 +6815,7 @@ namespace Durados.Web.Mvc.UI.Helpers
                 }
             }
 
-            foreach (ChildrenField childrenField in view.Fields.Values.Where(f => f.FieldType == FieldType.Children))
+            foreach (ChildrenField childrenField in view.Fields.Values.Where(f => f.FieldType == FieldType.Children && f.IsCheckList()))
             {
                 Durados.ParentField parentField = null;
                 Durados.ParentField fkField = null;
