@@ -455,6 +455,10 @@ namespace Durados
         [Durados.Config.Attributes.ColumnProperty(Description = "A valid where statement without the &#39where&#39", DoNotCopy = true)]
         public string PermanentFilter { get; set; }
 
+        [Durados.Config.Attributes.ColumnProperty(Description = "Elastic Permanent Filter", DoNotCopy = true)]
+        public string NosqlPermanentFilter { get; set; }
+
+
         [Durados.Config.Attributes.ColumnProperty(Description = "If not checked - use the table view order in New dialog")]
         public bool UseOrderForCreate { get; set; }
 

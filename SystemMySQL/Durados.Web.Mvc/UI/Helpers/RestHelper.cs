@@ -267,7 +267,7 @@ namespace Durados.Web.Mvc.UI.Helpers
             return System.Web.HttpContext.Current.Request.Url.PathAndQuery;
         }
 
-        public static object Get(this View view, bool withSelectOptions, bool withFilterOptions, int page, int pageSize, Dictionary<string, object>[] filter, string search, Dictionary<string, object>[] sort, out int rowCount, bool deep, BeforeSelectEventHandler beforeSelectCallback, AfterSelectEventHandler afterSelectCallback, bool returnDataView = false, bool descriptive = true, bool useCache = false, bool relatedObjects = false)
+        public static object Get(this View view, bool withSelectOptions, bool withFilterOptions, int page, int pageSize, Dictionary<string, object>[] filter, string search, Dictionary<string, object>[] sort, out int rowCount, bool deep, BeforeSelectEventHandler beforeSelectCallback, AfterSelectEventHandler afterSelectCallback, bool returnDataView = false, bool descriptive = true, bool useCache = false, bool relatedObjects = false, string where = null)
         {
             if (useCache)
             {
@@ -878,6 +878,7 @@ namespace Durados.Web.Mvc.UI.Helpers
                     return "content";
             }
         }
+
 
         public static bool IsLoginFailureException(this Database database, Exception exception)
         {

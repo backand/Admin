@@ -80,7 +80,6 @@ namespace BackAnd.Web.Api.Controllers
                 int rowCount = 0;
 
                 Dictionary<string, object>[] filterArray = null;
-
                 if (!string.IsNullOrEmpty(filter) && filter != "filter" && filter != "false" && filter != "null" && filter != "undefined" && filter != "[{}]")
                 {
                     if (filter == "(Collection)")
@@ -367,8 +366,12 @@ namespace BackAnd.Web.Api.Controllers
                 int rowCount = 0;
 
                 Dictionary<string, object>[] filterArray = null;
+                if (isNosqlFilter(filter))
+                {
+                    where = GetWhere(view, filter);
+                }
 
-                if (!string.IsNullOrEmpty(filter) && filter != "filter" && filter != "false" && filter != "null" && filter != "undefined" && filter != "[{}]")
+                else if (!string.IsNullOrEmpty(filter) && filter != "filter" && filter != "false" && filter != "null" && filter != "undefined" && filter != "[{}]")
                 {
                     if (filter == "(Collection)")
                     {
@@ -415,7 +418,7 @@ namespace BackAnd.Web.Api.Controllers
                 if (search == "null" || search == "undefined")
                     search = null;
 
-                var items = RestHelper.Get(view, withSelectOptions ?? false, withFilterOptions ?? false, pageNumber ?? 1, pageSize ?? 20, filterArray, search, sortArray, out rowCount, deep ?? false, view_BeforeSelect, view_AfterSelect, false, descriptive, false, relatedObjects ?? false);
+                var items = RestHelper.Get(view, withSelectOptions ?? false, withFilterOptions ?? false, pageNumber ?? 1, pageSize ?? 20, filterArray, search, sortArray, out rowCount, deep ?? false, view_BeforeSelect, view_AfterSelect, false, descriptive, false, relatedObjects ?? false, where);
                 
                 return Ok(items);
                 
@@ -433,6 +436,64 @@ namespace BackAnd.Web.Api.Controllers
                 throw new BackAndApiUnexpectedResponseException(exception, this);
 
             }
+        }
+
+        string where = null;
+        protected override void SetPermanentFilter(Durados.Web.Mvc.View view, Durados.DataAccess.Filter filter)
+        {
+            if (where != null)
+            {
+                filter.WhereStatement = " where " + where;
+            }
+            base.SetPermanentFilter(view, filter); ;
+            
+        }
+
+        private string GetWhere(View view, string json)
+        {
+            JavaScriptSerializer jss = new JavaScriptSerializer();
+
+            var data = jss.Deserialize<Dictionary<string, object>>(json);
+
+            if (!(data.Count == 1 && data.ContainsKey("q")))
+            {
+                throw new Durados.DuradosException("filter must start with \"q\"");
+            }
+
+            if (!data.ContainsKey("object"))
+            {
+                var data2 = new Dictionary<string, object>();
+                data2.Add("object", view.JsonName);
+                data2.Add("q", data["q"]);
+                data = data2;
+            }
+
+
+            if (!data.ContainsKey("json"))
+            {
+                var data2 = new Dictionary<string, object>();
+                data2.Add("json", data);
+                data = data2;
+            }
+
+            data.Add("isFilter", true);
+            
+            json = jss.Serialize(data);
+
+            var response = transformJson(json);
+
+            if (!response.ContainsKey("where"))
+            {
+                throw new Durados.DuradosException("Failed to transform nosql filter");
+            }
+
+            return response["where"].ToString();
+
+        }
+
+        private bool isNosqlFilter(string filter)
+        {
+            return !string.IsNullOrEmpty(filter) && filter.Contains("\"q\":");
         }
 
         [BackAnd.Web.Api.Controllers.Filters.ResponseHeaderFilter]

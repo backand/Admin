@@ -88,6 +88,58 @@ namespace BackAnd.Web.Api.Controllers
             return warnings;
         }
 
+        protected virtual Dictionary<string, object> transformJson(string json)
+        {
+            string getNodeUrl = GetNodeUrl() + "/transformJson";
+
+            bulk bulk = new Durados.Web.Mvc.UI.Helpers.bulk();
+
+            JavaScriptSerializer jss = new JavaScriptSerializer();
+
+            var data = jss.Deserialize<Dictionary<string, object>>(json);
+
+            if (!data.ContainsKey("appName"))
+            {
+                string appName = Map.AppName;
+                if (string.IsNullOrEmpty(appName))
+                {
+                    appName = (System.Web.HttpContext.Current.Items[Durados.Web.Mvc.Database.AppName] ?? string.Empty).ToString();
+                }
+                data.Add("appName", appName);
+            }
+
+            json = jss.Serialize(data);
+
+            var tasks = new List<Task<string>>();
+            object responses = null;
+            tasks.Add(Task.Factory.StartNew(() =>
+            {
+                //, { "Authorization", Request.Headers.Authorization.ToString() }
+                var responseStatusAndData = bulk.GetWebResponse("POST", getNodeUrl, json, null, new Dictionary<string, object>() { { "Content-Type", "application/json" }, { "Authorization", Request.Headers.Authorization.ToString() } }, 0);
+                responses = responseStatusAndData.data;
+                return responseStatusAndData.data;
+            }));
+
+            Task.WaitAll(tasks.ToArray());
+
+            Dictionary<string, object> result = null;
+            try
+            {
+                result = jss.Deserialize<Dictionary<string, object>>(responses.ToString());
+            }
+            catch
+            {
+                throw new DuradosException(responses.ToString());
+            }
+
+            LogModel(json, new JavaScriptSerializer().Serialize(result), result.ContainsKey("valid") ? result["valid"].ToString() : string.Empty, "nosql");
+
+            return result;
+
+
+
+        }
+
         protected virtual Dictionary<string, object> Transform(string json, bool getOldSchema = true)
         {
             string getNodeUrl = GetNodeUrl() + "/transform";
@@ -140,7 +192,7 @@ namespace BackAnd.Web.Api.Controllers
 
         }
 
-        private void LogModel(string input, string output, string valid)
+        protected void LogModel(string input, string output, string valid, string action = "model")
         {
             try
             {
@@ -149,7 +201,7 @@ namespace BackAnd.Web.Api.Controllers
                 {
                     appName = (System.Web.HttpContext.Current.Items[Durados.Web.Mvc.Database.AppName] ?? string.Empty).ToString();
                 }
-                LogModel(Map.AppName, Map.Database.GetCurrentUsername(), DateTime.Now, input, output, valid);
+                LogModel(appName, Map.Database.GetCurrentUsername(), DateTime.Now, input, output, valid, action);
             }
             catch (Exception exception)
             {
@@ -190,12 +242,12 @@ namespace BackAnd.Web.Api.Controllers
 
         protected int? logModelId = null;
 
-        private void LogModel(string appName, string username, DateTime timestamp, string input, string output, string valid)
+        private void LogModel(string appName, string username, DateTime timestamp, string input, string output, string valid, string action)
         {
             using (System.Data.SqlClient.SqlConnection connection = new System.Data.SqlClient.SqlConnection(Maps.Instance.DuradosMap.connectionString))
             {
                 connection.Open();
-                string sql = "insert into [backand_model] ([appName], [username], [timestamp], [input], [output], [valid]) values (@appName, @username, @timestamp, @input, @output, @valid); SELECT IDENT_CURRENT(N'backand_model') AS ID";
+                string sql = "insert into [backand_model] ([appName], [username], [timestamp], [input], [output], [valid], [action]) values (@appName, @username, @timestamp, @input, @output, @valid, @action); SELECT IDENT_CURRENT(N'backand_model') AS ID";
 
                 using (System.Data.SqlClient.SqlCommand command = new System.Data.SqlClient.SqlCommand(sql, connection))
                 {
@@ -205,6 +257,7 @@ namespace BackAnd.Web.Api.Controllers
                     command.Parameters.AddWithValue("input", input);
                     command.Parameters.AddWithValue("output", output);
                     command.Parameters.AddWithValue("valid", valid);
+                    command.Parameters.AddWithValue("action", action);
                     object scalar = command.ExecuteScalar();
                     logModelId = Convert.ToInt32(scalar);
                 }
