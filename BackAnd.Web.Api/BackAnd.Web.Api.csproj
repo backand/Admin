@@ -190,6 +190,7 @@
     <Compile Include="Controllers\accountController.cs" />
     <Compile Include="Controllers\Admin\actionTemplateController.cs" />
     <Compile Include="Controllers\Admin\farmController.cs" />
+    <Compile Include="Controllers\Admin\nosqlController.cs" />
     <Compile Include="Controllers\Admin\myAppConnectionController.cs" />
     <Compile Include="Controllers\Admin\myAppsController.cs" />
     <Compile Include="Controllers\Admin\modelController.cs" />

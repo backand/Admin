@@ -1649,6 +1649,8 @@ namespace Durados.Web.Mvc.Config
             //viewView.Fields["Order"].Order = 30;
             viewView.Fields["DisplayColumn"].Order = 40;
             viewView.Fields["PermanentFilter"].Order = 45;
+            if (viewView.Fields.ContainsKey("NosqlPermanentFilter"))
+                viewView.Fields["NosqlPermanentFilter"].Order = 46;
             viewView.Fields["BaseName"].Order = 50;
             viewView.Fields["Description"].Order = 60;
             viewView.Fields["DefaultSort"].Order = 70;
@@ -1800,6 +1802,21 @@ namespace Durados.Web.Mvc.Config
             (viewView.Fields["PermanentFilter"] as ColumnField).DictionaryType = DictionaryType.PlaceHolders;
             //(viewView.Fields["PermanentFilter"] as ColumnField).DictionaryViewFieldName = "Name";
             viewView.Fields["PermanentFilter"].PostLabel = "(add to WHERE Clause)";
+
+            if (viewView.Fields.ContainsKey("NosqlPermanentFilter"))
+            {
+                viewView.Fields["NosqlPermanentFilter"].Seperator = true;
+                viewView.Fields["NosqlPermanentFilter"].ColSpanInDialog = 2;
+                viewView.Fields["NosqlPermanentFilter"].GraphicProperties = "wtextareashort";
+                (viewView.Fields["NosqlPermanentFilter"] as ColumnField).TextHtmlControlType = TextHtmlControlType.TextArea;
+                viewView.Fields["NosqlPermanentFilter"].OrderForEdit = 61;
+                viewView.Fields["NosqlPermanentFilter"].OrderForCreate = 61;
+                viewView.Fields["NosqlPermanentFilter"].DisplayName = "Nosql Permanent Filter";
+                (viewView.Fields["NosqlPermanentFilter"] as ColumnField).CssClass += " field-dic";
+                (viewView.Fields["NosqlPermanentFilter"] as ColumnField).DictionaryType = DictionaryType.PlaceHolders;
+                //(viewView.Fields["PermanentFilter"] as ColumnField).DictionaryViewFieldName = "Name";
+                
+            }
             viewView.Fields["DefaultSort"].OrderForEdit = 70;
             viewView.Fields["DefaultSort"].OrderForCreate = 70;
 
@@ -4901,6 +4918,10 @@ namespace Durados.Web.Mvc.Config
             viewView.Fields["TabCache"].Category = deCategory;
             viewView.Fields["RefreshOnClose"].Category = deCategory;
             viewView.Fields["PermanentFilter"].Category = deCategory;
+            if (viewView.Fields.ContainsKey("NosqlPermanentFilter"))
+            {
+                viewView.Fields["NosqlPermanentFilter"].Category = deCategory;
+            }
             if (viewView.Fields.ContainsKey("OpenSingleRow"))
             {
                 viewView.Fields["OpenSingleRow"].Category = deCategory;

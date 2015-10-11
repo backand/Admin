@@ -19,6 +19,9 @@ namespace Durados
 
         [Durados.Config.Attributes.ColumnProperty()]
         public string SQL { get; set; }
+        
+        [Durados.Config.Attributes.ColumnProperty()]
+        public string NoSQL { get; set; }
 
         [Durados.Config.Attributes.ColumnProperty()]
         public string Parameters { get; set; }
