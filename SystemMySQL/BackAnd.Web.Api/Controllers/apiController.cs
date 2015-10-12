@@ -88,7 +88,7 @@ namespace BackAnd.Web.Api.Controllers
             return warnings;
         }
 
-        protected virtual Dictionary<string, object> transformJson(string json)
+        protected virtual Dictionary<string, object> transformJson(string json, bool shouldGeneralize = false)
         {
             string getNodeUrl = GetNodeUrl() + "/transformJson";
 
@@ -106,6 +106,10 @@ namespace BackAnd.Web.Api.Controllers
                     appName = (System.Web.HttpContext.Current.Items[Durados.Web.Mvc.Database.AppName] ?? string.Empty).ToString();
                 }
                 data.Add("appName", appName);
+            }
+            if (shouldGeneralize)
+            {
+                data.Add("shouldGeneralize", shouldGeneralize);
             }
 
             json = jss.Serialize(data);
@@ -138,6 +142,27 @@ namespace BackAnd.Web.Api.Controllers
 
 
 
+        }
+
+        protected void ReplaceVariables(Dictionary<string, object> result)
+        {
+            if (result.ContainsKey("values") && result.ContainsKey("variables") && result.ContainsKey("str") && result.ContainsKey("where"))
+            {
+                foreach (string variable in (ArrayList)result["variables"])
+                {
+                    string value = ((Dictionary<string, object>)result["values"])[variable].ToString();
+                    if (!(value.StartsWith("'") && value.EndsWith("'")))
+                    {
+                        decimal d = 0;
+                        if (!decimal.TryParse(value, out d))
+                        {
+                            value = value.Pad("'");
+                        }
+                    }
+                    result["str"] = result["str"].ToString().Replace(variable, value);
+                    result["where"] = result["where"].ToString().Replace(variable, value);
+                }
+            }
         }
 
         protected virtual Dictionary<string, object> Transform(string json, bool getOldSchema = true)

@@ -449,8 +449,23 @@ namespace BackAnd.Web.Api.Controllers
             
         }
 
-        private string GetWhere(View view, string json)
+        private string GetWhere(View view, string json, bool useCache = true)
         {
+            if (useCache)
+            {
+                try
+                {
+                    var cacheResponse = GetWhereFromCache(view, json);
+
+                    if (cacheResponse != null)
+                    {
+                        ReplaceVariables(cacheResponse);
+                        return cacheResponse["where"].ToString();
+                    }
+                }
+                catch { }
+            }
+
             JavaScriptSerializer jss = new JavaScriptSerializer();
 
             var data = jss.Deserialize<Dictionary<string, object>>(json);
@@ -480,15 +495,37 @@ namespace BackAnd.Web.Api.Controllers
             
             json = jss.Serialize(data);
 
-            var response = transformJson(json);
+            var response = transformJson(json, useCache);
 
             if (!response.ContainsKey("where"))
             {
                 throw new Durados.DuradosException("Failed to transform nosql filter");
             }
 
+            if (useCache)
+            {
+                SetWhereToCache(view, json, response);
+            }
+
+            if (useCache)
+            {
+                ReplaceVariables(response);
+            }
+            
+
             return response["where"].ToString();
 
+        }
+
+        private void SetWhereToCache(View view, string json, Dictionary<string, object> response)
+        {
+            NoSqlFilterCache.Set(Map.AppName, view, json, response);
+        }
+
+        
+        private Dictionary<string, object> GetWhereFromCache(View view, string json)
+        {
+            return NoSqlFilterCache.Get(Map.AppName, view, json);
         }
 
         private bool isNosqlFilter(string filter)

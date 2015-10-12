@@ -6603,6 +6603,73 @@ namespace Durados.Web.Mvc.UI.Helpers
         }
     }
 
+    public class NoSqlFilterCache
+    {
+        static string key = "NoSqlFilter";
+        static NoSqlFilterCache()
+        {
+           
+        }
+
+        private static Map GetMap(string appName)
+        {
+            Map map = null;
+
+            if (appName == Maps.DuradosAppName)
+            {
+                map = Maps.Instance.DuradosMap;
+            }
+            else
+            {
+                map = Maps.Instance.GetMap(appName);
+                if (map == null || map == Maps.Instance.DuradosMap)
+                {
+                    throw new AppNotFoundException(appName);
+                }
+            }
+
+            return map;
+        }
+
+        public static Dictionary<string, object> Get(string appName, View view, string json)
+        {
+            Map map = GetMap(appName);
+            if (!map.AllKindOfCache.ContainsKey(key))
+            {
+                map.AllKindOfCache.Add(key, new Dictionary<string, object>());
+            }
+            if (!map.AllKindOfCache[key].ContainsKey(view.JsonName))
+            {
+                ((Dictionary<string, object>)map.AllKindOfCache[key]).Add(view.JsonName, new Dictionary<string, object>());
+                return null;
+            }
+            if (((Dictionary<string, object>)((Dictionary<string, object>)map.AllKindOfCache[key])[view.JsonName]).ContainsKey(System.Web.Helpers.Crypto.SHA256(json)))
+            {
+                return (Dictionary<string, object>)((Dictionary<string, object>)((Dictionary<string, object>)map.AllKindOfCache[key])[view.JsonName])[System.Web.Helpers.Crypto.SHA256(json)];
+            }
+            return null;
+            
+        }
+
+        public static void Set(string appName, View view, string json, Dictionary<string, object> result)
+        {
+            Map map = GetMap(appName);
+            if (!map.AllKindOfCache.ContainsKey(key))
+            {
+                map.AllKindOfCache.Add(key, new Dictionary<string, object>());
+            }
+            if (!map.AllKindOfCache[key].ContainsKey(view.JsonName))
+            {
+                ((Dictionary<string, object>)map.AllKindOfCache[key]).Add(view.JsonName, new Dictionary<string, object>());
+            }
+            if (!((Dictionary<string, object>)((Dictionary<string, object>)map.AllKindOfCache[key])[view.JsonName]).ContainsKey(System.Web.Helpers.Crypto.SHA256(json)))
+            {
+                ((Dictionary<string, object>)((Dictionary<string, object>)map.AllKindOfCache[key])[view.JsonName]).Add(System.Web.Helpers.Crypto.SHA256(json), result);
+            }
+            
+
+        }
+    }
 
     public class RefreshToken
     {
