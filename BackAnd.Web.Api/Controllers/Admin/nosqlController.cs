@@ -52,13 +52,7 @@ namespace BackAnd.Web.Api.Controllers
                 {
                     return Ok(new { where = transformResult["where"] });
                 }
-
-                return Ok(new { sql = transformResult["str"] });
-            }
-            catch (WebException exception)
-            {
-                return ResponseMessage(Request.CreateResponse((HttpStatusCode)(int)exception.Status, exception.Message));
-
+                return Ok(new { valid = "always", sql = transformResult["str"] });
             }
             catch (Exception exception)
             {
@@ -66,8 +60,8 @@ namespace BackAnd.Web.Api.Controllers
                 {
                     exception = exception.InnerException;
                 }
-                throw new BackAndApiUnexpectedResponseException(exception, this);
-
+                return Ok(new { valid = "never", warnings = new string[1] { exception.Message } });
+                
             }
         }
 
