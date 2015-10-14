@@ -6771,6 +6771,8 @@ namespace Durados.Web.Mvc.UI.Helpers
         }
 
         const string SysUsername = "{{sys::username}}";
+        const string SysRole = "{{sys::role}}";
+        const string AdminRole = "Admin";
         private View GetUsersView(View view, string usersObjectName)
         {
             if (view.Name == usersObjectName)
@@ -6791,7 +6793,7 @@ namespace Durados.Web.Mvc.UI.Helpers
             return userView.Fields.ContainsKey(emailFieldName);
         }
 
-        public Dictionary<string, object> GetWhere(View view, string usersObjectName, string emailFieldName, int maxLevel)
+        public Dictionary<string, object> GetWhere(View view, string usersObjectName, string emailFieldName, int maxLevel, bool showAllForAdmin)
         {
             View usersView = GetUsersView(view, usersObjectName);
             if (usersView == null)
@@ -6809,21 +6811,26 @@ namespace Durados.Web.Mvc.UI.Helpers
 
             ISqlTextBuilder sqlTextBuilder = view.Database.GetSqlTextBuilder();
 
-            string sql = GetWhere(fields, usersObjectName, emailFieldName, fields.Count - 1, string.Empty, sqlTextBuilder);
-            string nosql = "{" + GetNoSql(fields, usersObjectName, emailFieldName, fields.Count - 1, string.Empty) + "}";
+            string sql = GetWhere(fields, usersObjectName, emailFieldName, fields.Count - 1, string.Empty, sqlTextBuilder, showAllForAdmin);
+            if (showAllForAdmin)
+            {
+                sql = "(" + string.Format(" '{0}' = '{1}'", AdminRole, SysRole) + ") or (" + sql + ")";
+            }
+            string nosql = "{" + GetNoSql(fields, usersObjectName, emailFieldName, fields.Count - 1, string.Empty, showAllForAdmin) + "}";
             return new Dictionary<string, object>() { { "sql", sql }, { "nosql", nosql } };
         }
 
-        private string GetWhere(List<Field> fields, string usersObjectName, string emailFieldName, int i, string where, ISqlTextBuilder sqlTextBuilder)
+        private string GetWhere(List<Field> fields, string usersObjectName, string emailFieldName, int i, string where, ISqlTextBuilder sqlTextBuilder, bool showAllForAdmin)
         {
             string next = null;
             if (i == 0)
             {
                 next = string.Format("{0} = '{1}'", sqlTextBuilder.EscapeDbObject(usersObjectName) + sqlTextBuilder.DbTableColumnSeperator + sqlTextBuilder.EscapeDbObject(emailFieldName), SysUsername);
+                
             }
             else
             {
-                next = GetWhere(fields, usersObjectName, emailFieldName, i - 1, where, sqlTextBuilder);
+                next = GetWhere(fields, usersObjectName, emailFieldName, i - 1, where, sqlTextBuilder, showAllForAdmin);
             }
             Field field = fields[i];
             if (field.FieldType == FieldType.Parent)
@@ -6848,7 +6855,7 @@ namespace Durados.Web.Mvc.UI.Helpers
             return where;
         }
 
-        private string GetNoSql(List<Field> fields, string usersObjectName, string emailFieldName, int i, string nosql)
+        private string GetNoSql(List<Field> fields, string usersObjectName, string emailFieldName, int i, string nosql, bool showAllForAdmin)
         {
             string next = null;
             if (i == 0)
@@ -6857,7 +6864,7 @@ namespace Durados.Web.Mvc.UI.Helpers
             }
             else
             {
-                next = GetNoSql(fields, usersObjectName, emailFieldName, i - 1, nosql);
+                next = GetNoSql(fields, usersObjectName, emailFieldName, i - 1, nosql, showAllForAdmin);
             }
 
             Field field = fields[i];
@@ -6865,23 +6872,46 @@ namespace Durados.Web.Mvc.UI.Helpers
             {
                 ParentField parentField = (ParentField)field;
                 //where += string.Format("{0} in (select {1} from {2} where {3})", sqlTextBuilder.EscapeDbObject(parentField.View.Name) + sqlTextBuilder.DbTableColumnSeperator + sqlTextBuilder.EscapeDbObject(parentField.GetColumnsNames()[0]), sqlTextBuilder.EscapeDbObject(parentField.ParentView.Name) + sqlTextBuilder.DbTableColumnSeperator + sqlTextBuilder.EscapeDbObject(parentField.ParentView.GetPkColumnNames()[0]), sqlTextBuilder.EscapeDbObject(parentField.ParentView.Name), next);
-                nosql += string.Format("\"object\":\"{0}\",\"q\":{{\"{1}\":{{\"$in\":{{{2},\"fields\":[\"{3}\"]}}}}}}", 
-                    parentField.View.JsonName, 
+                string q = string.Format("\"{0}\":{{\"$in\":{{{1},\"fields\":[\"{2}\"]}}}}",
                     parentField.JsonName, 
                     next, 
                     parentField.ParentView.GetFieldByColumnNames(parentField.ParentView.GetPkColumnNames()[0]).JsonName);
+
+                if (showAllForAdmin)
+                {
+                    if (i == fields.Count - 1)
+                    {
+                        q = string.Format("\"$or\":[{{\"'{0}'\":\"'{1}'\"}}, {{", SysRole, AdminRole) + q + "}]";
+                    }
+                }
+
+                nosql += string.Format("\"object\":\"{0}\",\"q\":{{{1}}}", 
+                    parentField.View.JsonName, 
+                    q);
             }
             else if (field.FieldType == FieldType.Children)
             {
                 ChildrenField childrenField = (ChildrenField)field;
-                nosql += string.Format("\"object\":\"{0}\",\"q\":{{\"{1}\":{{\"$in\":{{\"object\":\"{2}\",\"q\":{{\"{3}\":{{\"$in\":{{{4},\"fields\":[\"{5}\"]}}}}}},\"fields\":[\"{6}\"]}}}}}}", 
-                    childrenField.View.JsonName, 
-                    childrenField.GetColumnsNames()[0], 
-                    childrenField.ChildrenView.Name, 
+
+                string q = string.Format("\"{0}\":{{\"$in\":{{\"object\":\"{1}\",\"q\":{{\"{2}\":{{\"$in\":{{{3},\"fields\":[\"{4}\"]}}}}}},\"fields\":[\"{5}\"]}}}}",
+                    childrenField.GetColumnsNames()[0],
+                    childrenField.ChildrenView.Name,
                     childrenField.GetFirstNonEquivalentParentField().GetColumnsNames()[0],
                     next,
                     childrenField.GetFirstNonEquivalentParentField().ParentView.GetPkColumnNames()[0],
                     childrenField.GetEquivalentParentField().GetColumnsNames()[0]);
+
+                if (showAllForAdmin)
+                {
+                    if (i == fields.Count - 1)
+                    {
+                        q = string.Format("\"$or\":[{{\"'{0}'\":\"'{1}'\"}}, {{", SysRole, AdminRole) + q + "}]";
+                    }
+                }
+
+                nosql += string.Format("\"object\":\"{0}\",\"q\":{{{1}}}", 
+                    childrenField.View.JsonName, 
+                    q);
 
                 //nosql += string.Format("{0} in (select {1} from {2} where {3} in (select {4} from {5}  where {6}))",
                 //    childrenField.GetColumnsNames()[0],

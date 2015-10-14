@@ -65,6 +65,10 @@ namespace BackAnd.Web.Api.Controllers
                 {
                     sql = transformResult["str"];
                 }
+                if (sql != null)
+                {
+                    sql = sql.ToString().Replace("'\'", "'").Replace("\''", "'");
+                }
                 return Ok(new { valid = "always", sql = sql });
             }
             catch (Exception exception)
