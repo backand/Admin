@@ -2012,7 +2012,7 @@ namespace BackAnd.Web.Api.Controllers
 
         [Route("1/table/predefined/{name}")]
         [HttpGet]
-        public virtual IHttpActionResult predefined(string name, string usersObjectName = null, string emailFieldName = null, int? maxLevel = null)
+        public virtual IHttpActionResult predefined(string name, string usersObjectName = null, string emailFieldName = null, int? maxLevel = null, bool? showAllForAdmin = null)
         {
             try
             {
@@ -2036,7 +2036,7 @@ namespace BackAnd.Web.Api.Controllers
 
                 try
                 {
-                    Dictionary<string, object> where = new UserRelation().GetWhere(view, usersObjectName ?? "users", emailFieldName ?? "email", maxLevel ?? 3);
+                    Dictionary<string, object> where = new UserRelation().GetWhere(view, usersObjectName ?? "users", emailFieldName ?? "email", maxLevel ?? 3, showAllForAdmin ?? true);
                     dictionary.Add("valid", "always");
                     dictionary.Add("sql", where["sql"]);
                     dictionary.Add("nosql", where["nosql"]);
