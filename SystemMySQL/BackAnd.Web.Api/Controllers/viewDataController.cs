@@ -449,7 +449,7 @@ namespace BackAnd.Web.Api.Controllers
             
         }
 
-        private string GetWhere(View view, string json, bool useCache = true)
+        private string GetWhere(View view, string json, bool useCache = false)
         {
             if (useCache)
             {

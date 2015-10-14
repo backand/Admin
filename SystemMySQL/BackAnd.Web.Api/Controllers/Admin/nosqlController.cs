@@ -48,11 +48,24 @@ namespace BackAnd.Web.Api.Controllers
 
                 Dictionary<string, object> transformResult = transformJson(json);
 
+                object sql = null;
+                if (transformResult == null || !transformResult.ContainsKey("str"))
+                {
+                    return Ok(new { valid = "never", warnings = new string[1] { "Failed to transform" } });
+                }
                 if (whereOnly)
                 {
-                    return Ok(new { where = transformResult["where"] });
+                    if (!transformResult.ContainsKey("where"))
+                    {
+                        return Ok(new { valid = "never", warnings = new string[1] { "Failed to transform where condition" } });
+                    }
+                    sql = transformResult["where"];
                 }
-                return Ok(new { valid = "always", sql = transformResult["str"] });
+                else
+                {
+                    sql = transformResult["str"];
+                }
+                return Ok(new { valid = "always", sql = sql });
             }
             catch (Exception exception)
             {

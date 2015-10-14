@@ -136,7 +136,14 @@ namespace BackAnd.Web.Api.Controllers
                 throw new DuradosException(responses.ToString());
             }
 
-            LogModel(json, new JavaScriptSerializer().Serialize(result), result.ContainsKey("valid") ? result["valid"].ToString() : string.Empty, "nosql");
+            if (result == null)
+            {
+                LogModel(json, string.Empty, string.Empty, "nosql");
+            }
+            else
+            {
+                LogModel(json, new JavaScriptSerializer().Serialize(result), result.ContainsKey("valid") ? result["valid"].ToString() : string.Empty, "nosql");
+            }
 
             return result;
 

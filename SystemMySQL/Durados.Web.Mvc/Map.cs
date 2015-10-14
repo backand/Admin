@@ -3489,9 +3489,12 @@ namespace Durados.Web.Mvc
             }
             catch { }
         }
-       
+
         public void WriteConfigToCloud(DataSet ds, string filename)
         {
+            if (Maps.IsInMemoryMode())
+                return;
+
             WriteConfigToCloud(ds, filename, true);
         }
         public void WriteConfigToCloud(DataSet ds, string filename, bool async)
@@ -4309,6 +4312,16 @@ namespace Durados.Web.Mvc
     public class Maps
     {
         private static Maps instance;
+
+        public static string GetInMemoryKey()
+        {
+            return System.Web.HttpContext.Current.Request.Headers["TestKey"];
+        }
+
+        public static bool IsInMemoryMode()
+        {
+            return GetInMemoryKey() != null;
+        }
 
         private Maps()
         {
@@ -5303,7 +5316,14 @@ namespace Durados.Web.Mvc
                 
             Map map = null;
 
-            if (maps.ContainsKey(appName))
+            if (IsInMemoryMode())
+            {
+                if (maps.ContainsKey(appName + GetInMemoryKey()))
+                {
+                    map = maps[appName + GetInMemoryKey()];
+                }
+            }
+            else if (maps.ContainsKey(appName))
             {
                 map = maps[appName];
             }
@@ -5327,7 +5347,14 @@ namespace Durados.Web.Mvc
 
                 if (!newStructure)
                 {
-                    AddMap(appName, map);
+                    if (IsInMemoryMode())
+                    {
+                        AddMap(appName + GetInMemoryKey(), map);
+                    }
+                    else
+                    {
+                        AddMap(appName, map);
+                    }
                 }
             }
 
