@@ -6791,7 +6791,7 @@ namespace Durados.Web.Mvc.UI.Helpers
             return userView.Fields.ContainsKey(emailFieldName);
         }
 
-        public string GetWhere(View view, string usersObjectName, string emailFieldName, int maxLevel)
+        public Dictionary<string, object> GetWhere(View view, string usersObjectName, string emailFieldName, int maxLevel)
         {
             View usersView = GetUsersView(view, usersObjectName);
             if (usersView == null)
@@ -6809,7 +6809,9 @@ namespace Durados.Web.Mvc.UI.Helpers
 
             ISqlTextBuilder sqlTextBuilder = view.Database.GetSqlTextBuilder();
 
-            return GetWhere(fields, usersObjectName, emailFieldName, fields.Count - 1, string.Empty, sqlTextBuilder);
+            string sql = GetWhere(fields, usersObjectName, emailFieldName, fields.Count - 1, string.Empty, sqlTextBuilder);
+            string nosql = "{" + GetNoSql(fields, usersObjectName, emailFieldName, fields.Count - 1, string.Empty) + "}";
+            return new Dictionary<string, object>() { { "sql", sql }, { "nosql", nosql } };
         }
 
         private string GetWhere(List<Field> fields, string usersObjectName, string emailFieldName, int i, string where, ISqlTextBuilder sqlTextBuilder)
@@ -6844,6 +6846,54 @@ namespace Durados.Web.Mvc.UI.Helpers
             }
 
             return where;
+        }
+
+        private string GetNoSql(List<Field> fields, string usersObjectName, string emailFieldName, int i, string nosql)
+        {
+            string next = null;
+            if (i == 0)
+            {
+                next = string.Format("\"object\":\"{0}\",\"q\":{{\"{1}\":{{\"$eq\":\"'{2}'\"}}}}", usersObjectName, emailFieldName, SysUsername);
+            }
+            else
+            {
+                next = GetNoSql(fields, usersObjectName, emailFieldName, i - 1, nosql);
+            }
+
+            Field field = fields[i];
+            if (field.FieldType == FieldType.Parent)
+            {
+                ParentField parentField = (ParentField)field;
+                //where += string.Format("{0} in (select {1} from {2} where {3})", sqlTextBuilder.EscapeDbObject(parentField.View.Name) + sqlTextBuilder.DbTableColumnSeperator + sqlTextBuilder.EscapeDbObject(parentField.GetColumnsNames()[0]), sqlTextBuilder.EscapeDbObject(parentField.ParentView.Name) + sqlTextBuilder.DbTableColumnSeperator + sqlTextBuilder.EscapeDbObject(parentField.ParentView.GetPkColumnNames()[0]), sqlTextBuilder.EscapeDbObject(parentField.ParentView.Name), next);
+                nosql += string.Format("\"object\":\"{0}\",\"q\":{{\"{1}\":{{\"$in\":{{{2},\"fields\":[\"{3}\"]}}}}}}", 
+                    parentField.View.JsonName, 
+                    parentField.JsonName, 
+                    next, 
+                    parentField.ParentView.GetFieldByColumnNames(parentField.ParentView.GetPkColumnNames()[0]).JsonName);
+            }
+            else if (field.FieldType == FieldType.Children)
+            {
+                ChildrenField childrenField = (ChildrenField)field;
+                nosql += string.Format("\"object\":\"{0}\",\"q\":{{\"{1}\":{{\"$in\":{{\"object\":\"{2}\",\"q\":{{\"{3}\":{{\"$in\":{{{4},\"fields\":[\"{5}\"]}}}}}},\"fields\":[\"{6}\"]}}}}}}", 
+                    childrenField.View.JsonName, 
+                    childrenField.GetColumnsNames()[0], 
+                    childrenField.ChildrenView.Name, 
+                    childrenField.GetFirstNonEquivalentParentField().GetColumnsNames()[0],
+                    next,
+                    childrenField.GetFirstNonEquivalentParentField().ParentView.GetPkColumnNames()[0],
+                    childrenField.GetEquivalentParentField().GetColumnsNames()[0]);
+
+                //nosql += string.Format("{0} in (select {1} from {2} where {3} in (select {4} from {5}  where {6}))",
+                //    childrenField.GetColumnsNames()[0],
+                //    childrenField.GetEquivalentParentField().GetColumnsNames()[0],
+                //    childrenField.ChildrenView.Name,
+                //    childrenField.GetFirstNonEquivalentParentField().GetColumnsNames()[0],
+                //    childrenField.GetFirstNonEquivalentParentField().ParentView.GetPkColumnNames()[0],
+                //    childrenField.GetFirstNonEquivalentParentField().ParentView.Name,
+                //    next);
+            }
+
+            return nosql;
         }
 
         private Field GetUserRelatedField(View usersView, View view, List<Field> fields, int level, int max)

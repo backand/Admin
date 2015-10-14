@@ -2036,9 +2036,10 @@ namespace BackAnd.Web.Api.Controllers
 
                 try
                 {
-                    string where = new UserRelation().GetWhere(view, usersObjectName ?? "users", emailFieldName ?? "email", maxLevel ?? 3);
+                    Dictionary<string, object> where = new UserRelation().GetWhere(view, usersObjectName ?? "users", emailFieldName ?? "email", maxLevel ?? 3);
                     dictionary.Add("valid", "always");
-                    dictionary.Add("where", where);
+                    dictionary.Add("sql", where["sql"]);
+                    dictionary.Add("nosql", where["nosql"]);
                 }
                 catch (UserRelation.UserRelationException exception)
                 {
