@@ -121,6 +121,13 @@ namespace BackAnd.Web.Api.Controllers
                 //, { "Authorization", Request.Headers.Authorization.ToString() }
                 var responseStatusAndData = bulk.GetWebResponse("POST", getNodeUrl, json, null, new Dictionary<string, object>() { { "Content-Type", "application/json" }, { "Authorization", Request.Headers.Authorization.ToString() } }, 0);
                 responses = responseStatusAndData.data;
+                if (string.IsNullOrEmpty(responseStatusAndData.data))
+                {
+                    if (responseStatusAndData.GetHeaders()["error"] != null && !string.IsNullOrEmpty(responseStatusAndData.GetHeaders()["error"].ToString()))
+                    {
+                        throw new DuradosException(responseStatusAndData.GetHeaders()["error"].ToString());
+                    }
+                }
                 return responseStatusAndData.data;
             }));
 
