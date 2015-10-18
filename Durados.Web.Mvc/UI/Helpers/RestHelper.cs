@@ -5143,7 +5143,7 @@ namespace Durados.Web.Mvc.UI.Helpers
                 using (var responseStream = responseTask.Result.GetResponseStream())
                 {
                     var reader = new StreamReader(responseStream);
-                    return new ResponseStatusAndData() { status = (int)((HttpWebResponse)responseTask.Result).StatusCode, data = reader.ReadToEnd(), index = index };
+                    return new ResponseStatusAndData() { status = (int)((HttpWebResponse)responseTask.Result).StatusCode, data = reader.ReadToEnd(), index = index, headers = ((HttpWebResponse)responseTask.Result).Headers };
                 }
             }
             catch (Exception exception)
@@ -5180,7 +5180,12 @@ namespace Durados.Web.Mvc.UI.Helpers
             public int status { get; set; }
             public string data { get; set; }
             internal int index { get; set; }
+            internal System.Collections.Specialized.NameValueCollection headers { get; set; }
 
+            public System.Collections.Specialized.NameValueCollection GetHeaders()
+            {
+                return headers;
+            }
         }
 
     }
