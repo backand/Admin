@@ -950,19 +950,31 @@ namespace BackAnd.Web.Api.Controllers
             }
             catch (Exception exception)
             {
-                Map.Logger.Log("user", "signin", exception.Source, exception, 1, null);
-                if (string.IsNullOrEmpty(returnAddress))
+                try
                 {
-                    returnAddress = GetReturnAddress();
-                }
+                    try
+                    {
+                        Map.Logger.Log("user", "signin", exception.Source, exception, 1, null);
+                    }
+                    catch { }
+                    if (string.IsNullOrEmpty(returnAddress))
+                    {
+                        returnAddress = GetReturnAddress();
+                    }
 
-                if (!string.IsNullOrEmpty(returnAddress))
-                {
-                    return Redirect(GetErrorUrl(returnAddress, exception.Message, provider));
+                    if (!string.IsNullOrEmpty(returnAddress))
+                    {
+                        return Redirect(GetErrorUrl(returnAddress, exception.Message, provider));
+                    }
+                    else
+                    {
+                        return BadRequest(exception.Message);
+                    }
                 }
-                else
+                catch (Exception e)
                 {
-                    return BadRequest(exception.Message);
+                    return BadRequest(e.Message + ": " + e.StackTrace + (e.InnerException != null ? "||| message: " + e.InnerException.Message : string.Empty));
+
                 }
             }
         }
