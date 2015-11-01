@@ -718,7 +718,14 @@ namespace Durados
 
         public override string GetDefaultJsonName()
         {
-            return DisplayName.ReplaceNonAlphaNumeric2();
+            if (View.Database.IsConfig)
+            {
+                return DisplayName.ReplaceNonAlphaNumeric2();
+            }
+            else
+            {
+                return string.Join(string.Empty, GetColumnsNames()).ReplaceNonAlphaNumeric2();
+            }
         }
 
         protected override object GetDbDefaultValue()
