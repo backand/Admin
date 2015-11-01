@@ -209,7 +209,14 @@ namespace Durados
 
         protected override string GetInitialDisplayName()
         {
-            return GetFromCache() ?? ChildrenView.DisplayName;
+            if (View.Database.IsConfig)
+            {
+                return GetFromCache() ?? ChildrenView.DisplayName;
+            }
+            else
+            {
+                return GetFromCache() ?? ChildrenView.Name.ReplaceNonAlphaNumeric2();
+            }
         }
 
         private string GetFromCache()
