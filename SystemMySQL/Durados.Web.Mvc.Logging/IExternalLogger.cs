@@ -22,7 +22,7 @@ namespace Durados.Web.Mvc.Logging
         {
             try
             {
-                if (Convert.ToBoolean(System.Configuration.ConfigurationManager.AppSettings["LogAnalitics"] ?? "false"))
+                if (Convert.ToBoolean(System.Configuration.ConfigurationManager.AppSettings["LogAnalytics"] ?? "false"))
                     return new SegmentAnalytics(logger);
             }
             catch { }

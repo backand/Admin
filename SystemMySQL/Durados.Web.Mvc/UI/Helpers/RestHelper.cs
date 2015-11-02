@@ -3840,7 +3840,7 @@ namespace Durados.Web.Mvc.UI.Helpers
                     }
                     else
                     {
-                        SendSignupToAnalitics(appName, username,parameters);
+                        SendSignupToAnalytics(appName, username,parameters);
                         return new SignUpResults() { AppName = appName, Username = username, Status = SignUpStatus.PendingAdminApproval };
                     }
                 }
@@ -3863,7 +3863,7 @@ namespace Durados.Web.Mvc.UI.Helpers
                 }
 
                 SignUpResults signUpResults = new SignUpResults() { AppName = appName, Username = username };
-                SendSignupToAnalitics(appName, username,parameters);
+                SendSignupToAnalytics(appName, username,parameters);
                 if (isPending)
                 {
                     if (IsSignupEmailVerification(appName, isSignupEmailVerification))
@@ -3905,7 +3905,7 @@ namespace Durados.Web.Mvc.UI.Helpers
             }
         }
 
-        private  void SendSignupToAnalitics(string appName, string username,Dictionary<string,object> parameters)
+        private  void SendSignupToAnalytics(string appName, string username,Dictionary<string,object> parameters)
         {
             string provider = !parameters.ContainsKey("socialProfile") ? "Unknown" : (parameters["socialProfile"] as Durados.Web.Mvc.UI.Helpers.Social.Profile).Provider; 
            
