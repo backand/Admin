@@ -51,6 +51,8 @@ namespace BackAnd.Web.Api
                 });
             }
 
+            Analytics.Init();
+
         }
 
         public static OAuthAuthorizationServerOptions OAuthOptions { get; private set; }

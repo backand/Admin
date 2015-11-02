@@ -3052,6 +3052,38 @@ namespace Durados.Web.Mvc.UI.Helpers
             return new Stat();
         }
     }
+
+    public static class Analytics
+    {
+
+
+        private static Durados.Web.Mvc.Logging.IExternalAnalytics xLogger;
+
+        public static void Log(Durados.Web.Mvc.Logging.ExternalAnalyticsAction eventName,string username, Dictionary<string, object> dict)
+        {
+            try
+            {
+                if (!dict.ContainsKey(Database.AppName) || dict[Database.AppName].ToString() != Maps.DuradosAppName)
+                {
+                    Maps.Instance.DuradosMap.Logger.Log("Anaytics", "Log-Signup", "Log", "missing app name", null, 1, null, DateTime.Now);
+                    return;
+                }
+                  
+
+                if (xLogger != null)
+                    xLogger.Log(eventName, null, username, dict, true);
+            }
+            catch (Exception exception){
+                Maps.Instance.DuradosMap.Logger.Log("Anaytics","Log-Signup","Log",exception,1,null,DateTime.Now);
+            }
+
+        }
+
+        public static void Init()
+        {
+            xLogger = Durados.Web.Mvc.Logging.ExternalAnalyticsFactory.GetLogger(Durados.Web.Mvc.Maps.Instance.DuradosMap.Logger, 1);
+        }
+    }
     public class Sync
     {
         public virtual Dictionary<string, object> AddNewViewsAndSyncAll(Map map)
@@ -3808,6 +3840,7 @@ namespace Durados.Web.Mvc.UI.Helpers
                     }
                     else
                     {
+                        SendSignupToAnalitics(appName, username,parameters);
                         return new SignUpResults() { AppName = appName, Username = username, Status = SignUpStatus.PendingAdminApproval };
                     }
                 }
@@ -3830,6 +3863,7 @@ namespace Durados.Web.Mvc.UI.Helpers
                 }
 
                 SignUpResults signUpResults = new SignUpResults() { AppName = appName, Username = username };
+                SendSignupToAnalitics(appName, username,parameters);
                 if (isPending)
                 {
                     if (IsSignupEmailVerification(appName, isSignupEmailVerification))
@@ -3869,6 +3903,16 @@ namespace Durados.Web.Mvc.UI.Helpers
             {
                 throw new DuradosException("An unexpected signup  exception occured", exception);
             }
+        }
+
+        private  void SendSignupToAnalitics(string appName, string username,Dictionary<string,object> parameters)
+        {
+            string provider = !parameters.ContainsKey("socialProfile") ? "Unknown" : (parameters["socialProfile"] as Durados.Web.Mvc.UI.Helpers.Social.Profile).Provider; 
+           
+            Analytics.Log(Durados.Web.Mvc.Logging.ExternalAnalyticsAction.SocialSignedUp,username, new Dictionary<string, object>() { 
+                             { Durados.Web.Mvc.Logging.ExternalAnalyticsTraitsKey.name.ToString(), username } 
+                            , { Durados.Web.Mvc.Logging.ExternalAnalyticsTraitsKey.provider.ToString(), provider } 
+                            ,{ Durados.Database.AppName, appName}});
         }
 
         private bool IsSignupEmailVerification(string appName, bool? isSignupEmailVerification)
@@ -5964,6 +6008,10 @@ namespace Durados.Web.Mvc.UI.Helpers
             {
                 get { return dictionary["parameters"].ToString(); }
             }
+            public abstract string Provider
+            {
+                get;
+            }
         }
 
         public class Google : Social
@@ -6210,7 +6258,10 @@ namespace Durados.Web.Mvc.UI.Helpers
                     get { return ((Dictionary<string, object>)((object[])dictionary["emails"])[0])["value"].ToString(); }
                 }
 
-
+                public override string Provider
+                {
+                    get { return "google"; }
+                }
             }
 
             public class GoogleException : SocialException
@@ -6481,7 +6532,10 @@ namespace Durados.Web.Mvc.UI.Helpers
                     get { return GetPart("email"); }
                 }
 
-
+                public override string Provider
+                {
+                    get { return "facebook"; }
+                }
             }
 
             public class FacebookException : SocialException
@@ -6685,7 +6739,10 @@ namespace Durados.Web.Mvc.UI.Helpers
                         return null;
                     }
                 }
-
+                public override string Provider
+                {
+                    get { return "github"; }
+                }
 
             }
 

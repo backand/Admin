@@ -636,6 +636,9 @@ namespace BackAnd.Web.Api.Controllers
                 {
                     Durados.Web.Mvc.UI.Helpers.Account account = new Durados.Web.Mvc.UI.Helpers.Account(this);
                     account.InviteAdminAfterSignUp(email);
+                    Durados.Web.Mvc.UI.Helpers.Analytics.Log(Durados.Web.Mvc.Logging.ExternalAnalyticsAction.SignedUp, email,new Dictionary<string, object>() { 
+                        { Durados.Database.AppName, Durados.Web.Mvc.Maps.DuradosAppName }
+                        , { Durados.Web.Mvc.Logging.ExternalAnalyticsTraitsKey.name.ToString(), fullName } });
                     return Ok();
                 }
                 else

@@ -340,6 +340,16 @@ namespace Durados.Web.Mvc.Logging
             }
         }
 
+        public string UserIPAddress{ 
+            get
+            {
+                if (System.Web.HttpContext.Current == null)
+                    return null;
+                if (string.IsNullOrEmpty(System.Web.HttpContext.Current.Request.ServerVariables["HTTP_X_FORWARDED_FOR"]))
+                    return System.Web.HttpContext.Current.Request.ServerVariables["REMOTE_ADDR"];
+                return System.Web.HttpContext.Current.Request.ServerVariables["HTTP_X_FORWARDED_FOR"];
+            }
+         }
         private string GetExeptionMessage(Exception exception)
         {
             string message = string.Empty;
