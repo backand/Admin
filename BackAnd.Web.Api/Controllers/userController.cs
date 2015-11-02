@@ -889,7 +889,7 @@ namespace BackAnd.Web.Api.Controllers
                             lastName = values["lastName"].ToString();
                         }
                         
-                        var password = GeneratePassword(4, 4, 4);
+                        var password = DuradosAuthorizationHelper.GeneratePassword(4, 4, 4);
 
                         account.SignUp(appName, firstName, lastName, email, null, false, password, password, false, values, view_BeforeCreate, view_BeforeCreateInDatabase, view_AfterCreateBeforeCommit, view_AfterCreateAfterCommit, view_BeforeEdit, view_BeforeEditInDatabase, view_AfterEditBeforeCommit, view_AfterEditAfterCommit);
                         if (appName == Maps.DuradosAppName)
@@ -1247,37 +1247,7 @@ namespace BackAnd.Web.Api.Controllers
             };
         }
         */
-        private string GeneratePassword(int lowercase, int uppercase, int numerics)
-        {
-            string lowers = "abcdefghijklmnopqrstuvwxyz";
-            string uppers = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-            string number = "0123456789";
-
-            Random random = new Random();
-
-            string generated = "!";
-            for (int i = 1; i <= lowercase; i++)
-                generated = generated.Insert(
-                    random.Next(generated.Length),
-                    lowers[random.Next(lowers.Length - 1)].ToString()
-                );
-
-            for (int i = 1; i <= uppercase; i++)
-                generated = generated.Insert(
-                    random.Next(generated.Length),
-                    uppers[random.Next(uppers.Length - 1)].ToString()
-                );
-
-            for (int i = 1; i <= numerics; i++)
-                generated = generated.Insert(
-                    random.Next(generated.Length),
-                    number[random.Next(number.Length - 1)].ToString()
-                );
-
-            return generated.Replace("!", string.Empty);
-
-        }
-
+        
         private void CallActionBeforeSignup(string appName, string username, Social.Profile profile, Dictionary<string, object> values)
         {
             Map map = Maps.Instance.GetMap(appName);

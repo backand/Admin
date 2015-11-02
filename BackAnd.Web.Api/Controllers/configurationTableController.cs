@@ -40,6 +40,11 @@ namespace BackAnd.Web.Api.Controllers
         {
             try
             {
+                if (!IsAdmin())
+                {
+                    return ResponseMessage(Request.CreateResponse(HttpStatusCode.Forbidden, Messages.ActionIsUnauthorized));
+                }
+
                 var item = RestHelper.Get(GetView(GetConfigViewName()), id, deep, view_BeforeSelect, view_AfterSelect);
 
                 if (item == null)
@@ -72,6 +77,11 @@ namespace BackAnd.Web.Api.Controllers
         {
             try
             {
+                if (!IsAdmin())
+                {
+                    return ResponseMessage(Request.CreateResponse(HttpStatusCode.Forbidden, Messages.ActionIsUnauthorized));
+                }
+
                 View view = (View)Map.GetConfigDatabase().Views[GetConfigViewName()];
 
                 int rowCount = 0;

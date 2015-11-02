@@ -50,6 +50,19 @@ namespace BackAnd.Web.Api.Providers
                     context.AdditionalResponseParameters.Add("userId", userId);
                 }
                 catch { }
+
+                try
+                {
+                    if (System.Web.HttpContext.Current.Items.Contains(Durados.Database.CustomTokenAttrKey))
+                    {
+                        IDictionary<string, object> dic = (IDictionary<string, object>)System.Web.HttpContext.Current.Items[Durados.Database.CustomTokenAttrKey];
+                        foreach (string key in dic.Keys)
+                        {
+                            context.AdditionalResponseParameters.Add(key, dic[key]);
+                        }
+                    }
+                }
+                catch { }
             }
 
             return Task.FromResult<object>(null);
@@ -314,7 +327,8 @@ namespace BackAnd.Web.Api.Providers
             Durados.Web.Mvc.Maps.Instance.DuradosMap.Logger.Log("auth-start", appname, username, null, 3, string.Empty);
             
             UserValidationError userValidationError = UserValidationError.Valid;
-            if (!IsValid(username, password, out userValidationError))
+            string customError = null;
+            if (!IsValid(username, password, out userValidationError, out customError))
             {
 
 
@@ -338,6 +352,12 @@ namespace BackAnd.Web.Api.Providers
                         break;
                     case UserValidationError.UserDoesNotBelongToApp:
                         message = UserValidationErrorMessages.UserDoesNotBelongToApp;
+                        break;
+                    case UserValidationError.Custom:
+                        if (customError != null)
+                            message = customError;
+                        else
+                            message = UserValidationErrorMessages.Unknown;
                         break;
 
                     default:
@@ -432,10 +452,10 @@ namespace BackAnd.Web.Api.Providers
             return new DuradosAuthorizationHelper().IsAppExists(appname);
         }
 
-        public bool IsValid(string username, string password, out UserValidationError userValidationError)
+        public bool IsValid(string username, string password, out UserValidationError userValidationError, out string customError)
         {
 
-            return new DuradosAuthorizationHelper().IsValid(username, password, out userValidationError);
+            return new DuradosAuthorizationHelper().IsValid(username, password, out userValidationError, out customError);
         }
 
         public override Task ValidateAuthorizeRequest(OAuthValidateAuthorizeRequestContext context)

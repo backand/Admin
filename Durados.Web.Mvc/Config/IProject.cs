@@ -3129,6 +3129,9 @@ namespace Durados.Web.Mvc.Config
 
             databaseView.Fields["RequiresSSL"].Category = displayCategory;
             databaseView.Fields["DefaultPageSize"].Category = displayCategory;
+
+            if (databaseView.Fields.ContainsKey("Config"))
+                databaseView.Fields["Config"].Category = displayCategory;
             if (databaseView.Fields.ContainsKey("DateFormat"))
             {
                 ColumnField dateFormatColumnField = (ColumnField)databaseView.Fields["DateFormat"];
