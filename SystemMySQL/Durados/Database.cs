@@ -29,6 +29,7 @@ namespace Durados
         public static readonly string DictionaryPrefix = "{{";
         public static readonly string DictionaryPostfix = "}}";
         public static readonly string SysPlaceHolder = "sys::";
+        public static readonly string ConfigPlaceHolder = "config::";
         public static readonly string SysUserPlaceHolder = SysPlaceHolder + "user";
         public static readonly string SysUsernamePlaceHolder = SysPlaceHolder + "username";
         public static readonly string SysRolePlaceHolder = SysPlaceHolder + "role";
@@ -47,6 +48,9 @@ namespace Durados
         public static readonly string RequestId = "requestId";
         public static readonly string AnonymousToken = "AnonymousToken";
         public static readonly string CreateSchema = "CreateSchema";
+        public static readonly string CustomValidationActionName = "backandAuthenticationOverride";
+        public static readonly string CustomTokenAttrKey = "CustomTokenAttr";
+        
         
         public virtual Guid Guid
         {
@@ -498,6 +502,24 @@ namespace Durados
             private set { queries = value; }
         }
 
+        //private Dictionary<int, NameValue> globals;
+        //[Durados.Config.Attributes.ChildrenProperty(TableName = "NameValue", Type = typeof(NameValue), DictionaryKeyColumnName = "ID")]
+        //public Dictionary<int, NameValue> Globals
+        //{
+        //    get
+        //    {
+        //        foreach (NameValue global in globals.Values)
+        //            global.Database = this;
+        //        //}
+        //        //isPagesInitialized = true;
+        //        return globals;
+
+
+        //    }
+        //    private set { globals = value; }
+        //}
+
+
         //[Durados.Config.Attributes.ParentProperty(TableName = "Menu", RelationName="RootMenu")]
         //public Menu Menu { get; private set; }
 
@@ -553,6 +575,7 @@ namespace Durados
             Crons = new Dictionary<string, Cron>();
             Dashboards = new Dictionary<int, Durados.MyCharts>();
             Queries = new Dictionary<int, Durados.Query>();
+            //Globals = new Dictionary<int, Durados.NameValue>();
 
             Workspaces = new Dictionary<int, Workspace>();
             DefaultStepMessage = "Please select the next step";
@@ -1148,6 +1171,29 @@ namespace Durados
         {
             throw new NotImplementedException();
         }
+
+        [Durados.Config.Attributes.ColumnProperty(Description = "Configuration JSON")]
+        public string Config { get; set; }
+
+        public virtual Dictionary<string, object> GetConfigDictionary()
+        {
+            return null;
+        }
+
+        //public Dictionary<string, object> GetGlobalsDictionary()
+        //{
+        //    Dictionary<string, object> dic = new Dictionary<string, object>();
+
+        //    foreach (int key in Globals.Keys)
+        //    {
+        //        string name = Globals[key].Name;
+        //        string value = Globals[key].Value;
+
+        //        dic.Add(name, value);
+        //    }
+
+        //    return dic;
+        //}
     }
 
     public class IlegalDateFormatException : DuradosException

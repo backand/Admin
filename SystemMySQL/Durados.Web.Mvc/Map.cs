@@ -604,6 +604,12 @@ namespace Durados.Web.Mvc
                         AddSendForgotPassword();
                         Commit();
                     }
+
+                    if (!(this is DuradosMap) && !HasRule(Database.CustomValidationActionName))
+                    {
+                        AddBackandAuthenticationOverride();
+                        Commit();
+                    }
                     
                     if (!(this is DuradosMap) && !HasRule("userApproval"))
                     {
@@ -690,6 +696,11 @@ namespace Durados.Web.Mvc
         public bool HasRule(string ruleName)
         {
             return Database.GetUserView().GetRules().Where(r => r.Name.Equals(ruleName)).Count() > 0;
+        }
+
+        public Rule GetRule(string ruleName)
+        {
+            return Database.GetUserView().GetRules().Where(r => r.Name.Equals(ruleName)).FirstOrDefault();
         }
 
         public void NotifyUser(string subjectKey,string messageKey)
@@ -1205,6 +1216,7 @@ namespace Durados.Web.Mvc
             AddNewUserVerification();
             AddBeforeSocialSignup();
             AddSendForgotPassword();
+            AddBackandAuthenticationOverride();
             AddUserApproval();
             AddSyncUserRules();
             AddNewUserInvitation();
@@ -1496,6 +1508,31 @@ namespace Durados.Web.Mvc
 
         }
 
+      public const string EmptyCode = "/* globals\\n\\  $http - service for AJAX calls - $http({method:'GET',url:CONSTS.apiUrl + '/1/objects/yourObject' , headers: {'Authorization':userProfile.token}});\n" +
+     "  CONSTS - CONSTS.apiUrl for Backands API URL\n" +
+     "*/\n" +
+     "\'use strict\';\n" +
+     "function backandCallback(userInput, dbRow, parameters, userProfile) {\n" +
+     "   return {};\n" +
+     "}";
+        private void AddBackandAuthenticationOverride()
+        {
+            ConfigAccess configAccess = new DataAccess.ConfigAccess();
+            string userViewPK = configAccess.GetViewPK(Database.UserViewName, configDatabase.ConnectionString);
+            View ruleView = (View)configDatabase.Views["Rule"];
+            Dictionary<string, object> values = new Dictionary<string, object>();
+            values.Add("Name", Database.CustomValidationActionName);
+            values.Add("Rules_Parent", userViewPK);
+            values.Add("DataAction", Durados.TriggerDataAction.OnDemand.ToString());
+            values.Add("WorkflowAction", Durados.WorkflowAction.JavaScript.ToString());
+            values.Add("WhereCondition", "true");
+
+            values.Add("Code", EmptyCode);
+            
+            DataRow row = ruleView.Create(values, null, null, null, null, null);
+            string rulePK = ruleView.GetPkValue(row);
+
+        }
         private void AddSendForgotPassword()
         {
             ConfigAccess configAccess = new DataAccess.ConfigAccess();

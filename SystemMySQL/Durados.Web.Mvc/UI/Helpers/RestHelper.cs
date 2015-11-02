@@ -220,6 +220,9 @@ namespace Durados.Web.Mvc.UI.Helpers
                   .Replace(Durados.Database.UsernamePlaceHolder, currentUsername, false).Replace(Durados.Database.SysUsernamePlaceHolder.AsToken(), currentUsername)
                   .Replace(Durados.Database.RolePlaceHolder, currentUserRole, false).Replace(Durados.Database.SysRolePlaceHolder.AsToken(), currentUserRole);
 
+            //sql = sql.ReplaceGlobals(query.Database);
+            sql = sql.ReplaceConfig(query.Database);
+
             SqlAccess sqlAccess = GetSqlAccess(query.Database.SqlProduct);
 
             DataTable table = sqlAccess.ExecuteTable(query.Database.ConnectionString, sql, null, CommandType.Text);
@@ -3317,6 +3320,25 @@ namespace Durados.Web.Mvc.UI.Helpers
             //dt.Rows.Add("User Id", Durados.Database.SysUserPlaceHolder, DataType.Numeric);
             dt.Rows.Add("User Role", Durados.Database.SysRolePlaceHolder, DataType.ShortText);
             dt.Rows.Add("Username", Durados.Database.SysUsernamePlaceHolder, DataType.ShortText);
+
+            Map map = Maps.Instance.GetMap();
+            if (map != null && !map.IsMainMap)
+            {
+                var dic = map.Database.GetConfigDictionary();
+                if (dic != null)
+                {
+                    foreach (string key in dic.Keys)
+                    {
+                        string name = key;
+                        object value = dic[key];
+
+                        if (!(value is IDictionary<string, object>) && !(value is IEnumerable<object>))
+                        {
+                            dt.Rows.Add(name, Durados.Database.ConfigPlaceHolder + name, DataType.ShortText);
+                        }
+                    }
+                }
+            }
             //   dt.Rows.Add("Current Date", Durados.Database.CurrentDatePlaceHolder);
             DataView dataView = new DataView(dt);
             return dataView;
@@ -5198,6 +5220,7 @@ namespace Durados.Web.Mvc.UI.Helpers
         UserDoesNotBelongToApp,
         NotRegistered,
         NotApproved,
+        Custom,
         Unknown
     }
 
@@ -5224,7 +5247,315 @@ namespace Durados.Web.Mvc.UI.Helpers
         public static readonly string InvalidRefreshToken = "Invalid refreshToken.";
         
     }
-    public class DuradosAuthorizationHelper
+
+    public class wf : Durados.Workflow.INotifier, Durados.Workflow.IExecuter
+    {
+        protected Map map = null;
+        public Map Map
+        {
+            get
+            {
+                if (map == null)
+                    map = Maps.Instance.GetMap();
+                map.OpenSshSession();
+                return map;
+            }
+        }
+
+        protected virtual string GetUserID()
+        {
+            return Map.Database.GetUserID();
+        }
+
+        #region notifier
+
+        public bool DontSend
+        {
+            get
+            {
+                return Convert.ToBoolean(System.Configuration.ConfigurationManager.AppSettings["DontSend"] ?? "false");
+            }
+        }
+
+        public virtual string GetSiteWithoutQueryString()
+        {
+            return System.Web.HttpContext.Current.Request.Url.Scheme + "://" + System.Web.HttpContext.Current.Request.Url.Authority;
+            //return Request.Url.Scheme + "://" + Request.Url.Authority;
+
+        }
+
+        public virtual string GetMainSiteWithoutQueryString()
+        {
+            //return System.Web.HttpContext.Current.Request.Url.Scheme + "://" + System.Web.HttpContext.Current.Request.Url.Authority;
+            return Maps.Instance.DuradosMap.Url;
+
+        }
+
+        public string GetUrlAction(Durados.View view, string pk)
+        {
+            //return Url.Action(((View)view).IndexAction, ((View)view).Controller, new { viewName = view.Name, pk = pk });
+            return string.Empty;
+
+        }
+
+        public virtual string SaveInMessageBoard(Dictionary<string, Durados.Parameter> parameters, Durados.View view, Dictionary<string, object> values, System.Data.DataRow prevRow, string pk, string siteWithoutQueryString, string urlAction, string subject, string message, int currentUserId, string currentUserRole, Dictionary<int, bool> recipients)
+        {
+            return SaveInMessageBoard(parameters, (View)view, values, prevRow, pk, siteWithoutQueryString, urlAction, subject, message, currentUserId, recipients);
+        }
+
+        public virtual void SaveMessageAction(View view, string pk, Durados.Web.Mvc.UI.Json.Field jsonField, Durados.Web.Mvc.Controllers.MessageBoardAction messageBoardAction)
+        {
+            SaveMessageAction(view, pk, ((ColumnField)view.Fields[messageBoardAction.ToString()]).ConvertFromString(jsonField.Value.ToString()), messageBoardAction.GetHashCode(), Convert.ToInt32(GetUserID()));
+        }
+
+        public virtual void SaveMessageAction(Durados.View view, string pk, object value, int messageBoardAction, int userId)
+        {
+            SqlAccess sqlAccess = new SqlAccess();
+            Dictionary<string, object> parameters = new Dictionary<string, object>();
+            parameters.Add("@UserId", userId);
+            parameters.Add("@MessageId", Convert.ToInt32(pk));
+
+            parameters.Add("@ActionId", messageBoardAction);
+            parameters.Add("@ActionValue", value);
+            sqlAccess.ExecuteProcedure(Map.Database.SysDbConnectionString, "Durados_MessageBoard_Action", parameters, null);
+
+        }
+
+
+        public virtual string SaveInMessageBoard(Dictionary<string, Durados.Parameter> parameters, View view, Dictionary<string, object> values, System.Data.DataRow prevRow, string pk, string siteWithoutQueryString, string urlAction, string subject, string message, int currentUserId, Dictionary<int, bool> recipients)
+        {
+            if (view.Database.IsApi())
+                return null;
+
+            string id = null;
+            try
+            {
+                View messageBoardView = (View)Map.Database.Views["durados_v_MessageBoard"];
+
+
+                string sql = "INSERT INTO [durados_MessageBoard] ([Subject] ,[Message] ,[OriginatedUserId] ,[ViewName] ,[ViewDisplayName] ,[PK] ,[RowDisplayName] ,[CreatedDate] ,[RowLink] ,[ViewLink]) VALUES (";
+                sql += "@Subject, @Message, @OriginatedUserId, @ViewName, @ViewDisplayName, @PK, @RowDisplayName, @CreatedDate, @RowLink, @ViewLink);";
+                sql += "SELECT IDENT_CURRENT('[durados_MessageBoard]') AS ID";
+
+                Dictionary<string, object> parameters2 = new Dictionary<string, object>();
+                string rowDisplayValue = view.GetDisplayValue(pk, values, prevRow);
+                parameters2.Add("Subject", subject);
+                parameters2.Add("Message", message);
+                parameters2.Add("OriginatedUserId", currentUserId);
+                parameters2.Add("ViewName", view.Name);
+                parameters2.Add("ViewDisplayName", view.DisplayName);
+                parameters2.Add("PK", pk);
+                parameters2.Add("RowDisplayName", rowDisplayValue);
+                parameters2.Add("CreatedDate", DateTime.Now);
+                parameters2.Add("RowLink", FieldHelper.GetUrlData(view.DisplayName + " - " + rowDisplayValue, urlAction));
+                parameters2.Add("ViewLink", FieldHelper.GetUrlData(view.DisplayName + " - " + rowDisplayValue, urlAction));
+
+
+                SqlAccess sqlAccess = new SqlAccess();
+                id = sqlAccess.ExecuteScalar(Map.Database.SysDbConnectionString, sql, parameters2);
+
+                View messageStatusView = (View)Map.Database.Views["durados_MessageStatus"];
+
+                foreach (int recipient in recipients.Keys)
+                {
+                    SaveMessageAction(messageStatusView, id, recipients[recipient] ? "True" : "False", 4, recipient);
+                }
+            }
+            catch (Exception ex)
+            {
+                Map.Logger.Log("", "", ex.Source, ex, 1, "Save Message Board View name: " + view.Name + ", pk: " + pk);
+            }
+
+            return id;
+        }
+
+        public virtual string GetFieldValue(Durados.Field field, string pk)
+        {
+            return field.GetValue(pk);
+        }
+
+        protected virtual Durados.Web.Mvc.UI.TableViewer GetNewTableViewer()
+        {
+            return new Durados.Web.Mvc.UI.TableViewer();
+        }
+
+        Durados.Web.Mvc.UI.TableViewer tableViewer = null;
+
+        public ITableConverter GetTableViewer()
+        {
+            if (tableViewer == null)
+                tableViewer = GetNewTableViewer();
+
+            return tableViewer;
+        }
+
+        protected virtual string GetViewDisplayName(Durados.Web.Mvc.View view)
+        {
+            return view.DisplayName;
+        }
+        protected virtual DataView GetDataView(Durados.Web.Mvc.ChildrenField childrenField, DataRow dataRow)
+        {
+            return childrenField.GetDataView(dataRow);
+        }
+        protected virtual string GetDynastyPath(string dynastyPath, Durados.Web.Mvc.ParentField parentField, Durados.Web.Mvc.ParentField field)
+        {
+            if (parentField == null)
+                return dynastyPath + field.DisplayName + ".";
+
+            string[] s = dynastyPath.Split('.');
+
+            for (int i = s.Length - 1; i >= 0; i--)
+            {
+                if (s[i] == parentField.DisplayName)
+                {
+                    string r = string.Empty;
+                    for (int j = 0; j <= i; j++)
+                    {
+                        r += s[j] + ".";
+                    }
+                    return r + field.DisplayName + ".";
+                }
+            }
+
+            return dynastyPath += field.DisplayName + ".";
+        }
+        public void LoadValues(Dictionary<string, object> values, System.Data.DataRow dataRow, Durados.View view, Durados.ParentField parentField, Durados.View rootView, string dynastyPath, string prefix, string postfix, Dictionary<string, Durados.Workflow.DictionaryField> dicFields, string internalDynastyPath)
+        {
+            if (view.Equals(rootView))
+            {
+                dynastyPath = GetViewDisplayName((View)view) + ".";
+                internalDynastyPath = view.Name + ".";
+            }
+            foreach (Durados.Field field in view.Fields.Values.Where(f => f.FieldType == Durados.FieldType.Column))
+            {
+                LoadValue(values, dataRow, view, field, dynastyPath, prefix, postfix, dicFields, internalDynastyPath);
+            }
+
+            var childrenFields = view.Fields.Values.Where(f => f.FieldType == Durados.FieldType.Children && ((ChildrenField)f).LoadForBlockTemplate);
+            foreach (ChildrenField field in childrenFields)
+            {
+                string name = prefix + dynastyPath + field.DisplayName + postfix;
+                string internalName = prefix + internalDynastyPath + field.Name + postfix;
+                System.Data.DataView value = GetDataView(field, dataRow);
+                if (!values.ContainsKey(name))
+                {
+                    values.Add(name, value);
+                    dicFields.Add(internalDynastyPath, new Durados.Workflow.DictionaryField { DisplayName = field.DisplayName, Type = field.DataType, Value = value });
+                }
+
+                foreach (ColumnField columnField in field.ChildrenView.Fields.Values.Where(f => f.FieldType == Durados.FieldType.Column))
+                {
+                    if (columnField.Upload != null)
+                    {
+                        value.Table.Columns[columnField.Name].ExtendedProperties["ImagePath"] = columnField.GetUploadPath();
+                    }
+                }
+            }
+
+            foreach (ParentField field in view.Fields.Values.Where(f => f.FieldType == Durados.FieldType.Parent))
+            {
+                if (view.Equals(rootView))
+                {
+                    dynastyPath = view.DisplayName + ".";
+                    internalDynastyPath = view.Name + ".";
+                }
+                LoadValue(values, dataRow, view, field, dynastyPath, prefix, postfix, dicFields, internalDynastyPath);
+
+
+
+                System.Data.DataRow parentRow = dataRow.GetParentRow(field.DataRelation.RelationName);
+                View parentView = (View)field.ParentView;
+                if (parentRow == null)
+                {
+                    string key = field.GetValue(dataRow);
+                    if (!string.IsNullOrEmpty(key))
+                        parentRow = parentView.GetDataRow(key, dataRow.Table.DataSet);
+                }
+                if (parentRow != null && parentField != field)
+                {
+                    if (parentView != rootView)
+                    {
+                        //dynastyPath += field.DisplayName + ".";
+                        dynastyPath = GetDynastyPath(dynastyPath, (ParentField)parentField, field);
+                        internalDynastyPath = GetInternalDynastyPath(internalDynastyPath, (ParentField)parentField, field);
+                        LoadValues(values, parentRow, parentView, field, rootView, dynastyPath, prefix, postfix, dicFields, internalDynastyPath);
+                    }
+                }
+            }
+
+
+        }
+        protected virtual string GetInternalDynastyPath(string dynastyPath, Durados.Web.Mvc.ParentField parentField, Durados.Web.Mvc.ParentField field)
+        {
+            if (parentField == null)
+                return dynastyPath + field.Name + ".";
+
+            string[] s = dynastyPath.Split('.');
+
+            for (int i = s.Length - 1; i >= 0; i--)
+            {
+                if (s[i] == parentField.Name)
+                {
+                    string r = string.Empty;
+                    for (int j = 0; j <= i; j++)
+                    {
+                        r += s[j] + ".";
+                    }
+                    return r + field.Name + ".";
+                }
+            }
+
+            return dynastyPath += field.Name + ".";
+        }
+        public void LoadValue(Dictionary<string, object> values, System.Data.DataRow dataRow, Durados.View view, Durados.Field field, string dynastyPath, string prefix, string postfix, Dictionary<string, Durados.Workflow.DictionaryField> dicFields, string internalDynastyPath)
+        {
+            string name = prefix + dynastyPath + field.DisplayName + postfix;
+            string InternalName = prefix + internalDynastyPath + field.Name + postfix;
+            string value = view.GetDisplayValue(field.Name, dataRow);
+            if (!values.ContainsKey(name))
+            {
+                values.Add(name, value);
+                dicFields.Add(InternalName, new Durados.Workflow.DictionaryField { DisplayName = name, Type = field.DataType, Value = value });
+
+            }
+            if (field.FieldType == Durados.FieldType.Column && ((ColumnField)field).Upload != null)
+            {
+                if (dataRow.Table.Columns.Contains(field.Name))
+                {
+
+                    dataRow.Table.Columns[field.Name].ExtendedProperties["ImagePath"] = ((ColumnField)field).GetUploadPath();
+                }
+            }
+        }
+
+        protected virtual Durados.Web.Mvc.View GetView(string viewName)
+        {
+            Durados.Web.Mvc.View view = (Durados.Web.Mvc.View)Map.Database.GetViewByJsonName(viewName);
+            if (view != null)
+                return view;
+
+            return ViewHelper.GetViewForRest(viewName);
+        }
+        public Durados.View GetNonConfigView(string viewName)
+        {
+            return GetView(viewName);
+        }
+
+        public string HtmlDecode(string text)
+        {
+            return System.Web.HttpUtility.HtmlDecode(text);
+        }
+
+        #endregion notifier
+
+        #region executer
+        public string[] GetFilterFieldValue(Durados.View view)
+        {
+            return null;
+        }
+        #endregion executer
+    }
+    public class DuradosAuthorizationHelper : wf
     {
         public bool IsAppExists(string appname)
         {
@@ -5234,8 +5565,20 @@ namespace Durados.Web.Mvc.UI.Helpers
                 return Durados.Web.Mvc.Maps.Instance.AppExists(appname).HasValue;
         }
 
-        public bool IsValid(string username, string password, out UserValidationError userValidationError)
+        public bool IsValid(string username, string password, out UserValidationError userValidationError, out string customError)
         {
+            if (HasCustomValidation())
+            {
+                try
+                {
+                    return CustomValidation(username, password, out userValidationError, out customError);
+                }
+                catch (Exception exception)
+                {
+                    map.Logger.Log("signin", "CustomValidation", "general", exception, 1, string.Empty);
+                }
+            }
+            customError = null;
             Durados.Web.Mvc.Controllers.AccountMembershipService accountMembershipService = new Durados.Web.Mvc.Controllers.AccountMembershipService();
             bool valid = accountMembershipService.ValidateUser(username, password);
             if (valid)
@@ -5285,6 +5628,127 @@ namespace Durados.Web.Mvc.UI.Helpers
             }
 
             return valid;
+        }
+
+        protected virtual Durados.Web.Mvc.Workflow.Engine CreateWorkflowEngine()
+        {
+            return new Durados.Web.Mvc.Workflow.Engine();
+        }
+        private bool CustomValidation(string username, string password, out UserValidationError userValidationError, out string customError)
+        {
+            customError = null;
+            userValidationError = UserValidationError.Custom;
+
+            Dictionary<string, object> values = null;
+            values = new Dictionary<string, object>();
+            values.Add("username", username);
+            values.Add("password", password);
+
+            Map map = Maps.Instance.GetMap();
+            View view = (View)map.Database.GetUserView();
+            string parameters = System.Web.HttpContext.Current.Request.QueryString["parameters"];
+            if (!string.IsNullOrEmpty(parameters))
+            {
+                string json = System.Web.HttpContext.Current.Server.UrlDecode(parameters);
+
+                try
+                {
+                    Dictionary<string, object> rulesParameters = view.Deserialize(System.Web.HttpContext.Current.Server.UrlDecode(parameters));
+                    foreach (string key in rulesParameters.Keys)
+                    {
+                        if (!values.ContainsKey(key))
+                            values.Add(key.AsToken(), rulesParameters[key]);
+                    }
+                }
+                catch (Exception exception)
+                {
+                    map.Logger.Log("signin", "CustomValidation", "get parameters json", exception, 2, string.Empty);
+                }
+            }
+            Durados.Web.Mvc.Workflow.Engine wfe = CreateWorkflowEngine();
+            try
+            {
+                wfe.PerformActions(this, view, Durados.TriggerDataAction.OnDemand, values, null, null, map.Database.ConnectionString, Convert.ToInt32(map.Database.GetUserID()), map.Database.GetUserRole(), null, Durados.Database.CustomValidationActionName);
+            }
+            catch (Exception exception)
+            {
+                customError = exception.Message;
+                return false;
+            }
+            if (values.ContainsKey(Durados.Workflow.JavaScript.ReturnedValueKey))
+            {
+                var returnedValue = values[Durados.Workflow.JavaScript.ReturnedValueKey];
+                System.Web.HttpContext.Current.Items.Add(Durados.Database.CustomTokenAttrKey, returnedValue);
+            }
+            if (!IsUserExist(username))
+            {
+                try
+                {
+                    AddUser(username);
+                }
+                catch (Exception exception)
+                {
+                    customError = "Failed to add user: " + exception.Message;
+                    return false;
+                }
+            }
+            return true;
+
+        }
+
+        public static string GeneratePassword(int lowercase, int uppercase, int numerics)
+        {
+            string lowers = "abcdefghijklmnopqrstuvwxyz";
+            string uppers = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+            string number = "0123456789";
+
+            Random random = new Random();
+
+            string generated = "!";
+            for (int i = 1; i <= lowercase; i++)
+                generated = generated.Insert(
+                    random.Next(generated.Length),
+                    lowers[random.Next(lowers.Length - 1)].ToString()
+                );
+
+            for (int i = 1; i <= uppercase; i++)
+                generated = generated.Insert(
+                    random.Next(generated.Length),
+                    uppers[random.Next(uppers.Length - 1)].ToString()
+                );
+
+            for (int i = 1; i <= numerics; i++)
+                generated = generated.Insert(
+                    random.Next(generated.Length),
+                    number[random.Next(number.Length - 1)].ToString()
+                );
+
+            return generated.Replace("!", string.Empty);
+
+        }
+
+
+        private void AddUser(string username)
+        {
+            Account account = new Account(this);
+
+            Map map = Maps.Instance.GetMap();
+
+            string password = GeneratePassword(4, 4, 4);
+            Durados.Web.Mvc.UI.Helpers.Account.SignUpResults signUpResults = account.SignUp(map.AppName, username.Split('@').FirstOrDefault(), string.Empty, username, null, true, password, password, false, null, null, null, null, null, null, null, null, null);
+
+        }
+
+        private bool IsUserExist(string username)
+        {
+            Map map = Maps.Instance.GetMap();
+            return map.Database.GetUserRow(username) != null;
+        }
+
+        private bool HasCustomValidation()
+        {
+            Map map = Maps.Instance.GetMap();
+            return map.HasRule(Database.CustomValidationActionName) && (map.GetRule(Database.CustomValidationActionName).Code != Map.EmptyCode);
         }
 
         public bool ValidateLogOnAuthUrl(Durados.Web.Mvc.Map map, System.Collections.Specialized.NameValueCollection formCollecion)

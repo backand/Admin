@@ -1243,6 +1243,20 @@ namespace Durados.Web.Mvc
         {
             return RestHelper.GetConnectionSource(Map.AppName);
         }
+
+        public override Dictionary<string, object> GetConfigDictionary()
+        {
+            if (string.IsNullOrEmpty(Config))
+                return new Dictionary<string, object>();
+            try
+            {
+                return Durados.Web.Mvc.UI.Json.JsonSerializer.Deserialize(Config);
+            }
+            catch (Exception exception)
+            {
+                throw new DuradosException("Failed to parse the configuration JSON: " + exception.Message, exception);
+            }
+        }
     }
 
 

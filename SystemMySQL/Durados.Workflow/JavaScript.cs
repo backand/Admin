@@ -128,10 +128,12 @@ namespace Durados.Workflow
             string code = parameters["code"].Value.Replace(Engine.AsToken(values), ((Durados.Workflow.INotifier)controller).GetTableViewer(), view);
 
             string currentUsername = view.Database.GetCurrentUsername();
-            
+
             code = code.Replace(Durados.Database.UserPlaceHolder, currentUsetId.ToString(), false).Replace(Durados.Database.SysUserPlaceHolder.AsToken(), currentUsetId.ToString(), false)
                   .Replace(Durados.Database.UsernamePlaceHolder, currentUsername, false).Replace(Durados.Database.SysUsernamePlaceHolder.AsToken(), currentUsername)
-                  .Replace(Durados.Database.RolePlaceHolder, currentUserRole, false).Replace(Durados.Database.SysRolePlaceHolder.AsToken(), currentUserRole);
+                  .Replace(Durados.Database.RolePlaceHolder, currentUserRole, false).Replace(Durados.Database.SysRolePlaceHolder.AsToken(), currentUserRole)
+                  .ReplaceConfig(view);
+                  //.ReplaceGlobals(view);
 
             Dictionary<string, object> clientParameters = new Dictionary<string, object>();
             Dictionary<string, object> newRow = new Dictionary<string, object>();
@@ -193,6 +195,7 @@ namespace Durados.Workflow
             userProfile.Add("role", currentUserRole);
             userProfile.Add("app", view.Database.GetCurrentAppName());
             userProfile.Add("token", System.Web.HttpContext.Current.Request.Headers["Authorization"] ?? "anonymous-" + System.Web.HttpContext.Current.Request.Headers["AnonymousToken"]);
+            userProfile.Add("request", new Dictionary<string, object>() { { "headers", GetHeaders(System.Web.HttpContext.Current.Request.Headers) } });
 
             var call = new Jint.Engine(cfg => cfg.AllowClr(typeof(Backand.XMLHttpRequest).Assembly));
 
@@ -218,6 +221,10 @@ namespace Durados.Workflow
             var userProfile2 = parser.Parse(new System.Web.Script.Serialization.JavaScriptSerializer().Serialize(userProfile));
             var CONSTS2 = parser.Parse(new System.Web.Script.Serialization.JavaScriptSerializer().Serialize(CONSTS));
 
+            //var Globals = view.Database.GetGlobalsDictionary();
+            //var Globals2 = parser.Parse(new System.Web.Script.Serialization.JavaScriptSerializer().Serialize(Globals));
+            var Config = view.Database.GetConfigDictionary();
+            var Config2 = parser.Parse(new System.Web.Script.Serialization.JavaScriptSerializer().Serialize(Config));
 
             try
             {
@@ -227,6 +234,8 @@ namespace Durados.Workflow
                 .SetValue("parameters", clientParametersToSend)
                 .SetValue("userProfile", userProfile2)
                 .SetValue("CONSTS", CONSTS2)
+                .SetValue("Config", Config2)
+                //.SetValue("Globals", Globals2)
                 .Execute(GetXhrWrapper() + code + "; function call(){return backandCallback(userInput, dbRow, parameters, userProfile);}");
             }
             catch (Exception exception)
@@ -330,6 +339,23 @@ namespace Durados.Workflow
                 else
                     values[ReturnedValueKey] = r;
             }
+        }
+
+        private Dictionary<string, object> GetHeaders(System.Collections.Specialized.NameValueCollection headers)
+        {
+            Dictionary<string, object> dic = new Dictionary<string, object>();
+
+            HashSet<string> hash = new HashSet<string>() { "Cache-Control", "Connection", "Content-Length", "Content-Type", "Accept", "Accept-Encoding", "Accept-Language", "Host", "User-Agent", "Origin", "Postman-Token" };
+
+            foreach (string name in headers.AllKeys)
+            {
+                if (!hash.Contains(name))
+                {
+                    dic.Add(name, headers[name]);
+                }
+            }
+
+            return dic;
         }
 
         

@@ -154,8 +154,61 @@ namespace System
             content = (content.IndexOf("#") == -1 && content.IndexOf(Database.DictionaryPrefix + Database.SysPrevPlaceHolder) == -1) ? content : content.ReplaceWithSharp(view, null, prevRow);
             content = (content.IndexOf("$") == -1 && content.IndexOf(Database.DictionaryPrefix) == -1) ? content : content.ReplaceWithDollar(view, values, prevRow);
 
+            //content = ReplaceGlobals(content, view);
+            content = ReplaceConfig(content, view);
+
             return content;
         }
+
+        public static string ReplaceConfig(this string template, View view)
+        {
+            return ReplaceConfig(template, view.Database);
+        }
+
+        public static string ReplaceConfig(this string template, Database database)
+        {
+            string s = template;
+
+            try
+            {
+                var dic = database.GetConfigDictionary();
+                foreach (string key in dic.Keys)
+                {
+                    string name = key;
+                    object value = dic[key];
+
+                    if (!(value is IDictionary<string, object>) && !(value is IEnumerable<object>))
+                    {
+                        s = s.Replace((Database.ConfigPlaceHolder + name).AsToken(), value.ToString());
+                    }
+                }
+            }
+            catch { }
+            return s;
+        }
+
+        //public static string ReplaceGlobals(this string template, View view)
+        //{
+        //    return ReplaceGlobals(template, view.Database);
+        //}
+
+        //public static string ReplaceGlobals(this string template, Database database)
+        //{
+        //    string s = template;
+
+        //    try
+        //    {
+        //        foreach (int key in database.Globals.Keys)
+        //        {
+        //            string name = database.Globals[key].Name;
+        //            string value = database.Globals[key].Value;
+
+        //            s = s.Replace((Database.SysPlaceHolder + name).AsToken(), value);
+        //        }
+        //    }
+        //    catch { }
+        //    return s;
+        //}
 
         private static Durados.View GetChildrenView(Durados.View view, string name)
         {

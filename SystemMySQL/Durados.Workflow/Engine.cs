@@ -245,7 +245,9 @@ namespace Durados.Workflow
             return parser.Check(rule.WhereCondition.Replace(currentUserId)
                                 .Replace(Database.SysUsernamePlaceHolder.AsToken(), GetCurrentUsername(view))
                                 .Replace(Database.SysRolePlaceHolder.AsToken(), currentUserRole)
-                                .Replace(GetPrevRowAsToken(view,prevRow)).Replace(GetValuesAsToken(values)).Replace(values));
+                                .Replace(GetPrevRowAsToken(view,prevRow)).Replace(GetValuesAsToken(values)).Replace(values)
+                                .ReplaceConfig(view));
+                                //.ReplaceGlobals(view));
 
         }
 
@@ -377,6 +379,8 @@ namespace Durados.Workflow
                  .Replace(Durados.Database.UsernamePlaceHolder, currentUsername, false).Replace(Durados.Database.SysUsernamePlaceHolder.AsToken(), currentUsername)
                  .Replace(Durados.Database.RolePlaceHolder, currentUserRole, false).Replace(Durados.Database.SysRolePlaceHolder.AsToken(), currentUserRole);
 
+            //whereCondition = whereCondition.ReplaceGlobals(view);
+            whereCondition = whereCondition.ReplaceConfig(view);
             try
             {
                 whereCondition = whereCondition.ReplaceAllTokens(view, values, pk, currentUserId.ToString(), currentUsername, currentUserRole, prevRow);

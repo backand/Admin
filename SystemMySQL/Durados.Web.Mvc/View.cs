@@ -391,6 +391,9 @@ namespace Durados.Web.Mvc
             if (permanentFilter.Contains(Database.SysRolePlaceHolder.AsToken()) || permanentFilter.ToLower().Contains(Database.SysRolePlaceHolder.ToLower().AsToken()))
                 permanentFilter = permanentFilter.Replace(Database.SysRolePlaceHolder.AsToken(), Database.GetUserRole(), false);
 
+            //permanentFilter = permanentFilter.ReplaceGlobals(Database);
+            permanentFilter = permanentFilter.ReplaceConfig(Database);
+
             return permanentFilter;
         }
 
