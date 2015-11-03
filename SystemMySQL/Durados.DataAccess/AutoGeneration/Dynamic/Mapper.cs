@@ -730,7 +730,42 @@ namespace Durados.DataAccess.AutoGeneration.Dynamic
                         dataset.Tables[viewName].PrimaryKey = new DataColumn[0];
                     }
                 }
-                dataset.Tables[viewName].Columns.Remove(column.ColumnName);
+                try
+                {
+                    dataset.Tables[viewName].Columns.Remove(column.ColumnName);
+                }
+                catch (System.ArgumentException)
+                {
+                    List<DataRelation> relations = new List<DataRelation>();
+                    foreach (DataRelation relation in column.Table.ParentRelations)
+                    {
+                        if (relation.ChildColumns.Contains(column))
+                        {
+                            relations.Add(relation);
+                        }
+                    }
+                    foreach (DataRelation relation in relations)
+                    {
+                        column.Table.ParentRelations.Remove(relation);
+                    }
+                    relations = new List<DataRelation>();
+                    foreach (DataRelation relation in column.Table.ChildRelations)
+                    {
+                        if (relation.ParentColumns.Contains(column))
+                        {
+                            relations.Add(relation);
+                        }
+                    }
+                    foreach (DataRelation relation in relations)
+                    {
+                        column.Table.ChildRelations.Remove(relation);
+                    }
+                    try
+                    {
+                        dataset.Tables[viewName].Columns.Remove(column.ColumnName);
+                    }
+                    catch { }
+                }
             }
 
             if (table.PrimaryKey.Length == 1)
