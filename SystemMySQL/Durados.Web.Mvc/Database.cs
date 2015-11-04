@@ -72,7 +72,7 @@ namespace Durados.Web.Mvc
             DefaultCertificateName = GetDefaultCertificateName();
             DefaultSymmetricKeyAlgorithm = SymmetricKeyAlgorithm.TRIPLE_DES;
 
-            
+            EnableUserRegistration = true;
         }
 
         public int GetWorkspaceIndex(Workspace workspace)

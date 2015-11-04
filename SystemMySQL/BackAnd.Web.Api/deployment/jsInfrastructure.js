@@ -21,7 +21,7 @@ var console = new Backand.console(); var socket = new Backand.socket();
     exports['get'] = function (key) {
         var value = bCookie.get(key)
         if (value != null)
-            return JSON.parse(value);
+            try { return JSON.parse(value); } catch (err) { return value;}
         else
             return null;
     };

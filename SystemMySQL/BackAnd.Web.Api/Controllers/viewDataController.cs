@@ -555,7 +555,7 @@ namespace BackAnd.Web.Api.Controllers
 
                 string json = System.Web.HttpContext.Current.Server.UrlDecode(Request.Content.ReadAsStringAsync().Result.Replace("%22", "%2522").Replace("%2B", "%252B").Replace("+", "%2B"));
 
-                values = GetParameters(parameters, view, json);
+                values = GetParameters(parameters, view, json, deep ?? false);
 
                 string pk = view.Create(values, deep ?? false, view_BeforeCreate, view_BeforeCreateInDatabase, view_AfterCreateBeforeCommit, view_AfterCreateAfterCommit);
 
@@ -614,7 +614,7 @@ namespace BackAnd.Web.Api.Controllers
             }
         }
 
-        private static Dictionary<string, object>[] GetParameters(string parameters, View view, string json)
+        private static Dictionary<string, object>[] GetParameters(string parameters, View view, string json, bool deep)
         {
             if (string.IsNullOrEmpty(json))
             {
@@ -628,7 +628,16 @@ namespace BackAnd.Web.Api.Controllers
 
                 foreach (var values in valuesArray)
                 {
-                    Dictionary<string, object> valuesWithParameters = GetParameters(parameters, view, values);
+                    Dictionary<string, object> valuesWithParameters = null;
+                    if (deep)
+                    {
+                        valuesWithParameters = GetParametersForUpdateDeep(parameters, view, values);
+                    }
+                    else
+                    {
+                        valuesWithParameters = GetParameters(parameters, view, values);
+                    }
+                        
                     list.Add(valuesWithParameters);
                 }
 
@@ -638,9 +647,61 @@ namespace BackAnd.Web.Api.Controllers
             else
             {
                 Dictionary<string, object> values = view.Deserialize(json);
-
-                return new Dictionary<string, object>[1] { GetParameters(parameters, view, values) };
+                Dictionary<string, object> valuesWithParameters = null;
+                if (deep)
+                {
+                    valuesWithParameters = GetParametersForUpdateDeep(parameters, view, values);
+                }
+                else
+                {
+                    valuesWithParameters = GetParameters(parameters, view, values);
+                }
+                return new Dictionary<string, object>[1] { valuesWithParameters };
             }
+        }
+
+        private static Dictionary<string, object> GetParametersForUpdateDeep(string parameters, View view, Dictionary<string, object> values)
+        {
+            if (!string.IsNullOrEmpty(parameters))
+            {
+               
+                Dictionary<string, object> rulesParameters = view.Deserialize(System.Web.HttpContext.Current.Server.UrlDecode(parameters));
+                GetParametersForUpdateDeep(rulesParameters, view, values);
+                
+               
+            }
+
+            return values;
+            
+        }
+
+        private static Dictionary<string, object> GetParametersForUpdateDeep(Dictionary<string, object> rulesParameters, View view, Dictionary<string, object> values)
+        {
+            foreach (string key in rulesParameters.Keys)
+            {
+                if (!values.ContainsKey(key.AsToken()))
+                {
+                    values.Add(key.AsToken(), rulesParameters[key]);
+                }
+            }
+
+            foreach (Durados.Field field in view.Fields.Values)
+            {
+                if (field.FieldType == Durados.FieldType.Children && !field.IsCheckList())
+                {
+
+                    ChildrenField childrenField = (ChildrenField)field;
+                    View childrenView = (View)childrenField.ChildrenView;
+                    var children = (object[])values[field.JsonName];
+                    foreach (Dictionary<string, object> child in children)
+                    {
+                        GetParametersForUpdateDeep(rulesParameters, childrenView, child);
+                    }
+                }
+                            
+            }
+
+            return values;
         }
 
         private static Dictionary<string, object> GetParameters(string parameters, View view, Dictionary<string, object> values)
@@ -699,7 +760,17 @@ namespace BackAnd.Web.Api.Controllers
 
                 Dictionary<string, object> values2 = view.Deserialize(json);
 
-                Dictionary<string, object> values = GetParameters(parameters, view, values2);
+
+                Dictionary<string, object> values = null;
+                if (deep ?? false)
+                {
+                    values = GetParametersForUpdateDeep(parameters, view, values2);
+                }
+                else
+                {
+                    values = GetParameters(parameters, view, values2);
+                }
+                    
 
                 view.Update(values, id, deep ?? false, view_BeforeEdit, view_BeforeEditInDatabase, view_AfterEditBeforeCommit, view_AfterEditAfterCommit, view_BeforeCreate, view_BeforeCreateInDatabase, view_AfterCreateBeforeCommit, view_AfterCreateAfterCommit, overwrite ?? false, view_BeforeDelete, view_AfterDeleteBeforeCommit, view_AfterDeleteAfterCommit);
                 
