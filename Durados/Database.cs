@@ -593,7 +593,8 @@ namespace Durados
 
             MyCharts = new MyCharts(this);
 
-            SecureLevel = Durados.SecureLevel.RegisteredUsers;
+            SecureLevel = Durados.SecureLevel.AllUsers; //RegisteredUsers;
+            DefaultGuestRole = "User";
 
             DefaultLevelOfDept = 3;
 
