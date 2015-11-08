@@ -5615,7 +5615,12 @@ namespace Durados.Web.Mvc.UI.Helpers
             {
                 try
                 {
-                    return CustomValidation(username, password, out userValidationError, out customError);
+                    bool? customValidation = CustomValidation(username, password, out userValidationError, out customError);
+
+                    if (customValidation.HasValue)
+                    {
+                        return customValidation.Value;
+                    }
                 }
                 catch (Exception exception)
                 {
@@ -5678,7 +5683,7 @@ namespace Durados.Web.Mvc.UI.Helpers
         {
             return new Durados.Web.Mvc.Workflow.Engine();
         }
-        private bool CustomValidation(string username, string password, out UserValidationError userValidationError, out string customError)
+        private bool? CustomValidation(string username, string password, out UserValidationError userValidationError, out string customError)
         {
             customError = null;
             userValidationError = UserValidationError.Custom;
@@ -5722,7 +5727,59 @@ namespace Durados.Web.Mvc.UI.Helpers
             if (values.ContainsKey(Durados.Workflow.JavaScript.ReturnedValueKey))
             {
                 var returnedValue = values[Durados.Workflow.JavaScript.ReturnedValueKey];
-                System.Web.HttpContext.Current.Items.Add(Durados.Database.CustomTokenAttrKey, returnedValue);
+                if (returnedValue is IDictionary<string, object>)
+                {
+                    const string Result = "result";
+                    const string Allow = "allow";
+                    const string Deny = "deny";
+                    const string Ignore = "ignore";
+                    const string Message = "message";
+                    const string AdditionalTokenInfo = "additionalTokenInfo";
+                    IDictionary<string, object> result = (IDictionary<string, object>)returnedValue;
+                    if (result.ContainsKey(Result))
+                    {
+                        if (result[Result].Equals(Ignore))
+                        {
+                            return null;
+                        }
+                        else if (result[Result].Equals(Allow))
+                        {
+                            if (result.ContainsKey(AdditionalTokenInfo))
+                            {
+                                System.Web.HttpContext.Current.Items.Add(Durados.Database.CustomTokenAttrKey, result[AdditionalTokenInfo]);
+                            }
+                        }
+                        else if (result[Result].Equals(Deny))
+                        {
+                            if (result.ContainsKey(Message))
+                            {
+                                customError = result[Message].ToString();
+                                return false;
+                            }
+                            else
+                            {
+                                customError = Database.CustomValidationActionName + " did not return the expected result. Missing " + Message + " field in the returned object";
+                                return false;
+                            }
+                        }
+                        else 
+                        {
+                            customError = Database.CustomValidationActionName + " did not return the expected result. " + Result + " must return either \"" + Allow + "\", \"" + Deny + "\" or \"" + Ignore + "\".";
+                            return false;
+                        }
+                    }
+                    else
+                    {
+                        customError = Database.CustomValidationActionName + " did not return the expected result. Missing " + Result + " field in the returned object.";
+                        return false;
+                    }
+                }
+                else
+                {
+                    customError = Database.CustomValidationActionName + " did not return the expected result.";
+                    return false;
+                }
+                
             }
             if (!IsUserExist(username))
             {
