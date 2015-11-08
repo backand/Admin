@@ -1508,13 +1508,23 @@ namespace Durados.Web.Mvc
 
         }
 
-      public const string EmptyCode = "/* globals\\n\\  $http - service for AJAX calls - $http({method:'GET',url:CONSTS.apiUrl + '/1/objects/yourObject' , headers: {'Authorization':userProfile.token}});\n" +
-     "  CONSTS - CONSTS.apiUrl for Backands API URL\n" +
-     "*/\n" +
-     "\'use strict\';\n" +
-     "function backandCallback(userInput, dbRow, parameters, userProfile) {\n" +
-     "   return {};\n" +
-     "}";
+        public const string EmptyCode = "/* globals\n" +
+    "$http - Service for AJAX calls \n" +
+    "CONSTS - CONSTS.apiUrl for Backands API URL\n" +
+    "Config - Global Configuration\n" +
+    "*/\n" +
+    "'use strict';\n" +
+    "function backandCallback(userInput, dbRow, parameters, userProfile) {\n" +
+    "   \n" +
+    "   //Example for SSO in OAuth 2.0 standard\n" +
+    "   //$http({\"method\":\"POST\",\"url\":\"http://www.mydomain.com/api/token\", \"data\":\"grant_type=password&username=\" + userInput.username + \"&password=\" + userInput.password, \"headers\":{\"Content-Type\":\"application/x-www-form-urlencoded\"}});\n" +
+    "   \n" +
+    "   //Return results of \"allow\" or \"deny\" to override the Backand auth and provide a denied message\n" +
+    "   //Return ignored to ignore this fucntion and use Backand default authentication\n" +
+    "   //Return additionalTokenInfo that will be added to backand auth result.\n" +
+    "   //You may access this later by using the getUserDetails function of the Backand SDK.\n" +
+    "   return {\"result\": \"ignore\", \"message\":\"\", \"additionalTokenInfo\":{}};\n" +
+    "}";
         private void AddBackandAuthenticationOverride()
         {
             ConfigAccess configAccess = new DataAccess.ConfigAccess();

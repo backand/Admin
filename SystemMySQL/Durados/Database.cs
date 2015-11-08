@@ -48,7 +48,7 @@ namespace Durados
         public static readonly string RequestId = "requestId";
         public static readonly string AnonymousToken = "AnonymousToken";
         public static readonly string CreateSchema = "CreateSchema";
-        public static readonly string CustomValidationActionName = "backandAuthenticationOverride";
+        public static readonly string CustomValidationActionName = "backandAuthOverride";
         public static readonly string CustomTokenAttrKey = "CustomTokenAttr";
         
         
