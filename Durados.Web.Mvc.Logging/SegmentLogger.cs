@@ -45,66 +45,63 @@ namespace Durados.Web.Mvc.Logging
             catch (Exception ex) { }
 
         }
-        public void _Log(ExternalAnalyticsAction actioName, DateTime? timestamp,string userId, Dictionary<string, object> traits, bool identify = false)
+        public void _Log(ExternalAnalyticsAction actioName, DateTime? timestamp, string userId, Dictionary<string, object> traits, bool identify = false)
         {
             try
             {
-                
+
                 if (Analytics.Client == null)
                     Analytics.Initialize(writeKey, new Config().SetAsync(false));
                 timestamp = timestamp ?? DateTime.Now;
-                if(Analytics.Client == null)
-                    throw new ExternalAnalyticsException("Analytics.Client faild to initail"); 
+                if (Analytics.Client == null)
+                    throw new ExternalAnalyticsException("Analytics.Client faild to initail");
 
-                if (string.IsNullOrEmpty(userId) && !traits.ContainsKey(ExternalAnalyticsTraitsKey.email.ToString()) )
+                if (string.IsNullOrEmpty(userId) && !traits.ContainsKey(ExternalAnalyticsTraitsKey.email.ToString()))
                 {
                     throw new ExternalAnalyticsException("missing username or email");
                 }
 
 
-                userId = !string.IsNullOrEmpty(userId) ?userId: traits[ExternalAnalyticsTraitsKey.email.ToString()].ToString();
+                userId = !string.IsNullOrEmpty(userId) ? userId : traits[ExternalAnalyticsTraitsKey.email.ToString()].ToString();
                 string name = !traits.ContainsKey(ExternalAnalyticsTraitsKey.name.ToString()) ? userId : traits[ExternalAnalyticsTraitsKey.name.ToString()].ToString();
-                if ((identify || actioName == ExternalAnalyticsAction.SignedUp || actioName == ExternalAnalyticsAction.SocialSignedUp)  )
+                if ((identify || actioName == ExternalAnalyticsAction.SignedUp || actioName == ExternalAnalyticsAction.SocialSignedUp))
                 {
-                    
+
                     string origIp = Convert.ToString(traits[ExternalAnalyticsTraitsKey.ipAddress.ToString()] ?? null);
-                    
+
                     Analytics.Client.Identify(userId, new Traits() {
                         { ExternalAnalyticsTraitsKey.email.ToString(), userId },
                         { ExternalAnalyticsTraitsKey.name.ToString(), name }
                         }, new Options().SetContext(new Context() {
                         { "ip", origIp }}).SetTimestamp(timestamp));
 
-                
-                }
-                switch (actioName)
-                {
-                    case ExternalAnalyticsAction.SignedUp:
-                            Analytics.Client.Track(userId, actioName.ToString(), new Properties() {
-                            { ExternalAnalyticsTraitsKey.name.ToString(), name }
-                        });
-                        break;
-                    case ExternalAnalyticsAction.SocialSignedUp:
-                        string provider = !traits.ContainsKey(ExternalAnalyticsTraitsKey.provider.ToString()) ? "Unknown" : traits[ExternalAnalyticsTraitsKey.provider.ToString()].ToString();
-                        Analytics.Client.Track(userId, actioName.ToString(), new Properties() {
+
+                    if (actioName == ExternalAnalyticsAction.SignedUp || actioName == ExternalAnalyticsAction.SocialSignedUp)
+                    {
+                        Analytics.Client.Track(userId, ExternalAnalyticsAction.SignedUp.ToString(), new Properties() {
+                                                { ExternalAnalyticsTraitsKey.name.ToString(), name }
+                                            });
+
+                        string provider = !traits.ContainsKey(ExternalAnalyticsTraitsKey.provider.ToString()) ? "self" : traits[ExternalAnalyticsTraitsKey.provider.ToString()].ToString();
+                        Analytics.Client.Track(userId, ExternalAnalyticsAction.SocialSignedUp.ToString(), new Properties() {
                             { ExternalAnalyticsTraitsKey.provider.ToString(), provider }
                         });
-                        break;
-                    default:
-                        break;
+                    }
                 }
-              
-                
+
+
+
+
                 Analytics.Client.Flush();
             }
             catch (Exception exception)
             {
-                logger.Log("externalLog-Segment" ,string.Empty,"_Log", exception,1,string.Empty);// System.Diagnostics.EventLogEntryType.FailureAudit, 1);
+                logger.Log("externalLog-Segment", string.Empty, "_Log", exception, 1, string.Empty);// System.Diagnostics.EventLogEntryType.FailureAudit, 1);
             }
 
         }
 
-        public void Log(ExternalAnalyticsAction actioName, DateTime? timestamp, string username,Dictionary<string, object> traits, bool identify = false)
+        public void Log(ExternalAnalyticsAction actioName, DateTime? timestamp, string username, Dictionary<string, object> traits, bool identify = false)
         {
             try
             {
