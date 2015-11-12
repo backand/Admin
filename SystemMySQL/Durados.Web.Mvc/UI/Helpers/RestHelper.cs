@@ -3907,12 +3907,24 @@ namespace Durados.Web.Mvc.UI.Helpers
 
         private  void SendSignupToAnalytics(string appName, string username,Dictionary<string,object> parameters)
         {
-            string provider = !parameters.ContainsKey("socialProfile") ? "Unknown" : (parameters["socialProfile"] as Durados.Web.Mvc.UI.Helpers.Social.Profile).Provider; 
-           
-            Analytics.Log(Durados.Web.Mvc.Logging.ExternalAnalyticsAction.SocialSignedUp,username, new Dictionary<string, object>() { 
+            try
+            {
+                if (string.IsNullOrEmpty(username) || appName != Maps.DuradosAppName)
+                    return;
+                string provider = ( parameters == null || !parameters.ContainsKey("socialProfile")  )? "self" : (parameters["socialProfile"] as Durados.Web.Mvc.UI.Helpers.Social.Profile).Provider;
+
+                Analytics.Log(Durados.Web.Mvc.Logging.ExternalAnalyticsAction.SocialSignedUp, username, new Dictionary<string, object>() { 
                              { Durados.Web.Mvc.Logging.ExternalAnalyticsTraitsKey.name.ToString(), username } 
                             , { Durados.Web.Mvc.Logging.ExternalAnalyticsTraitsKey.provider.ToString(), provider } 
                             ,{ Durados.Database.AppName, appName}});
+            }
+            catch (Exception exception){
+                try
+                {
+                    Maps.Instance.DuradosMap.Logger.Log("Anaytics", "Log-Signup", "SendSignupToAnalytics", exception, 1, null, DateTime.Now);
+                }
+                catch { }
+            }
         }
 
         private bool IsSignupEmailVerification(string appName, bool? isSignupEmailVerification)

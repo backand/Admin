@@ -58,7 +58,7 @@ namespace Durados.Web.Mvc.Logging
 
                 if (string.IsNullOrEmpty(userId) && !traits.ContainsKey(ExternalAnalyticsTraitsKey.email.ToString()))
                 {
-                    throw new ExternalAnalyticsException("missing username or email");
+                    throw new ExternalAnalyticsException("Analytics missing username or email");
                 }
 
 
