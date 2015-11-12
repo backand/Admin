@@ -76,6 +76,7 @@ namespace BackAnd.Web.Api.Controllers
 
          [Route("businessrule/{id}")]
          [Route("action/config/{id}")]
+        [BackAnd.Web.Api.Controllers.Filters.ConfigBackupFilter]
         [HttpPut]
         public virtual IHttpActionResult Put(string id)
         {
@@ -163,6 +164,7 @@ namespace BackAnd.Web.Api.Controllers
 
         [Route("businessrule")]
         [Route("action/config")]
+        [BackAnd.Web.Api.Controllers.Filters.ConfigBackupFilter]
         public virtual IHttpActionResult Post()
         {
             return base.Post();
@@ -257,6 +259,7 @@ namespace BackAnd.Web.Api.Controllers
 
         [Route("businessrule/{id}")]
         [Route("action/config/{id}")]
+        [BackAnd.Web.Api.Controllers.Filters.ConfigBackupFilter]
         public virtual IHttpActionResult Delete(string id)
         {
             return base.Delete(id);

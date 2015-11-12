@@ -368,7 +368,7 @@ namespace Durados.DataAccess
 
         public override string GetTableRowsCount(string tableName, string indexName)
         {
-            return "select count(*) from " + tableName + " use index(" + indexName + ")";
+            return "select count(*) from `" + tableName + "` use index(" + indexName + ")";
         }
 
         public override string GetEntitiesSelectStatement()

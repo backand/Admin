@@ -1705,7 +1705,25 @@ namespace Durados.Web.Mvc.UI.Helpers
     {
         protected virtual bool IsAdmin(Database database)
         {
-            string role = database.GetUserRole(database.GetCurrentUsername());
+            string role = null;
+            try
+            {
+                if (System.Web.HttpContext.Current.Items["role"] != null)
+                {
+                    role = System.Web.HttpContext.Current.Items["role"].ToString();
+                }
+            }
+            catch { }
+            if (role == null)
+            {
+                role = database.GetUserRole(database.GetCurrentUsername());
+                try
+                {
+                    System.Web.HttpContext.Current.Items["role"] = role;
+                }
+                catch { }
+            }
+
 
             return role == "Admin" || role == "Developer";
 

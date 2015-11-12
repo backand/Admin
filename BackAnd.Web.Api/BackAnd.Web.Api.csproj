@@ -190,6 +190,7 @@
     <Compile Include="Controllers\accountController.cs" />
     <Compile Include="Controllers\Admin\actionTemplateController.cs" />
     <Compile Include="Controllers\Admin\farmController.cs" />
+    <Compile Include="Controllers\Admin\hostingController.cs" />
     <Compile Include="Controllers\Admin\nosqlController.cs" />
     <Compile Include="Controllers\Admin\myAppConnectionController.cs" />
     <Compile Include="Controllers\Admin\myAppsController.cs" />
@@ -202,11 +203,13 @@
     <Compile Include="Controllers\dashboardConfigController.cs" />
     <Compile Include="Controllers\chartDataController.cs" />
     <Compile Include="Controllers\chartConfigController.cs" />
+    <Compile Include="Controllers\Filters\ConfigBackupFilterAttribute.cs" />
     <Compile Include="Controllers\Filters\ResponseHeaderFilterAttribute.cs" />
     <Compile Include="Controllers\Filters\MasterKeyAuthorize.cs" />
     <Compile Include="Controllers\Filters\TokenAuthorizeAttribute .cs" />
     <Compile Include="Controllers\Filters\LogActionFilterAttribute.cs" />
     <Compile Include="Controllers\Filters\LogExceptionFilterAttribute .cs" />
+    <Compile Include="IHasMap.cs" />
     <Compile Include="Controllers\uploadConfigController.cs" />
     <Compile Include="Controllers\queryDataController.cs" />
     <Compile Include="Controllers\ruleController.cs" />
@@ -215,7 +218,6 @@
     <Compile Include="Controllers\fileController.cs" />
     <Compile Include="Controllers\businessRuleController.cs" />
     <Compile Include="Controllers\userController.cs" />
-    <Compile Include="Controllers\paymentController.cs" />
     <Compile Include="Controllers\userRoleDataController.cs" />
     <Compile Include="Controllers\wfController.cs" />
     <Compile Include="Controllers\viewDataController.cs" />

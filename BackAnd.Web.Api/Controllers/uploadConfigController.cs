@@ -49,12 +49,14 @@ namespace BackAnd.Web.Api.Controllers
             return base.Get(withSelectOptions, pageNumber, pageSize, filter, sort, search);
         }
          [Route("{id}")]
+        [BackAnd.Web.Api.Controllers.Filters.ConfigBackupFilter]
         public override IHttpActionResult Put(string id)
         {
             return base.Put(id);
         }
 
          [Route("{viewName}/{fieldName}")]
+         [BackAnd.Web.Api.Controllers.Filters.ConfigBackupFilter]
          public override IHttpActionResult Post()
          {
              IDictionary<string,object> values = Request.GetRouteData().Values;
@@ -117,13 +119,14 @@ namespace BackAnd.Web.Api.Controllers
              return false;
          }
 
-        
-        [Route("{id}")]
-        [HttpDelete]
-        public override IHttpActionResult Delete(string id)
-        {
-            return base.Delete(id);
-        }
+
+         [Route("{id}")]
+         [HttpDelete]
+         [BackAnd.Web.Api.Controllers.Filters.ConfigBackupFilter]
+         public override IHttpActionResult Delete(string id)
+         {
+             return base.Delete(id);
+         }
 
         const string NAME = "Title";
         protected override IHttpActionResult ValidateInputForPost(View view, Dictionary<string, object> values)

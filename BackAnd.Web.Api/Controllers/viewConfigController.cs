@@ -1028,6 +1028,7 @@ namespace BackAnd.Web.Api.Controllers
             }
         }
 
+        [BackAnd.Web.Api.Controllers.Filters.ConfigBackupFilter]
         public virtual IHttpActionResult Post()
         {
             try
@@ -1404,7 +1405,8 @@ namespace BackAnd.Web.Api.Controllers
                 catch { }
             }
         }
-
+        
+        [BackAnd.Web.Api.Controllers.Filters.ConfigBackupFilter]
         public virtual IHttpActionResult Put(string name, bool reload = true)
         {
             try

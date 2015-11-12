@@ -650,7 +650,13 @@ namespace Durados.DataAccess.AutoGeneration.Dynamic
             foreach (DataColumn changedColumn in changedColumns)
             {
                 DataColumn originalColumn = dataset.Tables[viewName].Columns[changedColumn.ColumnName];
+                originalColumn.DefaultValue = null;
                 originalColumn.DataType = changedColumn.DataType;
+                try
+                {
+                    originalColumn.DefaultValue = changedColumn.DefaultValue;
+                }
+                catch { }
                 originalColumn.AutoIncrement = changedColumn.AutoIncrement;
                 if (originalColumn.DataType.Equals(typeof(string)))
                 {
@@ -1892,7 +1898,11 @@ namespace Durados.DataAccess.AutoGeneration.Dynamic
 
             foreach (DataColumn column in newColumns)
             {
-                MapDataSet.Field.AddFieldRow(viewRow, column.ColumnName, null, column.DataType.FullName, IsColumnPartOfPK(column), false, column.MaxLength, !column.AllowDBNull, column.DefaultValue == null ? string.Empty : column.DefaultValue.ToString());
+                try
+                {
+                    MapDataSet.Field.AddFieldRow(viewRow, column.ColumnName, null, column.DataType.FullName, IsColumnPartOfPK(column), false, column.MaxLength, !column.AllowDBNull, column.DefaultValue == null ? string.Empty : column.DefaultValue.ToString());
+                }
+                catch { }
             }
 
             foreach (DataColumn column in deletedColumns)
@@ -2037,23 +2047,32 @@ namespace Durados.DataAccess.AutoGeneration.Dynamic
 
             foreach (MapDataSet.FieldRow fieldRow in viewRow.GetFieldRows())
             {
-                DataColumn[] columns = AddField(ds, table, fieldRow, true);
-                if (fieldRow.PK)
-                {
-                    pk.AddRange(columns);
-                    autoIncrement = fieldRow.AutoIncrement;
-
-                    if (!hasPK)
+                DataColumn[] columns = null;
+                //try
+                //{
+                    columns = AddField(ds, table, fieldRow, true);
+                    if (fieldRow.PK)
                     {
-                        table.PrimaryKey = pk.ToArray();
-                        if (pk.Count == 1)
+                        pk.AddRange(columns);
+                        autoIncrement = fieldRow.AutoIncrement;
+
+                        if (!hasPK)
                         {
-                            if (table.PrimaryKey[0].DefaultValue != null)
-                                table.PrimaryKey[0].DefaultValue = null;
-                            table.PrimaryKey[0].AutoIncrement = autoIncrement;
+                            table.PrimaryKey = pk.ToArray();
+                            if (pk.Count == 1)
+                            {
+                                if (table.PrimaryKey[0].DefaultValue != null)
+                                    table.PrimaryKey[0].DefaultValue = null;
+                                table.PrimaryKey[0].AutoIncrement = autoIncrement;
+                            }
                         }
                     }
-                }
+                //}
+                //catch (Exception exception)
+                //{
+                //    Log("Mapper", "AddField", "AddField", exception, 1, "field: " + fieldRow.Name + ", view: " + table.TableName);
+
+                //}
             }
 
 

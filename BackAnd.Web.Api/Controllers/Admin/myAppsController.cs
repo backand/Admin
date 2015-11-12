@@ -150,9 +150,35 @@ namespace BackAnd.Web.Api.Controllers
                 {
                     databaseView = (View)Maps.Instance.GetMap(id).GetConfigDatabase().Views["Database"];
                 }
-                catch
+                catch (Exception exception)
                 {
+                    try
+                    {
+                        Maps.Instance.DuradosMap.Logger.Log("Map", "Initiate", "Get", exception, 1, "failt to initiate " + id);
+                    }
+                    catch { }
 
+                    try
+                    {
+                        HandleInitiationFailure(id);
+                        try
+                        {
+                            databaseView = (View)Maps.Instance.GetMap(id).GetConfigDatabase().Views["Database"];
+                        }
+                        catch
+                        {
+
+                        }
+                    }
+                    catch (Exception exception2)
+                    {
+                        try
+                        {
+                            Maps.Instance.DuradosMap.Logger.Log("Map", "Initiate", "HandleInitiationFailure", exception2, 1, "failt to HandleInitiationFailure " + id);
+                        }
+                        catch { }
+                    }
+                    
                 }
 
                 if (databaseView == null)
@@ -228,6 +254,18 @@ namespace BackAnd.Web.Api.Controllers
                 throw new BackAndApiUnexpectedResponseException(exception, this);
 
             }
+        }
+
+        private void HandleInitiationFailure(string id)
+        {
+            try
+            {
+                Maps.Instance.Restore(id);
+                RestHelper.Refresh(id);
+                new Sync().Initiate(Maps.Instance.GetMap(appName));
+                new Sync().Initiate(Maps.Instance.GetMap(appName));
+            }
+            catch { }
         }
 
         private bool BlobExists(string appName, string appId)
@@ -386,6 +424,7 @@ namespace BackAnd.Web.Api.Controllers
         Dictionary<string, object> databaseSettings = null;
         string appName = null;
         string newAppName = null;
+        [BackAnd.Web.Api.Controllers.Filters.ConfigBackupFilter]
         public virtual IHttpActionResult Put(string id)
         {
             try
