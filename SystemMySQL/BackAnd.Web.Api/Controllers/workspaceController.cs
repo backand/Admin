@@ -53,12 +53,14 @@ namespace BackAnd.Web.Api.Controllers
             return base.Get(withSelectOptions, pageNumber, pageSize, filter, sort, search);
         }
          [Route("{id}")]
-        public  IHttpActionResult Put(string id)
+        [BackAnd.Web.Api.Controllers.Filters.ConfigBackupFilter]
+        public IHttpActionResult Put(string id)
         {
             return base.Put(id);
         }
 
          [Route("")]
+         [BackAnd.Web.Api.Controllers.Filters.ConfigBackupFilter]
          public virtual IHttpActionResult Post()
          {
              return base.Post();
@@ -156,6 +158,7 @@ namespace BackAnd.Web.Api.Controllers
         }
         [Route("{id}")]
         [HttpDelete]
+        [BackAnd.Web.Api.Controllers.Filters.ConfigBackupFilter]
         public virtual IHttpActionResult Delete(string id)
         {
             return ResponseMessage(Request.CreateResponse(HttpStatusCode.NotImplemented,Messages.NotImplemented));

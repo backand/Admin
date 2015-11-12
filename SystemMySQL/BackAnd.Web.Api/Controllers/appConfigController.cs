@@ -138,6 +138,7 @@ namespace BackAnd.Web.Api.Controllers
 
         [System.Web.Http.HttpGet]
         [Route("sync")]
+        [BackAnd.Web.Api.Controllers.Filters.ConfigBackupFilter]
         public IHttpActionResult sync()
         {
             if (!IsAdmin())

@@ -460,7 +460,7 @@ namespace Durados.Web.Mvc
             {
                 string appName = Maps.Instance.GetAppName();
                 Logger.Log("Map", "Initiate", "Initiate", excepetion, 1, "App name:" + appName);
-                throw new DuradosException("Failed to initiate project: " + appName, excepetion);
+                throw new DuradosException("Failed to initiate app", excepetion);
             }
         }
 
@@ -1520,7 +1520,7 @@ namespace Durados.Web.Mvc
     "   //$http({\"method\":\"POST\",\"url\":\"http://www.mydomain.com/api/token\", \"data\":\"grant_type=password&username=\" + userInput.username + \"&password=\" + userInput.password, \"headers\":{\"Content-Type\":\"application/x-www-form-urlencoded\"}});\n" +
     "   \n" +
     "   //Return results of \"allow\" or \"deny\" to override the Backand auth and provide a denied message\n" +
-    "   //Return ignored to ignore this fucntion and use Backand default authentication\n" +
+    "   //Return ignore to ignore this fucntion and use Backand default authentication\n" +
     "   //Return additionalTokenInfo that will be added to backand auth result.\n" +
     "   //You may access this later by using the getUserDetails function of the Backand SDK.\n" +
     "   return {\"result\": \"ignore\", \"message\":\"\", \"additionalTokenInfo\":{}};\n" +
@@ -2910,6 +2910,22 @@ namespace Durados.Web.Mvc
 
         public SiteInfo SiteInfo { get; set; }
 
+        public void BackupConfig()
+        {
+            string filename = configDatabase.ConnectionString;
+            BackupConfig(filename);
+            BackupConfig(filename + ".xml");
+        }
+
+        private void BackupConfig(string filename)
+        {
+            string containerName = Maps.GetStorageBlobName(filename);
+
+            CloudBlobContainer container = GetContainer(containerName);
+
+            (new Durados.Web.Mvc.Azure.BlobBackup()).BackupSync(container, containerName);
+        }
+
         public void Refresh()
         {
             IsConfigChanged = true;
@@ -3606,7 +3622,6 @@ namespace Durados.Web.Mvc
             }
         }
 
-
         private void BlobTransferCompletedCallback(IAsyncResult result)
         {
             BlobTransferAsyncState state = (BlobTransferAsyncState)result.AsyncState;
@@ -3616,7 +3631,10 @@ namespace Durados.Web.Mvc
             try
             {
                 state.Blob.EndUploadFromStream(result);
-                Maps.Instance.Backup.BackupAsync(state.Container, state.BlobName);
+                if (!Maps.IsApi2())
+                {
+                    Maps.Instance.Backup.BackupAsync(state.Container, state.BlobName);
+                }
             }
             catch (Exception exception)
             {
@@ -4370,6 +4388,34 @@ namespace Durados.Web.Mvc
             return GetInMemoryKey() != null;
         }
 
+        public void Restore(string name)
+        {
+            int? id = AppExists(name);
+            if (!id.HasValue)
+                return;
+
+            string containerName = Maps.DuradosAppPrefix.Replace("_", "").Replace(".", "").ToLower() + id.ToString();
+            CloudBlobContainer container = GetContainer(containerName);
+
+            (new Durados.Web.Mvc.Azure.BlobBackup()).RestoreSync(container, containerName);
+
+            containerName += "xml";
+            container = GetContainer(containerName);
+
+            (new Durados.Web.Mvc.Azure.BlobBackup()).RestoreSync(container, containerName);
+        }
+
+        Azure.DuradosStorage storage = new Azure.DuradosStorage();
+
+        private CloudBlobContainer GetContainer(string filename)
+        {
+            // Get a handle on account, create a blob service client and get container proxy
+            //var account = CloudStorageAccount.Parse(RoleEnvironment.GetConfigurationSettingValue("ConfigAzureStorage"));
+            //var client = account.CreateCloudBlobClient();
+            //return client.GetContainerReference(RoleEnvironment.GetConfigurationSettingValue("configContainer"));
+            return storage.GetContainer(filename);
+        }
+
         private Maps()
         {
             InitPersistency();
@@ -4598,6 +4644,8 @@ namespace Durados.Web.Mvc
 
             UserPreviewUrl = System.Configuration.ConfigurationManager.AppSettings["UserPreviewUrl"] ?? ".backand.loc:4012/";
 
+            S3Bucket = System.Configuration.ConfigurationManager.AppSettings["S3Bucket"] ?? "hosting.backand.net";
+
         }
 
         public static string GetConfigPath(string filename)
@@ -4663,6 +4711,7 @@ namespace Durados.Web.Mvc
         public static string AzureCacheUrl { get; private set; }
         public static int AzureCachePort { get; private set; }
         public static string UserPreviewUrl { get; private set; }
+        public static string S3Bucket { get; private set; }
         
         public static TimeSpan AzureCacheUpdateInterval { get; private set; }
 
@@ -5406,6 +5455,12 @@ namespace Durados.Web.Mvc
             }
 
             return map;
+        }
+
+        public static bool IsApi2()
+        {
+            string s = System.Configuration.ConfigurationManager.AppSettings["GoogleClientId"];
+            return !string.IsNullOrEmpty(s);
         }
 
         public bool IsApi()

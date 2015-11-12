@@ -48,8 +48,19 @@ namespace BackAnd.Web.Api.Controllers
 
                 Dictionary<string, object> transformResult = Transform(json, false);
 
-                
+                const string Alter = "alter";
 
+                if (transformResult.ContainsKey(Alter))
+                {
+                    if (transformResult[Alter] is ArrayList)
+                    {
+                        ArrayList arrayList = (ArrayList)transformResult[Alter];
+                        for (int i = 0; i< arrayList.Count; i++)
+                        {
+                            arrayList[i] = AdjustSql(arrayList[i].ToString());
+                        }
+                    }
+                }
                 return Ok(transformResult);
             }
             catch (WebException exception)
@@ -68,8 +79,20 @@ namespace BackAnd.Web.Api.Controllers
             }
         }
 
+        private string AdjustSql(string sql)
+        {
+            sql = sql.Replace("int unsigned", "int(11)");
+            sql = sql.Replace(" boolean,", " bit,");
+            sql = sql.Replace(" boolean null", " bit null");
+            sql = sql.Replace(" boolean)", " bit)");
+            sql = sql.Replace(" boolean;", " bit;");
+            sql = new Squeezer().Squeeze(sql);
+            return sql;
+        }
+
         [Route("~/1/model")]
         [HttpPost]
+        [BackAnd.Web.Api.Controllers.Filters.ConfigBackupFilter]
         public IHttpActionResult Post(bool? firstTime = false)
         {
             try
@@ -86,12 +109,8 @@ namespace BackAnd.Web.Api.Controllers
                 }
 
                 string sql = string.Join(";", ((System.Collections.ArrayList)transformResult["alter"]).ToArray());
-                sql = sql.Replace("int unsigned", "int(11)");
-                sql = sql.Replace(" boolean,", " bit,");
-                sql = sql.Replace(" boolean null", " bit null");
-                sql = sql.Replace(" boolean)", " bit)");
-                sql = sql.Replace(" boolean;", " bit;");
-                sql = new Squeezer().Squeeze(sql);
+                sql = AdjustSql(sql);
+
                 if (!string.IsNullOrEmpty(sql))
                 {
 

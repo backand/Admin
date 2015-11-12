@@ -61,15 +61,34 @@ namespace Durados.Web.Mvc.Azure
     public class BlobBackup
     {
         public int NumberOfCopies { get; set; }
+        public string BackupPrefix { get; set; }
 
         public BlobBackup()
         {
             NumberOfCopies = 5;
+            BackupPrefix = "B";
+            if (Maps.IsApi2())
+            {
+                NumberOfCopies = 1;
+                BackupPrefix = "BU";
+           
+            }
+            
         }
 
         public void BackupAsync(CloudBlobContainer container, string blobName)
         {
             CopyAsync(container, blobName, NumberOfCopies);
+        }
+
+        public void BackupSync(CloudBlobContainer container, string blobName)
+        {
+            Copy(container, blobName, NumberOfCopies);
+        }
+
+        public void RestoreSync(CloudBlobContainer container, string blobName)
+        {
+            CopyBack(container, blobName, NumberOfCopies);
         }
 
         private void CopyAsync(CloudBlobContainer container, string blobName, int copy)
@@ -80,16 +99,30 @@ namespace Durados.Web.Mvc.Azure
             target.BeginCopyFromBlob(source, CopyAsyncCompletedCallback, state);
         }
 
+        private void Copy(CloudBlobContainer container, string blobName, int copy)
+        {
+            var source = container.GetBlobReference(GetSource(blobName, copy));
+            var target = container.GetBlobReference(GetTarget(blobName, copy));
+            target.CopyFromBlob(source);
+        }
+
+        private void CopyBack(CloudBlobContainer container, string blobName, int copy)
+        {
+            var source = container.GetBlobReference(GetSource(blobName, copy));
+            var target = container.GetBlobReference(GetTarget(blobName, copy));
+            source.CopyFromBlob(target);
+        }
+
         private string GetTarget(string blobName, int copy)
         {
-            return blobName + "B" + copy;
+            return blobName + BackupPrefix + copy;
         }
 
         private string GetSource(string blobName, int copy)
         {
             if (copy == 1)
                 return blobName;
-            return blobName + "B" + (copy - 1);
+            return blobName + BackupPrefix + (copy - 1);
         }
 
         private void CopyAsyncCompletedCallback(IAsyncResult result)

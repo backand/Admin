@@ -35,7 +35,7 @@ namespace BackAnd.Web.Api.Controllers
     //[System.Web.Http.Authorize]
     [LogExceptionFilter]
     [LogActionFilter]
-    public class apiController : ApiController
+    public class apiController : ApiController, IHasMap
     {
         protected const string JsonNull = "\"null\"";
         //
@@ -1624,6 +1624,9 @@ namespace BackAnd.Web.Api.Controllers
                 }
                 catch { }
         }
+
+
+        
     }
 
 

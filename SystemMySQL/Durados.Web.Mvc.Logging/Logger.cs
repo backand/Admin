@@ -450,6 +450,9 @@ namespace Durados.Web.Mvc.Logging
             if (username.Equals(superDeveloper) && System.Web.Configuration.WebConfigurationManager.ConnectionStrings["LogConnectionString"].ConnectionString != connectionString)
                 return null;
 
+            string clientIP = GetClientIP();
+            string clientInfo = GetClientInfo();
+
             if (guid != null)
             {
                 using (IDbConnection sqlConnection = GetConnection(connectionString))
@@ -515,7 +518,7 @@ namespace Durados.Web.Mvc.Logging
 
                                         sqlConnection.Open();
 
-                                        SetCommandParametrs(command, applicationName, username, controller, action, method, message, trace, logType, freeText, time, log, appName, guid);
+                                        SetCommandParametrs(command, applicationName, username, controller, action, method, message, trace, logType, freeText, time, log, appName, clientIP, clientInfo, guid);
 
                                         command.ExecuteNonQuery();
                                     }
@@ -564,6 +567,37 @@ namespace Durados.Web.Mvc.Logging
                 }
             }
             return log;
+        }
+
+        private string GetClientIP()
+        {
+            try
+            {
+                if (System.Web.HttpContext.Current == null)
+                    return null;
+                return System.Web.HttpContext.Current.Server.UrlDecode(System.Web.HttpContext.Current.Request.Headers["origin"].ToString());
+            }
+            catch
+            {
+                return null;
+            }
+        }
+
+        private string GetClientInfo()
+        {
+            try
+            {
+                if (System.Web.HttpContext.Current == null)
+                    return null;
+                return "origin=" + System.Web.HttpContext.Current.Server.UrlDecode(System.Web.HttpContext.Current.Request.Headers["origin"].ToString()) + "; " +
+                    "host=" + System.Web.HttpContext.Current.Server.UrlDecode(System.Web.HttpContext.Current.Request.Headers["host"].ToString()) + "; " +
+                    "referer=" + System.Web.HttpContext.Current.Server.UrlDecode(System.Web.HttpContext.Current.Request.Headers["referer"].ToString()) + "; " +
+                    "user-agent=" + System.Web.HttpContext.Current.Server.UrlDecode(System.Web.HttpContext.Current.Request.Headers["user-agent"].ToString());
+            }
+            catch
+            {
+                return null;
+            }
         }
 
         private string GetAppName()
@@ -651,12 +685,18 @@ namespace Durados.Web.Mvc.Logging
             }
             return log;
         }
-        private void SetCommandParametrs(IDbCommand cmd, string applicationName, string username, string controller, string action, string method, string message, string trace, int logType, string freeText, DateTime time, Log log, string appName,Guid? guid = null)
+        private void SetCommandParametrs(IDbCommand cmd, string applicationName, string username, string controller, string action, string method, string message, string trace, int logType, string freeText, DateTime time, Log log, string appName, string clientIP, string clientInfo, Guid? guid = null)
         {
             SetCommandParametrs(cmd, applicationName, username, controller, action, method, message, trace, logType, freeText, time, log, guid);
             IDataParameter appNameParameter = GetNewParameter(cmd, "AppName", SqlDbType.NVarChar);
             appNameParameter.Value = appName;
             cmd.Parameters.Add(appNameParameter);
+            IDataParameter clientIPParameter = GetNewParameter(cmd, "ClientIP", SqlDbType.NVarChar);
+            clientIPParameter.Value = clientIP;
+            cmd.Parameters.Add(clientIPParameter);
+            IDataParameter clientInfoParameter = GetNewParameter(cmd, "ClientInfo", SqlDbType.NVarChar);
+            clientInfoParameter.Value = clientInfo;
+            cmd.Parameters.Add(clientInfoParameter);
         }
         private void SetCommandParametrs(IDbCommand cmd, string applicationName, string username, string controller, string action, string method, string message, string trace, int logType, string freeText, DateTime time, Log log, Guid? guid = null)
         {
