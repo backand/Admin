@@ -49,7 +49,9 @@ namespace BackAnd.Web.Api.Controllers
                 JavaScriptSerializer jss = new JavaScriptSerializer();
                 var data = new Dictionary<string, object>() { { "bucket", bucket }, { "dir", dir } };
                 string json = jss.Serialize(data);
-                return Ok(bucketCredentials(json));
+                Dictionary<string, object> credentials = bucketCredentials(json);
+                credentials.Add("Info", new Dictionary<string, object>() { { "Bucket", bucket }, { "Dir", dir } });
+                return Ok(credentials);
             }
             catch (Exception exception)
             {
