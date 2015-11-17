@@ -57,7 +57,7 @@ namespace Backand
         /// <param name="data"></param>
         /// <param name="users"></param>
         /// <returns></returns>
-        public virtual object emitUsers(string eventName, object data, List<string> users)
+        public virtual object emitUsers(string eventName, object data, object users)
         {
             if (users == null)
             {
@@ -67,7 +67,7 @@ namespace Backand
             return EmitPrivate(eventName, data, null, "Users", null, users);
         }
 
-        private object EmitPrivate(string eventName, object data, string appName, string mode,  string role="", List<string> users = null )
+        private object EmitPrivate(string eventName, object data, string appName, string mode, string role = "", object users = null)
         {
             try
             {
@@ -127,7 +127,7 @@ namespace Backand
 
         object emitRole(string eventName, object data, string role);
 
-        object emitUsers(string eventName, object data, List<string> users);
+        object emitUsers(string eventName, object data, object users);
 
     }
 }
