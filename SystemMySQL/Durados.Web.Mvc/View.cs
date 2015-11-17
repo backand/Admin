@@ -679,7 +679,7 @@ namespace Durados.Web.Mvc
                         try
                         {
 
-                            socket.emit(JsonName + "." + eventName, string.Format("{{\"id\":\"{0}\", \"objectName\":\"{1}\", \"event\":\"{2}\"}}", pk, JsonName, eventName), appName);
+                            socket.emitAll(JsonName + "." + eventName, string.Format("{{\"id\":\"{0}\", \"objectName\":\"{1}\", \"event\":\"{2}\"}}", pk, JsonName, eventName), appName);
 
                         }
                         catch (Exception exception)
