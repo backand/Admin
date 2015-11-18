@@ -86,10 +86,10 @@ namespace Backand
                 switch (mode)
                 {
                     case "Role":
-                        newData.Add("Role", role);
+                        newData.Add("role", role);
                         break;
                     case "Users":
-                        newData.Add("Users", users);
+                        newData.Add("users", users);
                         break;
                     default:
                         break;
