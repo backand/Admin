@@ -57,8 +57,15 @@
     </Otherwise>
   </Choose>
   <ItemGroup>
+    <Compile Include="AdminUtil.cs">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="AuthentificationTest.cs" />
+    <Compile Include="CrudUtil.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="TestUtil.cs" />
+    <Compile Include="LoginTests.cs" />
+    <Compile Include="CrudTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
