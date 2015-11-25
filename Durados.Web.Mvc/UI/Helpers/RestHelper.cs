@@ -59,6 +59,7 @@ namespace Durados.Web.Mvc.UI.Helpers
             {
                 Maps.Instance.StorageCache.Remove(blobName);
             }
+            FarmCaching.Instance.ClearMachinesCache(appname);
         }
 
         public static void AddStat(Dictionary<string, object> item, string appName)
@@ -79,9 +80,9 @@ namespace Durados.Web.Mvc.UI.Helpers
             return new DictionaryConverter().TableToDictionary(view, dataView, deep, descriptive, relatedObjects);
         }
 
-        public static Dictionary<string, object> RowToDictionary(View view, DataRow row, string pk, bool deep, bool displayParentValue = false, int level = 3)
+        public static Dictionary<string, object> RowToDictionary(View view, DataRow row, string pk, bool deep, bool displayParentValue = false, int level = 3, bool hideMetadata = false)
         {
-            return GetDictionaryConverter(view).RowToDictionary(view, row, pk, deep, displayParentValue, level);
+            return GetDictionaryConverter(view).RowToDictionary(view, row, pk, deep, displayParentValue, level, hideMetadata);
 
         }
 
@@ -113,13 +114,13 @@ namespace Durados.Web.Mvc.UI.Helpers
             return GetRest(view).Create(view, values, deep, beforeCreateCallback, beforeCreateInDatabaseEventHandler, afterCreateBeforeCommitCallback, afterCreateAfterCommitCallback);
         }
 
-        public static string Create(this View view, Dictionary<string, object>[] values, bool deep, BeforeCreateEventHandler beforeCreateCallback, BeforeCreateInDatabaseEventHandler beforeCreateInDatabaseEventHandler, AfterCreateEventHandler afterCreateBeforeCommitCallback, AfterCreateEventHandler afterCreateAfterCommitCallback, bool clearCache = false)
+        public static string Create(this View view, Dictionary<string, object>[] values, bool deep, BeforeCreateEventHandler beforeCreateCallback, BeforeCreateInDatabaseEventHandler beforeCreateInDatabaseEventHandler, AfterCreateEventHandler afterCreateBeforeCommitCallback, AfterCreateEventHandler afterCreateAfterCommitCallback, bool clearCache = false, IDbCommand command = null, IDbCommand sysCommand = null)
         {
             if (clearCache)
             {
                 ClearCache();
             }
-            return GetRest(view).Create(view, values, deep, beforeCreateCallback, beforeCreateInDatabaseEventHandler, afterCreateBeforeCommitCallback, afterCreateAfterCommitCallback);
+            return GetRest(view).Create(view, values, deep, beforeCreateCallback, beforeCreateInDatabaseEventHandler, afterCreateBeforeCommitCallback, afterCreateAfterCommitCallback, command, sysCommand);
         }
 
         const string RestDataCache = "RestDataCache";
@@ -141,14 +142,14 @@ namespace Durados.Web.Mvc.UI.Helpers
             Update(view, Deserialize(view, json), pk, deep, beforeEditCallback, beforeEditInDatabaseCallback, afteEditBeforeCommitCallback, afterEditAfterCommitCallback);
         }
 
-        public static void Update(this View view, Dictionary<string, object> values, string pk, bool deep, BeforeEditEventHandler beforeEditCallback, BeforeEditInDatabaseEventHandler beforeEditInDatabaseCallback, AfterEditEventHandler afteEditBeforeCommitCallback, AfterEditEventHandler afterEditAfterCommitCallback, BeforeCreateEventHandler beforeCreateCallback = null, BeforeCreateInDatabaseEventHandler beforeCreateInDatabaseCallback = null, AfterCreateEventHandler afterCreateBeforeCommitCallback = null, AfterCreateEventHandler afterCreateAfterCommitCallback = null, bool overwrite = false, BeforeDeleteEventHandler beforeDeleteCallback = null, AfterDeleteEventHandler afterDeleteBeforeCommitCallback = null, AfterDeleteEventHandler afterDeleteAfterCommitCallback = null, bool clearCache = false)
+        public static void Update(this View view, Dictionary<string, object> values, string pk, bool deep, BeforeEditEventHandler beforeEditCallback, BeforeEditInDatabaseEventHandler beforeEditInDatabaseCallback, AfterEditEventHandler afteEditBeforeCommitCallback, AfterEditEventHandler afterEditAfterCommitCallback, BeforeCreateEventHandler beforeCreateCallback = null, BeforeCreateInDatabaseEventHandler beforeCreateInDatabaseCallback = null, AfterCreateEventHandler afterCreateBeforeCommitCallback = null, AfterCreateEventHandler afterCreateAfterCommitCallback = null, bool overwrite = false, BeforeDeleteEventHandler beforeDeleteCallback = null, AfterDeleteEventHandler afterDeleteBeforeCommitCallback = null, AfterDeleteEventHandler afterDeleteAfterCommitCallback = null, bool clearCache = false, IDbCommand command = null, IDbCommand sysCommand = null)
         {
             if (clearCache)
             {
                 ClearCache();
             }
             
-            GetRest(view).Update(view, values, pk, deep, beforeEditCallback, beforeEditInDatabaseCallback, afteEditBeforeCommitCallback, afterEditAfterCommitCallback, beforeCreateCallback, beforeCreateInDatabaseCallback, afterCreateBeforeCommitCallback, afterCreateAfterCommitCallback, overwrite, beforeDeleteCallback, afterDeleteBeforeCommitCallback, afterDeleteAfterCommitCallback);
+            GetRest(view).Update(view, values, pk, deep, beforeEditCallback, beforeEditInDatabaseCallback, afteEditBeforeCommitCallback, afterEditAfterCommitCallback, beforeCreateCallback, beforeCreateInDatabaseCallback, afterCreateBeforeCommitCallback, afterCreateAfterCommitCallback, overwrite, beforeDeleteCallback, afterDeleteBeforeCommitCallback, afterDeleteAfterCommitCallback, command, sysCommand);
         }
 
         public static Dictionary<string, object> Deserialize(this View view, string json)
@@ -199,13 +200,13 @@ namespace Durados.Web.Mvc.UI.Helpers
             return values;
         }
 
-        public static void Delete(this View view, string pk, bool deep, BeforeDeleteEventHandler beforeDeleteCallback, AfterDeleteEventHandler afteDeleteBeforeCommitCallback, AfterDeleteEventHandler afterDeleteAfterCommitCallback, Dictionary<string, object> values = null, bool clearCache = false)
+        public static void Delete(this View view, string pk, bool deep, BeforeDeleteEventHandler beforeDeleteCallback, AfterDeleteEventHandler afteDeleteBeforeCommitCallback, AfterDeleteEventHandler afterDeleteAfterCommitCallback, Dictionary<string, object> values = null, bool clearCache = false, IDbCommand command = null, IDbCommand sysCommand = null)
         {
             if (clearCache)
             {
                 ClearCache();
             }
-            GetRest(view).Delete(view, pk, deep, beforeDeleteCallback, afteDeleteBeforeCommitCallback, afterDeleteAfterCommitCallback, null, null, values);
+            GetRest(view).Delete(view, pk, deep, beforeDeleteCallback, afteDeleteBeforeCommitCallback, afterDeleteAfterCommitCallback, command, sysCommand, values);
         }
 
         public static object Get(this Query query, int page, int pageSize, Dictionary<string, object> values, bool dataSeries = true)
@@ -531,7 +532,7 @@ namespace Durados.Web.Mvc.UI.Helpers
 
         }
 
-        public static Dictionary<string, object> Get(this View view, string pk, bool deep, BeforeSelectEventHandler beforeSelectCallback, AfterSelectEventHandler afterSelectCallback, bool displayParentValue = false, bool ignoreConfig = false, bool useCache = false, int level = 3)
+        public static Dictionary<string, object> Get(this View view, string pk, bool deep, BeforeSelectEventHandler beforeSelectCallback, AfterSelectEventHandler afterSelectCallback, bool displayParentValue = false, bool ignoreConfig = false, bool useCache = false, int level = 3, bool hideMetadata = false)
         {
             try
             {
@@ -562,7 +563,7 @@ namespace Durados.Web.Mvc.UI.Helpers
 
             map.Logger.Log(view.Name, pk, "before row to json", null, 5, null);
 
-            Dictionary<string, object> dic = RowToDictionary(view, dataRow, pk, deep, false, level);
+            Dictionary<string, object> dic = RowToDictionary(view, dataRow, pk, deep, false, level, hideMetadata);
 
             map.Logger.Log(view.Name, pk, "after row to json", null, 5, null);
 
@@ -1729,7 +1730,7 @@ namespace Durados.Web.Mvc.UI.Helpers
 
         }
 
-        public Dictionary<string, object>[] TableToDictionary(View view, DataView dataView, bool deep = false, bool descriptive = true, bool relatedObjects = false, int level = 3)
+        public Dictionary<string, object>[] TableToDictionary(View view, DataView dataView, bool deep = false, bool descriptive = true, bool relatedObjects = false, int level = 3, bool hideMetadata = false)
         {
             List<Dictionary<string, object>> list = new List<Dictionary<string, object>>();
 
@@ -1742,7 +1743,7 @@ namespace Durados.Web.Mvc.UI.Helpers
             {
                 if (deep && !relatedObjects)
                 {
-                    list.Add(RowToDictionary(view, row.Row, view.GetPkValue(row.Row), deep, false, level));
+                    list.Add(RowToDictionary(view, row.Row, view.GetPkValue(row.Row), deep, false, level, hideMetadata));
                 }
                 else
                 {
@@ -2033,24 +2034,24 @@ namespace Durados.Web.Mvc.UI.Helpers
             return "Err!";
         }
 
-        public Dictionary<string, object> RowToDictionary(View view, DataRow row, string pk, bool deep, bool displayParentValue, int level)
+        public Dictionary<string, object> RowToDictionary(View view, DataRow row, string pk, bool deep, bool displayParentValue, int level, bool hideMetadata)
         {
             if (deep)
-                return RowToDeepDictionary(view, row, level);
+                return RowToDeepDictionary(view, row, level, hideMetadata);
             else
                 return RowToShallowDictionary(view, row, pk, displayParentValue);
 
         }
 
-        public Dictionary<string, object> RowToDeepDictionary(View view, DataRow row, int level)
+        public Dictionary<string, object> RowToDeepDictionary(View view, DataRow row, int level, bool hideMetadata)
         {
-            return RowToDeepDictionary(view, row, true, new Dictionary<string, object>(), level, 0);
+            return RowToDeepDictionary(view, row, true, new Dictionary<string, object>(), level, 0, hideMetadata);
         }
 
 
         //System.Threading.Tasks.Task.Run(() =>Send(host, useDefaultCredentials, port, username, password, useSsl, to, cc, bcc, subject, message, fromEmail, fromNick, anonymousEmail, dontSend, files, logger, false));
 
-        public virtual Dictionary<string, object> RowToDeepDictionary(View view, DataRow dataRow, bool withChildren, Dictionary<string, object> pks, int level, int currentLevel)
+        public virtual Dictionary<string, object> RowToDeepDictionary(View view, DataRow dataRow, bool withChildren, Dictionary<string, object> pks, int level, int currentLevel, bool hideMetadata)
         {
             if (dataRow == null)
                 return null;
@@ -2064,7 +2065,8 @@ namespace Durados.Web.Mvc.UI.Helpers
             else
                 pks.Add(pk, dictionary);
 
-            dictionary.Add(Database.__metadata, GetRowMetadata(view, dataRow));
+            if (!hideMetadata)
+                dictionary.Add(Database.__metadata, GetRowMetadata(view, dataRow));
 
             var fields = GetFields(view);
 
@@ -2097,7 +2099,7 @@ namespace Durados.Web.Mvc.UI.Helpers
                             continue;
 
 
-                        Dictionary<string, object> childDictionary = RowToDeepDictionary(childrenView, childRow.Row, true, pks, level, currentLevel++);
+                        Dictionary<string, object> childDictionary = RowToDeepDictionary(childrenView, childRow.Row, true, pks, level, currentLevel + 1, hideMetadata);
 
                         if (childDictionary != null)
                         {
@@ -2128,7 +2130,7 @@ namespace Durados.Web.Mvc.UI.Helpers
                         continue;
                     }
 
-                    Dictionary<string, object> parentDictionary = RowToDeepDictionary(parentView, parentRow, false, pks, level, 0);
+                    Dictionary<string, object> parentDictionary = RowToDeepDictionary(parentView, parentRow, false, pks, level, 0, hideMetadata);
 
                     if (parentDictionary != null)
                     {
@@ -3923,20 +3925,21 @@ namespace Durados.Web.Mvc.UI.Helpers
             }
         }
 
-        private  void SendSignupToAnalytics(string appName, string username,Dictionary<string,object> parameters)
+        private void SendSignupToAnalytics(string appName, string username, Dictionary<string, object> parameters)
         {
             try
             {
                 if (string.IsNullOrEmpty(username) || appName != Maps.DuradosAppName)
                     return;
-                string provider = ( parameters == null || !parameters.ContainsKey("socialProfile")  )? "self" : (parameters["socialProfile"] as Durados.Web.Mvc.UI.Helpers.Social.Profile).Provider;
+                string provider = (parameters == null || !parameters.ContainsKey("socialProfile")) ? "self" : (parameters["socialProfile"] as Durados.Web.Mvc.UI.Helpers.Social.Profile).Provider;
 
                 Analytics.Log(Durados.Web.Mvc.Logging.ExternalAnalyticsAction.SocialSignedUp, username, new Dictionary<string, object>() { 
                              { Durados.Web.Mvc.Logging.ExternalAnalyticsTraitsKey.name.ToString(), username } 
                             , { Durados.Web.Mvc.Logging.ExternalAnalyticsTraitsKey.provider.ToString(), provider } 
                             ,{ Durados.Database.AppName, appName}});
             }
-            catch (Exception exception){
+            catch (Exception exception)
+            {
                 try
                 {
                     Maps.Instance.DuradosMap.Logger.Log("Anaytics", "Log-Signup", "SendSignupToAnalytics", exception, 1, null, DateTime.Now);
@@ -3999,7 +4002,7 @@ namespace Durados.Web.Mvc.UI.Helpers
             values.Add("firstName".AsToken(), row.IsNull("FirstName") ? username : row["FirstName"].ToString());
 
 
-            wfe.PerformActions(this.controller, view, Durados.TriggerDataAction.OnDemand, values, id, row, map.Database.ConnectionString, Convert.ToInt32(id), row["Role"].ToString(), null, "newUserVerification");
+            wfe.PerformActions(this.controller, view, Durados.TriggerDataAction.OnDemand, values, id, row, map.Database.ConnectionString, Convert.ToInt32(id), row["Role"].ToString(), null, null, "newUserVerification");
 
 
             Debug.WriteLine(encrypted);
@@ -4032,7 +4035,7 @@ namespace Durados.Web.Mvc.UI.Helpers
             values.Add("firstName".AsToken(), row.IsNull("FirstName") ? username : row["FirstName"].ToString());
 
 
-            wfe.PerformActions(this.controller, view, Durados.TriggerDataAction.OnDemand, values, id, row, map.Database.ConnectionString, Convert.ToInt32(id), row["Role"].ToString(), null, "userApproval");
+            wfe.PerformActions(this.controller, view, Durados.TriggerDataAction.OnDemand, values, id, row, map.Database.ConnectionString, Convert.ToInt32(id), row["Role"].ToString(), null, null, "userApproval");
 
 
             Debug.WriteLine(token);
@@ -4764,7 +4767,7 @@ namespace Durados.Web.Mvc.UI.Helpers
             values.Add("FirstName".AsToken(), row.IsNull("FirstName") ? username : row["FirstName"].ToString());
 
 
-            wfe.PerformActions(this.controller, view, Durados.TriggerDataAction.OnDemand, values, id, row, map.Database.ConnectionString, Convert.ToInt32(id), row["Role"].ToString(), null, "requestResetPassword");
+            wfe.PerformActions(this.controller, view, Durados.TriggerDataAction.OnDemand, values, id, row, map.Database.ConnectionString, Convert.ToInt32(id), row["Role"].ToString(), null, null, "requestResetPassword");
 
             Debug.WriteLine(token);
         }
@@ -5747,7 +5750,7 @@ namespace Durados.Web.Mvc.UI.Helpers
             Durados.Web.Mvc.Workflow.Engine wfe = CreateWorkflowEngine();
             try
             {
-                wfe.PerformActions(this, view, Durados.TriggerDataAction.OnDemand, values, null, null, map.Database.ConnectionString, Convert.ToInt32(map.Database.GetUserID()), map.Database.GetUserRole(), null, Durados.Database.CustomValidationActionName);
+                wfe.PerformActions(this, view, Durados.TriggerDataAction.OnDemand, values, null, null, map.Database.ConnectionString, Convert.ToInt32(map.Database.GetUserID()), map.Database.GetUserRole(), null, null, Durados.Database.CustomValidationActionName);
             }
             catch (Exception exception)
             {
@@ -6004,7 +6007,7 @@ namespace Durados.Web.Mvc.UI.Helpers
             if (map.HasRule("beforeSocialSignup"))
             {
                 Durados.Web.Mvc.Workflow.Engine wfe = new Durados.Web.Mvc.Workflow.Engine();
-                wfe.PerformActions(this, view, Durados.TriggerDataAction.OnDemand, values, null, null, map.Database.ConnectionString, -1, null, null, "beforeSocialSignup");
+                wfe.PerformActions(this, view, Durados.TriggerDataAction.OnDemand, values, null, null, map.Database.ConnectionString, -1, null, null, null, "beforeSocialSignup");
             }
         }
 

@@ -82,13 +82,11 @@ namespace BackAnd.Web.Api.Controllers
     {
         const string AppViewName = "durados_App";
 
-        protected override View GetView(string viewName)
+        protected internal override View GetView(string viewName)
         {
             return (View)Maps.Instance.DuradosMap.Database.Views[AppViewName];
         }
 
-
-        
         public IHttpActionResult Get(string id = null, bool? deep = null, bool? withSelectOptions = null, int? pageNumber = null, int? pageSize = null, string filter = null, string sort = null, string search = null)
         {
             if (id != null)

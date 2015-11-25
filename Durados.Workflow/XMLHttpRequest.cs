@@ -77,6 +77,35 @@ namespace Backand
         {
             try
             {
+                if (Durados.Workflow.JavaScript.IsCrud(request))
+                {
+                    try
+                    {
+                        string result = Durados.Workflow.JavaScript.PerformCrud(request, data);
+                        status = 200;
+                        responseText = result;
+                    }
+                    catch (Durados.Data.DataHandlerException e)
+                    {
+                        responseText = e.Message;
+                        status = e.Status;
+                    }
+
+                    return;
+                }
+            }
+            catch(Exception crudException) 
+            {
+                if (crudException.InnerException is StackOverflowException)
+                {
+                    responseText = crudException.Message;
+                    status = (int)HttpStatusCode.BadRequest;
+                    return;
+                }
+            }
+
+            try
+            {
                 if (Durados.Workflow.JavaScript.IsDebug() || request.RequestUri.AbsoluteUri.Contains("localhost") || request.RequestUri.AbsoluteUri.ToLower().Contains("backand"))
                 {
                     string appName = (Durados.Workflow.JavaScript.GetCacheInCurrentRequest(Durados.Database.AppName) ?? string.Empty).ToString();
@@ -154,6 +183,8 @@ namespace Backand
 
             try
             {
+
+
                 response = (HttpWebResponse)request.GetResponse();
 
                 status = (int)response.StatusCode;
@@ -162,7 +193,18 @@ namespace Backand
                     //Get response stream into StreamReader
                     using (Stream responseStream = response.GetResponseStream())
                     {
-                        using (StreamReader reader = new StreamReader(responseStream))
+                        string charset = GetCharset(request);
+                        Encoding encoding = Encoding.UTF8;
+                        if (charset != null)
+                        {
+                            try
+                            {
+                               encoding= Encoding.GetEncoding(charset);
+                            }
+                            catch { }
+                        }
+                            
+                        using (StreamReader reader = new StreamReader(responseStream,encoding))
                             responseText = reader.ReadToEnd();
                         //if(string.IsNullOrEmpty(responseText)) responseText="{}";
                     }
@@ -171,13 +213,19 @@ namespace Backand
             }
             catch (WebException we)
             {   //TODO: Add custom exception handling
+                if (we.Status == WebExceptionStatus.Timeout)
+                    status = (int)HttpStatusCode.RequestTimeout;
                 responseText = we.Message;
                 var encoding = ASCIIEncoding.ASCII;
-                using (var reader = new System.IO.StreamReader(we.Response.GetResponseStream(), encoding))
+                if (we.Response != null)
                 {
-                    responseText += ": " + reader.ReadToEnd();
+                    using (var reader = new System.IO.StreamReader(we.Response.GetResponseStream(), encoding))
+                    {
+                        responseText += ": " + reader.ReadToEnd();
+                    }
+                    status = (int)((System.Net.HttpWebResponse)(we.Response)).StatusCode;
                 }
-                status = (int)((System.Net.HttpWebResponse)(we.Response)).StatusCode;
+                
             }
             catch (Exception ex) { throw new Exception(ex.Message); }
             finally
@@ -192,6 +240,29 @@ namespace Backand
                 }
                 response = null;
                 request = null;
+            }
+        }
+
+        private string GetCharset(WebRequest request)
+        {
+            try
+            {
+                string contentType = request.ContentType;
+                string[] arr1 = contentType.Split(";".ToCharArray());
+                if (arr1.Length != 2)
+                {
+                    return null;
+                }
+                string[] arr2 = arr1.LastOrDefault().Split("=".ToCharArray());
+                if (arr2.Length != 2)
+                {
+                    return null;
+                }
+                return arr2.LastOrDefault();
+            }
+            catch
+            {
+                return null;
             }
         }
 

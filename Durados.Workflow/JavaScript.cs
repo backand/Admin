@@ -117,10 +117,149 @@ namespace Durados.Workflow
             // "The follwoing action: "aaa" failed to perform: Failed to load the javascript code: Line 166: Unexpected token }"
         }
 
-        public virtual void Execute(object controller, Dictionary<string, Parameter> parameters, View view, Dictionary<string, object> values, DataRow prevRow, string pk, string connectionString, int currentUsetId, string currentUserRole, IDbCommand command)
+        public static bool IsCrud(System.Net.WebRequest request)
         {
+            HashSet<string> methods = new HashSet<string>() { "POST", "PUT", "DELETE" };
+            string route = "/objects/";
+
+            return IsBackand(request) && request.RequestUri.AbsoluteUri.Contains(route) & methods.Contains(request.Method.ToUpper());
+        }
+
+        private static bool IsBackand(System.Net.WebRequest request)
+        {
+            string localhost = "localhost";
+            string backand = "backand";
+
+            return request.RequestUri.AbsoluteUri.Contains(localhost) || request.RequestUri.AbsoluteUri.ToLower().Contains(backand);
+        }
+
+        public static string PerformCrud(System.Net.WebRequest request, string json)
+        {
+            //, { "parameters", parameters }, { "view", view }, { "values", values }, { "prevRow", prevRow }, { "pk", pk }
+            Dictionary<string, object> executeArgs = (Dictionary<string, object>)GetCacheInCurrentRequest("js" + GetCacheInCurrentRequest(GuidKey));
+            if (executeArgs.ContainsKey("view"))
+                executeArgs["view"] = GetViewName(request);
+            else
+                executeArgs.Add("view", GetViewName(request));
+            if (executeArgs.ContainsKey("pk"))
+                executeArgs["pk"] = GetPk(request);
+            else
+                executeArgs.Add("pk", GetPk(request));
+            if (executeArgs.ContainsKey("parameters"))
+                executeArgs["parameters"] = GetParameters(request);
+            else
+                executeArgs.Add("parameters", GetParameters(request));
+
+
+            return PerformCrud(request, json, executeArgs);
+        }
+
+        private static string GetViewName(System.Net.WebRequest request)
+        {
+            if (request.Method == "POST")
+            {
+                return request.RequestUri.Segments.LastOrDefault();
+            }
+            else if (request.Method == "PUT" || request.Method == "DELETE")
+            {
+                return request.RequestUri.Segments[request.RequestUri.Segments.Length - 2];
+            }
+            else
+            {
+                return null;
+            }
+        }
+
+        private static string GetPk(System.Net.WebRequest request)
+        {
+            if (request.Method == "POST")
+            {
+                return null;
+            }
+            else if (request.Method == "PUT" || request.Method == "DELETE")
+            {
+                return request.RequestUri.Segments.LastOrDefault(); 
+            }
+            else
+            {
+                return null;
+            }
+        }
+
+        private static string GetParameters(System.Net.WebRequest request)
+        {
+            System.Collections.Specialized.NameValueCollection qs = System.Web.HttpUtility.ParseQueryString(request.RequestUri.Query);
+            return qs["Parameters"];
+        }
+
+        private static string PerformCrud(System.Net.WebRequest request, string json, Dictionary<string, object> executeArgs)
+        {
+            return PerformCrud(request, json, executeArgs, (Durados.Data.IData)executeArgs["controller"], (string)executeArgs["actionName"]);
+        }
+
+        private static string PerformCrud(System.Net.WebRequest request, string json, Dictionary<string, object> executeArgs, Durados.Data.IData controller, string actionName)
+        {
+            if (IsEndlessLoop(request, json))
+            {
+                throw new JavaScriptException(string.Format("The request '{0}' is repeating calling itself. Please change the action {1}", request.RequestUri.AbsoluteUri, actionName), new StackOverflowException());
+            }
+            return controller.DataHandler.PerformCrud(request, json, executeArgs);
+        }
+
+        private static bool IsEndlessLoop(System.Net.WebRequest request, string json)
+        {
+
+            string key = "endless" + GetActionName();
+            if (GetCacheInCurrentRequest(key) == null)
+                SetCacheInCurrentRequest(key, new HashSet<string>());
+            HashSet<string> requests = (HashSet<string>)GetCacheInCurrentRequest(key);
+
+            if (requests.Contains(request.RequestUri.AbsoluteUri + request.Method + json))
+            {
+                return true;
+            }
+            requests.Add(request.RequestUri.AbsoluteUri + request.Method + json);
+            return false;
+
+            //string prevUrl = (GetCacheInCurrentRequest("request" + GetCacheInCurrentRequest(GuidKey)) ?? string.Empty).ToString();
+            //string prevJson = (GetCacheInCurrentRequest("json" + GetCacheInCurrentRequest(GuidKey)) ?? string.Empty).ToString();
+
+            //SetCacheInCurrentRequest("request" + GetCacheInCurrentRequest(GuidKey), request.RequestUri.AbsoluteUri);
+            //SetCacheInCurrentRequest("json" + GetCacheInCurrentRequest(GuidKey), json);
+            
+            //return json.Equals(prevJson) && prevUrl.Equals(request.RequestUri.AbsoluteUri);
+        }
+
+        private static string GetActionName()
+        {
+            object args = GetCacheInCurrentRequest("js" + GetCacheInCurrentRequest(GuidKey));
+            if (args == null)
+                return string.Empty;
+
+            Dictionary<string, object> argsDic = (Dictionary<string, object>)args;
+            if (argsDic.ContainsKey("actionName"))
+                return argsDic["actionName"].ToString();
+
+            return string.Empty;
+        }
+
+        public virtual void Execute(object controller, Dictionary<string, Parameter> parameters, View view, Dictionary<string, object> values, DataRow prevRow, string pk, string connectionString, int currentUsetId, string currentUserRole, IDbCommand command, IDbCommand sysCommand, string actionName)
+        {
+            if (pk != null && prevRow == null)
+            {
+                try
+                {
+                    prevRow = ((Durados.Data.IData)controller).DataHandler.GetDataRow(view, pk, command);
+                }
+                catch { }
+            }
+
+            var guid = Guid.NewGuid();
+            SetCacheInCurrentRequest("js" + guid, new Dictionary<string, object>() { { "controller", controller }, { "connectionString", connectionString }, { "currentUsetId", currentUsetId }, { "currentUserRole", currentUserRole }, { "command", command }, { "sysCommand", sysCommand }, { "actionName", actionName } });
+            
+
             SetCacheInCurrentRequest(ConnectionStringKey, view.Database.SysDbConnectionString);
-            SetCacheInCurrentRequest(GuidKey, Guid.NewGuid());
+            SetCacheInCurrentRequest(GuidKey, guid);
             
             if (!parameters.ContainsKey("code"))
                 throw new DuradosException("code was not supplied");
@@ -195,7 +334,7 @@ namespace Durados.Workflow
             userProfile.Add("role", currentUserRole);
             userProfile.Add("app", view.Database.GetCurrentAppName());
             userProfile.Add("token", System.Web.HttpContext.Current.Request.Headers["Authorization"] ?? "anonymous-" + System.Web.HttpContext.Current.Request.Headers["AnonymousToken"]);
-            userProfile.Add("request", new Dictionary<string, object>() { { "headers", GetHeaders(System.Web.HttpContext.Current.Request.Headers) } });
+            userProfile.Add("request", new Dictionary<string, object>() { {"userIP", GetUserIP()}, { "headers", GetHeaders(System.Web.HttpContext.Current.Request.Headers) } });
 
             var call = new Jint.Engine(cfg => cfg.AllowClr(typeof(Backand.XMLHttpRequest).Assembly));
 
@@ -358,7 +497,31 @@ namespace Durados.Workflow
             return dic;
         }
 
-        
+        public static string GetUserIP()
+        {
+            var ip = (System.Web.HttpContext.Current.Request.ServerVariables["HTTP_X_FORWARDED_FOR"] != null
+                      && System.Web.HttpContext.Current.Request.ServerVariables["HTTP_X_FORWARDED_FOR"] != "")
+                     ? System.Web.HttpContext.Current.Request.ServerVariables["HTTP_X_FORWARDED_FOR"]
+                     : System.Web.HttpContext.Current.Request.ServerVariables["REMOTE_ADDR"];
+            if (ip.Contains(","))
+                ip = ip.Split(',').First().Trim();
+            return ip;
+        }
+    }
+
+    public class JavaScriptException :DuradosException
+    {
+        public JavaScriptException(string message)
+            : base(message)
+        {
+
+        }
+
+        public JavaScriptException(string message, Exception innerException)
+            : base(message, innerException)
+        {
+
+        }
     }
 
 }

@@ -90,7 +90,7 @@ namespace Durados.Workflow
 
         public Step.Result StepResult { set; get; }
 
-        public virtual void PerformActions(object controller, Durados.View view, Durados.TriggerDataAction dataAction, Dictionary<string, object> values, string pk, DataRow prevRow, string connectionString, int currentUserId, string currentUserRole, IDbCommand command, string ruleName = null)
+        public virtual void PerformActions(object controller, Durados.View view, Durados.TriggerDataAction dataAction, Dictionary<string, object> values, string pk, DataRow prevRow, string connectionString, int currentUserId, string currentUserRole, IDbCommand command, IDbCommand sysCommand, string ruleName = null)
         {
             SetCurrentDatabase(view);
 
@@ -111,7 +111,7 @@ namespace Durados.Workflow
                     try
                     {
                         view.Database.Logger.Log(view.Name, "Start", "PerformAction " + rule.Name, "Engine", "", 14, view.Database.Logger.NowWithMilliseconds(), DateTime.Now);
-                        object result = PerformAction(controller, rule.WorkflowAction, rule.GetParameters(), view, values, prevRow, pk, connectionString, currentUserId, currentUserRole, command);
+                        object result = PerformAction(controller, rule.WorkflowAction, rule.GetParameters(), view, values, prevRow, pk, connectionString, currentUserId, currentUserRole, command, sysCommand, rule.Name);
                         view.Database.Logger.Log(view.Name, "End", "PerformAction " + rule.Name, "Engine", "", 14, view.Database.Logger.NowWithMilliseconds(), DateTime.Now);
                         if (result != null)
                         {
@@ -407,7 +407,7 @@ namespace Durados.Workflow
             return string.Empty;
         }
 
-        protected virtual object PerformAction(object controller, Durados.WorkflowAction action, Dictionary<string, Parameter> parameters, View view, Dictionary<string, object> values, DataRow prevRow, string pk, string connectionString, int currentUserId, string currentUserRole, IDbCommand command)
+        protected virtual object PerformAction(object controller, Durados.WorkflowAction action, Dictionary<string, Parameter> parameters, View view, Dictionary<string, object> values, DataRow prevRow, string pk, string connectionString, int currentUserId, string currentUserRole, IDbCommand command, IDbCommand sysCommand, string actionName)
         {
             switch (action)
             {
@@ -420,7 +420,7 @@ namespace Durados.Workflow
                 case WorkflowAction.Execute:
                     return Execute(controller, parameters, view, prevRow, values, pk, connectionString, currentUserId, currentUserRole, command);
                 case WorkflowAction.JavaScript:
-                    return ExecuteJs(controller, parameters, view, prevRow, values, pk, connectionString, currentUserId, currentUserRole, command);
+                    return ExecuteJs(controller, parameters, view, prevRow, values, pk, connectionString, currentUserId, currentUserRole, command, sysCommand, actionName);
                 case WorkflowAction.WebService:
                     return CallWebService(controller, parameters, view, prevRow, values, pk, connectionString, currentUserId, currentUserRole, command);
                 case WorkflowAction.CompleteStep:
@@ -470,9 +470,9 @@ namespace Durados.Workflow
             return null;
         }
 
-        protected virtual object ExecuteJs(object controller, Dictionary<string, Parameter> parameters, View view, DataRow prevRow, Dictionary<string, object> values, string pk, string connectionString, int currentUserId, string currentUserRole, IDbCommand command)
+        protected virtual object ExecuteJs(object controller, Dictionary<string, Parameter> parameters, View view, DataRow prevRow, Dictionary<string, object> values, string pk, string connectionString, int currentUserId, string currentUserRole, IDbCommand command, IDbCommand sysCommand, string actionName)
         {
-            javaScript.Execute(controller, parameters, view, values, prevRow, pk, connectionString, currentUserId, currentUserRole, command);
+            javaScript.Execute(controller, parameters, view, values, prevRow, pk, connectionString, currentUserId, currentUserRole, command, sysCommand, actionName);
             return null;
         }
 

@@ -2048,8 +2048,8 @@ namespace Durados.DataAccess.AutoGeneration.Dynamic
             foreach (MapDataSet.FieldRow fieldRow in viewRow.GetFieldRows())
             {
                 DataColumn[] columns = null;
-                //try
-                //{
+                try
+                {
                     columns = AddField(ds, table, fieldRow, true);
                     if (fieldRow.PK)
                     {
@@ -2067,12 +2067,12 @@ namespace Durados.DataAccess.AutoGeneration.Dynamic
                             }
                         }
                     }
-                //}
-                //catch (Exception exception)
-                //{
-                //    Log("Mapper", "AddField", "AddField", exception, 1, "field: " + fieldRow.Name + ", view: " + table.TableName);
+                }
+                catch (Exception exception)
+                {
+                    Log("Mapper", "AddField", "AddField", exception, 1, "field: " + fieldRow.Name + ", view: " + table.TableName);
 
-                //}
+                }
             }
 
 

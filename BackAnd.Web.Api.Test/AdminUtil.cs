@@ -3,6 +3,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using RestSharp;
 using Newtonsoft.Json;
 using System.Collections.Generic;
+using System.Threading;
 
 namespace BackAnd.Web.Api.Test
 {
@@ -13,22 +14,261 @@ namespace BackAnd.Web.Api.Test
         public Actions Actions { get; private set; }
         public Objects Objects { get; private set; }
 
-        public AdminUtility()
+        internal Envirement env = Envirement.Dev;
+        internal RestClient client = null;
+
+        public AdminUtility(string appName, string username, string password, Envirement env = Envirement.Dev)
         {
+            this.env = env;
+            client = new TestUtil(env).GetAuthentificatedClient(appName, username, password);
             Actions = new Actions(this);
             Objects = new Objects(this);
         }
 
+        public IRestResponse CreateApp(string name, string title)
+        {
+            // Arrange
+            var data = new { Name = name, Title = title };
+            var request = new RestRequest("/admin/myApps", Method.POST);
+            request.RequestFormat = DataFormat.Json;
+            request.AddBody(data);
+            
+            // Act
+            var response = client.Execute(request);
+            if (response.StatusCode == System.Net.HttpStatusCode.OK)
+            {
+                var result = JsonConvert.DeserializeObject<Dictionary<string, object>>(response.Content);
 
+                // Assert
+                Assert.IsTrue(result.ContainsKey("__metadata"));
+                Assert.IsTrue(result["__metadata"] is Newtonsoft.Json.Linq.JObject);
+                
+            }
+            return response;
+        }
+
+        public IRestResponse ConnectApp(string name)
+        {
+            //string schema = "[" +
+            //  "{" +
+            //    "\"name\": \"items\"," +
+            //    "\"fields\": {" +
+            //      "\"name\": {" +
+            //        "\"type\": \"string\"" +
+            //      "}," +
+            //      "\"description\": {" +
+            //        "\"type\": \"text\"" +
+            //      "}," +
+            //      "\"user\": {" +
+            //        "\"object\": \"users\"" +
+            //      "}" +
+            //    "}" +
+            //  "}," +
+            //  "{" +
+            //    "\"name\": \"users\"," +
+            //    "'\"fields\": {" +
+            //      "\"email\": {" +
+            //        "\"type\": \"string\"" +
+            //      "}," +
+            //      "\"firstName\": {" +
+            //        "\"type\": \"string\"" +
+            //      "}," +
+            //      "\"lastName\": {" +
+            //        "\"type\": \"string\"" +
+            //      "}," +
+            //      "\"items\": {" +
+            //        "\"collection\": \"items\"," +
+            //        "\"via\": \"user\"" +
+            //      "}" +
+            //    "}" +
+            //  "}" +
+            //"]";
+
+            var schema = new List<Dictionary<string, object>>() 
+            { 
+                new Dictionary<string, object>() 
+                { 
+                    { 
+                        "name", "items" 
+                    }, 
+                    { 
+                        "fields", new Dictionary<string, object>() 
+                        { 
+                            { 
+                                "name", new Dictionary<string, object>() 
+                                { 
+                                    {
+                                        "type", "string"
+                                    }
+                                }
+                            },
+                            { 
+                                "description", new Dictionary<string, object>() 
+                                { 
+                                    {
+                                        "type", "text"
+                                    }
+                                }
+                            },
+                            { 
+                                "user", new Dictionary<string, object>() 
+                                { 
+                                    {
+                                        "object", "users"
+                                    }
+                                }
+                            }
+                        } 
+                    } 
+                },
+                new Dictionary<string, object>() 
+                { 
+                    { 
+                        "name", "users" 
+                    }, 
+                    { 
+                        "fields", new Dictionary<string, object>() 
+                        { 
+                            { 
+                                "email", new Dictionary<string, object>() 
+                                { 
+                                    {
+                                        "type", "string"
+                                    }
+                                }
+                            },
+                            { 
+                                "firstName", new Dictionary<string, object>() 
+                                { 
+                                    {
+                                        "type", "string"
+                                    }
+                                }
+                            },
+                            { 
+                                "lastName", new Dictionary<string, object>() 
+                                { 
+                                    {
+                                        "type", "string"
+                                    }
+                                }
+                            },
+                            { 
+                                "items", new Dictionary<string, object>() 
+                                { 
+                                    {
+                                        "collection", "items"
+                                    },
+                                    {
+                                        "via", "user"
+                                    }
+                                }
+                            }
+                        } 
+                    } 
+                } 
+            };
+            
+
+//            {"product":"10","sampleApp":"","schema":[{
+   
+//    name:"yyy",
+//    fields:[{name:"c1", type:"ShortText"},{name:"c2",type:"SingleSelect"}]
+//}]}
+
+            return ConnectApp(name, schema);
+        }
+
+        public IRestResponse ConnectApp(string name, object schema)
+        {
+            // Arrange
+            var data = new {name = name, product= "10", schema = schema };
+            var request = new RestRequest("/admin/myAppConnection/{name}", Method.POST);
+            request.AddUrlSegment("name", name);
+            request.RequestFormat = DataFormat.Json;
+            request.AddBody(data);
+            request.Timeout = 1000 * 60 * 10;
+            // Act
+            var response = client.Execute(request);
+            // Assert
+            Assert.IsTrue(response.StatusCode == System.Net.HttpStatusCode.OK, response.Content);
+            
+            return response;
+        }
+
+
+        public IRestResponse GetAppStatus(string name)
+        {
+            // Arrange
+            var request = new RestRequest("/admin/myAppConnection/status/{name}", Method.GET);
+            request.AddUrlSegment("name", name);
+            request.RequestFormat = DataFormat.Json;
+            // Act
+            var response = client.Execute(request);
+            // Assert
+            Assert.IsTrue(response.StatusCode == System.Net.HttpStatusCode.OK, response.Content);
+
+            return response;
+        }
+
+        public IRestResponse WaitUntilAppIsReady(string name, int firstWait = 60, int interval = 10, int totalWait = 600)
+        {
+            Thread.Sleep(interval * 1000);
+            IRestResponse response = GetAppStatus(name);
+            string status = GetStatus(response);
+            if (status != OnBoardingStatus.Processing.ToString())
+            {
+                return response;
+            }
+            Thread.Sleep(firstWait * 1000);
+            DateTime start = DateTime.Now;
+
+            bool tooLong = false;
+            
+            while (!tooLong)
+            {
+                response = GetAppStatus(name);
+                status = GetStatus(response);
+                if (status != OnBoardingStatus.Processing.ToString())
+                {
+                    return response;
+                }
+                Thread.Sleep(interval * 1000);
+                tooLong = DateTime.Now.Subtract(start).TotalMinutes > totalWait;
+            }
+            Exception exception = new Exception("Too much time has passed");
+            Assert.Fail(exception.Message);
+            throw exception;
+        }
+
+        private string GetStatus(IRestResponse response)
+        {
+            if (response.StatusCode == System.Net.HttpStatusCode.OK)
+            {
+                Dictionary<string, object> data = null;
+                try
+                {
+                    data = JsonConvert.DeserializeObject<Dictionary<string, object>>(response.Content);
+                }
+                catch(Exception exception)
+                {
+                    Assert.Fail(exception.Message);
+                }
+                Assert.IsTrue(data.ContainsKey("status"), "response does not contain status");
+                return data["status"].ToString();
+            }
+            else
+            {
+                return response.StatusCode.ToString();
+            }
+        }
     }
 
     public class Objects : Config
     {
-        AdminUtility admin = null;
-
         public Objects(AdminUtility admin)
+            : base(admin)
         {
-            this.admin = admin;
         }
 
         public override string Route
@@ -41,11 +281,9 @@ namespace BackAnd.Web.Api.Test
 
     public class Actions : Config
     {
-        AdminUtility admin = null;
-
         public Actions(AdminUtility admin)
+            : base(admin)
         {
-            this.admin = admin;
         }
 
         public override string Route
@@ -171,6 +409,11 @@ namespace BackAnd.Web.Api.Test
 
     public abstract class Config
     {
+        protected AdminUtility admin = null;
+        public Config(AdminUtility admin)
+        {
+            this.admin = admin;
+        }
         public abstract string Route
         {
             get;
@@ -178,7 +421,7 @@ namespace BackAnd.Web.Api.Test
         public IRestResponse GetAll(bool? withSelectOptions = null, int? pageNumber = null, int? pageSize = null, FilterItem[] filter = null, SortItem[] sort = null, string search = null)
         {
             // Arrange
-            var client = TestUtil.GetAuthentificatedClient();
+            var client = new TestUtil(admin.env).GetAuthentificatedClient();
             var request = new RestRequest(Route, Method.GET);
             if (pageNumber.HasValue)
                 request.AddParameter("pageNumber", pageNumber.Value, ParameterType.QueryString);
@@ -208,7 +451,7 @@ namespace BackAnd.Web.Api.Test
         public IRestResponse GetOne(string id)
         {
             // Arrange
-            var client = TestUtil.GetAuthentificatedClient();
+            var client = new TestUtil(admin.env).GetAuthentificatedClient();
             var request = new RestRequest(Route + "/{id}", Method.GET);
             request.AddUrlSegment("id", id);
 
@@ -231,7 +474,7 @@ namespace BackAnd.Web.Api.Test
         public IRestResponse Post(object data)
         {
             // Arrange
-            var client = TestUtil.GetAuthentificatedClient();
+            var client = new TestUtil(admin.env).GetAuthentificatedClient();
             var request = new RestRequest(Route, Method.POST);
             request.RequestFormat = DataFormat.Json;
             request.AddBody(data);
@@ -252,7 +495,7 @@ namespace BackAnd.Web.Api.Test
         public IRestResponse Put(string id, object data)
         {
             // Arrange
-            var client = TestUtil.GetAuthentificatedClient();
+            var client = new TestUtil(admin.env).GetAuthentificatedClient();
             var request = new RestRequest(Route + "/{id}", Method.PUT);
             request.AddUrlSegment("id", id);
             request.RequestFormat = DataFormat.Json;
@@ -276,7 +519,7 @@ namespace BackAnd.Web.Api.Test
         public IRestResponse Delete(string id)
         {
             // Arrange
-            var client = TestUtil.GetAuthentificatedClient();
+            var client = new TestUtil(admin.env).GetAuthentificatedClient();
             var request = new RestRequest(Route + "/{id}", Method.DELETE);
             request.AddUrlSegment("id", id);
 
@@ -359,5 +602,13 @@ namespace BackAnd.Web.Api.Test
         Xml,
         Custom,
         JavaScript
+    }
+
+    public enum OnBoardingStatus
+    {
+        NotStarted = 0,
+        Ready = 1,
+        Processing = 2,
+        Error = 3
     }
 }

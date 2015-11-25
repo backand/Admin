@@ -32,10 +32,274 @@ DELETE	    |404 (Not Found), unless you want to delete the whole collection—no
 
 namespace BackAnd.Web.Api.Controllers
 {
+    public class DataHandler : Durados.Data.IDataHandler
+    {
+        viewDataController controller;
+        public DataHandler(viewDataController controller)
+        {
+            this.controller = controller;
+        }
+
+        public DataRow GetDataRow(Durados.View view, string pk, IDbCommand command = null)
+        {
+            if (command == null)
+            {
+                return view.GetDataRow(pk);
+            }
+            else
+            {
+                return view.GetDataRow2(pk, command);
+            }
+        }
+
+        private string GetObjectNameFromRequest(System.Net.WebRequest request)
+        {
+            return request.RequestUri.AbsoluteUri.Split('?').FirstOrDefault().Split(new string[] { "objects/" }, StringSplitOptions.None).LastOrDefault().Split('/').FirstOrDefault();
+        }
+
+        public string PerformCrud(System.Net.WebRequest request, string json, Dictionary<string, object> executeArgs)
+        {
+            if (request.Method.ToUpper() == "POST")
+            {
+                return Post(GetObjectNameFromRequest(request), json, (IDbCommand)executeArgs["command"], (IDbCommand)executeArgs["sysCommand"], GetNullableBoolFromRequest(request, "deep"), GetNullableBoolFromRequest(request, "returnObject"), (string)GetParamFromRequest(request, "parameters"));
+            }
+            else if (request.Method.ToUpper() == "PUT")
+            {
+                return Put(GetObjectNameFromRequest(request), (string)executeArgs["pk"], json, (IDbCommand)executeArgs["command"], (IDbCommand)executeArgs["sysCommand"], GetNullableBoolFromRequest(request, "deep"), GetNullableBoolFromRequest(request, "returnObject"), (string)GetParamFromRequest(request, "parameters"), GetNullableBoolFromRequest(request, "overwrite"));
+            }
+            else if (request.Method.ToUpper() == "DELETE")
+            {
+                return Delete(GetObjectNameFromRequest(request), (string)executeArgs["pk"], (IDbCommand)executeArgs["command"], (IDbCommand)executeArgs["sysCommand"], GetNullableBoolFromRequest(request, "deep"), (string)GetParamFromRequest(request, "parameters"));
+            }
+            else
+            {
+                return null;
+            }
+            
+        }
+
+        private bool? GetNullableBoolFromRequest(WebRequest request, string name)
+        {
+            object param = GetParamFromRequest(request, name);
+            if (param == null)
+                return null;
+            bool b = false;
+            if (bool.TryParse(param.ToString(), out b))
+            {
+                return b;
+            }
+            return null;
+        }
+
+        private object GetParamFromRequest(WebRequest request, string name)
+        {
+            return request.RequestUri.ParseQueryString()[name];
+        }
+
+        protected virtual string Post(string name, string json, IDbCommand command, IDbCommand sysCommand, bool? deep = null, bool? returnObject = null, string parameters = null)
+        {
+            Dictionary<string, object>[] values = null;
+            try
+            {
+                if (string.IsNullOrEmpty(name))
+                {
+                    throw new Durados.Data.DataHandlerException((int)HttpStatusCode.NotFound, Messages.ViewNameIsMissing);
+                }
+                Durados.Web.Mvc.View view = controller.GetView(name);
+                if (view == null)
+                {
+                    throw new Durados.Data.DataHandlerException((int)HttpStatusCode.NotFound, string.Format(Messages.ViewNameNotFound, name));
+                }
+                if (!view.IsCreatable() && !view.IsDuplicatable())
+                {
+                    throw new Durados.Data.DataHandlerException((int)HttpStatusCode.Forbidden, Messages.ActionIsUnauthorized);
+                }
+
+                json = System.Web.HttpContext.Current.Server.UrlDecode(json.Replace("%22", "%2522").Replace("%2B", "%252B").Replace("+", "%2B"));
+
+                values = viewDataController.GetParameters(parameters, view, json, deep ?? false);
+
+                string pk = view.Create(values, deep ?? false, controller.view_BeforeCreate, controller.view_BeforeCreateInDatabase, controller.view_AfterCreateBeforeCommit, controller.view_AfterCreateAfterCommit, false, command, sysCommand);
+
+                string[] pkArray = pk.Split(';');
+                int pkArrayLength = pkArray.Length;
+
+                if (returnObject.HasValue && returnObject.Value && pkArrayLength == 1)
+                {
+                    var item = RestHelper.Get(view, pk, deep ?? false, controller.view_BeforeSelect, controller.view_AfterSelect);
+                    return Ok(item);
+                }
+                else if (returnObject.HasValue && returnObject.Value && pkArrayLength > 1 && pkArrayLength <= 100)
+                {
+                    List<Dictionary<string, object>> data = new List<Dictionary<string, object>>();
+                    foreach (string key in pkArray)
+                    {
+                        var item = RestHelper.Get(view, key, deep ?? false, controller.view_BeforeSelect, controller.view_AfterSelect);
+                        data.Add(item);
+                    }
+
+                    Dictionary<string, object> items = new Dictionary<string, object>();
+                    items.Add("totalRows", pkArrayLength);
+                    items.Add("data", data.ToArray());
+
+                    return Ok(items);
+                }
+
+                object id = pk;
+                if (pkArrayLength > 1)
+                {
+                    id = pkArray;
+                }
+                return Ok(new { __metadata = new { id = id } });
+            }
+            catch (Exception exception)
+            {
+
+                throw new Durados.Data.DataHandlerException((int)HttpStatusCode.InternalServerError, exception.Message, exception);
+                
+            }
+        }
+
+        protected virtual string Put(string name, string id, string json, IDbCommand command, IDbCommand sysCommand, bool? deep = null, bool? returnObject = null, string parameters = null, bool? overwrite = null)
+        {
+            try
+            {
+
+                if (string.IsNullOrEmpty(id) || id.Equals("undefined"))
+                {
+                    throw new Durados.Data.DataHandlerException((int)HttpStatusCode.NotFound, Messages.IdIsMissing);
+                }
+
+                if (string.IsNullOrEmpty(name))
+                {
+                    throw new Durados.Data.DataHandlerException((int)HttpStatusCode.NotFound, Messages.ViewNameIsMissing);
+                }
+                Durados.Web.Mvc.View view = controller.GetView(name);
+                if (view == null)
+                {
+                    throw new Durados.Data.DataHandlerException((int)HttpStatusCode.NotFound, string.Format(Messages.ViewNameNotFound, name));
+                }
+                if (!view.IsEditable())
+                {
+                    throw new Durados.Data.DataHandlerException((int)HttpStatusCode.Forbidden, Messages.ActionIsUnauthorized);
+                }
+
+                json = System.Web.HttpContext.Current.Server.UrlDecode(json.Replace("%22", "%2522").Replace("%2B", "%252B").Replace("+", "%2B"));
+
+                if (string.IsNullOrEmpty(json))
+                {
+                    throw new Durados.Data.DataHandlerException((int)HttpStatusCode.NotFound, Messages.MissingObjectToUpdate);
+                }
+
+                Dictionary<string, object> values2 = view.Deserialize(json);
+
+
+                Dictionary<string, object> values = null;
+                if (deep ?? false)
+                {
+                    values = viewDataController.GetParametersForUpdateDeep(parameters, view, values2);
+                }
+                else
+                {
+                    values = viewDataController.GetParameters(parameters, view, values2);
+                }
+
+
+                view.Update(values, id, deep ?? false, controller.view_BeforeEdit, controller.view_BeforeEditInDatabase, controller.view_AfterEditBeforeCommit, controller.view_AfterEditAfterCommit, controller.view_BeforeCreate, controller.view_BeforeCreateInDatabase, controller.view_AfterCreateBeforeCommit, controller.view_AfterCreateAfterCommit, overwrite ?? false, controller.view_BeforeDelete, controller.view_AfterDeleteBeforeCommit, controller.view_AfterDeleteAfterCommit, false, command, sysCommand);
+
+                if (returnObject.HasValue && returnObject.Value)
+                {
+                    var item = RestHelper.Get(view, id, deep ?? false, controller.view_BeforeSelect, controller.view_AfterSelect);
+                    return Ok(item);
+                }
+
+                return Ok();
+            }
+            catch (Exception exception)
+            {
+                throw new Durados.Data.DataHandlerException((int)HttpStatusCode.InternalServerError, exception.Message, exception);
+               
+
+            }
+        }
+
+        protected virtual string Delete(string name, string id, IDbCommand command, IDbCommand sysCommand, bool? deep = null, string parameters = null)
+        {
+            try
+            {
+                if (string.IsNullOrEmpty(id))
+                {
+                    throw new Durados.Data.DataHandlerException((int)HttpStatusCode.NotFound, Messages.IdIsMissing);
+                }
+
+                if (string.IsNullOrEmpty(name))
+                {
+                    throw new Durados.Data.DataHandlerException((int)HttpStatusCode.NotFound, Messages.ViewNameIsMissing);
+                }
+                Durados.Web.Mvc.View view = controller.GetView(name);
+                if (view == null)
+                {
+                    throw new Durados.Data.DataHandlerException((int)HttpStatusCode.NotFound, string.Format(Messages.ViewNameNotFound, name));
+                }
+                if (!view.IsDeletable())
+                {
+                    throw new Durados.Data.DataHandlerException((int)HttpStatusCode.NotFound, Messages.ViewIsUnauthorized);
+                }
+
+                Dictionary<string, object> values = null;
+
+                if (!string.IsNullOrEmpty(parameters))
+                {
+                    values = new Dictionary<string, object>();
+                    Dictionary<string, object> rulesParameters = view.Deserialize(System.Web.HttpContext.Current.Server.UrlDecode(parameters));
+                    foreach (string key in rulesParameters.Keys)
+                    {
+                        if (!values.ContainsKey(key))
+                            values.Add(key.AsToken(), rulesParameters[key]);
+                    }
+                }
+
+                view.Delete(id, deep ?? false, controller.view_BeforeDelete, controller.view_AfterDeleteBeforeCommit, controller.view_AfterDeleteAfterCommit, values, false, command, sysCommand);
+
+
+                return Ok(new { __metadata = new { id = id } });
+            }
+            catch (RowNotFoundException exception)
+            {
+                throw new Durados.Data.DataHandlerException((int)HttpStatusCode.NotFound, exception.Message);
+            }
+            catch (System.Data.Common.DbException exception)
+            {
+                string message = exception.Message;
+                if (message.StartsWith("The DELETE statement conflicted with the REFERENCE constraint"))
+                    message = Messages.ForeignKeyDeleteViolation;
+                throw new Durados.Data.DataHandlerException((int)HttpStatusCode.ExpectationFailed, message);
+            }
+
+            catch (Exception exception)
+            {
+                throw new Durados.Data.DataHandlerException((int)HttpStatusCode.InternalServerError, exception.Message, exception);
+               
+
+            }
+        }
+
+        protected virtual string Ok()
+        {
+            return string.Empty;
+        }
+
+        protected virtual string Ok(object data)
+        {
+            JavaScriptSerializer jss = new JavaScriptSerializer();
+            return jss.Serialize(data);
+        }
+
+    }
     //[System.Web.Http.Authorize]
     [LogExceptionFilter]
     [LogActionFilter]
-    public class apiController : ApiController, IHasMap
+    public class apiController : ApiController, IHasMap, Durados.Data.IData
     {
         protected const string JsonNull = "\"null\"";
         //
@@ -52,6 +316,9 @@ namespace BackAnd.Web.Api.Controllers
             }
         }
 
+        public Durados.Data.IDataHandler DataHandler { get; private set; }
+        
+
         public Durados.Database Database { get; private set; }
         protected Durados.Web.Mvc.Workflow.Engine wfe = null;
         public const string GuidKey = "JsGuid";
@@ -60,6 +327,8 @@ namespace BackAnd.Web.Api.Controllers
         public apiController()
             : base()
         {
+            if (this is viewDataController)
+                DataHandler = new DataHandler((viewDataController)this);
             //Init();
         }
 
@@ -577,7 +846,7 @@ namespace BackAnd.Web.Api.Controllers
 
         #region select callbacks
 
-        protected virtual void view_BeforeSelect(object sender, SelectEventArgs e)
+        protected internal virtual void view_BeforeSelect(object sender, SelectEventArgs e)
         {
             if (string.IsNullOrEmpty(e.Sql))
                 SetPermanentFilter((Durados.Web.Mvc.View)e.View, (Durados.DataAccess.Filter)e.Filter);
@@ -585,7 +854,7 @@ namespace BackAnd.Web.Api.Controllers
                 SetSql(e);
         }
 
-        protected virtual void view_AfterSelect(object sender, SelectEventArgs e)
+        protected internal virtual void view_AfterSelect(object sender, SelectEventArgs e)
         {
         }
 
@@ -606,7 +875,7 @@ namespace BackAnd.Web.Api.Controllers
 
         #region create callbacks
 
-        protected void view_BeforeCreate(object sender, CreateEventArgs e)
+        protected internal void view_BeforeCreate(object sender, CreateEventArgs e)
         {
             try
             {
@@ -615,7 +884,13 @@ namespace BackAnd.Web.Api.Controllers
             catch (Exception exception)
             {
                 if (e.Command != null && e.Command.Transaction != null)
-                    e.Command.Transaction.Rollback();
+                {
+                    try
+                    {
+                        e.Command.Transaction.Rollback();
+                    }
+                    catch { }
+                }
                 //Map.Logger.Log(GetControllerNameForLog(this.ControllerContext), this.ControllerContext.RouteData.Values["action"].ToString(), exception.Source, exception, 1, null);
                 throw exception;
             }
@@ -646,7 +921,7 @@ namespace BackAnd.Web.Api.Controllers
                 e.UserId = currentUserId;
             }
 
-            CreateWorkflowEngine().PerformActions(this, e.View, TriggerDataAction.BeforeCreate, e.Values, e.PrimaryKey, null, Map.Database.ConnectionString, currentUserId, currentUserRole, e.Command);
+            CreateWorkflowEngine().PerformActions(this, e.View, TriggerDataAction.BeforeCreate, e.Values, e.PrimaryKey, null, Map.Database.ConnectionString, currentUserId, currentUserRole, e.Command, e.SysCommand);
         }
 
         private void LoadCreationSignature(Durados.View view, Dictionary<string, object> values)
@@ -766,7 +1041,7 @@ namespace BackAnd.Web.Api.Controllers
         }
 
 
-        protected void view_BeforeCreateInDatabase(object sender, CreateEventArgs e)
+        protected internal void view_BeforeCreateInDatabase(object sender, CreateEventArgs e)
         {
             try
             {
@@ -775,7 +1050,13 @@ namespace BackAnd.Web.Api.Controllers
             catch (Exception exception)
             {
                 if (e.Command != null && e.Command.Transaction != null)
-                    e.Command.Transaction.Rollback();
+                {
+                    try
+                    {
+                        e.Command.Transaction.Rollback();
+                    }
+                    catch { }
+                }
                 //Map.Logger.Log(GetControllerNameForLog(this.ControllerContext), this.ControllerContext.RouteData.Values["action"].ToString(), exception.Source, exception, 1, null);
                 throw exception;
             }
@@ -785,7 +1066,7 @@ namespace BackAnd.Web.Api.Controllers
         {
         }
 
-        virtual protected void view_AfterCreateBeforeCommit(object sender, CreateEventArgs e)
+        virtual protected internal void view_AfterCreateBeforeCommit(object sender, CreateEventArgs e)
         {
             try
             {
@@ -803,9 +1084,21 @@ namespace BackAnd.Web.Api.Controllers
             catch (Exception exception)
             {
                 if (e.Command != null && e.Command.Transaction != null)
-                    e.Command.Transaction.Rollback();
+                {
+                    try
+                    {
+                        e.Command.Transaction.Rollback();
+                    }
+                    catch { }
+                }
                 if (!Database.IdenticalSystemConnection && e.SysCommand != null && e.SysCommand.Transaction != null)
-                    e.SysCommand.Transaction.Rollback();
+                {
+                    try
+                    {
+                        e.SysCommand.Transaction.Rollback();
+                    }
+                    catch { }
+                }
                 //Map.Logger.Log(GetControllerNameForLog(this.ControllerContext), this.ControllerContext.RouteData.Values["action"].ToString(), exception.Source, exception, 1, null);
                 throw exception;
             }
@@ -867,12 +1160,12 @@ namespace BackAnd.Web.Api.Controllers
                 currentUserRole = Map.Database.DefaultGuestRole ?? Map.Database.NewUserDefaultRole;
             }
 
-            wfe.PerformActions(this, e.View, TriggerDataAction.AfterCreateBeforeCommit, e.Values, e.PrimaryKey, null, Map.Database.ConnectionString, Convert.ToInt32(((Durados.Web.Mvc.Database)e.View.Database).GetUserID()), currentUserRole, e.Command);
+            wfe.PerformActions(this, e.View, TriggerDataAction.AfterCreateBeforeCommit, e.Values, e.PrimaryKey, null, Map.Database.ConnectionString, Convert.ToInt32(((Durados.Web.Mvc.Database)e.View.Database).GetUserID()), currentUserRole, e.Command, e.SysCommand);
 
 
         }
 
-        protected void view_AfterCreateAfterCommit(object sender, CreateEventArgs e)
+        protected internal void view_AfterCreateAfterCommit(object sender, CreateEventArgs e)
         {
             AfterCreateAfterCommit(e);
         }
@@ -892,7 +1185,7 @@ namespace BackAnd.Web.Api.Controllers
             }
             if (wfe == null)
                 wfe = CreateWorkflowEngine();
-            wfe.PerformActions(this, e.View, TriggerDataAction.AfterCreate, e.Values, e.PrimaryKey, null, Map.Database.ConnectionString, Convert.ToInt32(((Durados.Web.Mvc.Database)e.View.Database).GetUserID()), currentUserRole, e.Command);
+            wfe.PerformActions(this, e.View, TriggerDataAction.AfterCreate, e.Values, e.PrimaryKey, null, Map.Database.ConnectionString, Convert.ToInt32(((Durados.Web.Mvc.Database)e.View.Database).GetUserID()), currentUserRole, e.Command, e.SysCommand);
 
 
         }
@@ -901,7 +1194,7 @@ namespace BackAnd.Web.Api.Controllers
 
         #region update callbacks
 
-        protected virtual void view_BeforeEditInDatabase(object sender, EditEventArgs e)
+        protected internal virtual void view_BeforeEditInDatabase(object sender, EditEventArgs e)
         {
             try
             {
@@ -910,7 +1203,13 @@ namespace BackAnd.Web.Api.Controllers
             catch (Exception exception)
             {
                 if (e.Command != null && e.Command.Transaction != null)
-                    e.Command.Transaction.Rollback();
+                {
+                    try
+                    {
+                        e.Command.Transaction.Rollback();
+                    }
+                    catch { }
+                }
                 //Map.Logger.Log(GetControllerNameForLog(this.ControllerContext), this.ControllerContext.RouteData.Values["action"].ToString(), exception.Source, exception, 1, null);
                 throw exception;
             }
@@ -920,7 +1219,7 @@ namespace BackAnd.Web.Api.Controllers
         {
         }
 
-        protected virtual void view_BeforeEdit(object sender, EditEventArgs e)
+        protected internal virtual void view_BeforeEdit(object sender, EditEventArgs e)
         {
             try
             {
@@ -929,7 +1228,13 @@ namespace BackAnd.Web.Api.Controllers
             catch (Exception exception)
             {
                 if (e.Command != null && e.Command.Transaction != null)
-                    e.Command.Transaction.Rollback();
+                {
+                    try
+                    {
+                        e.Command.Transaction.Rollback();
+                    }
+                    catch { }
+                }
                 //Map.Logger.Log(GetControllerNameForLog(this.ControllerContext), this.ControllerContext.RouteData.Values["action"].ToString(), exception.Source, exception, 1, null);
                 throw exception;
             }
@@ -986,7 +1291,7 @@ namespace BackAnd.Web.Api.Controllers
             }
             if (e.View.GetRules().Count() > 0)
             {
-                CreateWorkflowEngine().PerformActions(this, e.View, TriggerDataAction.BeforeEdit, e.Values, e.PrimaryKey, e.PrevRow, Map.Database.ConnectionString, currentUserId, currentUserRole, e.Command);
+                CreateWorkflowEngine().PerformActions(this, e.View, TriggerDataAction.BeforeEdit, e.Values, e.PrimaryKey, e.PrevRow, Map.Database.ConnectionString, currentUserId, currentUserRole, e.Command, e.SysCommand);
             }
         }
 
@@ -1053,7 +1358,7 @@ namespace BackAnd.Web.Api.Controllers
             }
         }
 
-        protected virtual void view_AfterEditBeforeCommit(object sender, EditEventArgs e)
+        protected internal virtual void view_AfterEditBeforeCommit(object sender, EditEventArgs e)
         {
             try
             {
@@ -1067,9 +1372,21 @@ namespace BackAnd.Web.Api.Controllers
             catch (Exception exception)
             {
                 if (e.Command != null && e.Command.Transaction != null)
-                    e.Command.Transaction.Rollback();
+                {
+                    try
+                    {
+                        e.Command.Transaction.Rollback();
+                    }
+                    catch { }
+                }
                 if (!Database.IdenticalSystemConnection && e.SysCommand != null && e.SysCommand.Transaction != null)
-                    e.SysCommand.Transaction.Rollback();
+                {
+                    try
+                    {
+                        e.SysCommand.Transaction.Rollback();
+                    }
+                    catch { }
+                }
                 // Map.Logger.Log(GetControllerNameForLog(this.ControllerContext), this.ControllerContext.RouteData.Values["action"].ToString(), exception.Source, exception, 1, null);
                 throw exception;
             }
@@ -1103,7 +1420,7 @@ namespace BackAnd.Web.Api.Controllers
             //    catch { }
             //}
 
-            wfe.PerformActions(this, e.View, TriggerDataAction.AfterEditBeforeCommit, e.Values, e.PrimaryKey, e.PrevRow, Map.Database.ConnectionString, userId, ((Durados.Web.Mvc.Database)e.View.Database).GetUserRole(), e.Command);
+            wfe.PerformActions(this, e.View, TriggerDataAction.AfterEditBeforeCommit, e.Values, e.PrimaryKey, e.PrevRow, Map.Database.ConnectionString, userId, ((Durados.Web.Mvc.Database)e.View.Database).GetUserRole(), e.Command, e.SysCommand);
 
             HandleUploadsSpecialPaths(e.View, DataAction.Edit, e.Values, e.PrimaryKey, (DataActionEventArgs)e);
 
@@ -1370,7 +1687,7 @@ namespace BackAnd.Web.Api.Controllers
             return dynastyPath += field.Name + ".";
         }
 
-        protected virtual void view_AfterEditAfterCommit(object sender, EditEventArgs e)
+        protected internal virtual void view_AfterEditAfterCommit(object sender, EditEventArgs e)
         {
             AfterEditAfterCommit(e);
         }
@@ -1381,7 +1698,7 @@ namespace BackAnd.Web.Api.Controllers
             if (wfe == null)
                 wfe = CreateWorkflowEngine();
 
-            wfe.PerformActions(this, e.View, TriggerDataAction.AfterEdit, e.Values, e.PrimaryKey, e.PrevRow, Map.Database.ConnectionString, Convert.ToInt32(((Durados.Web.Mvc.Database)e.View.Database).GetUserID()), ((Durados.Web.Mvc.Database)e.View.Database).GetUserRole(), e.Command);
+            wfe.PerformActions(this, e.View, TriggerDataAction.AfterEdit, e.Values, e.PrimaryKey, e.PrevRow, Map.Database.ConnectionString, Convert.ToInt32(((Durados.Web.Mvc.Database)e.View.Database).GetUserID()), ((Durados.Web.Mvc.Database)e.View.Database).GetUserRole(), e.Command, e.SysCommand);
            
             wfe.Notifier.Notify((Durados.Web.Mvc.View)e.View, 1, GetUsername(), e.OldNewValues, e.PrimaryKey, e.PrevRow, this, e.Values, GetSiteWithoutQueryString(), GetMainSiteWithoutQueryString());
              
@@ -1407,7 +1724,7 @@ namespace BackAnd.Web.Api.Controllers
 
         #region delete callbacks
 
-        protected void view_BeforeDelete(object sender, DeleteEventArgs e)
+        protected internal void view_BeforeDelete(object sender, DeleteEventArgs e)
         {
             try
             {
@@ -1416,7 +1733,13 @@ namespace BackAnd.Web.Api.Controllers
             catch (Exception exception)
             {
                 if (e.Command != null && e.Command.Transaction != null)
-                    e.Command.Transaction.Rollback();
+                {
+                    try
+                    {
+                        e.Command.Transaction.Rollback();
+                    }
+                    catch { }
+                }
                 //Map.Logger.Log(GetControllerNameForLog(this.ControllerContext), this.ControllerContext.RouteData.Values["action"].ToString(), exception.Source, exception, 1, null);
                 throw exception;
             }
@@ -1444,10 +1767,10 @@ namespace BackAnd.Web.Api.Controllers
                 e.History = GetNewHistory();
                 e.UserId = currentUserId;
             }
-            CreateWorkflowEngine().PerformActions(this, e.View, TriggerDataAction.BeforeDelete, e.Values, e.PrimaryKey, e.PrevRow, Map.Database.ConnectionString, currentUserId, currentUserRole, e.Command);
+            CreateWorkflowEngine().PerformActions(this, e.View, TriggerDataAction.BeforeDelete, e.Values, e.PrimaryKey, e.PrevRow, Map.Database.ConnectionString, currentUserId, currentUserRole, e.Command, e.SysCommand);
         }
 
-        protected void view_AfterDeleteBeforeCommit(object sender, DeleteEventArgs e)
+        protected internal void view_AfterDeleteBeforeCommit(object sender, DeleteEventArgs e)
         {
             try
             {
@@ -1461,7 +1784,13 @@ namespace BackAnd.Web.Api.Controllers
             catch (Exception exception)
             {
                 if (e.Command != null && e.Command.Transaction != null)
-                    e.Command.Transaction.Rollback();
+                {
+                    try
+                    {
+                        e.Command.Transaction.Rollback();
+                    }
+                    catch { }
+                }
                 //Map.Logger.Log(GetControllerNameForLog(this.ControllerContext), this.ControllerContext.RouteData.Values["action"].ToString(), exception.Source, exception, 1, null);
                 throw exception;
             }
@@ -1496,11 +1825,11 @@ namespace BackAnd.Web.Api.Controllers
             if (wfe == null)
                 wfe = CreateWorkflowEngine();
 
-            wfe.PerformActions(this, e.View, TriggerDataAction.AfterDeleteBeforeCommit, e.Values, e.PrimaryKey, e.PrevRow, Map.Database.ConnectionString, Convert.ToInt32(Map.Database.GetUserID()), ((Durados.Web.Mvc.Database)e.View.Database).GetUserRole(), e.Command);
+            wfe.PerformActions(this, e.View, TriggerDataAction.AfterDeleteBeforeCommit, e.Values, e.PrimaryKey, e.PrevRow, Map.Database.ConnectionString, Convert.ToInt32(Map.Database.GetUserID()), ((Durados.Web.Mvc.Database)e.View.Database).GetUserRole(), e.Command, e.SysCommand);
 
         }
 
-        protected void view_AfterDeleteAfterCommit(object sender, DeleteEventArgs e)
+        protected internal void view_AfterDeleteAfterCommit(object sender, DeleteEventArgs e)
         {
             AfterDeleteAfterCommit(e);
         }
@@ -1508,7 +1837,7 @@ namespace BackAnd.Web.Api.Controllers
         protected virtual void AfterDeleteAfterCommit(DeleteEventArgs e)
         {
 
-            wfe.PerformActions(this, e.View, TriggerDataAction.AfterDelete, e.Values, e.PrimaryKey, e.PrevRow, Map.Database.ConnectionString, Convert.ToInt32(Map.Database.GetUserID()), ((Durados.Web.Mvc.Database)e.View.Database).GetUserRole(), e.Command);
+            wfe.PerformActions(this, e.View, TriggerDataAction.AfterDelete, e.Values, e.PrimaryKey, e.PrevRow, Map.Database.ConnectionString, Convert.ToInt32(Map.Database.GetUserID()), ((Durados.Web.Mvc.Database)e.View.Database).GetUserRole(), e.Command, e.SysCommand);
             //wfe.Notifier.Notify((View)e.View, 3, GetUsername(), null, e.PrimaryKey, e.PrevRow, this, null, GetSiteWithoutQueryString(), GetMainSiteWithoutQueryString());
 
         }
@@ -1552,7 +1881,7 @@ namespace BackAnd.Web.Api.Controllers
         //    return json;
         //}
 
-        protected virtual Durados.Web.Mvc.View GetView(string viewName)
+        protected internal virtual Durados.Web.Mvc.View GetView(string viewName)
         {
             Durados.Web.Mvc.View view = (Durados.Web.Mvc.View)Map.Database.GetViewByJsonName(viewName);
             if (view != null)

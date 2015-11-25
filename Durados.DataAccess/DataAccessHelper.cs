@@ -162,6 +162,11 @@ namespace Durados.DataAccess
             return GetDataTableAccess(view).GetDataRow(view, pk);
         }
 
+        public static DataRow GetDataRow2(this View view, string pk, IDbCommand command)
+        {
+            return GetDataTableAccess(view).GetDataRow2(view, pk, command);
+        }
+
         public static DataRow GetDataRow(this View view, string pk, DataSet dataset)
         {
             return GetDataTableAccess(view).GetDataRow(view, pk, dataset);

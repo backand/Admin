@@ -140,7 +140,28 @@ namespace BackAnd.Web.Api.Controllers
                          catch { }
                          if (wfe == null)
                              wfe = CreateWorkflowEngine();
-                         wfe.PerformActions(this, view, Durados.TriggerDataAction.OnDemand, values, id, row, Map.Database.ConnectionString, userID, ((Durados.Web.Mvc.Database)view.Database).GetUserRole(), command, name);
+
+                         System.Data.IDbCommand sysCommand = null;
+                         System.Data.IDbTransaction sysTransaction = null; 
+                         System.Data.IDbConnection sysConnection = null;
+                         try
+                         {
+                             sysCommand = GetCommand(view.Database.SystemSqlProduct);
+                             sysConnection = SqlAccess.GetNewConnection(view.Database.SystemSqlProduct, view.Database.SystemConnectionString);
+                             sysConnection.Open();
+                             sysTransaction = sysConnection.BeginTransaction(System.Data.IsolationLevel.ReadCommitted);
+                             sysCommand.Connection = sysConnection;
+                             sysCommand.Transaction = sysTransaction;
+                         }
+                         catch { }
+                         wfe.PerformActions(this, view, Durados.TriggerDataAction.OnDemand, values, id, row, Map.Database.ConnectionString, userID, ((Durados.Web.Mvc.Database)view.Database).GetUserRole(), command, sysCommand, name);
+
+                         try
+                         {
+                             sysTransaction.Commit();
+                             sysConnection.Close();
+                         }
+                         catch { }
                      }
                  }
                  HttpResponseMessage response = null;
