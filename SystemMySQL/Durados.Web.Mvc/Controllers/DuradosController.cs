@@ -889,7 +889,7 @@ namespace Durados.Web.Mvc.Controllers
                 using (System.Data.IDbCommand command = view.GetNewCommand())
                 {
                     command.Connection.Open();
-                    wfe.PerformActions(this, view, TriggerDataAction.BeforeViewOpen, null, null, null, Map.Database.ConnectionString, Convert.ToInt32(Map.Database.GetUserID()), Map.Database.GetUserRole(), command);
+                    wfe.PerformActions(this, view, TriggerDataAction.BeforeViewOpen, null, null, null, Map.Database.ConnectionString, Convert.ToInt32(Map.Database.GetUserID()), Map.Database.GetUserRole(), command, null);
                     command.Connection.Close();
                 }
             }
@@ -4605,7 +4605,7 @@ namespace Durados.Web.Mvc.Controllers
                 e.UserId = currentUserId;
             }
 
-            CreateWorkflowEngine().PerformActions(this, e.View, TriggerDataAction.BeforeCreate, e.Values, e.PrimaryKey, null, Map.Database.ConnectionString, currentUserId, currentUserRole, e.Command);
+            CreateWorkflowEngine().PerformActions(this, e.View, TriggerDataAction.BeforeCreate, e.Values, e.PrimaryKey, null, Map.Database.ConnectionString, currentUserId, currentUserRole, e.Command, e.SysCommand);
         }
 
 
@@ -4897,7 +4897,7 @@ namespace Durados.Web.Mvc.Controllers
         {
             //Workflow.Engine wfe = CreateWorkflowEngine();
 
-            wfe.PerformActions(this, e.View, TriggerDataAction.AfterCreateBeforeCommit, e.Values, e.PrimaryKey, null, Map.Database.ConnectionString, Convert.ToInt32(((Database)e.View.Database).GetUserID()), ((Database)e.View.Database).GetUserRole(), e.Command);
+            wfe.PerformActions(this, e.View, TriggerDataAction.AfterCreateBeforeCommit, e.Values, e.PrimaryKey, null, Map.Database.ConnectionString, Convert.ToInt32(((Database)e.View.Database).GetUserID()), ((Database)e.View.Database).GetUserRole(), e.Command, e.SysCommand);
 
 
         }
@@ -5088,7 +5088,7 @@ namespace Durados.Web.Mvc.Controllers
         protected virtual void AfterCreateAfterCommit(CreateEventArgs e)
         {
             //Workflow.Engine wfe = CreateWorkflowEngine();
-            wfe.PerformActions(this, e.View, TriggerDataAction.AfterCreate, e.Values, e.PrimaryKey, null, Map.Database.ConnectionString, Convert.ToInt32(((Database)e.View.Database).GetUserID()), ((Database)e.View.Database).GetUserRole(), e.Command);
+            wfe.PerformActions(this, e.View, TriggerDataAction.AfterCreate, e.Values, e.PrimaryKey, null, Map.Database.ConnectionString, Convert.ToInt32(((Database)e.View.Database).GetUserID()), ((Database)e.View.Database).GetUserRole(), e.Command, e.SysCommand);
 
             HandleApi(e.View);
         }
@@ -5386,7 +5386,7 @@ namespace Durados.Web.Mvc.Controllers
                         object stepValue = view.WorkFlowStepsField.GetValue(prevRow);
                         values.Add(view.WorkFlowStepsFieldName, stepValue);
 
-                        wfe.PerformActions(this, view, TriggerDataAction.AfterCreateOrEdit, values, pk, prevRow, view.Database.ConnectionString, Convert.ToInt32(((Database)view.Database).GetUserID()), ((Database)view.Database).GetUserRole(), null);
+                        wfe.PerformActions(this, view, TriggerDataAction.AfterCreateOrEdit, values, pk, prevRow, view.Database.ConnectionString, Convert.ToInt32(((Database)view.Database).GetUserID()), ((Database)view.Database).GetUserRole(), null, null);
                     }
                     else
                     {
@@ -5516,7 +5516,7 @@ namespace Durados.Web.Mvc.Controllers
         {
             LoadModificationSignature(e.View, e.Values);
 
-            wfe.PerformActions(this, e.View, TriggerDataAction.BeforeCompleteStep, e.Values, e.PrimaryKey, e.PrevRow, Map.Database.ConnectionString, Convert.ToInt32(((Database)e.View.Database).GetUserID()), ((Database)e.View.Database).GetUserRole(), e.Command);
+            wfe.PerformActions(this, e.View, TriggerDataAction.BeforeCompleteStep, e.Values, e.PrimaryKey, e.PrevRow, Map.Database.ConnectionString, Convert.ToInt32(((Database)e.View.Database).GetUserID()), ((Database)e.View.Database).GetUserRole(), e.Command, e.SysCommand);
 
         }
 
@@ -5544,7 +5544,7 @@ namespace Durados.Web.Mvc.Controllers
 
         protected virtual void AfterCompleteStepBeforeCommit(EditEventArgs e)
         {
-            wfe.PerformActions(this, e.View, TriggerDataAction.AfterCompleteStepBeforeCommit, e.Values, e.PrimaryKey, e.PrevRow, Map.Database.ConnectionString, Convert.ToInt32(((Database)e.View.Database).GetUserID()), ((Database)e.View.Database).GetUserRole(), e.Command);
+            wfe.PerformActions(this, e.View, TriggerDataAction.AfterCompleteStepBeforeCommit, e.Values, e.PrimaryKey, e.PrevRow, Map.Database.ConnectionString, Convert.ToInt32(((Database)e.View.Database).GetUserID()), ((Database)e.View.Database).GetUserRole(), e.Command, e.SysCommand);
 
         }
 
@@ -5555,7 +5555,7 @@ namespace Durados.Web.Mvc.Controllers
 
         protected virtual void AfterCompleteStepAfterCommit(EditEventArgs e)
         {
-            wfe.PerformActions(this, e.View, TriggerDataAction.AfterCompleteStepAfterCommit, e.Values, e.PrimaryKey, e.PrevRow, Map.Database.ConnectionString, Convert.ToInt32(((Database)e.View.Database).GetUserID()), ((Database)e.View.Database).GetUserRole(), e.Command);
+            wfe.PerformActions(this, e.View, TriggerDataAction.AfterCompleteStepAfterCommit, e.Values, e.PrimaryKey, e.PrevRow, Map.Database.ConnectionString, Convert.ToInt32(((Database)e.View.Database).GetUserID()), ((Database)e.View.Database).GetUserRole(), e.Command, e.SysCommand);
 
         }
 
@@ -5876,7 +5876,7 @@ namespace Durados.Web.Mvc.Controllers
             }
             if (e.View.GetRules().Count() > 0)
             {
-                CreateWorkflowEngine().PerformActions(this, e.View, TriggerDataAction.BeforeEdit, e.Values, e.PrimaryKey, e.PrevRow, Map.Database.ConnectionString, currentUserId, currentUserRole, e.Command);
+                CreateWorkflowEngine().PerformActions(this, e.View, TriggerDataAction.BeforeEdit, e.Values, e.PrimaryKey, e.PrevRow, Map.Database.ConnectionString, currentUserId, currentUserRole, e.Command, e.SysCommand);
             }
         }
 
@@ -6028,7 +6028,7 @@ namespace Durados.Web.Mvc.Controllers
         {
 
             //Workflow.Engine wfe = CreateWorkflowEngine();
-            wfe.PerformActions(this, e.View, TriggerDataAction.AfterEditBeforeCommit, e.Values, e.PrimaryKey, e.PrevRow, Map.Database.ConnectionString, Convert.ToInt32(((Database)e.View.Database).GetUserID()), ((Database)e.View.Database).GetUserRole(), e.Command);
+            wfe.PerformActions(this, e.View, TriggerDataAction.AfterEditBeforeCommit, e.Values, e.PrimaryKey, e.PrevRow, Map.Database.ConnectionString, Convert.ToInt32(((Database)e.View.Database).GetUserID()), ((Database)e.View.Database).GetUserRole(), e.Command, e.SysCommand);
 
             HandleUploadsSpecialPaths(e.View, DataAction.Edit, e.Values, e.PrimaryKey, (DataActionEventArgs)e);
 
@@ -6339,7 +6339,7 @@ namespace Durados.Web.Mvc.Controllers
                 values.Add(view.WorkFlowStepsFieldName, stepValue);
             }
 
-            wfe.PerformActions(this, view, TriggerDataAction.AfterCreateOrEdit, values, pk, parentRow, view.Database.ConnectionString, Convert.ToInt32(((Database)view.Database).GetUserID()), ((Database)view.Database).GetUserRole(), null);
+            wfe.PerformActions(this, view, TriggerDataAction.AfterCreateOrEdit, values, pk, parentRow, view.Database.ConnectionString, Convert.ToInt32(((Database)view.Database).GetUserID()), ((Database)view.Database).GetUserRole(), null, null);
             if (wfe.StepResult == null)
                 return;
             //throw new Durados.Workflow.WorkflowEngineException("Please check workflow rules, complete step must be configured to AfterCreateOrEdit");
@@ -6389,7 +6389,7 @@ namespace Durados.Web.Mvc.Controllers
         protected virtual void AfterEditAfterCommit(EditEventArgs e)
         {
             //Workflow.Engine wfe = CreateWorkflowEngine();
-            wfe.PerformActions(this, e.View, TriggerDataAction.AfterEdit, e.Values, e.PrimaryKey, e.PrevRow, Map.Database.ConnectionString, Convert.ToInt32(((Database)e.View.Database).GetUserID()), ((Database)e.View.Database).GetUserRole(), e.Command);
+            wfe.PerformActions(this, e.View, TriggerDataAction.AfterEdit, e.Values, e.PrimaryKey, e.PrevRow, Map.Database.ConnectionString, Convert.ToInt32(((Database)e.View.Database).GetUserID()), ((Database)e.View.Database).GetUserRole(), e.Command, e.SysCommand);
 
             wfe.Notifier.Notify((View)e.View, 1, GetUsername(), e.OldNewValues, e.PrimaryKey, e.PrevRow, this, e.Values, GetSiteWithoutQueryString(), GetMainSiteWithoutQueryString());
 
@@ -6946,21 +6946,21 @@ namespace Durados.Web.Mvc.Controllers
                 e.History = GetNewHistory();
                 e.UserId = currentUserId;
             }
-            CreateWorkflowEngine().PerformActions(this, e.View, TriggerDataAction.BeforeDelete, e.Values, e.PrimaryKey, e.PrevRow, Map.Database.ConnectionString, currentUserId, currentUserRole, e.Command);
+            CreateWorkflowEngine().PerformActions(this, e.View, TriggerDataAction.BeforeDelete, e.Values, e.PrimaryKey, e.PrevRow, Map.Database.ConnectionString, currentUserId, currentUserRole, e.Command, e.SysCommand);
         }
 
         protected virtual void AfterDeleteBeforeCommit(DeleteEventArgs e)
         {
             //Workflow.Engine wfe = CreateWorkflowEngine();
 
-            wfe.PerformActions(this, e.View, TriggerDataAction.AfterDeleteBeforeCommit, e.Values, e.PrimaryKey, e.PrevRow, Map.Database.ConnectionString, Convert.ToInt32(Map.Database.GetUserID()), ((Database)e.View.Database).GetUserRole(), e.Command);
+            wfe.PerformActions(this, e.View, TriggerDataAction.AfterDeleteBeforeCommit, e.Values, e.PrimaryKey, e.PrevRow, Map.Database.ConnectionString, Convert.ToInt32(Map.Database.GetUserID()), ((Database)e.View.Database).GetUserRole(), e.Command, e.SysCommand);
 
         }
 
         protected virtual void AfterDeleteAfterCommit(DeleteEventArgs e)
         {
 
-            wfe.PerformActions(this, e.View, TriggerDataAction.AfterDelete, e.Values, e.PrimaryKey, e.PrevRow, Map.Database.ConnectionString, Convert.ToInt32(Map.Database.GetUserID()), ((Database)e.View.Database).GetUserRole(), e.Command);
+            wfe.PerformActions(this, e.View, TriggerDataAction.AfterDelete, e.Values, e.PrimaryKey, e.PrevRow, Map.Database.ConnectionString, Convert.ToInt32(Map.Database.GetUserID()), ((Database)e.View.Database).GetUserRole(), e.Command, e.SysCommand);
             wfe.Notifier.Notify((View)e.View, 3, GetUsername(), null, e.PrimaryKey, e.PrevRow, this, null, GetSiteWithoutQueryString(), GetMainSiteWithoutQueryString());
 
         }

@@ -11,15 +11,17 @@ namespace BackAnd.Web.Api.Test
     {
         string objectName = "items";
         string id = "1";
+        string appName = "app202";
+        string username = "relly";
+        string password = "123456";
+        
         CrudUtility crud = new CrudUtility();
-        AdminUtility admin = new AdminUtility();
+        AdminUtility admin = null;
         Dictionary<string, object> data = new Dictionary<string, object>() { { "name", "name1" }, { "description", "description1" } };
 
-        
-        [TestMethod]
-        public void CreateApp()
+        public CrudItems()
         {
-
+            this.admin = new AdminUtility(appName, username, password);
         }
 
 

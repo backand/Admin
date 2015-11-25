@@ -26,19 +26,19 @@ namespace Durados.Web.Mvc.Logging
         string connectionString = null;
         string machineName;
         string superDeveloper = null;
-        
+
         string eventViewerLogSource = Durados.Database.LongProductName;
         string eventViewerLog = "Application";
         WriteToEventViewer writeToEventViewer = WriteToEventViewer.OnlyExceptionsAndIfDbFails;
 
         string reportConnectionString = null;
         bool writeToReport = false;
-       
-            
+
+
         string logStashServer = null;
-        int logStashPort ;
+        int logStashPort;
         bool writeToLogStash = false;
-       
+
         private WritingEvents events;
         public WritingEvents Events
         {
@@ -76,14 +76,14 @@ namespace Durados.Web.Mvc.Logging
 
         public Logger()
         {
-            
-            
+
+
         }
 
         public string GetConfigPath(string configPath, string filename)
         {
             if (configPath.StartsWith("~"))
-                return System.Web.HttpContext.Current !=null ?System.Web.HttpContext.Current.Server.MapPath(configPath + filename):string.Empty;
+                return System.Web.HttpContext.Current != null ? System.Web.HttpContext.Current.Server.MapPath(configPath + filename) : string.Empty;
             else
                 return configPath + filename.Replace('/', '\\');
         }
@@ -109,14 +109,14 @@ namespace Durados.Web.Mvc.Logging
             else
                 writeToLogStash = false;
 
-            machineName = (System.Web.HttpContext.Current !=null)?System.Web.HttpContext.Current.Server.MachineName:System.Environment.MachineName;
+            machineName = (System.Web.HttpContext.Current != null) ? System.Web.HttpContext.Current.Server.MachineName : System.Environment.MachineName;
             superDeveloper = Convert.ToString(System.Configuration.ConfigurationManager.AppSettings["superDeveloper"] ?? "dev@devitout.com").ToLower();
 
 
             writeToEventViewer = (WriteToEventViewer)Enum.Parse(typeof(WriteToEventViewer), Convert.ToString(System.Web.Configuration.WebConfigurationManager.AppSettings["writeToEventViewer"] ?? WriteToEventViewer.OnlyExceptionsAndIfDbFails.ToString()));
             eventViewerLog = Convert.ToString(System.Web.Configuration.WebConfigurationManager.AppSettings["eventViewerLog"] ?? "Application");
             eventViewerLogSource = Convert.ToString(System.Web.Configuration.WebConfigurationManager.AppSettings["eventViewerLogSource"] ?? Durados.Database.LongProductName);
-            
+
 
             string logCS = "LogConnectionString";
             bool useAppPath = Convert.ToBoolean(System.Web.Configuration.WebConfigurationManager.AppSettings["UseAppPath"]);
@@ -145,7 +145,7 @@ namespace Durados.Web.Mvc.Logging
             if (System.Web.Configuration.WebConfigurationManager.AppSettings.AllKeys.Contains("logInsertFileName"))
                 logInsertFileName = Convert.ToString(System.Web.Configuration.WebConfigurationManager.AppSettings["logInsertFileName"]);
             logInsertFileName = GetSchemaCreateFileNameForProduct(logInsertFileName);
-            
+
             if (connectionString != null)
             {
                 //connection = new SqlConnection(connectionString);
@@ -239,29 +239,29 @@ namespace Durados.Web.Mvc.Logging
             }
         }
 
-        private  IDbConnection GetConnection(string connectionString)
+        private IDbConnection GetConnection(string connectionString)
         {
-           
+
             if (connectionString.StartsWith("server="))
                 return new MySqlConnection(connectionString);
             return new SqlConnection(connectionString);
         }
 
-        private  IDbCommand GetCommand(string connectionString)
+        private IDbCommand GetCommand(string connectionString)
         {
             if (connectionString.StartsWith("server="))
                 return new MySqlCommand();
             return new SqlCommand();
-             
+
         }
-        private  IDbCommand GetCommand(string connectionString,string cmdText)
+        private IDbCommand GetCommand(string connectionString, string cmdText)
         {
             if (connectionString.StartsWith("server="))
                 return new MySqlCommand(cmdText, new MySqlConnection(connectionString));
-            return new SqlCommand(cmdText,new SqlConnection(connectionString));
+            return new SqlCommand(cmdText, new SqlConnection(connectionString));
 
         }
-        private  IDbCommand GetCommand(IDbConnection cnn, string cmdText)
+        private IDbCommand GetCommand(IDbConnection cnn, string cmdText)
         {
             if (cnn.ConnectionString.StartsWith("server="))
                 return new MySqlCommand(cmdText, (MySqlConnection)cnn);
@@ -275,7 +275,7 @@ namespace Durados.Web.Mvc.Logging
             conn.Open();
             try
             {
-                IDbCommand command =  GetCommand(connectionString);
+                IDbCommand command = GetCommand(connectionString);
 
                 command.Connection = conn;
                 //command.CommandType = System.Data.CommandType.StoredProcedure;
@@ -289,12 +289,12 @@ namespace Durados.Web.Mvc.Logging
             }
         }
 
-        private  string GetSelectForSchemaTable(string connectionString, string  table)
+        private string GetSelectForSchemaTable(string connectionString, string table)
         {
             if (connectionString.StartsWith("server="))
-               return "SELECT 1  FROM INFORMATION_SCHEMA.TABLES  WHERE   table_name = '" + table + "' AND table_schema=DATABASE();";
-            
-            return "SELECT 1 FROM sysobjects  WHERE xtype='u' AND name='"+table+"'";
+                return "SELECT 1  FROM INFORMATION_SCHEMA.TABLES  WHERE   table_name = '" + table + "' AND table_schema=DATABASE();";
+
+            return "SELECT 1 FROM sysobjects  WHERE xtype='u' AND name='" + table + "'";
         }
 
 
@@ -340,7 +340,8 @@ namespace Durados.Web.Mvc.Logging
             }
         }
 
-        public string UserIPAddress{ 
+        public string UserIPAddress
+        {
             get
             {
                 if (System.Web.HttpContext.Current == null)
@@ -349,7 +350,7 @@ namespace Durados.Web.Mvc.Logging
                     return System.Web.HttpContext.Current.Request.ServerVariables["REMOTE_ADDR"];
                 return System.Web.HttpContext.Current.Request.ServerVariables["HTTP_X_FORWARDED_FOR"];
             }
-         }
+        }
         private string GetExeptionMessage(Exception exception)
         {
             string message = string.Empty;
@@ -395,7 +396,7 @@ namespace Durados.Web.Mvc.Logging
             if (exception != null)
             {
                 message = GetExeptionMessage(exception);
-                
+
             }
 
             string trace = string.Empty;
@@ -415,7 +416,7 @@ namespace Durados.Web.Mvc.Logging
 
         public Durados.Diagnostics.ILog Log(string controller, string action, string method, string message, string trace, int logType, string freeText, DateTime time, Guid? guid)
         {
-           
+
 
             if (!initiated)
                 Initiate();
@@ -434,12 +435,12 @@ namespace Durados.Web.Mvc.Logging
             //}
 
             string applicationName = string.Empty;
-            string appName =null ;
+            string appName = null;
             try
             {
-                applicationName =System.Web.HttpContext.Current == null?string.Empty: System.Web.HttpContext.Current.Request.Headers["Host"];
+                applicationName = System.Web.HttpContext.Current == null ? string.Empty : System.Web.HttpContext.Current.Request.Headers["Host"];
             }
-            catch{}
+            catch { }
             appName = GetAppName();
 
             string username = Username;
@@ -575,7 +576,9 @@ namespace Durados.Web.Mvc.Logging
             {
                 if (System.Web.HttpContext.Current == null)
                     return null;
-                return System.Web.HttpContext.Current.Server.UrlDecode(System.Web.HttpContext.Current.Request.Headers["origin"].ToString());
+
+                return GetUserIP();
+                //return System.Web.HttpContext.Current.Server.UrlDecode(System.Web.HttpContext.Current.Request.Headers["origin"] ?? string.Empty);
             }
             catch
             {
@@ -589,10 +592,10 @@ namespace Durados.Web.Mvc.Logging
             {
                 if (System.Web.HttpContext.Current == null)
                     return null;
-                return "origin=" + System.Web.HttpContext.Current.Server.UrlDecode(System.Web.HttpContext.Current.Request.Headers["origin"].ToString()) + "; " +
-                    "host=" + System.Web.HttpContext.Current.Server.UrlDecode(System.Web.HttpContext.Current.Request.Headers["host"].ToString()) + "; " +
-                    "referer=" + System.Web.HttpContext.Current.Server.UrlDecode(System.Web.HttpContext.Current.Request.Headers["referer"].ToString()) + "; " +
-                    "user-agent=" + System.Web.HttpContext.Current.Server.UrlDecode(System.Web.HttpContext.Current.Request.Headers["user-agent"].ToString());
+                return "origin=" + System.Web.HttpContext.Current.Server.UrlDecode(System.Web.HttpContext.Current.Request.Headers["origin"] ?? string.Empty) + "; " +
+                    "host=" + System.Web.HttpContext.Current.Server.UrlDecode(System.Web.HttpContext.Current.Request.Headers["host"] ?? string.Empty) + "; " +
+                    "referer=" + System.Web.HttpContext.Current.Server.UrlDecode(System.Web.HttpContext.Current.Request.Headers["referer"] ?? string.Empty) + "; " +
+                    "user-agent=" + System.Web.HttpContext.Current.Server.UrlDecode(System.Web.HttpContext.Current.Request.Headers["user-agent"] ?? string.Empty);
             }
             catch
             {
@@ -612,23 +615,23 @@ namespace Durados.Web.Mvc.Logging
                     appName = System.Web.HttpContext.Current.Items[Database.AppName].ToString();
 
                 if (appName == (System.Configuration.ConfigurationManager.AppSettings["durados_appName"] ?? "bko") && System.Web.HttpContext.Current.Items.Contains(Durados.Database.CurAppName))
-                         appName = System.Web.HttpContext.Current.Items[Durados.Database.CurAppName].ToString() ; 
+                    appName = System.Web.HttpContext.Current.Items[Durados.Database.CurAppName].ToString();
             }
             catch { }
             return appName;
         }
 
-       
 
-       
+
+
         public void WriteToEventLog(string controller, string action, string method, string message, string trace, int logType, string freeText)
         {
-            string sEvent = string.Format("controller: {0}; action: {1}; Method {2}; Message: {3}; trace: {4}; freeText: {5} ", controller, action, method, message, trace,  freeText);
+            string sEvent = string.Format("controller: {0}; action: {1}; Method {2}; Message: {3}; trace: {4}; freeText: {5} ", controller, action, method, message, trace, freeText);
 
             EventLogEntryType eventLogEntryType = logType < 4 ? EventLogEntryType.Warning : EventLogEntryType.Information;
 
             WriteToEventLog(sEvent, eventLogEntryType, logType);
-            
+
         }
 
         public void WriteToEventLog(string sEvent, EventLogEntryType eventLogEntryType, int id)
@@ -653,13 +656,13 @@ namespace Durados.Web.Mvc.Logging
                     evLog.Close();
                 }
             }
-            catch 
+            catch
             {
 
             }
         }
 
-       
+
         public Durados.Diagnostics.ILog LogSync(string controller, string action, string method, string message, string trace, int logType, string freeText, DateTime time)
         {
             Log log = new Log();
@@ -669,7 +672,7 @@ namespace Durados.Web.Mvc.Logging
                 using (IDbConnection cnn = GetConnection(connectionString))
                 {
                     cnn.Open();
-                    using (IDbCommand command = GetCommand("Durados_LogInsert",connectionString))
+                    using (IDbCommand command = GetCommand("Durados_LogInsert", connectionString))
                     {
                         command.CommandType = CommandType.StoredProcedure;
                         SetCommandParametrs(command, applicationName, Username, controller, action, method, message, trace, logType, freeText, time, log);
@@ -678,10 +681,10 @@ namespace Durados.Web.Mvc.Logging
                     cnn.Close();
                 }
             }
-            catch (Exception logException) 
+            catch (Exception logException)
             {
-                WriteToEventLog(logException.Message, EventLogEntryType.FailureAudit, 1); 
-                WriteToEventLog(controller, action, method, message, trace, logType, freeText); 
+                WriteToEventLog(logException.Message, EventLogEntryType.FailureAudit, 1);
+                WriteToEventLog(controller, action, method, message, trace, logType, freeText);
             }
             return log;
         }
@@ -701,7 +704,7 @@ namespace Durados.Web.Mvc.Logging
         private void SetCommandParametrs(IDbCommand cmd, string applicationName, string username, string controller, string action, string method, string message, string trace, int logType, string freeText, DateTime time, Log log, Guid? guid = null)
         {
             cmd.Parameters.Clear();
-            IDataParameter timeParameter = GetNewParameter(cmd,"Time", SqlDbType.DateTime);
+            IDataParameter timeParameter = GetNewParameter(cmd, "Time", SqlDbType.DateTime);
             timeParameter.Value = time;
             log.Time = DateTime.Now;
             cmd.Parameters.Add(timeParameter);
@@ -767,7 +770,7 @@ namespace Durados.Web.Mvc.Logging
         {
             if (command is MySqlCommand)
                 return new MySqlParameter() { ParameterName = parameterName };
-            return new SqlParameter("@"+parameterName, value);
+            return new SqlParameter("@" + parameterName, value);
         }
 
         public string NowWithMilliseconds()
@@ -813,8 +816,8 @@ namespace Durados.Web.Mvc.Logging
             if (guid2 == null)
                 guid2 = Guid.NewGuid();
             SendLogMessage(appName, applicationName, username, machineName, time.ToString(), controller, action, method, LogType.ToString(), message, trace, freeText, guid2.ToString());
-            
-            
+
+
         }
 
         void SendLogMessage(
@@ -833,29 +836,30 @@ namespace Durados.Web.Mvc.Logging
              string Guid
         )
         {
-            LogMessage message = new LogMessage { 
-                ID=ID, 
-                ApplicationName=ApplicationName, 
-                Username=Username, 
-                MachineName=MachineName, 
-                Time=Time, 
-                Controller=Controller,
-                Action=Action,
-                MethodName=MethodName,
-                LogType=LogType,
-                ExceptionMessage=ExceptionMessage,
-                Trace=Trace,
-                FreeText=FreeText,
-                Guid=Guid
+            LogMessage message = new LogMessage
+            {
+                ID = ID,
+                ApplicationName = ApplicationName,
+                Username = Username,
+                MachineName = MachineName,
+                Time = Time,
+                Controller = Controller,
+                Action = Action,
+                MethodName = MethodName,
+                LogType = LogType,
+                ExceptionMessage = ExceptionMessage,
+                Trace = Trace,
+                FreeText = FreeText,
+                Guid = Guid
             };
             var javaScriptSerializer = new System.Web.Script.Serialization.JavaScriptSerializer();
             string jsonString = javaScriptSerializer.Serialize(message);
             Connect(logStashServer, logStashPort, jsonString);
-            
+
         }
 
 
-         void Connect(String server, Int32 port, String message)
+        void Connect(String server, Int32 port, String message)
         {
             try
             {
@@ -882,17 +886,26 @@ namespace Durados.Web.Mvc.Logging
             }
             catch (ArgumentNullException e)
             {
-                WriteToEventLog( e.Message, EventLogEntryType.FailureAudit, 1);
+                WriteToEventLog(e.Message, EventLogEntryType.FailureAudit, 1);
             }
             catch (System.Net.Sockets.SocketException e)
             {
-                WriteToEventLog(string.Format("SocketException: {0}",e.Message),EventLogEntryType.Error,1);
+                WriteToEventLog(string.Format("SocketException: {0}", e.Message), EventLogEntryType.Error, 1);
             }
 
 
         }
 
-        
+        public static string GetUserIP()
+        {
+            var ip = (System.Web.HttpContext.Current.Request.ServerVariables["HTTP_X_FORWARDED_FOR"] != null
+                      && System.Web.HttpContext.Current.Request.ServerVariables["HTTP_X_FORWARDED_FOR"] != "")
+                     ? System.Web.HttpContext.Current.Request.ServerVariables["HTTP_X_FORWARDED_FOR"]
+                     : System.Web.HttpContext.Current.Request.ServerVariables["REMOTE_ADDR"];
+            if (ip.Contains(","))
+                ip = ip.Split(',').First().Trim();
+            return ip;
+        }
     }
 }
 

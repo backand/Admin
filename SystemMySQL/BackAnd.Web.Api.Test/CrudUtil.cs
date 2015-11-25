@@ -9,18 +9,20 @@ namespace BackAnd.Web.Api.Test
     public class CrudUtility
     {
         RestClient client = null;
-        public CrudUtility()
+
+        
+        public CrudUtility(Envirement env = Envirement.Dev)
         {
-            client = TestUtil.GetAuthentificatedClient();
+            client = new TestUtil(env).GetAuthentificatedClient();
         }
 
-        public CrudUtility(string appName)
+        public CrudUtility(string appName, Envirement env = Envirement.Dev)
         {
-            client = TestUtil.GetAuthentificatedClient(appName);
+            client = new TestUtil(env).GetAuthentificatedClient(appName);
         }
-        public CrudUtility(string appName, string username, string password)
+        public CrudUtility(string appName, string username, string password, Envirement env = Envirement.Dev)
         {
-            client = TestUtil.GetAuthentificatedClient(appName, username, password);
+            client = new TestUtil(env).GetAuthentificatedClient(appName, username, password);
         }
         public IRestResponse GelAll(string name, bool? withSelectOptions = null, bool? withFilterOptions = null, int? pageNumber = null, int? pageSize = null, object filter = null, object sort = null, string search = null, bool? deep = null, bool? descriptive = true, bool? relatedObjects = false)
         {
@@ -190,6 +192,85 @@ namespace BackAnd.Web.Api.Test
             }
 
             return response;
+        }
+
+        private IRestResponse ReadAll(string objectName)
+        {
+            var response = GelAll(objectName);
+            Assert.IsTrue(response.StatusCode == System.Net.HttpStatusCode.OK);
+            return response;
+        }
+
+        private IRestResponse Create(string objectName, Dictionary<string, object> data, out string id)
+        {
+            var response = Post(objectName, data);
+            Assert.IsTrue(response.StatusCode == System.Net.HttpStatusCode.OK);
+            var result = JsonConvert.DeserializeObject<Dictionary<string, object>>(response.Content);
+            id = ((Newtonsoft.Json.Linq.JObject)result["__metadata"])["id"].ToString();
+            return response;
+        }
+
+        private IRestResponse ReadOne(string objectName, string id)
+        {
+            var response = GetOne(objectName, id);
+            Assert.IsTrue(response.StatusCode == System.Net.HttpStatusCode.OK);
+            return response;
+
+        }
+
+        private IRestResponse UpdateItem(string objectName, Dictionary<string, object> data, string id)
+        {
+            var response = Put(objectName, id, data, null, true);
+            Assert.IsTrue(response.StatusCode == System.Net.HttpStatusCode.OK);
+            var result = JsonConvert.DeserializeObject<Dictionary<string, object>>(response.Content);
+
+            Assert.IsTrue(result.ContainsKey("name"));
+            Assert.IsTrue(result["name"].Equals(data["name"]));
+            Assert.IsTrue(result.ContainsKey("description"));
+            Assert.IsTrue(result["description"].Equals(data["description"]));
+            return response;
+        }
+
+        private IRestResponse DeleteItem(string objectName, string id)
+        {
+            var response = Delete(objectName, id);
+            Assert.IsTrue(response.StatusCode == System.Net.HttpStatusCode.OK);
+            response = GetOne(objectName, id);
+
+            Assert.IsTrue(response.StatusCode == System.Net.HttpStatusCode.NotFound);
+            return response;
+        }
+
+        [TestMethod]
+        public void RunSimpleCrud()
+        {
+            RunSimpleCrud("items", new Dictionary<string, object>() { { "name", "name1" }, { "description", "description1" } }, new Dictionary<string, object>() { { "name", "name2" }, { "description", "description2" } });
+        }
+
+        [TestMethod]
+        public void RunSimpleCrud(string objectName, Dictionary<string, object> dataForCreate, Dictionary<string, object> dataForUpdate)
+        {
+
+            ReadAll(objectName);
+            string id = null;
+            Create(objectName, dataForCreate, out id);
+            var response = ReadOne(objectName, id);
+            var result = JsonConvert.DeserializeObject<Dictionary<string, object>>(response.Content);
+
+            foreach (string key in dataForCreate.Keys)
+            {
+                Assert.IsTrue(result.ContainsKey(key));
+                Assert.IsTrue(result[key].Equals(dataForCreate[key]));
+            }
+
+            response = UpdateItem(objectName, dataForUpdate, id);
+            result = JsonConvert.DeserializeObject<Dictionary<string, object>>(response.Content);
+            foreach (string key in dataForUpdate.Keys)
+            {
+                Assert.IsTrue(result.ContainsKey(key));
+                Assert.IsTrue(result[key].Equals(dataForUpdate[key]));
+            }
+            DeleteItem(objectName, id);
         }
     }
 

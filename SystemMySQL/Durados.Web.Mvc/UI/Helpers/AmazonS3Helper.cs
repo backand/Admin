@@ -19,8 +19,8 @@ namespace Durados.Web.Mvc.UI.Helpers
 
         public static string SaveUploadedFileToAws(string accessKeyID, string secretAccessKey, string existingBucketName, string strFileName, string contentType, System.IO.Stream stream)
         {
-            try
-            {
+            //try
+            //{
                 TransferUtility fileTransferUtility = new
                     TransferUtility(accessKeyID, secretAccessKey);
 
@@ -74,13 +74,13 @@ namespace Durados.Web.Mvc.UI.Helpers
                 keyName = keyName.Trim(seperator.ToCharArray());
                 return string.Format("http://s3.amazonaws.com/{0}{1}", existingBucketName, keyName);
 
-            }
-            catch (AmazonS3Exception s3Exception)
-            {
-                Console.WriteLine(s3Exception.Message,
-                                  s3Exception.InnerException);
-            }
-            return string.Empty;
+            //}
+            //catch (AmazonS3Exception s3Exception)
+            //{
+            //    Console.WriteLine(s3Exception.Message,
+            //                      s3Exception.InnerException);
+            //}
+            //return string.Empty;
         }
     }
 }

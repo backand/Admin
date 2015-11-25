@@ -15,7 +15,7 @@ namespace BackAnd.Web.Api.Test
             string password = "123456";
             string appName = "app185";
 
-            var response = TestUtil.SignIn(username, password, appName);
+            var response = new TestUtil().SignIn(username, password, appName);
 
             Assert.IsFalse(string.IsNullOrEmpty(response.access_token));
             Assert.AreEqual(response.token_type, "bearer");

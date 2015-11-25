@@ -18,6 +18,7 @@ using Durados.DataAccess;
 using Durados.Web.Mvc.UI.Helpers;
 using Durados.Web.Mvc.Infrastructure;
 using Durados.Web.Mvc.Azure;
+using Newtonsoft.Json;
 
 namespace Durados.Web.Mvc
 {
@@ -1270,7 +1271,7 @@ namespace Durados.Web.Mvc
             }
         }
 
-        private void AddSyncUserRules()
+        private void AddSyncUserRulesOld()
         {
             const string  USERS = "users";
 
@@ -1308,6 +1309,158 @@ namespace Durados.Web.Mvc
             values.Add("WhereCondition", whereCondition);
             values.Add("ExecuteMessage", "Your objects do not contain a users object. Please set the where condition to false in the Security & Auth action \"Delete My App User\".");
             values.Add("ExecuteCommand", "delete from " + sqlTextBuilder.EscapeDbObject(USERS) + " where " + sqlTextBuilder.EscapeDbObject("email") + " = '{{Username}}'");
+            ruleView.Create(values, null, null, null, null, null);
+        }
+
+
+        private string GetJsCode(string internalCode) 
+        {
+            string code = "/* globals\n" +
+            "$http - Service for AJAX calls \n" +
+            "CONSTS - CONSTS.apiUrl for Backands API URL\n" +
+            "Config - Global Configuration\n" +
+            "*/\n" +
+            "'use strict';\n" +
+            "function backandCallback(userInput, dbRow, parameters, userProfile) {\n" +
+            "   \n" +
+            internalCode + "\n" +
+            "   return {};\n" +
+            "}";
+
+            return code;
+        }
+
+
+        string indentSpaces = "   ";
+            
+        private string GetPostCode(string varName, string objectName, Dictionary<string, object> parameters, Dictionary<string, object> data, int indent = 1)
+        {
+            return GetPostCode(varName, objectName, JsonConvert.SerializeObject(parameters ?? new Dictionary<string, object>()), JsonConvert.SerializeObject(data ?? new Dictionary<string, object>()), indent);
+        }
+
+        private string GetPostCode(string varName, string objectName, string parameters, string data, int indent = 1)
+        {
+            return String.Concat(Enumerable.Repeat(indentSpaces, indent)) + "var " + varName + " = $http({\n" +
+         String.Concat(Enumerable.Repeat(indentSpaces, indent + 1)) + "method: \"POST\",\n" +
+         String.Concat(Enumerable.Repeat(indentSpaces, indent + 1)) + "url:CONSTS.apiUrl + \"/1/objects/" + objectName + "\",\n" +
+         String.Concat(Enumerable.Repeat(indentSpaces, indent + 1)) + "params: " + (parameters ?? "{}") + ",\n" +
+         String.Concat(Enumerable.Repeat(indentSpaces, indent + 1)) + "data: " + data + ",\n" +
+         String.Concat(Enumerable.Repeat(indentSpaces, indent + 1)) + "headers: {\"Authorization\": userProfile.token}\n" +
+         String.Concat(Enumerable.Repeat(indentSpaces, indent)) + "});";
+        }
+
+        public string GetPutCode(string varName, string objectName, string id, Dictionary<string, object> parameters, Dictionary<string, object> data, int indent = 1)
+        {
+            return GetPutCode(varName, objectName, id, JsonConvert.SerializeObject(parameters ?? new Dictionary<string, object>()), JsonConvert.SerializeObject(data ?? new Dictionary<string, object>()), indent);
+        }
+
+        public string GetPutCode(string varName, string objectName, string id, string parameters, string data, int indent = 1)
+        {
+            string code = String.Concat(Enumerable.Repeat(indentSpaces, indent)) + "var " + varName + " = $http({\n" +
+        String.Concat(Enumerable.Repeat(indentSpaces, indent + 1)) + "method: \"PUT\",\n" +
+        String.Concat(Enumerable.Repeat(indentSpaces, indent + 1)) + "url:CONSTS.apiUrl + \"/1/objects/" + objectName + "/" + id + "\",\n" +
+        String.Concat(Enumerable.Repeat(indentSpaces, indent + 1)) + "params: " + (parameters ?? "{}") + ",\n" +
+        String.Concat(Enumerable.Repeat(indentSpaces, indent + 1)) + "data: " + data + ",\n" +
+        String.Concat(Enumerable.Repeat(indentSpaces, indent + 1)) + "headers: {\"Authorization\": userProfile.token}\n" +
+        String.Concat(Enumerable.Repeat(indentSpaces, indent)) + "});";
+            return code;
+        }
+
+        public string GetDeleteCode(string varName, string objectName, string id, Dictionary<string, object> parameters, int indent = 1)
+        {
+            return GetDeleteCode(varName, objectName, id, JsonConvert.SerializeObject(parameters ?? new Dictionary<string, object>()), indent);
+        }
+
+        public string GetDeleteCode(string varName, string objectName, string id, string parameters, int indent = 1)
+        {
+            string code = String.Concat(Enumerable.Repeat(indentSpaces, indent)) + "var " + varName + " = $http({\n" +
+        String.Concat(Enumerable.Repeat(indentSpaces, indent + 1)) + "method: \"DELETE\",\n" +
+        String.Concat(Enumerable.Repeat(indentSpaces, indent + 1)) + "url:CONSTS.apiUrl + \"/1/objects/" + objectName + "/" + id + "\",\n" +
+        String.Concat(Enumerable.Repeat(indentSpaces, indent + 1)) + "params: " + (parameters ?? "{}") + ",\n" +
+        String.Concat(Enumerable.Repeat(indentSpaces, indent + 1)) + "headers: {\"Authorization\": userProfile.token}\n" +
+        String.Concat(Enumerable.Repeat(indentSpaces, indent)) + "});";
+            return code;
+        }
+
+        public string GetAllCode(string varName, string objectName, Dictionary<string, object> parameters = null, int indent = 1)
+        {
+            return GetAllCode(varName, objectName, JsonConvert.SerializeObject(parameters ?? new Dictionary<string, object>()), indent);
+        }
+
+        public string GetAllCode(string varName, string objectName, string parameters = null, int indent = 1)
+        {
+            string code = String.Concat(Enumerable.Repeat(indentSpaces, indent)) + "var " + varName + " = $http({\n" +
+        String.Concat(Enumerable.Repeat(indentSpaces, indent + 1)) + "method: \"GET\",\n" +
+        String.Concat(Enumerable.Repeat(indentSpaces, indent + 1)) + "url:CONSTS.apiUrl + \"/1/objects/" + objectName + "\",\n" +
+        String.Concat(Enumerable.Repeat(indentSpaces, indent + 1)) + "params: " + (parameters ?? "{}") + ",\n" +
+        String.Concat(Enumerable.Repeat(indentSpaces, indent + 1)) + "headers: {\"Authorization\": userProfile.token}\n" +
+        String.Concat(Enumerable.Repeat(indentSpaces, indent)) + "});";
+            return code;
+        }
+
+        private void AddSyncUserRules()
+        {
+            const string USERS = "users";
+
+            string whereCondition = GetConnectionSource() == "local" ? "true" : "false";
+
+            string createCode = "   // When a new user registers, add her to the users object. \n" +
+                "   // If you are using a different object for your users then change this action accordingly. \n" +
+                "   if (parameters.sync)\n" +
+                "      return {};\n" +
+           GetPostCode("response", USERS, "{parameters: {\"sync\": true}}", "{\"email\": userInput.Username, \"firstName\": userInput.FirstName, \"lastName\": userInput.LastName }");
+
+            ISqlTextBuilder sqlTextBuilder = GetSqlTextBuilder();
+            ConfigAccess configAccess = new DataAccess.ConfigAccess();
+            string userViewPK = configAccess.GetViewPK(Database.UserViewName, configDatabase.ConnectionString);
+            View ruleView = (View)configDatabase.Views["Rule"];
+            Dictionary<string, object> values = new Dictionary<string, object>();
+            values.Add("Name", "Create My App User");
+            values.Add("Rules_Parent", userViewPK);
+            values.Add("DataAction", Durados.TriggerDataAction.AfterCreateBeforeCommit.ToString());
+            values.Add("WorkflowAction", Durados.WorkflowAction.JavaScript.ToString());
+            values.Add("WhereCondition", whereCondition);
+            values.Add("Code", GetJsCode(createCode)); 
+            ruleView.Create(values, null, null, null, null, null);
+
+            string updateCode = "   // When a registered user is changed, change your users object as well. \n" +
+                "   // If you are using a different object for your users then change this action accordingly. \n" +
+                "\n" +
+                "   // Get the user id by the user's email\n" +
+                GetAllCode("currentUser", USERS, "{filter:[{\"fieldName\":\"email\", \"operator\":\"equals\", \"value\": userInput.Username }]}") + "\n" +
+                "   if (currentUser.data.length == 1) { \n" +
+                "      var currentUserId = currentUser.data[0].__metadata.id; \n" +
+                GetPutCode("response", USERS, "\" + currentUserId + \"", null, "{\"firstName\": userInput.FirstName, \"lastName\": userInput.LastName }", 2) + "\n" +
+                "   } \n";
+                
+            values = new Dictionary<string, object>();
+            values.Add("Name", "Update My App User");
+            values.Add("Rules_Parent", userViewPK);
+            values.Add("DataAction", Durados.TriggerDataAction.AfterEditBeforeCommit.ToString());
+            values.Add("WorkflowAction", Durados.WorkflowAction.JavaScript.ToString());
+            values.Add("WhereCondition", whereCondition);
+            values.Add("Code", GetJsCode(updateCode)); 
+            ruleView.Create(values, null, null, null, null, null);
+
+
+            string deleteCode = "   // When a registered user name is deleted, delete her from your users object as well. \n" +
+                "   // If you are using a different object for your users then change this action accordingly. \n" +
+                "\n" +
+                "   // Get the user id by the user's email\n" +
+                GetAllCode("currentUser", USERS, "{filter:[{\"fieldName\":\"email\", \"operator\":\"equals\", \"value\": dbRow.Username }]}") + "\n" +
+                "   if (currentUser.data.length == 1) { \n" +
+                "      var currentUserId = currentUser.data[0].__metadata.id; \n" +
+                GetDeleteCode("response", USERS, "\" + currentUserId + \"", "{}", 2) + "\n" +
+                "   } \n";
+                
+
+            values = new Dictionary<string, object>();
+            values.Add("Name", "Delete My App User");
+            values.Add("Rules_Parent", userViewPK);
+            values.Add("DataAction", Durados.TriggerDataAction.AfterDeleteBeforeCommit.ToString());
+            values.Add("WorkflowAction", Durados.WorkflowAction.JavaScript.ToString());
+            values.Add("WhereCondition", whereCondition);
+            values.Add("Code", GetJsCode(deleteCode));
             ruleView.Create(values, null, null, null, null, null);
         }
 
@@ -2923,7 +3076,7 @@ namespace Durados.Web.Mvc
 
             CloudBlobContainer container = GetContainer(containerName);
 
-            (new Durados.Web.Mvc.Azure.BlobBackup()).BackupSync(container, containerName);
+            (new Durados.Web.Mvc.Azure.BlobBackup()).BackupSync(container, containerName, Database.ConfigVersion);
         }
 
         public void Refresh()
@@ -4388,7 +4541,19 @@ namespace Durados.Web.Mvc
             return GetInMemoryKey() != null;
         }
 
-        public void Restore(string name)
+        public string[] GetVersions(string name)
+        {
+            int? id = AppExists(name);
+            if (!id.HasValue)
+                return null;
+
+            string containerName = Maps.DuradosAppPrefix.Replace("_", "").Replace(".", "").ToLower() + id.ToString();
+            CloudBlobContainer container = GetContainer(containerName);
+
+            return (new Durados.Web.Mvc.Azure.BlobBackup()).GetVersions(container);
+        }
+
+        public void Restore(string name, string version = null)
         {
             int? id = AppExists(name);
             if (!id.HasValue)
@@ -4397,12 +4562,25 @@ namespace Durados.Web.Mvc
             string containerName = Maps.DuradosAppPrefix.Replace("_", "").Replace(".", "").ToLower() + id.ToString();
             CloudBlobContainer container = GetContainer(containerName);
 
-            (new Durados.Web.Mvc.Azure.BlobBackup()).RestoreSync(container, containerName);
+            if (version == null)
+            {
+                (new Durados.Web.Mvc.Azure.BlobBackup()).RestoreSync(container, containerName);
+            }
+            else
+            {
+                (new Durados.Web.Mvc.Azure.BlobBackup()).CopyBack(container, version, containerName);
+            }
 
             containerName += "xml";
             container = GetContainer(containerName);
-
-            (new Durados.Web.Mvc.Azure.BlobBackup()).RestoreSync(container, containerName);
+            if (version == null)
+            {
+                (new Durados.Web.Mvc.Azure.BlobBackup()).RestoreSync(container, containerName);
+            }
+            else
+            {
+                (new Durados.Web.Mvc.Azure.BlobBackup()).CopyBack(container, version, containerName);
+            }
         }
 
         Azure.DuradosStorage storage = new Azure.DuradosStorage();
@@ -5435,8 +5613,15 @@ namespace Durados.Web.Mvc
                 {
                     if (appName != duradosAppName && !BlobExists(appName))
                     {
-                        duradosMap.Logger.Log("uue", "get map", "appName: " + appName, null, -754, "5256");
-                        throw new DuradosException("Blob is not ready yet.");
+                        if (AppExists(appName).HasValue)
+                        {
+                            duradosMap.Logger.Log("uue", "get map", "appName: " + appName, null, -754, "5256");
+                            throw new DuradosException("Blob is not ready yet.");
+                        }
+                        else
+                        {
+                            throw new DuradosException("The App " + appName + " does not exist.");
+                        }
                     }
                 }
                 map = CreateMap(appName, out newStructure) ?? duradosMap;

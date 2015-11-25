@@ -125,6 +125,59 @@ namespace BackAnd.Web.Api.Controllers
         }
 
         [System.Web.Http.HttpGet]
+        [Route("restore")]
+        public IHttpActionResult restore(string version = null)
+        {
+            if (!IsAdmin())
+            {
+                return ResponseMessage(Request.CreateResponse(HttpStatusCode.NotFound, Messages.ActionIsUnauthorized));
+            }
+
+            try
+            {
+                //RefreshConfigCache();
+                string appName = System.Web.HttpContext.Current.Items[Durados.Database.AppName].ToString();
+                Maps.Instance.Restore(appName, version);
+                RestHelper.Refresh(appName);
+                try
+                {
+                    new Sync().Initiate(Maps.Instance.GetMap(appName));
+                    new Sync().Initiate(Maps.Instance.GetMap(appName));
+                }
+                catch { }
+                Maps.Instance.DuradosMap.Logger.Log(GetControllerNameForLog(ControllerContext), GetActionName(), this.Request.Method.Method, "Reload " + appName, "", 3, null, DateTime.Now);
+
+                return Ok();
+            }
+            catch (Exception exception)
+            {
+                return ResponseMessage(Request.CreateResponse(HttpStatusCode.InternalServerError, exception.Message));
+            }
+        }
+
+
+        [System.Web.Http.HttpGet]
+        [Route("versions")]
+        public IHttpActionResult versions()
+        {
+            if (!IsAdmin())
+            {
+                return ResponseMessage(Request.CreateResponse(HttpStatusCode.NotFound, Messages.ActionIsUnauthorized));
+            }
+
+            try
+            {
+                string appName = System.Web.HttpContext.Current.Items[Durados.Database.AppName].ToString();
+
+                return Ok(new { versions = Maps.Instance.GetVersions(appName) });
+            }
+            catch (Exception exception)
+            {
+                return ResponseMessage(Request.CreateResponse(HttpStatusCode.InternalServerError, exception.Message));
+            }
+        }
+
+        [System.Web.Http.HttpGet]
         [Route("dbStat")]
         public IHttpActionResult dbStat()
         {

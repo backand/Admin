@@ -249,6 +249,12 @@ namespace BackAnd.Web.Api
                defaults: new { controller = "myApps", id = RouteParameter.Optional }
            );
 
+          //  config.Routes.MapHttpRoute(
+          //    name: "myAppsStatus",
+          //    routeTemplate: "admin/myAppsStatus/{id}",
+          //    defaults: new { controller = "myApps", action = "status", id = RouteParameter.Optional }
+          //);
+
             config.Routes.MapHttpRoute(
                name: "myAppConnection",
                routeTemplate: "admin/myAppConnection/{id}",

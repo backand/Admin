@@ -120,6 +120,7 @@
     <Compile Include="Bookmark.cs" />
     <Compile Include="CalculatedField.cs" />
     <Compile Include="Category.cs" />
+    <Compile Include="Data\IData.cs" />
     <Compile Include="Data\IDataAcesss.cs" />
     <Compile Include="Data\ISqlTextBuilder.cs" />
     <Compile Include="Query.cs" />

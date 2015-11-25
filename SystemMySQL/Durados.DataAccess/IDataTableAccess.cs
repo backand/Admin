@@ -33,6 +33,7 @@ namespace Durados.DataAccess
         DataView FillPage(View view, int page, int pageSize, Filter filter, bool? search, bool? useLike, Dictionary<string, SortDirection> sortColumns, out int rowCount, BeforeSelectEventHandler beforeSelectCallback, AfterSelectEventHandler afterSelectCallback);
 
         DataRow GetDataRow(View view, string pk);
+        DataRow GetDataRow2(View view, string pk, IDbCommand command);
 
         DataRow GetDataRow(View view, string pk, DataSet dataset);
 

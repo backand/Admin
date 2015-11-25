@@ -1,4 +1,5 @@
-﻿using RestSharp;
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+using RestSharp;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,33 +8,28 @@ using System.Threading.Tasks;
 
 namespace BackAnd.Web.Api.Test
 {
-    public static class TestUtil
+    public class TestUtil
     {
         public const string ServiceAddressDev = "http://localhost:4110/";
-        public const string ServiceAddressQa = "http://localhost:4110/";
-        public const string ServiceAddressProd = "http://localhost:4110/";
+        public const string ServiceAddressQa = "http://api.backand.co:8099/";
+        public const string ServiceAddressProd = "https://api.backand.com/";
 
-        public static Envirement envirement = Envirement.Dev;
-        private static RestClient client = null;
-       public static RestClient Client
+        Envirement env = Envirement.Dev;
+
+        public TestUtil()
         {
-            get
-            {
-                if (client == null)
-                    client = GetRestClient();
-                return client;
-            }
+
+        }
+        public TestUtil(Envirement env)
+        {
+            this.env = env;
+        }
+        public RestClient GetRestClient()
+        {
+            return GetRestClient(env);
         }
 
-        
-        
-
-        private static RestClient GetRestClient()
-        {
-            return GetRestClient(envirement);
-        }
-
-        private static RestClient GetRestClient(Envirement env)
+        private RestClient GetRestClient(Envirement env)
         {
             RestClient client = null;
             if (env == Test.Envirement.Dev)
@@ -46,7 +42,7 @@ namespace BackAnd.Web.Api.Test
             return client;
         }
         
-        public static LoginResult SignIn(string username, string password, string appName)
+        public LoginResult SignIn(string username, string password, string appName)
         {
             var request = new RestRequest("token", Method.POST);
             request.AddParameter("username", username);
@@ -57,17 +53,17 @@ namespace BackAnd.Web.Api.Test
             request.AddHeader("Content-Type", "application/x-www-form-urlencoded");
             request.AddHeader("Accept", "application/json");
 
-            var response = Client.Execute<LoginResult>(request).Data;
+            var response = GetRestClient().Execute<LoginResult>(request).Data;
             return response;
         }
 
 
-        public static RestClient GetAuthentificatedClient(string appName = "app185", string username = "relly@backand.com", string password = "123456")
+        public RestClient GetAuthentificatedClient(string appName = "app185", string username = "relly@backand.com", string password = "123456")
         {
             var rest = GetRestClient();
             
             var res = SignIn(username, password, appName);
-
+            Assert.IsTrue(res.token_type != null && res.access_token != null, "Fail to sign in");
             rest.AddDefaultHeader("Authorization", res.token_type + " " + res.access_token);
             return rest;
         }

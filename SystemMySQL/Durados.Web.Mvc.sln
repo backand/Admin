@@ -45,6 +45,12 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BackAnd.Web.Api.Test", "Bac
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Owin.Security.Providers", "Owin.Security.Providers\Owin.Security.Providers.csproj", "{6AD9BA00-1330-426D-8BAE-2D3BC0D976E4}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Backand.Web.Api.BrowserTests", "Backand.Web.Api.BrowserTests\Backand.Web.Api.BrowserTests.csproj", "{1A294D5E-33CD-4FF9-989D-78B31C2FEAA5}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{259DC51F-3CAD-43FB-855F-54E047CCEC83}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BackAnd.UnitTests", "BackAnd.UnitTests\BackAnd.UnitTests.csproj", "{6D63D615-1B03-4E1A-A55D-93C8AF9860F9}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -178,9 +184,26 @@ Global
 		{6AD9BA00-1330-426D-8BAE-2D3BC0D976E4}.DebugLocal|Any CPU.Build.0 = Debug|Any CPU
 		{6AD9BA00-1330-426D-8BAE-2D3BC0D976E4}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{6AD9BA00-1330-426D-8BAE-2D3BC0D976E4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1A294D5E-33CD-4FF9-989D-78B31C2FEAA5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1A294D5E-33CD-4FF9-989D-78B31C2FEAA5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1A294D5E-33CD-4FF9-989D-78B31C2FEAA5}.DebugLocal|Any CPU.ActiveCfg = Debug|Any CPU
+		{1A294D5E-33CD-4FF9-989D-78B31C2FEAA5}.DebugLocal|Any CPU.Build.0 = Debug|Any CPU
+		{1A294D5E-33CD-4FF9-989D-78B31C2FEAA5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1A294D5E-33CD-4FF9-989D-78B31C2FEAA5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6D63D615-1B03-4E1A-A55D-93C8AF9860F9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6D63D615-1B03-4E1A-A55D-93C8AF9860F9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6D63D615-1B03-4E1A-A55D-93C8AF9860F9}.DebugLocal|Any CPU.ActiveCfg = Debug|Any CPU
+		{6D63D615-1B03-4E1A-A55D-93C8AF9860F9}.DebugLocal|Any CPU.Build.0 = Debug|Any CPU
+		{6D63D615-1B03-4E1A-A55D-93C8AF9860F9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6D63D615-1B03-4E1A-A55D-93C8AF9860F9}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{1A294D5E-33CD-4FF9-989D-78B31C2FEAA5} = {259DC51F-3CAD-43FB-855F-54E047CCEC83}
+		{B64789BD-B7B4-4C43-B6CC-97ECF4D93735} = {259DC51F-3CAD-43FB-855F-54E047CCEC83}
+		{6D63D615-1B03-4E1A-A55D-93C8AF9860F9} = {259DC51F-3CAD-43FB-855F-54E047CCEC83}
 	EndGlobalSection
 	GlobalSection(NDepend) = preSolution
 		Project = ".\Durados.Web.Mvc.ndproj"

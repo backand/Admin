@@ -35,7 +35,7 @@ namespace BackAnd.Web.Api.Controllers
         const string ProductPort = "productPort";
         const string Product = "product";
         
-        protected override View GetView(string viewName)
+        protected internal override View GetView(string viewName)
         {
             return (View)Maps.Instance.DuradosMap.Database.Views[viewName];
         }
@@ -489,6 +489,7 @@ namespace BackAnd.Web.Api.Controllers
             {
                 HandleCreateSchemaIfExist(appName);
                 UpdateDatabaseStatus(appId.Value, OnBoardingStatus.Ready);
+                //new Backand.socket().emitUsers("applicationReady", new { name = appName }, new string[] { "myUsername" });
             }
             catch (Exception exception)
             {
@@ -1035,6 +1036,18 @@ namespace BackAnd.Web.Api.Controllers
                 throw new BackAndApiUnexpectedResponseException(exception, this);
 
             }
+        }
+
+        [Route("status/{id}")]
+        [HttpGet]
+        public IHttpActionResult status(string id = null)
+        {
+            int? appId = Maps.Instance.AppExists(id, Convert.ToInt32(Maps.Instance.DuradosMap.Database.GetUserID()));
+            if (!appId.HasValue)
+            {
+                return ResponseMessage(Request.CreateResponse(HttpStatusCode.NotFound, string.Format(Messages.AppNotFound, id)));
+            }
+            return Ok(new { status = Maps.Instance.GetOnBoardingStatus(appId.Value.ToString()).ToString() });
         }
 
         [Route("rdsResponse")]

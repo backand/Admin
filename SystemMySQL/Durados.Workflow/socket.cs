@@ -5,6 +5,9 @@ namespace Backand
 {
     public class socket : ISocket
     {
+
+        public static List<object> SentMessagesMock;
+
         protected virtual string GetNodeUrl()
         {
             return System.Configuration.ConfigurationManager.AppSettings["nodeHost"] ?? "http://127.0.0.1:9000";
@@ -106,8 +109,19 @@ namespace Backand
                 {
 
                 }
+                
                 newData.Add("data", json);
+
+                // save requests for tests
+                if (SentMessagesMock != null)
+                {
+                    SentMessagesMock.Add(xmlHttpRequest);
+                }
+
+                // sehd data to server
                 xmlHttpRequest.send(serializer.Serialize(newData));
+
+                // send response to user
                 return new { status = xmlHttpRequest.status, message = xmlHttpRequest.responseText };
             }
             catch (Exception exception)

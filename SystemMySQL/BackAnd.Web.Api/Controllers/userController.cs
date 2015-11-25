@@ -1264,7 +1264,7 @@ namespace BackAnd.Web.Api.Controllers
             if (map.HasRule("beforeSocialSignup"))
             {
                 Durados.Web.Mvc.Workflow.Engine wfe = CreateWorkflowEngine();
-                wfe.PerformActions(this, view, Durados.TriggerDataAction.OnDemand, values, null, null, map.Database.ConnectionString, -1, null, null, "beforeSocialSignup");
+                wfe.PerformActions(this, view, Durados.TriggerDataAction.OnDemand, values, null, null, map.Database.ConnectionString, -1, null, null, null, "beforeSocialSignup");
             }
         }
 

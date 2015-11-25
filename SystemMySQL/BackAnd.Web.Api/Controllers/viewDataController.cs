@@ -218,7 +218,7 @@ namespace BackAnd.Web.Api.Controllers
             return (filter.StartsWith("filter"));
         }
 
-        public virtual IHttpActionResult Get(string name, string id, bool? deep = null, int? level = null)
+        public virtual IHttpActionResult Get(string name, string id, bool? deep = null, int? level = null, bool? hideMetadata = null)
         {
             try
             {
@@ -247,7 +247,10 @@ namespace BackAnd.Web.Api.Controllers
                     return ResponseMessage(Request.CreateResponse(HttpStatusCode.NotAcceptable, "The level must be more than 0."));
                 }
 
-                var item = RestHelper.Get(view, id, deep ?? false, view_BeforeSelect, view_AfterSelect, false, false, false, level ?? view.Database.DefaultLevelOfDept);
+                if (view.Database.DefaultLevelOfDept <= 0)
+                    view.Database.DefaultLevelOfDept = 3;
+
+                var item = RestHelper.Get(view, id, deep ?? false, view_BeforeSelect, view_AfterSelect, false, false, false, level ?? view.Database.DefaultLevelOfDept, hideMetadata ?? false);
                 
                 if (item == null)
                 {
@@ -614,7 +617,7 @@ namespace BackAnd.Web.Api.Controllers
             }
         }
 
-        private static Dictionary<string, object>[] GetParameters(string parameters, View view, string json, bool deep)
+        internal static Dictionary<string, object>[] GetParameters(string parameters, View view, string json, bool deep)
         {
             if (string.IsNullOrEmpty(json))
             {
@@ -660,7 +663,7 @@ namespace BackAnd.Web.Api.Controllers
             }
         }
 
-        private static Dictionary<string, object> GetParametersForUpdateDeep(string parameters, View view, Dictionary<string, object> values)
+        internal static Dictionary<string, object> GetParametersForUpdateDeep(string parameters, View view, Dictionary<string, object> values)
         {
             if (!string.IsNullOrEmpty(parameters))
             {
@@ -675,7 +678,7 @@ namespace BackAnd.Web.Api.Controllers
             
         }
 
-        private static Dictionary<string, object> GetParametersForUpdateDeep(Dictionary<string, object> rulesParameters, View view, Dictionary<string, object> values)
+        internal static Dictionary<string, object> GetParametersForUpdateDeep(Dictionary<string, object> rulesParameters, View view, Dictionary<string, object> values)
         {
             foreach (string key in rulesParameters.Keys)
             {
@@ -704,7 +707,7 @@ namespace BackAnd.Web.Api.Controllers
             return values;
         }
 
-        private static Dictionary<string, object> GetParameters(string parameters, View view, Dictionary<string, object> values)
+        internal static Dictionary<string, object> GetParameters(string parameters, View view, Dictionary<string, object> values)
         {
             Dictionary<string, object> values2 = new Dictionary<string, object>();
             if (!string.IsNullOrEmpty(parameters))
