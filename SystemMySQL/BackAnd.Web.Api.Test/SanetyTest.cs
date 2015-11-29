@@ -8,7 +8,7 @@ namespace BackAnd.Web.Api.Test
     public class SanetyTest
     {
         string mainApp = "www";
-        string appName = "app204";
+        string appName = "app205";
         string username = "relly@backand.com";
         string password = "123456";
         Envirement env = Envirement.Dev;

@@ -1408,7 +1408,12 @@ namespace Durados.Web.Mvc
                 "   // If you are using a different object for your users then change this action accordingly. \n" +
                 "   if (parameters.sync)\n" +
                 "      return {};\n" +
-           GetPostCode("response", USERS, "{parameters: {\"sync\": true}}", "{\"email\": userInput.Username, \"firstName\": userInput.FirstName, \"lastName\": userInput.LastName }");
+                "   if (!parameters)\n" +
+                "      parameters = {};\n" +
+                "   parameters.email = userInput.Username;\n" +
+                "   parameters.firstName = userInput.FirstName;\n" +
+                "   parameters.lastName = userInput.LastName;\n" +
+            GetPostCode("response", USERS, "{parameters: {\"sync\": true}}", "parameters");
 
             ISqlTextBuilder sqlTextBuilder = GetSqlTextBuilder();
             ConfigAccess configAccess = new DataAccess.ConfigAccess();

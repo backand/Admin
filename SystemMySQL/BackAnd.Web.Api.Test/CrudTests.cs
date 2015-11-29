@@ -12,7 +12,7 @@ namespace BackAnd.Web.Api.Test
         string objectName = "items";
         string id = "1";
         string appName = "app202";
-        string username = "relly";
+        string username = "relly@backand.com";
         string password = "123456";
         
         CrudUtility crud = new CrudUtility();
@@ -54,7 +54,7 @@ namespace BackAnd.Web.Api.Test
                 Assert.IsTrue(createActionResponse.StatusCode == System.Net.HttpStatusCode.OK);
             }
 
-            RunSimpleCrud();
+           // RunSimpleCrud();
         }
 
         [TestMethod]
@@ -92,15 +92,6 @@ namespace BackAnd.Web.Api.Test
 
         }
 
-        [TestMethod]
-        public void RunSimpleCrud()
-        {
-            ReadAllItems();
-            CreateItem();
-            ReadOneItem();
-            UpdateItem();
-            DeleteItem();
-        }
 
 
         [TestMethod]
