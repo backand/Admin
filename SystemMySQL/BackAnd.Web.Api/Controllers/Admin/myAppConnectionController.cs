@@ -129,9 +129,7 @@ namespace BackAnd.Web.Api.Controllers
            
 
         }
-       
 
-       
         protected virtual Dictionary<string, object> CreateApp(string template, string name, string title, string server, string catalog, string username, string password, bool usingSsh, bool usingSsl, string sshRemoteHost, string sshUser, string sshPassword, string sshPrivateKey, int sshPort, int productPort, int? themeId)
         {
             string id = GetTempGuid();
@@ -142,11 +140,369 @@ namespace BackAnd.Web.Api.Controllers
             string url = RestHelper.GetAppUrl(Maps.DuradosAppName, Maps.OldAdminHttp) + "/Website/CreateAppGet?" + qstring + data;
 
             Maps.Instance.DuradosMap.Logger.Log(GetControllerNameForLog(ControllerContext), GetActionName(), this.Request.Method.Method, "API Create App async call", url, 3, null, DateTime.Now);
-                
+
             string response = Durados.Web.Mvc.Infrastructure.Http.GetWebRequest(url);
             Dictionary<string, object> json = Durados.Web.Mvc.UI.Json.JsonSerializer.Deserialize(response);
             return json;
         }
+       
+        //protected virtual Dictionary<string, object> CreateAppoOld(string template, string name, string title, string server, string catalog, string username, string password, bool usingSsh, bool usingSsl, string sshRemoteHost, string sshUser, string sshPassword, string sshPrivateKey, int sshPort, int productPort, int? themeId)
+        //{
+        //    return CreateApp2(template, name, title, HttpUtility.UrlEncode(server), HttpUtility.UrlEncode(catalog), HttpUtility.UrlEncode(username), HttpUtility.UrlEncode(password), usingSsh, usingSsl, HttpUtility.UrlEncode(sshRemoteHost), HttpUtility.UrlEncode(sshUser), HttpUtility.UrlEncode(sshPassword), sshPrivateKey, sshPort, productPort, themeId);
+        //}
+
+        /***
+        private Dictionary<string, object> CreateApp2(string template, string name, string title, string server, string catalog, string username, string password, bool usingSsh, bool usingSsl, string sshRemoteHost, string sshUser, string sshPassword, string sshPrivateKey, int sshPort, int productPort, int? themeId)
+        {
+            Maps.Instance.DuradosMap.Logger.Log(GetControllerNameForLog(this.ControllerContext), "CreateApp", "CreateApp", "started", "", 3, "server: " + server + ", database: " + catalog, DateTime.Now);
+
+            Durados.SqlProduct sqlProduct = Durados.SqlProduct.SqlServer;
+
+            if (template == "1" || template == "3")
+                sqlProduct = Durados.SqlProduct.SqlAzure;
+            else if (template == "4")
+                sqlProduct = Durados.SqlProduct.MySql;
+            else if (template == "8")
+                sqlProduct = Durados.SqlProduct.Postgre;
+            else if (template == "7")
+                sqlProduct = Durados.SqlProduct.Oracle;
+
+            if (sshPrivateKey != null)
+                sshPrivateKey = sshPrivateKey.Replace(System.Environment.NewLine, string.Empty);
+            string errors;
+            if (!IsValidConnectionData(sqlProduct, name, title, server, catalog, username, password, usingSsh, usingSsl, sshRemoteHost, sshUser, sshPassword, sshPrivateKey, sshPort, productPort, out errors))
+                return new Dictionary<string, object>() { { "Success", false }, { "Message", errors } };
+            bool isBlankDababase = template.ToLower() == "5";
+            bool isAzureDemo = template.ToLower() == "1";
+            bool isOnPremiseDemo = template.ToLower() == "0";
+
+            bool isRdsBlank = IsNewDatabase(template);
+            if (isRdsBlank)
+                sqlProduct = Durados.Web.Mvc.UI.Helpers.RDSNewDatabaseFactory.GetSqlProductfromTemplate(template).Value;
+            bool connectionExists = false;
+            string userId = GetUserID();
+            string templateConnectionString = null;
+            string demoUsername = Maps.DemoSqlUsername;
+            string demoPassword = Maps.DemoSqlPassword;
+            bool isDemo = isAzureDemo || isOnPremiseDemo;
+
+            bool basic = !isDemo;
+
+            if (isAzureDemo)
+            {
+                demoUsername = Maps.DemoAzureUsername;
+                demoPassword = Maps.DemoAzurePassword;
+            }
+
+            string newPassword = password;
+            if (isAzureDemo || isOnPremiseDemo)
+                newPassword = new AccountMembershipService().GetRandomPassword(12);
+            string newUsername = username;
+
+            if (string.IsNullOrEmpty(userId))
+                return new Dictionary<string, object>() { { "Success", false }, { "Message", "Please login or sign-up." } };
+            
+            View view = GetView("durados_App");
+
+            try
+            {
+                name = GetCleanName(name);
+            }
+            catch (Exception exception)
+            {
+                Map.Logger.Log(GetControllerNameForLog(this.ControllerContext), this.ControllerContext.RouteData.Values["action"].ToString(), exception.Source, exception, 1, "app name exception");
+
+                return new Dictionary<string, object>() { { "Success", false }, { "Message", exception.Message } };
+            }
+
+            int? connectionId = null;
+            bool pendingExists = false;
+
+            if (isAzureDemo || isOnPremiseDemo)
+            {
+                string source = Maps.DemoDatabaseName + Map.SourceSuffix;
+                bool templateExists = Maps.Instance.AppExists(name).HasValue;
+                if (templateExists)
+                {
+                    return new Dictionary<string, object>() { { "Success", true }, { "Message", Maps.GetAppUrl(name) } };
+                }
+                else
+                {
+                    connectionId = Maps.Instance.GetConnection(server, catalog, newUsername, userId);
+                    connectionExists = connectionId.HasValue;
+                    if (connectionExists)
+                    {
+                        try
+                        {
+                            ValidateConnection(server, catalog, newUsername, newPassword);
+                        }
+                        catch (Exception exception)
+                        {
+                            Map.Logger.Log(GetControllerNameForLog(this.ControllerContext), this.ControllerContext.RouteData.Values["action"].ToString(), exception.Source, exception, 3, null);
+
+                            connectionExists = false;
+                        }
+                    }
+
+                    if (!connectionExists)
+                    {
+                        if (isAzureDemo)
+                        {
+                            string pending = Maps.GetPendingDatabase(template);
+
+                            //try
+                            //{
+                            try
+                            {
+                                for (int i = 0; i < Maps.DemoPendingNext; i++)
+                                {
+                                    try
+                                    {
+                                        pendingExists = false;
+                                        ValidateConnection(server, pending, demoUsername, demoPassword);
+                                        templateConnectionString = RenamePendingDatabase(server, catalog, demoUsername, demoPassword, pending);
+                                        pendingExists = true;
+                                        break;
+                                    }
+                                    catch (Exception exception)
+                                    {
+                                        pending = Maps.GetPendingDatabase(template);
+                                        Map.Logger.Log(GetControllerNameForLog(this.ControllerContext), this.ControllerContext.RouteData.Values["action"].ToString(), exception.Source, exception, 3, "pending=" + pending + ";i=" + i);
+                                    }
+                                }
+                                if (pendingExists)
+                                {
+                                    CreateDatabase(server, pending, demoUsername, demoPassword, source, template);
+                                }
+                            }
+                            catch (Exception exception)
+                            {
+                                Map.Logger.Log(GetControllerNameForLog(this.ControllerContext), this.ControllerContext.RouteData.Values["action"].ToString(), exception.Source, exception, 3, null);
+
+                                pendingExists = false;
+                            }
+
+                            //}
+                            //catch (Exception exception)
+                            //{
+                            //    Map.Logger.Log(GetControllerNameForLog(this.ControllerContext), this.ControllerContext.RouteData.Values["action"].ToString(), exception.Source, exception, 3, null);
+
+                            //    pendingExists = false;
+                            //}
+
+
+
+                            if (!pendingExists)
+                            {
+                                try
+                                {
+                                    templateConnectionString = CreateDatabase(server, catalog, demoUsername, demoPassword, source, template);
+
+                                }
+                                catch (Exception exception)
+                                {
+                                    Map.Logger.Log(GetControllerNameForLog(this.ControllerContext), this.ControllerContext.RouteData.Values["action"].ToString(), exception.Source, exception, 1, "Failed to create Azure database. username=" + newUsername);
+                                    return new Dictionary<string, object>() { { "Success", false }, { "Message", "Server is busy, Please try again later." } };
+                                }
+                            }
+                            else
+                            {
+                                try
+                                {
+                                    CreateDatabaseUser(server, catalog, demoUsername, demoPassword, false, newUsername, newPassword, false);
+
+                                }
+                                catch (Exception exception)
+                                {
+                                    Map.Logger.Log(GetControllerNameForLog(this.ControllerContext), this.ControllerContext.RouteData.Values["action"].ToString(), exception.Source, exception, 1, "Failed to create Azure database. username=" + newUsername);
+                                    return new Dictionary<string, object>() { { "Success", false }, { "Message", "Server is busy, Please try again later." } };
+                                }
+                            }
+                        }
+                        else
+                        {
+                            templateConnectionString = CreateDatabase(server, catalog, demoUsername, demoPassword, source, template);
+                            CreateDatabaseUser(server, catalog, demoUsername, demoPassword, false, newUsername, newPassword, false);
+                        }
+                    }
+                }
+            }
+
+            if (!isAzureDemo && !isBlankDababase && !isRdsBlank)
+            {
+                try
+                {
+                    ValidateConnection(server, catalog, newUsername, newPassword, sqlProduct, 3306, usingSsh, usingSsl, userId, sshRemoteHost, sshUser, sshPassword, sshPrivateKey, sshPort, productPort);
+                }
+                catch (Exception exception)
+                {
+                    string cnnstr = GetConnection(server, catalog, null, username, "*****", null, sqlProduct, productPort, usingSsh, usingSsl);
+                    TroubleshootInfo troubleshootInfo = ConnectionStringHelper.GetTroubleshootInfo(exception, server, catalog, username, password, usingSsh, sqlProduct, sshRemoteHost, sshUser, sshPassword, sshPort, productPort);
+                    Map.Logger.Log(GetControllerNameForLog(this.ControllerContext), this.ControllerContext.RouteData.Values["action"].ToString(), exception.Source, exception, 1, cnnstr + "\n\r" + "Troubleshoot Info Id = " + troubleshootInfo.Id);
+                    SendError(1, exception, GetControllerNameForLog(this.ControllerContext), this.ControllerContext.RouteData.Values["action"].ToString(), Map.Logger, cnnstr + "\n\r" + "Troubleshoot Info Id = " + troubleshootInfo.Id);
+                    //if(exception.InnerException is MySql.Data.MySqlClient.MySqlException)
+                    //    return Json(new { Success = false, Message = "Could not connect. "+exception.InnerException.Message });
+                    //return Json(new { Success = false, Message = "Could not connect. Please check the connection parameters and make sure the server is up and running." });
+                    string message = exception.InnerException == null ? exception.Message : exception.InnerException.Message;
+                    return new Dictionary<string, object>() { { "Success", false }, { "Message", message }, { "CnnString", cnnstr }, { "port", productPort }, { "TroubleshootInfo", troubleshootInfo } };
+                }
+            }
+
+            if (!connectionId.HasValue && !isBlankDababase)
+            {
+                try
+                {
+                    connectionId = SaveConnection(server, catalog, newUsername, newPassword, userId, sqlProduct, usingSsh, usingSsl, sshRemoteHost, sshUser, sshPassword, sshPrivateKey, sshPort, productPort);
+                }
+                catch (Exception exception)
+                {
+                    Map.Logger.Log(GetControllerNameForLog(this.ControllerContext), this.ControllerContext.RouteData.Values["action"].ToString(), exception.Source, exception, 1, "fail to save connection string");
+
+                    return new Dictionary<string, object>() { { "Success", false }, { "Message", exception.Message } };
+                }
+            }
+
+            Dictionary<string, object> values = new Dictionary<string, object>();
+            values.Add("Name", name);
+            values.Add("Title", title);
+            values.Add("Image", Durados.Database.LongProductName + ".png");
+
+            if (!isBlankDababase)
+            {
+                values.Add("FK_durados_App_durados_DataSourceType_Parent", "2");
+                values.Add("FK_durados_App_durados_SqlConnection_Parent", connectionId.Value.ToString());
+            }
+            else
+            {
+                values.Add("FK_durados_App_durados_DataSourceType_Parent", "1");
+                values.Add("FK_durados_App_durados_SqlConnection_Parent", string.Empty);
+            }
+            values.Add("FK_durados_App_durados_SqlConnection_System_Parent", string.Empty);
+            values.Add("FK_durados_App_durados_Template_Parent", string.Empty);
+            values.Add("SpecificDOTNET", string.Empty);
+            values.Add("SpecificJS", string.Empty);
+            values.Add("SpecificCss", string.Empty);
+            values.Add("Description", string.Empty);
+            values.Add("TemplateFile", string.Empty);
+            values.Add("FK_durados_App_durados_SqlConnection_Security_Parent", string.Empty);
+            values.Add("Basic", basic);
+            values.Add("FK_durados_App_durados_Theme_Parent", (themeId ?? Maps.DefaultThemeId).ToString());
+
+            System.Data.DataRow row = null;
+            try
+            {
+                row = view.Create(values, null, view_BeforeCreate, view_BeforeCreateInDatabase, view_AfterCreateBeforeCommit, view_AfterCreateAfterCommit);
+                if (isAzureDemo || isOnPremiseDemo)
+                {
+                    //string sourcePath = Maps.DemoUploadSourcePath;
+                    //string targetPath = "/Uploads/" + row["Id"] + "/";
+                    //try
+                    //{
+                    //    DirectoryCopy(sourcePath, targetPath, true);
+                    //}
+                    //catch (Exception exception) 
+                    //{
+                    //    Map.Logger.Log(GetControllerNameForLog(this.ControllerContext), this.ControllerContext.RouteData.Values["action"].ToString(), exception.Source, exception, 3, "Could not copy uploads");
+
+                    //}
+                }
+
+            }
+            catch (System.Data.SqlClient.SqlException exception)
+            {
+                if (exception.Number == 2601)
+                {
+                    Map.Logger.Log(GetControllerNameForLog(this.ControllerContext), this.ControllerContext.RouteData.Values["action"].ToString(), exception.Source, exception, 6, "App name already exists");
+                    return new Dictionary<string, object>() { { "Success", false }, { "Message", "Application name already exists, please enter a different name." } };
+                }
+                else
+                {
+                    Map.Logger.Log(GetControllerNameForLog(this.ControllerContext), this.ControllerContext.RouteData.Values["action"].ToString(), exception.Source, exception, 1, "failed to create app row");
+                    SendError(1, exception, GetControllerNameForLog(this.ControllerContext), this.ControllerContext.RouteData.Values["action"].ToString(), Map.Logger);
+                    return new Dictionary<string, object>() { { "Success", false }, { "Message", "Server is busy, please try again later" } };
+                }
+            }
+            catch (PlugInUserException exception)
+            {
+                Map.Logger.Log(GetControllerNameForLog(this.ControllerContext), this.ControllerContext.RouteData.Values["action"].ToString(), exception.Source, exception, 2, "failed to create app row");
+                //SendError(1, exception, GetControllerNameForLog(this.ControllerContext), this.ControllerContext.RouteData.Values["action"].ToString(), Map.Logger);
+                return new Dictionary<string, object>() { { "Success", false }, { "Message", exception.Message } };
+            }
+            catch (Exception exception)
+            {
+                Map.Logger.Log(GetControllerNameForLog(this.ControllerContext), this.ControllerContext.RouteData.Values["action"].ToString(), exception.Source, exception, 1, "failed to create app row");
+                SendError(1, exception, GetControllerNameForLog(this.ControllerContext), this.ControllerContext.RouteData.Values["action"].ToString(), Map.Logger);
+                return new Dictionary<string, object>() { { "Success", false }, { "Message", "Server is busy, please try again later" } };
+            }
+
+            if (isAzureDemo || isOnPremiseDemo)
+            {
+                try
+                {
+                    HandleTemplate(row, templateConnectionString);
+                }
+                catch (Exception exception)
+                {
+                    Map.Logger.Log(GetControllerNameForLog(this.ControllerContext), this.ControllerContext.RouteData.Values["action"].ToString(), exception.Source, exception, 1, "failed to create northwind template");
+
+                    return Json(new { Success = false, Message = "Server is busy, please try again later" });
+                }
+
+                if (isAzureDemo)
+                {
+                    if (!pendingExists)
+                    {
+
+                        bool inProcess = true;
+                        int counter = 0;
+                        while (inProcess && counter < 10)
+                        {
+                            try
+                            {
+                                counter++;
+                                ValidateConnection(server, catalog, newUsername, newPassword);
+                                System.Threading.Thread.Sleep(500);
+                                inProcess = false;
+                            }
+                            catch
+                            {
+                                inProcess = true;
+                            }
+                        }
+
+                        if (inProcess)
+                        {
+                            try
+                            {
+                                ValidateConnection(server, catalog, newUsername, newPassword);
+                            }
+                            catch (Exception exception)
+                            {
+                                Map.Logger.Log(GetControllerNameForLog(this.ControllerContext), this.ControllerContext.RouteData.Values["action"].ToString(), exception.Source, exception, 1, null);
+
+                            }
+                        }
+
+                        try
+                        {
+                            CreateDatabaseUser(server, catalog, demoUsername, demoPassword, false, newUsername, newPassword, false);
+
+                        }
+                        catch (Exception exception)
+                        {
+                            Map.Logger.Log(GetControllerNameForLog(this.ControllerContext), this.ControllerContext.RouteData.Values["action"].ToString(), exception.Source, exception, 1, "Failed to create Azure database. username=" + newUsername);
+                            return new Dictionary<string, object>() { { "Success", false }, { "Message", Database.GeneralErrorMessage } };
+                        }
+                    }
+                }
+
+            }
+            var builder = new UriBuilder(Request.Url);
+            string previewUrl = "http://" + name + Durados.Web.Mvc.Maps.UserPreviewUrl + GetThemePath(themeId);
+
+            return new Dictionary<string, object>() { { "Success", true }, { "Url", Maps.GetAppUrl(name) }, { "previewUrl", previewUrl } };
+        }
+        ****/
 
         [HttpPost]
         public virtual IHttpActionResult Test()

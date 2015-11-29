@@ -14,15 +14,23 @@ namespace BackAnd.Web.Api.Test
         public Actions Actions { get; private set; }
         public Objects Objects { get; private set; }
 
-        internal Envirement env = Envirement.Dev;
         internal RestClient client = null;
 
-        public AdminUtility(string appName, string username, string password, Envirement env = Envirement.Dev)
+        private string GetMainAppName()
         {
-            this.env = env;
-            client = new TestUtil(env).GetAuthentificatedClient(appName, username, password);
+            return Backand.Config.ConfigStore.GetConfig().mainAppName;
+        }
+        public AdminUtility(string username, string password)
+        {
+            client = new TestUtil().GetAuthentificatedClient(GetMainAppName(), username, password);
             Actions = new Actions(this);
             Objects = new Objects(this);
+        }
+
+        public void SetCurrentAppName(string appName)
+        {
+            client.AddDefaultHeader("AppName", appName);
+           
         }
 
         public IRestResponse CreateApp(string name, string title)
@@ -47,43 +55,8 @@ namespace BackAnd.Web.Api.Test
             return response;
         }
 
-        public IRestResponse ConnectApp(string name)
+        public List<Dictionary<string, object>> GetDefaultSchema()
         {
-            //string schema = "[" +
-            //  "{" +
-            //    "\"name\": \"items\"," +
-            //    "\"fields\": {" +
-            //      "\"name\": {" +
-            //        "\"type\": \"string\"" +
-            //      "}," +
-            //      "\"description\": {" +
-            //        "\"type\": \"text\"" +
-            //      "}," +
-            //      "\"user\": {" +
-            //        "\"object\": \"users\"" +
-            //      "}" +
-            //    "}" +
-            //  "}," +
-            //  "{" +
-            //    "\"name\": \"users\"," +
-            //    "'\"fields\": {" +
-            //      "\"email\": {" +
-            //        "\"type\": \"string\"" +
-            //      "}," +
-            //      "\"firstName\": {" +
-            //        "\"type\": \"string\"" +
-            //      "}," +
-            //      "\"lastName\": {" +
-            //        "\"type\": \"string\"" +
-            //      "}," +
-            //      "\"items\": {" +
-            //        "\"collection\": \"items\"," +
-            //        "\"via\": \"user\"" +
-            //      "}" +
-            //    "}" +
-            //  "}" +
-            //"]";
-
             var schema = new List<Dictionary<string, object>>() 
             { 
                 new Dictionary<string, object>() 
@@ -168,6 +141,47 @@ namespace BackAnd.Web.Api.Test
                     } 
                 } 
             };
+            return schema;
+        }
+
+        public IRestResponse ConnectApp(string name)
+        {
+            //string schema = "[" +
+            //  "{" +
+            //    "\"name\": \"items\"," +
+            //    "\"fields\": {" +
+            //      "\"name\": {" +
+            //        "\"type\": \"string\"" +
+            //      "}," +
+            //      "\"description\": {" +
+            //        "\"type\": \"text\"" +
+            //      "}," +
+            //      "\"user\": {" +
+            //        "\"object\": \"users\"" +
+            //      "}" +
+            //    "}" +
+            //  "}," +
+            //  "{" +
+            //    "\"name\": \"users\"," +
+            //    "'\"fields\": {" +
+            //      "\"email\": {" +
+            //        "\"type\": \"string\"" +
+            //      "}," +
+            //      "\"firstName\": {" +
+            //        "\"type\": \"string\"" +
+            //      "}," +
+            //      "\"lastName\": {" +
+            //        "\"type\": \"string\"" +
+            //      "}," +
+            //      "\"items\": {" +
+            //        "\"collection\": \"items\"," +
+            //        "\"via\": \"user\"" +
+            //      "}" +
+            //    "}" +
+            //  "}" +
+            //"]";
+
+            
             
 
 //            {"product":"10","sampleApp":"","schema":[{
@@ -176,10 +190,10 @@ namespace BackAnd.Web.Api.Test
 //    fields:[{name:"c1", type:"ShortText"},{name:"c2",type:"SingleSelect"}]
 //}]}
 
-            return ConnectApp(name, schema);
+            return ConnectApp(name, GetDefaultSchema());
         }
 
-        public IRestResponse ConnectApp(string name, object schema)
+        public IRestResponse ConnectApp(string name, List<Dictionary<string, object>> schema)
         {
             // Arrange
             var data = new {name = name, product= "10", schema = schema };
@@ -193,6 +207,21 @@ namespace BackAnd.Web.Api.Test
             // Assert
             Assert.IsTrue(response.StatusCode == System.Net.HttpStatusCode.OK, response.Content);
             
+            return response;
+        }
+
+        public IRestResponse ChangeModel(List<Dictionary<string, object>> schema)
+        {
+            // Arrange
+            var request = new RestRequest("/1/model", Method.POST);
+            request.RequestFormat = DataFormat.Json;
+            request.AddBody(new Dictionary<string, object>() { { "newSchema", schema }, { "severity", 0 } });
+            request.Timeout = 1000 * 60 * 10;
+            // Act
+            var response = client.Execute(request);
+            // Assert
+            Assert.IsTrue(response.StatusCode == System.Net.HttpStatusCode.OK, response.Content);
+
             return response;
         }
 
@@ -421,7 +450,7 @@ namespace BackAnd.Web.Api.Test
         public IRestResponse GetAll(bool? withSelectOptions = null, int? pageNumber = null, int? pageSize = null, FilterItem[] filter = null, SortItem[] sort = null, string search = null)
         {
             // Arrange
-            var client = new TestUtil(admin.env).GetAuthentificatedClient();
+            var client = new TestUtil().GetAuthentificatedClient(Backand.Config.ConfigStore.GetConfig().appname, Backand.Config.ConfigStore.GetConfig().username, Backand.Config.ConfigStore.GetConfig().pwd);
             var request = new RestRequest(Route, Method.GET);
             if (pageNumber.HasValue)
                 request.AddParameter("pageNumber", pageNumber.Value, ParameterType.QueryString);
@@ -451,7 +480,7 @@ namespace BackAnd.Web.Api.Test
         public IRestResponse GetOne(string id)
         {
             // Arrange
-            var client = new TestUtil(admin.env).GetAuthentificatedClient();
+            var client = new TestUtil().GetAuthentificatedClient(Backand.Config.ConfigStore.GetConfig().appname, Backand.Config.ConfigStore.GetConfig().username, Backand.Config.ConfigStore.GetConfig().pwd);
             var request = new RestRequest(Route + "/{id}", Method.GET);
             request.AddUrlSegment("id", id);
 
@@ -474,7 +503,7 @@ namespace BackAnd.Web.Api.Test
         public IRestResponse Post(object data)
         {
             // Arrange
-            var client = new TestUtil(admin.env).GetAuthentificatedClient();
+            var client = new TestUtil().GetAuthentificatedClient(Backand.Config.ConfigStore.GetConfig().appname, Backand.Config.ConfigStore.GetConfig().username, Backand.Config.ConfigStore.GetConfig().pwd);
             var request = new RestRequest(Route, Method.POST);
             request.RequestFormat = DataFormat.Json;
             request.AddBody(data);
@@ -495,7 +524,7 @@ namespace BackAnd.Web.Api.Test
         public IRestResponse Put(string id, object data)
         {
             // Arrange
-            var client = new TestUtil(admin.env).GetAuthentificatedClient();
+            var client = new TestUtil().GetAuthentificatedClient(Backand.Config.ConfigStore.GetConfig().appname, Backand.Config.ConfigStore.GetConfig().username, Backand.Config.ConfigStore.GetConfig().pwd);
             var request = new RestRequest(Route + "/{id}", Method.PUT);
             request.AddUrlSegment("id", id);
             request.RequestFormat = DataFormat.Json;
@@ -519,7 +548,7 @@ namespace BackAnd.Web.Api.Test
         public IRestResponse Delete(string id)
         {
             // Arrange
-            var client = new TestUtil(admin.env).GetAuthentificatedClient();
+            var client = new TestUtil().GetAuthentificatedClient(Backand.Config.ConfigStore.GetConfig().appname, Backand.Config.ConfigStore.GetConfig().username, Backand.Config.ConfigStore.GetConfig().pwd);
             var request = new RestRequest(Route + "/{id}", Method.DELETE);
             request.AddUrlSegment("id", id);
 

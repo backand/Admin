@@ -8,7 +8,6 @@ namespace BackAnd.Web.Api.Test
     public class LoginTests
     {
        
-        [TestMethod]
         public void TestValidLogin()
         {
             string username = "relly@backand.com";
@@ -25,11 +24,15 @@ namespace BackAnd.Web.Api.Test
 
         }
 
-        [TestMethod]
+        private string GetServerAddress()
+        {
+            return null;
+        }
+
         public void TestAnonymousLoginReturnValidRoleFromProfile()
         {
             // Arrane
-            var client = new RestClient(TestUtil.ServiceAddressDev);
+            var client = new RestClient(GetServerAddress());
             var request = new RestRequest("/api/Account/profile", Method.GET);
             request.AddHeader("AnonymousToken", "1212ad72-1625-4e69-aef5-438f2b6f3c2b");
             request.AddHeader("Content-Type", "application/x-www-form-urlencoded");
@@ -44,11 +47,10 @@ namespace BackAnd.Web.Api.Test
         }
 
 
-        [TestMethod]
         public void TestAnonymousLoginTestValidRoleFromProfile()
         {
             // Arrane
-            var client = new RestClient(TestUtil.ServiceAddressDev);
+            var client = new RestClient(GetServerAddress());
             var request = new RestRequest("/api/Account/profile", Method.GET);
             request.AddHeader("AppName", "app185");
             request.AddHeader("AnonymousToken", "1212ad72-1625-4e69-aef5-438f2b6f3c2b");

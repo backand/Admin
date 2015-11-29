@@ -10,34 +10,19 @@ namespace BackAnd.Web.Api.Test
 {
     public class TestUtil
     {
-        public const string ServiceAddressDev = "http://localhost:4110/";
-        public const string ServiceAddressQa = "http://api.backand.co:8099/";
-        public const string ServiceAddressProd = "https://api.backand.com/";
-
-        Envirement env = Envirement.Dev;
-
+        
         public TestUtil()
         {
 
         }
-        public TestUtil(Envirement env)
-        {
-            this.env = env;
-        }
-        public RestClient GetRestClient()
-        {
-            return GetRestClient(env);
-        }
 
-        private RestClient GetRestClient(Envirement env)
+        private string GetServerAddress()
         {
-            RestClient client = null;
-            if (env == Test.Envirement.Dev)
-                client = new RestClient(ServiceAddressDev);
-            else if (env == Test.Envirement.QA)
-                client = new RestClient(ServiceAddressQa);
-            else if (env == Test.Envirement.Prod)
-                client = new RestClient(ServiceAddressProd);
+            return Backand.Config.ConfigStore.GetConfig().serverAddress;
+        }
+        private RestClient GetRestClient()
+        {
+            RestClient client = new RestClient(GetServerAddress());
 
             return client;
         }
@@ -57,8 +42,17 @@ namespace BackAnd.Web.Api.Test
             return response;
         }
 
+        public RestClient GetAuthentificatedClient()
+        {
+            return GetAuthentificatedClient(Backand.Config.ConfigStore.GetConfig().appname, Backand.Config.ConfigStore.GetConfig().username, Backand.Config.ConfigStore.GetConfig().pwd);
+        }
 
-        public RestClient GetAuthentificatedClient(string appName = "app185", string username = "relly@backand.com", string password = "123456")
+        public RestClient GetAuthentificatedClient(string appName)
+        {
+            return GetAuthentificatedClient(appName, Backand.Config.ConfigStore.GetConfig().username, Backand.Config.ConfigStore.GetConfig().pwd);
+        }
+
+        public RestClient GetAuthentificatedClient(string appName, string username, string password)
         {
             var rest = GetRestClient();
             
@@ -67,13 +61,6 @@ namespace BackAnd.Web.Api.Test
             rest.AddDefaultHeader("Authorization", res.token_type + " " + res.access_token);
             return rest;
         }
-    }
-
-    public enum Envirement
-    {
-        Dev,
-        QA,
-        Prod
     }
 
     public class LoginResult

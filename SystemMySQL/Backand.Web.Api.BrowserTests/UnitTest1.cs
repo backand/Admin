@@ -18,7 +18,6 @@ namespace Backand.Web.Api.BrowserTests
             driver.Dispose();
         }
 
-        [TestMethod]
         public void TestLoginWithValidUsernameAndPasswordArriveToAppPage()
         {
             string username = "relly@backand.com";

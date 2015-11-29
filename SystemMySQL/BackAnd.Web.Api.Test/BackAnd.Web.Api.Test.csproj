@@ -75,6 +75,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SocketHelper.cs" />
     <Compile Include="SimpleUtil.cs" />
+    <Compile Include="AdminRunner.cs" />
     <Compile Include="TestRunner.cs" />
     <Compile Include="TestUtil.cs" />
     <Compile Include="LoginTests.cs" />
@@ -82,7 +83,16 @@
     <Compile Include="SanetyTest.cs" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="data.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Backand.Config\Backand.Config.csproj">
+      <Project>{c35122b9-b306-497c-a5a1-01e4dd2c6cc8}</Project>
+      <Name>Backand.Config</Name>
+    </ProjectReference>
   </ItemGroup>
   <Choose>
     <When Condition="'$(VisualStudioVersion)' == '10.0' And '$(IsCodedUITest)' == 'True'">

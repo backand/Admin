@@ -11,18 +11,18 @@ namespace BackAnd.Web.Api.Test
         RestClient client = null;
 
         
-        public CrudUtility(Envirement env = Envirement.Dev)
+        public CrudUtility()
         {
-            client = new TestUtil(env).GetAuthentificatedClient();
+            client = new TestUtil().GetAuthentificatedClient(Backand.Config.ConfigStore.GetConfig().appname, Backand.Config.ConfigStore.GetConfig().username, Backand.Config.ConfigStore.GetConfig().pwd);
         }
 
-        public CrudUtility(string appName, Envirement env = Envirement.Dev)
+        public CrudUtility(string appName)
         {
-            client = new TestUtil(env).GetAuthentificatedClient(appName);
+            client = new TestUtil().GetAuthentificatedClient(appName);
         }
-        public CrudUtility(string appName, string username, string password, Envirement env = Envirement.Dev)
+        public CrudUtility(string appName, string username, string password)
         {
-            client = new TestUtil(env).GetAuthentificatedClient(appName, username, password);
+            client = new TestUtil().GetAuthentificatedClient(appName, username, password);
         }
        
         public IRestResponse GelAll(string name, bool? withSelectOptions = null, bool? withFilterOptions = null, int? pageNumber = null, int? pageSize = null, object filter = null, object sort = null, string search = null, bool? deep = null, bool? descriptive = true, bool? relatedObjects = false)
@@ -248,11 +248,10 @@ namespace BackAnd.Web.Api.Test
                 new Dictionary<string, object>() { { "name", "name2" }, { "description", "description2" } });
         }
 
-        [TestMethod]
         public void RunSimpleCrud(string objectName, Dictionary<string, object> dataForCreate, Dictionary<string, object> dataForUpdate)
         {
 
-            new TestContext { ObjectName = objectName }
+            new CrudContext { ObjectName = objectName }
                 .CreateItem(dataForCreate)
                 .ReadOneItem()
                 .UpdateItem(dataForUpdate)
@@ -262,7 +261,7 @@ namespace BackAnd.Web.Api.Test
         public void RunDeepCrud(string objectName, Dictionary<string, object> dataForCreate, Dictionary<string, object> dataForUpdate)
         {
 
-            new TestContext { ObjectName = objectName }
+            new CrudContext { ObjectName = objectName }
                 .AddDeepOnUpdate()
                 .CreateItem(dataForCreate)
                 .ReadOneItem()
