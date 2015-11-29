@@ -38,7 +38,6 @@ namespace BackAnd.Web.Api.Test
     }
 
 
-    [TestClass]
     public class MyTestClass
     {
         [TestMethod]

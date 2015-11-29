@@ -6,7 +6,6 @@ using System.Collections.Generic;
 
 namespace BackAnd.Web.Api.Test
 {
-    [TestClass]
     public class CrudItems
     {
         string objectName = "items";
@@ -21,11 +20,10 @@ namespace BackAnd.Web.Api.Test
 
         public CrudItems()
         {
-            this.admin = new AdminUtility(appName, username, password);
+            this.admin = new AdminUtility(username, password);
         }
 
 
-        [TestMethod]
         public void RunJsInTransaction()
         {
             string objectNameUpdated = "items2";
@@ -57,7 +55,6 @@ namespace BackAnd.Web.Api.Test
            // RunSimpleCrud();
         }
 
-        [TestMethod]
         public void Endless()
         {
             
@@ -94,7 +91,6 @@ namespace BackAnd.Web.Api.Test
 
 
 
-        [TestMethod]
         public void ReadOneDeep()
         {
             CrudUtility crud2 = new CrudUtility("app189");

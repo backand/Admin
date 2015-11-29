@@ -8,9 +8,9 @@ using BackObject = System.Collections.Generic.Dictionary<string, object>;
 
 namespace BackAnd.Web.Api.Test
 {
-    public class TestContext
+    public class CrudContext
     {
-        public CrudUtility crud = new CrudUtility();
+        public CrudUtility crud = null;
 
         public string ObjectName { get; set; }
 
@@ -22,9 +22,14 @@ namespace BackAnd.Web.Api.Test
 
         public List<FilterItem> filter { get; set; }
 
-
-        public TestContext()
+        public CrudContext()
+            : this(Backand.Config.ConfigStore.GetConfig().appname, Backand.Config.ConfigStore.GetConfig().username, Backand.Config.ConfigStore.GetConfig().pwd)
         {
+
+        }
+        public CrudContext(string appName, string username, string password)
+        {
+            crud = new CrudUtility(appName, username, password);
             filter = new List<FilterItem>();
         }
     }
@@ -33,7 +38,7 @@ namespace BackAnd.Web.Api.Test
 
     public static class DeepHelper
     {
-        public static TestContext AddDeepOnUpdate(this TestContext runner)
+        public static CrudContext AddDeepOnUpdate(this CrudContext runner)
         {
             runner.DeepOnUpdate = true;
             return runner;
@@ -42,7 +47,7 @@ namespace BackAnd.Web.Api.Test
 
     public static class FilterHelper
     {
-        public static TestContext AddFilter(this TestContext runner, FilterItem item)
+        public static CrudContext AddFilter(this CrudContext runner, FilterItem item)
         {
             runner.filter.Add(item);
             return runner;
@@ -53,7 +58,7 @@ namespace BackAnd.Web.Api.Test
 
     public static class CrudRunnerExtension
     {
-        public static TestContext CreateItem(this TestContext runner, BackObject dataForCreate)
+        public static CrudContext CreateItem(this CrudContext runner, BackObject dataForCreate)
         {
             var response = runner.crud.Post(runner.ObjectName, dataForCreate, runner.DeepOnUpdate);
             Assert.IsTrue(response.StatusCode == System.Net.HttpStatusCode.OK);
@@ -65,13 +70,13 @@ namespace BackAnd.Web.Api.Test
             return runner;
         }
 
-        public static TestContext ReadOneItem(this TestContext runner)
+        public static CrudContext ReadOneItem(this CrudContext runner)
         {
             runner.ReadOneItem(runner.DataForCreate, runner.Id);
             return runner;
         }
 
-        public static TestContext ReadOneItem(this TestContext runner, BackObject dataToCompare, string id)
+        public static CrudContext ReadOneItem(this CrudContext runner, BackObject dataToCompare, string id)
         {
             var response = runner.crud.GetOne(runner.ObjectName, id);
             Assert.IsTrue(response.StatusCode == System.Net.HttpStatusCode.OK);
@@ -91,7 +96,7 @@ namespace BackAnd.Web.Api.Test
             }
         }
 
-        public static TestContext UpdateItem(this TestContext runner, BackObject dataToUpdate)
+        public static CrudContext UpdateItem(this CrudContext runner, BackObject dataToUpdate)
         {
             var response = runner.crud.Put(runner.ObjectName, runner.Id, dataToUpdate, null, true);
             Assert.IsTrue(response.StatusCode == System.Net.HttpStatusCode.OK);
@@ -102,7 +107,7 @@ namespace BackAnd.Web.Api.Test
         }
 
 
-        public static TestContext DeleteItem(this TestContext runner)
+        public static CrudContext DeleteItem(this CrudContext runner)
         {
             var response = runner.crud.Delete(runner.ObjectName, runner.Id);
             Assert.IsTrue(response.StatusCode == System.Net.HttpStatusCode.OK);
