@@ -24,6 +24,7 @@ namespace BackAnd.Web.Api.Test
         {
             client = new TestUtil(env).GetAuthentificatedClient(appName, username, password);
         }
+       
         public IRestResponse GelAll(string name, bool? withSelectOptions = null, bool? withFilterOptions = null, int? pageNumber = null, int? pageSize = null, object filter = null, object sort = null, string search = null, bool? deep = null, bool? descriptive = true, bool? relatedObjects = false)
         {
             // Arrange
@@ -60,6 +61,7 @@ namespace BackAnd.Web.Api.Test
                 Assert.IsTrue(result.ContainsKey("data"));
                 Assert.IsTrue(result.ContainsKey("totalRows"));
             }
+
             return response;
         }
 
@@ -89,8 +91,7 @@ namespace BackAnd.Web.Api.Test
             return response;
         }
 
-
-        public IRestResponse Post(string name, object data, bool? deep = null, bool? returnObject = null, string parameters = null)
+        public IRestResponse Post<T>(string name, T data, bool? deep = null, bool? returnObject = null, string parameters = null)
         {
             // Arrange
             var request = new RestRequest("/1/objects/{name}", Method.POST);
@@ -167,7 +168,6 @@ namespace BackAnd.Web.Api.Test
 
         }
 
-
         public IRestResponse Delete(string name, string id, bool? deep = null, string parameters = null)
         {
             // Arrange
@@ -201,11 +201,11 @@ namespace BackAnd.Web.Api.Test
             return response;
         }
 
-        private IRestResponse Create(string objectName, Dictionary<string, object> data, out string id)
+        private IRestResponse Create(string objectName,Dictionary<string,object> data, out string id)
         {
             var response = Post(objectName, data);
             Assert.IsTrue(response.StatusCode == System.Net.HttpStatusCode.OK);
-            var result = JsonConvert.DeserializeObject<Dictionary<string, object>>(response.Content);
+            var result = JsonConvert.DeserializeObject<Dictionary<string,object>>(response.Content);
             id = ((Newtonsoft.Json.Linq.JObject)result["__metadata"])["id"].ToString();
             return response;
         }
@@ -241,16 +241,38 @@ namespace BackAnd.Web.Api.Test
             return response;
         }
 
-        [TestMethod]
         public void RunSimpleCrud()
         {
-            RunSimpleCrud("items", new Dictionary<string, object>() { { "name", "name1" }, { "description", "description1" } }, new Dictionary<string, object>() { { "name", "name2" }, { "description", "description2" } });
+            RunSimpleCrud("items",
+                new Dictionary<string, object>() { { "name", "name1" }, { "description", "description1" } },
+                new Dictionary<string, object>() { { "name", "name2" }, { "description", "description2" } });
         }
 
         [TestMethod]
         public void RunSimpleCrud(string objectName, Dictionary<string, object> dataForCreate, Dictionary<string, object> dataForUpdate)
         {
 
+            new TestContext { ObjectName = objectName }
+                .CreateItem(dataForCreate)
+                .ReadOneItem()
+                .UpdateItem(dataForUpdate)
+                .DeleteItem();
+        }
+
+        public void RunDeepCrud(string objectName, Dictionary<string, object> dataForCreate, Dictionary<string, object> dataForUpdate)
+        {
+
+            new TestContext { ObjectName = objectName }
+                .AddDeepOnUpdate()
+                .CreateItem(dataForCreate)
+                .ReadOneItem()
+                .UpdateItem(dataForUpdate)
+                .DeleteItem();
+        }
+
+
+      /*  public void RunSimpleCrud<T>(string objectName,T dataForCreate,T dataForUpdate)
+        {
             ReadAll(objectName);
             string id = null;
             Create(objectName, dataForCreate, out id);
@@ -271,7 +293,7 @@ namespace BackAnd.Web.Api.Test
                 Assert.IsTrue(result[key].Equals(dataForUpdate[key]));
             }
             DeleteItem(objectName, id);
-        }
+        }*/
     }
 
     public class FilterItem
@@ -310,5 +332,18 @@ namespace BackAnd.Web.Api.Test
         notContains,
 
         @in,
+    }
+
+
+    public class GetCrudResponse<T>
+    {
+        public string id { get; set; }
+
+        public T Result { get; set; }
+
+        public GetCrudResponse(string content)
+        {
+
+        }
     }
 }

@@ -94,7 +94,7 @@ namespace Backand
             }
             else
             {
-                messageString = javaScriptSerializer.Serialize(message);
+                messageString = Newtonsoft.Json.JsonConvert.SerializeObject(message);
             }
             
             object[] list = new object[8] { o1, o2, o3, o4, o5, o6, o7, o8 };
@@ -108,7 +108,7 @@ namespace Backand
                     }
                     else
                     {
-                        messageString = javaScriptSerializer.Serialize(o);
+                        messageString = Newtonsoft.Json.JsonConvert.SerializeObject(o);
                     }
                    
                 }
