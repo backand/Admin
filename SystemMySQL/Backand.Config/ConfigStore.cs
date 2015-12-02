@@ -32,7 +32,7 @@ namespace Backand.Config
 
         public static string GetCurrentKey()
         {
-            return System.Environment.GetEnvironmentVariable(EnvVarName, EnvironmentVariableTarget.User) ?? DefaultKey;
+            return System.Environment.GetEnvironmentVariable(EnvVarName) ?? DefaultKey;
         }
 
         public static ServerConfig GetConfig()
