@@ -73,6 +73,9 @@
     <Compile Include="AuthentificationTest.cs" />
     <Compile Include="CrudUtil.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="SanityTest.cs">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="SocketHelper.cs" />
     <Compile Include="SimpleUtil.cs" />
     <Compile Include="AdminRunner.cs" />
@@ -80,7 +83,6 @@
     <Compile Include="TestUtil.cs" />
     <Compile Include="LoginTests.cs" />
     <Compile Include="CrudTests.cs" />
-    <Compile Include="SanetyTest.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="data.json">
