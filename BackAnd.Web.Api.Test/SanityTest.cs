@@ -61,7 +61,8 @@ namespace BackAnd.Web.Api.Test
 
         private bool TestFailed()
         {
-            return TestContext.CurrentTestOutcome == UnitTestOutcome.Failed;
+           // return TestContext.CurrentTestOutcome == UnitTestOutcome.Failed;
+            return true;
         }
 
 
