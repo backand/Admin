@@ -55,9 +55,7 @@ namespace BackAnd.Web.Api.Test
 
         public RestClient GetAuthentificatedClient(string appName, string username, string password)
         {
-            Console.WriteLine("aaaaa");
             Trace.WriteLine("trace");
-            Debug.WriteLine("debug");
             var rest = GetRestClient();
             
             var res = SignIn(username, password, appName);
