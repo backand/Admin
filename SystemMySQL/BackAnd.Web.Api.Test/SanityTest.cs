@@ -4,6 +4,7 @@ using System.Threading;
 using System.Diagnostics;
 using Backand.Config;
 using Newtonsoft.Json;
+using System.Collections;
 
 namespace BackAnd.Web.Api.Test
 {
@@ -57,6 +58,10 @@ namespace BackAnd.Web.Api.Test
         {
             Trace.WriteLine("CurrentKey " + ConfigStore.GetCurrentKey());
             Trace.WriteLine("CurrentConfig " + JsonConvert.SerializeObject(ConfigStore.GetConfig()));
+
+            Trace.WriteLine("GetEnvironmentVariables: ");
+            foreach (DictionaryEntry de in Environment.GetEnvironmentVariables())
+                Trace.WriteLine(string.Format("  {0} = {1}", de.Key, de.Value));
         }
 
         private bool TestFailed()
