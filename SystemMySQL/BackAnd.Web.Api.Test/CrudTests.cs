@@ -8,24 +8,26 @@ namespace BackAnd.Web.Api.Test
 {
     public class CrudItems
     {
-        string objectName = "items";
-        string id = "1";
-        string appName = "app202";
-        string username = "relly@backand.com";
-        string password = "123456";
-        
-        CrudUtility crud = new CrudUtility();
+        //string objectName = "items";
+        //string id = "1";
+        //string appName = "app202";
+        //string username = "relly@backand.com";
+        //string password = "123456";
+
+        CrudUtility crud = null;
         AdminUtility admin = null;
         Dictionary<string, object> data = new Dictionary<string, object>() { { "name", "name1" }, { "description", "description1" } };
 
-        public CrudItems()
+        public CrudItems(string appname, string username, string password)
         {
             this.admin = new AdminUtility(username, password);
+            this.crud = new CrudUtility(appname, username, password);
         }
 
 
         public void RunJsInTransaction()
         {
+            string objectName = "items";
             string objectNameUpdated = "items2";
             string objectId = null; 
             var getObjectIdResponse = admin.Objects.GetId(objectName, out objectId);
@@ -91,11 +93,11 @@ namespace BackAnd.Web.Api.Test
 
 
 
-        public void ReadOneDeep()
+        public void ReadOneDeep(string objectName, string id)
         {
-            CrudUtility crud2 = new CrudUtility("app189");
-        
-            var response = crud2.GetOne("items", "1", true);
+            //CrudUtility crud2 = new CrudUtility("app189");
+
+            var response = crud.GetOne(objectName, id, true);
             Assert.IsTrue(response.StatusCode == System.Net.HttpStatusCode.OK);
             var result = JsonConvert.DeserializeObject<Dictionary<string, object>>(response.Content);
 
@@ -103,14 +105,14 @@ namespace BackAnd.Web.Api.Test
         }
 
 
-        private void ReadAllItems()
+        private void ReadAllItems(string objectName)
         {
             var response = crud.GelAll(objectName);
             Assert.IsTrue(response.StatusCode == System.Net.HttpStatusCode.OK);
                 
         }
 
-        private void CreateItem()
+        private void CreateItem(string objectName, out string id)
         {
             var response = crud.Post(objectName, data);
             Assert.IsTrue(response.StatusCode == System.Net.HttpStatusCode.OK);
@@ -118,7 +120,7 @@ namespace BackAnd.Web.Api.Test
             id = ((Newtonsoft.Json.Linq.JObject)result["__metadata"])["id"].ToString();
         }
 
-        private void ReadOneItem()
+        private void ReadOneItem(string objectName, string id)
         {
             var response = crud.GetOne(objectName, id);
             Assert.IsTrue(response.StatusCode == System.Net.HttpStatusCode.OK);
@@ -132,7 +134,7 @@ namespace BackAnd.Web.Api.Test
             
         }
 
-        private void UpdateItem()
+        private void UpdateItem(string objectName, string id)
         {
             data["name"] = "update" + id;
             var response = crud.Put(objectName, id, data, null, true);
@@ -146,7 +148,7 @@ namespace BackAnd.Web.Api.Test
             
         }
 
-        private void DeleteItem()
+        private void DeleteItem(string objectName, string id)
         {
             var response = crud.Delete(objectName, id);
             Assert.IsTrue(response.StatusCode == System.Net.HttpStatusCode.OK);

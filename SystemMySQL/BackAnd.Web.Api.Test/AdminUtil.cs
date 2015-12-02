@@ -27,10 +27,11 @@ namespace BackAnd.Web.Api.Test
             Objects = new Objects(this);
         }
 
+        internal string AppName = null;
         public void SetCurrentAppName(string appName)
         {
             client.AddDefaultHeader("AppName", appName);
-           
+            this.AppName = appName;
         }
 
         public IRestResponse CreateApp(string name, string title)
@@ -450,7 +451,8 @@ namespace BackAnd.Web.Api.Test
         public IRestResponse GetAll(bool? withSelectOptions = null, int? pageNumber = null, int? pageSize = null, FilterItem[] filter = null, SortItem[] sort = null, string search = null)
         {
             // Arrange
-            var client = new TestUtil().GetAuthentificatedClient(Backand.Config.ConfigStore.GetConfig().appname, Backand.Config.ConfigStore.GetConfig().username, Backand.Config.ConfigStore.GetConfig().pwd);
+            var client = new TestUtil().GetAuthentificatedClient(admin.AppName ?? Backand.Config.ConfigStore.GetConfig().appname, Backand.Config.ConfigStore.GetConfig().username, Backand.Config.ConfigStore.GetConfig().pwd);
+            
             var request = new RestRequest(Route, Method.GET);
             if (pageNumber.HasValue)
                 request.AddParameter("pageNumber", pageNumber.Value, ParameterType.QueryString);
@@ -480,7 +482,7 @@ namespace BackAnd.Web.Api.Test
         public IRestResponse GetOne(string id)
         {
             // Arrange
-            var client = new TestUtil().GetAuthentificatedClient(Backand.Config.ConfigStore.GetConfig().appname, Backand.Config.ConfigStore.GetConfig().username, Backand.Config.ConfigStore.GetConfig().pwd);
+            var client = new TestUtil().GetAuthentificatedClient(admin.AppName ?? Backand.Config.ConfigStore.GetConfig().appname, Backand.Config.ConfigStore.GetConfig().username, Backand.Config.ConfigStore.GetConfig().pwd);
             var request = new RestRequest(Route + "/{id}", Method.GET);
             request.AddUrlSegment("id", id);
 
@@ -503,7 +505,7 @@ namespace BackAnd.Web.Api.Test
         public IRestResponse Post(object data)
         {
             // Arrange
-            var client = new TestUtil().GetAuthentificatedClient(Backand.Config.ConfigStore.GetConfig().appname, Backand.Config.ConfigStore.GetConfig().username, Backand.Config.ConfigStore.GetConfig().pwd);
+            var client = new TestUtil().GetAuthentificatedClient(admin.AppName ?? Backand.Config.ConfigStore.GetConfig().appname, Backand.Config.ConfigStore.GetConfig().username, Backand.Config.ConfigStore.GetConfig().pwd);
             var request = new RestRequest(Route, Method.POST);
             request.RequestFormat = DataFormat.Json;
             request.AddBody(data);
@@ -524,7 +526,7 @@ namespace BackAnd.Web.Api.Test
         public IRestResponse Put(string id, object data)
         {
             // Arrange
-            var client = new TestUtil().GetAuthentificatedClient(Backand.Config.ConfigStore.GetConfig().appname, Backand.Config.ConfigStore.GetConfig().username, Backand.Config.ConfigStore.GetConfig().pwd);
+            var client = new TestUtil().GetAuthentificatedClient(admin.AppName ?? Backand.Config.ConfigStore.GetConfig().appname, Backand.Config.ConfigStore.GetConfig().username, Backand.Config.ConfigStore.GetConfig().pwd);
             var request = new RestRequest(Route + "/{id}", Method.PUT);
             request.AddUrlSegment("id", id);
             request.RequestFormat = DataFormat.Json;
@@ -548,7 +550,7 @@ namespace BackAnd.Web.Api.Test
         public IRestResponse Delete(string id)
         {
             // Arrange
-            var client = new TestUtil().GetAuthentificatedClient(Backand.Config.ConfigStore.GetConfig().appname, Backand.Config.ConfigStore.GetConfig().username, Backand.Config.ConfigStore.GetConfig().pwd);
+            var client = new TestUtil().GetAuthentificatedClient(admin.AppName ?? Backand.Config.ConfigStore.GetConfig().appname, Backand.Config.ConfigStore.GetConfig().username, Backand.Config.ConfigStore.GetConfig().pwd);
             var request = new RestRequest(Route + "/{id}", Method.DELETE);
             request.AddUrlSegment("id", id);
 
