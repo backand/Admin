@@ -2,6 +2,7 @@
 using RestSharp;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -54,10 +55,13 @@ namespace BackAnd.Web.Api.Test
 
         public RestClient GetAuthentificatedClient(string appName, string username, string password)
         {
+            Console.WriteLine("aaaaa");
+            Trace.WriteLine("trace");
+            Debug.WriteLine("debug");
             var rest = GetRestClient();
             
             var res = SignIn(username, password, appName);
-            Assert.IsTrue(res.token_type != null && res.access_token != null, "Fail to sign in");
+            Assert.IsTrue(res != null && res.token_type != null && res.access_token != null, "Fail to sign in");
             rest.AddDefaultHeader("Authorization", res.token_type + " " + res.access_token);
             return rest;
         }
