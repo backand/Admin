@@ -785,6 +785,7 @@ namespace Durados.Web.Mvc.UI.Helpers
             user.Add("username", database.GetCurrentUsername());
             user.Add("fullName", database.GetUserFullName());
             user.Add("role", database.GetUserRole());
+            user.Add("appName", database.Map.AppName);
 
             return user;
         }
