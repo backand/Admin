@@ -22,11 +22,11 @@ namespace BackAnd.Web.Api.Test
 
         public List<FilterItem> filter { get; set; }
 
-        public CrudContext()
-            : this(Backand.Config.ConfigStore.GetConfig().appname, Backand.Config.ConfigStore.GetConfig().username, Backand.Config.ConfigStore.GetConfig().pwd)
-        {
+        //public CrudContext()
+        //    : this(Backand.Config.ConfigStore.GetConfig().appname, Backand.Config.ConfigStore.GetConfig().username, Backand.Config.ConfigStore.GetConfig().pwd)
+        //{
 
-        }
+        //}
         public CrudContext(string appName, string username, string password)
         {
             crud = new CrudUtility(appName, username, password);

@@ -9,22 +9,32 @@ namespace BackAnd.Web.Api.Test
     public class CrudUtility
     {
         RestClient client = null;
-
+        CrudContext crudContext = null;
+        string appName; string username; string password;
         
-        public CrudUtility()
-        {
-            client = new TestUtil().GetAuthentificatedClient(Backand.Config.ConfigStore.GetConfig().appname, Backand.Config.ConfigStore.GetConfig().username, Backand.Config.ConfigStore.GetConfig().pwd);
-        }
+        //public CrudUtility()
+        //{
+        //    client = new TestUtil().GetAuthentificatedClient(Backand.Config.ConfigStore.GetConfig().appname, Backand.Config.ConfigStore.GetConfig().username, Backand.Config.ConfigStore.GetConfig().pwd);
+        //}
 
-        public CrudUtility(string appName)
-        {
-            client = new TestUtil().GetAuthentificatedClient(appName);
-        }
+        //public CrudUtility(string appName)
+        //{
+        //    client = new TestUtil().GetAuthentificatedClient(appName);
+        //}
         public CrudUtility(string appName, string username, string password)
         {
+            this.appName = appName;
+            this.username = username;
+            this.password = password;
             client = new TestUtil().GetAuthentificatedClient(appName, username, password);
+            
         }
-       
+        private CrudContext GetCrudContext()
+        {
+            if (crudContext == null)
+                crudContext = new CrudContext(appName, username, password);
+            return crudContext;
+        }
         public IRestResponse GelAll(string name, bool? withSelectOptions = null, bool? withFilterOptions = null, int? pageNumber = null, int? pageSize = null, object filter = null, object sort = null, string search = null, bool? deep = null, bool? descriptive = true, bool? relatedObjects = false)
         {
             // Arrange
@@ -251,8 +261,8 @@ namespace BackAnd.Web.Api.Test
         public void RunSimpleCrud(string objectName, Dictionary<string, object> dataForCreate, Dictionary<string, object> dataForUpdate)
         {
 
-            new CrudContext { ObjectName = objectName }
-                .CreateItem(dataForCreate)
+            GetCrudContext().ObjectName = objectName;
+            GetCrudContext().CreateItem(dataForCreate)
                 .ReadOneItem()
                 .UpdateItem(dataForUpdate)
                 .DeleteItem();
@@ -261,8 +271,8 @@ namespace BackAnd.Web.Api.Test
         public void RunDeepCrud(string objectName, Dictionary<string, object> dataForCreate, Dictionary<string, object> dataForUpdate)
         {
 
-            new CrudContext { ObjectName = objectName }
-                .AddDeepOnUpdate()
+            GetCrudContext().ObjectName = objectName;
+            GetCrudContext().AddDeepOnUpdate()
                 .CreateItem(dataForCreate)
                 .ReadOneItem()
                 .UpdateItem(dataForUpdate)
