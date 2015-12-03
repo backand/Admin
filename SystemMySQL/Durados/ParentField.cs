@@ -301,6 +301,16 @@ namespace Durados
         
         }
 
+        public override bool GetDbUnique()
+        {
+            foreach (DataColumn column in DataRelation.ChildColumns)
+            {
+                if (column.Unique)
+                    return true;
+            }
+            return false;
+        }
+
         public override bool GetDbRequired()
         {
             return GetRequired();

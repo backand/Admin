@@ -132,11 +132,11 @@ namespace Durados.Web.Mvc
         {
             string uploadPath = GetUploadPath(string.Empty);
             System.Web.SessionState.HttpSessionState session=System.Web.HttpContext.Current.Session;
-                
-            if (Maps.Instance.GetMap() is DuradosMap && session["CurrentEditAppId"]!=null && session["CurrentEditAppId"].ToString()!=string.Empty)
+
+            if (session != null && Maps.Instance.GetMap() is DuradosMap && session["CurrentEditAppId"] != null && session["CurrentEditAppId"].ToString() != string.Empty)
             {
-                uploadPath =string.Format("{0}{1}\\", uploadPath, session["CurrentEditAppId"]);
-                
+                uploadPath = string.Format("{0}{1}\\", uploadPath, session["CurrentEditAppId"]);
+
             }
             return uploadPath + fileName;
            

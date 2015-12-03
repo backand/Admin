@@ -1341,6 +1341,16 @@ namespace Durados.Web.Mvc.UI.Helpers
                     Field realField = GetFieldFromFieldRow(view, dataRow);
                     return realField.Required;
                 }
+                if (columnField.Name == "Unique")
+                {
+                    Field realField = GetFieldFromFieldRow(view, dataRow);
+                    if (realField.Name == "description3")
+                    {
+                        int xxx = 1;
+                        xxx++;
+                    }
+                    return realField.Unique;
+                }
                 else if (columnField.Name == "HideInEdit")
                 {
                     Field realField = GetFieldFromFieldRow(view, dataRow);
@@ -3821,6 +3831,200 @@ namespace Durados.Web.Mvc.UI.Helpers
             return map.Database.GetRoleRow(role) != null;
         }
 
+        public Dictionary<string,object> SignUpToBackand(string username, string password, string send, string phone, string fullname, string dbtype, string dbother)
+        {
+            int identity = -1;
+            bool DontSend = false;
+            try
+            {
+                Durados.DataAccess.SqlAccess sql = new Durados.DataAccess.SqlAccess();
+                Dictionary<string, object> parameters = new Dictionary<string, object>();
+
+                string email = username.Trim();
+
+                parameters.Add("@Email", email);
+                parameters.Add("@Username", username);
+
+                if (sql.ExecuteScalar(Maps.Instance.DuradosMap.Database.ConnectionString, "SELECT TOP 1 [Username] FROM [durados_User] WHERE [Username]=@Username", parameters) != string.Empty)
+                {
+                    return new Dictionary<string, object>() { { "Success", false }, { "Message", string.Format("{0} is already signed up.", username) } };
+                }
+
+                string email1 = email;
+                try
+                {
+                    email1 = email.Split('@')[0];
+                }
+                catch { }
+
+                email1 = email1.ReplaceNonAlphaNumeric();
+                if (string.IsNullOrEmpty(email1))
+                    email1 = email;
+
+                string[] email1arr = email1.Split('_');
+                string firstName = string.Empty;
+                if (email1arr.Length > 0)
+                    firstName = email1arr[0];
+                else
+                    firstName = email;
+
+                parameters.Add("@FirstName", firstName);
+                string lastName = string.Empty;
+                if (email1arr.Length > 0)
+                    lastName = email1arr[email1arr.Length - 1];
+                else
+                    lastName = email;
+                parameters.Add("@LastName", lastName);
+
+                //Create random Password
+                if (string.IsNullOrEmpty(password))
+                {
+                    password = new Durados.Web.Mvc.Controllers.AccountMembershipService().GetRandomPassword(10);
+                }
+                parameters.Add("@Password", password);
+                string role = "User";
+                parameters.Add("@Role", role);
+
+                Guid guid = Guid.NewGuid();
+                parameters.Add("@Guid", guid);
+
+                sql.ExecuteNonQuery(Maps.Instance.DuradosMap.Database.ConnectionString, "INSERT INTO [durados_User] ([Username],[FirstName],[LastName],[Email],[Role],[Guid]) VALUES (@Username,@FirstName,@LastName,@Email,@Role,@Guid)", parameters, CreateMembershipCallback);
+
+                System.Web.Security.MembershipUser user = System.Web.Security.Membership.Provider.GetUser(username, true);
+                if (user != null)
+                {
+                    if (!user.IsApproved && Maps.MultiTenancy)
+                    {
+                        user.IsApproved = true;
+                        System.Web.Security.Membership.UpdateUser(user);
+
+                    }
+                }
+
+                //FormsAuth.SignIn(username, true);
+
+                //identity = Convert.ToInt32(Maps.Instance.DuradosMap.Database.GetUserRow(username)["Id"]);
+                //CreatePendingDatabase(identity);
+
+                bool sendEmail = false;
+                sendEmail = send != null && send == "true";
+
+                if (sendEmail)
+                    SendRegistrationRequest(fullname, lastName, email, guid.ToString(), username, password, Maps.Instance.DuradosMap, DontSend);
+
+                try
+                {
+                    Durados.Web.Mvc.UI.Helpers.Account.UpdateWebsiteUsers(username, identity);
+                }
+                catch (Exception ex)
+                {
+                    Maps.Instance.DuradosMap.Logger.Log("account", "SignUpToBackand", "SignUp", ex, 1, "failed to update websiteusercookie with userid");
+
+                }
+
+                //Insert into website users
+                try
+                {
+                    Durados.Web.Mvc.UI.Helpers.Account.InsertContactUsUsers(username, fullname, null, phone, 10, int.Parse(dbtype), dbother); //10=welcome email
+                }
+                catch (Exception ex)
+                {
+                    Maps.Instance.DuradosMap.Logger.Log("account", "SignUpToBackand", "SignUp", ex, 1, "failed to update websiteuser in ContactUs");
+
+                }
+
+            }
+            catch (DuradosException exception)
+            {
+                Maps.Instance.DuradosMap.Logger.Log("account", "SignUpToBackand", exception.Source, exception, 3, null);
+                return new Dictionary<string, object>() { { "Success", false }, { "Message", "The server is busy, please try again later." } };
+
+            }
+            catch (Exception exception)
+            {
+                Maps.Instance.DuradosMap.Logger.Log("account", "SignUpToBackand", exception.Source, exception, 1, null);
+                //ViewData["confirmed"] = false;
+                return new Dictionary<string, object>() { { "Success", false }, { "Message", "The server is busy, please try again later." } };
+            }
+
+            return new Dictionary<string, object>() { { "Success", true }, { "Message", "Success"} };
+            //return Json(new { Success = true, Message = "Success", identity = identity, DemoDefaults = GetDefaultDemo(identity) });
+        }
+
+        protected virtual string CreateMembershipCallback(Dictionary<string, object> paraemeters)
+        {
+            string username = paraemeters["@Username"].ToString();
+            string password = paraemeters["@Password"].ToString();
+            string email = paraemeters["@Email"].ToString();
+            string role = paraemeters["@Role"].ToString();
+
+            if (String.IsNullOrEmpty(role))
+            {
+                //System.Web.Security.Membership.Provider.DeleteUser(username, true);
+                return Maps.Instance.DuradosMap.Database.Localizer.Translate("Failed to create user, Role is missing");
+            }
+
+            System.Web.Security.MembershipCreateStatus status = CreateUser(username, password, email);
+
+            if (status == MembershipCreateStatus.Success)
+            {
+
+                //System.Web.Security.Roles.AddUserToRole(username, role);
+
+                System.Web.Security.MembershipUser user = System.Web.Security.Membership.Provider.GetUser(username, true);
+                user.IsApproved = false;
+                System.Web.Security.Membership.UpdateUser(user);
+
+                return "success";
+            }
+            else if (status == MembershipCreateStatus.DuplicateUserName)
+            {
+                return "success";
+            }
+            else
+            {
+                return ErrorCodeToString(status);
+            }
+        }
+
+        protected virtual string ErrorCodeToString(MembershipCreateStatus createStatus)
+        {
+            // See http://msdn.microsoft.com/en-us/library/system.web.security.membershipcreatestatus.aspx for
+            // a full list of status codes.
+            switch (createStatus)
+            {
+                case MembershipCreateStatus.DuplicateUserName:
+                    return "Username already exists. Please enter a different user name.";
+
+                case MembershipCreateStatus.DuplicateEmail:
+                    return "A username for that e-mail address already exists. Please enter a different e-mail address.";
+
+                case MembershipCreateStatus.InvalidPassword:
+                    return "The password provided is invalid. Please enter a valid password value.";
+
+                case MembershipCreateStatus.InvalidEmail:
+                    return "The e-mail address provided is invalid. Please check the value and try again.";
+
+                case MembershipCreateStatus.InvalidAnswer:
+                    return "The password retrieval answer provided is invalid. Please check the value and try again.";
+
+                case MembershipCreateStatus.InvalidQuestion:
+                    return "The password retrieval question provided is invalid. Please check the value and try again.";
+
+                case MembershipCreateStatus.InvalidUserName:
+                    return "The user name provided is invalid. Please check the value and try again.";
+
+                case MembershipCreateStatus.ProviderError:
+                    return "The authentication provider returned an error. Please verify your entry and try again. If the problem persists, please contact your system administrator.";
+
+                case MembershipCreateStatus.UserRejected:
+                    return "The user creation request has been canceled. Please verify your entry and try again. If the problem persists, please contact your system administrator.";
+
+                default:
+                    return "An unknown error occurred. Please verify your entry and try again. If the problem persists, please contact your system administrator.";
+            }
+        }
+
         public virtual SignUpResults SignUp(string appName, string firstName, string lastName, string username, string role, bool byAdmin, string password, string confirmPassword, bool? isSignupEmailVerification, Dictionary<string, object> parameters, BeforeCreateEventHandler beforeCreateCallback, BeforeCreateInDatabaseEventHandler beforeCreateInDatabaseEventHandler, AfterCreateEventHandler afterCreateBeforeCommitCallback, AfterCreateEventHandler afterCreateAfterCommitCallback, BeforeEditEventHandler beforeEditCallback, BeforeEditInDatabaseEventHandler beforeEditInDatabaseCallback, AfterEditEventHandler afteEditBeforeCommitCallback, AfterEditEventHandler afterEditAfterCommitCallback)
         {
             try
@@ -4785,7 +4989,7 @@ namespace Durados.Web.Mvc.UI.Helpers
                 object guid = sql.ExecuteScalar(Maps.Instance.DuradosMap.connectionString, "SELECT TOP 1 [durados_user].[guid] FROM durados_user WITH(NOLOCK)  WHERE [durados_user].[username]=@username", parameters);
 
                 if (guid == null || guid == DBNull.Value)
-                    throw new DuradosException("Username has no uniqe guid ,password canot be reset.");
+                    throw new DuradosException("Username has no unique guid ,password canot be reset.");
 
                 return guid.ToString();
             }

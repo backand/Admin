@@ -9,6 +9,34 @@ namespace Durados.Web.Mvc.UI.Helpers
 {
     public static class AzureHelper
     {
+        public static void CopyAzureContainer(int appId, string filePath)
+        {
+            string containerName = Maps.AzureAppPrefix + Maps.DemoUploadSourcePath;
+            string newContainerName = Maps.AzureAppPrefix + appId;
+            if (AzureHelper.DoesDefaultContainerExist(containerName))
+                AzureHelper.GetDefaultContainerReference(Convert.ToInt32(Maps.DemoUploadSourcePath)).Duplicate(newContainerName);
+            else if (AzureHelper.DoesContainerExist(AzureHelper.GetDefaultBlobClient(), "general"))
+                AzureHelper.GetContainerReference(AzureHelper.GetDefaultBlobClient(), "general").Duplicate(newContainerName);
+
+
+            System.IO.FileInfo file = new System.IO.FileInfo(filePath);
+            string content = System.IO.File.ReadAllText(filePath);
+            string oldAzureContainer = containerName + "</DirectoryVirtualPath>";
+            string oldAzurePath = "<DirectoryBasePath>" + containerName + "</DirectoryBasePath>";
+            string newAzurePath = "<DirectoryBasePath>" + newContainerName + "</DirectoryBasePath>";
+            string oldGeneralAzureContainer = "general</DirectoryVirtualPath>";
+            string newAzureContainer = newContainerName + "</DirectoryVirtualPath>";
+
+            //Replace Azure Container
+            content = content.Replace(oldAzureContainer, newAzureContainer);
+            content = content.Replace(oldGeneralAzureContainer, newAzureContainer);
+            content = content.Replace(oldAzurePath, newAzurePath);
+
+
+            System.IO.File.WriteAllText(filePath, content);
+
+        }
+
         public static CloudBlobContainer Duplicate(this CloudBlobContainer container, string newContainerName)
         {
             CloudBlobContainer newContainer = CreateContainer(Maps.AzureStorageAccountKey, Maps.AzureStorageAccountName, newContainerName);

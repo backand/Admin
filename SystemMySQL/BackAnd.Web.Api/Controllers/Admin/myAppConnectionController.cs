@@ -14,6 +14,7 @@ using Durados.DataAccess;
 using Durados.Web.Mvc;
 using System.Net.Http.Headers;
 using Durados.Web.Mvc.Controllers.Api;
+using System.Text.RegularExpressions;
 /*
  HTTP Verb	|Entire Collection (e.g. /customers)	                                                        |Specific Item (e.g. /customers/{id})
 -----------------------------------------------------------------------------------------------------------------------------------------------
@@ -130,7 +131,7 @@ namespace BackAnd.Web.Api.Controllers
 
         }
 
-        protected virtual Dictionary<string, object> CreateApp(string template, string name, string title, string server, string catalog, string username, string password, bool usingSsh, bool usingSsl, string sshRemoteHost, string sshUser, string sshPassword, string sshPrivateKey, int sshPort, int productPort, int? themeId)
+        protected virtual Dictionary<string, object> CreateAppOld(string template, string name, string title, string server, string catalog, string username, string password, bool usingSsh, bool usingSsl, string sshRemoteHost, string sshUser, string sshPassword, string sshPrivateKey, int sshPort, int productPort, int? themeId)
         {
             string id = GetTempGuid();
             //move to the next page
@@ -146,12 +147,1100 @@ namespace BackAnd.Web.Api.Controllers
             return json;
         }
        
-        //protected virtual Dictionary<string, object> CreateAppoOld(string template, string name, string title, string server, string catalog, string username, string password, bool usingSsh, bool usingSsl, string sshRemoteHost, string sshUser, string sshPassword, string sshPrivateKey, int sshPort, int productPort, int? themeId)
-        //{
-        //    return CreateApp2(template, name, title, HttpUtility.UrlEncode(server), HttpUtility.UrlEncode(catalog), HttpUtility.UrlEncode(username), HttpUtility.UrlEncode(password), usingSsh, usingSsl, HttpUtility.UrlEncode(sshRemoteHost), HttpUtility.UrlEncode(sshUser), HttpUtility.UrlEncode(sshPassword), sshPrivateKey, sshPort, productPort, themeId);
-        //}
+        protected virtual Dictionary<string, object> CreateApp(string template, string name, string title, string server, string catalog, string username, string password, bool usingSsh, bool usingSsl, string sshRemoteHost, string sshUser, string sshPassword, string sshPrivateKey, int sshPort, int productPort, int? themeId)
+        {
+            return CreateApp2(template, name, title, server, catalog, username, password, usingSsh, usingSsl, sshRemoteHost, sshUser, sshPassword, sshPrivateKey, sshPort, productPort, themeId);
+        }
 
-        /***
+        #region create app
+        private void RunDummyCall(string callbackUrl)
+        {
+            string response = Durados.Web.Mvc.Infrastructure.Http.GetWebRequest(callbackUrl + "&success=true");
+            Dictionary<string, object> json = Durados.Web.Mvc.UI.Json.JsonSerializer.Deserialize(response);
+        }
+        private static int GetStorageSize(Durados.SqlProduct product)
+        {
+            return 5;
+        }
+
+        private static string GetInstanceDBClass()
+        {
+            return "db.t1.micro";
+        }
+        private string GetPostDataForCreateNewRdsDatabase(string callbackUrl)
+        {
+
+            //  string ipRange = System.Configuration.ConfigurationManager.AppSettings["rdsIpRange"] ?? "[0.0.0.0/32]";
+            string authToken = System.Configuration.ConfigurationManager.AppSettings["nodeServicesAuth"] ?? GetMasterGuid();
+            string securityGroup = System.Configuration.ConfigurationManager.AppSettings["AWSsecurityGroup"] ?? "bknd-Allcustomer";
+
+            string dbClass = GetInstanceDBClass();
+            int storageSize = GetStorageSize(newDbParameters.SqlProduct);
+            //List<string> IPRange = new List<string>();
+            //IPRange.Add(ipRange);
+
+            Dictionary<string, string> dict = new Dictionary<string, string>();
+            dict.Add("instanceName", newDbParameters.InstanceName);
+            dict.Add("dbName", newDbParameters.DbName);
+            dict.Add("instanceClass", dbClass);
+            dict.Add("storageSize", storageSize.ToString());
+            //dict.Add("IPRange", ipRange);
+            dict.Add("engine", newDbParameters.Engine);
+            dict.Add("engineVersion", newDbParameters.EngineVersion);// need to change
+            dict.Add("username", newDbParameters.Username);
+            dict.Add("password", newDbParameters.Password);
+            dict.Add("region", newDbParameters.Zone);
+            dict.Add("characterSetName", newDbParameters.CharacterSetName);
+            dict.Add("callbackUrl", "callbackUrlValue");
+            dict.Add("authToken", authToken);
+            dict.Add("securityGroup", securityGroup);
+
+            //string postData = Newtonsoft.Json.JsonConvert.SerializeObject(dict);
+            System.Web.Script.Serialization.JavaScriptSerializer jsSerializer = new System.Web.Script.Serialization.JavaScriptSerializer();
+
+            string postData = jsSerializer.Serialize(dict);
+            postData = postData.Replace("callbackUrlValue", callbackUrl);
+            return postData; ;
+        }
+
+        private string GetNewAppGuid(Durados.CreateEventArgs e)
+        {
+            Guid guid;
+            string sql = "Select [Guid] from durados_app with(nolock) where id=" + e.PrimaryKey;
+            e.Command.CommandText = sql;
+
+            object scalar = e.Command.ExecuteScalar();
+            if (scalar == null || scalar == DBNull.Value || !Guid.TryParse(scalar.ToString(), out guid))
+            {
+                Map.Logger.Log(GetControllerNameForLog(this.ControllerContext), this.ControllerContext.RouteData.Values["action"].ToString(), "GetNewAppGuid", null, 1, "Failed to retrive guid for app id=" + e.PrimaryKey);
+                throw new Durados.DuradosException("Failed to retrive guid for app id=" + e.PrimaryKey);
+            }
+
+
+            return guid.ToString();
+        }
+
+        NewDatabaseParameters newDbParameters;
+        private bool IsTempAppBelongToCreator(Durados.CreateEventArgs e, out int? appId)
+        {
+            string appName = e.Values["Name"].ToString();
+            int creator = Convert.ToInt32(GetUserID());
+            appId = Maps.Instance.AppExists(appName, creator);
+            return appId.HasValue;
+        }
+        int? tempAppId = null;
+        
+        protected override void BeforeCreate(Durados.CreateEventArgs e)
+        {
+            if (e.View.Name == "durados_App")
+            {
+                if (IsTempAppBelongToCreator(e, out tempAppId))
+                {
+                    string sqlDeleteTempApp = "delete durados_App where Id = " + tempAppId.Value;
+                    e.Command.CommandText = sqlDeleteTempApp;
+                    e.Command.ExecuteNonQuery();
+                }
+            }
+            const string DatabaseStatus = "DatabaseStatus";
+            e.Values.Add(DatabaseStatus, (int)OnBoardingStatus.Processing);
+
+            BeforeCreate2(e);
+        }
+
+        string nameFieldName = "Name";
+        string imageFieldName = "Image";
+        string dataSourceTypeFieldName = "FK_durados_App_durados_DataSourceType_Parent";
+
+        private string GetUrl(string name)
+        {
+            string port = System.Web.HttpContext.Current.Request.Url.Port.ToString();
+            string host = Maps.Host;
+
+            if (System.Web.HttpContext.Current.Request.Url.ToString().Contains(port))
+                host += ":" + port;
+
+            return string.Format("{0}.{1}|_blank|" + System.Web.HttpContext.Current.Request.Url.Scheme + "://{0}.{1}?appName={0}", name, host);
+
+        }
+        protected void BeforeCreate2(Durados.CreateEventArgs e)
+        {
+            if (Map.Database.GetCurrentUsername().ToLower().StartsWith("wix"))
+            {
+                throw new Durados.Web.Mvc.Controllers.PlugInUserException("You cannot make this operation as a Wix user. Please <a href='/Account/LogOff'>logout</a> and register.");
+            }
+            string urlFieldName = "Url";
+
+            string name = e.Values[nameFieldName].ToString();
+
+            string dataSourceTypeId = e.Values[dataSourceTypeFieldName].ToString();
+
+            if (e.View.Fields.ContainsKey(imageFieldName) && e.View.Fields[imageFieldName].DefaultValue != null)
+            {
+                if (!e.Values.ContainsKey(imageFieldName))
+                    e.Values.Add(imageFieldName, e.View.Fields[imageFieldName].DefaultValue);
+            }
+            string cleanName = GetCleanName(name);
+            if (dataSourceTypeId == "2" || dataSourceTypeId == "4")
+            {
+                Durados.Field sqlConnectionField = e.View.GetFieldByColumnNames("SqlConnectionId");
+                object sqlConnectionId = e.Values[sqlConnectionField.Name];
+                if (sqlConnectionId == null || sqlConnectionId.Equals(string.Empty))
+                    throw new Durados.DuradosException(Map.Database.Localizer.Translate("Please create or select a ") + sqlConnectionField.DisplayName);
+            }
+
+            if (dataSourceTypeId == "4") // template
+            {
+                //sqlAccess.ExecuteNoneQueryStoredProcedure(Maps.Instance.ConnectionString, "durados_CreateNewDatabase", values);
+                Durados.Field templateField = e.View.GetFieldByColumnNames("TemplateId");
+                object templateId = e.Values[templateField.Name];
+                if (templateId == null || templateId.Equals(string.Empty))
+                    throw new Durados.DuradosException(Map.Database.Localizer.Translate("Please select an ") + templateField.DisplayName);
+            }
+
+
+            if (dataSourceTypeId == "1" || dataSourceTypeId == "4") // blank or template
+            {
+
+            }
+            else if (dataSourceTypeId == "2" && !Durados.Web.Mvc.UI.Helpers.SecurityHelper.IsInRole("Developer"))
+            {
+                string secFieldName = "FK_durados_App_durados_SqlConnection_Security_Parent";
+                if (!e.Values.ContainsKey(secFieldName))
+                {
+                    e.Values.Add(secFieldName, string.Empty);
+                }
+                e.Values[secFieldName] = string.Empty;
+                string sysFieldName = "FK_durados_App_durados_SqlConnection_System_Parent";
+                if (!e.Values.ContainsKey(secFieldName))
+                {
+                    e.Values.Add(sysFieldName, string.Empty);
+                }
+                e.Values[sysFieldName] = string.Empty;
+            }
+
+            if (!e.Values.ContainsKey(urlFieldName))
+            {
+                e.Values.Add(urlFieldName, string.Empty);
+            }
+
+            //string port = Request.Url.Port.ToString();
+            //string host = Maps.Host;
+
+            //if (Request.Url.ToString().Contains(port))
+            //    host += ":" + port;
+
+            e.Values[urlFieldName] = GetUrl(cleanName); //string.Format("{0}.{1}|_blank|" + System.Web.HttpContext.Current.Request.Url.Scheme + "://{0}.{1}?appName={0}", cleanName, host);
+
+            //string uploadPath = ((ColumnField)e.View.Fields["Image"]).GetUploadPath();
+            //string image = e.Values["Image"].ToString();
+            //string path = uploadPath + image;
+            //string newPath = uploadPath + cleanName + "\\" + image;
+            //System.IO.FileInfo fileInfo = new System.IO.FileInfo(newPath);
+            //fileInfo.Directory.Create(); // If the directory already exists, this method does nothing.
+
+
+            //try
+            //{
+            //    System.IO.File.Copy(path, newPath);
+            //}
+            //catch { }
+
+            //if (Session["UserApps"] != null)
+            //    Session["UserApps"] = null;
+            base.BeforeCreate(e);
+        }
+
+        protected override void AfterCreateBeforeCommit(Durados.CreateEventArgs e)//dateConnectionStatus(connectionId.Value, json["status"]== "Ok" ? "Pending" : "Faild");
+        {
+            if (e.View.Name != "durados_App")
+                return;
+            if (newDbParameters != null)
+            {
+                if (string.IsNullOrEmpty(e.PrimaryKey))
+                    throw new Durados.DuradosException("Failed to save new app.");
+                string callbackUrl = string.Format("{0}/admin/myAppConnection/rdsResponse?appguid={1}&appname={2}", Maps.ApiUrls[0], GetNewAppGuid(e), e.Values["Name"].ToString());
+
+
+                string url = System.Configuration.ConfigurationManager.AppSettings["nodeServicesUrl"] + "/createRDSInstance";
+                ///{"instanceName":"yrvtest23","dbName":"yrvtest23","instanceClass":"db.t1.micro","storageSize":"5","IPRange":["0.0.0.0/32"],"engine":"MySQL","engineVersion":"5.6.21","username":"yariv","password":"123456789","region":"us-east-1","characterSetName":"ASCII","callbackUrl":"http://backand-dev3.cloudapp.net:4109/admin/myAppConnection/rdsResponse?appguid=86bec9ad-3319-423d-8125-9860ccd535c4&appname=test1&success=true","authToken":"123456789","securityGroup":"bknd-Allcustomers"}
+
+                string postData = GetPostDataForCreateNewRdsDatabase(callbackUrl);
+                Dictionary<string, object> json = new Dictionary<string, object>();
+
+                try
+                {
+                    if (newDbParameters.Engine == RDSEngin.sqlserver_ee.ToString().Replace('_', '-'))
+                    {
+                        System.Threading.Tasks.Task.Run(() => RunDummyCall(callbackUrl));
+                        json.Add("status", null);
+                    }
+                    else
+                    {
+                        string response = Durados.Web.Mvc.Infrastructure.Http.PostWebRequest(url, postData);
+                        json = Durados.Web.Mvc.UI.Json.JsonSerializer.Deserialize(response);
+                    }
+                }
+                catch (Exception exception)
+                {
+                    Map.Logger.Log(GetControllerNameForLog(this.ControllerContext), this.ControllerContext.RouteData.Values["action"].ToString(), exception.Source, exception, 1, "Failed to create Amazon RDS database. username=" + Map.Database.GetUsernameById(Map.Database.GetUserID()));
+                    throw new Durados.DuradosException("Server is busy, Please try again later.");
+                }
+
+            }
+
+            base.AfterCreateBeforeCommit(e);
+        }
+        private string GetServerName(string connectionString)
+        {
+            return new MySqlSchema().GetServerName(connectionString);
+        }
+
+        private Durados.SqlProduct GetSystemSqlProduct()
+        {
+            if (MySqlAccess.IsMySqlConnectionString(Maps.Instance.SystemConnectionString))
+                return Durados.SqlProduct.MySql;
+            return Durados.SqlProduct.SqlServer;
+        }
+
+        private string GetTempalteUploadFolder(string templateConfigFileName)
+        {
+
+            System.Data.DataSet ds = new System.Data.DataSet();
+            if (!Maps.Cloud)
+                ds.ReadXml(templateConfigFileName);
+            else
+                Map.ReadConfigFromCloud(ds, templateConfigFileName);
+            return ds.Tables["Database"].Rows[0]["UploadFolder"].ToString();
+        }
+
+        private void DirectoryCopy(string sourcePath, string targetPath, bool copySubDirs)
+        {
+
+            System.IO.DirectoryInfo dir = new System.IO.DirectoryInfo(System.Web.HttpContext.Current.Server.MapPath(sourcePath));
+            if (!dir.Exists)
+            {
+                Map.Logger.Log(this.ToString(), "AfterCreateAfterCommit", "CopyUploadDirectory", null, 140, "The upload directory of the template app doesn't exists.");
+                return;
+            }
+
+            System.IO.DirectoryInfo[] dirs = dir.GetDirectories();
+
+
+
+            if (!System.IO.Directory.Exists(System.Web.HttpContext.Current.Server.MapPath(targetPath)))
+            {
+                try
+                {
+                    System.IO.Directory.CreateDirectory(System.Web.HttpContext.Current.Server.MapPath(targetPath));
+                }
+                catch (Exception exception)
+                {
+                    Map.Logger.Log(GetControllerNameForLog(this.ControllerContext), this.ControllerContext.RouteData.Values["action"].ToString(), exception.Source, exception, 2, null);
+                    return;
+                }
+            }
+
+            System.IO.FileInfo[] files = dir.GetFiles();
+            foreach (System.IO.FileInfo file in files)
+            {
+                string temppath = System.IO.Path.Combine(targetPath, file.Name);
+
+                try
+                {
+                    file.CopyTo(System.Web.HttpContext.Current.Server.MapPath(temppath), true);
+                }
+                catch (Exception exception)
+                {
+                    Map.Logger.Log(GetControllerNameForLog(this.ControllerContext), this.ControllerContext.RouteData.Values["action"].ToString(), exception.Source, exception, 2, null);
+                }
+            }
+
+            if (copySubDirs)
+            {
+                foreach (System.IO.DirectoryInfo subdir in dirs)
+                {
+                    string temppath = System.IO.Path.Combine(targetPath, subdir.Name);
+                    string subdirpath = System.IO.Path.Combine(sourcePath, subdir.Name);
+                    DirectoryCopy(subdirpath, temppath, copySubDirs);
+                }
+            }
+        }
+
+        private void CopyContainer(string sourcePath, string targetPath, bool p)
+        {
+            //throw new NotImplementedException();
+        }
+
+        protected string[] ChangeAppIdInConfigFiels(string[] fileNames, string oldConsoleId, string to)
+        {
+            string baseFolder = System.Configuration.ConfigurationManager.AppSettings["ChangeAppIdInConfigFielsFolder"] ?? "C:\\temp";
+
+            List<string> newFileNames = new List<string>();
+            foreach (string oldfilename in fileNames)
+            {
+
+                System.IO.FileInfo info = new System.IO.FileInfo(oldfilename);
+
+                string newFileName = baseFolder + "\\" + info.Name.Replace(oldConsoleId, to);
+
+                System.IO.File.Copy(oldfilename, newFileName, true);
+
+                System.Xml.XmlDocument doc = new System.Xml.XmlDocument();
+                doc.Load(newFileName);
+                System.Xml.XmlNodeList uploadNodes = doc.SelectNodes("/NewDataSet/Upload/UploadVirtualPath/text()[contains(.,'" + oldConsoleId + "')]");
+
+                foreach (System.Xml.XmlNode node in uploadNodes)
+                {
+                    node.InnerText = node.InnerText.Replace(oldConsoleId, to);
+                }
+
+                uploadNodes = doc.SelectNodes("/NewDataSet/Database/UploadFolder/text()[contains(.,'" + oldConsoleId + "')]");
+                foreach (System.Xml.XmlNode node in uploadNodes)
+                {
+                    node.InnerText = node.InnerText.Replace(oldConsoleId, to);
+                }
+
+                doc.Save(newFileName);
+                newFileNames.Add(newFileName);
+            }
+            return newFileNames.ToArray();
+        }
+        private void SetAndWirteNewConfigFile(string templateConfigFileName, string newConfigFileName, string targetPath, string templateId, string newConsoleId, string appName)
+        {
+
+            System.Data.DataSet ds = new System.Data.DataSet();
+            if ((!Maps.Cloud))
+            {
+                if (System.IO.File.Exists(templateConfigFileName))
+                {
+                    ds.ReadXml(templateConfigFileName);
+                    ChangeAppIdInConfigFiels(new string[] { newConfigFileName }, templateId, newConsoleId);
+                    // ds.Tables["Database"].Rows[0]["UploadFolder"] = targetPath;
+                    ds.WriteXml(newConfigFileName, System.Data.XmlWriteMode.WriteSchema);
+
+                    if (System.IO.File.Exists(templateConfigFileName + ".xml"))
+                        System.IO.File.Copy(templateConfigFileName + ".xml", newConfigFileName + ".xml");
+                }
+            }
+            else
+            {
+                Map.ReadConfigFromCloud(ds, templateConfigFileName);
+                ds.WriteXml(newConfigFileName, System.Data.XmlWriteMode.WriteSchema);
+                string[] newConfigTempFileNames = ChangeAppIdInConfigFiels(new string[] { newConfigFileName }, templateId, newConsoleId);
+                foreach (string tempConfigFileName in newConfigTempFileNames)
+                {
+                    System.Data.DataSet ds2 = new System.Data.DataSet();
+                    ds2.ReadXml(newConfigFileName);
+                    Map.WriteConfigToCloud2(ds2, newConfigFileName, false, Map);
+                    System.IO.FileInfo fileInfo = new System.IO.FileInfo(newConfigFileName);
+                    fileInfo.Delete();
+                }
+                System.Data.DataSet schemads = new System.Data.DataSet();
+                Map.ReadConfigFromCloud(schemads, templateConfigFileName + ".xml");
+                Map.WriteConfigToCloud2(schemads, newConfigFileName + ".xml", false, Map);
+            }
+
+
+        }
+
+        protected override void AfterCreateAfterCommit(Durados.CreateEventArgs e)
+        {
+            base.AfterCreateAfterCommit(e);
+
+            string dataSourceTypeId = e.Values[dataSourceTypeFieldName].ToString();
+            string name = e.Values[nameFieldName].ToString();
+            System.Data.SqlClient.SqlConnectionStringBuilder builder = new System.Data.SqlClient.SqlConnectionStringBuilder();
+            builder.ConnectionString = Map.connectionString;
+            string pk = e.PrimaryKey;
+
+            string cleanName = GetCleanName(name);
+
+            Durados.SqlProduct sqlProduct = Durados.SqlProduct.SqlServer;
+
+            if (dataSourceTypeId == "1")// || dataSourceTypeId == "4") // blank or template
+            {
+                Dictionary<string, object> values = new Dictionary<string, object>();
+                string appCatalog = Maps.DuradosAppPrefix + pk;
+                string sysCatalog = Maps.DuradosAppSysPrefix + pk;
+
+                values.Add("newdb", appCatalog);
+                values.Add("newSysDb", sysCatalog);
+
+                try
+                {
+                    sqlAccess.ExecuteNoneQueryStoredProcedure(Maps.Instance.ConnectionString, "durados_CreateNewDatabase", values);
+                }
+                catch (System.Data.SqlClient.SqlException exception)
+                {
+                    throw new Durados.DuradosException(exception.Message, exception);
+                }
+
+
+                //values = new Dictionary<string, object>();
+                //values.Add("AppId", Convert.ToInt32(pk));
+                //values.Add("Catalog", appCatalog);
+                //values.Add("SysCatalog", sysCatalog);
+                ////values.Add("ServerName", builder.DataSource);
+                ////values.Add("Username", builder.UserID);
+                ////values.Add("Password", builder.Password);
+                ////values.Add("IntegratedSecurity", builder.IntegratedSecurity);
+                //values.Add("DuradosUser", Map.Database.GetUserID());
+                //sqlAccess.ExecuteNoneQueryStoredProcedure(Maps.Instance.ConnectionString, "durados_SetConnection", values);
+
+                string duradosUser = Map.Database.GetUserID();
+                string newPassword = new Durados.Web.Mvc.Controllers.AccountMembershipService().GetRandomPassword(12);
+                string newUsername = appCatalog + "User";
+                try
+                {
+                    CreateDatabaseUser(builder.DataSource, appCatalog, builder.UserID, builder.Password, builder.IntegratedSecurity, newUsername, newPassword, false);
+                    sqlAccess.CreateDatabaseUserWithoutLogin(Map.connectionString, sysCatalog, newUsername, newPassword, "db_owner");
+                }
+                catch (Exception exception)
+                {
+                    Map.Logger.Log(GetControllerNameForLog(this.ControllerContext), this.ControllerContext.RouteData.Values["action"].ToString(), exception.Source, exception, 1, "Failed to create database user. username=" + newUsername);
+                    throw new Durados.DuradosException("Failed to create database user");
+                }
+                int? appConnId = SaveConnection(builder.DataSource, appCatalog, newUsername, newPassword, duradosUser, Durados.SqlProduct.SqlServer);
+
+                int? sysConnId = SaveConnection(builder.DataSource, sysCatalog, newUsername, newPassword, duradosUser, Durados.SqlProduct.SqlServer);
+
+                //values = new Dictionary<string, object>();
+                //values.Add("FK_durados_App_durados_SqlConnection_Parent", appConnId);
+                //values.Add("FK_durados_App_durados_SqlConnection_System_Parent", sysConnId);
+
+                //e.View.Edit(values, e.PrimaryKey, null, null, null, null);
+
+                string sql = "update durados_App set SqlConnectionId = " + appConnId + ", SystemSqlConnectionId = " + sysConnId + " where id = " + e.PrimaryKey;
+
+                using (System.Data.SqlClient.SqlConnection connection = new System.Data.SqlClient.SqlConnection(Maps.Instance.ConnectionString))
+                {
+                    connection.Open();
+                    using (System.Data.SqlClient.SqlCommand command = new System.Data.SqlClient.SqlCommand(sql, connection))
+                    {
+                        command.ExecuteNonQuery();
+                    }
+                }
+            }
+            if (dataSourceTypeId == "2") // existing
+            {
+
+                string sysConnection = e.Values["FK_durados_App_durados_SqlConnection_System_Parent"].ToString();
+                if (string.IsNullOrEmpty(sysConnection))
+                {
+                    string sysCatalog = Maps.DuradosAppSysPrefix + pk;
+
+                    string duradosUser = Map.Database.GetUserID();
+                    string newPassword = new Durados.Web.Mvc.Controllers.AccountMembershipService().GetRandomPassword(12);
+                    string newUsername = Durados.Database.ProductShorthandName + pk;
+                    string serverName = GetServerName(Maps.Instance.SystemConnectionString);
+                    //Dictionary<string, object> values = new Dictionary<string, object>();
+                    //values.Add("AppId", Convert.ToInt32(pk));
+                    //values.Add("Catalog", Maps.DuradosAppPrefix + pk);
+                    //values.Add("SysCatalog", Maps.DuradosAppSysPrefix + pk);
+                    //values.Add("DuradosUser", Map.Database.GetUserID());
+                    //sqlAccess.ExecuteNoneQueryStoredProcedure(Maps.Instance.ConnectionString, "durados_SetSysConnection", values);
+                    Durados.SqlProduct systemSqlProduct = GetSystemSqlProduct();
+                    int? sysConnId = null;
+                    if (systemSqlProduct == Durados.SqlProduct.SqlServer)
+                    {
+                        try
+                        {
+                            using (System.Data.SqlClient.SqlConnection connection = new System.Data.SqlClient.SqlConnection(Maps.Instance.ConnectionString))
+                            {
+                                connection.Open();
+                                using (System.Data.SqlClient.SqlCommand command = new System.Data.SqlClient.SqlCommand())
+                                {
+                                    command.Connection = connection;
+                                    sqlAccess.ExecuteNonQuery(e.View, command, "create database " + sysCatalog, null);
+                                }
+                            }
+                        }
+                        catch (Exception exception)
+                        {
+                            Map.Logger.Log(GetControllerNameForLog(this.ControllerContext), this.ControllerContext.RouteData.Values["action"].ToString(), exception.Source, exception, 1, "Failed to create system database. catalog=" + sysCatalog);
+                            throw new Durados.DuradosException("Failed to create database");
+                        }
+
+                        try
+                        {
+                            CreateDatabaseUser(builder.DataSource, sysCatalog, builder.UserID, builder.Password, builder.IntegratedSecurity, newUsername, newPassword, false);
+                        }
+                        catch (Exception exception)
+                        {
+                            Map.Logger.Log(GetControllerNameForLog(this.ControllerContext), this.ControllerContext.RouteData.Values["action"].ToString(), exception.Source, exception, 1, "Failed to create database user. username=" + newUsername);
+                            throw new Durados.DuradosException("Failed to create database user");
+                        }
+                        sysConnId = SaveConnection(builder.DataSource, sysCatalog, newUsername, newPassword, duradosUser, Durados.SqlProduct.SqlServer);
+
+                    }
+                    else if (systemSqlProduct == Durados.SqlProduct.MySql)
+                    {
+                        try
+                        {
+                            NewDatabaseParameters sysDbParameters = new NewDatabaseParameters { DbName = sysCatalog, Username = newUsername, Password = newPassword };
+                            AppFactory appFactory = new AppFactory();
+                            appFactory.CreateNewSystemSchemaAndUser(Maps.Instance.SystemConnectionString, sysDbParameters);
+                        }
+                        catch (Exception exception)
+                        {
+                            Map.Logger.Log(GetControllerNameForLog(this.ControllerContext), this.ControllerContext.RouteData.Values["action"].ToString(), exception.Source, exception, 1, "Failed to create database user. username=" + newUsername);
+                            throw new Durados.DuradosException("Failed to create database user");
+                        }
+
+                        int port = Convert.ToInt32(new MySqlSchema().GetPort(Maps.Instance.SystemConnectionString));
+                        sysConnId = SaveConnection(serverName, sysCatalog, newUsername, newPassword, duradosUser, Durados.SqlProduct.MySql, port);
+                    }
+                    //Dictionary<string, object> values = new Dictionary<string, object>();
+
+                    //values = new Dictionary<string, object>();
+                    //values.Add("FK_durados_App_durados_SqlConnection_System_Parent", sysConnId);
+
+                    //e.View.Edit(values, e.PrimaryKey, null, null, null, null);
+                    string sql = "update durados_App set SystemSqlConnectionId = " + sysConnId + " where id = " + e.PrimaryKey;
+
+                    using (System.Data.SqlClient.SqlConnection connection = new System.Data.SqlClient.SqlConnection(Maps.Instance.ConnectionString))
+                    {
+                        connection.Open();
+                        using (System.Data.SqlClient.SqlCommand command = new System.Data.SqlClient.SqlCommand(sql, connection))
+                        {
+                            command.ExecuteNonQuery();
+                        }
+                    }
+
+                }
+
+
+            }
+
+            if (dataSourceTypeId == "4") // template
+            {
+                //IPersistency persistency = Maps.Instance.GetNewPersistency();
+                //MapDataSet.durados_AppRow appRow = (MapDataSet.durados_AppRow)((View)e.View).GetDataRow(e.View.Fields[nameFieldName], name);
+
+                //if (!appRow.IsTemplateFileNull() && !string.IsNullOrEmpty(appRow.TemplateFile))
+                //{
+                //    TemplateGenerator TemplateGenerator = new TemplateGenerator(persistency.GetConnection(appRow, builder).ToString(), appRow.TemplateFile);
+                //}
+
+
+
+                Dictionary<string, object> values2 = new Dictionary<string, object>();
+                string appCatalog = Maps.DuradosAppPrefix + pk;
+                string sysCatalog = Maps.DuradosAppSysPrefix + pk;
+
+                string sysconnstrFieldName = e.View.GetFieldByColumnNames("SystemSqlConnectionId").Name;
+                bool sysExists = e.Values.ContainsKey(sysconnstrFieldName) && e.Values[sysconnstrFieldName] != null && e.Values[sysconnstrFieldName].ToString() != string.Empty;
+
+
+                string appconnstrFieldName = e.View.GetFieldByColumnNames("SqlConnectionId").Name;
+                bool appExists = e.Values.ContainsKey(appconnstrFieldName) && e.Values[appconnstrFieldName] != null && e.Values[appconnstrFieldName].ToString() != string.Empty;
+
+                try
+                {
+                    if (!sysExists)
+                    {
+                        using (System.Data.SqlClient.SqlConnection connection = new System.Data.SqlClient.SqlConnection(Maps.Instance.ConnectionString))
+                        {
+                            connection.Open();
+                            using (System.Data.SqlClient.SqlCommand command = new System.Data.SqlClient.SqlCommand("exec('create database " + sysCatalog + "')", connection))
+                            {
+                                command.ExecuteNonQuery();
+                            }
+                        }
+                    }
+                }
+                catch (System.Data.SqlClient.SqlException exception)
+                {
+                    throw new Durados.DuradosException("Could not create system database: " + sysCatalog + "; Additional info: " + exception.Message, exception);
+                }
+
+                try
+                {
+                    if (!appExists)
+                    {
+                        using (System.Data.SqlClient.SqlConnection connection = new System.Data.SqlClient.SqlConnection(Maps.Instance.ConnectionString))
+                        {
+                            connection.Open();
+                            using (System.Data.SqlClient.SqlCommand command = new System.Data.SqlClient.SqlCommand("exec('create database " + appCatalog + "')", connection))
+                            {
+                                command.ExecuteNonQuery();
+                            }
+                        }
+                    }
+                }
+                catch (System.Data.SqlClient.SqlException exception)
+                {
+                    throw new Durados.DuradosException("Could not create app database: " + appCatalog + "; Additional info: " + exception.Message, exception);
+                }
+
+
+                string duradosUser = Map.Database.GetUserID();
+                string newPassword = new Durados.Web.Mvc.Controllers.AccountMembershipService().GetRandomPassword(12);
+                string newUsername = appCatalog + "User";
+                try
+                {
+                    if (!appExists)
+                    {
+                        CreateDatabaseUser(builder.DataSource, appCatalog, builder.UserID, builder.Password, builder.IntegratedSecurity, newUsername, newPassword, false);
+                        if (!sysExists)
+                        {
+                            sqlAccess.CreateDatabaseUserWithoutLogin(Map.connectionString, sysCatalog, newUsername, newPassword, "db_owner");
+                        }
+                    }
+                    else if (!sysExists)
+                    {
+                        try
+                        {
+                            sqlAccess.CreateDatabaseUser(Map.connectionString, sysCatalog, newUsername, newPassword, "db_owner");
+                        }
+                        catch (System.Data.SqlClient.SqlException)
+                        {
+                            sqlAccess.CreateDatabaseUserWithoutLogin(Map.connectionString, sysCatalog, newUsername, newPassword, "db_owner");
+                        }
+                    }
+                }
+                catch (Exception exception)
+                {
+                    Map.Logger.Log(GetControllerNameForLog(this.ControllerContext), this.ControllerContext.RouteData.Values["action"].ToString(), exception.Source, exception, 1, "Failed to create database user. username=" + newUsername);
+                    throw new Durados.DuradosException("Failed to create database user");
+                }
+
+                int? appConnId = null;
+
+                if (!appExists)
+                    appConnId = SaveConnection(builder.DataSource, appCatalog, newUsername, newPassword, duradosUser, Durados.SqlProduct.SqlServer);
+                else
+                    appConnId = Convert.ToInt32(e.Values[appconnstrFieldName]);
+
+                int? sysConnId = null;
+                if (!sysExists)
+                    sysConnId = SaveConnection(builder.DataSource, sysCatalog, newUsername, newPassword, duradosUser, Durados.SqlProduct.SqlServer);
+                else
+                    sysConnId = Convert.ToInt32(e.Values[sysconnstrFieldName]);
+
+                //values = new Dictionary<string, object>();
+                //values.Add("FK_durados_App_durados_SqlConnection_Parent", appConnId);
+                //values.Add("FK_durados_App_durados_SqlConnection_System_Parent", sysConnId);
+
+                //e.View.Edit(values, e.PrimaryKey, null, null, null, null);
+
+                string sql2 = "update durados_App set SqlConnectionId = " + appConnId + ", SystemSqlConnectionId = " + sysConnId + " where id = " + e.PrimaryKey;
+
+                using (System.Data.SqlClient.SqlConnection connection = new System.Data.SqlClient.SqlConnection(Maps.Instance.ConnectionString))
+                {
+                    connection.Open();
+                    using (System.Data.SqlClient.SqlCommand command = new System.Data.SqlClient.SqlCommand(sql2, connection))
+                    {
+                        command.ExecuteNonQuery();
+                    }
+                }
+
+
+
+
+                try
+                {
+                    string templateId = e.Values[e.View.GetFieldByColumnNames("TemplateId").Name].ToString();
+                    System.Data.DataRow templateAppRow = e.View.GetDataRow(templateId);
+
+                    if (templateAppRow != null)
+                    {
+                        string image = string.Format("{0}/{1}", e.PrimaryKey, Regex.Replace(templateAppRow["Image"].ToString(), @"^[\d]+/", string.Empty));
+
+                        string connectionId = e.Values[e.View.GetFieldByColumnNames("SqlConnectionId").Name].ToString();
+                        if (string.IsNullOrEmpty(connectionId))
+                        {
+                            connectionId = templateAppRow["SqlConnectionId"].ToString();
+                        }
+                        View sqlConnectionView = (View)e.View.Database.Views["durados_SqlConnection"];
+                        System.Data.DataRow sqlConnectionRow = sqlConnectionView.GetDataRow(connectionId);
+                        if (sqlConnectionRow != null)
+                        {
+
+                            Dictionary<string, object> values = new Dictionary<string, object>();
+                            values.Add("ServerName", sqlConnectionRow["ServerName"].ToString());
+                            values.Add("Catalog", sqlConnectionRow["Catalog"].ToString());
+                            values.Add("Username", sqlConnectionRow["Username"].ToString());
+                            values.Add("Password", sqlConnectionRow["Password"].ToString());
+                            values.Add("IntegratedSecurity", sqlConnectionRow["IntegratedSecurity"]);
+                            values.Add(sqlConnectionView.GetFieldByColumnNames("DuradosUser").Name, Map.Database.GetUserID());
+                            values.Add(sqlConnectionView.GetFieldByColumnNames("SqlProductId").Name, sqlConnectionRow["SqlProductId"]);
+                            values.Add("ProductPort", sqlConnectionRow.IsNull("ProductPort") ? string.Empty : sqlConnectionRow["ProductPort"].ToString());
+                            values.Add("SshRemoteHost", sqlConnectionRow.IsNull("SshRemoteHost") ? string.Empty : sqlConnectionRow["SshRemoteHost"].ToString());
+                            values.Add("SshPort", sqlConnectionRow.IsNull("SshPort") ? string.Empty : sqlConnectionRow["SshPort"].ToString());
+                            values.Add("SshUser", sqlConnectionRow.IsNull("SshUser") ? string.Empty : sqlConnectionRow["SshUser"].ToString());
+                            values.Add("SshUses", sqlConnectionRow.IsNull("SshUses") ? string.Empty : sqlConnectionRow["SshUses"].ToString());
+                            values.Add("SshPassword", sqlConnectionRow.IsNull("SshPassword") ? string.Empty : sqlConnectionRow["SshPassword"].ToString());
+
+
+                            string newConnectionId = sqlConnectionView.Create(values);
+                            //values = new Dictionary<string, object>();
+                            //values.Add(e.View.GetFieldByColumnNames("SqlConnectionId").Name, newConnectionId);
+                            //e.View.Edit(values, e.PrimaryKey, null, null, null, null);
+                            string sql = "update durados_App set SqlConnectionId = " + newConnectionId + ",Image= '" + image + "', DataSourceTypeId=2 where Id = " + e.PrimaryKey;
+                            sqlAccess.ExecuteNonQuery(e.View.ConnectionString, sql);
+                        }
+                        sqlProduct = sqlConnectionRow.IsNull("SqlProductId") ? Durados.SqlProduct.SqlServer : (Durados.SqlProduct)sqlConnectionRow["SqlProductId"];
+                        //string templateConfigFileName = Server.MapPath(string.Format(Maps.ConfigPath + "durados_AppSys_{0}.xml", templateId));
+                        string templateConfigFileName = Maps.GetConfigPath(string.Format("durados_AppSys_{0}.xml", templateId), sqlProduct);
+                        string newConfigFileName = Maps.GetConfigPath(string.Format("durados_AppSys_{0}.xml", e.PrimaryKey), sqlProduct);
+                        //string newSchemaFileName = newConfigFileName + ".xml";
+                        //string templateSchemaFileName = templateConfigFileName + ".xml";
+
+                        string sourcePath = GetTempalteUploadFolder(templateConfigFileName);
+                        string targetPath = "/Uploads/" + e.PrimaryKey + "/";
+                        try
+                        {
+                            if (!Maps.Cloud)
+                                DirectoryCopy(sourcePath, targetPath, true);
+                            else
+                            {
+                                CopyContainer(sourcePath, targetPath, true);
+
+                            }
+                        }
+                        catch { }
+                        SetAndWirteNewConfigFile(templateConfigFileName, newConfigFileName, targetPath, templateId, e.PrimaryKey, cleanName);
+                        //Map.WriteConfigToCloud2(ds2, newConfigFileName, false);
+                        //if (System.IO.File.Exists(templateConfigFileName))
+                        //    System.IO.File.Copy(templateConfigFileName, newConfigFileName);
+                        //if (System.IO.File.Exists(templateSchemaFileName))
+                        //    System.IO.File.Copy(templateSchemaFileName, newSchemaFileName);
+
+                    }
+                }
+                catch (Exception exception)
+                {
+                    string sql = "delete durados_App where Id = " + e.PrimaryKey;
+                    sqlAccess.ExecuteNonQuery(e.View.ConnectionString, sql);
+                    Map.Logger.Log(GetControllerNameForLog(this.ControllerContext), this.ControllerContext.RouteData.Values["action"].ToString(), exception.Source, exception, 1, null);
+                    throw new Durados.DuradosException("Failed to create app, please try again later", exception);
+                }
+            }
+
+            if (e.View.Fields.ContainsKey(imageFieldName) && e.View.Fields[imageFieldName].DefaultValue != null)
+            {
+                string defaultImage = System.Web.HttpContext.Current.Server.MapPath("~/Content/Images/" + e.View.Fields[imageFieldName].DefaultValue);
+                //string destination = Server.MapPath("/Uploads/" + e.PrimaryKey + "/" + e.View.Fields[imageFieldName].DefaultValue);
+                string destination = Maps.GetUploadPath(sqlProduct) + "\\" + e.PrimaryKey + "\\" + e.View.Fields[imageFieldName].DefaultValue;
+                if (System.IO.File.Exists(defaultImage))
+                    try
+                    {
+                        System.IO.FileInfo fileInfo = new System.IO.FileInfo(destination);
+                        fileInfo.Directory.Create(); // If the directory already exists, this method does nothing.
+
+                        System.IO.File.Copy(defaultImage, destination);
+                    }
+                    catch (Exception exception)
+                    {
+                        Map.Logger.Log(GetControllerNameForLog(this.ControllerContext), this.ControllerContext.RouteData.Values["action"].ToString(), exception.Source, exception, 2, "Could not copy the app default icon from: " + defaultImage + " to: " + destination);
+
+                    }
+            }
+
+            //UpdateCache(name);
+            CreateDns(cleanName);
+        }
+
+        protected virtual void CreateDns(string name)
+        {
+            if (Maps.Debug)
+            {
+                try
+                {
+                    string windowsPath = System.Environment.GetEnvironmentVariable("windir");
+
+                    using (System.IO.StreamWriter sw = new System.IO.StreamWriter(windowsPath + @"\system32\drivers\etc\hosts", true))
+                    {
+
+                        sw.WriteLine(string.Format("127.0.0.1   {0}", name + "." + Maps.Host));
+
+                        sw.Close();
+
+                    }
+                }
+                catch { }
+            }
+
+
+        }
+
+        private bool IsValidConnectionData(Durados.SqlProduct product, string name, string title, string server, string catalog, string username, string password, bool usingSsh, bool usingSsl, string sshRemoteHost, string sshUser, string sshPassword, string sshPrivateKey, int sshPort, int productPort, out string errors)
+        {
+            errors = string.Empty;
+
+
+            if (string.IsNullOrEmpty(name))
+                errors += "<br>Appication name is required";
+
+            if (string.IsNullOrEmpty(server))
+                errors += "<br>End Point/Server name is required";
+
+            if (string.IsNullOrEmpty(catalog))
+                errors += "<br>Db name is required";
+
+            if (string.IsNullOrEmpty(username))
+                errors += "<br>Username is required";
+
+            if (string.IsNullOrEmpty(password))
+                errors += "<br>Password is required";
+
+            if (productPort == 0)
+                errors += "<br>Port is required";
+            if (product == Durados.SqlProduct.MySql && usingSsh)
+            {
+                if (string.IsNullOrEmpty(sshRemoteHost))
+                    errors += "<br>SSH Remote Host is required";
+
+                if (sshPort == 0)
+                    errors += "<br>SSH port is 0";
+
+                if (string.IsNullOrEmpty(sshPrivateKey))
+                {
+                    if (string.IsNullOrEmpty(sshUser))
+                        errors += "<br>SSH User is required";
+
+                    if (string.IsNullOrEmpty(sshPassword))
+                        errors += "<br>SSH password is required";
+                }
+
+            }
+
+            if (!string.IsNullOrEmpty(errors))
+                return false;
+            else
+                return true;
+
+        }
+
+        private string GetCleanName(string name)
+        {
+            name = name.Trim();
+
+            if (name.ToLower().Equals("www"))
+                throw new Durados.DuradosException(Map.Database.Localizer.Translate("This name already exists."));
+
+            Regex regex = new Regex("^[A-Za-z0-9\\-]+$");/**\\- support - inside url*/
+            if (!regex.IsMatch(name))
+            {
+                throw new Durados.DuradosException(Map.Database.Localizer.Translate("The 'Name' is the first part of the URL of the Console.\n\rOnly alphanumeric characters are allowed."));
+            }
+
+            if (name.Length > Maps.AppNameMax)
+                throw new Durados.DuradosException(Map.Database.Localizer.Translate("The 'Name' is the first part of the URL of the Console.\n\rMaximum 25 characters are allowed."));
+
+
+            return name;
+        }
+
+        private void ValidateConnection(string server, string catalog, string username, string password)
+        {
+            ValidateConnection(server, catalog, username, password, Durados.SqlProduct.SqlServer, 0, false, false, null, null, null, null, null, 0, 0);
+        }
+
+        SqlAccess sqlAccess = new SqlAccess();
+
+        private string CreateDatabase(string server, string catalog, string username, string password, string source, string template)
+        {
+            if (template == "1")
+                return sqlAccess.CopyAzureDatabase(server, catalog, username, password, source);
+            else
+                return sqlAccess.CopySqlServerDatabase(server, catalog, username, password, source, Maps.DemoOnPremiseSourcePath);
+        }
+
+        private string RenamePendingDatabase(string server, string catalog, string username, string password, string source)
+        {
+            return sqlAccess.RenameAzureDatabase(server, catalog, username, password, source);
+        }
+
+        private void CreateDatabaseUser(string server, string catalog, string username, string password, bool integrated, string newUser, string newPassword, bool notify)
+        {
+            sqlAccess.CreateDatabaseOwnerUser(server, catalog, username, password, integrated, newUser, newPassword);
+            if (notify)
+                NotifyNewDatabaseUser(server, catalog, newUser, newPassword);
+        }
+
+        protected void NotifyNewDatabaseUser(string server, string catalog, string newUser, string newPassword)
+        {
+            string host = Convert.ToString(System.Configuration.ConfigurationManager.AppSettings["host"]);
+            int port = Convert.ToInt32(System.Configuration.ConfigurationManager.AppSettings["port"]);
+            string username = Convert.ToString(System.Configuration.ConfigurationManager.AppSettings["username"]);
+            string password = Convert.ToString(System.Configuration.ConfigurationManager.AppSettings["password"]);
+
+            string from = Convert.ToString(System.Configuration.ConfigurationManager.AppSettings["fromAlert"]);
+            string subject = Map.Database.Localizer.Translate(CmsHelper.GetHtml("newDatabaseUserSubject"));
+            string message = Map.Database.Localizer.Translate(CmsHelper.GetHtml("newDatabaseUserMessage"));
+
+            string siteWithoutQueryString = System.Web.HttpContext.Current.Request.Url.Scheme + "://" + System.Web.HttpContext.Current.Request.Url.Authority;
+
+            System.Data.DataRow row = Map.Database.GetUserRow();
+
+            message = message.Replace("[FirstName]", row["FirstName"].ToString());
+            message = message.Replace("[LastName]", row["LastName"].ToString());
+            message = message.Replace("[Url]", siteWithoutQueryString);
+            message = message.Replace("[server]", server);
+            message = message.Replace("[catalog]", catalog);
+            message = message.Replace("[username]", newUser);
+            message = message.Replace("[password]", newPassword);
+            message = message.Replace("[Product]", Maps.Instance.DuradosMap.Database.SiteInfo.GetTitle());
+
+            string to = row["Email"].ToString();
+
+            Durados.Cms.DataAccess.Email.Send(host, Map.Database.UseSmtpDefaultCredentials, port, username, password, false, to.Split(';'), new string[0], new string[1] { from }, subject, message, from, null, null, DontSend, null, Map.Database.Logger, true);
+
+        }
+
+        public bool DontSend
+        {
+            get
+            {
+                return Convert.ToBoolean(System.Configuration.ConfigurationManager.AppSettings["DontSend"] ?? "false");
+            }
+        }
+
+        protected virtual void SendError(int logType, Exception exception, string controller, string action, Durados.Web.Mvc.Logging.Logger logger)
+        {
+            SendError(logType, exception, controller, action, logger, string.Empty);
+        }
+
+        protected virtual void SendError(int logType, Exception exception, string controller, string action, Durados.Web.Mvc.Logging.Logger logger, string moreInfo)
+        {
+            try
+            {
+                bool sendError = Convert.ToBoolean(System.Configuration.ConfigurationManager.AppSettings["sendError"]) && logType == 1;
+                if (sendError)
+                {
+                    string host = Convert.ToString(System.Configuration.ConfigurationManager.AppSettings["host"]);
+                    int port = Convert.ToInt32(System.Configuration.ConfigurationManager.AppSettings["port"]);
+                    string username = Convert.ToString(System.Configuration.ConfigurationManager.AppSettings["username"]);
+                    string password = Convert.ToString(System.Configuration.ConfigurationManager.AppSettings["password"]);
+                    string applicationName = System.Web.HttpContext.Current.Request.Url.Host;
+                    string from = Convert.ToString(System.Configuration.ConfigurationManager.AppSettings["fromError"]);
+                    string defaultTo = Convert.ToString(System.Configuration.ConfigurationManager.AppSettings["toError"]);
+                    string[] to = !string.IsNullOrEmpty(Map.Database.AdminEmail) ? Map.Database.AdminEmail.Split(';') : null;
+                    string[] cc = new string[1] { defaultTo };
+                    if (to == null || to.Length == 0)
+                    {
+                        to = cc;
+                        cc = null;
+                    }
+
+
+
+                    string message = "The following error occurred:\n\r" + exception.ToString();
+                    if (!string.IsNullOrEmpty(moreInfo))
+                    {
+                        message += "\n\r\n\r\n\rMore info:\n\r" + moreInfo;
+                    }
+
+                    Durados.Cms.DataAccess.Email.Send(host, false, port, username, password, false, to, cc, null, applicationName + " error", message, from, null, null, DontSend, logger);
+                }
+            }
+            catch (Exception ex)
+            {
+                logger.Log(controller, action, exception.Source, ex, 1, "Error sending email when logging an exception");
+            }
+        }
+        private int? SaveConnection(string server, string catalog, string username, string password, string userId, Durados.SqlProduct sqlProduct, int port)
+        {
+            return SaveConnection(server, catalog, username, password, userId, sqlProduct, false, false, string.Empty, string.Empty, string.Empty, string.Empty, 0, port);
+        }
+        protected int? SaveConnection(string server, string catalog, string username, string password, string userId, Durados.SqlProduct sqlProduct)
+        {
+            return SaveConnection(server, catalog, username, password, userId, sqlProduct, false, false, string.Empty, string.Empty, string.Empty, string.Empty, 0, 0);
+        }
+
+        protected int? SaveConnection(string server, string catalog, string username, string password, string userId, Durados.SqlProduct sqlProduct, bool usingSsh, bool usingSsl, string sshRemoteHost, string sshUser, string sshPassword, string sshPrivateKey, int sshPort, int productPort)
+        {
+            View view = GetView("durados_SqlConnection");
+
+            Dictionary<string, object> values = new Dictionary<string, object>();
+            values.Add("ServerName", server);
+            values.Add("Catalog", catalog);
+            values.Add("Username", username);
+            values.Add("IntegratedSecurity", false);
+            values.Add("Password", password);
+            values.Add(view.GetFieldByColumnNames("SqlProductId").Name, ((int)sqlProduct).ToString());
+            values.Add(view.GetFieldByColumnNames("DuradosUser").Name, userId);
+
+            values.Add("ProductPort", productPort.ToString());
+            values.Add("SshRemoteHost", sshRemoteHost);
+            values.Add("SshPort", sshPort);
+            values.Add("SshUser", sshUser);
+            values.Add("SshPassword", sshPassword);
+            values.Add("SshPrivateKey", sshPrivateKey);
+            values.Add("SshUses", usingSsh);
+            values.Add("SslUses", usingSsl);
+
+            string pk = view.Create(values);
+
+            if (string.IsNullOrEmpty(pk))
+                throw new Durados.DuradosException("Failed to get connection id");
+
+            int id = -1;
+
+            if (Int32.TryParse(pk, out id))
+                return id;
+            else
+                throw new Durados.DuradosException("Failed to get connection id");
+        }
+
+        private void HandleTemplate(System.Data.DataRow row, string connectionString)
+        {
+            HandleTemplate(row["Name"].ToString(), row["Id"].ToString(), (MapDataSet.durados_AppRow)row, connectionString);
+        }
+
+        private void HandleTemplate(string name, string id, MapDataSet.durados_AppRow appRow, string connectionString)
+        {
+            string oldConfigFileName = Maps.GetConfigPath(string.Format("durados_AppSys_{0}.xml", id));
+            string newConfigFileName = Maps.GetConfigPath(string.Format("{0}.xml", Maps.DemoConfigFilename));
+            string newSchemaFileName = newConfigFileName + ".xml";
+            string oldSchemaFileName = oldConfigFileName + ".xml";
+
+
+            System.IO.File.Copy(newConfigFileName, oldConfigFileName);
+            System.IO.File.Copy(newSchemaFileName, oldSchemaFileName);
+
+            string directory = Maps.DemoFtpPhysicalPath + name;
+            System.IO.Directory.CreateDirectory(directory);
+
+            string employeePicture = System.Web.HttpContext.Current.Server.MapPath("~/Content/Images/pic.jpg");
+            System.IO.File.Copy(employeePicture, directory + @"\" + "pic.jpg");
+
+            try
+            {
+                AzureHelper.CopyAzureContainer(Convert.ToInt32(id), oldConfigFileName);
+            }
+            catch (Exception exception)
+            {
+                Map.Logger.Log(GetControllerNameForLog(this.ControllerContext), this.ControllerContext.RouteData.Values["action"].ToString(), exception.Source, exception, 1, "Could not copy uploads");
+            }
+
+            //Maps.Instance.Restart(name);
+
+        }
+        private string GetThemePath(int? themeId)
+        {
+            return Maps.Instance.GetTheme(themeId).RelativePath;
+        }
+
+        public Dictionary<string, object> CreateAppGet2(string template, string name, string title, string server, string catalog, string username, string password, bool usingSsh, bool usingSsl, string sshRemoteHost, string sshUser, string sshPassword, string sshPrivateKey, int sshPort, int productPort, string zone, string characterSetName, string engine, string engineVersion, int? themeId)
+        {
+            Durados.SqlProduct? product = Durados.Web.Mvc.UI.Helpers.RDSNewDatabaseFactory.GetSqlProductfromTemplate(template);
+            newDbParameters = new NewDatabaseParameters();
+            newDbParameters.Zone = zone;
+            newDbParameters.Engine = engine;
+            newDbParameters.EngineVersion = engineVersion;
+            newDbParameters.CharacterSetName = characterSetName;
+            newDbParameters.InstanceName = server;
+            newDbParameters.DbName = catalog;
+            newDbParameters.Username = username;
+            newDbParameters.Password = password;
+            newDbParameters.SqlProduct = product.HasValue ? product.Value : Durados.SqlProduct.SqlServer;
+            server = System.Configuration.ConfigurationManager.AppSettings["rdsCreatDbPendingMessage"] + "Not available yet";
+            return CreateApp2(template, name, title, server, catalog, username, password, usingSsh, usingSsl, sshRemoteHost, sshUser, sshPassword, sshPrivateKey, sshPort, productPort, themeId);
+        }
+
         private Dictionary<string, object> CreateApp2(string template, string name, string title, string server, string catalog, string username, string password, bool usingSsh, bool usingSsl, string sshRemoteHost, string sshUser, string sshPassword, string sshPrivateKey, int sshPort, int productPort, int? themeId)
         {
             Maps.Instance.DuradosMap.Logger.Log(GetControllerNameForLog(this.ControllerContext), "CreateApp", "CreateApp", "started", "", 3, "server: " + server + ", database: " + catalog, DateTime.Now);
@@ -196,7 +1285,7 @@ namespace BackAnd.Web.Api.Controllers
 
             string newPassword = password;
             if (isAzureDemo || isOnPremiseDemo)
-                newPassword = new AccountMembershipService().GetRandomPassword(12);
+                newPassword = new Durados.Web.Mvc.Controllers.AccountMembershipService().GetRandomPassword(12);
             string newUsername = username;
 
             if (string.IsNullOrEmpty(userId))
@@ -363,6 +1452,7 @@ namespace BackAnd.Web.Api.Controllers
             }
 
             Dictionary<string, object> values = new Dictionary<string, object>();
+            values.Add(view.GetFieldByColumnNames("Creator").Name, Map.Database.GetUserID().ToString());
             values.Add("Name", name);
             values.Add("Title", title);
             values.Add("Image", Durados.Database.LongProductName + ".png");
@@ -422,7 +1512,7 @@ namespace BackAnd.Web.Api.Controllers
                     return new Dictionary<string, object>() { { "Success", false }, { "Message", "Server is busy, please try again later" } };
                 }
             }
-            catch (PlugInUserException exception)
+            catch (Durados.Web.Mvc.Controllers.PlugInUserException exception)
             {
                 Map.Logger.Log(GetControllerNameForLog(this.ControllerContext), this.ControllerContext.RouteData.Values["action"].ToString(), exception.Source, exception, 2, "failed to create app row");
                 //SendError(1, exception, GetControllerNameForLog(this.ControllerContext), this.ControllerContext.RouteData.Values["action"].ToString(), Map.Logger);
@@ -445,7 +1535,7 @@ namespace BackAnd.Web.Api.Controllers
                 {
                     Map.Logger.Log(GetControllerNameForLog(this.ControllerContext), this.ControllerContext.RouteData.Values["action"].ToString(), exception.Source, exception, 1, "failed to create northwind template");
 
-                    return Json(new { Success = false, Message = "Server is busy, please try again later" });
+                    return new Dictionary<string, object>() { { "Success", false }, { "Message", "Server is busy, please try again later" } };
                 }
 
                 if (isAzureDemo)
@@ -497,12 +1587,12 @@ namespace BackAnd.Web.Api.Controllers
                 }
 
             }
-            var builder = new UriBuilder(Request.Url);
+            var builder = new UriBuilder(System.Web.HttpContext.Current.Request.Url);
             string previewUrl = "http://" + name + Durados.Web.Mvc.Maps.UserPreviewUrl + GetThemePath(themeId);
 
             return new Dictionary<string, object>() { { "Success", true }, { "Url", Maps.GetAppUrl(name) }, { "previewUrl", previewUrl } };
         }
-        ****/
+        #endregion create app
 
         [HttpPost]
         public virtual IHttpActionResult Test()
@@ -820,8 +1910,28 @@ namespace BackAnd.Web.Api.Controllers
                 
             }
         }
-
         private void ProcessDatabase(int appId, string appName)
+        {
+            //if (!System.Web.HttpContext.Current.Items.Contains("xxxzzzzzzzzz"))
+            //    System.Web.HttpContext.Current.Items.Add("xxxzzzzzzzzz", appName);
+            //Map map = Maps.Instance.GetMap(appName);
+            try
+            {
+                HandleCreateSchemaIfExist(appName);
+                //appId = Maps.Instance.AppExists(appName).Value;
+                //UpdateDatabaseStatus(appId, OnBoardingStatus.Ready);
+                //new Backand.socket().emitUsers("applicationReady", new { name = appName }, new string[] { "myUsername" });
+            }
+            catch (Exception exception)
+            {
+                Maps.Instance.DuradosMap.Logger.Log(GetControllerNameForLog(ControllerContext), GetActionName(), this.Request.Method.Method, exception.Message, exception.StackTrace, 1, null, DateTime.Now);
+
+                UpdateDatabaseStatus(appId, OnBoardingStatus.Error);
+
+            }
+        }
+
+        private void ProcessDatabaseOld(int appId, string appName)
         {
             //string id = GetTempGuid();
             string url = RestHelper.GetAppUrl(appName, Maps.OldAdminHttp);
@@ -829,6 +1939,31 @@ namespace BackAnd.Web.Api.Controllers
             AsyncCallback asyncCallback = new AsyncCallback(RespCallback);
 
             Durados.Web.Mvc.Infrastructure.Http.AsyncWebRequest(url, new SendAsyncErrorHandler(appId), asyncCallback);
+        }
+
+        private void RespCallbackNew(IAsyncResult ar)
+        {
+            // Get the RequestState object from the async result.
+            Durados.Web.Mvc.Infrastructure.RequestState rs = (Durados.Web.Mvc.Infrastructure.RequestState)ar.AsyncState;
+
+            // Get the WebRequest from RequestState.
+            WebRequest req = rs.Request;
+
+            string appName = Request.RequestUri.Segments.LastOrDefault(); //req.RequestUri.Authority.Split('.')[0];
+            int? appId = Maps.Instance.AppExists(appName);
+            try
+            {
+                UpdateDatabaseStatus(appId.Value, OnBoardingStatus.Ready);
+                //new Backand.socket().emitUsers("applicationReady", new { name = appName }, new string[] { "myUsername" });
+            }
+            catch (Exception exception)
+            {
+                Maps.Instance.DuradosMap.Logger.Log(GetControllerNameForLog(ControllerContext), GetActionName(), this.Request.Method.Method, exception.Message, exception.StackTrace, 1, null, DateTime.Now);
+
+                UpdateDatabaseStatus(appId.Value, OnBoardingStatus.Error);
+
+            }
+
         }
 
         private void RespCallback(IAsyncResult ar)
@@ -870,6 +2005,22 @@ namespace BackAnd.Web.Api.Controllers
         }
 
         private void CallHttpRequestToCreateTheSchema(string appName, string json)
+        {
+            json = "{newSchema: " + json + ", severity: 0}";
+
+
+            string url = GetUrl();
+            Dictionary<string, string> headers = GetHeaders(appName);
+            //string response = Durados.Web.Mvc.Infrastructure.Http.WebRequestingJson(url, json, headers);
+            //Dictionary<string, object> ret = Durados.Web.Mvc.UI.Json.JsonSerializer.Deserialize(response);
+            //return ret;
+
+            int appId = Maps.Instance.AppExists(appName).Value;
+            AsyncCallback asyncCallback = new AsyncCallback(RespCallbackNew);
+            Durados.Web.Mvc.Infrastructure.Http.AsyncPostWebRequest(url, json, headers, new SendAsyncErrorHandler(appId), asyncCallback);
+        }
+
+        private void CallHttpRequestToCreateTheSchemaOld(string appName, string json)
         {
             json = "{newSchema: " + json + ", severity: 0}";
             

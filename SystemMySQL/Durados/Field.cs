@@ -31,7 +31,6 @@ namespace Durados
             Order = int.MaxValue;
             LabelContentLayout = Orientation.Horizontal;
             SpecialColumn = SpecialColumn.None;
-            Unique = false;
             PartFromUniqueIndex = false;
             SaveHistory = true;
             GridEditable = true;
@@ -747,6 +746,7 @@ namespace Durados
         }
 
         public abstract bool GetDbRequired();
+        public abstract bool GetDbUnique();
         public abstract bool GetDbNotEditable();
 
         private bool required;
@@ -784,7 +784,16 @@ namespace Durados
         public bool Refresh { get; set; }
 
         [Durados.Config.Attributes.ColumnProperty(Description = "Used as primary key of the record. Used for duplication")]
-        public bool Unique { get; set; }
+        public bool Unique {
+            get
+            {
+                return GetDbUnique();
+            }
+            set
+            {
+
+            }
+        }
 
         [Durados.Config.Attributes.ColumnProperty()]
         public bool PartFromUniqueIndex { get; set; }

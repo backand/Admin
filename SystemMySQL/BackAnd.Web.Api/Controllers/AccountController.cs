@@ -576,7 +576,7 @@ namespace BackAnd.Web.Api.Controllers
             return Durados.Security.CipherUtility.Encrypt<System.Security.Cryptography.AesManaged>(parameters, Durados.Web.Mvc.Maps.Instance.DuradosMap.Database.DefaultMasterKeyPassword, Durados.Web.Mvc.Maps.Instance.DuradosMap.Database.Salt);
         }
 
-        protected virtual Dictionary<string, object> SignUp(string fullName, string email, string password)
+        protected virtual Dictionary<string, object> SignUpOld(string fullName, string email, string password)
         {
             string data = string.Format("fullname={0}&username={1}&Password={2}&send=true&phone=&dbtype=100&dbother=", System.Web.HttpUtility.UrlEncode(fullName), System.Web.HttpUtility.UrlEncode(email), System.Web.HttpUtility.UrlEncode(password));
             string url = Durados.Web.Mvc.UI.Helpers.RestHelper.GetAppUrl(Durados.Web.Mvc.Maps.DuradosAppName, Durados.Web.Mvc.Maps.OldAdminHttp) + "/WebsiteAccount/SignUp?" + data;
@@ -584,6 +584,13 @@ namespace BackAnd.Web.Api.Controllers
             Durados.Web.Mvc.Maps.Instance.DuradosMap.Logger.Log("Account", "SignUp", "Post", "SignUp call", url, 3, null, DateTime.Now);
             string response = Durados.Web.Mvc.Infrastructure.Http.PostWebRequest(url, data);
             Dictionary<string, object> json = Durados.Web.Mvc.UI.Json.JsonSerializer.Deserialize(response);
+            return json;
+        }
+
+        protected virtual Dictionary<string, object> SignUp(string fullName, string email, string password)
+        {
+            Dictionary<string, object> json = new Durados.Web.Mvc.UI.Helpers.Account(this).SignUpToBackand(email, password, "true", null, fullName, "100", null);
+            Durados.Web.Mvc.Maps.Instance.DuradosMap.Logger.Log("Account", "SignUp", "Post", "SignUp call", email, 3, null, DateTime.Now);
             return json;
         }
 
