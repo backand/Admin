@@ -87,6 +87,50 @@ namespace Durados.Web.Mvc.Infrastructure
             //allDone.WaitOne();
         }
 
+        public static void AsyncPostWebRequest(string url, string postData, Dictionary<string, string> headers, ISendAsyncErrorHandler sendAsyncErrorHandler, AsyncCallback asyncCallback)
+        {
+            // Get the URI from the command line.
+            Uri httpSite = new Uri(url);
+
+            // Create the request object.
+            WebRequest wreq = WebRequest.Create(httpSite);
+
+            StreamWriter requestWriter;
+            if (wreq != null)
+            {
+                wreq.Method = "POST";
+                //wreq.ServicePoint.Expect100Continue = false;
+                wreq.Timeout = 60 * 60 * 1000;
+                foreach (string key in headers.Keys)
+                {
+                    wreq.Headers.Add(key, headers[key]);
+                }
+
+                wreq.ContentType = "application/json";
+                //POST the data.
+                using (requestWriter = new StreamWriter(wreq.GetRequestStream()))
+                {
+                    requestWriter.Write(postData);
+                }
+            }
+
+            wreq.Timeout = 60 * 60 * 1000;
+            // Create the state object.
+            RequestState rs = new RequestState();
+
+            // Put the request into the state object so it can be passed around.
+            rs.Request = wreq;
+            rs.SendAsyncErrorHandler = sendAsyncErrorHandler;
+
+            // Issue the async request.
+            IAsyncResult r = (IAsyncResult)wreq.BeginGetResponse(
+               asyncCallback, rs);
+
+            // Wait until the ManualResetEvent is set so that the application 
+            // does not exit until after the callback is called.
+            //allDone.WaitOne();
+        }
+
         private static void RespCallback(IAsyncResult ar)
         {
             // Get the RequestState object from the async result.

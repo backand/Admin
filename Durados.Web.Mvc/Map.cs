@@ -5431,6 +5431,18 @@ namespace Durados.Web.Mvc
                 {
                     return null;
                 }
+
+                //int l = System.Web.HttpContext.Current.Request.Url.Segments.Length;
+
+                //if (l > 3)
+                //{
+
+                //    if (System.Web.HttpContext.Current.Items.Contains("xxxzzzzzzzzz") && System.Web.HttpContext.Current.Request.Url.Segments[l - 2] == "myAppConnection/" && System.Web.HttpContext.Current.Request.HttpMethod == "POST")
+                //    {
+                //        return System.Web.HttpContext.Current.Request.Url.Segments[l - 1];
+                //    }
+                //}
+
                 if (System.Web.HttpContext.Current.Items.Contains(Database.AppName))
                 {
                     return System.Web.HttpContext.Current.Items[Database.AppName].ToString();
@@ -5614,21 +5626,21 @@ namespace Durados.Web.Mvc
             if (map == null)
             {
                 bool newStructure = false;
-                if (IsApi())
-                {
-                    if (appName != duradosAppName && !BlobExists(appName))
-                    {
-                        if (AppExists(appName).HasValue)
-                        {
-                            duradosMap.Logger.Log("uue", "get map", "appName: " + appName, null, -754, "5256");
-                            throw new DuradosException("Blob is not ready yet.");
-                        }
-                        else
-                        {
-                            throw new DuradosException("The App " + appName + " does not exist.");
-                        }
-                    }
-                }
+                //if (IsApi())
+                //{
+                //    if (appName != duradosAppName && !BlobExists(appName))
+                //    {
+                //        if (AppExists(appName).HasValue)
+                //        {
+                //            duradosMap.Logger.Log("uue", "get map", "appName: " + appName, null, -754, "5256");
+                //            throw new DuradosException("Blob is not ready yet.");
+                //        }
+                //        else
+                //        {
+                //            throw new DuradosException("The App " + appName + " does not exist.");
+                //        }
+                //    }
+                //}
                 map = CreateMap(appName, out newStructure) ?? duradosMap;
 
                 if (!newStructure)

@@ -33,6 +33,7 @@
               <xs:element name="MaxLength" msprop:Generator_ColumnVarNameInTable="columnMaxLength" msprop:Generator_ColumnPropNameInRow="MaxLength" msprop:Generator_ColumnPropNameInTable="MaxLengthColumn" msprop:Generator_UserColumnName="MaxLength" type="xs:int" minOccurs="0" />
               <xs:element name="Required" msprop:Generator_ColumnVarNameInTable="columnRequired" msprop:Generator_ColumnPropNameInRow="Required" msprop:Generator_ColumnPropNameInTable="RequiredColumn" msprop:Generator_UserColumnName="Required" type="xs:boolean" minOccurs="0" />
               <xs:element name="DefaultValue" msprop:Generator_ColumnVarNameInTable="columnDefaultValue" msprop:Generator_ColumnPropNameInRow="DefaultValue" msprop:Generator_ColumnPropNameInTable="DefaultValueColumn" msprop:Generator_UserColumnName="DefaultValue" type="xs:string" minOccurs="0" />
+              <xs:element name="Unique" msprop:Generator_ColumnVarNameInTable="columnUnique" msprop:Generator_ColumnPropNameInRow="Unique" msprop:nullValue="false" msprop:Generator_ColumnPropNameInTable="UniqueColumn" msprop:Generator_UserColumnName="Unique" type="xs:boolean" minOccurs="0" />
             </xs:sequence>
           </xs:complexType>
         </xs:element>
@@ -84,9 +85,9 @@
   </xs:element>
   <xs:annotation>
     <xs:appinfo>
-      <msdata:Relationship name="View_Field" msdata:parent="View" msdata:child="Field" msdata:parentkey="Id" msdata:childkey="ViewId" msprop:Generator_UserChildTable="Field" msprop:Generator_ChildPropName="GetFieldRows" msprop:Generator_UserRelationName="View_Field" msprop:Generator_ParentPropName="ViewRow" msprop:Generator_RelationVarName="relationView_Field" msprop:Generator_UserParentTable="View" />
-      <msdata:Relationship name="Relation_Field" msdata:parent="Relation" msdata:child="Field" msdata:parentkey="Id" msdata:childkey="RelationId" msprop:Generator_UserChildTable="Field" msprop:Generator_ChildPropName="GetFieldRows" msprop:Generator_UserRelationName="Relation_Field" msprop:Generator_ParentPropName="RelationRow" msprop:Generator_RelationVarName="relationRelation_Field" msprop:Generator_UserParentTable="Relation" />
-      <msdata:Relationship name="Relation_RelationColumns" msdata:parent="Relation" msdata:child="RelationColumns" msdata:parentkey="Id" msdata:childkey="RelationId" msprop:Generator_UserChildTable="RelationColumns" msprop:Generator_ChildPropName="GetRelationColumnsRows" msprop:Generator_UserRelationName="Relation_RelationColumns" msprop:Generator_ParentPropName="RelationRow" msprop:Generator_RelationVarName="relationRelation_RelationColumns" msprop:Generator_UserParentTable="Relation" />
+      <msdata:Relationship name="View_Field" msdata:parent="View" msdata:child="Field" msdata:parentkey="Id" msdata:childkey="ViewId" msprop:Generator_UserChildTable="Field" msprop:Generator_ChildPropName="GetFieldRows" msprop:Generator_UserRelationName="View_Field" msprop:Generator_RelationVarName="relationView_Field" msprop:Generator_UserParentTable="View" msprop:Generator_ParentPropName="ViewRow" />
+      <msdata:Relationship name="Relation_Field" msdata:parent="Relation" msdata:child="Field" msdata:parentkey="Id" msdata:childkey="RelationId" msprop:Generator_UserChildTable="Field" msprop:Generator_ChildPropName="GetFieldRows" msprop:Generator_UserRelationName="Relation_Field" msprop:Generator_RelationVarName="relationRelation_Field" msprop:Generator_UserParentTable="Relation" msprop:Generator_ParentPropName="RelationRow" />
+      <msdata:Relationship name="Relation_RelationColumns" msdata:parent="Relation" msdata:child="RelationColumns" msdata:parentkey="Id" msdata:childkey="RelationId" msprop:Generator_UserChildTable="RelationColumns" msprop:Generator_ChildPropName="GetRelationColumnsRows" msprop:Generator_UserRelationName="Relation_RelationColumns" msprop:Generator_RelationVarName="relationRelation_RelationColumns" msprop:Generator_UserParentTable="Relation" msprop:Generator_ParentPropName="RelationRow" />
     </xs:appinfo>
   </xs:annotation>
 </xs:schema>

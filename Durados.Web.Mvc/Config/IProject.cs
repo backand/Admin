@@ -708,6 +708,7 @@ namespace Durados.Web.Mvc.Config
             fieldView.Fields["DataType"].Plan = "1,2,3";
             fieldView.Fields["Excluded"].Plan = "1,2,3";
             fieldView.Fields["Required"].Plan = "1,2,3";
+            fieldView.Fields["Unique"].Plan = "1,2,3";
             fieldView.Fields["DefaultValue"].Plan = "1,2,3";
             fieldView.Fields["Description"].Plan = "1,2,3";
             if (fieldView.Fields.ContainsKey("TextAlignment"))
@@ -2552,8 +2553,8 @@ namespace Durados.Web.Mvc.Config
             }
             if (fieldView.Fields.ContainsKey("Unique"))
             {
-                fieldView.Fields["Unique"].HideInTable = true;
-                fieldView.Fields["Unique"].DisplayName = "Unique for Duplicate";
+                //fieldView.Fields["Unique"].HideInTable = true;
+                fieldView.Fields["Unique"].DisplayName = "Unique";
             }
             if (fieldView.Fields.ContainsKey("PartFromUniqueIndex"))
             {
@@ -5202,6 +5203,7 @@ namespace Durados.Web.Mvc.Config
 
             fieldView.Fields["Excluded"].Category = alCategory;
             fieldView.Fields["Required"].Category = alCategory;
+            fieldView.Fields["Unique"].Category = alCategory;
             fieldView.Fields["ExcludeInUpdate"].Category = alCategory;
             fieldView.Fields["ExcludeInInsert"].Category = alCategory;
 
@@ -5345,7 +5347,7 @@ namespace Durados.Web.Mvc.Config
             fieldView.Fields["BooleanHtmlControlType"].Category = advCategory;
             fieldView.Fields["RadioOrientation"].Category = advCategory;
             fieldView.Fields["LoadForBlockTemplate"].Category = advCategory;
-            fieldView.Fields["Unique"].Category = advCategory;
+            //fieldView.Fields["Unique"].Category = advCategory;
             fieldView.Fields["AutocompleteColumn"].Category = advCategory;
             fieldView.Fields["AutocompleteTable"].Category = advCategory;
             fieldView.Fields["AutocompleteSql"].Category = advCategory;

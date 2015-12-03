@@ -53,6 +53,11 @@ namespace Durados
             return string.IsNullOrEmpty(XmlElement) ? ChildrenView.GetXmlElement() : XmlElement;
         }
 
+        public override bool GetDbUnique()
+        {
+            return false;
+        }
+
         public override bool GetDbRequired()
         {
             return false;

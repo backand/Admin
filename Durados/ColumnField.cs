@@ -78,6 +78,11 @@ namespace Durados
             return GetRequired();
         }
 
+        public override bool GetDbUnique()
+        {
+            return DataColumn.Unique; 
+        }
+
         public override bool GetDbNotEditable()
         {
             return DataColumn.ExtendedProperties.ContainsKey("NotInEditable");

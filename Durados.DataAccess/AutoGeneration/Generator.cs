@@ -201,9 +201,21 @@ namespace Durados.DataAccess.AutoGeneration
                 }
                 catch { }
 
+                bool unique = false;
+                try
+                {
+                    int ord = reader.GetOrdinal("column_key");
+                    if (ord >= 0)
+                    {
+                        unique = reader.GetString(ord).Equals("UNI");
+                    }
+                }
+                catch { }
+
                 DataColumn column = new DataColumn();
                 column.ColumnName = columnName;
                 Type type = GetType(dataType);
+                column.Unique = unique;
 
                 if (type == null && tableFromCommand != null)
                 {
