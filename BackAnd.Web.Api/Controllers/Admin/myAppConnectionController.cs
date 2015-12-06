@@ -1996,12 +1996,29 @@ namespace BackAnd.Web.Api.Controllers
         {
             string json = GetSchemaFromCache(appName);
             if (string.IsNullOrEmpty(json))
+            {
+                CallHttpRequestToConnectExisting(appName);
                 return;
-
+            }
             if (!string.IsNullOrEmpty(appName))
             {
                 CallHttpRequestToCreateTheSchema(appName, json);
             }
+        }
+
+        private void CallHttpRequestToConnectExisting(string appName)
+        {
+            string url = GetUrlToConnect(appName);
+            
+            int appId = Maps.Instance.AppExists(appName).Value;
+            Dictionary<string, string> headers = GetHeaders(appName);
+            AsyncCallback asyncCallback = new AsyncCallback(RespCallbackNew);
+            Durados.Web.Mvc.Infrastructure.Http.AsyncWebRequest(url, new SendAsyncErrorHandler(appId), asyncCallback, headers);
+        }
+
+        private string GetUrlToConnect(string appName)
+        {
+            return this.Request.RequestUri.OriginalString.Split(new string[1] { "admin" }, StringSplitOptions.RemoveEmptyEntries)[0] + "admin/myAppConnection/status/" + appName;
         }
 
         private void CallHttpRequestToCreateTheSchema(string appName, string json)

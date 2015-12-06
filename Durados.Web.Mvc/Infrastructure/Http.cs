@@ -62,13 +62,21 @@ namespace Durados.Web.Mvc.Infrastructure
         {
             AsyncWebRequest(url, sendAsyncErrorHandler, new AsyncCallback(RespCallback));
         }
-        public static void AsyncWebRequest(string url, ISendAsyncErrorHandler sendAsyncErrorHandler, AsyncCallback asyncCallback)
+        public static void AsyncWebRequest(string url, ISendAsyncErrorHandler sendAsyncErrorHandler, AsyncCallback asyncCallback, Dictionary<string, string> headers = null)
         {
             // Get the URI from the command line.
             Uri httpSite = new Uri(url);
 
             // Create the request object.
             WebRequest wreq = WebRequest.Create(httpSite);
+
+            if (headers != null)
+            {
+                foreach (string key in headers.Keys)
+                {
+                    wreq.Headers.Add(key, headers[key]);
+                }
+            }
             
             wreq.Timeout = 60 * 60 * 1000;
             // Create the state object.
