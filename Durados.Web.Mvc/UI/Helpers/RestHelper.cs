@@ -1344,11 +1344,6 @@ namespace Durados.Web.Mvc.UI.Helpers
                 if (columnField.Name == "Unique")
                 {
                     Field realField = GetFieldFromFieldRow(view, dataRow);
-                    if (realField.Name == "description3")
-                    {
-                        int xxx = 1;
-                        xxx++;
-                    }
                     return realField.Unique;
                 }
                 else if (columnField.Name == "HideInEdit")

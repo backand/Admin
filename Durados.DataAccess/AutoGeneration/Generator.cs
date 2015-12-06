@@ -204,10 +204,13 @@ namespace Durados.DataAccess.AutoGeneration
                 bool unique = false;
                 try
                 {
-                    int ord = reader.GetOrdinal("column_key");
-                    if (ord >= 0)
+                    if (reader is MySql.Data.MySqlClient.MySqlDataReader)
                     {
-                        unique = reader.GetString(ord).Equals("UNI");
+                        int ord = reader.GetOrdinal("column_key");
+                        if (ord >= 0)
+                        {
+                            unique = reader.GetString(ord).Equals("UNI");
+                        }
                     }
                 }
                 catch { }
