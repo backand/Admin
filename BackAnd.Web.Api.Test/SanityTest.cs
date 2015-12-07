@@ -43,6 +43,21 @@ namespace BackAnd.Web.Api.Test
                 crud.RunSimpleCrud();
         }
 
+        [TestMethod]
+        public void SignupCreateAppDeleteAppDeleteUser()
+        {
+            string appName = GetAppName();
+            string username = GetUsername();
+            string password = Backand.Config.ConfigStore.GetConfig().pwd;
+
+            AdminContext admin = new AdminContext();
+            admin.Signup(username, password)
+                .CreateConnectAndWaitUntilAppIsReady(appName)
+                .RunSimpleCrud(appName, username, password)
+                .DeleteApp(appName)
+                .DeleteUser(username);
+        }
+
         [TestCleanup]
         public void Cleanup()
         {

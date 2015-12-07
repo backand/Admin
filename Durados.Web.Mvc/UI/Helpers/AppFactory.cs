@@ -90,7 +90,23 @@ namespace Durados.Web.Mvc.UI.Helpers
                             GRANT ALL ON `{0}`.* TO '{1}'@'%';", newDbParameters.DbName, newDbParameters.Username, newDbParameters.Password);
             return sql;
         }
-        private System.Data.IDbConnection GetExternalAvailableInstanceConnection(SqlProduct product,out string server,out int port)
+
+        private static string connectionStringCache = null;
+        private static string serverCache = null;
+        private static int portCache = -1;
+
+        private System.Data.IDbConnection GetExternalAvailableInstanceConnection(SqlProduct product, out string server, out int port)
+        {
+            if (connectionStringCache == null || serverCache == null || portCache == -1)
+            {
+                connectionStringCache = GetExternalAvailableInstanceConnectionString(product, out  serverCache, out  portCache);
+            }
+            server = serverCache;
+            port = portCache;
+            return GetConnection(product, connectionStringCache);           
+        }
+
+        private string GetExternalAvailableInstanceConnectionString(SqlProduct product,out string server,out int port)
         {
             
             string catalog =null;
@@ -125,12 +141,20 @@ namespace Durados.Web.Mvc.UI.Helpers
                 }
             }
 
+            if (!connectionId.HasValue)
+            {
+                Maps.Instance.DuradosMap.Logger.Log("AppFactory", null, "GetExternalAvailableInstanceConnection", null, 1, "Failed to retrive available external instance = connection id has no value");
+                throw new Exception("Failed to retrive available external instance = connection id has no value");
+            }
+
             Durados.Web.Mvc.View view = GetView(ConnectionViewName);
-            Dictionary<string, object> values = new Dictionary<string, object>();
-            values.Add("Id", "&&%&=&&%& " + connectionId.Value.ToString());
-            int rowCount = 0;
-            System.Data.DataView dataView = view.FillPage(1, 2, values, false, null, out rowCount, null, null);
-            if (dataView == null || rowCount != 1)
+            System.Data.DataRow connectionRow = view.GetDataRow(connectionId.Value.ToString());
+            //Dictionary<string, object> values = new Dictionary<string, object>();
+            //values.Add("Id", "&&%&=&&%& " + connectionId.Value.ToString());
+            //int rowCount = 0;
+            //System.Data.DataView dataView = view.FillPage(1, 2, values, false, null, out rowCount, null, null);
+            //if (dataView == null || rowCount != 1)
+            if (connectionRow == null)
             {
                 Maps.Instance.DuradosMap.Logger.Log("AppFactory", null, "GetExternalAvailableInstanceConnection", null, 1, "Failed to retrive available external instance = no data");
                 throw new Exception("Failed to retrive available external instance = no data");
@@ -138,11 +162,11 @@ namespace Durados.Web.Mvc.UI.Helpers
 
             try
             {
-                password = Convert.ToString(dataView[0]["Password"]);
-                username = Convert.ToString(dataView[0]["Username"]);
-                server = Convert.ToString(dataView[0]["ServerName"]);
-                catalog = Convert.ToString(dataView[0]["Catalog"]);
-                port = Convert.ToInt32(dataView[0]["ProductPort"]);
+                password = Convert.ToString(connectionRow["Password"]);
+                username = Convert.ToString(connectionRow["Username"]);
+                server = Convert.ToString(connectionRow["ServerName"]);
+                catalog = Convert.ToString(connectionRow["Catalog"]);
+                port = Convert.ToInt32(connectionRow["ProductPort"]);
 
             }
             catch(Exception ex)
@@ -152,7 +176,8 @@ namespace Durados.Web.Mvc.UI.Helpers
             }
             string connectionString = GetConnectionString(server, catalog, false, username, password, null, product,port, false, false);
 
-            return GetConnection(product, connectionString);           
+            return connectionString;
+            
 
          
         }

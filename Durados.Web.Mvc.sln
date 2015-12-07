@@ -53,6 +53,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BackAnd.UnitTests", "BackAn
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Backand.Config", "Backand.Config\Backand.Config.csproj", "{C35122B9-B306-497C-A5A1-01E4DD2C6CC8}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Backand.BrowserRunner", "Backand.BrowserRunner\Backand.BrowserRunner.csproj", "{521457C7-F935-4340-88F6-A5D2A7F43218}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -204,6 +206,12 @@ Global
 		{C35122B9-B306-497C-A5A1-01E4DD2C6CC8}.DebugLocal|Any CPU.Build.0 = Debug|Any CPU
 		{C35122B9-B306-497C-A5A1-01E4DD2C6CC8}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C35122B9-B306-497C-A5A1-01E4DD2C6CC8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{521457C7-F935-4340-88F6-A5D2A7F43218}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{521457C7-F935-4340-88F6-A5D2A7F43218}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{521457C7-F935-4340-88F6-A5D2A7F43218}.DebugLocal|Any CPU.ActiveCfg = Debug|Any CPU
+		{521457C7-F935-4340-88F6-A5D2A7F43218}.DebugLocal|Any CPU.Build.0 = Debug|Any CPU
+		{521457C7-F935-4340-88F6-A5D2A7F43218}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{521457C7-F935-4340-88F6-A5D2A7F43218}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -213,6 +221,7 @@ Global
 		{B64789BD-B7B4-4C43-B6CC-97ECF4D93735} = {259DC51F-3CAD-43FB-855F-54E047CCEC83}
 		{6D63D615-1B03-4E1A-A55D-93C8AF9860F9} = {259DC51F-3CAD-43FB-855F-54E047CCEC83}
 		{C35122B9-B306-497C-A5A1-01E4DD2C6CC8} = {259DC51F-3CAD-43FB-855F-54E047CCEC83}
+		{521457C7-F935-4340-88F6-A5D2A7F43218} = {259DC51F-3CAD-43FB-855F-54E047CCEC83}
 	EndGlobalSection
 	GlobalSection(NDepend) = preSolution
 		Project = ".\Durados.Web.Mvc.ndproj"

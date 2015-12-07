@@ -25,6 +25,8 @@ namespace BackAnd.Web.Api.Test
         }
 
         public List<BackObject> Schema { get; set; }
+
+        
     }
 
     public static class JsInTransactionHelper
@@ -102,6 +104,11 @@ namespace BackAnd.Web.Api.Test
             return runner.CreateApp(appName)
                 .ConnectApp()
                 .WaitUntilAppIsReady();
+        }
+
+        public static AdminContext Signup(string username, string password)
+        {
+            throw new NotImplementedException();
         }
 
         public static AdminContext SetCurrentAppName(this AdminContext runner, string appName)
