@@ -6,6 +6,7 @@ using OpenQA.Selenium.Support.UI;
 using System.Threading;
 using Backand.Config;
 using System.Linq;
+using System.Drawing.Imaging;
 
 namespace Backand.Web.Api.BrowserTests
 {
@@ -64,34 +65,31 @@ namespace Backand.Web.Api.BrowserTests
     public class AutomationTestContext
     {
         public IWebDriver driver;
-        public WebDriverWait wait;
+        public WebDriverWait tinyWait;
+        public WebDriverWait longWait;
+
 
         public ServerConfig config;
 
-        public string username
-        {
-
-            get
-            {
-                if (_username == null)
-                {
-                    _username = GetUserName();
-                }
-
-                return _username;
-            }
-        }
-
-        private string _username;
-
+        public string username;
+        
 
         public string Password = "12345678";
         public AutomationTestContext()
         {
             driver = new ChromeDriver();
-            wait = new WebDriverWait(driver, new TimeSpan(0, 0, 30));
+            tinyWait = new WebDriverWait(driver, new TimeSpan(0, 0, 30));
+            longWait = new WebDriverWait(driver, new TimeSpan(0, 3, 0));
+
             WebPage = "https://www.backand.com/apps/#/sign_up";
             config = ConfigStore.GetConfig();
+            username = GetUserName();
+            AppName = GetAppName();
+        }
+
+        private string GetAppName()
+        {
+            return "testApp" + DateTime.Now.Ticks;
         }
 
         public string WebPage { get; set; }
@@ -99,6 +97,18 @@ namespace Backand.Web.Api.BrowserTests
         private string GetUserName()
         {
             return "relly+" + DateTime.Now.Ticks + "@backand.com";
+        }
+
+        public string AppName { get; set; }
+
+        public void TakeScreenshot()
+        {
+            Screenshot ss = ((ITakesScreenshot)driver).GetScreenshot();
+
+            //Use it as you want now
+            string screenshot = ss.AsBase64EncodedString;
+            byte[] screenshotAsByteArray = ss.AsByteArray;
+            ss.SaveAsFile(AppName + ".png", ImageFormat.Png); //use any of the built in image formating
         }
     }
 
@@ -121,19 +131,62 @@ namespace Backand.Web.Api.BrowserTests
         public static AutomationTestContext CloseIntercom(this AutomationTestContext context)
         {
             Console.WriteLine("Wait for intercom");
-            context.wait.Until((a) => { return a.FindElement(By.ClassName("intercom-launcher-hovercard-close")); }).Click();
+            context.tinyWait.Until(ExpectedConditions.ElementIsVisible(By.ClassName("intercom-launcher-hovercard-close")));
+            context.tinyWait.Until((a) => { return a.FindElement(By.ClassName("intercom-launcher-hovercard-close")); }).Click();
+
             return context;
         }
 
         public static AutomationTestContext FillSignUpPage(this AutomationTestContext context)
         {
-            context.wait.Until((a) => { return a.FindElement(By.Name("uFullFirst")); }).SendKeys("Ygal");
+            context.tinyWait.Until(ExpectedConditions.ElementExists(By.Name("uFullFirst")));
+
+            //todo
+            context.tinyWait.Until((a) => { return a.FindElement(By.Name("uFullFirst")); }).SendKeys("Ygal");
             context.driver.FindElement(By.Name("uEmail")).SendKeys(context.username);
             context.driver.FindElement(By.Name("Upassword")).SendKeys(context.Password);
             context.driver.FindElement(By.Name("confirm_password")).SendKeys(context.Password);
-            context.driver.FindElements(By.ClassName("auth-button")).First(a => a.Enabled).Click();
+            context.tinyWait.Until(ExpectedConditions.ElementToBeClickable(By.ClassName("auth-button")));
+            context.driver.FindElements(By.ClassName("auth-button")).First(c => c.Enabled).Click();
             return context;
         }
+
+        public static AutomationTestContext CreateApp(this AutomationTestContext context)
+        {
+            context.tinyWait.Until(ExpectedConditions.ElementIsVisible(By.Name("appName")));
+            context.driver.FindElement(By.Name("appName")).SendKeys(context.AppName);
+            context.tinyWait.Until(ExpectedConditions.ElementToBeClickable(By.CssSelector("[test-hook='apps.new-app.create']")));
+            context.driver.FindElement(By.CssSelector("[test-hook='apps.new-app.create']")).Click();
+
+            // we arrived to intern app page
+            // check "next" button exist
+            // thanks to shmuela
+            
+            context.tinyWait.Until(ExpectedConditions.ElementToBeClickable(By.CssSelector("[test-hook='database-edit.create']")));
+            context.driver.FindElement(By.CssSelector("[test-hook='database-edit.create']")).Click();
+            return context;
+        }
+
+    
+
+        public static AutomationTestContext EnsureAppCreated(this AutomationTestContext context)
+        {
+            var res = context.longWait.Until(ExpectedConditions.ElementIsVisible(By.ClassName("ba-icon-objects")));
+            
+            if(res == null)
+            {
+                throw new ElementNotVisibleException("Can't find object menu in tab");
+            }
+
+            return context;
+        }
+                
+        public static AutomationTestContext Finish(this AutomationTestContext context)
+        {
+            context.driver.Dispose();
+            return context;
+        }
+
 
 
     }

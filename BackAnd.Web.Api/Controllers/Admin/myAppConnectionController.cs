@@ -1941,6 +1941,31 @@ namespace BackAnd.Web.Api.Controllers
             Durados.Web.Mvc.Infrastructure.Http.AsyncWebRequest(url, new SendAsyncErrorHandler(appId), asyncCallback);
         }
 
+        private void RespCallbackNew2(IAsyncResult ar)
+        {
+            // Get the RequestState object from the async result.
+            Durados.Web.Mvc.Infrastructure.RequestState rs = (Durados.Web.Mvc.Infrastructure.RequestState)ar.AsyncState;
+
+            // Get the WebRequest from RequestState.
+            WebRequest req = rs.Request;
+
+            string appName = Request.RequestUri.Segments.LastOrDefault(); //req.RequestUri.Authority.Split('.')[0];
+            int? appId = Maps.Instance.AppExists(appName);
+            try
+            {
+                string json = GetSchemaFromCache(appName);
+                CallHttpRequestToCreateTheSchema(appName, json);
+            }
+            catch (Exception exception)
+            {
+                Maps.Instance.DuradosMap.Logger.Log(GetControllerNameForLog(ControllerContext), GetActionName(), this.Request.Method.Method, exception.Message, exception.StackTrace, 1, null, DateTime.Now);
+
+                UpdateDatabaseStatus(appId.Value, OnBoardingStatus.Error);
+
+            }
+
+        }
+
         private void RespCallbackNew(IAsyncResult ar)
         {
             // Get the RequestState object from the async result.
@@ -2002,8 +2027,19 @@ namespace BackAnd.Web.Api.Controllers
             }
             if (!string.IsNullOrEmpty(appName))
             {
-                CallHttpRequestToCreateTheSchema(appName, json);
+                //CallHttpRequestToCreateTheSchema(appName, json);
+                CallHttpRequestToCreateTheSchema2(appName);
             }
+        }
+
+        private void CallHttpRequestToCreateTheSchema2(string appName)
+        {
+            string url = GetUrlToConnect(appName);
+
+            int appId = Maps.Instance.AppExists(appName).Value;
+            Dictionary<string, string> headers = GetHeaders(appName);
+            AsyncCallback asyncCallback = new AsyncCallback(RespCallbackNew2);
+            Durados.Web.Mvc.Infrastructure.Http.AsyncWebRequest(url, new SendAsyncErrorHandler(appId), asyncCallback, headers);
         }
 
         private void CallHttpRequestToConnectExisting(string appName)

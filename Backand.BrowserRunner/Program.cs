@@ -11,11 +11,27 @@ namespace Backand.BrowserRunner
     {
         static void Main(string[] args)
         {
-            new AutomationTestContext()
+            var context = new AutomationTestContext();
+            try
+            {
+                context
                 .GoToHomePage()
                 .ClicktOnTryMeButton()
                 .CloseIntercom()
-                .FillSignUpPage();
+                .FillSignUpPage()
+                .CreateApp()
+                .EnsureAppCreated();
+            }
+            catch(Exception e)
+            {
+                context.TakeScreenshot();
+                   
+            }
+            finally
+            {
+                context.Finish();
+            }
+            
         }
     }
 }
