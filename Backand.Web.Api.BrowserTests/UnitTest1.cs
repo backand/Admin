@@ -7,6 +7,8 @@ using System.Threading;
 using Backand.Config;
 using System.Linq;
 using System.Drawing.Imaging;
+using Durados.Web.Mvc.Logging;
+using Durados.Cms.DataAccess;
 
 namespace Backand.Web.Api.BrowserTests
 {
@@ -67,6 +69,7 @@ namespace Backand.Web.Api.BrowserTests
         public IWebDriver driver;
         public WebDriverWait tinyWait;
         public WebDriverWait longWait;
+        public Logger logger;
 
 
         public ServerConfig config;
@@ -85,6 +88,7 @@ namespace Backand.Web.Api.BrowserTests
             config = ConfigStore.GetConfig();
             username = GetUserName();
             AppName = GetAppName();
+            logger = new Logger();
         }
 
         private string GetAppName()
@@ -101,14 +105,45 @@ namespace Backand.Web.Api.BrowserTests
 
         public string AppName { get; set; }
 
-        public void TakeScreenshot()
+        public string TakeScreenshot()
         {
             Screenshot ss = ((ITakesScreenshot)driver).GetScreenshot();
 
             //Use it as you want now
             string screenshot = ss.AsBase64EncodedString;
             byte[] screenshotAsByteArray = ss.AsByteArray;
-            ss.SaveAsFile(AppName + ".png", ImageFormat.Png); //use any of the built in image formating
+            string filename = AppName + ".png";
+            ss.SaveAsFile(filename, ImageFormat.Png); //use any of the built in image formating
+            return filename;
+        }
+
+        public void SendEmail(string screenshot, Exception e)
+        {
+            string host = Convert.ToString(System.Configuration.ConfigurationManager.AppSettings["host"]);
+            int port = Convert.ToInt32(System.Configuration.ConfigurationManager.AppSettings["port"]);
+            string username = Convert.ToString(System.Configuration.ConfigurationManager.AppSettings["username"]);
+            string password = Convert.ToString(System.Configuration.ConfigurationManager.AppSettings["password"]);
+            
+            string from = Convert.ToString(System.Configuration.ConfigurationManager.AppSettings["fromError"]);
+            string defaultTo = Convert.ToString(System.Configuration.ConfigurationManager.AppSettings["toError"]);
+            string[] to = new string[1] { defaultTo };
+            string[] cc = new string[1] { defaultTo };
+            string[] files = new string[1] { screenshot };
+
+
+            string message = "The following error occurred:\n\r" + e.ToString();
+            
+            Durados.Cms.DataAccess.Email.Send(host, false, port, username, password, false, to, cc, null, " Auto test error", message, from, null, null, false, files, logger);
+        }
+
+        public void SendSMS()
+        {
+            //throw new NotImplementedException();
+        }
+
+        public void WriteToEventViewer(Exception e)
+        {
+            //throw new NotImplementedException();
         }
     }
 
@@ -167,7 +202,13 @@ namespace Backand.Web.Api.BrowserTests
             return context;
         }
 
-    
+
+        public static AutomationTestContext Log(this AutomationTestContext context, Exception e = null)
+        {
+            bool failure = e != null;
+            context.logger.Log("BrowserTest", "app: " + context.AppName, "username: " + context.username, e, failure ? 1 : 3, "");
+            return context;
+        }
 
         public static AutomationTestContext EnsureAppCreated(this AutomationTestContext context)
         {
