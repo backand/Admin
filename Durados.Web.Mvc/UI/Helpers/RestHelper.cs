@@ -720,10 +720,22 @@ namespace Durados.Web.Mvc.UI.Helpers
             return company;
         }
 
-        public static string GetAppUrl(string appname, bool ishttp = false)
+        //public static string GetAppUrl(string appname, bool ishttp = false)
+        //{
+        //    string host = System.Configuration.ConfigurationManager.AppSettings["durados_host"];
+        //    string port = System.Configuration.ConfigurationManager.AppSettings["durados_port"];
+        //    string http = "https://";
+        //    if (Maps.Debug || ishttp)
+        //        http = "http://";
+
+        //    string url = http + appname + "." + host + (string.IsNullOrEmpty(port) ? string.Empty : ":" + port);
+        //    return url;
+        //}
+
+        public static string GetRemoteAdminUrl(string appname, bool ishttp = false)
         {
-            string host = System.Configuration.ConfigurationManager.AppSettings["durados_host"];
-            string port = System.Configuration.ConfigurationManager.AppSettings["durados_port"];
+            string host = System.Configuration.ConfigurationManager.AppSettings["remoteAdminHost"];
+            string port = System.Configuration.ConfigurationManager.AppSettings["remoteAdminPort"];
             string http = "https://";
             if (Maps.Debug || ishttp)
                 http = "http://";
@@ -732,11 +744,7 @@ namespace Durados.Web.Mvc.UI.Helpers
             return url;
         }
 
-        public static string GetCurrentAdminAppUrl()
-        {
-            return GetAppUrl((System.Web.HttpContext.Current.Items[Database.AppName] ?? "www").ToString());
-        }
-
+        
         public static string GetCurrentUsername()
         {
             return (System.Web.HttpContext.Current.Items[Database.Username] ?? "").ToString();
@@ -758,23 +766,24 @@ namespace Durados.Web.Mvc.UI.Helpers
                     defaulLogo = Maps.Instance.DuradosMap.Database.Views["durados_App"].Fields[imageFieldName].DefaultValue.ToString();
                 }
                 catch { }
-                if (filename == null || filename.EndsWith(defaulLogo) || filename.ToLower().EndsWith("backand.png") || filename.ToLower().EndsWith("modubiz.png"))
-                {
-                    return GetAppUrl("www") + "/Content/Images/" + defaulLogo;
-                }
+                //if (filename == null || filename.EndsWith(defaulLogo) || filename.ToLower().EndsWith("backand.png") || filename.ToLower().EndsWith("modubiz.png"))
+                //{
+                //    return GetAppUrl("www") + "/Content/Images/" + defaulLogo;
+                //}
                 string folder = Maps.AzureAppPrefix + pk;
                 return string.Format(Maps.AzureStorageUrl + "/{2}", Maps.AzureStorageAccountName, folder, filename);
             }
             catch
             {
-                try
-                {
-                    return GetAppUrl("www") + "/Content/Images/" + defaulLogo;
-                }
-                catch
-                {
-                    return string.Empty;
-                }
+                //try
+                //{
+                //    return GetAppUrl("www") + "/Content/Images/" + defaulLogo;
+                //}
+                //catch
+                //{
+                //    return string.Empty;
+                //}
+                return string.Empty;
             }
         }
 

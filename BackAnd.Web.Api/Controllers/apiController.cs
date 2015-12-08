@@ -639,7 +639,7 @@ namespace BackAnd.Web.Api.Controllers
             string id = GetMasterGuid();
 
             string qstring = "id=" + id;
-            string url = RestHelper.GetAppUrl(appName, Maps.OldAdminHttp) + "/Admin/Restart?" + qstring;
+            string url = RestHelper.GetRemoteAdminUrl(appName, Maps.OldAdminHttp) + "/Admin/Restart?" + qstring;
 
             Maps.Instance.DuradosMap.Logger.Log(GetControllerNameForLog(ControllerContext), GetActionName(), this.Request.Method.Method, "Refresh admin after Sync " + appName, url, 3, null, DateTime.Now);
 

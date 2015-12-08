@@ -36,21 +36,21 @@ namespace BackAnd.Web.Api.Controllers
         }
 
         
-        [BackAnd.Web.Api.Controllers.Filters.BackAndAuthorize]
-        public IHttpActionResult Post()
-        {
-            try
-            {
-                if (IsAdmin())
-                    return Ok(new { url = Durados.Web.Mvc.UI.Helpers.RestHelper.GetCurrentAdminAppUrl(), username = Durados.Web.Mvc.UI.Helpers.RestHelper.GetCurrentUsername() });// System.Web.HttpContext.Current.Items["appname"].ToString();
+        //[BackAnd.Web.Api.Controllers.Filters.BackAndAuthorize]
+        //public IHttpActionResult Post()
+        //{
+        //    try
+        //    {
+        //        if (IsAdmin())
+        //            return Ok(new { url = Durados.Web.Mvc.UI.Helpers.RestHelper.GetCurrentAdminAppUrl(), username = Durados.Web.Mvc.UI.Helpers.RestHelper.GetCurrentUsername() });// System.Web.HttpContext.Current.Items["appname"].ToString();
 
-                return Ok();
-            }
-            catch (Exception exception)
-            {
-                throw new BackAndApiUnexpectedResponseException(exception, this);
-            }
-        }
+        //        return Ok();
+        //    }
+        //    catch (Exception exception)
+        //    {
+        //        throw new BackAndApiUnexpectedResponseException(exception, this);
+        //    }
+        //}
 
         
     }

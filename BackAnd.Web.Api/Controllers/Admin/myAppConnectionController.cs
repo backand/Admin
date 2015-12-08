@@ -131,21 +131,6 @@ namespace BackAnd.Web.Api.Controllers
 
         }
 
-        protected virtual Dictionary<string, object> CreateAppOld(string template, string name, string title, string server, string catalog, string username, string password, bool usingSsh, bool usingSsl, string sshRemoteHost, string sshUser, string sshPassword, string sshPrivateKey, int sshPort, int productPort, int? themeId)
-        {
-            string id = GetTempGuid();
-            //move to the next page
-            string qstring = "id=" + id;
-
-            string data = string.Format("&template={0}&name={1}&title={2}&server={3}&catalog={4}&username={5}&password={6}&usingSsh={7}&usingSsl={8}&sshRemoteHost={9}&sshUser={10}&sshPassword={11}&sshPrivateKey={12}&sshPort={13}&productPort={14}&themeId={11}", template, name, title, HttpUtility.UrlEncode(server), HttpUtility.UrlEncode(catalog), HttpUtility.UrlEncode(username), HttpUtility.UrlEncode(password), usingSsh, usingSsl, HttpUtility.UrlEncode(sshRemoteHost), HttpUtility.UrlEncode(sshUser), HttpUtility.UrlEncode(sshPassword), sshPrivateKey, sshPort, productPort, themeId);
-            string url = RestHelper.GetAppUrl(Maps.DuradosAppName, Maps.OldAdminHttp) + "/Website/CreateAppGet?" + qstring + data;
-
-            Maps.Instance.DuradosMap.Logger.Log(GetControllerNameForLog(ControllerContext), GetActionName(), this.Request.Method.Method, "API Create App async call", url, 3, null, DateTime.Now);
-
-            string response = Durados.Web.Mvc.Infrastructure.Http.GetWebRequest(url);
-            Dictionary<string, object> json = Durados.Web.Mvc.UI.Json.JsonSerializer.Deserialize(response);
-            return json;
-        }
        
         protected virtual Dictionary<string, object> CreateApp(string template, string name, string title, string server, string catalog, string username, string password, bool usingSsh, bool usingSsl, string sshRemoteHost, string sshUser, string sshPassword, string sshPrivateKey, int sshPort, int productPort, int? themeId)
         {
@@ -1929,16 +1914,6 @@ namespace BackAnd.Web.Api.Controllers
                 UpdateDatabaseStatus(appId, OnBoardingStatus.Error);
 
             }
-        }
-
-        private void ProcessDatabaseOld(int appId, string appName)
-        {
-            //string id = GetTempGuid();
-            string url = RestHelper.GetAppUrl(appName, Maps.OldAdminHttp);
-            url += "?appName=" + appName;// +"&id=" + id;
-            AsyncCallback asyncCallback = new AsyncCallback(RespCallback);
-
-            Durados.Web.Mvc.Infrastructure.Http.AsyncWebRequest(url, new SendAsyncErrorHandler(appId), asyncCallback);
         }
 
         private void RespCallbackNew2(IAsyncResult ar)

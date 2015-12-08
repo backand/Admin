@@ -137,15 +137,179 @@ namespace BackAnd.Web.Api.Controllers
 
         }
 
+        //protected virtual Dictionary<string, object> changePasswordOld(string newPassword, string confirmPassword, string userSysGuid)
+        //{
+        //    string data = string.Format("newPassword={0}&confirmPassword={1}&userSysGuid={2}", System.Web.HttpUtility.UrlEncode(newPassword), System.Web.HttpUtility.UrlEncode(confirmPassword), userSysGuid);
+        //    string url = Durados.Web.Mvc.UI.Helpers.RestHelper.GetAppUrl(Durados.Web.Mvc.Maps.DuradosAppName, Durados.Web.Mvc.Maps.OldAdminHttp) + "/Account/ForgotPassword?" + data;
+
+        //    Durados.Web.Mvc.Maps.Instance.DuradosMap.Logger.Log("Account", "changePassword", "Post", "changePassword call", url, 3, null, DateTime.Now);
+        //    string response = Durados.Web.Mvc.Infrastructure.Http.PostWebRequest(url, data);
+        //    Dictionary<string, object> json = Durados.Web.Mvc.UI.Json.JsonSerializer.Deserialize(response);
+        //    return json;
+        //}
+
         protected virtual Dictionary<string, object> changePassword(string newPassword, string confirmPassword, string userSysGuid)
         {
-            string data = string.Format("newPassword={0}&confirmPassword={1}&userSysGuid={2}", System.Web.HttpUtility.UrlEncode(newPassword), System.Web.HttpUtility.UrlEncode(confirmPassword), userSysGuid);
-            string url = Durados.Web.Mvc.UI.Helpers.RestHelper.GetAppUrl(Durados.Web.Mvc.Maps.DuradosAppName, Durados.Web.Mvc.Maps.OldAdminHttp) + "/Account/ForgotPassword?" + data;
+            return ForgotPassword(newPassword, confirmPassword, userSysGuid);
+        }
 
-            Durados.Web.Mvc.Maps.Instance.DuradosMap.Logger.Log("Account", "changePassword", "Post", "changePassword call", url, 3, null, DateTime.Now);
-            string response = Durados.Web.Mvc.Infrastructure.Http.PostWebRequest(url, data);
-            Dictionary<string, object> json = Durados.Web.Mvc.UI.Json.JsonSerializer.Deserialize(response);
-            return json;
+        Durados.Web.Mvc.Controllers.AccountMembershipService MembershipService = new Durados.Web.Mvc.Controllers.AccountMembershipService();
+        private bool ValidateNewPassword(string newPassword, string confirmPassword)
+        {
+            if (newPassword == null || newPassword.Length < MembershipService.MinPasswordLength)
+            {
+                ModelState.AddModelError("newPassword",
+                    String.Format(System.Globalization.CultureInfo.CurrentCulture,
+                         "You must specify a new password of {0} or more characters.",
+                         MembershipService.MinPasswordLength));
+            }
+
+            if (!String.Equals(newPassword, confirmPassword, StringComparison.Ordinal))
+            {
+                ModelState.AddModelError("_FORM", Map.Database.Localizer.Translate("The new password and confirmation password do not match."));
+            }
+
+            return ModelState.IsValid;
+        }
+
+        private Dictionary<string, string> userData;
+        private string GetUserDetail(string guid, string userField)
+        {
+            if (userData == null)
+                LoadUserData(guid);
+            //return GetUserDetailsFromGuid(guid, userField);
+            if (userData == null)
+                throw new Durados.DuradosException("User does not exist.");
+            if (userData.ContainsKey(userField))
+                return userData[userField];
+            else
+                return string.Empty;
+
+
+        }
+
+        private string GetUserFieldsForSelect()
+        {
+            string select;
+            select = string.Format("[{0}],[{1}],[{2}],[{3}],[{4}]", Map.Database.UserGuidFieldName, Map.Database.UsernameFieldName, "FirstName", "LastName", "Email");
+
+            return select;
+        }
+        protected string UsernameNotfinishRegister
+        {
+            get { return Map.Database.Localizer.Translate("User didn't finish registration. Please follow the email instruction in order to finish registration."); }
+        }                
+
+        protected string UsernameNotExistsMessage
+        {
+            get { return Map.Database.Localizer.Translate("Username dose not exists."); }
+        }
+        protected string PWResetNotAllowedMessage
+        {
+            get { return Map.Database.Localizer.Translate("Password reset is not allowed\r\n"); }
+        }
+        private void LoadUserData(string guid)
+        {
+            Durados.DataAccess.SqlAccess sqlAccess = new Durados.DataAccess.SqlAccess();
+
+            Dictionary<string, object> parameters = new Dictionary<string, object>();
+
+            parameters.Add("@guid", guid);
+
+            string sqlDuradosSys = string.Format("SELECT TOP 1 username FROM durados_user WITH(NOLOCK)  WHERE guid=@guid");
+
+            object duradosSysUser = sqlAccess.ExecuteScalar(Durados.Web.Mvc.Maps.Instance.ConnectionString, sqlDuradosSys, parameters);
+
+            if (duradosSysUser == null || duradosSysUser == DBNull.Value)
+                throw new Durados.DuradosException(Map.Database.Localizer.Translate("Username has no uniqe guid ,password canot be reset."));
+
+            parameters.Clear();
+
+            parameters.Add("@username", duradosSysUser.ToString());
+
+            string sql = string.Format("SELECT TOP 1 {0} FROM {1} WITH(NOLOCK)  WHERE {2}=@username", GetUserFieldsForSelect(), Map.Database.UserViewName, Map.Database.UsernameFieldName);
+
+            object dataTable = sqlAccess.ExecuteTable(Map.Database.GetUserView().ConnectionString, sql, parameters, System.Data.CommandType.Text);
+
+            if (dataTable == null || dataTable == DBNull.Value)
+                throw new Durados.DuradosException(Map.Database.Localizer.Translate("Username has no uniqe guid ,password canot be reset."));
+            if (((System.Data.DataTable)dataTable).Rows.Count <= 0)
+                throw new Durados.DuradosException(UsernameNotExistsMessage);
+            userData = new Dictionary<string, string>();
+            System.Data.DataRow row = ((System.Data.DataTable)dataTable).Rows[0];
+
+            foreach (System.Data.DataColumn col in row.Table.Columns)
+            {
+                userData.Add(col.ColumnName, row[col.ColumnName].ToString());
+            }
+        }
+
+        private string ChangePasswordAfterForgot(string guid, out string username)
+        {
+            username = GetUserDetail(guid, Map.Database.UsernameFieldName);// Map.Database.GetUsernameByGuid(guid);//GetUserDetailsFromGuid(guid, "[" + Map.Database.UserViewName + "].[" + Map.Database. + "]");
+            return MembershipService.ResetPassword(username);
+
+        }
+
+        protected virtual Dictionary<string, object> ForgotPassword(string newPassword, string confirmPassword, string userSysGuid)
+        {
+            string usernameForgot = null;
+            string currentPassword = null;
+            
+            if (string.IsNullOrEmpty(userSysGuid))
+            {
+                return new Dictionary<string, object>() { { "success", false }, { "message", "missing user identification" } };
+
+            }
+            if (string.IsNullOrEmpty(confirmPassword))
+            {
+                return new Dictionary<string, object>() { { "success", false }, { "message", String.Format(System.Globalization.CultureInfo.CurrentCulture,
+                        "You must specify a new password of {0} or more characters.",
+                        MembershipService.MinPasswordLength) } };
+
+            }
+
+            if (!ValidateNewPassword(newPassword, confirmPassword))
+                return new Dictionary<string, object>() { { "success", false }, { "message", "Passwords do not match." } };
+
+            userSysGuid = Durados.Web.Mvc.UI.Helpers.SecurityHelper.GetUserGuidFromTmpGuid(userSysGuid);
+            if (string.IsNullOrEmpty(userSysGuid))
+            {
+                return new Dictionary<string, object>() { { "success", false }, { "message", "User identification is invalid." } };
+            }
+            string guid = GetUserDetail(userSysGuid, Map.Database.UserGuidFieldName);// GetUserDetailsFromGuid(userSysGuid, "[" + Map.Database.UserViewName + "].[" + Map.Database.UserGuidFieldName + "]");
+            if (string.IsNullOrEmpty(guid))// &&  guid.Equals(userSysGuid)
+            {
+                return new Dictionary<string, object>() { { "success", false }, { "message", "User data is invalid." } };
+
+            }
+
+
+
+            string errorMessage = Map.Database.Localizer.Translate("The current password is incorrect or the new password is invalid.");
+            currentPassword = ChangePasswordAfterForgot(userSysGuid, out usernameForgot);
+            try
+            {
+                string username = usernameForgot ?? User.Identity.Name;
+                if (MembershipService.ChangePassword(username, currentPassword, newPassword, true))
+                {
+
+                    MembershipService.UnlockUser(username);
+                    return new Dictionary<string, object>() { { "success", true }, { "message", "Your password has been changed successfully." } };
+                }
+                else
+                {
+
+                    ModelState.AddModelError("_FORM", errorMessage);
+                    return new Dictionary<string, object>() { { "success", false }, { "message", errorMessage } };
+                }
+            }
+            catch
+            {
+                ModelState.AddModelError("_FORM", Map.Database.Localizer.Translate("The current password is incorrect or the new password is invalid."));
+                return new Dictionary<string, object>() { { "success", false }, { "message", errorMessage } };
+            }
+
         }
 
         [Route("changePassword")]
@@ -199,13 +363,128 @@ namespace BackAnd.Web.Api.Controllers
 
         protected virtual Dictionary<string, object> SendChangePasswordLink(string username)
         {
-            string data = string.Format("userName={0}", System.Web.HttpUtility.UrlEncode(username));
-            string url = Durados.Web.Mvc.UI.Helpers.RestHelper.GetAppUrl(Durados.Web.Mvc.Maps.DuradosAppName, Durados.Web.Mvc.Maps.OldAdminHttp) + "/Account/PasswordReset?" + data;
+            return PasswordReset(username);
+        }
 
-            Durados.Web.Mvc.Maps.Instance.DuradosMap.Logger.Log("Account", "SendChangePasswordLink", "Post", "SendChangePasswordLink call", url, 3, null, DateTime.Now);
-            string response = Durados.Web.Mvc.Infrastructure.Http.PostWebRequest(url, data);
-            Dictionary<string, object> json = Durados.Web.Mvc.UI.Json.JsonSerializer.Deserialize(response);
-            return json;
+        private string GetUserGuid(string userName)
+        {
+            try
+            {
+                Durados.DataAccess.SqlAccess sql = new Durados.DataAccess.SqlAccess();
+
+                Dictionary<string, object> parameters = new Dictionary<string, object>();
+
+                parameters.Add("@username", userName);
+                string userViewName = Map.Database.UserViewName;
+                object guid = sql.ExecuteScalar(Durados.Web.Mvc.Maps.Instance.DuradosMap.connectionString, "SELECT TOP 1 [durados_user].[guid] FROM durados_user WITH(NOLOCK)  WHERE [durados_user].[username]=@username", parameters);
+
+                if (guid == null || guid == DBNull.Value)
+                    throw new Durados.DuradosException(Map.Database.Localizer.Translate("Username has no uniqe guid ,password canot be reset."));
+
+                return guid.ToString();
+            }
+            catch (Exception ex)
+            {
+                throw new Durados.DuradosException("User guid was not found.", ex);
+            }
+
+        }
+
+        private string GetFullName(string userSysGuid)
+        {
+            //return Map.Database.GetUserFullName();
+            //return GetUserDetailsFromGuid(userSysGuid,"["+Map.Database.UserViewName+"].[FirstName]+' '+["+Map.Database.UserViewName+"].[LastName]");
+            return GetUserDetail(userSysGuid, "FirstName") + " " + GetUserDetail(userSysGuid, "LastName");
+        }
+
+
+        protected virtual void SendPasswordResetEmail(Dictionary<string, string> collection)
+        {
+            string host = Convert.ToString(System.Configuration.ConfigurationManager.AppSettings["host"]);
+            int port = Convert.ToInt32(System.Configuration.ConfigurationManager.AppSettings["port"]);
+            string username = Convert.ToString(System.Configuration.ConfigurationManager.AppSettings["username"]);
+            string password = Convert.ToString(System.Configuration.ConfigurationManager.AppSettings["password"]);
+
+            string from = Convert.ToString(System.Configuration.ConfigurationManager.AppSettings["fromAlert"]);
+            string subject = collection["Subject"] ?? string.Empty;
+            string message = collection["Message"] ?? string.Empty;
+
+            //message += collection["Comments"];
+            string to = collection["to"] ?? string.Empty;
+            //string cc = collection["cc"] ?? string.Empty;
+
+            string siteWithoutQueryString = Durados.Web.Mvc.Maps.GetAppUrl(Durados.Web.Mvc.Maps.GetCurrentAppName()); //System.Web.HttpContext.Current.Request.Url.Scheme + "://" + System.Web.HttpContext.Current.Request.Url.Authority;  
+
+            Durados.Web.Mvc.View userView = (Durados.Web.Mvc.View)Map.Database.GetUserView();
+
+            message = message.Replace("[username]", collection["username"]);
+            message = message.Replace("[fullname]", GetFullName(collection["Guid"]), false);
+            message = message.Replace("[Product]", Map.Database.SiteInfo.GetTitle());
+            message = message.Replace("[Url]", siteWithoutQueryString);
+            message = message.Replace("[Guid]", collection["Guid"]);
+
+            Durados.Cms.DataAccess.Email.Send(host, false, port, username, password, false, to.Split(';'), null, null, subject, message, from, null, null, false, Map.Logger);
+
+        }
+
+        protected virtual Dictionary<string, object> PasswordReset(string userName)
+        {
+
+            try
+            {
+
+                if (!MembershipService.PasswordResetEnabled) throw new Durados.DuradosException(PWResetNotAllowedMessage);
+
+                if (!MembershipService.ValidateUserExists(userName))
+                    if (string.IsNullOrEmpty(Map.Database.GetGuidByUsername(userName)))
+                        return new Dictionary<string, object>() { { "error", "error" }, { "message", UsernameNotExistsMessage } }; 
+                    else
+                        return new Dictionary<string, object>() { { "error", "error" }, { "message", UsernameNotfinishRegister } };
+
+                string guid = GetUserGuid(userName);
+
+                //string guid = Map.Database.GetGuidByUsername(userName);
+
+                Dictionary<string, string> collection = new Dictionary<string, string>();
+
+                collection.Add("username", userName);
+
+                string to = GetUserDetail(guid, "Email");//GetUserDetailsFromGuid(guid, "["+Map.Database.UserViewName+"].[email]");
+                //string to = Map.Database.GetEmailByUsername(userName);
+
+                if (string.IsNullOrEmpty(to))
+                    throw new Durados.DuradosException("Account missing email, reset password email can not be sent.");
+
+                collection.Add("to", to);
+
+                collection.Add("Guid", Durados.Web.Mvc.UI.Helpers.SecurityHelper.GetTmpUserGuidFromGuid(guid.ToString()));
+
+                string subject = System.Web.Mvc.CmsHelper.GetHtml("passwordResetConfirmationSubject");
+                string messageKey = string.Empty;
+                if (Durados.Web.Mvc.Maps.Instance.GetMap() is Durados.Web.Mvc.DuradosMap)
+                    messageKey = "passwordResetConfirmationMessageInSite";
+                else
+                    messageKey = "passwordResetConfirmationMessage";
+                string message = System.Web.Mvc.CmsHelper.GetHtml(messageKey);
+
+                if (string.IsNullOrEmpty(subject) || string.IsNullOrEmpty(message))
+                    throw new Durados.DuradosException("Missing email Content, make sure your database contains content table with required keys.");
+
+                collection.Add("Subject", Map.Database.Localizer.Translate(subject));
+
+                collection.Add("Message", Map.Database.Localizer.Translate(message));
+
+                SendPasswordResetEmail(collection);
+
+                return new Dictionary<string, object>() { { "error", "success" }, { "message", Map.Database.Localizer.Translate("Please check your mailbox - we've sent you an email with a link to reset your password.") } };
+            }
+
+            catch (Durados.DuradosException exception)
+            {
+                Map.Logger.Log(this.ControllerContext.RouteData.Values["controller"].ToString(), this.ControllerContext.RouteData.Values["action"].ToString(), exception.Source, exception, 3, null);
+                return new Dictionary<string, object>() { { "error", "error" }, { "message", exception.Message } }; 
+            }
+
         }
 
         [Route("sendChangePasswordLink")]
@@ -359,142 +638,7 @@ namespace BackAnd.Web.Api.Controllers
             return (map.Database.EnableUserRegistration);
         }
 
-        //private string GetApp(string appToken)
-        //{
-        //    Durados.DataAccess.SqlAccess sqlAccess = new Durados.DataAccess.SqlAccess();
-
-        //    return sqlAccess.ExecuteScalar(Durados.Web.Mvc.Maps.Instance.DuradosMap.connectionString, "select name from durados_app where Guid = @guid", new Dictionary<string, object>() { { "@guid", appToken } });
-        //}
-
-        protected virtual Dictionary<string, object> Register(string appName, string firstName, string lastName, string email, string password, string confirmPassword, string defaultRole, bool isApproved)
-        {
-            string data = string.Format("First_Name={0}&Last_Name={1}&Email={2}&Password={3}&ConfirmPassword={4}&DefaultRole={5}&IsApproves={6}", firstName, lastName, email, password, confirmPassword, defaultRole, isApproved);
-            string url = Durados.Web.Mvc.UI.Helpers.RestHelper.GetAppUrl(appName, Durados.Web.Mvc.Maps.OldAdminHttp) + "/DuradosAccount/RegistrationRequest?" + data;
-            //string data = string.Format("First_Name={0}&Last_Name={1}&Email={2}&Password={3}&ConfirmPassword={4}&appName={5}", firstName, lastName, email, password, confirmPassword, appName);
-            //string url = Durados.Web.Mvc.UI.Helpers.RestHelper.GetAppUrl(Durados.Web.Mvc.Maps.DuradosAppName, Durados.Web.Mvc.Maps.OldAdminHttp) + "/DuradosAccount/RegistrationRequest?" + data;
-
-            Durados.Web.Mvc.Maps.Instance.DuradosMap.Logger.Log("Account", "Register", "Post", "register call", url, 3, null, DateTime.Now);
-            string response = Durados.Web.Mvc.Infrastructure.Http.PostWebRequest(url, data);
-            try
-            {
-                Dictionary<string, object> json = Durados.Web.Mvc.UI.Json.JsonSerializer.Deserialize(response);
-                return json;
-            }
-            catch
-            {
-                return new Dictionary<string, object>() { { "error", response } };
-            }
-        }
-
         
-
-        //[Route("register")]
-        //[HttpPost]
-        //[BackAnd.Web.Api.Controllers.Filters.TokenAuthorize(BackAnd.Web.Api.Controllers.Filters.HeaderToken.SignUpToken)]
-        //public virtual IHttpActionResult Register()
-        //{
-        //    try
-        //    {
-        //        string json = System.Web.HttpContext.Current.Server.UrlDecode(Request.Content.ReadAsStringAsync().Result);
-        //        Dictionary<string, object> values = Durados.Web.Mvc.UI.Json.JsonSerializer.Deserialize(json);
-
-        //        if (!values.ContainsKey("firstName"))
-        //        {
-        //            return ResponseMessage(Request.CreateResponse(HttpStatusCode.NotAcceptable, "First name is missing"));
-
-        //        }
-
-        //        string firstName = values["firstName"].ToString();
-
-        //        if (!values.ContainsKey("lastName"))
-        //        {
-        //            return ResponseMessage(Request.CreateResponse(HttpStatusCode.NotAcceptable, "Last name is missing"));
-
-        //        }
-        //        string lastName = values["lastName"].ToString();
-        //        if (!values.ContainsKey("email"))
-        //        {
-        //            return ResponseMessage(Request.CreateResponse(HttpStatusCode.NotAcceptable, "Email is missing"));
-
-        //        }
-        //        string email = values["email"].ToString();
-               
-
-        //        if (!values.ContainsKey("password"))
-        //        {
-        //            return ResponseMessage(Request.CreateResponse(HttpStatusCode.NotAcceptable, "Password is missing"));
-
-        //        }
-        //        string password = values["password"].ToString();
-                
-        //        if (!values.ContainsKey("confirmPassword"))
-        //        {
-        //            return ResponseMessage(Request.CreateResponse(HttpStatusCode.NotAcceptable, "Confirm password is missing"));
-
-        //        }
-        //        string confirmPassword = values["confirmPassword"].ToString();
-                
-        //        if (!password.Equals(confirmPassword))
-        //            return ResponseMessage(Request.CreateResponse(HttpStatusCode.NotAcceptable, "The password is is not confirmed"));
-
-        //        string appName = Durados.Web.Mvc.Maps.DuradosAppName;
-        //        if (values.ContainsKey("appName"))
-        //        {
-        //            appName = values["appName"].ToString();
-
-        //        }
-
-        //        if (!appName.Equals(System.Web.HttpContext.Current.Items[Durados.Web.Mvc.Database.AppName]))
-        //        {
-        //            string message = "The SignUpToken in the header does not match with the appName in the request";
-        //            return ResponseMessage(Request.CreateResponse(HttpStatusCode.Unauthorized, message));
-        //        }
-
-
-        //        string redirect = null;
-        //        if (values.ContainsKey("redirect"))
-        //        {
-        //            redirect = values["redirect"].ToString();
-        //            if (!(redirect.Equals(Durados.Web.Mvc.Maps.Instance.GetMap(appName).Database.RegistrationRedirectUrl)))
-        //            {
-        //                string message = "The redirect parameter does not match with the Registration Redirect Url in the configuration";
-        //                return ResponseMessage(Request.CreateResponse(HttpStatusCode.Unauthorized, message));
-
-        //            }
-        //        }
-        //        else
-        //        {
-        //            return ResponseMessage(Request.CreateResponse(HttpStatusCode.NotAcceptable, "redirect is missing"));
-        //        }
-
-        //        bool allowRegistration = IsRegisreationAllowed(Durados.Web.Mvc.Maps.Instance.GetMap(appName));
-
-        //        if (!allowRegistration)
-        //        {
-        //            string message = "To enable Sign Up, please Enable User Registration";
-        //            return ResponseMessage(Request.CreateResponse(HttpStatusCode.Unauthorized, message));
-        //        }
-
-        //        string defaultRole = GetDefaultRole(appName);
-        //        bool isApproved = GetIsApproved(appName);
-
-        //        Dictionary<string, object> jsonResponse = Register(appName, firstName, lastName, email, password, confirmPassword, defaultRole, isApproved);
-
-        //        if (jsonResponse.ContainsKey("error") && jsonResponse["error"].Equals("success"))
-        //        {
-        //            SendRegistrationApproval(firstName, lastName, email, email, appName, redirect);
-        //            return Ok();
-        //        }
-        //        else
-        //            return ResponseMessage(Request.CreateResponse(HttpStatusCode.ExpectationFailed, jsonResponse));
-
-        //    }
-        //    catch (Exception exception)
-        //    {
-        //        throw new BackAndApiUnexpectedResponseException(exception, this);
-        //    }
-        //}
-
         private bool GetIsApproved(string appName)
         {
             return !Durados.Web.Mvc.Maps.Instance.GetMap(appName).Database.ApproveNewUsersManually;
@@ -574,17 +718,6 @@ namespace BackAnd.Web.Api.Controllers
         {
             string parameters = string.Format("appName={0}&userToken={1}&redirect={2}", appName, userToken, redirect);
             return Durados.Security.CipherUtility.Encrypt<System.Security.Cryptography.AesManaged>(parameters, Durados.Web.Mvc.Maps.Instance.DuradosMap.Database.DefaultMasterKeyPassword, Durados.Web.Mvc.Maps.Instance.DuradosMap.Database.Salt);
-        }
-
-        protected virtual Dictionary<string, object> SignUpOld(string fullName, string email, string password)
-        {
-            string data = string.Format("fullname={0}&username={1}&Password={2}&send=true&phone=&dbtype=100&dbother=", System.Web.HttpUtility.UrlEncode(fullName), System.Web.HttpUtility.UrlEncode(email), System.Web.HttpUtility.UrlEncode(password));
-            string url = Durados.Web.Mvc.UI.Helpers.RestHelper.GetAppUrl(Durados.Web.Mvc.Maps.DuradosAppName, Durados.Web.Mvc.Maps.OldAdminHttp) + "/WebsiteAccount/SignUp?" + data;
-
-            Durados.Web.Mvc.Maps.Instance.DuradosMap.Logger.Log("Account", "SignUp", "Post", "SignUp call", url, 3, null, DateTime.Now);
-            string response = Durados.Web.Mvc.Infrastructure.Http.PostWebRequest(url, data);
-            Dictionary<string, object> json = Durados.Web.Mvc.UI.Json.JsonSerializer.Deserialize(response);
-            return json;
         }
 
         protected virtual Dictionary<string, object> SignUp(string fullName, string email, string password)

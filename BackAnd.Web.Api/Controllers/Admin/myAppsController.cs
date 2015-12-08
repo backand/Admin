@@ -651,14 +651,6 @@ namespace BackAnd.Web.Api.Controllers
             }
         }
 
-        private string GetDeleteAppUrl(string appName)
-        {
-            string id = GetMasterGuid();
-
-            string qstring = "id=" + id + "&appName=" + appName; 
-            
-            return RestHelper.GetAppUrl(appName, Maps.OldAdminHttp) + "/Admin/DeleteApp?" + qstring;
-        }
         public virtual IHttpActionResult Delete(string id)
         {
             try
@@ -687,15 +679,7 @@ namespace BackAnd.Web.Api.Controllers
                 string guid = GetMasterGuid();
 
                 string qstring = "id=" + guid;
-                string url = RestHelper.GetAppUrl(id, Maps.OldAdminHttp) + "/Admin/Restart?" + qstring;
-                try
-                {
-                    Durados.Web.Mvc.Infrastructure.Http.GetWebRequest(url, string.Empty, string.Empty, 100000);
-                }
-                catch
-                {
-
-                }
+                
                 
                 try
                 {
