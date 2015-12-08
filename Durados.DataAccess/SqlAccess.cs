@@ -383,7 +383,7 @@ namespace Durados.DataAccess
                 }
             }
         }
-        public void DeleteDatabase(string connectionString, string catalog)
+        public virtual void DeleteDatabase(string connectionString, string catalog)
         {
 
             string rollbackCommand = @"ALTER DATABASE [" + catalog + "] SET  SINGLE_USER WITH ROLLBACK IMMEDIATE";

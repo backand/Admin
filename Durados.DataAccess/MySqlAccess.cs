@@ -204,6 +204,24 @@ namespace Durados.DataAccess
                     return false;
             }
         }
+
+        
+        public override void DeleteDatabase(string connectionString, string catalog)
+        {
+
+            string sql = "DROP DATABASE `" + catalog + "`";
+            sql = string.Format(sql, catalog);
+
+            using (MySqlConnection connection = new MySqlConnection(connectionString))
+            {
+                connection.Open();
+                //connection.ChangeDatabase("master");
+                using (MySqlCommand command = new MySqlCommand(sql, connection))
+                {
+                    command.ExecuteNonQuery();
+                }
+            }
+        }
     }
 
 

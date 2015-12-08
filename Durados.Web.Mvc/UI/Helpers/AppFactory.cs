@@ -295,7 +295,83 @@ namespace Durados.Web.Mvc.UI.Helpers
             return Durados.DataAccess.DataAccessObject.GetNewConnection(sqlProduct, connectionString);
         }
 
+        public Dictionary<string, string> GetExternalInstanceConnection()
+        {
+            return GetConnectionFromConnectionId(GetExternalConnectionIds());
 
+
+        }
+
+        private List<int> GetExternalConnectionIds()
+        {
+            List<int> conIds = new List<int>();
+            string sql = "SELECT  SqlConnectionId  FROM durados_ExternaInstance WITH(NOLOCK) INNER JOIN durados_SqlConnection WITH(NOLOCK) on durados_SqlConnection.Id = durados_ExternaInstance.SqlConnectionId";
+            using (System.Data.IDbConnection cnn = Durados.DataAccess.DataAccessObject.GetNewConnection(SqlProduct.SqlServer, Maps.Instance.ConnectionString))
+            {
+                using (DuradosCommand command = new DuradosCommand(GetSystemProduct()))
+                {
+                    command.Connection = cnn;
+                    command.CommandText = sql;
+
+                    if (command.Connection.State == System.Data.ConnectionState.Closed)
+                    {
+                        try
+                        {
+                            command.Connection.Open();
+                        }
+                        catch (Exception ex)
+                        {
+                            Maps.Instance.DuradosMap.Logger.Log("AppFactory", null, "GetExternalInstanceConnection", null, 1, "No connection to main database");
+                            throw new Exception("No connection to main database", ex);
+                        }
+                    }
+                    System.Data.IDataReader reader = command.ExecuteReader();
+                    while (reader.Read())
+                        conIds.Add(reader.GetInt32(reader.GetOrdinal("SqlConnectionId")));
+                }
+            }
+            return conIds;
+        }
+
+        private Dictionary<string, string> GetConnectionFromConnectionId(List<int> connIds)
+        {
+            Dictionary<string, string> connStrs = new Dictionary<string, string>();
+            foreach (int connId in connIds)
+            {
+
+
+                Durados.Web.Mvc.View view = GetView(ConnectionViewName);
+                System.Data.DataRow connectionRow = view.GetDataRow(connId.ToString());
+
+                if (connectionRow != null)
+                {
+                    string password, username, server, catalog;
+                    int port, SqlProductId;
+                    try
+                    {
+                        password = Convert.ToString(connectionRow["Password"]);
+                        username = Convert.ToString(connectionRow["Username"]);
+                        server = Convert.ToString(connectionRow["ServerName"]);
+                        catalog = Convert.ToString(connectionRow["Catalog"]);
+                        SqlProductId = Convert.ToInt32(connectionRow["SqlProductId"]);
+                        port = Convert.ToInt32(connectionRow["ProductPort"]);
+
+                    }
+                    catch (Exception ex)
+                    {
+                        Maps.Instance.DuradosMap.Logger.Log("AppFactory", null, "GetExternalAvailableInstanceConnection", ex, 1, "Missing external instance parameters or converion errors");
+                        throw new Exception("Missing external instance parameters or converion errors");
+                    }
+                    string connectionString = GetConnectionString(server, catalog, false, username, password, null, (Durados.SqlProduct)SqlProductId, port, false, false);
+                    connStrs.Add(server, connectionString);
+                }
+                else
+                    Maps.Instance.DuradosMap.Logger.Log("AppFactory", null, "GetConnectionFromConnectionId", null, 1, "No sqlConnection row for connectionId" + connId.ToString());
+
+            }
+            return connStrs;
+
+        }
 
     }
 }
