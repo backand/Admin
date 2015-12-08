@@ -1,0 +1,26 @@
+﻿[
+	{
+		"name" : "default",
+		"serverAddress" : "http://localhost:4110/",
+		"appname" : "app206",
+		"mainAppName" : "www",
+		"username": "relly@backand.com",
+		"pwd" : "123456"
+	},
+	{
+		"name" : "RELLY",
+		"serverAddress" : "http://localhost:4110/",
+		"appname" : "app207",
+		"mainAppName" : "www",
+		"username": "relly@backand.com",
+		"pwd" : "123456"
+	},
+	{
+		"name" : "QA",
+		"serverAddress" : "http://api.backand.co:8099/",
+		"appname" : "backandtest",
+		"mainAppName" : "bko",
+		"username": "relly@backand.com",
+		"pwd" : "relly2805"
+	}
+]
