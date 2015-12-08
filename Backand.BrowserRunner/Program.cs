@@ -21,11 +21,48 @@ namespace Backand.BrowserRunner
                 .FillSignUpPage()
                 .CreateApp()
                 .EnsureAppCreated();
+                context.Log();
             }
             catch(Exception e)
             {
-                context.TakeScreenshot();
-                   
+                try
+                {
+                    context.Log(e);
+                }
+                catch (Exception exception)
+                {
+                    try
+                    {
+                        context.WriteToEventViewer(exception);
+                    }
+                    catch { }
+                }
+                string screenshot = context.TakeScreenshot();
+                try
+                {
+                    context.SendEmail(screenshot, e);
+                }
+                catch (Exception exception)
+                {
+                    try
+                    {
+                        context.WriteToEventViewer(exception);
+                    }
+                    catch { }
+                }
+                try
+                {
+                    context.SendSMS();
+                }
+                catch (Exception exception)
+                {
+                    try
+                    {
+                        context.WriteToEventViewer(exception);
+                    }
+                    catch { }
+                }
+                
             }
             finally
             {
