@@ -11,9 +11,9 @@ namespace Durados.Web.Mvc.Infrastructure
     public class ProductMaintenance
     {
         public static string toDeleteViewName = "v_toDeleteApps";
-       
 
-        
+
+
         public string RemoveApps(DataTable dt, IDbCommand command)
         {
             StringBuilder stringBuilder = new StringBuilder();
@@ -25,20 +25,20 @@ namespace Durados.Web.Mvc.Infrastructure
                 return "No apps to delete";
             //Connections connection = new Connections();
             //connection.Init();
-            
+
             foreach (DataRow dr in dt.Rows)
             {
                 try
                 {
                     App app = new App(dr);
                     RemoveApp(app);
-                    stringBuilder.AppendFormat("<br>Completely remove app number {0}" , dr["Id"].ToString() );
+                    stringBuilder.AppendFormat("<br>Completely remove app number {0}", dr["Id"].ToString());
                     Maps.Instance.DuradosMap.Logger.Log("ProductMaintenance", "RemoveApps", "RemoveApps", null, 3, string.Format("Completely remove app number {0}.", dr["Id"].ToString()));
-                   
+
                 }
-                catch(Exception ex)
+                catch (Exception ex)
                 {
-                    Maps.Instance.DuradosMap.Logger.Log("ProductMaintenance", "RemoveApps", "RemoveApps",ex, 2,     string.Format("Could not completely remove app number {0}.",dr["Id"].ToString() ));
+                    Maps.Instance.DuradosMap.Logger.Log("ProductMaintenance", "RemoveApps", "RemoveApps", ex, 2, string.Format("Could not completely remove app number {0}.", dr["Id"].ToString()));
                     stringBuilder.AppendFormat("<br>Failed to completely remove app number" + dr["Id"].ToString() + ". Cause: " + ex.Message);
                 }
             }
@@ -56,20 +56,20 @@ namespace Durados.Web.Mvc.Infrastructure
         {
             if (string.IsNullOrEmpty(appName))
                 throw new DuradosException("App name is empty");
-            App app =  new AppFactory().GetAppByName(appName);
+            App app = new AppFactory().GetAppByName(appName);
             if (app == null || app.AppId <= 0)
                 throw new DuradosException("App was not found");
             return RemoveApp(app);
         }
         public bool RemoveApp(int appId)
         {
-            if(appId <= 0) 
-                    throw new DuradosException("App could not be 0");
+            if (appId <= 0)
+                throw new DuradosException("App could not be 0");
 
             App app = new AppFactory().GetAppById(appId);
             if (app == null || app.AppId <= 0)
                 throw new DuradosException("App was not found");
-            return  RemoveApp(app);
+            return RemoveApp(app);
         }
         private bool RemoveApp(App app)
         {
@@ -92,8 +92,9 @@ namespace Durados.Web.Mvc.Infrastructure
             }
             try
             {
-                SqlServerManager manager = Connections.GetSqlServerManager(app.Server);
-                SqlServerManager sysManager = Connections.GetSqlServerManager(app.SystemServer);
+                SqlServerManager manager = Connections.GetServerManager(app.Server);
+                SqlServerManager sysManager = Connections.GetServerManager(app.SystemServer);
+
                 switch (app.AppType)
                 {
                     case 0:
@@ -148,7 +149,7 @@ namespace Durados.Web.Mvc.Infrastructure
         }
         private void DeleteConfiguration(string configFileName)
         {
-            
+
             Maps.Instance.RemoveConfigFromCloud(configFileName);
             Maps.Instance.RemoveConfigFromCloud(configFileName + ".xml");
         }
@@ -167,9 +168,9 @@ namespace Durados.Web.Mvc.Infrastructure
 
                 }
                 catch (Exception ex)
-                { throw new DuradosException("<br>Failed to update app " +appId.ToString()); }
+                { throw new DuradosException("<br>Failed to update app " + appId.ToString()); }
                 command.CommandText = "Delete From  durados_UserApp  WHERE appId=@Id";
-               
+
                 try
                 {
                     if (command.Connection.State == ConnectionState.Closed)
@@ -182,8 +183,8 @@ namespace Durados.Web.Mvc.Infrastructure
 
             }
         }
-    
-        
+
+
     }
     public class App
     {
@@ -232,7 +233,7 @@ namespace Durados.Web.Mvc.Infrastructure
         {
             string sql = GetAppSql();
             sql = sql + " AND  a.Id=@appId ";
-            return GetApp(sql , "appId", appId.ToString());
+            return GetApp(sql, "appId", appId.ToString());
         }
 
         public App GetAppByName(string name)
@@ -241,14 +242,14 @@ namespace Durados.Web.Mvc.Infrastructure
             sql = sql + " AND  a.Name=@Name ";
             return GetApp(sql, "Name", name);
         }
-        private App GetApp(string sql,string parameterName,string parameterVal)
+        private App GetApp(string sql, string parameterName, string parameterVal)
         {
-           
+
             App app = new App();
             SqlSchema schema = new SqlSchema();
             IDbCommand command = schema.GetCommand();
             command.Connection = schema.GetConnection(Maps.Instance.DuradosMap.connectionString);
-             ValidateSelectFunctionExists(command);
+            ValidateSelectFunctionExists(command);
             command.CommandText = sql;
             command.Parameters.Add(new System.Data.SqlClient.SqlParameter(parameterName, parameterVal));
             try
@@ -296,27 +297,20 @@ namespace Durados.Web.Mvc.Infrastructure
                 RETURNS int
                 AS
                 BEGIN
+	                Declare @hostedServer varchar(250)
 	                -- Declare the return variable here
 	                DECLARE @ResultVar int
-	
-	                --1	console
-	                --2	free
-	                --3	nw
-	                --4	wix
-	                --5	system
-
+					SELECT @hostedServer=ServerName FROM durados_ExternaInstance WITH(NOLOCK) INNER JOIN durados_SqlConnection WITH(NOLOCK) on durados_SqlConnection.Id = durados_ExternaInstance.SqlConnectionId
+					--1:console  --2:free   --3:nw     --4:wix --5:system
 	                -- Add the T-SQL statements to compute the return value here
-	                select @ResultVar = CASE WHEN SUBSTRING([Catalog],1,14) = ''durados_AppSys'' THEN 2 ELSE 
-	                CASE WHEN (SUBSTRING([Catalog],1,6) in (select SUBSTRING(DatabaseName,1,6) from  dbo.durados_SampleApp with (NOLOCK))) THEN 4
-	                WHEN ServerName = ''137.117.97.62'' or ServerName=''tcp:d9gwdrhh5n.database.windows.net,1433'' THEN 3  
-	                WHEN ServerName <> ''137.117.97.62\prod2'' THEN 1
+	                select @ResultVar = CASE WHEN ServerName = @hostedServer  THEN 2 ELSE 
+	                CASE WHEN ServerName  <> @hostedServer THEN 1
 	                ELSE 5 END END
-	                from dbo.durados_SqlConnection c with (NOLOCK)
-	                where id=@id
+	                FROM dbo.durados_SqlConnection c with (NOLOCK) 
+	                WHERE id=@id
 
 	                -- Return the result of the function
 	                RETURN @ResultVar
-
                 END
 
                 ' 
@@ -346,7 +340,7 @@ namespace Durados.Web.Mvc.Infrastructure
                 command = sqlSchema.GetCommand();
             }
 
-            command.CommandText = "Select * from ["+ProductMaintenance.toDeleteViewName +"]";
+            command.CommandText = "Select * from [" + ProductMaintenance.toDeleteViewName + "]";
             using (IDbConnection connection = sqlSchema.GetConnection(Maps.Instance.DuradosMap.connectionString))
             {
                 command.Connection = connection;
@@ -356,7 +350,7 @@ namespace Durados.Web.Mvc.Infrastructure
             return dt;
 
 
-           
+
         }
         private static string GetAppSql()
         {
@@ -364,7 +358,7 @@ namespace Durados.Web.Mvc.Infrastructure
                              a.Creator,cnn.ServerName, cnn.catalog ,syscnn.ServerName sysServerName,syscnn.catalog sysCatalog
                             FROM dbo.durados_App AS a WITH (NOLOCK) INNER JOIN dbo.durados_SqlConnection AS cnn WITH (NOLOCK) ON a.SqlConnectionId = cnn.Id INNER JOIN dbo.durados_SqlConnection AS syscnn WITH (NOLOCK) ON a.SystemSqlConnectionId = syscnn.Id
                             WHERE   [ToDelete]<>1";
-             //dbo.f_report_is_user_from_wix(a.Creator, NULL) AS inwix,   
+            //dbo.f_report_is_user_from_wix(a.Creator, NULL) AS inwix,   
         }
 
 
@@ -374,43 +368,77 @@ namespace Durados.Web.Mvc.Infrastructure
     public static class Connections
     {
         private static bool isLoaded = false;
-        public static bool IsLoaded { get { return isLoaded; } set { isLoaded = value; } } 
+        public static bool IsLoaded { get { return isLoaded; } set { isLoaded = value; } }
         public static Dictionary<string, string> List = new Dictionary<string, string>();
         private static void LoadConnections()
         {
             foreach (System.Configuration.ConnectionStringSettings connectionString in System.Configuration.ConfigurationManager.ConnectionStrings)
             {
-                System.Data.SqlClient.SqlConnectionStringBuilder cnnBuilder = new System.Data.SqlClient.SqlConnectionStringBuilder(connectionString.ConnectionString);
+                System.Data.Common.DbConnectionStringBuilder csb;
+                if (MySqlAccess.IsMySqlConnectionString(connectionString.ConnectionString))
+                    csb = new MySql.Data.MySqlClient.MySqlConnectionStringBuilder(connectionString.ConnectionString);
+                else
+                    csb = new System.Data.SqlClient.SqlConnectionStringBuilder(connectionString.ConnectionString);
 
-                if (!List.ContainsKey(cnnBuilder.DataSource))
-                    List.Add(cnnBuilder.DataSource, connectionString.ConnectionString);
+                if (!List.ContainsKey(csb["data source"].ToString()))
+                    List.Add(csb["data source"].ToString(), connectionString.ConnectionString);
                 //else
                 //    List[cnnParameter.serverName]=new SqlServersManager(connectionString) ;
             }
+            AddOnPremissDemoDb();
+            AddExternalInstances();
+
+
+            isLoaded = true;
+        }
+
+        private static void AddOnPremissDemoDb()
+        {
             string demoServer = System.Configuration.ConfigurationManager.AppSettings["demoOnPremiseServer"];
             string demoUsername = System.Configuration.ConfigurationManager.AppSettings["demoSqlUsername"];
             string demoPassword = System.Configuration.ConfigurationManager.AppSettings["demoSqlPassword"];
             if (!List.ContainsKey(demoServer))
                 List.Add(demoServer, GetConnectionString(demoServer, demoUsername, demoPassword));
-
-            isLoaded = true;
         }
-        public static string GetConnectionString(string server, string username, string password,bool isMaster=false)
-        {
-            System.Data.SqlClient.SqlConnectionStringBuilder builder = new System.Data.SqlClient.SqlConnectionStringBuilder();
 
-            builder.DataSource = server;
-            builder.UserID = username;
-            builder.Password = password;
-            if (isMaster) builder.InitialCatalog = "master";
+        private static void AddExternalInstances()
+        {
+            Durados.Web.Mvc.UI.Helpers.AppFactory externalAppFactory = new UI.Helpers.AppFactory();
+
+            Dictionary<string, string> conns = externalAppFactory.GetExternalInstanceConnection();
+            foreach (string endpoint in conns.Keys)
+                if (!List.ContainsKey(endpoint))
+                    List.Add(endpoint, conns[endpoint]);
+        }
+
+        public static string GetConnectionString(string server, string username, string password, bool isMaster = false, Durados.SqlProduct product = Durados.SqlProduct.SqlServer)
+        {
+            System.Data.Common.DbConnectionStringBuilder builder = GetConnectionStringBuilder(product);
+
+            builder["data source"] = server;
+            builder["User ID"] = username;
+            builder["Password"] = password;
+            if (isMaster) builder["initial catalog"] = "master";
             return builder.ConnectionString;
         }
-        public static SqlServerManager GetSqlServerManager(string server)
+
+        private static System.Data.Common.DbConnectionStringBuilder GetConnectionStringBuilder(Durados.SqlProduct product)
+        {
+            if (product == SqlProduct.MySql)
+                return new MySql.Data.MySqlClient.MySqlConnectionStringBuilder();
+            return new System.Data.SqlClient.SqlConnectionStringBuilder();
+
+        }
+        public static SqlServerManager GetServerManager(string server)
         {
             if (!IsLoaded)
                 LoadConnections();
             if (List == null || List.Count == 0 || !List.ContainsKey(server))
                 return null;
+
+            if (MySqlAccess.IsMySqlConnectionString(List[server]))
+                return new MysqlManager(List[server]);
+
             return new SqlServerManager(List[server]);
         }
     }
@@ -426,13 +454,17 @@ namespace Durados.Web.Mvc.Infrastructure
         public string ServerPassword { get; set; }
         public SqlServerManager(string connectionString)
         {
-            System.Data.SqlClient.SqlConnectionStringBuilder builder = new System.Data.SqlClient.SqlConnectionStringBuilder();
+            System.Data.Common.DbConnectionStringBuilder builder = GetConnectionStringBuilder();
             builder.ConnectionString = connectionString;
-            this.Server = builder.DataSource;
-            this.ServerUserName = builder.UserID;
-            this.ServerPassword = builder.Password;
+            this.Server = builder["DataSource"].ToString();
+            this.ServerUserName = builder["UserID"].ToString();
+            this.ServerPassword = builder["Password"].ToString();
 
+        }
 
+        protected virtual System.Data.Common.DbConnectionStringBuilder GetConnectionStringBuilder()
+        {
+            return new System.Data.SqlClient.SqlConnectionStringBuilder();
         }
         public SqlServerManager(string server, string username, string password)
         {
@@ -441,14 +473,14 @@ namespace Durados.Web.Mvc.Infrastructure
             this.ServerPassword = password;
         }
 
-        internal void DropDB(string server, string catalog)
+        public virtual void DropDB(string server, string catalog)
         {
             SqlAccess sqlAccess = new SqlAccess();
             try
             {
-                sqlAccess.DeleteDatabase(Connections.GetConnectionString(this.Server, this.ServerUserName, this.ServerPassword,true), catalog);
+                sqlAccess.DeleteDatabase(Connections.GetConnectionString(this.Server, this.ServerUserName, this.ServerPassword, true, GetSqlProduct()), catalog);
             }
-            catch(System.Data.SqlClient.SqlException exception)
+            catch (System.Data.SqlClient.SqlException exception)
             {
                 if ((exception.Number == 3702))
                     throw new DuradosException(catalog + " is currently busy");
@@ -457,6 +489,11 @@ namespace Durados.Web.Mvc.Infrastructure
             }
             Maps.Instance.DuradosMap.Logger.Log("ProductMaintenance", "RemoveApp", "DropDB", null, 3, "Catalog:" + catalog + " was droped");
 
+        }
+
+        protected virtual SqlProduct GetSqlProduct()
+        {
+            return SqlProduct.SqlServer;
         }
         internal void DropTable(View view)
         {
@@ -474,7 +511,7 @@ namespace Durados.Web.Mvc.Infrastructure
                         if (sqlSchema.IsTableExists(view.EditableTableName, command))
                         {
                             sqlSchema.DropTable(view.EditableTableName, command);
-                          
+
                         }
                     }
                 }
@@ -483,15 +520,50 @@ namespace Durados.Web.Mvc.Infrastructure
                     if (sqlSchema.IsTableExists(view.Name, command))
                     {
                         sqlSchema.DropTable(view.Name, command);
-                       
+
 
                     }
                 }
                 Maps.Instance.DuradosMap.Logger.Log("ProductMaintenance", "RemoveApp", "DropTable", null, 3, "In Catalog " + command.Connection.Database + " view:" + view.Name + " and his editable table was droped ");
             }
-                
+
 
         }
-      
+
+    }
+
+
+    public class MysqlManager : SqlServerManager
+    {
+        public MysqlManager(string connectionString)
+            : base(connectionString)
+        {
+
+        }
+        protected override System.Data.Common.DbConnectionStringBuilder GetConnectionStringBuilder()
+        {
+            return new MySql.Data.MySqlClient.MySqlConnectionStringBuilder();
+
+        }
+        protected override SqlProduct GetSqlProduct()
+        {
+            return SqlProduct.MySql;
+        }
+
+        public override void DropDB(string server, string catalog)
+        {
+
+            MySqlAccess sqlAccess = new MySqlAccess();
+            try
+            {
+                sqlAccess.DeleteDatabase(Connections.GetConnectionString(this.Server, this.ServerUserName, this.ServerPassword, false, GetSqlProduct()), catalog);
+            }
+            catch (MySql.Data.MySqlClient.MySqlException exception)
+            {
+                throw new DuradosException("Error occured when deleting app " + catalog + " Error message: " + exception.Message);
+            }
+            Maps.Instance.DuradosMap.Logger.Log("ProductMaintenance", "RemoveApp", "DropDB", null, 3, "Catalog:" + catalog + " was droped");
+
+        }
     }
 }
