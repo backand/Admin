@@ -734,14 +734,8 @@ namespace Durados.Web.Mvc.UI.Helpers
 
         public static string GetRemoteAdminUrl(string appname, bool ishttp = false)
         {
-            string host = System.Configuration.ConfigurationManager.AppSettings["remoteAdminHost"];
-            string port = System.Configuration.ConfigurationManager.AppSettings["remoteAdminPort"];
-            string http = "https://";
-            if (Maps.Debug || ishttp)
-                http = "http://";
-
-            string url = http + appname + "." + host + (string.IsNullOrEmpty(port) ? string.Empty : ":" + port);
-            return url;
+            string remoteAdminUrl = System.Configuration.ConfigurationManager.AppSettings["remoteAdminUrl"];
+            return remoteAdminUrl;
         }
 
         

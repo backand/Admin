@@ -7,8 +7,7 @@ using System.Threading;
 using Backand.Config;
 using System.Linq;
 using System.Drawing.Imaging;
-using Durados.Web.Mvc.Logging;
-using Durados.Cms.DataAccess;
+using System.Data.SqlClient;
 
 namespace Backand.Web.Api.BrowserTests
 {
@@ -21,7 +20,7 @@ namespace Backand.Web.Api.BrowserTests
         {
             get
             {
-                return "https://www.backand.com";
+                return "http://localhost:4110";
             }
         }
 
@@ -69,13 +68,14 @@ namespace Backand.Web.Api.BrowserTests
         public IWebDriver driver;
         public WebDriverWait tinyWait;
         public WebDriverWait longWait;
-        public Logger logger;
+        //public Logger logger;
 
 
         public ServerConfig config;
 
         public string username;
-        
+
+        public bool hasIntercom;
 
         public string Password = "12345678";
         public AutomationTestContext()
@@ -84,11 +84,18 @@ namespace Backand.Web.Api.BrowserTests
             tinyWait = new WebDriverWait(driver, new TimeSpan(0, 0, 30));
             longWait = new WebDriverWait(driver, new TimeSpan(0, 3, 0));
 
-            WebPage = "https://www.backand.com/apps/#/sign_up";
+            //WebPage = "https://www.backand.com/apps/#/sign_up";
+            WebPage = GetWebPage();
+            hasIntercom = false;
             config = ConfigStore.GetConfig();
             username = GetUserName();
             AppName = GetAppName();
-            logger = new Logger();
+            //logger = new Logger();
+        }
+
+        private string GetWebPage()
+        {
+            return Convert.ToString(System.Configuration.ConfigurationManager.AppSettings["WebPage"] ?? "http://localhost:3001/#/sign_up");
         }
 
         private string GetAppName()
@@ -119,21 +126,21 @@ namespace Backand.Web.Api.BrowserTests
 
         public void SendEmail(string screenshot, Exception e)
         {
-            string host = Convert.ToString(System.Configuration.ConfigurationManager.AppSettings["host"]);
-            int port = Convert.ToInt32(System.Configuration.ConfigurationManager.AppSettings["port"]);
-            string username = Convert.ToString(System.Configuration.ConfigurationManager.AppSettings["username"]);
-            string password = Convert.ToString(System.Configuration.ConfigurationManager.AppSettings["password"]);
+            //string host = Convert.ToString(System.Configuration.ConfigurationManager.AppSettings["host"]);
+            //int port = Convert.ToInt32(System.Configuration.ConfigurationManager.AppSettings["port"]);
+            //string username = Convert.ToString(System.Configuration.ConfigurationManager.AppSettings["username"]);
+            //string password = Convert.ToString(System.Configuration.ConfigurationManager.AppSettings["password"]);
             
-            string from = Convert.ToString(System.Configuration.ConfigurationManager.AppSettings["fromError"]);
-            string defaultTo = Convert.ToString(System.Configuration.ConfigurationManager.AppSettings["toError"]);
-            string[] to = new string[1] { defaultTo };
-            string[] cc = new string[1] { defaultTo };
-            string[] files = new string[1] { screenshot };
+            //string from = Convert.ToString(System.Configuration.ConfigurationManager.AppSettings["fromError"]);
+            //string defaultTo = Convert.ToString(System.Configuration.ConfigurationManager.AppSettings["toError"]);
+            //string[] to = new string[1] { defaultTo };
+            //string[] cc = new string[1] { defaultTo };
+            //string[] files = new string[1] { screenshot };
 
 
-            string message = "The following error occurred:\n\r" + e.ToString();
+            //string message = "The following error occurred:\n\r" + e.ToString();
             
-            Durados.Cms.DataAccess.Email.Send(host, false, port, username, password, false, to, cc, null, " Auto test error", message, from, null, null, false, files, logger);
+            //Durados.Cms.DataAccess.Email.Send(host, false, port, username, password, false, to, cc, null, " Auto test error", message, from, null, null, false, files, logger);
         }
 
         public void SendSMS()
@@ -165,10 +172,13 @@ namespace Backand.Web.Api.BrowserTests
 
         public static AutomationTestContext CloseIntercom(this AutomationTestContext context)
         {
-            Console.WriteLine("Wait for intercom");
-            context.tinyWait.Until(ExpectedConditions.ElementIsVisible(By.ClassName("intercom-launcher-hovercard-close")));
-            context.tinyWait.Until((a) => { return a.FindElement(By.ClassName("intercom-launcher-hovercard-close")); }).Click();
-
+            if (context.hasIntercom)
+            {
+                Console.WriteLine("Wait for intercom");
+                context.tinyWait.Until(ExpectedConditions.ElementIsVisible(By.ClassName("intercom-launcher-hovercard-close")));
+                context.tinyWait.Until((a) => { return a.FindElement(By.ClassName("intercom-launcher-hovercard-close")); }).Click();
+            }
+            
             return context;
         }
 
@@ -202,11 +212,58 @@ namespace Backand.Web.Api.BrowserTests
             return context;
         }
 
+        private static string GetConnectionString()
+        {
+            return System.Configuration.ConfigurationManager.ConnectionStrings["LogConnectionString"].ConnectionString;
+        }
 
-        public static AutomationTestContext Log(this AutomationTestContext context, Exception e = null)
+        private static int GetFailureLogType()
+        {
+            return Convert.ToInt32(System.Configuration.ConfigurationManager.AppSettings["FailureLogType"] ?? "1"); 
+        }
+
+        private static int GetSuccessLogType()
+        {
+            return Convert.ToInt32(System.Configuration.ConfigurationManager.AppSettings["SuccessLogType"] ?? "3");
+        }
+
+        public static AutomationTestContext Log(this AutomationTestContext context, Exception e = null, string freeText = null)
         {
             bool failure = e != null;
-            context.logger.Log("BrowserTest", "app: " + context.AppName, "username: " + context.username, e, failure ? 1 : 3, "");
+            int failureLogType = GetFailureLogType();
+            int successLogType = GetSuccessLogType();
+
+            //context.logger.Log("BrowserTest", "app: " + context.AppName, "username: " + context.username, e, failure ? 1 : 3, "");
+            string connectionString = GetConnectionString();
+            string cmd = "insert into durados_log ([ApplicationName], [Username], [MachineName], [Time], [Controller], [Action], [MethodName], [LogType], [ExceptionMessage], [Trace], [FreeText]) values (@ApplicationName, @Username, @MachineName, @Time, @Controller, @Action, @MethodName, @LogType, @ExceptionMessage, @Trace, @FreeText)";
+
+            using (SqlConnection connection = new SqlConnection(connectionString))
+            {
+                connection.Open();
+                using (SqlCommand command = new SqlCommand(cmd, connection))
+                {
+                    command.Parameters.AddWithValue("ApplicationName", context.AppName);
+                    command.Parameters.AddWithValue("Username", context.username);
+                    command.Parameters.AddWithValue("MachineName", System.Environment.MachineName);
+                    command.Parameters.AddWithValue("Time", DateTime.Now);
+                    command.Parameters.AddWithValue("Controller", "auto test");
+                    command.Parameters.AddWithValue("Action", "Action");
+                    command.Parameters.AddWithValue("MethodName", "MethodName");
+                    command.Parameters.AddWithValue("LogType", failure ? failureLogType : successLogType);
+                    command.Parameters.AddWithValue("ExceptionMessage", e == null ? string.Empty : e.Message);
+                    command.Parameters.AddWithValue("Trace", e == null ? string.Empty : e.ToString());
+                    command.Parameters.AddWithValue("freeText", freeText == null ? string.Empty : freeText);
+
+                    try
+                    {
+                        command.ExecuteNonQuery();
+                    }
+                    catch (Exception exception)
+                    {
+                        throw exception;
+                    }
+                }
+            } 
             return context;
         }
 
@@ -221,6 +278,65 @@ namespace Backand.Web.Api.BrowserTests
 
             return context;
         }
+
+        public static AutomationTestContext LogOut(this AutomationTestContext context)
+        {
+            try
+            {
+                context.longWait.Until(ExpectedConditions.ElementIsVisible(By.CssSelector("[ng-bind='okBtnText']"))).Click();
+                // wait for fadeout animation
+                Thread.Sleep(1000);
+            }
+            catch (Exception exception)
+            {
+                throw new ElementNotVisibleException("Element probably disappeared because app was not created and logged out", exception);
+            }
+
+           
+
+            var res = context.longWait.Until(ExpectedConditions.ElementToBeClickable(By.ClassName("dropdown-toggle")));
+
+            if (res == null)
+            {
+                throw new ElementNotVisibleException("Can't find user tag");
+            }
+            try
+            {
+                res.Click();
+            }
+            catch (Exception exception)
+            {
+                throw new ElementNotVisibleException("Element probably disappeared because app was not created and logged out", exception);
+            }
+
+            context.longWait.Until(ExpectedConditions.ElementIsVisible(By.CssSelector("[ng-click='header.logout()']"))).Click();
+
+            return context;
+        }
+
+        public static AutomationTestContext SignIn(this AutomationTestContext context)
+        {
+            context.tinyWait.Until((a) => { return a.FindElement(By.Name("uEmail")); }).SendKeys(context.username);
+            context.driver.FindElement(By.Name("uPassword")).SendKeys(context.Password);
+            context.driver.FindElements(By.ClassName("auth-button")).First(c => c.Enabled).Click();
+            
+            return context;
+        }
+
+        public static AutomationTestContext OpenApp(this AutomationTestContext context)
+        {
+            try
+            {
+                context.longWait.Until(ExpectedConditions.ElementIsVisible(By.CssSelector("[test-hook='apps.app-panel.manage-button']"))).Click();
+            }
+            catch (Exception exception)
+            {
+                throw new ElementNotVisibleException("Element probably disappeared because app was not created and logged out", exception);
+            }
+
+            return context;
+        }
+        
                 
         public static AutomationTestContext Finish(this AutomationTestContext context)
         {

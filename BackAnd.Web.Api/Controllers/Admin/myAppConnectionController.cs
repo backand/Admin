@@ -1924,7 +1924,7 @@ namespace BackAnd.Web.Api.Controllers
             // Get the WebRequest from RequestState.
             WebRequest req = rs.Request;
 
-            string appName = Request.RequestUri.Segments.LastOrDefault(); //req.RequestUri.Authority.Split('.')[0];
+            string appName = Request.RequestUri.Segments.LastOrDefault().ToLower(); //req.RequestUri.Authority.Split('.')[0];
             int? appId = Maps.Instance.AppExists(appName);
             try
             {
@@ -1949,7 +1949,7 @@ namespace BackAnd.Web.Api.Controllers
             // Get the WebRequest from RequestState.
             WebRequest req = rs.Request;
 
-            string appName = Request.RequestUri.Segments.LastOrDefault(); //req.RequestUri.Authority.Split('.')[0];
+            string appName = Request.RequestUri.Segments.LastOrDefault().ToLower(); //req.RequestUri.Authority.Split('.')[0];
             int? appId = Maps.Instance.AppExists(appName);
             try
             {
@@ -1974,7 +1974,7 @@ namespace BackAnd.Web.Api.Controllers
             // Get the WebRequest from RequestState.
             WebRequest req = rs.Request;
 
-            string appName = req.RequestUri.Authority.Split('.')[0];
+            string appName = req.RequestUri.Authority.Split('.')[0].ToLower();
             int? appId = Maps.Instance.AppExists(appName);
             try
             {

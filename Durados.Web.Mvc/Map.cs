@@ -3653,7 +3653,7 @@ namespace Durados.Web.Mvc
         {
             System.IO.FileInfo fileInfo = new FileInfo(filename);
             string filenameOnly = fileInfo.Name.TrimEnd(fileInfo.Extension.ToCharArray());
-            return filenameOnly.Equals(Maps.GetMainAppName());
+            return filenameOnly.Equals(Maps.GetmainAppConfigName());
         }
 
         public bool Exists(string filename)
@@ -3727,8 +3727,17 @@ namespace Durados.Web.Mvc
             WriteConfigToCloud2(ds, filename, async, map);
 
             if (map == null)
-                map = Maps.Instance.GetMap();
-
+            {
+                //map = Maps.Instance.GetMap();
+                try
+                {
+                    map = Maps.Instance.GetMap();
+                }
+                catch
+                {
+                    return;
+                }
+            }
             if (map is DuradosMap)
                 return;
 
@@ -4609,7 +4618,7 @@ namespace Durados.Web.Mvc
                 duradosMap = new DuradosMap();
                 duradosMap.connectionString = persistency.ConnectionString;
                 duradosMap.systemConnectionString = persistency.ConnectionString;
-                duradosMap.ConfigFileName = Maps.GetConfigPath(Maps.GetMainAppName() + ".xml");
+                duradosMap.ConfigFileName = Maps.GetConfigPath(Maps.GetmainAppConfigName() + ".xml");
                 duradosMap.Url = GetAppUrl(duradosAppName);
                 duradosMap.Initiate(false);
 
@@ -4709,6 +4718,7 @@ namespace Durados.Web.Mvc
         static Maps()
         {
             host = System.Configuration.ConfigurationManager.AppSettings["durados_host"] ?? "durados.com";
+            mainAppConfigName = System.Configuration.ConfigurationManager.AppSettings["mainAppConfigName"] ?? "backand";
             hostByUs = Convert.ToBoolean(System.Configuration.ConfigurationManager.AppSettings["hostByUs"] ?? "false");
             duradosAppName = System.Configuration.ConfigurationManager.AppSettings["durados_appName"] ?? "www";
             demoAzureUsername = System.Configuration.ConfigurationManager.AppSettings["demoAzureUsername"] ?? "itayher";
@@ -4919,6 +4929,7 @@ namespace Durados.Web.Mvc
         private static bool dropAppDatabase = true;
         private static int appNameMax = 32;
         private static string host = "durados.com";
+        private static string mainAppConfigName = "backand";
         private static bool hostByUs = false;
         private static string duradosAppName = "www";
         private static string demoAzureUsername = "itayher";
@@ -5231,15 +5242,6 @@ namespace Durados.Web.Mvc
             get
             {
                 return hostByUs;
-            }
-        }
-
-
-        public static string Domain
-        {
-            get
-            {
-                return host;
             }
         }
 
@@ -6175,9 +6177,9 @@ namespace Durados.Web.Mvc
             return GetAppUrl(duradosAppName);
         }
 
-        public static string GetMainAppName()
+        public static string GetmainAppConfigName()
         {
-            return host.Split('.')[0];
+            return mainAppConfigName;
         }
 
 

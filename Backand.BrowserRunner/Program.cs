@@ -9,7 +9,22 @@ namespace Backand.BrowserRunner
 {
     class Program
     {
+        private static int GetSeqRuns()
+        {
+            return Convert.ToInt32(System.Configuration.ConfigurationManager.AppSettings["SeqRuns"] ?? "5");
+        }
+
         static void Main(string[] args)
+        {
+            int seqRuns = GetSeqRuns();
+
+            for (int i = 1; i <= seqRuns; i++)
+            {
+                RunTest(i);
+            }
+        }
+
+        static void RunTest(int i)
         {
             var context = new AutomationTestContext();
             try
@@ -20,10 +35,13 @@ namespace Backand.BrowserRunner
                 .CloseIntercom()
                 .FillSignUpPage()
                 .CreateApp()
-                .EnsureAppCreated();
-                context.Log();
+                .EnsureAppCreated()
+                .LogOut()
+                .SignIn()
+                .OpenApp();
+                context.Log(null, i.ToString());
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 try
                 {
@@ -62,7 +80,7 @@ namespace Backand.BrowserRunner
                     }
                     catch { }
                 }
-                
+
             }
             finally
             {
@@ -70,5 +88,6 @@ namespace Backand.BrowserRunner
             }
             
         }
+        
     }
 }

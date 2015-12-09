@@ -413,14 +413,14 @@ namespace BackAnd.Web.Api.Controllers
             string to = collection["to"] ?? string.Empty;
             //string cc = collection["cc"] ?? string.Empty;
 
-            string siteWithoutQueryString = Durados.Web.Mvc.Maps.GetAppUrl(Durados.Web.Mvc.Maps.GetCurrentAppName()); //System.Web.HttpContext.Current.Request.Url.Scheme + "://" + System.Web.HttpContext.Current.Request.Url.Authority;  
+            //string siteWithoutQueryString = GetCloudServiceUrl();//Durados.Web.Mvc.Maps.GetAppUrl(Durados.Web.Mvc.Maps.GetCurrentAppName()); //System.Web.HttpContext.Current.Request.Url.Scheme + "://" + System.Web.HttpContext.Current.Request.Url.Authority;  
 
             Durados.Web.Mvc.View userView = (Durados.Web.Mvc.View)Map.Database.GetUserView();
 
             message = message.Replace("[username]", collection["username"]);
             message = message.Replace("[fullname]", GetFullName(collection["Guid"]), false);
             message = message.Replace("[Product]", Map.Database.SiteInfo.GetTitle());
-            message = message.Replace("[Url]", siteWithoutQueryString);
+            //message = message.Replace("[Url]", siteWithoutQueryString);
             message = message.Replace("[Guid]", collection["Guid"]);
 
             Durados.Cms.DataAccess.Email.Send(host, false, port, username, password, false, to.Split(';'), null, null, subject, message, from, null, null, false, Map.Logger);
