@@ -81,7 +81,7 @@ namespace Backand.Web.Api.BrowserTests
         public AutomationTestContext()
         {
             driver = new ChromeDriver();
-            tinyWait = new WebDriverWait(driver, new TimeSpan(0, 0, 30));
+            tinyWait = new WebDriverWait(driver, new TimeSpan(0, 0, 60));
             longWait = new WebDriverWait(driver, new TimeSpan(0, 3, 0));
 
             //WebPage = "https://www.backand.com/apps/#/sign_up";
@@ -336,6 +336,21 @@ namespace Backand.Web.Api.BrowserTests
 
             return context;
         }
+
+        public static AutomationTestContext SelectItems(this AutomationTestContext context)
+        {
+            var res = context.tinyWait.Until(ExpectedConditions.ElementIsVisible(By.ClassName("ba-icon-objects")));
+            res.Click();
+
+            // wait for fadein animation
+            Thread.Sleep(500);
+            context.driver.FindElements(By.CssSelector("[ng-click='nav.showTable(table)']")).First(c => c.Enabled).Click();
+
+            res = context.longWait.Until(ExpectedConditions.ElementIsVisible(By.XPath("//strong[text()=' Object - items ']")));
+
+            return context;
+        }
+        
         
                 
         public static AutomationTestContext Finish(this AutomationTestContext context)
