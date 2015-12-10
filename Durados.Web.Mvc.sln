@@ -35,10 +35,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Durados.Version", "Durados.
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Durados.Web.Mvc.Specifics.Example", "Durados.Web.Mvc.Specifics.Example\Durados.Web.Mvc.Specifics.Example.csproj", "{5E8573C2-1207-4379-965E-114BFD44F364}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Durados.Website", "Durados.Website\Durados.Website.csproj", "{06A7A55B-FA0D-4F7D-8B97-78C4A40CB9BF}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Duradus.Web.Mvc.App", "Duradus.Web.Mvc.App\Duradus.Web.Mvc.App.csproj", "{D46BF832-7E35-4E54-859C-271190AB971C}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BackAnd.Web.Api", "BackAnd.Web.Api\BackAnd.Web.Api.csproj", "{444966E0-5C1D-4176-86DD-7508368314FA}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BackAnd.Web.Api.Test", "BackAnd.Web.Api.Test\BackAnd.Web.Api.Test.csproj", "{B64789BD-B7B4-4C43-B6CC-97ECF4D93735}"
@@ -158,18 +154,6 @@ Global
 		{5E8573C2-1207-4379-965E-114BFD44F364}.DebugLocal|Any CPU.Build.0 = Debug|Any CPU
 		{5E8573C2-1207-4379-965E-114BFD44F364}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{5E8573C2-1207-4379-965E-114BFD44F364}.Release|Any CPU.Build.0 = Release|Any CPU
-		{06A7A55B-FA0D-4F7D-8B97-78C4A40CB9BF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{06A7A55B-FA0D-4F7D-8B97-78C4A40CB9BF}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{06A7A55B-FA0D-4F7D-8B97-78C4A40CB9BF}.DebugLocal|Any CPU.ActiveCfg = Debug|Any CPU
-		{06A7A55B-FA0D-4F7D-8B97-78C4A40CB9BF}.DebugLocal|Any CPU.Build.0 = Debug|Any CPU
-		{06A7A55B-FA0D-4F7D-8B97-78C4A40CB9BF}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{06A7A55B-FA0D-4F7D-8B97-78C4A40CB9BF}.Release|Any CPU.Build.0 = Release|Any CPU
-		{D46BF832-7E35-4E54-859C-271190AB971C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{D46BF832-7E35-4E54-859C-271190AB971C}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{D46BF832-7E35-4E54-859C-271190AB971C}.DebugLocal|Any CPU.ActiveCfg = Debug|Any CPU
-		{D46BF832-7E35-4E54-859C-271190AB971C}.DebugLocal|Any CPU.Build.0 = Debug|Any CPU
-		{D46BF832-7E35-4E54-859C-271190AB971C}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{D46BF832-7E35-4E54-859C-271190AB971C}.Release|Any CPU.Build.0 = Release|Any CPU
 		{444966E0-5C1D-4176-86DD-7508368314FA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{444966E0-5C1D-4176-86DD-7508368314FA}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{444966E0-5C1D-4176-86DD-7508368314FA}.DebugLocal|Any CPU.ActiveCfg = Debug|Any CPU
