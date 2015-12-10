@@ -687,15 +687,15 @@ namespace BackAnd.Web.Api.Controllers
                 string guid = GetMasterGuid();
 
                 string qstring = "id=" + guid;
-                string url = RestHelper.GetAppUrl(id, Maps.OldAdminHttp) + "/Admin/Restart?" + qstring;
-                try
-                {
-                    Durados.Web.Mvc.Infrastructure.Http.GetWebRequest(url, string.Empty, string.Empty, 100000);
-                }
-                catch
-                {
+                //string url = RestHelper.GetAppUrl(id, Maps.OldAdminHttp) + "/Admin/Restart?" + qstring;
+                //try
+                //{
+                //    Durados.Web.Mvc.Infrastructure.Http.GetWebRequest(url, string.Empty, string.Empty, 100000);
+                //}
+                //catch
+                //{
 
-                }
+                //}
                 
                 try
                 {
