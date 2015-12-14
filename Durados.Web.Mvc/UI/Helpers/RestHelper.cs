@@ -142,14 +142,14 @@ namespace Durados.Web.Mvc.UI.Helpers
             Update(view, Deserialize(view, json), pk, deep, beforeEditCallback, beforeEditInDatabaseCallback, afteEditBeforeCommitCallback, afterEditAfterCommitCallback);
         }
 
-        public static void Update(this View view, Dictionary<string, object> values, string pk, bool deep, BeforeEditEventHandler beforeEditCallback, BeforeEditInDatabaseEventHandler beforeEditInDatabaseCallback, AfterEditEventHandler afteEditBeforeCommitCallback, AfterEditEventHandler afterEditAfterCommitCallback, BeforeCreateEventHandler beforeCreateCallback = null, BeforeCreateInDatabaseEventHandler beforeCreateInDatabaseCallback = null, AfterCreateEventHandler afterCreateBeforeCommitCallback = null, AfterCreateEventHandler afterCreateAfterCommitCallback = null, bool overwrite = false, BeforeDeleteEventHandler beforeDeleteCallback = null, AfterDeleteEventHandler afterDeleteBeforeCommitCallback = null, AfterDeleteEventHandler afterDeleteAfterCommitCallback = null, bool clearCache = false, IDbCommand command = null, IDbCommand sysCommand = null)
+        public static int Update(this View view, Dictionary<string, object> values, string pk, bool deep, BeforeEditEventHandler beforeEditCallback, BeforeEditInDatabaseEventHandler beforeEditInDatabaseCallback, AfterEditEventHandler afteEditBeforeCommitCallback, AfterEditEventHandler afterEditAfterCommitCallback, BeforeCreateEventHandler beforeCreateCallback = null, BeforeCreateInDatabaseEventHandler beforeCreateInDatabaseCallback = null, AfterCreateEventHandler afterCreateBeforeCommitCallback = null, AfterCreateEventHandler afterCreateAfterCommitCallback = null, bool overwrite = false, BeforeDeleteEventHandler beforeDeleteCallback = null, AfterDeleteEventHandler afterDeleteBeforeCommitCallback = null, AfterDeleteEventHandler afterDeleteAfterCommitCallback = null, bool clearCache = false, IDbCommand command = null, IDbCommand sysCommand = null)
         {
             if (clearCache)
             {
                 ClearCache();
             }
 
-            GetRest(view).Update(view, values, pk, deep, beforeEditCallback, beforeEditInDatabaseCallback, afteEditBeforeCommitCallback, afterEditAfterCommitCallback, beforeCreateCallback, beforeCreateInDatabaseCallback, afterCreateBeforeCommitCallback, afterCreateAfterCommitCallback, overwrite, beforeDeleteCallback, afterDeleteBeforeCommitCallback, afterDeleteAfterCommitCallback, command, sysCommand);
+            return GetRest(view).Update(view, values, pk, deep, beforeEditCallback, beforeEditInDatabaseCallback, afteEditBeforeCommitCallback, afterEditAfterCommitCallback, beforeCreateCallback, beforeCreateInDatabaseCallback, afterCreateBeforeCommitCallback, afterCreateAfterCommitCallback, overwrite, beforeDeleteCallback, afterDeleteBeforeCommitCallback, afterDeleteAfterCommitCallback, command, sysCommand);
         }
 
         public static Dictionary<string, object> Deserialize(this View view, string json)
@@ -200,13 +200,13 @@ namespace Durados.Web.Mvc.UI.Helpers
             return values;
         }
 
-        public static void Delete(this View view, string pk, bool deep, BeforeDeleteEventHandler beforeDeleteCallback, AfterDeleteEventHandler afteDeleteBeforeCommitCallback, AfterDeleteEventHandler afterDeleteAfterCommitCallback, Dictionary<string, object> values = null, bool clearCache = false, IDbCommand command = null, IDbCommand sysCommand = null)
+        public static int Delete(this View view, string pk, bool deep, BeforeDeleteEventHandler beforeDeleteCallback, AfterDeleteEventHandler afteDeleteBeforeCommitCallback, AfterDeleteEventHandler afterDeleteAfterCommitCallback, Dictionary<string, object> values = null, bool clearCache = false, IDbCommand command = null, IDbCommand sysCommand = null)
         {
             if (clearCache)
             {
                 ClearCache();
             }
-            GetRest(view).Delete(view, pk, deep, beforeDeleteCallback, afteDeleteBeforeCommitCallback, afterDeleteAfterCommitCallback, command, sysCommand, values);
+            return GetRest(view).Delete(view, pk, deep, beforeDeleteCallback, afteDeleteBeforeCommitCallback, afterDeleteAfterCommitCallback, command, sysCommand, values);
         }
 
         public static object Get(this Query query, int page, int pageSize, Dictionary<string, object> values, bool dataSeries = true)
@@ -734,7 +734,11 @@ namespace Durados.Web.Mvc.UI.Helpers
 
         public static string GetRemoteAdminUrl(string appname, bool ishttp = false)
         {
-            string remoteAdminUrl = System.Configuration.ConfigurationManager.AppSettings["remoteAdminUrl"];
+            string http = "https://";
+            if (Maps.Debug || ishttp)
+                http = "http://";
+
+            string remoteAdminUrl = http + appname + "." + System.Configuration.ConfigurationManager.AppSettings["remoteAdminUrl"];
             return remoteAdminUrl;
         }
 
@@ -7200,6 +7204,10 @@ namespace Durados.Web.Mvc.UI.Helpers
 
         private string GetMyAddress()
         {
+            if (Maps.Debug)
+            {
+                myAddress = System.Configuration.ConfigurationManager.AppSettings["farmMyIntanceAddress"];
+            }
             if (myAddress == null)
             {
                 myAddress = Http.LocalIPAddress();
@@ -7222,7 +7230,7 @@ namespace Durados.Web.Mvc.UI.Helpers
 
 
 
-        public void ClearMachinesCache(string appName, bool async = true)
+        public void ClearMachinesCache(string appName, bool async = false)
         {
             if (async)
             {
@@ -7805,7 +7813,7 @@ namespace Durados.Web.Mvc.UI.Helpers
         public bool Pop(string appName, string username, out int? appId)
         {
             int creator = GetCreator(username);
-            return Pop(appName, username, out appId);
+            return Pop(appName, username, creator, out appId);
         }
 
         private int GetCreator(string username)

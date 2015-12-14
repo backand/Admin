@@ -1791,7 +1791,7 @@ namespace BackAnd.Web.Api.Controllers
                 if (isNewDatabase)
                 {
                     int? appIdFromPool = null;
-                    poolSuccess = new AppsPool().Pop(id, username, out appIdFromPool);
+                    poolSuccess = new AppsPool().Pop(id, Maps.Instance.DuradosMap.Database.GetCurrentUsername(), out appIdFromPool);
 
                     if (poolSuccess)
                     {
@@ -1977,31 +1977,31 @@ namespace BackAnd.Web.Api.Controllers
 
         }
 
-        private void RespCallback(IAsyncResult ar)
-        {
-            // Get the RequestState object from the async result.
-            Durados.Web.Mvc.Infrastructure.RequestState rs = (Durados.Web.Mvc.Infrastructure.RequestState)ar.AsyncState;
+        //private void RespCallback(IAsyncResult ar)
+        //{
+        //    // Get the RequestState object from the async result.
+        //    Durados.Web.Mvc.Infrastructure.RequestState rs = (Durados.Web.Mvc.Infrastructure.RequestState)ar.AsyncState;
 
-            // Get the WebRequest from RequestState.
-            WebRequest req = rs.Request;
+        //    // Get the WebRequest from RequestState.
+        //    WebRequest req = rs.Request;
 
-            string appName = req.RequestUri.Authority.Split('.')[0].ToLower();
-            int? appId = Maps.Instance.AppExists(appName);
-            try
-            {
-                HandleCreateSchemaIfExist(appName);
-                UpdateDatabaseStatus(appId.Value, OnBoardingStatus.Ready);
-                //new Backand.socket().emitUsers("applicationReady", new { name = appName }, new string[] { "myUsername" });
-            }
-            catch (Exception exception)
-            {
-                Maps.Instance.DuradosMap.Logger.Log(GetControllerNameForLog(ControllerContext), GetActionName(), this.Request.Method.Method, exception.Message, exception.StackTrace, 1, null, DateTime.Now);
+        //    string appName = req.RequestUri.Authority.Split('.')[0].ToLower();
+        //    int? appId = Maps.Instance.AppExists(appName);
+        //    try
+        //    {
+        //        HandleCreateSchemaIfExist(appName);
+        //        UpdateDatabaseStatus(appId.Value, OnBoardingStatus.Ready);
+        //        //new Backand.socket().emitUsers("applicationReady", new { name = appName }, new string[] { "myUsername" });
+        //    }
+        //    catch (Exception exception)
+        //    {
+        //        Maps.Instance.DuradosMap.Logger.Log(GetControllerNameForLog(ControllerContext), GetActionName(), this.Request.Method.Method, exception.Message, exception.StackTrace, 1, null, DateTime.Now);
 
-                UpdateDatabaseStatus(appId.Value, OnBoardingStatus.Error);
+        //        UpdateDatabaseStatus(appId.Value, OnBoardingStatus.Error);
 
-            }
+        //    }
 
-        }
+        //}
 
         private void HandleCreateSchemaIfExist(string appName)
         {
@@ -2025,7 +2025,19 @@ namespace BackAnd.Web.Api.Controllers
             int appId = Maps.Instance.AppExists(appName).Value;
             Dictionary<string, string> headers = GetHeaders(appName);
             AsyncCallback asyncCallback = new AsyncCallback(RespCallbackNew2);
-            Durados.Web.Mvc.Infrastructure.Http.AsyncWebRequest(url, new SendAsyncErrorHandler(appId), asyncCallback, headers);
+            try
+            {
+                Durados.Web.Mvc.Infrastructure.Http.AsyncWebRequest(url, new SendAsyncErrorHandler(appId), asyncCallback, headers);
+            }
+            catch(Exception exception)
+            {
+                try
+                {
+                    UpdateDatabaseStatus(appId, OnBoardingStatus.Error);
+                    Map.Logger.Log(GetControllerNameForLog(this.ControllerContext), this.ControllerContext.RouteData.Values["action"].ToString(), exception.Source, exception, 1, null);
+                }
+                catch { }
+            }
         }
 
         private void CallHttpRequestToConnectExisting(string appName)
@@ -2035,7 +2047,19 @@ namespace BackAnd.Web.Api.Controllers
             int appId = Maps.Instance.AppExists(appName).Value;
             Dictionary<string, string> headers = GetHeaders(appName);
             AsyncCallback asyncCallback = new AsyncCallback(RespCallbackNew);
-            Durados.Web.Mvc.Infrastructure.Http.AsyncWebRequest(url, new SendAsyncErrorHandler(appId), asyncCallback, headers);
+            try
+            {
+                Durados.Web.Mvc.Infrastructure.Http.AsyncWebRequest(url, new SendAsyncErrorHandler(appId), asyncCallback, headers);
+            }
+            catch (Exception exception)
+            {
+                try
+                {
+                    UpdateDatabaseStatus(appId, OnBoardingStatus.Error);
+                    Map.Logger.Log(GetControllerNameForLog(this.ControllerContext), this.ControllerContext.RouteData.Values["action"].ToString(), exception.Source, exception, 1, null);
+                }
+                catch { }
+            }
         }
 
         private string GetUrlToConnect(string appName)

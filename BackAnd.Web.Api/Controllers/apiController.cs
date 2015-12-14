@@ -2077,10 +2077,12 @@ namespace BackAnd.Web.Api.Controllers
         public static readonly string DuplicateCollectionName = "The collection name exists more than once.";
         public static readonly string ViewIsUnauthorized = "The Table is unauthorized for this current user role.";
         public static readonly string ViewNameNotFound = "The Table \"{0}\" was not found.";
+        public static readonly string PostContradictsPredefinedFilter = "Post failed because it contradicts the predefined filter.";
+        
         public static readonly string MissingObjectToUpdate = "The object to update is missing.";
         public static readonly string FieldNameNotFound = "The field \"{0}\" was not found.";
         public static readonly string TheFieldMustBeTextual = "The field must be textual.";
-        public static readonly string ItemWithIdNotFound = "An item with id \"{0}\" was not found in Table \"{1}\".";
+        public static readonly string ItemWithIdNotFound = "An item with id \"{0}\" was not found or filtered by predefined filter in Table \"{1}\".";
         public static readonly string AppNotFound = "The app \"{0}\" was not found.";
         public static readonly string ChartWithIdNotFound = "An chart with id \"{0}\" was not found.";
         public static readonly string Unexpected = "An error occurred, please try again or contact the administrator. Error details: {0}";

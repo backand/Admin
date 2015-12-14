@@ -593,6 +593,10 @@ namespace BackAnd.Web.Api.Controllers
                 }
                 return Ok(new { __metadata = new { id = id } });
             }
+            catch (RowNotFoundException)
+            {
+                return ResponseMessage(Request.CreateResponse(HttpStatusCode.Forbidden, Messages.PostContradictsPredefinedFilter));
+            }
             catch (Exception exception)
             {
                 
@@ -775,8 +779,13 @@ namespace BackAnd.Web.Api.Controllers
                 }
                     
 
-                view.Update(values, id, deep ?? false, view_BeforeEdit, view_BeforeEditInDatabase, view_AfterEditBeforeCommit, view_AfterEditAfterCommit, view_BeforeCreate, view_BeforeCreateInDatabase, view_AfterCreateBeforeCommit, view_AfterCreateAfterCommit, overwrite ?? false, view_BeforeDelete, view_AfterDeleteBeforeCommit, view_AfterDeleteAfterCommit);
-                
+                int affected = view.Update(values, id, deep ?? false, view_BeforeEdit, view_BeforeEditInDatabase, view_AfterEditBeforeCommit, view_AfterEditAfterCommit, view_BeforeCreate, view_BeforeCreateInDatabase, view_AfterCreateBeforeCommit, view_AfterCreateAfterCommit, overwrite ?? false, view_BeforeDelete, view_AfterDeleteBeforeCommit, view_AfterDeleteAfterCommit);
+
+                if (affected == 0)
+                {
+                    return ResponseMessage(Request.CreateResponse(HttpStatusCode.NotFound, string.Format(Messages.ItemWithIdNotFound, id, name)));
+                }
+
                 if (returnObject.HasValue && returnObject.Value)
                 {
                     var item = RestHelper.Get(view, id, deep ?? false, view_BeforeSelect, view_AfterSelect);
@@ -829,8 +838,13 @@ namespace BackAnd.Web.Api.Controllers
                     }
                 }
 
-                view.Delete(id, deep ?? false, view_BeforeDelete, view_AfterDeleteBeforeCommit, view_AfterDeleteAfterCommit, values);
+                int affected = view.Delete(id, deep ?? false, view_BeforeDelete, view_AfterDeleteBeforeCommit, view_AfterDeleteAfterCommit, values);
 
+                if (affected == 0)
+                {
+                    return ResponseMessage(Request.CreateResponse(HttpStatusCode.NotFound, string.Format(Messages.ItemWithIdNotFound, id, name)));
+ 
+                }
 
                 return Ok(new { __metadata = new { id = id } });
             }
