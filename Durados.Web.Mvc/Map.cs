@@ -98,7 +98,7 @@ namespace Durados.Web.Mvc
             //    version = GetVersion();
             //}
             version = GetVersion();
-          //  systemVersion = General.Version(Durados.Web.Mvc.App.Helpers);
+            //  systemVersion = General.Version(Durados.Web.Mvc.App.Helpers);
             Concurrency = new Concurrency();
 
 
@@ -453,7 +453,7 @@ namespace Durados.Web.Mvc
                 if (JsonConfigCache != null)
                     JsonConfigCache.Clear();
 
-                bool firstTime= Initiate(project,save);
+                bool firstTime = Initiate(project, save);
                 initiated = true;
                 return firstTime;
             }
@@ -481,13 +481,13 @@ namespace Durados.Web.Mvc
         protected virtual Durados.DataAccess.AutoGeneration.Dynamic.Mapper GetNewSystemMapper(string connectionString)
         {
             if (MySqlAccess.IsMySqlConnectionString(connectionString))
-              return new Durados.DataAccess.AutoGeneration.Dynamic.MySqlMapper();
-             else
+                return new Durados.DataAccess.AutoGeneration.Dynamic.MySqlMapper();
+            else
                 return new Durados.DataAccess.AutoGeneration.Dynamic.Mapper();
-       }
-        
+        }
 
-        private bool Initiate(Durados.Web.Mvc.Config.IProject project,bool save)
+
+        private bool Initiate(Durados.Web.Mvc.Config.IProject project, bool save)
         {
 
             this.project = project;
@@ -528,7 +528,7 @@ namespace Durados.Web.Mvc
 
             string linkSchemaGeneratorFileName = SystemDynamicMapper.GetGenerateScriptFileName(Maps.GetDeploymentPath("Sql/Link.sql"));
             Durados.DataAccess.AutoGeneration.Link persistentLink = SystemDynamicMapper.GetLinkGenerator(systemConnectionString, linkSchemaGeneratorFileName);
-                
+
 
             //string mailingServiceSchemaGeneratorFileName = Maps.GetDeploymentPath("Sql/MailingService.sql");
             //Durados.DataAccess.AutoGeneration.MailingService mailingServiceLink =
@@ -570,13 +570,13 @@ namespace Durados.Web.Mvc
 
 
 
-            Initiate(ds, connectionString, this.ConfigFileName,save); //"~/bugit2.xml");
+            Initiate(ds, connectionString, this.ConfigFileName, save); //"~/bugit2.xml");
 
             if (firstTime && Maps.MultiTenancy)
             {
                 InitiateFirstTime();
 
-                
+
 
             }
             else
@@ -611,7 +611,7 @@ namespace Durados.Web.Mvc
                         AddBackandAuthenticationOverride();
                         Commit();
                     }
-                    
+
                     if (!(this is DuradosMap) && !HasRule("userApproval"))
                     {
                         AddUserApproval();
@@ -628,7 +628,7 @@ namespace Durados.Web.Mvc
                         Commit();
                     }
 
-                    
+
                     //if (!ConfigAccess.ContainsCategoryName("General", configDatabase.ConnectionString))
                     //{
                     //    ConfigCategory();
@@ -689,11 +689,11 @@ namespace Durados.Web.Mvc
         {
             if (mapper is Durados.DataAccess.AutoGeneration.Dynamic.MySqlMapper)
                 return new MySqlPersistentSession(systemConnectionString, sessionSchemaGeneratorFileName);
-           
+
             return new PersistentSession(systemConnectionString, sessionSchemaGeneratorFileName);
         }
 
-      
+
         public bool HasRule(string ruleName)
         {
             return Database.GetUserView().GetRules().Where(r => r.Name.Equals(ruleName)).Count() > 0;
@@ -704,7 +704,7 @@ namespace Durados.Web.Mvc
             return Database.GetUserView().GetRules().Where(r => r.Name.Equals(ruleName)).FirstOrDefault();
         }
 
-        public void NotifyUser(string subjectKey,string messageKey)
+        public void NotifyUser(string subjectKey, string messageKey)
         {
             try
             {
@@ -719,11 +719,11 @@ namespace Durados.Web.Mvc
                 string message = Database.Localizer.Translate(System.Web.Mvc.CmsHelper.GetContent(messageKey));
                 message = string.IsNullOrEmpty(message) ? messageKey : message;
                 string siteWithoutQueryString = System.Web.HttpContext.Current.Request.Url.Scheme + "://" + System.Web.HttpContext.Current.Request.Url.Authority;
-                message = message.Replace("[Url]", siteWithoutQueryString).Replace("[UserPreviewUrl]",this.GetPreviewPath());
+                message = message.Replace("[Url]", siteWithoutQueryString).Replace("[UserPreviewUrl]", this.GetPreviewPath());
                 int appId = Convert.ToInt32(Maps.Instance.GetCurrentAppId());
                 string to = Maps.Instance.DuradosMap.Database.GetCreatorUsername(appId);
 
-                Durados.Cms.DataAccess.Email.Send(host, Database.UseSmtpDefaultCredentials, port, smtpUsername, smtpPassword, false, new string[1] { to }, null, null, subject, message, from, null, null,false,null, Logger);
+                Durados.Cms.DataAccess.Email.Send(host, Database.UseSmtpDefaultCredentials, port, smtpUsername, smtpPassword, false, new string[1] { to }, null, null, subject, message, from, null, null, false, null, Logger);
 
             }
             catch (Exception exception)
@@ -1141,7 +1141,7 @@ namespace Durados.Web.Mvc
             }
 
         }
-        
+
         private void HandleWorkspaceContent()
         {
             HandleAdminWorkspaceContent();
@@ -1243,7 +1243,7 @@ namespace Durados.Web.Mvc
         {
             View databaseView = (View)configDatabase.Views["Database"];
 
-            databaseView.Edit(new Dictionary<string, object>() { { "NewUserDefaultRole", "User"} }, "0", null, null, null, null);
+            databaseView.Edit(new Dictionary<string, object>() { { "NewUserDefaultRole", "User" } }, "0", null, null, null, null);
         }
 
         public string GetLocalDatabaseHost()
@@ -1273,7 +1273,7 @@ namespace Durados.Web.Mvc
 
         private void AddSyncUserRulesOld()
         {
-            const string  USERS = "users";
+            const string USERS = "users";
 
             string whereCondition = GetConnectionSource() == "local" ? "true" : "false";
 
@@ -1313,7 +1313,7 @@ namespace Durados.Web.Mvc
         }
 
 
-        private string GetJsCode(string internalCode) 
+        private string GetJsCode(string internalCode)
         {
             string code = "/* globals\n" +
             "$http - Service for AJAX calls \n" +
@@ -1332,7 +1332,7 @@ namespace Durados.Web.Mvc
 
 
         string indentSpaces = "   ";
-            
+
         private string GetPostCode(string varName, string objectName, Dictionary<string, object> parameters, Dictionary<string, object> data, int indent = 1)
         {
             return GetPostCode(varName, objectName, JsonConvert.SerializeObject(parameters ?? new Dictionary<string, object>()), JsonConvert.SerializeObject(data ?? new Dictionary<string, object>()), indent);
@@ -1425,7 +1425,7 @@ namespace Durados.Web.Mvc
             values.Add("DataAction", Durados.TriggerDataAction.AfterCreateBeforeCommit.ToString());
             values.Add("WorkflowAction", Durados.WorkflowAction.JavaScript.ToString());
             values.Add("WhereCondition", whereCondition);
-            values.Add("Code", GetJsCode(createCode)); 
+            values.Add("Code", GetJsCode(createCode));
             ruleView.Create(values, null, null, null, null, null);
 
             string updateCode = "   // When a registered user is changed, change your users object as well. \n" +
@@ -1437,14 +1437,14 @@ namespace Durados.Web.Mvc
                 "      var currentUserId = currentUser.data[0].__metadata.id; \n" +
                 GetPutCode("response", USERS, "\" + currentUserId + \"", null, "{\"firstName\": userInput.FirstName, \"lastName\": userInput.LastName }", 2) + "\n" +
                 "   } \n";
-                
+
             values = new Dictionary<string, object>();
             values.Add("Name", "Update My App User");
             values.Add("Rules_Parent", userViewPK);
             values.Add("DataAction", Durados.TriggerDataAction.AfterEditBeforeCommit.ToString());
             values.Add("WorkflowAction", Durados.WorkflowAction.JavaScript.ToString());
             values.Add("WhereCondition", whereCondition);
-            values.Add("Code", GetJsCode(updateCode)); 
+            values.Add("Code", GetJsCode(updateCode));
             ruleView.Create(values, null, null, null, null, null);
 
 
@@ -1457,7 +1457,7 @@ namespace Durados.Web.Mvc
                 "      var currentUserId = currentUser.data[0].__metadata.id; \n" +
                 GetDeleteCode("response", USERS, "\" + currentUserId + \"", "{}", 2) + "\n" +
                 "   } \n";
-                
+
 
             values = new Dictionary<string, object>();
             values.Add("Name", "Delete My App User");
@@ -1511,7 +1511,7 @@ namespace Durados.Web.Mvc
             values.Add("DefaultLanguage", "en-us");
             values.Add("LocalizationSchemaGeneratorFileName", string.Empty);
             values.Add("LocalizationConnectionStringKey", string.Empty);
-            
+
             DataRow localizationRow = localizationView.Create(values, null, null, null, null, null);
 
             View databaseView = (View)configDatabase.Views["Database"];
@@ -1562,7 +1562,7 @@ namespace Durados.Web.Mvc
                 values.Add("AllowSelectRoles", string.Format("{0},{1}", publicRoles, readOnlyRoles));
                 values.Add("ViewOwnerRoles", OwnerRoles);
                 values.Add("Precedent", true);
-                
+
                 workspaceView.Create(values, null, null, null, null, null);
             }
 
@@ -1696,7 +1696,7 @@ namespace Durados.Web.Mvc
             values.Add("WhereCondition", "true");
 
             values.Add("Code", EmptyCode);
-            
+
             DataRow row = ruleView.Create(values, null, null, null, null, null);
             string rulePK = ruleView.GetPkValue(row);
 
@@ -1734,20 +1734,20 @@ namespace Durados.Web.Mvc
             values.Add("DataAction", Durados.TriggerDataAction.OnDemand.ToString());
             values.Add("WorkflowAction", Durados.WorkflowAction.JavaScript.ToString());
             values.Add("WhereCondition", "false");
-            string  code = "/* globals\\n\\  $http - service for AJAX calls - $http({method:'GET',url:CONSTS.apiUrl + '/1/objects/yourObject' , headers: {'Authorization':userProfile.token}});\n" +
+            string code = "/* globals\\n\\  $http - service for AJAX calls - $http({method:'GET',url:CONSTS.apiUrl + '/1/objects/yourObject' , headers: {'Authorization':userProfile.token}});\n" +
       "  CONSTS - CONSTS.apiUrl for Backands API URL\n" +
       "*/\n" +
       "\'use strict\';\n" +
       "function backandCallback(userInput, dbRow, parameters, userProfile) {\n" +
       "}";
             values.Add("Code", code);
-           
+
             DataRow row = ruleView.Create(values, null, null, null, null, null);
             string rulePK = ruleView.GetPkValue(row);
 
         }
 
-        
+
 
         private void AddUserApproval()
         {
@@ -1770,7 +1770,7 @@ namespace Durados.Web.Mvc
             string rulePK = ruleView.GetPkValue(row);
 
         }
-        
+
         private void AddNewUserInvitation()
         {
             ConfigAccess configAccess = new DataAccess.ConfigAccess();
@@ -1989,7 +1989,7 @@ namespace Durados.Web.Mvc
             table.Columns.Add("Token", typeof(string));
 
             table.Columns.Add("DataType", typeof(Durados.DataType));
-            
+
             table.PrimaryKey = new DataColumn[1] { pk };
         }
 
@@ -2029,15 +2029,15 @@ namespace Durados.Web.Mvc
                 return;
 
             //DataTable v_durados_UserTable = Durados.DataAccess.AutoGeneration.Generator.CreateTable(v_durados_User, systemConnectionString);
-            DataTable v_durados_UserTable = systemGenerator.CreateTable(v_durados_User,durados_User, systemConnectionString);
-           
+            DataTable v_durados_UserTable = systemGenerator.CreateTable(v_durados_User, durados_User, systemConnectionString);
+
             ds.Tables.Add(v_durados_UserTable);
             v_durados_UserTable.PrimaryKey = new DataColumn[1] { v_durados_UserTable.Columns["ID"] };
 
 
             //DataTable durados_UserRoleTable = Durados.DataAccess.AutoGeneration.Generator.CreateTable(durados_UserRole, systemConnectionString);
             DataTable durados_UserRoleTable = systemGenerator.CreateTable(durados_UserRole, systemConnectionString);
-            
+
             ds.Tables.Add(durados_UserRoleTable);
 
             ds.Relations.Add("UserRole", durados_UserRoleTable.Columns["Name"], v_durados_UserTable.Columns["Role"]);
@@ -2077,7 +2077,7 @@ namespace Durados.Web.Mvc
                 if (durados_AppTable.PrimaryKey.Length == 1)
                 {
                     DataColumn appIdColumn = durados_AppTable.PrimaryKey[0];
-            
+
                     ds.Relations.Add("SampleAppApp", appIdColumn, durados_SampleAppTable.Columns["AppId"]);
                     ds.Relations.Add("InstanceApp", appIdColumn, durados_PlugInInstanceTable.Columns["AppId"]);
 
@@ -2184,7 +2184,7 @@ namespace Durados.Web.Mvc
 
             DataColumn pk = table.Columns.Add("ID", typeof(int));
             table.Columns.Add("FileName", typeof(string));
-            
+
             table.PrimaryKey = new DataColumn[1] { pk };
             table.ExtendedProperties.Add("system", true);
 
@@ -2358,7 +2358,7 @@ namespace Durados.Web.Mvc
             Durados.Web.Mvc.ColumnField writeErrorsField = ((Durados.Web.Mvc.ColumnField)db.Views["durados_Import"].Fields["WriteErrors"]);
             writeErrorsField.DefaultValue = true;
             Durados.Web.Mvc.ColumnField sheetNameField = ((Durados.Web.Mvc.ColumnField)db.Views["durados_Import"].Fields["SheetName"]);
-            
+
             Durados.Web.Mvc.ColumnField importMode = ((Durados.Web.Mvc.ColumnField)db.Views["durados_Import"].Fields["ImportMode"]);
             importMode.MultiValueAdditionals = "1,Add new lines,2,Update existing lines,3,Both,4,Add and Ignore Duplicates";
             importMode.TextHtmlControlType = TextHtmlControlType.DropDown;
@@ -2386,7 +2386,7 @@ namespace Durados.Web.Mvc
             sheetNameField.Precedent = true;
             sheetNameField.AllowCreateRoles = "Developer";
             //sheetNameField.DenyCreateRoles = "View Owner,Admin";
-            
+
             sourceType.DefaultValue = 1;
         }
 
@@ -2419,9 +2419,9 @@ namespace Durados.Web.Mvc
 
             string downloadConfigUrl = "/Admin/DownloadConfig";
             uploadField.PreLabel = "<div class='upload-config-w'><ul><li><span class='upload-config-w1'>This option allows you to update the configuration of you production app from your test app.<br>The database schema of both apps must be identical.</span></li><li><span class='upload-config-w2'>Please upload the zip file you downloaded from your test app.</span></li><li><span class='upload-config-w3'>Please make a backup of the current configuration. You may download it <a href='" + downloadConfigUrl + "'>here</a></span></li></ul></div>";
-           
+
         }
-        
+
 
         private void ConfigSystemBlockTable()
         {
@@ -2509,7 +2509,7 @@ namespace Durados.Web.Mvc
                 db.Views["durados_v_ChangeHistory"].Precedent = true;
                 db.Views["durados_ChangeHistory"].AllowSelectRoles = "everyone";
                 db.Views["durados_ChangeHistoryField"].AllowSelectRoles = "everyone";
-                db.Views["durados_v_ChangeHistory"].AllowSelectRoles = "everyone"; 
+                db.Views["durados_v_ChangeHistory"].AllowSelectRoles = "everyone";
 
                 //db.Views["durados_ChangeHistory"].DisplayType = DisplayType.Report;
                 db.Views["durados_v_ChangeHistory"].DisplayType = DisplayType.Table;
@@ -2537,8 +2537,8 @@ namespace Durados.Web.Mvc
                 db.Views["durados_v_ChangeHistory"].Fields["OldValue"].DisplayName = "Old";
                 db.Views["durados_v_ChangeHistory"].Fields["NewValue"].DisplayName = "New";
 
-               ((ColumnField)db.Views["durados_v_ChangeHistory"].Fields["Admin"]).DataColumn.DataType = typeof(Int32);
-               (db.Views["durados_v_ChangeHistory"].Fields["Admin"] as ColumnField).DataType = DataType.Numeric;
+                ((ColumnField)db.Views["durados_v_ChangeHistory"].Fields["Admin"]).DataColumn.DataType = typeof(Int32);
+                (db.Views["durados_v_ChangeHistory"].Fields["Admin"] as ColumnField).DataType = DataType.Numeric;
                 db.Views["durados_v_ChangeHistory"].Fields["ActionHistory_Parent"].DisplayName = "Action";
                 ((ParentField)db.Views["durados_v_ChangeHistory"].Fields["ActionHistory_Parent"]).NoHyperlink = true;
                 ((ParentField)db.Views["durados_v_ChangeHistory"].Fields["ActionHistory_Parent"]).JsonName = "Action";
@@ -2698,7 +2698,7 @@ namespace Durados.Web.Mvc
             editableTableName.AutocompleteFilter = false;
         }
 
-        private  SqlSchema GetSqlSchema()
+        private SqlSchema GetSqlSchema()
         {
             if (SqlProduct == SqlProduct.MySql)
                 return new MySqlSchema();
@@ -2791,7 +2791,7 @@ namespace Durados.Web.Mvc
 
                 }
 
-            }  
+            }
         }
 
         private void ConfigSystemLogTable()
@@ -2850,11 +2850,12 @@ namespace Durados.Web.Mvc
                 ColumnField usernameField = (ColumnField)userView.Fields["Username"];
                 usernameField.DisplayName = "Username";
                 usernameField.SpecialColumn = SpecialColumn.None;
-                if (!Maps.PrivateCloud) {
+                if (!Maps.PrivateCloud)
+                {
                     usernameField.DisplayName += " (Email)";
                     usernameField.SpecialColumn = SpecialColumn.Email;
                 }
-                
+
                 usernameField.DisableInEdit = true;
             }
             if (userView.Fields.ContainsKey("Password"))
@@ -3015,7 +3016,7 @@ namespace Durados.Web.Mvc
         }
 
 
-        private void Initiate(DataSet dataSet, string connectionString, string configFileName,bool save)
+        private void Initiate(DataSet dataSet, string connectionString, string configFileName, bool save)
         {
             ConfigFileName = configFileName;
             dataset = dataSet;
@@ -3027,12 +3028,12 @@ namespace Durados.Web.Mvc
             //    InitiateLocalization();
             ////LoadConfiguration();
             Refresh();
-            
+
             if (save)
             {
                 SaveConfigForTheFirstTimeInCaseOfChangeInStructure();
             }
-           
+
 
             if (db.Localization != null)
                 localizationDatabase = CreateLocalizationDatabase();
@@ -3049,7 +3050,7 @@ namespace Durados.Web.Mvc
                 if (!string.IsNullOrEmpty(db.Localization.LocalizationConnectionStringKey))
                     cs = System.Configuration.ConfigurationManager.ConnectionStrings[db.Localization.LocalizationConnectionStringKey].ConnectionString;
             }
-            Durados.Localization.ILocalizer localizer =GetLocalizer(); 
+            Durados.Localization.ILocalizer localizer = GetLocalizer();
 
             if (db.Localization != null)
             {
@@ -3063,7 +3064,7 @@ namespace Durados.Web.Mvc
         {
             if (SystemDynamicMapper is Durados.DataAccess.AutoGeneration.Dynamic.MySqlMapper)
                 return new Durados.Web.Localization.MySqlLocalizer();
-            return new Durados.Web.Localization.Localizer(); 
+            return new Durados.Web.Localization.Localizer();
         }
 
         public SiteInfo SiteInfo { get; set; }
@@ -3318,7 +3319,7 @@ namespace Durados.Web.Mvc
             {
                 SaveConfig(ds, filename);
             }
-            catch (Exception exception )
+            catch (Exception exception)
             {
                 Logger.Log("Map", "Initiation", "SaveConfigForTheFirstTimeInCaseOfChangeInStructure", exception, 3, "");
             }
@@ -3662,7 +3663,7 @@ namespace Durados.Web.Mvc
                 return System.IO.File.Exists(filename);
 
             string containerName = Maps.GetStorageBlobName(filename);
-           
+
             return storage.Exists(containerName);
         }
 
@@ -4183,8 +4184,8 @@ namespace Durados.Web.Mvc
             //if (defualtDatabase == null)
             //{
 
-                DataSet ds = GetDefaultDataSet();
-                defualtDatabase = new Database(ds, this);
+            DataSet ds = GetDefaultDataSet();
+            defualtDatabase = new Database(ds, this);
             //}
 
             return defualtDatabase;
@@ -4223,7 +4224,7 @@ namespace Durados.Web.Mvc
             DynamicMapper.Sync(Database.Views[viewName], configViewPk, configDatabase.Views["Field"], field, dataset, Database, parentField);
         }
 
-        public Dictionary<string,int> RemovedDeletedViews(Database database, out string message)
+        public Dictionary<string, int> RemovedDeletedViews(Database database, out string message)
         {
             message = string.Empty;
             string[] deletedViews = DynamicMapper.GetDeletedViews(database);
@@ -4308,7 +4309,7 @@ namespace Durados.Web.Mvc
             if (dr != null)
             {
                 ///Admin/Download/Workspace?fieldName=Description&amp;filename=/moduBiz.png&amp;pk=\"
-                if(string.IsNullOrEmpty(fileName)) 
+                if (string.IsNullOrEmpty(fileName))
                     fileName = dr.Image;
 
                 return string.Format("/Home/{0}/{1}?fieldName={2}&amp;fileName={3}&amp;pk={4}", DownloadActionName, dr.Table.TableName, "Image", fileName, dr.Id.ToString());
@@ -4718,6 +4719,9 @@ namespace Durados.Web.Mvc
         static Maps()
         {
             host = System.Configuration.ConfigurationManager.AppSettings["durados_host"] ?? "durados.com";
+            poolCreator = Convert.ToInt32(System.Configuration.ConfigurationManager.AppSettings["poolCreator"] ?? "55555");
+            poolShouldBeUsed = Convert.ToBoolean(System.Configuration.ConfigurationManager.AppSettings["poolShouldBeUsed"] ?? "false");
+
             mainAppConfigName = System.Configuration.ConfigurationManager.AppSettings["mainAppConfigName"] ?? "backand";
             hostByUs = Convert.ToBoolean(System.Configuration.ConfigurationManager.AppSettings["hostByUs"] ?? "false");
             duradosAppName = System.Configuration.ConfigurationManager.AppSettings["durados_appName"] ?? "www";
@@ -4739,7 +4743,7 @@ namespace Durados.Web.Mvc
             demoFtpUser = System.Configuration.ConfigurationManager.AppSettings["demoFtpUser"] ?? "itay";
             demoFtpPassword = System.Configuration.ConfigurationManager.AppSettings["demoFtpPassword"] ?? "dio2008";
             demoFtpPhysicalPath = System.Configuration.ConfigurationManager.AppSettings["demoFtpPhysicalPath"] ?? @"C:\FTP\";
-            demoUploadSourcePath = System.Configuration.ConfigurationManager.AppSettings["demoUploadSourcePath"] ?? "/Uploads/220/"; 
+            demoUploadSourcePath = System.Configuration.ConfigurationManager.AppSettings["demoUploadSourcePath"] ?? "/Uploads/220/";
             demoOnPremiseSourcePath = System.Configuration.ConfigurationManager.AppSettings["demoOnPremiseSourcePath"] ?? @"C:\Dev\Databases\";
             allowLocalConnection = Convert.ToBoolean(System.Configuration.ConfigurationManager.AppSettings["allowLocalConnection"] ?? "false");
             cloud = Convert.ToBoolean(System.Configuration.ConfigurationManager.AppSettings["cloud"] ?? "false"); // false;// RoleEnvironment.IsAvailable;//
@@ -4762,8 +4766,8 @@ namespace Durados.Web.Mvc
             AllowedDownloadFileTypes = Convert.ToString(System.Configuration.ConfigurationManager.AppSettings["AllowedDownloadFileTypes"] ?? allowedDownloadFileTypesDefault).Split(',').ToArray();
             DenyDownloadFileTypes = Convert.ToString(System.Configuration.ConfigurationManager.AppSettings["DenyDownloadFileTypes"] ?? denyDownloadFileTypesDefault).Split(',').ToArray();
 
-            ReservedAppNames = Convert.ToString(System.Configuration.ConfigurationManager.AppSettings["ReservedAppNames"] ?? reservedAppNames).Split(',').Select(k => k).ToHashSet<string>();  
-         
+            ReservedAppNames = Convert.ToString(System.Configuration.ConfigurationManager.AppSettings["ReservedAppNames"] ?? reservedAppNames).Split(',').Select(k => k).ToHashSet<string>();
+
             azureDatabasePendingPool = new PendingPool(demoPendingNext);
             onPremiseDatabasePendingPool = new PendingPool(demoPendingNext);
 
@@ -4814,12 +4818,12 @@ namespace Durados.Web.Mvc
             }
 
             CacheType = (CacheType)Enum.Parse(typeof(CacheType), System.Configuration.ConfigurationManager.AppSettings["cacheType"] ?? CacheType.Local.ToString());
-           
+
 
             AzureCachePort = Convert.ToInt32(System.Configuration.ConfigurationManager.AppSettings["AzureCachePort"] ?? "22233");
 
             AzureCacheUpdateInterval = new TimeSpan(0, 0, Convert.ToInt32(System.Configuration.ConfigurationManager.AppSettings["AzureCacheUpdateInterval"] ?? "60"));
-            
+
             DefaultUploadName = System.Configuration.ConfigurationManager.AppSettings["DefaultUploadName"] ?? "DefaultUpload";
 
             DefaultImageHeight = Convert.ToInt32(System.Configuration.ConfigurationManager.AppSettings["DefaultImageHeight"] ?? "80");
@@ -4883,11 +4887,11 @@ namespace Durados.Web.Mvc
         public static string GetDeploymentPath(string filename)
         {
             return System.Web.HttpContext.Current.Server.MapPath("~/Deployment/") + filename;
-            
+
         }
 
         public static string Version = null;
-        
+
         public static Dictionary<SqlProduct, int> ProductsPort { get; private set; }
         public static bool SplitProducts { get; private set; }
         public static string AzureStorageUrl { get; private set; }
@@ -4898,14 +4902,14 @@ namespace Durados.Web.Mvc
         public static string ConfigAzureStorageAccountName { get; private set; }
         public static string ConfigAzureStorageAccountKey { get; private set; }
         public static string[] ApiUrls { get; private set; }
-        
+
         public static string AzureCacheAccountKey { get; private set; }
         public static string AzureCacheAccountName { get; private set; }
         public static string AzureCacheUrl { get; private set; }
         public static int AzureCachePort { get; private set; }
         public static string UserPreviewUrl { get; private set; }
         public static string S3Bucket { get; private set; }
-        
+
         public static TimeSpan AzureCacheUpdateInterval { get; private set; }
 
         public static CacheType CacheType { get; private set; }
@@ -4929,6 +4933,9 @@ namespace Durados.Web.Mvc
         private static bool dropAppDatabase = true;
         private static int appNameMax = 32;
         private static string host = "durados.com";
+        private static int poolCreator = 5555;
+        private static bool poolShouldBeUsed = false;
+
         private static string mainAppConfigName = "backand";
         private static bool hostByUs = false;
         private static string duradosAppName = "www";
@@ -4948,7 +4955,7 @@ namespace Durados.Web.Mvc
         private static long demoFtpFileSizeLimitKb = 1024;
         private static long demoFtpFolderSizeLimitKb = 1024;
         private static string demoFtpPhysicalPath = @"C:\FTP\";
-        private static string demoUploadSourcePath = @"C:\Dev\Demo\"; 
+        private static string demoUploadSourcePath = @"C:\Dev\Demo\";
         private static string demoOnPremiseSourcePath = @"C:\Dev\Databases\";
         private static string demoFtpUser = "itay";
         private static string demoFtpPassword = "dio2008";
@@ -4971,7 +4978,7 @@ namespace Durados.Web.Mvc
         public static bool OldAdminHttp = false;
 
         private static string reservedAppNames = "api";
-        
+
         private Map duradosMap = null;
         System.Data.SqlClient.SqlConnectionStringBuilder builder = new System.Data.SqlClient.SqlConnectionStringBuilder();
 
@@ -5014,14 +5021,14 @@ namespace Durados.Web.Mvc
                 if (System.Configuration.ConfigurationManager.ConnectionStrings["SystemMapsConnectionString"] == null)
                     throw new DuradosException("Please add SystemMapsConnectionString to the web.config connection strings");
                 sqlPersistency.SystemConnectionString = System.Configuration.ConfigurationManager.ConnectionStrings["SystemMapsConnectionString"].ConnectionString;
-              
+
                 persistency = sqlPersistency;
                 builder.ConnectionString = sqlPersistency.ConnectionString;
 
                 Durados.DataAccess.ConfigAccess.multiTenancy = multiTenancy;
                 Durados.DataAccess.ConfigAccess.cloud = cloud;
                 Durados.DataAccess.ConfigAccess.storage = new Map();
-               
+
             }
         }
 
@@ -5116,6 +5123,23 @@ namespace Durados.Web.Mvc
                 return demoFtpHost;
             }
         }
+        public static int PoolCreator
+        {
+            get
+            {
+                return poolCreator;
+            }
+        }
+        public static bool PoolShouldBeUsed
+        {
+            get
+            {
+                return poolShouldBeUsed;
+            }
+        }
+
+
+
 
         public static string DemoFtpPort
         {
@@ -5284,7 +5308,7 @@ namespace Durados.Web.Mvc
                 return superDeveloper;
             }
         }
-        
+
 
         public static int PlugInSampleGenerationCount
         {
@@ -5470,15 +5494,15 @@ namespace Durados.Web.Mvc
         {
             return (View)duradosMap.Database.Views["durados_App"];
         }
-        
+
         /***Return - Plugin Type (Id) or 0 if value wasn't set or exist*/
         private int GetPluginType(int appId)
         {
             SqlAccess sql = new SqlAccess();
 
-            string sSqlCommand = "SELECT     dbo.durados_PlugInSite.PlugInId " ;
-            sSqlCommand += "from  dbo.durados_PlugInSite with(nolock), dbo.durados_PlugInSiteApp with(nolock) " ;
-            sSqlCommand += "where dbo.durados_PlugInSite.Id = dbo.durados_PlugInSiteApp.PlugInSiteId " ;
+            string sSqlCommand = "SELECT     dbo.durados_PlugInSite.PlugInId ";
+            sSqlCommand += "from  dbo.durados_PlugInSite with(nolock), dbo.durados_PlugInSiteApp with(nolock) ";
+            sSqlCommand += "where dbo.durados_PlugInSite.Id = dbo.durados_PlugInSiteApp.PlugInSiteId ";
             sSqlCommand += " and  dbo.durados_PlugInSiteApp.AppId = " + appId + " ";
 
             object scalar = sql.ExecuteScalar(duradosMap.connectionString, sSqlCommand);
@@ -5548,7 +5572,7 @@ namespace Durados.Web.Mvc
         {
             //try
             //{
-                
+
             //    //string filename = GetMap().ConfigFileName;
             //    string key = "duradosappsys";//GetStorageBlobName(filename);
             //    int? id = AppExists(pk);
@@ -5578,8 +5602,8 @@ namespace Durados.Web.Mvc
                 RemoveMap(pk.ToLower());
             }
 
-           
-            
+
+
             try
             {
                 RemoveSqlProduct(pk);
@@ -5606,7 +5630,7 @@ namespace Durados.Web.Mvc
                 //}
                 return duradosMap;
             }
-                
+
             Map map = null;
 
             if (IsInMemoryMode())
@@ -5690,7 +5714,7 @@ namespace Durados.Web.Mvc
             return true;
         }
 
-        private  Map GetMapFromSession(Map map)
+        private Map GetMapFromSession(Map map)
         {
 
             //if (IsPreviewModeOff)
@@ -5745,7 +5769,7 @@ namespace Durados.Web.Mvc
 
         //    }
         //}
-        
+
         //public bool IsPreviewModeOn
         //{
         //    get
@@ -5756,7 +5780,7 @@ namespace Durados.Web.Mvc
         //    }
         //}
 
-       
+
         public HttpContextBase httpContext
         {
             get
@@ -5766,7 +5790,7 @@ namespace Durados.Web.Mvc
                 return (HttpContextBase)context;
             }
         }
-        
+
         public string GetActionName()
         {
             string url = HttpContext.Current.Request.RawUrl;
@@ -5776,10 +5800,10 @@ namespace Durados.Web.Mvc
             System.Web.Mvc.UrlHelper urlHelper = new System.Web.Mvc.UrlHelper(new System.Web.Routing.RequestContext(httpContext, route));
 
             var routeValueDictionary = urlHelper.RequestContext.RouteData.Values;
-            
+
             if (!routeValueDictionary.ContainsKey("action"))
                 return string.Empty;
-            
+
             string actionName = routeValueDictionary["action"].ToString();
             return actionName;
         }
@@ -5789,14 +5813,14 @@ namespace Durados.Web.Mvc
         public Map CreateMap(string appName, out bool newStructure)
         {
             //Durados.Diagnostics.EventViewer.WriteEvent("Start CreateMap for: " + appName);
-                
+
             newStructure = false;
             View appView = GetAppView();
             Field idField = appView.Fields["Id"];
 
             if (string.IsNullOrEmpty(appName))
                 Durados.Diagnostics.EventViewer.WriteEvent("CreateMap: appName is null");
-                
+
             int? id = AppExists(appName);
             if (!id.HasValue)
             {
@@ -5829,7 +5853,7 @@ namespace Durados.Web.Mvc
             }
 
             //Durados.Diagnostics.EventViewer.WriteEvent("appRow found for: " + appName + " id: " + id, System.Diagnostics.EventLogEntryType.SuccessAudit, 500);
-            
+
             Map map = null;
 
             map = new Map();
@@ -5879,7 +5903,7 @@ namespace Durados.Web.Mvc
             }
 
             map.LocalPort = localPort;
-            
+
             if (sqlProduct == 3)
             {
                 map.connectionString = persistency.GetMySqlConnection(appRow, builder, localPort).ToString();
@@ -5902,14 +5926,14 @@ namespace Durados.Web.Mvc
             string pk = appRow.Id.ToString();
             map.Id = pk;
             map.DatabaseName = appRow != null && appRow.durados_SqlConnectionRowByFK_durados_App_durados_SqlConnection != null && !appRow.durados_SqlConnectionRowByFK_durados_App_durados_SqlConnection.IsCatalogNull() ? appRow.durados_SqlConnectionRowByFK_durados_App_durados_SqlConnection.Catalog : "Yours";
-            
+
             map.ConfigFileName = Maps.GetConfigPath(Maps.DuradosAppPrefix + pk + ".xml");
             if (!appRow.IsUsesSpecificBinaryNull() && appRow.UsesSpecificBinary)
                 // map.selectedProject = string.Format("Durados.Web.Mvc.Specifics.{0}.{0}Project, Durados.Web.Mvc.Specifics.{0}, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null", Maps.DuradosAppPrefix + pk);
-                map.selectedProject = HttpContext.Current.Server.MapPath("/" + appRow.SpecificDOTNET) ;
+                map.selectedProject = HttpContext.Current.Server.MapPath("/" + appRow.SpecificDOTNET);
 
             //Durados.Diagnostics.EventViewer.WriteEvent("connections set for: " + appName + " id: " + id);
-            
+
             map.SiteInfo = new SiteInfo();
             if (appRow.IsTitleNull())
                 map.SiteInfo.Product = string.Empty;
@@ -5939,7 +5963,7 @@ namespace Durados.Web.Mvc
             {
                 map.Commit();
             }
-            
+
             map.AppName = appName;
 
 
@@ -5952,7 +5976,7 @@ namespace Durados.Web.Mvc
             int themeId = 0;
             string themeName = "";
             string themePath = "";
-           
+
             MapDataSet.durados_ThemeRow themeRow = appRow.durados_ThemeRow ?? GetDefaultTheme();
 
             themeId = themeRow.Id;
@@ -5965,9 +5989,9 @@ namespace Durados.Web.Mvc
             {
                 themePath = themeRow.RelativePath;
             }
-            
+
             map.Theme = new Theme() { Id = themeId, Name = themeName, Path = themePath };
-            if ( firstTime && Convert.ToBoolean(System.Configuration.ConfigurationManager.AppSettings["NotifyUserOnConsoleReady"] ?? "true"))
+            if (firstTime && Convert.ToBoolean(System.Configuration.ConfigurationManager.AppSettings["NotifyUserOnConsoleReady"] ?? "true"))
                 map.NotifyUser("consoleFirstTimeSubject", "consoleFirstTimeMessage");
             RefreshMapDnsAlias(map);
 
@@ -6003,7 +6027,7 @@ namespace Durados.Web.Mvc
 
         private MapDataSet.durados_ThemeRow GetDefaultTheme()
         {
-            
+
             if (defaultThemeRow == null)
                 defaultThemeRow = GetTheme(DefaultThemeId);
 
@@ -6031,7 +6055,7 @@ namespace Durados.Web.Mvc
             }
             catch
             {
-                
+
             }
             if (themeId.Equals(CustomTheme))
             {
@@ -6083,7 +6107,7 @@ namespace Durados.Web.Mvc
             {
                 map.Plan = 0;
             }
-            
+
         }
 
         private void RefreshMapDnsAlias(Map map)
@@ -6112,7 +6136,7 @@ namespace Durados.Web.Mvc
             string sSqlCommand = "";
 
             sSqlCommand = "select [name] from durados_App with(nolock) where [Guid] = '" + guid + "'";
-            
+
             object scalar = sql.ExecuteScalar(duradosMap.connectionString, sSqlCommand);
 
             if (scalar.Equals(string.Empty) || scalar == null || scalar == DBNull.Value)
@@ -6120,8 +6144,8 @@ namespace Durados.Web.Mvc
             else
                 return scalar.ToString();
         }
-        
-        public int? AppExists(string appName, int? userId=null)
+
+        public int? AppExists(string appName, int? userId = null)
         {
             SqlAccess sql = new SqlAccess();
             string sSqlCommand = "";
@@ -6132,8 +6156,8 @@ namespace Durados.Web.Mvc
             }
             else
             {
-                sSqlCommand = "SELECT dbo.durados_App.Id FROM dbo.durados_App with(nolock), dbo.durados_UserApp with(nolock) where (dbo.durados_App.Name = N'" + appName + "' and ((dbo.durados_UserApp.UserId="+userId+" and dbo.durados_UserApp.AppId = dbo.durados_App.Id) or dbo.durados_App.Creator="+userId+") ) group by(dbo.durados_App.Id)";
-                    /*"SELECT dbo.durados_App.Id FROM dbo.durados_App with(nolock) INNER JOIN dbo.durados_UserApp with(nolock) ON dbo.durados_App.Id = dbo.durados_UserApp.AppId WHERE (dbo.durados_App.Name = N'" + appName + "' and dbo.durados_UserApp.UserId = "+userId+")";*/
+                sSqlCommand = "SELECT dbo.durados_App.Id FROM dbo.durados_App with(nolock), dbo.durados_UserApp with(nolock) where (dbo.durados_App.Name = N'" + appName + "' and ((dbo.durados_UserApp.UserId=" + userId + " and dbo.durados_UserApp.AppId = dbo.durados_App.Id) or dbo.durados_App.Creator=" + userId + ") ) group by(dbo.durados_App.Id)";
+                /*"SELECT dbo.durados_App.Id FROM dbo.durados_App with(nolock) INNER JOIN dbo.durados_UserApp with(nolock) ON dbo.durados_App.Id = dbo.durados_UserApp.AppId WHERE (dbo.durados_App.Name = N'" + appName + "' and dbo.durados_UserApp.UserId = "+userId+")";*/
 
 
             }
@@ -6228,11 +6252,11 @@ namespace Durados.Web.Mvc
         }
         private void RemoveConfig(string filename)//DataSet ds,
         {
-            if (Maps.Cloud  )
+            if (Maps.Cloud)
             {
                 try
                 {
-                    DeleteConfig( filename);
+                    DeleteConfig(filename);
                 }
                 catch (Exception exception)
                 {
@@ -6254,9 +6278,9 @@ namespace Durados.Web.Mvc
             //}
         }
 
-        private void DeleteConfig( string filename)
+        private void DeleteConfig(string filename)
         {
-            if (Maps.Cloud )
+            if (Maps.Cloud)
             {
                 RemoveConfigFromCloud(filename);
 
@@ -6286,7 +6310,7 @@ namespace Durados.Web.Mvc
                 Maps.Instance.StorageCache.Remove(containerName);
             }
         }
-  
+
 
         internal void ChangeName(string oldName, string newName)
         {
@@ -6351,7 +6375,7 @@ namespace Durados.Web.Mvc
             }
             else
             {
-                return AllowedDownloadFileTypes.Contains(extension,StringComparer.OrdinalIgnoreCase);
+                return AllowedDownloadFileTypes.Contains(extension, StringComparer.OrdinalIgnoreCase);
             }
 
         }
@@ -6487,7 +6511,7 @@ namespace Durados.Web.Mvc
         private Type childrenType = typeof(Durados.Web.Mvc.ChildrenField);
 
         private Dictionary<string, Dictionary<string, bool>> properties = new Dictionary<string, Dictionary<string, bool>>();
-        
+
         public bool IsInType(string fieldName, string fieldType)
         {
             Type type = GetFieldType(fieldType);
@@ -6662,7 +6686,7 @@ namespace Durados.Web.Mvc
             maxCount = Convert.ToInt32(System.Configuration.ConfigurationManager.AppSettings["plugInMaxCount"] ?? "2");
             batch = Convert.ToInt32(System.Configuration.ConfigurationManager.AppSettings["plugInBatch"] ?? "4");
             remains = Convert.ToInt32(System.Configuration.ConfigurationManager.AppSettings["plugInRemains"] ?? "1");
-           
+
         }
 
         private int GetCount(int sampleId)
@@ -6776,8 +6800,8 @@ namespace Durados.Web.Mvc
         private string GetConnectionStringTemplate(MapDataSet.durados_SqlConnectionRow sqlConnectionRow)
         {
             int sqlProductId = sqlConnectionRow.SqlProductId;
-             if (((SqlProduct)sqlProductId)==SqlProduct.MySql)
-                 return ConnectionStringHelper.GetConnectionStringSchema(sqlConnectionRow);
+            if (((SqlProduct)sqlProductId) == SqlProduct.MySql)
+                return ConnectionStringHelper.GetConnectionStringSchema(sqlConnectionRow);
             return "Data Source={0};Initial Catalog={1};User ID={2};Password={3};Integrated Security=False;";
         }
 

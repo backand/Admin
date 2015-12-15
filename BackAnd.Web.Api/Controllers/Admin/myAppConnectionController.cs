@@ -35,18 +35,18 @@ namespace BackAnd.Web.Api.Controllers
         const string ConnectionViewName = "durados_SqlConnection";
         const string ProductPort = "productPort";
         const string Product = "product";
-        
+
         protected internal override View GetView(string viewName)
         {
             return (View)Maps.Instance.DuradosMap.Database.Views[viewName];
         }
 
-        
-        private void CreateAppForNewDatabase(string id,  string template, string name, string title, out string server, out string catalog, out string username, out string password, out int productPort, string sampleApp)
+
+        private void CreateAppForNewDatabase(string id, string template, string name, string title, out string server, out string catalog, out string username, out string password, out int productPort, string sampleApp)
         {
-          
+
             Maps.Instance.DuradosMap.Logger.Log(GetControllerNameForLog(ControllerContext), GetActionName(), this.Request.Method.Method, "start create new app in api", HttpStatusCode.OK.ToString(), 3, null, DateTime.Now);
-            
+
             Durados.SqlProduct? sqlProduct = Durados.Web.Mvc.UI.Helpers.RDSNewDatabaseFactory.GetSqlProductfromTemplate(template);
             if (!sqlProduct.HasValue)
             {
@@ -60,9 +60,9 @@ namespace BackAnd.Web.Api.Controllers
             Durados.Web.Mvc.UI.Helpers.NewDatabaseParameters newDbParameters = null;
             try
             {
-                newDbParameters = appFactory.GetNewExternalDBParameters(sqlProduct.Value, id, out  server, out port,sampleApp);//, out  catalog
+                newDbParameters = appFactory.GetNewExternalDBParameters(sqlProduct.Value, id, out  server, out port, sampleApp);//, out  catalog
                 Maps.Instance.DuradosMap.Logger.Log(GetControllerNameForLog(ControllerContext), GetActionName(), this.Request.Method.Method, "start create new app in api", HttpStatusCode.OK.ToString(), 3, null, DateTime.Now);
-           
+
             }
             catch (Exception ex)
             {
@@ -75,12 +75,12 @@ namespace BackAnd.Web.Api.Controllers
                 throw new Exception("Failed to retrive new App parameters 2");
             }
 
-            
+
             catalog = newDbParameters.DbName;
             username = newDbParameters.Username;
             password = newDbParameters.Password;
             productPort = port;
-            
+
             //string data = string.Format(@"&template={0}&name={1}&title={2}&server={3}&catalog={4}&username={5}&password={6}&usingSsh={7}&usingSsl={8}&sshRemoteHost={9}&sshUser={10}&sshPassword={11}&sshPrivateKey={12}&sshPort={13}&productPort={14}&zone={15}&characterSetName={16}&engine={17}&engineVersion={18}&themeId={19}"
             //    , GetSqlProductFromTemplate(template)//0
             //    , name//1
@@ -127,11 +127,11 @@ namespace BackAnd.Web.Api.Controllers
             else if (template == "13")
                 return 7.ToString();
             return template;
-           
+
 
         }
 
-       
+
         protected virtual Dictionary<string, object> CreateApp(string template, string name, string title, string server, string catalog, string username, string password, bool usingSsh, bool usingSsl, string sshRemoteHost, string sshUser, string sshPassword, string sshPrivateKey, int sshPort, int productPort, int? themeId)
         {
             return CreateApp2(template, name, title, server, catalog, username, password, usingSsh, usingSsl, sshRemoteHost, sshUser, sshPassword, sshPrivateKey, sshPort, productPort, themeId);
@@ -197,7 +197,7 @@ namespace BackAnd.Web.Api.Controllers
             object scalar = e.Command.ExecuteScalar();
             if (scalar == null || scalar == DBNull.Value || !Guid.TryParse(scalar.ToString(), out guid))
             {
-                Map.Logger.Log(GetControllerNameForLog(this.ControllerContext), this.ControllerContext.RouteData.Values["action"].ToString(), "GetNewAppGuid", null, 1, "Failed to retrive guid for app id=" + e.PrimaryKey);
+                Map.Logger.Log(GetControllerNameForLog(this.ControllerContext), "CreateApp", "GetNewAppGuid", null, 1, "Failed to retrive guid for app id=" + e.PrimaryKey);
                 throw new Durados.DuradosException("Failed to retrive guid for app id=" + e.PrimaryKey);
             }
 
@@ -214,7 +214,7 @@ namespace BackAnd.Web.Api.Controllers
             return appId.HasValue;
         }
         int? tempAppId = null;
-        
+
         protected override void BeforeCreate(Durados.CreateEventArgs e)
         {
             if (e.View.Name == "durados_App")
@@ -367,7 +367,7 @@ namespace BackAnd.Web.Api.Controllers
                 }
                 catch (Exception exception)
                 {
-                    Map.Logger.Log(GetControllerNameForLog(this.ControllerContext), this.ControllerContext.RouteData.Values["action"].ToString(), exception.Source, exception, 1, "Failed to create Amazon RDS database. username=" + Map.Database.GetUsernameById(Map.Database.GetUserID()));
+                    Map.Logger.Log(GetControllerNameForLog(this.ControllerContext), "CreateApp", exception.Source, exception, 1, "Failed to create Amazon RDS database. username=" + Map.Database.GetUsernameById(Map.Database.GetUserID()));
                     throw new Durados.DuradosException("Server is busy, Please try again later.");
                 }
 
@@ -420,7 +420,7 @@ namespace BackAnd.Web.Api.Controllers
                 }
                 catch (Exception exception)
                 {
-                    Map.Logger.Log(GetControllerNameForLog(this.ControllerContext), this.ControllerContext.RouteData.Values["action"].ToString(), exception.Source, exception, 2, null);
+                    Map.Logger.Log(GetControllerNameForLog(this.ControllerContext), "CreateApp", exception.Source, exception, 2, null);
                     return;
                 }
             }
@@ -436,7 +436,7 @@ namespace BackAnd.Web.Api.Controllers
                 }
                 catch (Exception exception)
                 {
-                    Map.Logger.Log(GetControllerNameForLog(this.ControllerContext), this.ControllerContext.RouteData.Values["action"].ToString(), exception.Source, exception, 2, null);
+                    Map.Logger.Log(GetControllerNameForLog(this.ControllerContext), "CreateApp", exception.Source, exception, 2, null);
                 }
             }
 
@@ -582,7 +582,7 @@ namespace BackAnd.Web.Api.Controllers
                 }
                 catch (Exception exception)
                 {
-                    Map.Logger.Log(GetControllerNameForLog(this.ControllerContext), this.ControllerContext.RouteData.Values["action"].ToString(), exception.Source, exception, 1, "Failed to create database user. username=" + newUsername);
+                    Map.Logger.Log(GetControllerNameForLog(this.ControllerContext), "CreateApp", exception.Source, exception, 1, "Failed to create database user. username=" + newUsername);
                     throw new Durados.DuradosException("Failed to create database user");
                 }
                 int? appConnId = SaveConnection(builder.DataSource, appCatalog, newUsername, newPassword, duradosUser, Durados.SqlProduct.SqlServer);
@@ -642,7 +642,7 @@ namespace BackAnd.Web.Api.Controllers
                         }
                         catch (Exception exception)
                         {
-                            Map.Logger.Log(GetControllerNameForLog(this.ControllerContext), this.ControllerContext.RouteData.Values["action"].ToString(), exception.Source, exception, 1, "Failed to create system database. catalog=" + sysCatalog);
+                            Map.Logger.Log(GetControllerNameForLog(this.ControllerContext), "CreateApp", exception.Source, exception, 1, "Failed to create system database. catalog=" + sysCatalog);
                             throw new Durados.DuradosException("Failed to create database");
                         }
 
@@ -652,7 +652,7 @@ namespace BackAnd.Web.Api.Controllers
                         }
                         catch (Exception exception)
                         {
-                            Map.Logger.Log(GetControllerNameForLog(this.ControllerContext), this.ControllerContext.RouteData.Values["action"].ToString(), exception.Source, exception, 1, "Failed to create database user. username=" + newUsername);
+                            Map.Logger.Log(GetControllerNameForLog(this.ControllerContext), "CreateApp", exception.Source, exception, 1, "Failed to create database user. username=" + newUsername);
                             throw new Durados.DuradosException("Failed to create database user");
                         }
                         sysConnId = SaveConnection(builder.DataSource, sysCatalog, newUsername, newPassword, duradosUser, Durados.SqlProduct.SqlServer);
@@ -668,7 +668,7 @@ namespace BackAnd.Web.Api.Controllers
                         }
                         catch (Exception exception)
                         {
-                            Map.Logger.Log(GetControllerNameForLog(this.ControllerContext), this.ControllerContext.RouteData.Values["action"].ToString(), exception.Source, exception, 1, "Failed to create database user. username=" + newUsername);
+                            Map.Logger.Log(GetControllerNameForLog(this.ControllerContext), "CreateApp", exception.Source, exception, 1, "Failed to create database user. username=" + newUsername);
                             throw new Durados.DuradosException("Failed to create database user");
                         }
 
@@ -786,7 +786,7 @@ namespace BackAnd.Web.Api.Controllers
                 }
                 catch (Exception exception)
                 {
-                    Map.Logger.Log(GetControllerNameForLog(this.ControllerContext), this.ControllerContext.RouteData.Values["action"].ToString(), exception.Source, exception, 1, "Failed to create database user. username=" + newUsername);
+                    Map.Logger.Log(GetControllerNameForLog(this.ControllerContext), "CreateApp", exception.Source, exception, 1, "Failed to create database user. username=" + newUsername);
                     throw new Durados.DuradosException("Failed to create database user");
                 }
 
@@ -898,7 +898,7 @@ namespace BackAnd.Web.Api.Controllers
                 {
                     string sql = "delete durados_App where Id = " + e.PrimaryKey;
                     sqlAccess.ExecuteNonQuery(e.View.ConnectionString, sql);
-                    Map.Logger.Log(GetControllerNameForLog(this.ControllerContext), this.ControllerContext.RouteData.Values["action"].ToString(), exception.Source, exception, 1, null);
+                    Map.Logger.Log(GetControllerNameForLog(this.ControllerContext), "CreateApp", exception.Source, exception, 1, null);
                     throw new Durados.DuradosException("Failed to create app, please try again later", exception);
                 }
             }
@@ -918,7 +918,7 @@ namespace BackAnd.Web.Api.Controllers
                     }
                     catch (Exception exception)
                     {
-                        Map.Logger.Log(GetControllerNameForLog(this.ControllerContext), this.ControllerContext.RouteData.Values["action"].ToString(), exception.Source, exception, 2, "Could not copy the app default icon from: " + defaultImage + " to: " + destination);
+                        Map.Logger.Log(GetControllerNameForLog(this.ControllerContext), "CreateApp", exception.Source, exception, 2, "Could not copy the app default icon from: " + defaultImage + " to: " + destination);
 
                     }
             }
@@ -1198,7 +1198,7 @@ namespace BackAnd.Web.Api.Controllers
             }
             catch (Exception exception)
             {
-                Map.Logger.Log(GetControllerNameForLog(this.ControllerContext), this.ControllerContext.RouteData.Values["action"].ToString(), exception.Source, exception, 1, "Could not copy uploads");
+                Map.Logger.Log(GetControllerNameForLog(this.ControllerContext), "CreateApp", exception.Source, exception, 1, "Could not copy uploads");
             }
 
             //Maps.Instance.Restart(name);
@@ -1209,22 +1209,22 @@ namespace BackAnd.Web.Api.Controllers
             return Maps.Instance.GetTheme(themeId).RelativePath;
         }
 
-        public Dictionary<string, object> CreateAppGet2(string template, string name, string title, string server, string catalog, string username, string password, bool usingSsh, bool usingSsl, string sshRemoteHost, string sshUser, string sshPassword, string sshPrivateKey, int sshPort, int productPort, string zone, string characterSetName, string engine, string engineVersion, int? themeId)
-        {
-            Durados.SqlProduct? product = Durados.Web.Mvc.UI.Helpers.RDSNewDatabaseFactory.GetSqlProductfromTemplate(template);
-            newDbParameters = new NewDatabaseParameters();
-            newDbParameters.Zone = zone;
-            newDbParameters.Engine = engine;
-            newDbParameters.EngineVersion = engineVersion;
-            newDbParameters.CharacterSetName = characterSetName;
-            newDbParameters.InstanceName = server;
-            newDbParameters.DbName = catalog;
-            newDbParameters.Username = username;
-            newDbParameters.Password = password;
-            newDbParameters.SqlProduct = product.HasValue ? product.Value : Durados.SqlProduct.SqlServer;
-            server = System.Configuration.ConfigurationManager.AppSettings["rdsCreatDbPendingMessage"] + "Not available yet";
-            return CreateApp2(template, name, title, server, catalog, username, password, usingSsh, usingSsl, sshRemoteHost, sshUser, sshPassword, sshPrivateKey, sshPort, productPort, themeId);
-        }
+        //public Dictionary<string, object> CreateAppGet2(string template, string name, string title, string server, string catalog, string username, string password, bool usingSsh, bool usingSsl, string sshRemoteHost, string sshUser, string sshPassword, string sshPrivateKey, int sshPort, int productPort, string zone, string characterSetName, string engine, string engineVersion, int? themeId)
+        //{
+        //    Durados.SqlProduct? product = Durados.Web.Mvc.UI.Helpers.RDSNewDatabaseFactory.GetSqlProductfromTemplate(template);
+        //    newDbParameters = new NewDatabaseParameters();
+        //    newDbParameters.Zone = zone;
+        //    newDbParameters.Engine = engine;
+        //    newDbParameters.EngineVersion = engineVersion;
+        //    newDbParameters.CharacterSetName = characterSetName;
+        //    newDbParameters.InstanceName = server;
+        //    newDbParameters.DbName = catalog;
+        //    newDbParameters.Username = username;
+        //    newDbParameters.Password = password;
+        //    newDbParameters.SqlProduct = product.HasValue ? product.Value : Durados.SqlProduct.SqlServer;
+        //    server = System.Configuration.ConfigurationManager.AppSettings["rdsCreatDbPendingMessage"] + "Not available yet";
+        //    return CreateApp2(template, name, title, server, catalog, username, password, usingSsh, usingSsl, sshRemoteHost, sshUser, sshPassword, sshPrivateKey, sshPort, productPort, themeId);
+        //}
 
         private Dictionary<string, object> CreateApp2(string template, string name, string title, string server, string catalog, string username, string password, bool usingSsh, bool usingSsl, string sshRemoteHost, string sshUser, string sshPassword, string sshPrivateKey, int sshPort, int productPort, int? themeId)
         {
@@ -1275,7 +1275,7 @@ namespace BackAnd.Web.Api.Controllers
 
             if (string.IsNullOrEmpty(userId))
                 return new Dictionary<string, object>() { { "Success", false }, { "Message", "Please login or sign-up." } };
-            
+
             View view = GetView("durados_App");
 
             try
@@ -1284,7 +1284,7 @@ namespace BackAnd.Web.Api.Controllers
             }
             catch (Exception exception)
             {
-                Map.Logger.Log(GetControllerNameForLog(this.ControllerContext), this.ControllerContext.RouteData.Values["action"].ToString(), exception.Source, exception, 1, "app name exception");
+                Map.Logger.Log(GetControllerNameForLog(this.ControllerContext), "CreateApp", exception.Source, exception, 1, "app name exception");
 
                 return new Dictionary<string, object>() { { "Success", false }, { "Message", exception.Message } };
             }
@@ -1312,7 +1312,7 @@ namespace BackAnd.Web.Api.Controllers
                         }
                         catch (Exception exception)
                         {
-                            Map.Logger.Log(GetControllerNameForLog(this.ControllerContext), this.ControllerContext.RouteData.Values["action"].ToString(), exception.Source, exception, 3, null);
+                            Map.Logger.Log(GetControllerNameForLog(this.ControllerContext), "CreateApp", exception.Source, exception, 3, null);
 
                             connectionExists = false;
                         }
@@ -1341,7 +1341,7 @@ namespace BackAnd.Web.Api.Controllers
                                     catch (Exception exception)
                                     {
                                         pending = Maps.GetPendingDatabase(template);
-                                        Map.Logger.Log(GetControllerNameForLog(this.ControllerContext), this.ControllerContext.RouteData.Values["action"].ToString(), exception.Source, exception, 3, "pending=" + pending + ";i=" + i);
+                                        Map.Logger.Log(GetControllerNameForLog(this.ControllerContext), "CreateApp", exception.Source, exception, 3, "pending=" + pending + ";i=" + i);
                                     }
                                 }
                                 if (pendingExists)
@@ -1351,7 +1351,7 @@ namespace BackAnd.Web.Api.Controllers
                             }
                             catch (Exception exception)
                             {
-                                Map.Logger.Log(GetControllerNameForLog(this.ControllerContext), this.ControllerContext.RouteData.Values["action"].ToString(), exception.Source, exception, 3, null);
+                                Map.Logger.Log(GetControllerNameForLog(this.ControllerContext), "CreateApp", exception.Source, exception, 3, null);
 
                                 pendingExists = false;
                             }
@@ -1359,7 +1359,7 @@ namespace BackAnd.Web.Api.Controllers
                             //}
                             //catch (Exception exception)
                             //{
-                            //    Map.Logger.Log(GetControllerNameForLog(this.ControllerContext), this.ControllerContext.RouteData.Values["action"].ToString(), exception.Source, exception, 3, null);
+                            //    Map.Logger.Log(GetControllerNameForLog(this.ControllerContext), "CreateApp", exception.Source, exception, 3, null);
 
                             //    pendingExists = false;
                             //}
@@ -1375,7 +1375,7 @@ namespace BackAnd.Web.Api.Controllers
                                 }
                                 catch (Exception exception)
                                 {
-                                    Map.Logger.Log(GetControllerNameForLog(this.ControllerContext), this.ControllerContext.RouteData.Values["action"].ToString(), exception.Source, exception, 1, "Failed to create Azure database. username=" + newUsername);
+                                    Map.Logger.Log(GetControllerNameForLog(this.ControllerContext), "CreateApp", exception.Source, exception, 1, "Failed to create Azure database. username=" + newUsername);
                                     return new Dictionary<string, object>() { { "Success", false }, { "Message", "Server is busy, Please try again later." } };
                                 }
                             }
@@ -1388,7 +1388,7 @@ namespace BackAnd.Web.Api.Controllers
                                 }
                                 catch (Exception exception)
                                 {
-                                    Map.Logger.Log(GetControllerNameForLog(this.ControllerContext), this.ControllerContext.RouteData.Values["action"].ToString(), exception.Source, exception, 1, "Failed to create Azure database. username=" + newUsername);
+                                    Map.Logger.Log(GetControllerNameForLog(this.ControllerContext), "CreateApp", exception.Source, exception, 1, "Failed to create Azure database. username=" + newUsername);
                                     return new Dictionary<string, object>() { { "Success", false }, { "Message", "Server is busy, Please try again later." } };
                                 }
                             }
@@ -1412,8 +1412,8 @@ namespace BackAnd.Web.Api.Controllers
                 {
                     string cnnstr = GetConnection(server, catalog, null, username, "*****", null, sqlProduct, productPort, usingSsh, usingSsl);
                     TroubleshootInfo troubleshootInfo = ConnectionStringHelper.GetTroubleshootInfo(exception, server, catalog, username, password, usingSsh, sqlProduct, sshRemoteHost, sshUser, sshPassword, sshPort, productPort);
-                    Map.Logger.Log(GetControllerNameForLog(this.ControllerContext), this.ControllerContext.RouteData.Values["action"].ToString(), exception.Source, exception, 1, cnnstr + "\n\r" + "Troubleshoot Info Id = " + troubleshootInfo.Id);
-                    SendError(1, exception, GetControllerNameForLog(this.ControllerContext), this.ControllerContext.RouteData.Values["action"].ToString(), Map.Logger, cnnstr + "\n\r" + "Troubleshoot Info Id = " + troubleshootInfo.Id);
+                    Map.Logger.Log(GetControllerNameForLog(this.ControllerContext), "CreateApp", exception.Source, exception, 1, cnnstr + "\n\r" + "Troubleshoot Info Id = " + troubleshootInfo.Id);
+                    SendError(1, exception, GetControllerNameForLog(this.ControllerContext), "CreateApp", Map.Logger, cnnstr + "\n\r" + "Troubleshoot Info Id = " + troubleshootInfo.Id);
                     //if(exception.InnerException is MySql.Data.MySqlClient.MySqlException)
                     //    return Json(new { Success = false, Message = "Could not connect. "+exception.InnerException.Message });
                     //return Json(new { Success = false, Message = "Could not connect. Please check the connection parameters and make sure the server is up and running." });
@@ -1430,7 +1430,7 @@ namespace BackAnd.Web.Api.Controllers
                 }
                 catch (Exception exception)
                 {
-                    Map.Logger.Log(GetControllerNameForLog(this.ControllerContext), this.ControllerContext.RouteData.Values["action"].ToString(), exception.Source, exception, 1, "fail to save connection string");
+                    Map.Logger.Log(GetControllerNameForLog(this.ControllerContext), "CreateApp", exception.Source, exception, 1, "fail to save connection string");
 
                     return new Dictionary<string, object>() { { "Success", false }, { "Message", exception.Message } };
                 }
@@ -1477,7 +1477,7 @@ namespace BackAnd.Web.Api.Controllers
                     //}
                     //catch (Exception exception) 
                     //{
-                    //    Map.Logger.Log(GetControllerNameForLog(this.ControllerContext), this.ControllerContext.RouteData.Values["action"].ToString(), exception.Source, exception, 3, "Could not copy uploads");
+                    //    Map.Logger.Log(GetControllerNameForLog(this.ControllerContext), "CreateApp", exception.Source, exception, 3, "Could not copy uploads");
 
                     //}
                 }
@@ -1487,26 +1487,26 @@ namespace BackAnd.Web.Api.Controllers
             {
                 if (exception.Number == 2601)
                 {
-                    Map.Logger.Log(GetControllerNameForLog(this.ControllerContext), this.ControllerContext.RouteData.Values["action"].ToString(), exception.Source, exception, 6, "App name already exists");
+                    Map.Logger.Log(GetControllerNameForLog(this.ControllerContext), "CreateApp", exception.Source, exception, 6, "App name already exists");
                     return new Dictionary<string, object>() { { "Success", false }, { "Message", "Application name already exists, please enter a different name." } };
                 }
                 else
                 {
-                    Map.Logger.Log(GetControllerNameForLog(this.ControllerContext), this.ControllerContext.RouteData.Values["action"].ToString(), exception.Source, exception, 1, "failed to create app row");
-                    SendError(1, exception, GetControllerNameForLog(this.ControllerContext), this.ControllerContext.RouteData.Values["action"].ToString(), Map.Logger);
+                    Map.Logger.Log(GetControllerNameForLog(this.ControllerContext), "CreateApp", exception.Source, exception, 1, "failed to create app row");
+                    SendError(1, exception, GetControllerNameForLog(this.ControllerContext), "CreateApp", Map.Logger);
                     return new Dictionary<string, object>() { { "Success", false }, { "Message", "Server is busy, please try again later" } };
                 }
             }
             catch (Durados.Web.Mvc.Controllers.PlugInUserException exception)
             {
-                Map.Logger.Log(GetControllerNameForLog(this.ControllerContext), this.ControllerContext.RouteData.Values["action"].ToString(), exception.Source, exception, 2, "failed to create app row");
-                //SendError(1, exception, GetControllerNameForLog(this.ControllerContext), this.ControllerContext.RouteData.Values["action"].ToString(), Map.Logger);
+                Map.Logger.Log(GetControllerNameForLog(this.ControllerContext), "CreateApp", exception.Source, exception, 2, "failed to create app row");
+                //SendError(1, exception, GetControllerNameForLog(this.ControllerContext), "CreateApp", Map.Logger);
                 return new Dictionary<string, object>() { { "Success", false }, { "Message", exception.Message } };
             }
             catch (Exception exception)
             {
-                Map.Logger.Log(GetControllerNameForLog(this.ControllerContext), this.ControllerContext.RouteData.Values["action"].ToString(), exception.Source, exception, 1, "failed to create app row");
-                SendError(1, exception, GetControllerNameForLog(this.ControllerContext), this.ControllerContext.RouteData.Values["action"].ToString(), Map.Logger);
+                Map.Logger.Log(GetControllerNameForLog(this.ControllerContext), "CreateApp", exception.Source, exception, 1, "failed to create app row");
+                SendError(1, exception, GetControllerNameForLog(this.ControllerContext), "CreateApp", Map.Logger);
                 return new Dictionary<string, object>() { { "Success", false }, { "Message", "Server is busy, please try again later" } };
             }
 
@@ -1518,7 +1518,7 @@ namespace BackAnd.Web.Api.Controllers
                 }
                 catch (Exception exception)
                 {
-                    Map.Logger.Log(GetControllerNameForLog(this.ControllerContext), this.ControllerContext.RouteData.Values["action"].ToString(), exception.Source, exception, 1, "failed to create northwind template");
+                    Map.Logger.Log(GetControllerNameForLog(this.ControllerContext), "CreateApp", exception.Source, exception, 1, "failed to create northwind template");
 
                     return new Dictionary<string, object>() { { "Success", false }, { "Message", "Server is busy, please try again later" } };
                 }
@@ -1553,7 +1553,7 @@ namespace BackAnd.Web.Api.Controllers
                             }
                             catch (Exception exception)
                             {
-                                Map.Logger.Log(GetControllerNameForLog(this.ControllerContext), this.ControllerContext.RouteData.Values["action"].ToString(), exception.Source, exception, 1, null);
+                                Map.Logger.Log(GetControllerNameForLog(this.ControllerContext), "CreateApp", exception.Source, exception, 1, null);
 
                             }
                         }
@@ -1565,7 +1565,7 @@ namespace BackAnd.Web.Api.Controllers
                         }
                         catch (Exception exception)
                         {
-                            Map.Logger.Log(GetControllerNameForLog(this.ControllerContext), this.ControllerContext.RouteData.Values["action"].ToString(), exception.Source, exception, 1, "Failed to create Azure database. username=" + newUsername);
+                            Map.Logger.Log(GetControllerNameForLog(this.ControllerContext), "CreateApp", exception.Source, exception, 1, "Failed to create Azure database. username=" + newUsername);
                             return new Dictionary<string, object>() { { "Success", false }, { "Message", Database.GeneralErrorMessage } };
                         }
                     }
@@ -1592,7 +1592,7 @@ namespace BackAnd.Web.Api.Controllers
                 return ResponseMessage(Request.CreateResponse(HttpStatusCode.NotFound, message));
             }
 
-            
+
 
             string json = System.Web.HttpContext.Current.Server.UrlDecode(Request.Content.ReadAsStringAsync().Result);
 
@@ -1637,7 +1637,7 @@ namespace BackAnd.Web.Api.Controllers
             object[] serverAndPort = GetProductPortAndServer(values);
             string server = (string)serverAndPort[0];
             int productPort = (int)serverAndPort[1];
-               
+
             Durados.SqlProduct sqlProduct = Durados.SqlProduct.SqlServer;
 
             if (template == "1" || template == "3")
@@ -1656,7 +1656,7 @@ namespace BackAnd.Web.Api.Controllers
             {
                 string cnnstr = GetConnection(server, catalog, null, username, "*****", null, sqlProduct, productPort, usingSsh, usingSsl);
                 TroubleshootInfo troubleshootInfo = ConnectionStringHelper.GetTroubleshootInfo(exception, server, catalog, username, password, usingSsh, sqlProduct, sshRemoteHost, sshUser, sshPassword, sshPort, productPort);
-                Map.Logger.Log(GetControllerNameForLog(this.ControllerContext), this.ControllerContext.RouteData.Values["action"].ToString(), exception.Source, exception, 1, cnnstr + "\n\r" + "Troubleshoot Info Id = " + troubleshootInfo.Id);
+                Map.Logger.Log(GetControllerNameForLog(this.ControllerContext), "CreateApp", exception.Source, exception, 1, cnnstr + "\n\r" + "Troubleshoot Info Id = " + troubleshootInfo.Id);
                 //if(exception.InnerException is MySql.Data.MySqlClient.MySqlException)
                 //    return Json(new { Success = false, Message = "Could not connect. "+exception.InnerException.Message });
                 //return Json(new { Success = false, Message = "Could not connect. Please check the connection parameters and make sure the server is up and running." });
@@ -1678,7 +1678,7 @@ namespace BackAnd.Web.Api.Controllers
             {
                 id = id.ToLower();
                 Maps.Instance.DuradosMap.Logger.Log(GetControllerNameForLog(ControllerContext), GetActionName(), this.Request.Method.Method, "API Create App started", string.Empty, 3, null, DateTime.Now);
-                    
+
                 View view = GetView(AppViewName);
                 if (view == null)
                 {
@@ -1727,18 +1727,18 @@ namespace BackAnd.Web.Api.Controllers
 
                 string name = item["Name"].ToString();
                 string title = item["Title"].ToString();
-                
-                
+
+
                 string json = System.Web.HttpContext.Current.Server.UrlDecode(Request.Content.ReadAsStringAsync().Result);
 
                 Maps.Instance.DuradosMap.Logger.Log(GetControllerNameForLog(ControllerContext), GetActionName(), this.Request.Method.Method, "API Create App get params", json, 3, null, DateTime.Now);
-                
+
 
                 Dictionary<string, object> values = RestHelper.Deserialize(view, json);
 
                 string template = values[Product].ToString();
                 string server = null;
-                
+
                 string catalog = null;
                 if (values.ContainsKey("database"))
                     catalog = values["database"].ToString();
@@ -1784,57 +1784,68 @@ namespace BackAnd.Web.Api.Controllers
                 int productPort = (int)serverAndPort[1];
                 //10 mysql,postgre,dummy
                 //10 mysql 11 postgre 12 dummy
-                 Dictionary<string, object> result;
-                 bool success = false;
-                 bool isNewDatabase = IsNewDatabase(template);
-                 if (isNewDatabase)
-                 {
-                     if (values.ContainsKey("schema"))
-                     {
-                         object schema = values["schema"];
-                         //SchemaGenerator sg = new SchemaGenerator();
+                Dictionary<string, object> result;
+                bool success = false;
+                bool isNewDatabase = IsNewDatabase(template);
+                bool poolSuccess = false;
+                if (isNewDatabase)
+                {
+                    int? appIdFromPool = null;
+                    poolSuccess = new AppsPool().Pop(id, Maps.Instance.DuradosMap.Database.GetCurrentUsername(), out appIdFromPool);
 
-                         //ValidateSchema(schema, id);
-                         Dictionary<string, object> transformResult = Transform("{newSchema: " + new JavaScriptSerializer().Serialize(schema) + ", severity: 0}", false);
+                    if (poolSuccess)
+                    {
+                        result = new Dictionary<string, object>() { { "Success", true } };
+                    }
+                    else
+                    {
+                        if (values.ContainsKey("schema"))
+                        {
+                            object schema = values["schema"];
+                            //SchemaGenerator sg = new SchemaGenerator();
 
-                         if (!transformResult.ContainsKey("alter"))
-                         {
-                             return ResponseMessage(Request.CreateResponse(HttpStatusCode.ExpectationFailed, Messages.InvalidSchema + ": " + GetWarnings(transformResult)));
+                            //ValidateSchema(schema, id);
+                            Dictionary<string, object> transformResult = Transform("{newSchema: " + new JavaScriptSerializer().Serialize(schema) + ", severity: 0}", false);
 
-                         }
-                         //sg.Validate(Map, (IEnumerable<object>)schema);
+                            if (!transformResult.ContainsKey("alter"))
+                            {
+                                return ResponseMessage(Request.CreateResponse(HttpStatusCode.ExpectationFailed, Messages.InvalidSchema + ": " + GetWarnings(transformResult)));
 
-                         if (!map.AllKindOfCache.ContainsKey(Durados.Database.CreateSchema))
-                         {
-                             map.AllKindOfCache.Add(Durados.Database.CreateSchema, new Dictionary<string, object>());
-                         }
+                            }
+                            //sg.Validate(Map, (IEnumerable<object>)schema);
 
-                         string schemaJson = new JavaScriptSerializer().Serialize(schema);
+                            if (!map.AllKindOfCache.ContainsKey(Durados.Database.CreateSchema))
+                            {
+                                map.AllKindOfCache.Add(Durados.Database.CreateSchema, new Dictionary<string, object>());
+                            }
 
-                         if (map.AllKindOfCache[Durados.Database.CreateSchema].ContainsKey(id))
-                         {
-                             map.AllKindOfCache[Durados.Database.CreateSchema].Remove(id);
-                         }
-                         map.AllKindOfCache[Durados.Database.CreateSchema].Add(id, schemaJson);
-                     }
+                            string schemaJson = new JavaScriptSerializer().Serialize(schema);
 
-                     string sampleApp = null;
-                     if (values.ContainsKey("sampleApp"))
-                         sampleApp = values["sampleApp"].ToString();
+                            if (map.AllKindOfCache[Durados.Database.CreateSchema].ContainsKey(id))
+                            {
+                                map.AllKindOfCache[Durados.Database.CreateSchema].Remove(id);
+                            }
+                            map.AllKindOfCache[Durados.Database.CreateSchema].Add(id, schemaJson);
+                        }
 
-                     //string id, string template, string name, string title, string server, string catalog, string username, string password, bool usingSsh, bool usingSsl, string sshRemoteHost, string sshUser, string sshPassword, string sshPrivateKey, int sshPort, int productPort, int? themeId)
-                     // result =
-                     CreateAppForNewDatabase(id, template, name, title, out server, out catalog, out username, out password, out productPort,sampleApp);
-                     Maps.Instance.DuradosMap.Logger.Log(GetControllerNameForLog(ControllerContext), GetActionName(), this.Request.Method.Method, "return from CreateApp in console", HttpStatusCode.OK.ToString(), 3, null, DateTime.Now);
-                     template = GetSqlProductFromTemplate(template);
+                        string sampleApp = null;
+                        if (values.ContainsKey("sampleApp"))
+                            sampleApp = values["sampleApp"].ToString();
 
-                     
-                     
-                 }
-                 
-                     result = CreateApp(template, name, title, server, catalog, username, password, usingSsh, usingSsl, sshRemoteHost, sshUser, sshPassword, sshPrivateKey, sshPort, productPort, null);
-                 
-                
+                        //string id, string template, string name, string title, string server, string catalog, string username, string password, bool usingSsh, bool usingSsl, string sshRemoteHost, string sshUser, string sshPassword, string sshPrivateKey, int sshPort, int productPort, int? themeId)
+                        // result =
+                        CreateAppForNewDatabase(id, template, name, title, out server, out catalog, out username, out password, out productPort, sampleApp);
+                        Maps.Instance.DuradosMap.Logger.Log(GetControllerNameForLog(ControllerContext), GetActionName(), this.Request.Method.Method, "return from CreateApp in console", HttpStatusCode.OK.ToString(), 3, null, DateTime.Now);
+                        template = GetSqlProductFromTemplate(template);
+
+                        result = CreateApp(template, name, title, server, catalog, username, password, usingSsh, usingSsl, sshRemoteHost, sshUser, sshPassword, sshPrivateKey, sshPort, productPort, null);
+                    }
+                }
+                else
+                {
+                    result = CreateApp(template, name, title, server, catalog, username, password, usingSsh, usingSsl, sshRemoteHost, sshUser, sshPassword, sshPrivateKey, sshPort, productPort, null);
+                }
+
                 success = Convert.ToBoolean(result["Success"]);
                 if (success)
                 {
@@ -1848,7 +1859,7 @@ namespace BackAnd.Web.Api.Controllers
                     string message = result["Message"].ToString();
                     Maps.Instance.DuradosMap.Logger.Log(GetControllerNameForLog(ControllerContext), GetActionName(), this.Request.Method.Method, message, HttpStatusCode.ExpectationFailed.ToString(), 1, null, DateTime.Now);
                     return ResponseMessage(Request.CreateResponse(HttpStatusCode.ExpectationFailed, message));
-            }
+                }
             }
             catch (Exception exception)
             {
@@ -1859,15 +1870,15 @@ namespace BackAnd.Web.Api.Controllers
 
         private void ValidateSchema(object schema, string appName)
         {
-            string url = this.Request.RequestUri.OriginalString.Split(new string[1] { "admin" }, StringSplitOptions.RemoveEmptyEntries)[0] + "1/model/validate"; 
+            string url = this.Request.RequestUri.OriginalString.Split(new string[1] { "admin" }, StringSplitOptions.RemoveEmptyEntries)[0] + "1/model/validate";
             Dictionary<string, string> headers = GetHeaders(appName);
             headers.Remove("AppName");
 
             string json = "{newSchema: " + new JavaScriptSerializer().Serialize(schema) + ", severity: 0}";
-            
+
             string response = Durados.Web.Mvc.Infrastructure.Http.WebRequestingJson(url, json, headers);
             Dictionary<string, object> ret = Durados.Web.Mvc.UI.Json.JsonSerializer.Deserialize(response);
-            
+
         }
 
         private static bool IsNewDatabase(string template)
@@ -1876,7 +1887,7 @@ namespace BackAnd.Web.Api.Controllers
             return int.TryParse(template, out templateId) && templateId >= 10;
         }
 
-        
+
         public class SendAsyncErrorHandler : Durados.Web.Mvc.Infrastructure.ISendAsyncErrorHandler
         {
             int appId;
@@ -1887,12 +1898,12 @@ namespace BackAnd.Web.Api.Controllers
             public void HandleError(Exception exception)
             {
                 Maps.Instance.DuradosMap.Logger.Log("myAppConnection", "CreateApp", exception.Source, exception, 1, null);
-                
+
                 string sql = "Update durados_App set DatabaseStatus = " + (int)OnBoardingStatus.Error + " where id = " + appId;
                 Durados.DataAccess.SqlAccess sqlAccess = new Durados.DataAccess.SqlAccess();
-                
+
                 sqlAccess.ExecuteNonQuery(Maps.Instance.DuradosMap.connectionString, sql);
-                
+
             }
         }
         private void ProcessDatabase(int appId, string appName)
@@ -1966,31 +1977,31 @@ namespace BackAnd.Web.Api.Controllers
 
         }
 
-        private void RespCallback(IAsyncResult ar)
-        {
-            // Get the RequestState object from the async result.
-            Durados.Web.Mvc.Infrastructure.RequestState rs = (Durados.Web.Mvc.Infrastructure.RequestState)ar.AsyncState;
+        //private void RespCallback(IAsyncResult ar)
+        //{
+        //    // Get the RequestState object from the async result.
+        //    Durados.Web.Mvc.Infrastructure.RequestState rs = (Durados.Web.Mvc.Infrastructure.RequestState)ar.AsyncState;
 
-            // Get the WebRequest from RequestState.
-            WebRequest req = rs.Request;
+        //    // Get the WebRequest from RequestState.
+        //    WebRequest req = rs.Request;
 
-            string appName = req.RequestUri.Authority.Split('.')[0].ToLower();
-            int? appId = Maps.Instance.AppExists(appName);
-            try
-            {
-                HandleCreateSchemaIfExist(appName);
-                UpdateDatabaseStatus(appId.Value, OnBoardingStatus.Ready);
-                //new Backand.socket().emitUsers("applicationReady", new { name = appName }, new string[] { "myUsername" });
-            }
-            catch (Exception exception)
-            {
-                Maps.Instance.DuradosMap.Logger.Log(GetControllerNameForLog(ControllerContext), GetActionName(), this.Request.Method.Method, exception.Message, exception.StackTrace, 1, null, DateTime.Now);
-                    
-                UpdateDatabaseStatus(appId.Value, OnBoardingStatus.Error);
+        //    string appName = req.RequestUri.Authority.Split('.')[0].ToLower();
+        //    int? appId = Maps.Instance.AppExists(appName);
+        //    try
+        //    {
+        //        HandleCreateSchemaIfExist(appName);
+        //        UpdateDatabaseStatus(appId.Value, OnBoardingStatus.Ready);
+        //        //new Backand.socket().emitUsers("applicationReady", new { name = appName }, new string[] { "myUsername" });
+        //    }
+        //    catch (Exception exception)
+        //    {
+        //        Maps.Instance.DuradosMap.Logger.Log(GetControllerNameForLog(ControllerContext), GetActionName(), this.Request.Method.Method, exception.Message, exception.StackTrace, 1, null, DateTime.Now);
 
-            }
+        //        UpdateDatabaseStatus(appId.Value, OnBoardingStatus.Error);
 
-        }
+        //    }
+
+        //}
 
         private void HandleCreateSchemaIfExist(string appName)
         {
@@ -2014,17 +2025,41 @@ namespace BackAnd.Web.Api.Controllers
             int appId = Maps.Instance.AppExists(appName).Value;
             Dictionary<string, string> headers = GetHeaders(appName);
             AsyncCallback asyncCallback = new AsyncCallback(RespCallbackNew2);
-            Durados.Web.Mvc.Infrastructure.Http.AsyncWebRequest(url, new SendAsyncErrorHandler(appId), asyncCallback, headers);
+            try
+            {
+                Durados.Web.Mvc.Infrastructure.Http.AsyncWebRequest(url, new SendAsyncErrorHandler(appId), asyncCallback, headers);
+            }
+            catch(Exception exception)
+            {
+                try
+                {
+                    UpdateDatabaseStatus(appId, OnBoardingStatus.Error);
+                    Map.Logger.Log(GetControllerNameForLog(this.ControllerContext), "CreateApp", exception.Source, exception, 1, null);
+                }
+                catch { }
+            }
         }
 
         private void CallHttpRequestToConnectExisting(string appName)
         {
             string url = GetUrlToConnect(appName);
-            
+
             int appId = Maps.Instance.AppExists(appName).Value;
             Dictionary<string, string> headers = GetHeaders(appName);
             AsyncCallback asyncCallback = new AsyncCallback(RespCallbackNew);
-            Durados.Web.Mvc.Infrastructure.Http.AsyncWebRequest(url, new SendAsyncErrorHandler(appId), asyncCallback, headers);
+            try
+            {
+                Durados.Web.Mvc.Infrastructure.Http.AsyncWebRequest(url, new SendAsyncErrorHandler(appId), asyncCallback, headers);
+            }
+            catch (Exception exception)
+            {
+                try
+                {
+                    UpdateDatabaseStatus(appId, OnBoardingStatus.Error);
+                    Map.Logger.Log(GetControllerNameForLog(this.ControllerContext), "CreateApp", exception.Source, exception, 1, null);
+                }
+                catch { }
+            }
         }
 
         private string GetUrlToConnect(string appName)
@@ -2051,7 +2086,7 @@ namespace BackAnd.Web.Api.Controllers
         private void CallHttpRequestToCreateTheSchemaOld(string appName, string json)
         {
             json = "{newSchema: " + json + ", severity: 0}";
-            
+
 
             string url = GetUrl();
             Dictionary<string, string> headers = GetHeaders(appName);
@@ -2066,7 +2101,7 @@ namespace BackAnd.Web.Api.Controllers
 
             headers.Add("Authorization", Request.Headers.GetValues("Authorization").FirstOrDefault());
             headers.Add("AppName", appName);
-            
+
             return headers;
         }
 
@@ -2099,12 +2134,12 @@ namespace BackAnd.Web.Api.Controllers
             }
             catch (Exception exception)
             {
-                Map.Logger.Log(GetControllerNameForLog(this.ControllerContext), this.ControllerContext.RouteData.Values["action"].ToString(), exception.Source, exception, 1, null);
-                
+                Map.Logger.Log(GetControllerNameForLog(this.ControllerContext), "CreateApp", exception.Source, exception, 1, null);
+
             }
         }
 
-        
+
         private object[] GetProductPortAndServer(Dictionary<string, object> values)
         {
             int port = 0;
@@ -2211,7 +2246,7 @@ namespace BackAnd.Web.Api.Controllers
             try
             {
                 id = id.ToLower();
-                
+
                 View view = GetView(AppViewName);
                 if (view == null)
                 {
@@ -2290,7 +2325,7 @@ namespace BackAnd.Web.Api.Controllers
 
                 if (values.ContainsKey("server") && !values.ContainsKey("ServerName"))
                     values.Add("ServerName", server);
-                
+
                 if (!values.ContainsKey("ProductPort"))
                     values.Add("ProductPort", productPort);
 
@@ -2323,7 +2358,7 @@ namespace BackAnd.Web.Api.Controllers
             }
             catch (Exception exception)
             {
-                Map.Logger.Log(GetControllerNameForLog(this.ControllerContext), this.ControllerContext.RouteData.Values["action"].ToString(), exception.Source, exception, 1, "UpdateProductCache exception");
+                Map.Logger.Log(GetControllerNameForLog(this.ControllerContext), "CreateApp", exception.Source, exception, 1, "UpdateProductCache exception");
 
             }
         }
@@ -2375,7 +2410,7 @@ namespace BackAnd.Web.Api.Controllers
 
         string SslUses = "SslUses";
         string SshPrivateKey = "SshPrivateKey";
-        
+
         private void ValidateConnectionString(Durados.DataActionEventArgs e)
         {
             OpenSshSessionIfNecessary(e);
@@ -2559,8 +2594,8 @@ namespace BackAnd.Web.Api.Controllers
                 {
                     item[ServernameFieldName] = server + ":" + productPort;
                 }
-                    
-                        
+
+
 
                 return Ok(item);
 
@@ -2589,14 +2624,14 @@ namespace BackAnd.Web.Api.Controllers
         [HttpGet]
         public IHttpActionResult rdsResponse(string appguid, string appname, string endpoint, bool? success = null)
         {
-            Maps.Instance.DuradosMap.Logger.Log("myAppConnection", "rdsResponse",null,"start", null, 3, null,DateTime.Now);
+            Maps.Instance.DuradosMap.Logger.Log("myAppConnection", "rdsResponse", null, "start", null, 3, null, DateTime.Now);
             Guid guid;
-            int id=0;
+            int id = 0;
             int creator;
-            if(string.IsNullOrEmpty(appguid) || !Guid.TryParse(appguid,out guid) || string.IsNullOrEmpty(appname)  )
+            if (string.IsNullOrEmpty(appguid) || !Guid.TryParse(appguid, out guid) || string.IsNullOrEmpty(appname))
             {
-                Maps.Instance.DuradosMap.Logger.Log("myAppConnection", "rdsResponse",null,"appGuid or app id  null or unformmatted",null, 3, null,DateTime.Now);
-                return NotFound() ;
+                Maps.Instance.DuradosMap.Logger.Log("myAppConnection", "rdsResponse", null, "appGuid or app id  null or unformmatted", null, 3, null, DateTime.Now);
+                return NotFound();
             }
             try
             {
@@ -2620,16 +2655,16 @@ namespace BackAnd.Web.Api.Controllers
                 {
                     int? connectionId;
                     int? port;
-                    string serverName,catalog,dbUsername,dbPassword;
-                    if (!IsValidConnection(endpoint, id, out connectionId, out serverName, out port, out catalog,out dbUsername,out  dbPassword))
+                    string serverName, catalog, dbUsername, dbPassword;
+                    if (!IsValidConnection(endpoint, id, out connectionId, out serverName, out port, out catalog, out dbUsername, out  dbPassword))
                     {
                         Maps.Instance.DuradosMap.Logger.Log("myAppConnection", "rdsResponse", null, null, 1, "Endpointvalidation failed");
                         return NotFound();
                     }
-                    UpdateAppEndpoint(serverName,port.Value, connectionId);
+                    UpdateAppEndpoint(serverName, port.Value, connectionId);
                     //UpdateDatabaseStatus(id,OnBoardingStatus.Ready);
                     ProcessDatabase(id, appname);
-                    Maps.Instance.DuradosMap.Logger.Log("myAppConnection", "rdsResponse",null,"succes - call ProccesDatabse",null, 3, null,DateTime.Now);
+                    Maps.Instance.DuradosMap.Logger.Log("myAppConnection", "rdsResponse", null, "succes - call ProccesDatabse", null, 3, null, DateTime.Now);
                     if (Convert.ToBoolean(System.Configuration.ConfigurationManager.AppSettings["NotifyUserOnConsoleReady"] ?? "false"))
                     {
                         Map map = Maps.Instance.GetMap(appname);
@@ -2645,34 +2680,34 @@ namespace BackAnd.Web.Api.Controllers
             }
             catch (Exception ex)
             {
-                Maps.Instance.DuradosMap.Logger.Log("myAppConnection", "rdsResponse",null,ex,1,null);
+                Maps.Instance.DuradosMap.Logger.Log("myAppConnection", "rdsResponse", null, ex, 1, null);
 
                 return NotFound();
             }
 
-           
+
         }
 
-        private void UpdateAppEndpoint(string serverName,int port, int? connectioId)
+        private void UpdateAppEndpoint(string serverName, int port, int? connectioId)
         {
             if (connectioId.HasValue)
             {
-                
+
                 string sql = string.Format("UPDATE [dbo].[durados_SqlConnection]  SET [ServerName] = '{0}',[ProductPort]='{1}' WHERE Id={2}", serverName, port, connectioId);
                 Durados.DataAccess.SqlAccess sqlAccess = new Durados.DataAccess.SqlAccess();
                 try
                 {
                     sqlAccess.ExecuteNonQuery(Maps.Instance.DuradosMap.connectionString, sql);
                 }
-                catch(Exception ex)
+                catch (Exception ex)
                 {
                     Maps.Instance.DuradosMap.Logger.Log("myAppConnection", "UpdateAppEndpoint", null, ex, 1, null);
-                    
+
                 }
             }
         }
 
-        private bool IsValidConnection(string endpoint, int id, out int? connectionId,out string serverName,out int? port,out string catalog,out string username, out string password)
+        private bool IsValidConnection(string endpoint, int id, out int? connectionId, out string serverName, out int? port, out string catalog, out string username, out string password)
         {
             connectionId = null;
             serverName = string.Empty;
@@ -2683,9 +2718,9 @@ namespace BackAnd.Web.Api.Controllers
             if (string.IsNullOrEmpty(endpoint))
                 return false;
             MapDataSet.durados_AppRow appRow = Maps.Instance.GetAppRow(id);
-            if(appRow==null)
+            if (appRow == null)
             {
-                Maps.Instance.DuradosMap.Logger.Log("myAppConnection", "rdsResponse", "IsValidConnection", "no appRow for appId="+id.ToString(), null, 3, null, DateTime.Now);
+                Maps.Instance.DuradosMap.Logger.Log("myAppConnection", "rdsResponse", "IsValidConnection", "no appRow for appId=" + id.ToString(), null, 3, null, DateTime.Now);
                 return false;
             }
             MapDataSet.durados_SqlConnectionRow sqlConnectioRow = appRow.durados_SqlConnectionRowByFK_durados_App_durados_SqlConnection;
@@ -2696,8 +2731,8 @@ namespace BackAnd.Web.Api.Controllers
             }
             connectionId = (int)sqlConnectioRow.Id;
             Durados.SqlProduct sqlProduct;
-            
-            
+
+
             bool isValid = true;
             try
             {
@@ -2710,7 +2745,7 @@ namespace BackAnd.Web.Api.Controllers
                 Maps.Instance.DuradosMap.Logger.Log("myAppConnection", "rdsResponse", "IsValidConnection", ex, 1, null);
                 isValid = false;
             }
-                return isValid;
+            return isValid;
         }
 
         private void GetConnectionParameters(MapDataSet.durados_SqlConnectionRow sqlConnectioRow, out Durados.SqlProduct sqlProduct, out string userName, out string password, out string catalog)
@@ -2725,7 +2760,7 @@ namespace BackAnd.Web.Api.Controllers
             catalog = sqlConnectioRow.Catalog;
         }
 
-        private void ExtractServerNameAndPort(string endpoint,Durados.SqlProduct sqlProduct,out string serverName,out int? port)
+        private void ExtractServerNameAndPort(string endpoint, Durados.SqlProduct sqlProduct, out string serverName, out int? port)
         {
             port = null;
             int sIndex = endpoint.IndexOf(":");// serverUrl.substring( + 1);
@@ -2790,7 +2825,7 @@ namespace BackAnd.Web.Api.Controllers
                 }
 
                 view = GetView(ConnectionViewName);
-                Dictionary<string,object> values = new Dictionary<string,object>();
+                Dictionary<string, object> values = new Dictionary<string, object>();
                 values.Add("Id", "&&%&=&&%& " + connectionId.ToString());
                 int rowCount = 0;
                 System.Data.DataView dataView = view.FillPage(1, 2, values, false, null, out rowCount, view_BeforeSelect, view_AfterSelect);
@@ -2870,14 +2905,14 @@ namespace BackAnd.Web.Api.Controllers
                 if (sqlProduct == Durados.SqlProduct.Oracle)
                 {
                     connectionString = OracleAccess.GetConnectionStringSchema();
-                    
+
 
                 }
 
                 bool hasUsername = !string.IsNullOrEmpty(username);
                 bool hasPassword = !string.IsNullOrEmpty(password);
 
-                
+
                 if (!hasServer)
                 {
                     if (Maps.AllowLocalConnection)
@@ -2998,7 +3033,7 @@ namespace BackAnd.Web.Api.Controllers
             }
         }
 
-        protected void NotifyNewDatabase(string server, string catalog, string newUser, string newPassword,int creator,string previewPath)
+        protected void NotifyNewDatabase(string server, string catalog, string newUser, string newPassword, int creator, string previewPath)
         {
             string host = Convert.ToString(System.Configuration.ConfigurationManager.AppSettings["host"]);
             int port = Convert.ToInt32(System.Configuration.ConfigurationManager.AppSettings["port"]);

@@ -4360,6 +4360,30 @@ namespace Durados.DataAccess
                 }
             }
 
+            if (!string.IsNullOrEmpty(view.PermanentFilter))
+            {
+                command.Parameters.Clear();
+                command.CommandText = string.Format("select 1 from " + sqlTextBuilder.EscapeDbObject("{0}") + " where " + GetWhereStatement(view, tableName, true), tableName);
+                foreach (IDataParameter parameter in GetWhereParemeters(view, pk))
+                {
+                    command.Parameters.Add(GetNewParameter(command, parameter.ParameterName, parameter.Value));
+                }
+                object scalar2 = command.ExecuteScalar();
+                
+                if (scalar2 == null || scalar2 == DBNull.Value)
+                {
+                    string pk2 = pk;
+                    pk = null;
+                    command.Transaction.Rollback();
+                    try
+                    {
+                        sysCommand.Transaction.Rollback();
+                    }
+                    catch { }
+                    throw new RowNotFoundException(view, pk2);
+                }
+            }
+
 
             if (history != null && view.Database.SwVersion != null)
             {
@@ -4843,7 +4867,7 @@ namespace Durados.DataAccess
 
         }
 
-        public virtual void Delete(View view, string pk, BeforeDeleteEventHandler beforeDeleteCallback, AfterDeleteEventHandler afterDeleteBeforeCommitCallback, AfterDeleteEventHandler afterDeleteAfterCommitCallback, IDbCommand useCommand, IDbCommand useSysCommand, Dictionary<string, object> values = null)
+        public virtual int Delete(View view, string pk, BeforeDeleteEventHandler beforeDeleteCallback, AfterDeleteEventHandler afterDeleteBeforeCommitCallback, AfterDeleteEventHandler afterDeleteAfterCommitCallback, IDbCommand useCommand, IDbCommand useSysCommand, Dictionary<string, object> values = null)
         {
             ISqlTextBuilder sqlTextBuilder = GetSqlTextBuilder(view);
             string tableName = GetTableName(view);
@@ -4855,6 +4879,8 @@ namespace Durados.DataAccess
             IDbCommand command = null;
             IDbTransaction transaction = null;
             IDbConnection connection = null;
+            int affected = 0;
+
             if (useCommand == null)
             {
                 connection = GetNewConnection(view.ConnectionString);
@@ -4896,7 +4922,7 @@ namespace Durados.DataAccess
                 if (deleteEventArgs.Cancel)
                 {
                     transaction.Rollback();
-                    return;
+                    return affected;
                 }
 
                 if (!view.DeleteOverride)
@@ -4904,7 +4930,7 @@ namespace Durados.DataAccess
                     pk = deleteEventArgs.PrimaryKey;
 
                     string sql = "delete from " + sqlTextBuilder.EscapeDbObject("{0}") + " where {1}";
-                    sql = string.Format(sql, tableName, GetWhereStatement(view, tableName));
+                    sql = string.Format(sql, tableName, GetWhereStatement(view, tableName, true));
 
                     command.CommandText = sql;
                     command.Parameters.Clear();
@@ -4917,7 +4943,7 @@ namespace Durados.DataAccess
 
 
 
-                    command.ExecuteNonQuery();
+                    affected = command.ExecuteNonQuery();
                 }
                 History history = null;
 
@@ -4980,14 +5006,15 @@ namespace Durados.DataAccess
 
             view.SendRealTimeEvent(pk, Crud.delete);
 
-
+            return affected;
         }
 
-        public virtual void Edit(View view, Dictionary<string, object> values, string pk, BeforeEditEventHandler beforeEditCallback, BeforeEditInDatabaseEventHandler beforeEditInDatabaseEventHandler, AfterEditEventHandler afterEditBeforeCommitCallback, AfterEditEventHandler afterEditAfterCommitCallback, IDbCommand useCommand, IDbCommand useSysCommand, object history, int? userId)
+        public virtual int Edit(View view, Dictionary<string, object> values, string pk, BeforeEditEventHandler beforeEditCallback, BeforeEditInDatabaseEventHandler beforeEditInDatabaseEventHandler, AfterEditEventHandler afterEditBeforeCommitCallback, AfterEditEventHandler afterEditAfterCommitCallback, IDbCommand useCommand, IDbCommand useSysCommand, object history, int? userId)
         {
             ISqlTextBuilder sqlTextBuilder = GetSqlTextBuilder(view);
             IDbCommand sysCommand = null;
             bool identicalSystemConnection = view.Database.IdenticalSystemConnection;
+            int affected = 0;
 
             try
             {
@@ -5104,7 +5131,7 @@ namespace Durados.DataAccess
 
 
                 string sql = "update " + sqlTextBuilder.EscapeDbObject("{0}") + " set {2} where {1}";
-                sql = string.Format(sql, tableName, GetWhereStatement(view, tableName), updateSetColumns);
+                sql = string.Format(sql, tableName, GetWhereStatement(view, tableName, true), updateSetColumns);
 
                 if (editEventArgs.Cancel)
                 {
@@ -5114,7 +5141,7 @@ namespace Durados.DataAccess
                         if (!identicalSystemConnection)
                             sysCommand.Transaction.Rollback();
                     }
-                    return;
+                    return affected;
                 }
 
 
@@ -5126,6 +5153,7 @@ namespace Durados.DataAccess
                 command.CommandType = CommandType.Text;
                 command.CommandText = sql;
 
+                
                 if (!string.IsNullOrEmpty(updateSetColumns))
                 {
 
@@ -5138,7 +5166,7 @@ namespace Durados.DataAccess
                     {
                         command.Parameters.Add(GetNewParameter(command, parameter.ParameterName, parameter.Value));
                     }
-                    command.ExecuteNonQuery();
+                    affected = command.ExecuteNonQuery();
 
                 }
 
@@ -5231,6 +5259,8 @@ namespace Durados.DataAccess
 
                     view.Database.Logger.Log(view.Name, "End", "Edit", "DataAccess", "", 10, view.Database.Logger.NowWithMilliseconds(), DateTime.Now);
                 }
+
+                return affected;
             }
             finally
             {
@@ -6821,7 +6851,7 @@ namespace Durados.DataAccess
             return GetWhereStatement(view, view.DataTable.TableName);
         }
 
-        private string GetWhereStatement(View view, string tableName)
+        private string GetWhereStatement(View view, string tableName, bool usePermanentFilter = false)
         {
             ISqlTextBuilder sqlTextBuilder = GetSqlTextBuilder(view);
             string whereStatement = string.Empty;
@@ -6829,6 +6859,10 @@ namespace Durados.DataAccess
             foreach (DataColumn dataColumn in view.DataTable.PrimaryKey)
             {
                 whereStatement += sqlTextBuilder.EscapeDbObject(tableName) + sqlTextBuilder.DbTableColumnSeperator + sqlTextBuilder.EscapeDbObject(dataColumn.ColumnName) + sqlTextBuilder.DbEquals + sqlTextBuilder.DbParameterPrefix +"pk_" + GetVarFromName(dataColumn.ColumnName) + sqlTextBuilder.DbAnd;
+            }
+            if (usePermanentFilter && !string.IsNullOrEmpty(view.PermanentFilter))
+            {
+                whereStatement +=  " (" + view.GetPermanentFilter() + ")";
             }
 
             return RemoveSuffix(whereStatement, sqlTextBuilder.DbAnd) + " ";
@@ -9945,13 +9979,14 @@ namespace Durados.DataAccess
         }
 
 
-        public void Update(View view, Dictionary<string, object> deepObject, string pk, bool deep, BeforeEditEventHandler beforeEditCallback, BeforeEditInDatabaseEventHandler beforeEditInDatabaseCallback, AfterEditEventHandler afterEditBeforeCommitCallback, AfterEditEventHandler afterEditAfterCommitCallback, BeforeCreateEventHandler beforeCreateCallback = null, BeforeCreateInDatabaseEventHandler beforeCreateInDatabaseCallback = null, AfterCreateEventHandler afterCreateBeforeCommitCallback = null, AfterCreateEventHandler afterCreateAfterCommitCallback = null, bool overwrite = false, BeforeDeleteEventHandler beforeDeleteCallback = null, AfterDeleteEventHandler afterDeleteBeforeCommitCallback = null, AfterDeleteEventHandler afterDeleteAfterCommitCallback = null, IDbCommand command = null, IDbCommand sysCommand = null)
+        public int Update(View view, Dictionary<string, object> deepObject, string pk, bool deep, BeforeEditEventHandler beforeEditCallback, BeforeEditInDatabaseEventHandler beforeEditInDatabaseCallback, AfterEditEventHandler afterEditBeforeCommitCallback, AfterEditEventHandler afterEditAfterCommitCallback, BeforeCreateEventHandler beforeCreateCallback = null, BeforeCreateInDatabaseEventHandler beforeCreateInDatabaseCallback = null, AfterCreateEventHandler afterCreateBeforeCommitCallback = null, AfterCreateEventHandler afterCreateAfterCommitCallback = null, bool overwrite = false, BeforeDeleteEventHandler beforeDeleteCallback = null, AfterDeleteEventHandler afterDeleteBeforeCommitCallback = null, AfterDeleteEventHandler afterDeleteAfterCommitCallback = null, IDbCommand command = null, IDbCommand sysCommand = null)
         {
             bool identicalSystemConnection = view.Database.IdenticalSystemConnection;
             IDbConnection connection = null;
             IDbTransaction transaction = null;
             IDbTransaction sysTransaction = null;
-                
+            int affected = 0;
+
             try
             {
                 if (command == null || command.Connection.State == ConnectionState.Closed || command.Connection.ConnectionString != view.ConnectionString)
@@ -9984,18 +10019,31 @@ namespace Durados.DataAccess
                     }
                 }
 
-                Update(view, deepObject, pk, deep, command, sysCommand, beforeEditCallback, beforeEditInDatabaseCallback, afterEditBeforeCommitCallback, afterEditAfterCommitCallback, beforeCreateCallback, beforeCreateInDatabaseCallback, afterCreateBeforeCommitCallback, afterCreateAfterCommitCallback, overwrite, beforeDeleteCallback, afterDeleteBeforeCommitCallback, afterDeleteAfterCommitCallback);
+                affected = Update(view, deepObject, pk, deep, command, sysCommand, beforeEditCallback, beforeEditInDatabaseCallback, afterEditBeforeCommitCallback, afterEditAfterCommitCallback, beforeCreateCallback, beforeCreateInDatabaseCallback, afterCreateBeforeCommitCallback, afterCreateAfterCommitCallback, overwrite, beforeDeleteCallback, afterDeleteBeforeCommitCallback, afterDeleteAfterCommitCallback);
 
                 if (connection != null)
                 {
-                    transaction.Commit();
-                    if (!identicalSystemConnection)
+                    if (affected == 0)
                     {
-                        sysTransaction.Commit();
+                        transaction.Rollback();
+                        if (!identicalSystemConnection)
+                        {
+                            sysTransaction.Rollback();
+                        }
+                    }
+                    else
+                    {
+
+                        transaction.Commit();
+                        if (!identicalSystemConnection)
+                        {
+                            sysTransaction.Commit();
+                        }
                     }
                 }
                 SqlAccess.Cache.Clear(view.Name);
 
+                return affected;
             }
             finally
             {
@@ -10015,7 +10063,7 @@ namespace Durados.DataAccess
 
         }
 
-        protected virtual void Update(View view, Dictionary<string, object> deepObject, string pk, bool deep, IDbCommand command, IDbCommand sysCommand, BeforeEditEventHandler beforeEditCallback, BeforeEditInDatabaseEventHandler beforeEditInDatabaseCallback, AfterEditEventHandler afterEditBeforeCommitCallback, AfterEditEventHandler afterEditAfterCommitCallback, BeforeCreateEventHandler beforeCreateCallback = null, BeforeCreateInDatabaseEventHandler beforeCreateInDatabaseCallback = null, AfterCreateEventHandler afterCreateBeforeCommitCallback = null, AfterCreateEventHandler afterCreateAfterCommitCallback = null, bool overwrite = false, BeforeDeleteEventHandler beforeDeleteCallback = null, AfterDeleteEventHandler afterDeleteBeforeCommitCallback = null, AfterDeleteEventHandler afterDeleteAfterCommitCallback = null)
+        protected virtual int Update(View view, Dictionary<string, object> deepObject, string pk, bool deep, IDbCommand command, IDbCommand sysCommand, BeforeEditEventHandler beforeEditCallback, BeforeEditInDatabaseEventHandler beforeEditInDatabaseCallback, AfterEditEventHandler afterEditBeforeCommitCallback, AfterEditEventHandler afterEditAfterCommitCallback, BeforeCreateEventHandler beforeCreateCallback = null, BeforeCreateInDatabaseEventHandler beforeCreateInDatabaseCallback = null, AfterCreateEventHandler afterCreateBeforeCommitCallback = null, AfterCreateEventHandler afterCreateAfterCommitCallback = null, bool overwrite = false, BeforeDeleteEventHandler beforeDeleteCallback = null, AfterDeleteEventHandler afterDeleteBeforeCommitCallback = null, AfterDeleteEventHandler afterDeleteAfterCommitCallback = null)
         {
             if (deep && GetPk(deepObject) == null)
             {
@@ -10116,7 +10164,7 @@ namespace Durados.DataAccess
                 }
             }
 
-            GetSqlAccess(view).Edit(view, values, pk, beforeEditCallback, beforeEditInDatabaseCallback, afterEditBeforeCommitCallback, afterEditAfterCommitCallback, command, sysCommand, view.SaveHistory ? new History() : null, null);
+            return GetSqlAccess(view).Edit(view, values, pk, beforeEditCallback, beforeEditInDatabaseCallback, afterEditBeforeCommitCallback, afterEditAfterCommitCallback, command, sysCommand, view.SaveHistory ? new History() : null, null);
 
         }
 
@@ -10164,13 +10212,13 @@ namespace Durados.DataAccess
             }
         }
 
-        public void Delete(View view, string pk, bool deep, BeforeDeleteEventHandler beforeDeleteCallback, AfterDeleteEventHandler afterDeleteBeforeCommitCallback, AfterDeleteEventHandler afterDeleteAfterCommitCallback, IDbCommand command = null, IDbCommand sysCommand = null, Dictionary<string, object> values = null)
+        public int Delete(View view, string pk, bool deep, BeforeDeleteEventHandler beforeDeleteCallback, AfterDeleteEventHandler afterDeleteBeforeCommitCallback, AfterDeleteEventHandler afterDeleteAfterCommitCallback, IDbCommand command = null, IDbCommand sysCommand = null, Dictionary<string, object> values = null)
         {
             if ((command != null && command.Connection.State == ConnectionState.Closed) || (command != null && command.Connection.ConnectionString != view.ConnectionString))
                 command = null;
             if ((sysCommand != null && sysCommand.Connection.State == ConnectionState.Closed) || (command != null && command.Connection.ConnectionString != view.ConnectionString))
                 sysCommand = null;
-            GetSqlAccess(view).Delete(view, pk, beforeDeleteCallback, afterDeleteBeforeCommitCallback, afterDeleteAfterCommitCallback, command, sysCommand, values);
+            return GetSqlAccess(view).Delete(view, pk, beforeDeleteCallback, afterDeleteBeforeCommitCallback, afterDeleteAfterCommitCallback, command, sysCommand, values);
         }
     }
 
@@ -10183,8 +10231,8 @@ namespace Durados.DataAccess
     {
         string Create(View view, Dictionary<string, object>[] deepObject, bool deep, BeforeCreateEventHandler beforeCreateCallback, BeforeCreateInDatabaseEventHandler beforeCreateInDatabaseEventHandler, AfterCreateEventHandler afterCreateBeforeCommitCallback, AfterCreateEventHandler afterCreateAfterCommitCallback, IDbCommand command = null, IDbCommand sysCommand = null);
         string Create(View view, Dictionary<string, object> deepObject, bool deep, BeforeCreateEventHandler beforeCreateCallback, BeforeCreateInDatabaseEventHandler beforeCreateInDatabaseEventHandler, AfterCreateEventHandler afterCreateBeforeCommitCallback, AfterCreateEventHandler afterCreateAfterCommitCallback);
-        void Update(View view, Dictionary<string, object> deepObject, string pk, bool deep, BeforeEditEventHandler beforeEditCallback, BeforeEditInDatabaseEventHandler beforeEditInDatabaseCallback, AfterEditEventHandler afteEditBeforeCommitCallback, AfterEditEventHandler afterEditAfterCommitCallback, BeforeCreateEventHandler beforeCreateCallback = null, BeforeCreateInDatabaseEventHandler beforeCreateInDatabaseCallback = null, AfterCreateEventHandler afterCreateBeforeCommitCallback = null, AfterCreateEventHandler afterCreateAfterCommitCallback = null, bool overwrite = false, BeforeDeleteEventHandler beforeDeleteCallback = null, AfterDeleteEventHandler afterDeleteBeforeCommitCallback = null, AfterDeleteEventHandler afterDeleteAfterCommitCallback = null, IDbCommand command = null, IDbCommand sysCommand = null);
-        void Delete(View view, string pk, bool deep, BeforeDeleteEventHandler beforeDeleteCallback, AfterDeleteEventHandler afteDeleterBeforeCommitCallback, AfterDeleteEventHandler afterDeleteAfterCommitCallback, IDbCommand command = null, IDbCommand sysCommand = null, Dictionary<string, object> values = null);
+        int Update(View view, Dictionary<string, object> deepObject, string pk, bool deep, BeforeEditEventHandler beforeEditCallback, BeforeEditInDatabaseEventHandler beforeEditInDatabaseCallback, AfterEditEventHandler afteEditBeforeCommitCallback, AfterEditEventHandler afterEditAfterCommitCallback, BeforeCreateEventHandler beforeCreateCallback = null, BeforeCreateInDatabaseEventHandler beforeCreateInDatabaseCallback = null, AfterCreateEventHandler afterCreateBeforeCommitCallback = null, AfterCreateEventHandler afterCreateAfterCommitCallback = null, bool overwrite = false, BeforeDeleteEventHandler beforeDeleteCallback = null, AfterDeleteEventHandler afterDeleteBeforeCommitCallback = null, AfterDeleteEventHandler afterDeleteAfterCommitCallback = null, IDbCommand command = null, IDbCommand sysCommand = null);
+        int Delete(View view, string pk, bool deep, BeforeDeleteEventHandler beforeDeleteCallback, AfterDeleteEventHandler afteDeleterBeforeCommitCallback, AfterDeleteEventHandler afterDeleteAfterCommitCallback, IDbCommand command = null, IDbCommand sysCommand = null, Dictionary<string, object> values = null);
         
     }
 }

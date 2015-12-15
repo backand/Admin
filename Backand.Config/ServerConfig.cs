@@ -15,6 +15,8 @@ namespace Backand.Config
         public string mainAppName { get; set; }
         public string username { get; set; }
         public string pwd { get; set; }
+        public string ins1url { get; set; }
+        public string ins2url { get; set; }
     }
 
 }

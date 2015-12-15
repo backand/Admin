@@ -1,6 +1,7 @@
 ﻿using Backand.Web.Api.BrowserTests;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -26,9 +27,11 @@ namespace Backand.BrowserRunner
 
         static void RunTest(int i)
         {
+            string processId = Process.GetCurrentProcess().Id.ToString();
             var context = new AutomationTestContext();
             try
             {
+                context.Log(null, "P" + processId + "; " + i.ToString() + " - started");
                 context
                 .GoToHomePage()
                 .ClicktOnTryMeButton()
@@ -38,8 +41,9 @@ namespace Backand.BrowserRunner
                 .EnsureAppCreated()
                 .LogOut()
                 .SignIn()
-                .OpenApp();
-                context.Log(null, i.ToString());
+                .OpenApp()
+                .SelectItems();
+                context.Log(null, "P" + processId + "; " + i.ToString() + " - ended");
             }
             catch (Exception e)
             {

@@ -142,14 +142,14 @@ namespace Durados.Web.Mvc.UI.Helpers
             Update(view, Deserialize(view, json), pk, deep, beforeEditCallback, beforeEditInDatabaseCallback, afteEditBeforeCommitCallback, afterEditAfterCommitCallback);
         }
 
-        public static void Update(this View view, Dictionary<string, object> values, string pk, bool deep, BeforeEditEventHandler beforeEditCallback, BeforeEditInDatabaseEventHandler beforeEditInDatabaseCallback, AfterEditEventHandler afteEditBeforeCommitCallback, AfterEditEventHandler afterEditAfterCommitCallback, BeforeCreateEventHandler beforeCreateCallback = null, BeforeCreateInDatabaseEventHandler beforeCreateInDatabaseCallback = null, AfterCreateEventHandler afterCreateBeforeCommitCallback = null, AfterCreateEventHandler afterCreateAfterCommitCallback = null, bool overwrite = false, BeforeDeleteEventHandler beforeDeleteCallback = null, AfterDeleteEventHandler afterDeleteBeforeCommitCallback = null, AfterDeleteEventHandler afterDeleteAfterCommitCallback = null, bool clearCache = false, IDbCommand command = null, IDbCommand sysCommand = null)
+        public static int Update(this View view, Dictionary<string, object> values, string pk, bool deep, BeforeEditEventHandler beforeEditCallback, BeforeEditInDatabaseEventHandler beforeEditInDatabaseCallback, AfterEditEventHandler afteEditBeforeCommitCallback, AfterEditEventHandler afterEditAfterCommitCallback, BeforeCreateEventHandler beforeCreateCallback = null, BeforeCreateInDatabaseEventHandler beforeCreateInDatabaseCallback = null, AfterCreateEventHandler afterCreateBeforeCommitCallback = null, AfterCreateEventHandler afterCreateAfterCommitCallback = null, bool overwrite = false, BeforeDeleteEventHandler beforeDeleteCallback = null, AfterDeleteEventHandler afterDeleteBeforeCommitCallback = null, AfterDeleteEventHandler afterDeleteAfterCommitCallback = null, bool clearCache = false, IDbCommand command = null, IDbCommand sysCommand = null)
         {
             if (clearCache)
             {
                 ClearCache();
             }
-            
-            GetRest(view).Update(view, values, pk, deep, beforeEditCallback, beforeEditInDatabaseCallback, afteEditBeforeCommitCallback, afterEditAfterCommitCallback, beforeCreateCallback, beforeCreateInDatabaseCallback, afterCreateBeforeCommitCallback, afterCreateAfterCommitCallback, overwrite, beforeDeleteCallback, afterDeleteBeforeCommitCallback, afterDeleteAfterCommitCallback, command, sysCommand);
+
+            return GetRest(view).Update(view, values, pk, deep, beforeEditCallback, beforeEditInDatabaseCallback, afteEditBeforeCommitCallback, afterEditAfterCommitCallback, beforeCreateCallback, beforeCreateInDatabaseCallback, afterCreateBeforeCommitCallback, afterCreateAfterCommitCallback, overwrite, beforeDeleteCallback, afterDeleteBeforeCommitCallback, afterDeleteAfterCommitCallback, command, sysCommand);
         }
 
         public static Dictionary<string, object> Deserialize(this View view, string json)
@@ -200,13 +200,13 @@ namespace Durados.Web.Mvc.UI.Helpers
             return values;
         }
 
-        public static void Delete(this View view, string pk, bool deep, BeforeDeleteEventHandler beforeDeleteCallback, AfterDeleteEventHandler afteDeleteBeforeCommitCallback, AfterDeleteEventHandler afterDeleteAfterCommitCallback, Dictionary<string, object> values = null, bool clearCache = false, IDbCommand command = null, IDbCommand sysCommand = null)
+        public static int Delete(this View view, string pk, bool deep, BeforeDeleteEventHandler beforeDeleteCallback, AfterDeleteEventHandler afteDeleteBeforeCommitCallback, AfterDeleteEventHandler afterDeleteAfterCommitCallback, Dictionary<string, object> values = null, bool clearCache = false, IDbCommand command = null, IDbCommand sysCommand = null)
         {
             if (clearCache)
             {
                 ClearCache();
             }
-            GetRest(view).Delete(view, pk, deep, beforeDeleteCallback, afteDeleteBeforeCommitCallback, afterDeleteAfterCommitCallback, command, sysCommand, values);
+            return GetRest(view).Delete(view, pk, deep, beforeDeleteCallback, afteDeleteBeforeCommitCallback, afterDeleteAfterCommitCallback, command, sysCommand, values);
         }
 
         public static object Get(this Query query, int page, int pageSize, Dictionary<string, object> values, bool dataSeries = true)
@@ -374,7 +374,7 @@ namespace Durados.Web.Mvc.UI.Helpers
 
             try
             {
-                
+
                 Map map = Maps.Instance.GetMap();
                 if (map.AllKindOfCache.ContainsKey(RestDataCache))
                 {
@@ -734,11 +734,15 @@ namespace Durados.Web.Mvc.UI.Helpers
 
         public static string GetRemoteAdminUrl(string appname, bool ishttp = false)
         {
-            string remoteAdminUrl = System.Configuration.ConfigurationManager.AppSettings["remoteAdminUrl"];
+            string http = "https://";
+            if (Maps.Debug || ishttp)
+                http = "http://";
+
+            string remoteAdminUrl = http + appname + "." + System.Configuration.ConfigurationManager.AppSettings["remoteAdminUrl"];
             return remoteAdminUrl;
         }
 
-        
+
         public static string GetCurrentUsername()
         {
             return (System.Web.HttpContext.Current.Items[Database.Username] ?? "").ToString();
@@ -972,7 +976,7 @@ namespace Durados.Web.Mvc.UI.Helpers
         public static object ResetUserKey(string username, BeforeEditInDatabaseEventHandler view_BeforeEditInDatabase, Map map = null)
         {
             if (map == null)
-                map = Maps.Instance.GetMap();   
+                map = Maps.Instance.GetMap();
             if (map == null || map is DuradosMap)
             {
                 throw new DuradosException("App not found");
@@ -2000,7 +2004,7 @@ namespace Durados.Web.Mvc.UI.Helpers
             descriptives.Add(GetName(field), new Dictionary<string, object>() { { "label", label }, { "value", value } });
 
 
-            
+
         }
 
         public virtual string GetName(Durados.Field field)
@@ -3088,7 +3092,7 @@ namespace Durados.Web.Mvc.UI.Helpers
 
         private static Durados.Web.Mvc.Logging.IExternalAnalytics xLogger;
 
-        public static void Log(Durados.Web.Mvc.Logging.ExternalAnalyticsAction eventName,string username, Dictionary<string, object> dict)
+        public static void Log(Durados.Web.Mvc.Logging.ExternalAnalyticsAction eventName, string username, Dictionary<string, object> dict)
         {
             try
             {
@@ -3097,13 +3101,14 @@ namespace Durados.Web.Mvc.UI.Helpers
                     Maps.Instance.DuradosMap.Logger.Log("Anaytics", "Log-Signup", "Log", "missing app name", null, 1, null, DateTime.Now);
                     return;
                 }
-                  
+
 
                 if (xLogger != null)
                     xLogger.Log(eventName, null, username, dict, true);
             }
-            catch (Exception exception){
-                Maps.Instance.DuradosMap.Logger.Log("Anaytics","Log-Signup","Log",exception,1,null,DateTime.Now);
+            catch (Exception exception)
+            {
+                Maps.Instance.DuradosMap.Logger.Log("Anaytics", "Log-Signup", "Log", exception, 1, null, DateTime.Now);
             }
 
         }
@@ -3829,7 +3834,7 @@ namespace Durados.Web.Mvc.UI.Helpers
             return map.Database.GetRoleRow(role) != null;
         }
 
-        public Dictionary<string,object> SignUpToBackand(string username, string password, string send, string phone, string fullname, string dbtype, string dbother)
+        public Dictionary<string, object> SignUpToBackand(string username, string password, string send, string phone, string fullname, string dbtype, string dbother)
         {
             int identity = -1;
             bool DontSend = false;
@@ -3945,7 +3950,7 @@ namespace Durados.Web.Mvc.UI.Helpers
                 return new Dictionary<string, object>() { { "Success", false }, { "Message", "The server is busy, please try again later." } };
             }
 
-            return new Dictionary<string, object>() { { "Success", true }, { "Message", "Success"} };
+            return new Dictionary<string, object>() { { "Success", true }, { "Message", "Success" } };
             //return Json(new { Success = true, Message = "Success", identity = identity, DemoDefaults = GetDefaultDemo(identity) });
         }
 
@@ -4063,7 +4068,7 @@ namespace Durados.Web.Mvc.UI.Helpers
                     }
                     else
                     {
-                        SendSignupToAnalytics(appName, username,parameters);
+                        SendSignupToAnalytics(appName, username, parameters);
                         return new SignUpResults() { AppName = appName, Username = username, Status = SignUpStatus.PendingAdminApproval };
                     }
                 }
@@ -4086,7 +4091,7 @@ namespace Durados.Web.Mvc.UI.Helpers
                 }
 
                 SignUpResults signUpResults = new SignUpResults() { AppName = appName, Username = username };
-                SendSignupToAnalytics(appName, username,parameters);
+                SendSignupToAnalytics(appName, username, parameters);
                 if (isPending)
                 {
                     if (IsSignupEmailVerification(appName, isSignupEmailVerification))
@@ -5041,7 +5046,7 @@ namespace Durados.Web.Mvc.UI.Helpers
                 throw new DuradosException("user belong to more than one app");
 
 
-            
+
             if (Maps.Instance.DuradosMap.Database.GetUserRow() == null)
                 throw new DuradosException("user does not exist");
 
@@ -5050,7 +5055,7 @@ namespace Durados.Web.Mvc.UI.Helpers
 
             parameters.Add("@username", username);
 
-            
+
             string sql = string.Format("delete FROM durados_user WHERE [username]=@username");
 
             if (appName != null && appName != Maps.DuradosAppName)
@@ -5077,7 +5082,7 @@ namespace Durados.Web.Mvc.UI.Helpers
                 Map map = Maps.Instance.GetMap(appName);
                 appId = Convert.ToInt32(map.Id);
             }
-            
+
             Durados.DataAccess.SqlAccess sqlAccess = new Durados.DataAccess.SqlAccess();
             Dictionary<string, object> parameters = new Dictionary<string, object>();
 
@@ -5088,9 +5093,9 @@ namespace Durados.Web.Mvc.UI.Helpers
             string sql = string.Format("select id FROM durados_userapp WHERE [userid]=@userid and appid<>@appid");
 
             return !sqlAccess.ExecuteScalar(Maps.Instance.DuradosMap.connectionString, sql, parameters).Equals(string.Empty);
-            
-            
-            
+
+
+
         }
 
         private bool UserHasApps(string username)
@@ -5323,7 +5328,7 @@ namespace Durados.Web.Mvc.UI.Helpers
                 int index2 = index;
                 //Maps.Instance.DuradosMap.Logger.Log("FarmCaching", "RefreshCash", "RunBulkIterate", null, 3, string.Format("method:{0}, url:{1},  headers:{2}", method, url,   string.Join(";",headers.Select(x=>x.Key+"="+x.Value ).ToArray())));
                 request.Add("headers2", headers);
-                
+
                 tasks.Add(Task.Factory.StartNew(() =>
                 {
                     var responseStatusAndData = GetWebResponse(method, url, data, parameters, headers, index2);
@@ -5340,16 +5345,16 @@ namespace Durados.Web.Mvc.UI.Helpers
             try
             {
                 Task.WaitAll(tasks.ToArray());
-                for(int index3=0; index3<responses.Length; index3++)
+                for (int index3 = 0; index3 < responses.Length; index3++)
                 {
-                    if (((int)HttpStatusCode.OK) !=((ResponseStatusAndData)responses[index3]).status  )
+                    if (((int)HttpStatusCode.OK) != ((ResponseStatusAndData)responses[index3]).status && ((int)HttpStatusCode.NotFound) != ((ResponseStatusAndData)responses[index3]).status)
                     {
                         string msg = string.Format("Config cash refresh return {0} to server {1} ,requsts headers :{2}"
                             , ((ResponseStatusAndData)responses[index3]).status.ToString()
                             , ((Dictionary<string, object>)requests[index3])["url"].ToString()
                             , string.Join(";", ((Dictionary<string, object>)((Dictionary<string, object>)requests[index3])
                                 ["headers2"]).Select(x => x.Key + "=" + x.Value).ToArray()));
-
+                         
                         throw new DuradosException(msg);
                     }
                 }
@@ -5360,7 +5365,7 @@ namespace Durados.Web.Mvc.UI.Helpers
                 Maps.Instance.DuradosMap.Logger.Log(appName, "RefreshCash", "Task.Run", ex, 1, "");
                 if (ex.InnerException != null)
                     Maps.Instance.DuradosMap.Logger.Log("FarmCaching", "RefreshCash", "Task.Run", ex.InnerException, 1, "");
-              //  throw new DuradosException("failed to refresh farm instances cash." );
+                //  throw new DuradosException("failed to refresh farm instances cash." );
             }
             return responses;
         }
@@ -5525,7 +5530,7 @@ namespace Durados.Web.Mvc.UI.Helpers
         public static readonly string InvalidAccessToken = "Invalid accessToken.";
         public static readonly string WrongAppName = "Wrong appName.";
         public static readonly string InvalidRefreshToken = "Invalid refreshToken.";
-        
+
     }
 
     public class wf : Durados.Workflow.INotifier, Durados.Workflow.IExecuter
@@ -5998,7 +6003,7 @@ namespace Durados.Web.Mvc.UI.Helpers
                                 return false;
                             }
                         }
-                        else 
+                        else
                         {
                             customError = Database.CustomValidationActionName + " did not return the expected result. " + Result + " must return either \"" + Allow + "\", \"" + Deny + "\" or \"" + Ignore + "\".";
                             return false;
@@ -6015,7 +6020,7 @@ namespace Durados.Web.Mvc.UI.Helpers
                     customError = Database.CustomValidationActionName + " did not return the expected result.";
                     return false;
                 }
-                
+
             }
             if (!IsUserExist(username))
             {
@@ -7199,6 +7204,10 @@ namespace Durados.Web.Mvc.UI.Helpers
 
         private string GetMyAddress()
         {
+            if (Maps.Debug)
+            {
+                myAddress = System.Configuration.ConfigurationManager.AppSettings["farmMyIntanceAddress"];
+            }
             if (myAddress == null)
             {
                 myAddress = Http.LocalIPAddress();
@@ -7209,7 +7218,7 @@ namespace Durados.Web.Mvc.UI.Helpers
 
         private string[] GetInternalAddresses()
         {
-            if (internalAddresses == null)
+            if (internalAddresses == null || internalAddresses.Length == 0)
             {
                 LoadInternalAddresses();
             }
@@ -7217,11 +7226,11 @@ namespace Durados.Web.Mvc.UI.Helpers
             return internalAddresses;
         }
 
-        
 
-        
 
-        public void ClearMachinesCache(string appName, bool async = true)
+
+
+        public void ClearMachinesCache(string appName, bool async = false)
         {
             if (async)
             {
@@ -7234,13 +7243,13 @@ namespace Durados.Web.Mvc.UI.Helpers
             {
                 RunBulk(appName);
             }
-            
+
         }
 
         public string GetAuthorization()
         {
             return (System.Configuration.ConfigurationManager.AppSettings["farmAuth"] ?? "69F77115-495F-4C83-A9EC-0AA46714482E").ToString();
-           
+
         }
 
         private string GetSchema()
@@ -7256,7 +7265,7 @@ namespace Durados.Web.Mvc.UI.Helpers
         private Dictionary<string, object> GetRequest(string address, string appName)
         {
             Dictionary<string, object> request = new Dictionary<string, object>();
-            
+
             string port = GetPort();
             if (!string.IsNullOrEmpty(port))
             {
@@ -7265,7 +7274,7 @@ namespace Durados.Web.Mvc.UI.Helpers
 
             string url = GetSchema() + "://" + address + port + "/farm/reload/" + appName ?? string.Empty;
             request.Add("url", url);
-           
+
             return request;
         }
 
@@ -7276,21 +7285,21 @@ namespace Durados.Web.Mvc.UI.Helpers
 
         private void RunBulk(string appName = null, string[] addresses = null)
         {
-            if (addresses == null)
+            if (addresses == null || addresses.Length == 0)
             {
                 addresses = GetInternalAddresses();
             }
 
             bulk bulk = new bulk();
             List<Dictionary<string, object>> requests = new List<Dictionary<string, object>>();
-           
+
             foreach (string address in addresses)
             {
                 requests.Add(GetRequest(address, appName));
             }
-             
+
             bulk.Run(requests.ToArray(), GetAuthorization(), appName);
-            
+
         }
 
         private void AddMeToList()
@@ -7299,12 +7308,12 @@ namespace Durados.Web.Mvc.UI.Helpers
             {
                 connection.Open();
 
-                string sql = "insert into backand_farm ([address]) values (@address)";
+                string sql = "if not exists (select * from backand_farm where [address] = @address) begin  insert into backand_farm ([address]) values (@address) end";
                 using (System.Data.SqlClient.SqlCommand command = new SqlCommand(sql, connection))
                 {
                     command.Parameters.AddWithValue("address", GetMyAddress());
                     command.ExecuteNonQuery();
-                    
+
                 }
 
                 connection.Close();
@@ -7427,7 +7436,7 @@ namespace Durados.Web.Mvc.UI.Helpers
         static string key = "NoSqlFilter";
         static NoSqlFilterCache()
         {
-           
+
         }
 
         private static Map GetMap(string appName)
@@ -7467,7 +7476,7 @@ namespace Durados.Web.Mvc.UI.Helpers
                 return (Dictionary<string, object>)((Dictionary<string, object>)((Dictionary<string, object>)map.AllKindOfCache[key])[view.JsonName])[System.Web.Helpers.Crypto.SHA256(json)];
             }
             return null;
-            
+
         }
 
         public static void Set(string appName, View view, string json, Dictionary<string, object> result)
@@ -7485,7 +7494,7 @@ namespace Durados.Web.Mvc.UI.Helpers
             {
                 ((Dictionary<string, object>)((Dictionary<string, object>)map.AllKindOfCache[key])[view.JsonName]).Add(System.Web.Helpers.Crypto.SHA256(json), result);
             }
-            
+
 
         }
     }
@@ -7526,7 +7535,7 @@ namespace Durados.Web.Mvc.UI.Helpers
                     throw new AppNotFoundException(appName);
                 }
             }
-           
+
             return map;
         }
 
@@ -7567,7 +7576,7 @@ namespace Durados.Web.Mvc.UI.Helpers
     {
         public class UserRelationException : Durados.DuradosException
         {
-            public UserRelationException(string message, Exception innerException):
+            public UserRelationException(string message, Exception innerException) :
                 base(message, innerException)
             {
 
@@ -7645,7 +7654,7 @@ namespace Durados.Web.Mvc.UI.Helpers
             if (i == 0)
             {
                 next = string.Format("{0} = '{1}'", sqlTextBuilder.EscapeDbObject(usersObjectName) + sqlTextBuilder.DbTableColumnSeperator + sqlTextBuilder.EscapeDbObject(emailFieldName), SysUsername);
-                
+
             }
             else
             {
@@ -7661,13 +7670,13 @@ namespace Durados.Web.Mvc.UI.Helpers
             {
                 ChildrenField childrenField = (ChildrenField)field;
                 //where += string.Format("{0} in (select {1} from {2}" + sqlTextBuilder.WithNolock + " inner join {3} on {4} = {5} where {6})", sqlTextBuilder.EscapeDbObject(childrenField.View.Name) + sqlTextBuilder.DbTableColumnSeperator + sqlTextBuilder.EscapeDbObject(childrenField.GetColumnsNames()[0]), sqlTextBuilder.EscapeDbObject(childrenField.ChildrenView.Name) + sqlTextBuilder.DbTableColumnSeperator + sqlTextBuilder.EscapeDbObject(childrenField.GetEquivalentParentField().GetColumnsNames()[0]), sqlTextBuilder.EscapeDbObject(childrenField.ChildrenView.Name), sqlTextBuilder.EscapeDbObject(childrenField.GetFirstNonEquivalentParentField().ParentView.Name), sqlTextBuilder.EscapeDbObject(childrenField.ChildrenView.Name) + sqlTextBuilder.DbTableColumnSeperator + sqlTextBuilder.EscapeDbObject(childrenField.GetFirstNonEquivalentParentField().GetColumnsNames()[0]), sqlTextBuilder.EscapeDbObject(childrenField.GetFirstNonEquivalentParentField().ParentView.Name) + sqlTextBuilder.DbTableColumnSeperator + sqlTextBuilder.EscapeDbObject(childrenField.GetFirstNonEquivalentParentField().ParentView.GetPkColumnNames()[0]), next);
-                where += string.Format("{0} in (select {1} from {2}" + sqlTextBuilder.WithNolock + " where {3} in (select {4} from {5}  where {6}))", 
-                    sqlTextBuilder.EscapeDbObject(childrenField.View.Name) + sqlTextBuilder.DbTableColumnSeperator + sqlTextBuilder.EscapeDbObject(childrenField.GetColumnsNames()[0]), 
-                    sqlTextBuilder.EscapeDbObject(childrenField.ChildrenView.Name) + sqlTextBuilder.DbTableColumnSeperator + sqlTextBuilder.EscapeDbObject(childrenField.GetEquivalentParentField().GetColumnsNames()[0]), 
+                where += string.Format("{0} in (select {1} from {2}" + sqlTextBuilder.WithNolock + " where {3} in (select {4} from {5}  where {6}))",
+                    sqlTextBuilder.EscapeDbObject(childrenField.View.Name) + sqlTextBuilder.DbTableColumnSeperator + sqlTextBuilder.EscapeDbObject(childrenField.GetColumnsNames()[0]),
+                    sqlTextBuilder.EscapeDbObject(childrenField.ChildrenView.Name) + sqlTextBuilder.DbTableColumnSeperator + sqlTextBuilder.EscapeDbObject(childrenField.GetEquivalentParentField().GetColumnsNames()[0]),
                     sqlTextBuilder.EscapeDbObject(childrenField.ChildrenView.Name),
                     sqlTextBuilder.EscapeDbObject(childrenField.ChildrenView.Name) + sqlTextBuilder.DbTableColumnSeperator + sqlTextBuilder.EscapeDbObject(childrenField.GetFirstNonEquivalentParentField().GetColumnsNames()[0]),
                     sqlTextBuilder.EscapeDbObject(childrenField.GetFirstNonEquivalentParentField().ParentView.Name) + sqlTextBuilder.DbTableColumnSeperator + sqlTextBuilder.EscapeDbObject(childrenField.GetFirstNonEquivalentParentField().ParentView.GetPkColumnNames()[0]),
-                    sqlTextBuilder.EscapeDbObject(childrenField.GetFirstNonEquivalentParentField().ParentView.Name), 
+                    sqlTextBuilder.EscapeDbObject(childrenField.GetFirstNonEquivalentParentField().ParentView.Name),
                     next);
             }
 
@@ -7692,8 +7701,8 @@ namespace Durados.Web.Mvc.UI.Helpers
                 ParentField parentField = (ParentField)field;
                 //where += string.Format("{0} in (select {1} from {2} where {3})", sqlTextBuilder.EscapeDbObject(parentField.View.Name) + sqlTextBuilder.DbTableColumnSeperator + sqlTextBuilder.EscapeDbObject(parentField.GetColumnsNames()[0]), sqlTextBuilder.EscapeDbObject(parentField.ParentView.Name) + sqlTextBuilder.DbTableColumnSeperator + sqlTextBuilder.EscapeDbObject(parentField.ParentView.GetPkColumnNames()[0]), sqlTextBuilder.EscapeDbObject(parentField.ParentView.Name), next);
                 string q = string.Format("\"{0}\":{{\"$in\":{{{1},\"fields\":[\"{2}\"]}}}}",
-                    parentField.JsonName, 
-                    next, 
+                    parentField.JsonName,
+                    next,
                     parentField.ParentView.GetFieldByColumnNames(parentField.ParentView.GetPkColumnNames()[0]).JsonName);
 
                 if (showAllForAdmin)
@@ -7704,8 +7713,8 @@ namespace Durados.Web.Mvc.UI.Helpers
                     }
                 }
 
-                nosql += string.Format("\"object\":\"{0}\",\"q\":{{{1}}}", 
-                    parentField.View.JsonName, 
+                nosql += string.Format("\"object\":\"{0}\",\"q\":{{{1}}}",
+                    parentField.View.JsonName,
                     q);
             }
             else if (field.FieldType == FieldType.Children)
@@ -7728,8 +7737,8 @@ namespace Durados.Web.Mvc.UI.Helpers
                     }
                 }
 
-                nosql += string.Format("\"object\":\"{0}\",\"q\":{{{1}}}", 
-                    childrenField.View.JsonName, 
+                nosql += string.Format("\"object\":\"{0}\",\"q\":{{{1}}}",
+                    childrenField.View.JsonName,
                     q);
 
                 //nosql += string.Format("{0} in (select {1} from {2} where {3} in (select {4} from {5}  where {6}))",
@@ -7799,11 +7808,101 @@ namespace Durados.Web.Mvc.UI.Helpers
         }
     }
 
-    
+    public class AppsPool
+    {
+        public bool Pop(string appName, string username, out int? appId)
+        {
+            int creator = GetCreator(username);
+            return Pop(appName, username, creator, out appId);
+        }
+
+        private int GetCreator(string username)
+        {
+            return Maps.Instance.DuradosMap.Database.GetUserID(username);
+        }
+
+        public bool Pop(string appName, string username, int creator, out int? appId)
+        {
+            Map mainMap = null;
+            appId = null;
+            if (!ShouldBeUsed())
+                return false;
+            if (GetPoolCreator() == creator)
+                return false;
+
+            try
+            {
+                mainMap = Maps.Instance.DuradosMap;
+                appId = FindAndUpdateAppInMain(appName, creator, mainMap.connectionString);
+                ReplaceUsernameInSysDb(mainMap, appName, username);
+
+                return true;
+            }
+            catch (Exception exception)
+            {
+                mainMap.Logger.Log("AppsPool", "Pop", "", exception, 1, string.Empty);
+                return false;
+            }
+        }
+
+        private void ReplaceUsernameInSysDb(Map mainMap, string appName, string username)
+        {
+            Map map = Maps.Instance.GetMap(appName);
+            System.Data.DataRow userMainRow = mainMap.Database.GetUserRow(username);
+            string firstName = userMainRow["FirstName"].ToString();
+            string lastName = userMainRow["LastName"].ToString();
+            View userView = (View)map.Database.GetUserView();
+            int rowCount = 0;
+            DataView dataView = userView.FillPage(1, 2, null, null, null, out rowCount, null, null);
+            if (dataView.Count != 1)
+                throw new Durados.DuradosException("system user should contain one row");
+            System.Data.DataRow currentUserRow = dataView[0].Row;
+            string pk = userView.GetPkValue(currentUserRow);
+            userView.Edit(new Dictionary<string, object>() { { "Username", username }, { "Email", username }, { "FirstName", firstName }, { "LastName", lastName } }, pk, null, null, null, null);
+        }
+
+        private int? FindAndUpdateAppInMain(string appName, int creator, string connectionString)
+        {
+            return FindAndUpdateAppInMain(appName, creator, GetPoolCreator(), connectionString);
+        }
+
+        private int GetPoolCreator()
+        {
+            return Maps.PoolCreator;
+        }
+
+        private bool ShouldBeUsed()
+        {
+            return Maps.PoolShouldBeUsed;
+        }
+
+        private int? FindAndUpdateAppInMain(string appName, int creator, int poolCreator, string connectionString)
+        {
+            string sql =
+                "begin tran getFromPool " +
+                "declare @appId int " +
+                "select top(1) @appId = id from durados_App where creator = @poolCreator and DatabaseStatus = 1 order by id asc; " +
+                "update BackAnd_dev.dbo.durados_App " +
+                "set creator = @creator, " +
+                "[CreatedDate] = @CreatedDate " +
+                "[Name] = @Name " +
+                "where id = @appId; " +
+                "select @appId " +
+                "commit tran getFromPool";
+            string scalar = new SqlAccess().ExecuteScalar(connectionString, sql, new Dictionary<string, object>() { { "poolCreator", poolCreator }, { "creator", creator }, { "CreatedDate", DateTime.Now }, { "Name", appName } });
+            if (!string.IsNullOrEmpty(scalar))
+            {
+                return Convert.ToInt32(scalar);
+            }
+            return null;
+        }
+    }
+
+
     public class RestException : DuradosException
     {
         public RestException(string message, Exception innerException) : base(message, innerException) { }
-        
+
         public RestException(string message)
             : base(message)
         {
