@@ -21,9 +21,9 @@ namespace BackAnd.Web.Api.Test
         {
             return Backand.Config.ConfigStore.GetConfig().serverAddress;
         }
-        private RestClient GetRestClient()
+        private RestClient GetRestClient(string url = null)
         {
-            RestClient client = new RestClient(GetServerAddress());
+            RestClient client = new RestClient(url ?? GetServerAddress());
 
             return client;
         }
@@ -53,10 +53,10 @@ namespace BackAnd.Web.Api.Test
             return GetAuthentificatedClient(appName, Backand.Config.ConfigStore.GetConfig().username, Backand.Config.ConfigStore.GetConfig().pwd);
         }
 
-        public RestClient GetAuthentificatedClient(string appName, string username, string password)
+        public RestClient GetAuthentificatedClient(string appName, string username, string password, string url = null)
         {
            // Trace.WriteLine("trace");
-            var rest = GetRestClient();
+            var rest = GetRestClient(url);
             
             var res = SignIn(username, password, appName);
             Assert.IsTrue(res != null && res.token_type != null && res.access_token != null, "Fail to sign in");

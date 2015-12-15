@@ -5,9 +5,114 @@ using System.Diagnostics;
 using Backand.Config;
 using Newtonsoft.Json;
 using System.Collections;
+using RestSharp;
+using System.Collections.Generic;
 
 namespace BackAnd.Web.Api.Test
 {
+
+    [TestClass]
+    public class FarmCache
+    {
+        [TestMethod]
+        public void Test()
+        {
+            string ins1url = GetIns1url();
+            string ins2url = GetIns2url();
+
+            string ins1config = GetInsConfig(GetClient1(ins1url));
+            string ins2config = GetInsConfig(GetClient2(ins2url));
+
+            Assert.AreEqual(ins1config, ins2config, "In the beginning both instances config should be equal and they are not.");
+
+            string ins1configChanged = ChangeInsConfig(ins1config);
+            UpdateConfig(GetClient1(ins1url), ins1configChanged);
+            ins2config = GetInsConfig(GetClient2(ins2url));
+
+            Assert.AreNotEqual(ins1config, ins2config, "ins2 config was not changed.");
+            Assert.AreEqual(ins1configChanged, ins2config, "In the end both instances config should be equal and they are not.");
+        }
+
+        private void UpdateConfig(RestClient client, string config)
+        {
+            var request = new RestRequest("/1/table/config/items", Method.PUT);
+            //var json = JsonConvert.DeserializeObject(config);
+           // request.JsonSerializer = RestSharp.Serialize new JsonSerializer();
+            request.RequestFormat = DataFormat.Json;
+            request.AddParameter("application/json; charset=utf-8", config, ParameterType.RequestBody);
+            
+            // Act
+            var response = client.Execute(request);
+
+            // Assert
+            if (response.StatusCode == System.Net.HttpStatusCode.OK)
+            {
+            }
+            else
+            {
+                Assert.Fail("Fail to update config");
+            }
+            
+        }
+
+        private string ChangeInsConfig(string ins1config)
+        {
+            return ins1config.Replace("\"name\":\"description", "\"name\":\"description1");
+        }
+
+        private RestClient _client1 = null;
+        private RestClient _client2 = null;
+
+        private RestClient GetClient1(string ins1url)
+        {
+            if (_client1 == null)
+            {
+                ServerConfig config = Backand.Config.ConfigStore.GetConfig();
+                _client1 = new TestUtil().GetAuthentificatedClient(config.appname, config.username, config.pwd, ins1url);
+            }
+            return _client1;
+        }
+
+        private RestClient GetClient2(string ins2url)
+        {
+            if (_client2 == null)
+            {
+                ServerConfig config = Backand.Config.ConfigStore.GetConfig();
+                _client2 = new TestUtil().GetAuthentificatedClient(config.appname, config.username, config.pwd, ins2url);
+            }
+            return _client2;
+        }
+
+        private string GetInsConfig(RestClient client)
+        {
+            var request = new RestRequest("/1/table/config/items", Method.GET);
+            
+            // Act
+            var response = client.Execute<Dictionary<string,object>>(request);
+            if (response.StatusCode == System.Net.HttpStatusCode.OK)
+            {
+                return response.Content;
+            }
+            else
+            {
+                Assert.Fail("Fail to get config");
+            }
+
+            return null;
+        }
+
+        private string GetIns2url()
+        {
+            return Backand.Config.ConfigStore.GetConfig().ins2url;
+        }
+
+        private string GetIns1url()
+        {
+            return Backand.Config.ConfigStore.GetConfig().ins1url;
+        }
+
+    }
+
     [TestClass]
     public class SanityTest
     {
@@ -42,6 +147,8 @@ namespace BackAnd.Web.Api.Test
             CrudUtility crud = new CrudUtility(appName, Backand.Config.ConfigStore.GetConfig().username, Backand.Config.ConfigStore.GetConfig().pwd);
                 crud.RunSimpleCrud();
         }
+
+        
 
         //[TestMethod]
         //public void SignupCreateAppDeleteAppDeleteUser()
@@ -200,4 +307,5 @@ namespace BackAnd.Web.Api.Test
 
         
     }
+
 }

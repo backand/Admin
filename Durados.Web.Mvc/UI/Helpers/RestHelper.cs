@@ -5347,7 +5347,7 @@ namespace Durados.Web.Mvc.UI.Helpers
                 Task.WaitAll(tasks.ToArray());
                 for (int index3 = 0; index3 < responses.Length; index3++)
                 {
-                    if (((int)HttpStatusCode.OK) != ((ResponseStatusAndData)responses[index3]).status)
+                    if (((int)HttpStatusCode.OK) != ((ResponseStatusAndData)responses[index3]).status && ((int)HttpStatusCode.NotFound) != ((ResponseStatusAndData)responses[index3]).status)
                     {
                         string msg = string.Format("Config cash refresh return {0} to server {1} ,requsts headers :{2}"
                             , ((ResponseStatusAndData)responses[index3]).status.ToString()
@@ -7218,7 +7218,7 @@ namespace Durados.Web.Mvc.UI.Helpers
 
         private string[] GetInternalAddresses()
         {
-            if (internalAddresses == null)
+            if (internalAddresses == null || internalAddresses.Length == 0)
             {
                 LoadInternalAddresses();
             }
@@ -7285,7 +7285,7 @@ namespace Durados.Web.Mvc.UI.Helpers
 
         private void RunBulk(string appName = null, string[] addresses = null)
         {
-            if (addresses == null)
+            if (addresses == null || addresses.Length == 0)
             {
                 addresses = GetInternalAddresses();
             }
@@ -7308,7 +7308,7 @@ namespace Durados.Web.Mvc.UI.Helpers
             {
                 connection.Open();
 
-                string sql = "insert into backand_farm ([address]) values (@address)";
+                string sql = "if not exists (select * from backand_farm where [address] = @address) begin  insert into backand_farm ([address]) values (@address) end";
                 using (System.Data.SqlClient.SqlCommand command = new SqlCommand(sql, connection))
                 {
                     command.Parameters.AddWithValue("address", GetMyAddress());
