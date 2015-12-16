@@ -19,6 +19,7 @@ using Durados.Web.Mvc.Controllers;
 using BackAnd.Web.Api.Controllers.Filters;
 using System.Threading.Tasks;
 using System.Collections;
+using System.Data.SqlClient;
 
 /*
  HTTP Verb	|Entire Collection (e.g. /customers)	                                                        |Specific Item (e.g. /customers/{id})
@@ -559,15 +560,23 @@ namespace BackAnd.Web.Api.Controllers
 
                 using (System.Data.SqlClient.SqlCommand command = new System.Data.SqlClient.SqlCommand(sql, connection))
                 {
-                    command.Parameters.AddWithValue("appName", appName);
-                    command.Parameters.AddWithValue("username", username);
-                    command.Parameters.AddWithValue("timestamp", timestamp);
-                    command.Parameters.AddWithValue("input", input);
-                    command.Parameters.AddWithValue("output", output);
-                    command.Parameters.AddWithValue("valid", valid);
-                    command.Parameters.AddWithValue("action", action);
-                    object scalar = command.ExecuteScalar();
-                    logModelId = Convert.ToInt32(scalar);
+                    try
+                    {
+                        command.Parameters.AddWithValue("appName", appName);
+                        command.Parameters.AddWithValue("username", username);
+                        command.Parameters.AddWithValue("timestamp", timestamp);
+                        command.Parameters.AddWithValue("input", input);
+                        command.Parameters.AddWithValue("output", output);
+                        command.Parameters.AddWithValue("valid", valid);
+                        command.Parameters.AddWithValue("action", action);
+                        object scalar = command.ExecuteScalar();
+                        logModelId = Convert.ToInt32(scalar);
+                    }
+                    catch (SqlException e)
+                    {
+                        Maps.Instance.DuradosMap.Logger.Log("Model", "Validate", "LogModel", e, 1, command.CommandText + "; " + connection.ConnectionString);
+               
+                    }
                 }
 
                 connection.Close();
