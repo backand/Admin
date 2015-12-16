@@ -3786,13 +3786,27 @@ namespace Durados.Web.Mvc
                 ds.WriteXml(stream, XmlWriteMode.WriteSchema);
                 stream.Seek(0, SeekOrigin.Begin);
 
-                blob.BeginUploadFromStream(stream, BlobTransferCompletedCallback, new BlobTransferAsyncState(blob, stream, container, containerName, map));
+                DateTime started = DateTime.Now;
+
+                blob.BeginUploadFromStream(stream, BlobTransferCompletedCallback, new BlobTransferAsyncState(blob, stream, started, container, containerName, map));
+
+                try
+                {
+                    Maps.Instance.DuradosMap.Logger.Log("Map", "WriteConfigToCloud", map.AppName ?? string.Empty, string.Empty, string.Empty, -8, containerName + " started", started);
+                }
+                catch { }
             }
         }
 
         private void BlobTransferCompletedCallback(IAsyncResult result)
         {
             BlobTransferAsyncState state = (BlobTransferAsyncState)result.AsyncState;
+
+            try
+            {
+                Maps.Instance.DuradosMap.Logger.Log("Map", "WriteConfigToCloud", state.Map.AppName ?? string.Empty, DateTime.Now.Subtract(state.Started).TotalMilliseconds.ToString(), string.Empty, -8, state.BlobName + " ended", DateTime.Now);
+            }
+            catch { }
 
             RefreshApis(state.Map);
 
