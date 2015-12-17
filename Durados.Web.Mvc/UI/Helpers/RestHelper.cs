@@ -7594,9 +7594,10 @@ namespace Durados.Web.Mvc.UI.Helpers
                 "begin tran getFromPool " +
                 "declare @appId int " +
                 "select top(1) @appId = id from durados_App where creator = @poolCreator and DatabaseStatus = 1 order by id asc; " +
-                "update BackAnd_dev.dbo.durados_App " +
+                "delete from durados_App where [Name] = @Name; " +
+                "update durados_App " +
                 "set creator = @creator, " +
-                "[CreatedDate] = @CreatedDate " +
+                "[CreatedDate] = @CreatedDate, " +
                 "[Name] = @Name " +
                 "where id = @appId; " +
                 "select @appId " +
