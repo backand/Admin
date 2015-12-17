@@ -3853,10 +3853,6 @@ namespace Durados.Web.Mvc
             catch { }
         }
 
-        private void SyncCache()
-        {
-            Maps.Instance.SyncCache();
-        }
 
         Azure.DuradosStorage storage = new Azure.DuradosStorage();
 
@@ -4648,9 +4644,7 @@ namespace Durados.Web.Mvc
                 //(select SystemSqlConnectionId from durados_app inner join durados_userApp on durados_app.id =durados_userApp.appId where durados_UserApp.UserId = [Durados_User]))";
 
                 //maps = new Dictionary<string, Map>();
-                CacheType cacheType = Cloud ? Maps.CacheType : CacheType.Local;
-
-                maps = new MapCache(cacheType);
+                mapsCache = CacheFactory.CreateCache<Map>("maps");
 
                 LoadDnsAliases();
 
@@ -4831,8 +4825,7 @@ namespace Durados.Web.Mvc
                 throw new DuradosException("Please add the AzureCacheUrl to the web.config.");
             }
 
-            CacheType = (CacheType)Enum.Parse(typeof(CacheType), System.Configuration.ConfigurationManager.AppSettings["cacheType"] ?? CacheType.Local.ToString());
-
+         
 
             AzureCachePort = Convert.ToInt32(System.Configuration.ConfigurationManager.AppSettings["AzureCachePort"] ?? "22233");
 
@@ -4926,15 +4919,13 @@ namespace Durados.Web.Mvc
 
         public static TimeSpan AzureCacheUpdateInterval { get; private set; }
 
-        public static CacheType CacheType { get; private set; }
-
         public static string ConfigPath { get; private set; }
 
         public static bool DownloadDenyPolicy { get; private set; }
         public static string[] AllowedDownloadFileTypes { get; private set; }
         public static string[] DenyDownloadFileTypes { get; private set; }
 
-        private MapCache maps = null;
+        private ICache<Map> mapsCache = null;
         public static Dictionary<string, string> DnsAliases = null;
         private IPersistency persistency = null;
         private static bool multiTenancy = false;
@@ -5547,32 +5538,18 @@ namespace Durados.Web.Mvc
             return (View)duradosMap.Database.Views["durados_DnsAlias"];
         }
 
-        public void ClearSession()
-        {
-            if (cloud)
-                return;
-
-            foreach (Map map in maps.Values)
-            {
-                try
-                {
-                    map.Session.Clear();
-                }
-                catch { }
-            }
-        }
 
         public void Rename(string oldAppName, string newAppName)
         {
             Map map = null;
-            if (maps.ContainsKey(oldAppName))
+            if (mapsCache.ContainsKey(oldAppName))
             {
-                map = maps[oldAppName];
+                map = mapsCache[oldAppName];
                 RemoveMap(oldAppName);
             }
-            else if (maps.ContainsKey(oldAppName.ToLower()))
+            else if (mapsCache.ContainsKey(oldAppName.ToLower()))
             {
-                map = maps[oldAppName.ToLower()];
+                map = mapsCache[oldAppName.ToLower()];
                 RemoveMap(oldAppName.ToLower());
             }
             if (map != null)
@@ -5607,11 +5584,11 @@ namespace Durados.Web.Mvc
             //}
             //catch { }
 
-            if (maps.ContainsKey(pk))
+            if (mapsCache.ContainsKey(pk))
             {
                 RemoveMap(pk);
             }
-            else if (maps.ContainsKey(pk.ToLower()))
+            else if (mapsCache.ContainsKey(pk.ToLower()))
             {
                 RemoveMap(pk.ToLower());
             }
@@ -5628,7 +5605,7 @@ namespace Durados.Web.Mvc
 
         public void Delete(string pk)
         {
-            if (maps.ContainsKey(pk))
+            if (mapsCache.ContainsKey(pk))
             {
                 RemoveMap(pk);
             }
@@ -5650,14 +5627,14 @@ namespace Durados.Web.Mvc
 
             if (IsInMemoryMode())
             {
-                if (maps.ContainsKey(appName + GetInMemoryKey()))
+                if (mapsCache.ContainsKey(appName + GetInMemoryKey()))
                 {
-                    map = maps[appName + GetInMemoryKey()];
+                    map = mapsCache[appName + GetInMemoryKey()];
                 }
             }
-            else if (maps.ContainsKey(appName))
+            else if (mapsCache.ContainsKey(appName))
             {
-                map = maps[appName];
+                map = mapsCache[appName];
             }
 
 
@@ -6127,7 +6104,7 @@ namespace Durados.Web.Mvc
 
         public bool AppInCach(string appName)
         {
-            return maps.ContainsKey(appName);
+            return mapsCache.ContainsKey(appName);
         }
 
         public string GetAppNameByGuid(string guid)
@@ -6235,20 +6212,20 @@ namespace Durados.Web.Mvc
 
         public void AddMap(string appName, Map map)
         {
-            if (!maps.ContainsKey(appName))
-                maps.Add(appName, map);
+            if (!mapsCache.ContainsKey(appName))
+                mapsCache.Add(appName, map);
 
         }
 
         public void UpdateCache(string appName, Map map)
         {
-            maps.Add(appName, map);
+            mapsCache.Add(appName, map);
 
         }
 
         public void RemoveMap(string appName)
         {
-            maps.Remove(appName);
+            mapsCache.Remove(appName);
         }
         private void RemoveConfig(string filename)//DataSet ds,
         {
@@ -6314,10 +6291,10 @@ namespace Durados.Web.Mvc
 
         internal void ChangeName(string oldName, string newName)
         {
-            if (maps.ContainsKey(oldName))
+            if (mapsCache.ContainsKey(oldName))
             {
-                Map map = maps[oldName];
-                if (maps.ContainsKey(newName))
+                Map map = mapsCache[oldName];
+                if (mapsCache.ContainsKey(newName))
                     throw new DuradosException("The " + newName + " already exists in the dictionary.");
                 AddMap(newName, map);
                 RemoveMap(oldName);
@@ -6381,15 +6358,6 @@ namespace Durados.Web.Mvc
         }
         public Dictionary<PlugInType, PluginCache> PluginsCache { get; private set; }
 
-
-        public void AllStopAllSshSessions()
-        {
-            foreach (Map map in maps.Values)
-            {
-                map.SshStop();
-            }
-        }
-
         public static SqlProduct GetCurrentSqlProduct()
         {
             return GetSqlProduct(GetCurrentAppName());
@@ -6439,11 +6407,6 @@ namespace Durados.Web.Mvc
 
 
 
-        public void SyncCache()
-        {
-            maps.SyncCache(GetCurrentAppName());
-        }
-
         public static string GetStorageBlobName(string filename)
         {
             System.IO.FileInfo fileInfo = new FileInfo(filename);
@@ -6453,8 +6416,9 @@ namespace Durados.Web.Mvc
 
         }
 
-        LocalCache storageCache = new LocalCache();
-        public LocalCache StorageCache
+        ICache<DataSet> storageCache = CacheFactory.CreateCache<DataSet>("storageCache");
+
+        public ICache<DataSet> StorageCache
         {
             get
             {
@@ -7042,33 +7006,6 @@ namespace Durados.Web.Mvc
         }
     }
 
-    public class MapCache : Durados.Web.Mvc.Azure.Cache
-    {
-        public MapCache(CacheType cacheType) : base(cacheType) { }
-        public Map this[string key]
-        {
-            get
-            {
-                return (Map)Get(key);
-            }
-        }
-
-
-        public System.Collections.IEnumerable Values
-        {
-            get
-            {
-                if (CacheType == CacheType.Local)
-                {
-                    return ((Dictionary<string, object>)base.SpecificCache).Values;
-                }
-
-                return null;
-            }
-        }
-
-
-    }
     public static class IEnumerableExtensions
     {
         public static HashSet<T> ToHashSet<T>(this IEnumerable<T> source)
