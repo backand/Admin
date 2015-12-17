@@ -47,9 +47,11 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{259DC51F
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BackAnd.UnitTests", "BackAnd.UnitTests\BackAnd.UnitTests.csproj", "{6D63D615-1B03-4E1A-A55D-93C8AF9860F9}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Backand.Config", "Backand.Config\Backand.Config.csproj", "{C35122B9-B306-497C-A5A1-01E4DD2C6CC8}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Backand.Test.Config", "Backand.Config\Backand.Test.Config.csproj", "{C35122B9-B306-497C-A5A1-01E4DD2C6CC8}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Backand.BrowserRunner", "Backand.BrowserRunner\Backand.BrowserRunner.csproj", "{521457C7-F935-4340-88F6-A5D2A7F43218}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{8B3C8B90-EA3B-455A-B35B-F94381EB49C9}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

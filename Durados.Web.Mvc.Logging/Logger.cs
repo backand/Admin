@@ -117,7 +117,6 @@ namespace Durados.Web.Mvc.Logging
             eventViewerLog = Convert.ToString(System.Web.Configuration.WebConfigurationManager.AppSettings["eventViewerLog"] ?? "Application");
             eventViewerLogSource = Convert.ToString(System.Web.Configuration.WebConfigurationManager.AppSettings["eventViewerLogSource"] ?? Durados.Database.LongProductName);
 
-
             string logCS = "LogConnectionString";
             bool useAppPath = Convert.ToBoolean(System.Web.Configuration.WebConfigurationManager.AppSettings["UseAppPath"]);
             string configPath = Convert.ToString(System.Web.Configuration.WebConfigurationManager.AppSettings["configPath"] ?? "~/Config/");
@@ -128,19 +127,21 @@ namespace Durados.Web.Mvc.Logging
                 connectionString = System.Web.Configuration.WebConfigurationManager.ConnectionStrings[logCS].ConnectionString;
 
             //// deployment sql
-            string logTableFileName = GetConfigPath("~/Deployment/", "Sql/logTable.sql");
+            var deploymentPath = Convert.ToString(System.Web.Configuration.WebConfigurationManager.AppSettings["deploymentPath"] ?? "~/Deployment/");
+
+            string logTableFileName = GetConfigPath(deploymentPath, "Sql/logTable.sql");
 
             if (System.Web.Configuration.WebConfigurationManager.AppSettings.AllKeys.Contains("logTableFileName"))
                 logTableFileName = Convert.ToString(System.Web.Configuration.WebConfigurationManager.AppSettings["logTableFileName"]);
             logTableFileName = GetSchemaCreateFileNameForProduct(logTableFileName);
             //// deployment sql
-            string logClearFileName = GetConfigPath("~/Deployment/", "Sql/logClear.sql");
+            string logClearFileName = GetConfigPath(deploymentPath, "Sql/logClear.sql");
 
             if (System.Web.Configuration.WebConfigurationManager.AppSettings.AllKeys.Contains("logClearFileName"))
                 logClearFileName = Convert.ToString(System.Web.Configuration.WebConfigurationManager.AppSettings["logClearFileName"]);
 
             //// deployment sql
-            string logInsertFileName = GetConfigPath("~/Deployment/", "Sql/logInsert.sql");
+            string logInsertFileName = GetConfigPath(deploymentPath, "Sql/logInsert.sql");
 
             if (System.Web.Configuration.WebConfigurationManager.AppSettings.AllKeys.Contains("logInsertFileName"))
                 logInsertFileName = Convert.ToString(System.Web.Configuration.WebConfigurationManager.AppSettings["logInsertFileName"]);

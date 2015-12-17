@@ -44,11 +44,11 @@ namespace BackAnd.Web.Api.Controllers
             {
                 if (string.IsNullOrEmpty(appName))
                 {
-                    FarmCaching.Instance.ClearInternalAddresses();
+                    FarmCachingSingeltone.Instance.ClearInternalAddresses();
                 }
                 else
                 {
-                    FarmCaching.Instance.ClearInternalCache(appName);
+                    FarmCachingSingeltone.Instance.ClearInternalCache(appName);
                 }
                 return Ok();
             }

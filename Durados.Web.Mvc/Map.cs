@@ -3016,17 +3016,11 @@ namespace Durados.Web.Mvc
         }
 
 
-        private void Initiate(DataSet dataSet, string connectionString, string configFileName, bool save)
+        private void Initiate(DataSet dataSetParam, string connectionString, string configFileName, bool save)
         {
             ConfigFileName = configFileName;
-            dataset = dataSet;
-            //DataSet ds = dataset.Clone();
-            //db = new Database(ds);
-            //db.ConnectionString = connectionString;
-
-            //if (db.Localization != null)
-            //    InitiateLocalization();
-            ////LoadConfiguration();
+            dataset = dataSetParam;
+            
             Refresh();
 
             if (save)
@@ -3669,8 +3663,11 @@ namespace Durados.Web.Mvc
 
         public void ReadConfigFromCloud(DataSet ds, string filename)
         {
+            
             string blobName = Maps.GetStorageBlobName(filename);
             object cachedDs = Maps.Instance.StorageCache.Get(blobName);
+            
+            // check exist in cache
             if (cachedDs != null)
             {
                 using (MemoryStream stream = new MemoryStream())
@@ -3682,10 +3679,13 @@ namespace Durados.Web.Mvc
                 return;
             }
 
+            // fetch from storage
             ReadConfigFromCloudStorage(ds, filename);
-            Maps.Instance.StorageCache.Add(blobName, ds);
 
+            // add to cache for next read
+            Maps.Instance.StorageCache.Add(blobName, ds);
         }
+        
         public void ReadConfigFromCloudStorage(DataSet ds, string filename)
         {
 
@@ -5638,10 +5638,11 @@ namespace Durados.Web.Mvc
         {
             if (appName == null || ReservedAppNames.Contains(appName))
             {
-                //if (IsApi())
-                //{
-                //    duradosMap.Logger.Log("uue", "get map", "appName: " + appName, null, -754, "5231");
-                //}
+                return duradosMap;
+            }
+
+            if (appName == DuradosAppName)
+            {
                 return duradosMap;
             }
 
@@ -5658,30 +5659,26 @@ namespace Durados.Web.Mvc
             {
                 map = maps[appName];
             }
+
+
             //else if (maps.ContainsKey(appName.ToLower()))
             //{
             //    map = maps[appName.ToLower()];
             //}
+            
 
             if (map == null)
             {
                 bool newStructure = false;
-                //if (IsApi())
-                //{
-                //    if (appName != duradosAppName && !BlobExists(appName))
-                //    {
-                //        if (AppExists(appName).HasValue)
-                //        {
-                //            duradosMap.Logger.Log("uue", "get map", "appName: " + appName, null, -754, "5256");
-                //            throw new DuradosException("Blob is not ready yet.");
-                //        }
-                //        else
-                //        {
-                //            throw new DuradosException("The App " + appName + " does not exist.");
-                //        }
-                //    }
-                //}
-                map = CreateMap(appName, out newStructure) ?? duradosMap;
+                map = CreateMap(appName, out newStructure);
+                
+                // app not exist
+                if(map == null)
+                {
+                    return null;
+                }
+
+                //todo: check null return
 
                 if (!newStructure)
                 {
@@ -5824,7 +5821,7 @@ namespace Durados.Web.Mvc
 
         PortManager portManager = new PortManager(Convert.ToInt32(System.Configuration.ConfigurationManager.AppSettings["startSshTunnelPort"] ?? "10000"), Convert.ToInt32(System.Configuration.ConfigurationManager.AppSettings["endSshTunnelPort"] ?? "63000"));
 
-        public Map CreateMap(string appName, out bool newStructure)
+        private Map CreateMap(string appName, out bool newStructure)
         {
             //Durados.Diagnostics.EventViewer.WriteEvent("Start CreateMap for: " + appName);
 
@@ -5832,16 +5829,15 @@ namespace Durados.Web.Mvc
             View appView = GetAppView();
             Field idField = appView.Fields["Id"];
 
-            if (string.IsNullOrEmpty(appName))
-                Durados.Diagnostics.EventViewer.WriteEvent("CreateMap: appName is null");
-
-            int? id = AppExists(appName);
+            int? id = AppExists(appName, null);
+            
             if (!id.HasValue)
             {
                 Durados.Diagnostics.EventViewer.WriteEvent("CreateMap: could not find is for: " + appName);
                 return null;
             }
-
+            
+            // if you are here, your application exist but don't have already created map
             MapDataSet.durados_AppRow appRow = null;
             try
             {
@@ -5868,9 +5864,7 @@ namespace Durados.Web.Mvc
 
             //Durados.Diagnostics.EventViewer.WriteEvent("appRow found for: " + appName + " id: " + id, System.Diagnostics.EventLogEntryType.SuccessAudit, 500);
 
-            Map map = null;
-
-            map = new Map();
+            Map map = new Map();
 
             map.PlugInId = GetPluginType((int)id);/***Return - Plugin Type (Id) or 0 if value wasn't set or exist*/
 
@@ -5973,20 +5967,12 @@ namespace Durados.Web.Mvc
 
             bool firstTime = map.Initiate(false);
             ConfigAccess.Refresh(map.GetConfigDatabase().ConnectionString);
-            if (false)
-            {
-                map.Commit();
-            }
 
             map.AppName = appName;
-
-
             map.Url = GetAppUrl(appName);
             map.SiteInfo.LogoHref = map.Url;
-
-
             map.Guid = appRow.Guid;
-
+            
             int themeId = 0;
             string themeName = "";
             string themePath = "";
@@ -6007,8 +5993,8 @@ namespace Durados.Web.Mvc
             map.Theme = new Theme() { Id = themeId, Name = themeName, Path = themePath };
             if (firstTime && Convert.ToBoolean(System.Configuration.ConfigurationManager.AppSettings["NotifyUserOnConsoleReady"] ?? "true"))
                 map.NotifyUser("consoleFirstTimeSubject", "consoleFirstTimeMessage");
+            
             RefreshMapDnsAlias(map);
-
             UpdatePlan(appRow.Id, map);
 
             newStructure = map.SaveChangesInConfigStructure();

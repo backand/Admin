@@ -681,7 +681,7 @@ namespace BackAnd.Web.Api.Controllers
                 Map.AllKindOfCache.Clear();
                 RefreshOldAdmin(Map.AppName);
             }
-            FarmCaching.Instance.ClearMachinesCache(Map.AppName);
+            FarmCachingSingeltone.Instance.ClearMachinesCache(Map.AppName);
 
         }
 
@@ -702,7 +702,7 @@ namespace BackAnd.Web.Api.Controllers
                 }
                 catch { }
             }
-            FarmCaching.Instance.ClearMachinesCache(map.AppName);
+            FarmCachingSingeltone.Instance.ClearMachinesCache(map.AppName);
 
         }
 

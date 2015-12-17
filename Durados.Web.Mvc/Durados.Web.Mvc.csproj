@@ -271,6 +271,7 @@
     <Compile Include="UI\FieldValue.cs" />
     <Compile Include="UI\Gantt.cs" />
     <Compile Include="UI\Helpers\AppFactory.cs" />
+    <Compile Include="UI\Helpers\FarmCaching.cs" />
     <Compile Include="UI\Helpers\FtpHelper.cs" />
     <Compile Include="UI\Helpers\AmazonS3Helper.cs" />
     <Compile Include="UI\Helpers\AzureHelper.cs" />
@@ -282,6 +283,7 @@
     <Compile Include="UI\Helpers\Base64CryptoHelper.cs" />
     <Compile Include="UI\Helpers\CryptorHelper.cs" />
     <Compile Include="UI\Helpers\ERDHelper.cs" />
+    <Compile Include="UI\Helpers\IFarmCaching.cs" />
     <Compile Include="UI\Helpers\MailingServiceHelper.cs" />
     <Compile Include="UI\Helpers\MenuHelper.cs" />
     <Compile Include="UI\Helpers\NewDatabaseParametersFactory.cs" />
@@ -394,7 +396,9 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <None Include="app.config" />
+    <None Include="app.config">
+      <SubType>Designer</SubType>
+    </None>
     <None Include="MapDataSet.xsc">
       <DependentUpon>MapDataSet.xsd</DependentUpon>
     </None>
