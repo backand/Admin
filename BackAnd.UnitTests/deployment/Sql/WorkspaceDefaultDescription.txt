@@ -1,0 +1,369 @@
+﻿<style type="text/css">
+body {
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-size: 14px;
+  line-height: 1.42857143;
+  color: #333;
+  background-color: #fff;
+  margin: 0px !important;
+}
+a {
+    text-decoration: none;
+}
+a:hover {
+    /*text-decoration: underline;*/
+}
+.containere {
+    width: 980px;
+    margin: auto;
+}
+.bg {
+    width: 100%;
+    height: 672px;
+    background: #e86021;
+}
+.mainimg {
+    background: url('https://prod1.blob.core.windows.net/app36867/mainimgtwo.png');
+    width: 100%;
+    height: 672px;
+    float: left;
+    border-left: 1px solid #fff;
+    border-right: 1px solid #fff;
+}
+.hoverone {
+     width: 260px;
+    height: 130px;
+}
+.obone {
+    width: 260px;
+    height: 256px;
+    display: block;
+    margin-left: 123px;
+    margin-top: 161px;
+    float: left;
+    font-size: 1.4em;
+    color: #e86021; 
+    font-family: Trebuchet MS;
+    font-weight: bold;
+    padding-top: 0px;
+    padding-left: 0px;
+}
+.firtadnaccess {
+    height: 100px;
+    width: 200px;
+    display: block;
+    float: left;
+}
+.hoverone:hover {
+    color: #e86021 !important;
+}
+.hovertwo {
+    width: 260px;
+    height: 112px;
+    margin-right: 0px;
+}
+.obtwo {
+    width: 221px;
+    height: 224px;
+    display: block;
+    float: right;
+    margin-top: 268px;
+    margin-right: 139px;
+    color: #e86021; 
+    font-family: Trebuchet MS;
+    font-weight: bold;
+    padding-top: 0px;
+    padding-left: 0px;
+    font-size: 1.32em;
+    width: 260px;
+}
+.hoverthree {
+    width: 260px;
+    height: 112px;
+    margin-right: 0px;
+}
+#obthree {
+    width: 221px;
+    height: 224px;
+    display: block;
+    float: right;
+    margin-top: 59px;
+    margin-right: 15px;
+    color: #e86021; 
+    font-family: Trebuchet MS;
+    font-weight: bold;
+    margin-top: 38px;
+    padding-left: 0px;
+    font-size: 1.32em;
+    width: 260px; 
+}
+.hoverthree p {
+    margin-bottom: 0px !important;
+    margin-top: 0px !important;
+    text-indent: 52px;
+}
+.hoverone:hover {
+     background: url('https://prod1.blob.core.windows.net/app36867/hoverone.png');
+     cursor: pointer;
+}
+.hovertwo:hover {
+     background: url('https://prod1.blob.core.windows.net/app36867/hovertwo.png')  39px 0px no-repeat;
+     cursor: pointer;
+     color: #e86021; 
+}
+.hoverthree:hover {
+     background: url('https://prod1.blob.core.windows.net/app36867/hovertwo.png') 39px 0px no-repeat;
+     cursor: pointer;
+     color: #e86021; 
+}
+.softorange {
+    width: 100%;
+    height: 26px;
+    background: #f3b858;
+}
+.greennumber {
+    font-size: 80px;
+    font-weight: bold;
+    color: #269e84;
+    position: absolute;
+    font-family: Georgia;
+}
+#firstone {
+   position: relative;
+   top: 0px;
+   left: 0px;
+   display: block;
+  margin-top: -112px;
+margin-left: 107px;
+height: 97px;
+}
+#firstone:hover {
+    text-decoration: none !important;
+}
+#secondone {
+    float: none;
+   position: relative;
+    top: 0px;
+    left: 0px;
+   width: 100px;
+    display: block;
+    margin-right: 0px;
+    margin-left: 122px;
+    margin-top: -109px;
+    height: 94px;
+    margin-bottom: 0px;
+}
+#thirdone {
+    width: 41px;
+    font-size: 70px !important;
+    position: relative;
+    top: 0px;
+    left: 0px;
+    margin-top: -91px;
+    margin-left: 127px;
+    height: 88px;
+}
+.tdu {
+    text-decoration: underline;
+}
+#firstiteself {
+    margin-bottom: 28px;
+    text-align: center;
+    color: hsl(19, 81%, 52%);
+}
+#faccess:hover {
+    text-decoration: none;
+}
+#createdash{
+    
+}
+#createdash:hover {
+    text-decoration: none;
+}
+#movtwo {
+    margin-right: 0px;
+    margin-top: 20px;
+}
+#seconditself {
+    width: 185px;
+    display: block;
+    margin-left: 60px;
+    color: hsl(19, 81%, 52%);
+}
+#thirditself {
+    margin-left: 85px;
+    color: hsl(19, 81%, 52%);
+}
+#thirditself p {
+    margin: 0px;
+}
+ .modal-admin {
+    /* new custom width */
+    width: 750px;
+    height: 350px;
+    /* must be half of the width, minus scrollbar on the left (30px) */
+    left: 50%;
+margin-left:-325px;
+top:120px;
+ color:black;
+background-color:white;
+opacity:1;
+}
+.maindiv{
+width:100%;
+}
+</style>
+
+<div class="maindiv">
+<h1 center="">Place the default page content here</h1></div>
+<div id="angular-pop" style="display:none" class="modal-admin modal fade in">  
+<div class="modal-header">  <a class="close" data-dismiss="modal">×</a>  </div>
+<div class="modal-body">    
+<h1>Getting Started with the User Preview</h1>  
+           <p>The above navigation bar gives you quick access to your Backand Console.  Use this to easily toggle between the two views.</p>
+<p>The User Preview code can be found on GitHub (https://github.com/backand/angularbknd).  Please follow the read.me section to set up your environment and have fun creating your application in Backand. </p>
+<p>Tip – we highly recommend that you modify your User Preview homepage.  This will be the first page your end-users will see when they log into your application. You can easily design it or remove it altogether</p>
+</div>
+<div class="modal-footer">  <a href="#" class="btn" data-dismiss="modal">Close</a>  </div>          
+
+</div>
+<div id="admin-pop">
+        <div class="maincont" style="background-color:#e86021;">
+            <div class="containere">
+                <div class="bg">
+                    <div class="mainimg">
+                        <div class="obone">
+                            <a href="/Admin/Pages" target="_top" id="faccess">
+                                <div class="greennumber" id="firstone">1</div>
+                                <div id="firstiteself">ACCESS DATA</div>
+                            </a>
+                        <div class="hoverone" id="movone"></div>
+                        </div>
+                        <div class="obtwo">
+                        <a href="/Home/Charts" target="_top" id="createdash">
+                            <div class="greennumber" id="secondone">2</div>
+                            <div id="seconditself">CREATE DASHBOARDS</div>
+                        </a>
+                        <div class="hovertwo" id="movtwo"></div>
+                        </div>
+                        <div id="obthree">
+                            <a href="/Home/IndexPage/v_durados_User" target="_top" id="manageusers">
+                                <div class="greennumber" id="thirdone">3</div>
+                                <div id="thirditself"><p>MANAGE USERS</p> <p>&amp; PERMISSIONS</p></div>
+                            </a>
+                            <div class="hoverthree" id="movthree"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="tutorial" style="padding: 0px;">
+                <div id="video">video</div>
+        </div>
+		</div>
+        <script>
+
+        $(document).ready(function() {
+            $('#faccess').on("mouseover", function () {
+                $('#firstiteself').addClass('tdu');
+            });
+             $('#faccess').on("mouseout", function () {
+                $('#firstiteself').removeClass('tdu');
+            });
+
+            $('#createdash').on("mouseover", function () {
+                   $('#seconditself').addClass('tdu');
+            });
+             $('#createdash').on("mouseout", function () {
+                   $('#seconditself').removeClass('tdu');
+            });
+
+            $('#manageusers').on("mouseover", function () {
+                $('#thirditself').addClass('tdu');
+            });
+            $('#manageusers').on("mouseout", function () {
+                $('#thirditself').removeClass('tdu');
+            });
+
+            $('#movone').on("click", function () {
+   		openVideo('eSBqt4FbGbc','How to add a database table');
+            });
+            $('#movtwo').on("click", function () {
+                openVideo('cu49opckIME','Create a charts in Dashboard');
+            });
+            $('#movthree').on("click", function () {
+                openVideo('DjZhipDPbiw','Create a new user');
+            });
+			 $('#admin-pop').dialog(
+				{
+					modal: true,
+					draggable: false,
+					resizable: false,
+					autoOpen: false,
+					hide: { effect: 'fade', duration: 1 },
+					show: { effect: 'fade', duration: 200 },
+					closeText: '',
+                                        height:720,
+					width: 1010,
+					stack: false,
+					position: ["center", 100],
+					
+					open: function () {
+						$('.ui-widget-overlay').css('height', $('body').height() + 'px');
+						}
+		});
+		
+	    $('#tutorial').dialog(
+		{
+		    modal: true,
+		    draggable: false,
+		    resizable: false,
+		    autoOpen: false,
+		    hide: { effect: 'fade', duration: 1 },
+		    show: { effect: 'fade', duration: 200 },
+		    closeText: '',
+		    width: 853,
+		    stack: false,
+		    position: ["center", 100],
+		    close: function () { $('#video').html(''); $('.change-sequence').show(); },
+		    open: function () {
+		        $('.ui-widget-overlay').css('height', $('body').height() + 'px');
+		    }
+		});
+		try{
+			if(isUserAdmin && isUserAdmin() )
+				openAdminPopup()
+		 }catch(err) {}
+		try{
+			if(backand !== undefined &&   backand.security.banner.getAdminInfo().username)
+			{
+			openAdminPopup('angular')
+			}
+		 }catch(err) {}
+        });
+		
+		
+        function openVideo (id, title) {
+        try{
+
+        	$('#video').html('<iframe width="853" height="480" src="https://www.youtube.com/embed/' + id + '?rel=0&autoplay=1" frameborder="0"></iframe>');
+		$('#tutorial').dialog("option", "title", title);
+        	$('#tutorial').dialog('open'); //
+    	}
+    	catch (err) { }
+
+	}
+	function openAdminPopup (site) {
+        try{
+		if(site=='angular')
+{
+
+			$('#angular-pop').modal('show');
+}
+		else
+        	$('#admin-pop').dialog('open');
+		
+    	}
+    	catch (err) { alert('err'+err);}
+		}
+        </script>

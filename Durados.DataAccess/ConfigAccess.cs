@@ -148,8 +148,10 @@ namespace Durados.DataAccess
                     }
                     catch (ArgumentException)
                     {
+
                     }
                 }
+
                 HandleOrder(dataSets[fileName], fileName);
 
                 return dataSets[fileName];
@@ -845,8 +847,24 @@ namespace Durados.DataAccess
 
             if (dataSet != null)
             {
-                return dataSet.Tables[viewName].Select(columnName + " = '" + value + "'").Count() > 0;
+                // validate input is valid
+                if (!dataSet.Tables.Contains(viewName))
+                {
+                    StringBuilder builder = new StringBuilder();
+                    builder.Append("Count: ");
+                    builder.Append(dataSet.Tables.Count);
 
+                  
+                    foreach (DataTable table in dataSet.Tables)
+	                {
+                        builder.Append(table.TableName);
+                        builder.Append(",");
+	                }        
+
+                    throw new DuradosException("Can't find view name " + viewName + "  in dataset " + fileName + " " + builder.ToString());
+                }
+
+                return dataSet.Tables[viewName].Select(columnName + " = '" + value + "'").Count() > 0;
             }
 
             return false;

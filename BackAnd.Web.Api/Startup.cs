@@ -38,7 +38,8 @@ namespace BackAnd.Web.Api
             app.UseCors(Microsoft.Owin.Cors.CorsOptions.AllowAll);
             app.UseWebApi(config);
 
-            FarmCaching.Instance.AppStarted();
+            
+            FarmCachingSingeltone.Instance.AppStarted();
 
             var context = new OwinContext(app.Properties);
             var token = context.Get<System.Threading.CancellationToken>("host.OnAppDisposing");
@@ -46,13 +47,12 @@ namespace BackAnd.Web.Api
             {
                 token.Register(() =>
                 {
-                    FarmCaching.Instance.AppEnded();
+                    FarmCachingSingeltone.Instance.AppEnded();
 
                 });
             }
-
+            
             Analytics.Init();
-
         }
 
         public static OAuthAuthorizationServerOptions OAuthOptions { get; private set; }

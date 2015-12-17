@@ -82,7 +82,7 @@ namespace Backand.Web.Api.BrowserTests
         {
             driver = new ChromeDriver();
             tinyWait = new WebDriverWait(driver, new TimeSpan(0, 0, 60));
-            longWait = new WebDriverWait(driver, new TimeSpan(0, 3, 0));
+            longWait = new WebDriverWait(driver, new TimeSpan(0, 5, 0));
 
             //WebPage = "https://www.backand.com/apps/#/sign_up";
             WebPage = GetWebPage();

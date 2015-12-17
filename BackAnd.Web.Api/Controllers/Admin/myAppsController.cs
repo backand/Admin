@@ -31,6 +31,7 @@ namespace BackAnd.Web.Api.Controllers
     [BackAnd.Web.Api.Controllers.Filters.BackAndAuthorize]
     public class keysController : apiController
     {
+       
         [HttpGet]
         [Route("{id}")]
         public IHttpActionResult Get(string id)
@@ -43,8 +44,6 @@ namespace BackAnd.Web.Api.Controllers
             try
             {
                 return Ok(RestHelper.GetKeys(id));
-
-
             }
             catch (Exception exception)
             {
@@ -65,8 +64,6 @@ namespace BackAnd.Web.Api.Controllers
             try
             {
                 return Ok(RestHelper.ResetKey(id, key));
-
-
             }
             catch (Exception exception)
             {
