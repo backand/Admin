@@ -2338,8 +2338,13 @@ namespace Durados.Web.Mvc.Controllers
             if (row == null)
                 return false;
             else
+            {
+                if (Map == null)
+                {
+                    return false;
+                }
                 return ValidateUser(Convert.ToInt32(Map.Id), Convert.ToInt32(row["ID"]));
-
+            }
         }
 
         private bool ValidateUser(int appID, int userId)

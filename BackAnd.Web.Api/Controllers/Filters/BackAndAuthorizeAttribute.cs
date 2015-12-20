@@ -62,13 +62,13 @@ namespace BackAnd.Web.Api.Controllers.Filters
 
                 if (usernameObj == null)
                 {
-                    HandleUnauthorized(actionContext);
+                    HandleUnauthorized(actionContext, null, null);
                     return;
                 }
 
                 if (appnameObj == null)
                 {
-                    HandleUnauthorized(actionContext);
+                    HandleUnauthorized(actionContext, null, null);
                     return;
                 }
 
@@ -99,7 +99,7 @@ namespace BackAnd.Web.Api.Controllers.Filters
                         //}
                         if (!accountMembershipService.ValidateUser(username) || !accountMembershipService.IsApproved(username))
                         {
-                            HandleUnauthorized(actionContext);
+                            HandleUnauthorized(actionContext, appname, username);
                             return;
                         }
                     }
@@ -136,8 +136,8 @@ namespace BackAnd.Web.Api.Controllers.Filters
                     {
                         actionContext.ActionArguments.Add(Database.backand_serverAuthorizationAttempt, true);
                         actionContext.ActionArguments.Add(UserRoleNotSufficient, true);
-                     
-                        HandleUnauthorized(actionContext);
+
+                        HandleUnauthorized(actionContext, appname, username);
                         return;
                     }
                 }
@@ -145,7 +145,7 @@ namespace BackAnd.Web.Api.Controllers.Filters
             }
             catch
             {
-                HandleUnauthorized(actionContext);
+                HandleUnauthorized(actionContext, null, null);
                 return;
             }
         }
@@ -437,9 +437,21 @@ namespace BackAnd.Web.Api.Controllers.Filters
         }
        
 
-        private void HandleUnauthorized(System.Web.Http.Controllers.HttpActionContext actionContext)
+        private void HandleUnauthorized(System.Web.Http.Controllers.HttpActionContext actionContext, string appName, string username)
         {
-            if (actionContext.ActionArguments.ContainsKey(Database.backand_serverAuthorizationAttempt))
+            if (appName == null)
+            {
+                actionContext.Response = actionContext.Request.CreateErrorResponse(
+                        HttpStatusCode.Unauthorized,
+                        string.Format("The user is unauthorized. Please try to login again or contact the system administrator."));
+            }
+            else if (username == null)
+            {
+                actionContext.Response = actionContext.Request.CreateErrorResponse(
+                        HttpStatusCode.Unauthorized,
+                        string.Format("The user is unauthorized. Please try to login again or contact the system administrator."));
+            }
+            else if (actionContext.ActionArguments.ContainsKey(Database.backand_serverAuthorizationAttempt))
             {
                 if (actionContext.ActionArguments.ContainsKey(Database.backand_appNameEmpty))
                 {
@@ -478,7 +490,7 @@ namespace BackAnd.Web.Api.Controllers.Filters
             {
                 actionContext.Response = actionContext.Request.CreateErrorResponse(
                         HttpStatusCode.Unauthorized,
-                        "The user is unauthorized. Please try to login again or contact the system administrator.");
+                        string.Format("The user {0} is unauthorized for {1}. Please try to login again or contact the system administrator.", username, appName));
             }
         }
     }
