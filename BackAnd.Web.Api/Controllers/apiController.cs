@@ -297,6 +297,7 @@ namespace BackAnd.Web.Api.Controllers
         }
 
     }
+    
     //[System.Web.Http.Authorize]
     [LogExceptionFilter]
     [LogActionFilter]
@@ -681,6 +682,7 @@ namespace BackAnd.Web.Api.Controllers
                 Map.AllKindOfCache.Clear();
                 RefreshOldAdmin(Map.AppName);
             }
+
             FarmCachingSingeltone.Instance.ClearMachinesCache(Map.AppName);
 
         }
@@ -702,6 +704,7 @@ namespace BackAnd.Web.Api.Controllers
                 }
                 catch { }
             }
+
             FarmCachingSingeltone.Instance.ClearMachinesCache(map.AppName);
 
         }

@@ -38,9 +38,6 @@ namespace BackAnd.Web.Api
             app.UseCors(Microsoft.Owin.Cors.CorsOptions.AllowAll);
             app.UseWebApi(config);
 
-            
-            FarmCachingSingeltone.Instance.AppStarted();
-
             var context = new OwinContext(app.Properties);
             var token = context.Get<System.Threading.CancellationToken>("host.OnAppDisposing");
             if (token != System.Threading.CancellationToken.None)
