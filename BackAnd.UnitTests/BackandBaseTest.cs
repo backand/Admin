@@ -2,6 +2,7 @@
 using Durados.Web.Mvc;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Web;
@@ -22,7 +23,16 @@ namespace BackAnd.UnitTests
 
         protected void InitInner()
         {
-            TestHelper.Init();
+            try
+            {
+                Trace.WriteLine("Start Init");
+                TestHelper.Init();
+            }
+            catch(Exception e)
+            {
+                Trace.WriteLine(e.StackTrace);
+                Trace.WriteLine(e);
+            }
         }
 
         protected void CleanupInner()
