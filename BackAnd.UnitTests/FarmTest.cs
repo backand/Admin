@@ -2,6 +2,7 @@
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Durados.Web.Mvc.UI.Helpers;
 using Durados.Web.Mvc;
+using System.Diagnostics;
 
 namespace BackAnd.UnitTests
 {
@@ -17,15 +18,24 @@ namespace BackAnd.UnitTests
         [TestMethod]
         public void TestAfterResetAppDontExistInCache()
         {
-            // Arrange
-            var appName = this.ValidAppName;
-            var res = Maps.Instance.GetMap(appName);
+            try
+            {
+                // Arrange
+                var appName = this.ValidAppName;
 
-            // Act
-            FarmCachingSingeltone.Instance.ClearInternalCache(appName);
+                var res = Maps.Instance.GetMap(appName);
 
-            // Assert
-            Assert.IsFalse(Maps.Instance.AppInCach(appName));
+                // Act
+                FarmCachingSingeltone.Instance.ClearInternalCache(appName);
+
+                // Assert
+                Assert.IsFalse(Maps.Instance.AppInCach(appName));
+            }
+            catch(Exception e)
+            {
+                Trace.WriteLine(e.StackTrace);
+                Trace.WriteLine(e);
+            }
         }
 
         [TestMethod]
