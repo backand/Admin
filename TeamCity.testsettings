@@ -2,8 +2,9 @@
 <TestSettings name="TeamCity" id="67103b57-56b0-4d0b-a7fa-2dd79d07cbd8" xmlns="http://microsoft.com/schemas/VisualStudio/TeamTest/2010">
   <Description>These are default test settings for a local test run.</Description>
   <Deployment>
-    <DeploymentItem filename="BackAnd.UnitTests\deployment\" />
     <DeploymentItem filename="BackAnd.UnitTests\Config\" />
+    <DeploymentItem filename="BackAnd.UnitTests\deployment\" />
+    <DeploymentItem filename="Backand.Config\data.json" />
   </Deployment>
   <Execution>
     <TestTypeSpecific>
