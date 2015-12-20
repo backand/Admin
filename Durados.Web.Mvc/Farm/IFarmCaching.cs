@@ -7,15 +7,9 @@ namespace Durados.Web.Mvc.UI.Helpers
 {
     public interface IFarmCaching
     {
-        void ClearInternalAddresses();
-
         void ClearInternalCache(string appName);
 
         void ClearMachinesCache(string appName, bool async = false);
-
-        void AppStarted();
-
-        void ClearMachinesAddresses();
 
         void AppEnded();
     }

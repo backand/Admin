@@ -22,13 +22,22 @@ namespace BackAnd.UnitTests
 
         protected void InitInner()
         {
-            Maps.Version = "4";
-            HttpContext.Current = new HttpContext(new HttpRequest(null, "http://tempuri.org", null), new HttpResponse(null));
+            TestHelper.Init();
         }
 
         protected void CleanupInner()
         {
            
+        }
+    }
+
+
+    public static class TestHelper
+    {
+        public static void Init()
+        {
+            Maps.Version = "4";
+            HttpContext.Current = new HttpContext(new HttpRequest(null, "http://tempuri.org", null), new HttpResponse(null));
         }
     }
 }

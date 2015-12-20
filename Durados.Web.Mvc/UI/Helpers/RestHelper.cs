@@ -40,6 +40,7 @@ namespace Durados.Web.Mvc.UI.Helpers
             string fileName = Maps.Instance.GetMap(appname).GetConfigDatabase().ConnectionString;
             Maps.Instance.Restart(appname);
             Durados.DataAccess.ConfigAccess.Restart(fileName);
+           
             if (Workflow.Engine.CurrentDatabases != null && Workflow.Engine.CurrentDatabases.ContainsKey(appname))
             {
                 try
@@ -50,16 +51,18 @@ namespace Durados.Web.Mvc.UI.Helpers
             }
 
             string blobName = Maps.GetStorageBlobName(fileName);
+           
             if (Maps.Instance.StorageCache.ContainsKey(blobName))
             {
                 Maps.Instance.StorageCache.Remove(blobName);
+
+                 blobName += "xml";
+
+                 if (Maps.Instance.StorageCache.ContainsKey(blobName))
+                 {
+                     Maps.Instance.StorageCache.Remove(blobName);
+                 }
             }
-            blobName += "xml";
-            if (Maps.Instance.StorageCache.ContainsKey(blobName))
-            {
-                Maps.Instance.StorageCache.Remove(blobName);
-            }
-            FarmCachingSingeltone.Instance.ClearMachinesCache(appname);
         }
 
         public static void AddStat(Dictionary<string, object> item, string appName)
@@ -991,6 +994,7 @@ namespace Durados.Web.Mvc.UI.Helpers
                 throw new UserNotFoundException(username);
             }
             map.Database.GetUserView().Edit(new Dictionary<string, object>() { { "Guid", guid } }, pk.ToString(), null, view_BeforeEditInDatabase, null, null);
+            
             RefreshToken.Clear();
             return guid;
         }

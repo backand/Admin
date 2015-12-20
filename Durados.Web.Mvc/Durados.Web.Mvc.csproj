@@ -151,6 +151,10 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\Duradus.Web.Mvc.App\deployment\PayPal.dll</HintPath>
     </Reference>
+    <Reference Include="StackExchange.Redis, Version=1.0.316.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\StackExchange.Redis.1.0.488\lib\net45\StackExchange.Redis.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System.configuration" />
@@ -240,6 +244,9 @@
     <Compile Include="Controllers\UtilsController.cs" />
     <Compile Include="Controllers\CrmController.cs" />
     <Compile Include="Controllers\ImageOrganizerController.cs" />
+    <Compile Include="Farm\FarmMessage.cs" />
+    <Compile Include="Farm\IPubsubTransport.cs" />
+    <Compile Include="Farm\RedisFarm.cs" />
     <Compile Include="FtpAzure.cs" />
     <Compile Include="FtpUpload.cs" />
     <Compile Include="GeneralDataAccess.cs" />
@@ -273,7 +280,7 @@
     <Compile Include="UI\FieldValue.cs" />
     <Compile Include="UI\Gantt.cs" />
     <Compile Include="UI\Helpers\AppFactory.cs" />
-    <Compile Include="UI\Helpers\FarmCaching.cs" />
+    <Compile Include="Farm\FarmCaching.cs" />
     <Compile Include="UI\Helpers\FtpHelper.cs" />
     <Compile Include="UI\Helpers\AmazonS3Helper.cs" />
     <Compile Include="UI\Helpers\AzureHelper.cs" />
@@ -285,7 +292,7 @@
     <Compile Include="UI\Helpers\Base64CryptoHelper.cs" />
     <Compile Include="UI\Helpers\CryptorHelper.cs" />
     <Compile Include="UI\Helpers\ERDHelper.cs" />
-    <Compile Include="UI\Helpers\IFarmCaching.cs" />
+    <Compile Include="Farm\IFarmCaching.cs" />
     <Compile Include="UI\Helpers\MailingServiceHelper.cs" />
     <Compile Include="UI\Helpers\MenuHelper.cs" />
     <Compile Include="UI\Helpers\NewDatabaseParametersFactory.cs" />
@@ -415,6 +422,7 @@
     <None Include="Microsoft.WindowsAzure.Caching\ClientPerfCountersInstaller.exe.config">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Include="packages.config" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>

@@ -4730,6 +4730,9 @@ namespace Durados.Web.Mvc
             poolCreator = Convert.ToInt32(System.Configuration.ConfigurationManager.AppSettings["poolCreator"] ?? "55555");
             poolShouldBeUsed = Convert.ToBoolean(System.Configuration.ConfigurationManager.AppSettings["poolShouldBeUsed"] ?? "false");
 
+            redisConnectionString = System.Configuration.ConfigurationManager.AppSettings["redisConnectionString"] ?? "pub-redis-10938.us-east-1-4.3.ec2.garantiadata.com:10938,password=bell1234"; 
+        
+
             mainAppConfigName = System.Configuration.ConfigurationManager.AppSettings["mainAppConfigName"] ?? "backand";
             hostByUs = Convert.ToBoolean(System.Configuration.ConfigurationManager.AppSettings["hostByUs"] ?? "false");
             duradosAppName = System.Configuration.ConfigurationManager.AppSettings["durados_appName"] ?? "www";
@@ -4941,6 +4944,8 @@ namespace Durados.Web.Mvc
         private static int poolCreator = 5555;
         private static bool poolShouldBeUsed = false;
 
+        private static string redisConnectionString = "";
+
         private static string mainAppConfigName = "backand";
         private static bool hostByUs = false;
         private static string duradosAppName = "www";
@@ -5135,6 +5140,16 @@ namespace Durados.Web.Mvc
                 return poolCreator;
             }
         }
+
+        public static string RedisConnectionString
+        {
+            get
+            {
+                return redisConnectionString;
+            }
+        }
+
+        
         public static bool PoolShouldBeUsed
         {
             get
@@ -5584,16 +5599,8 @@ namespace Durados.Web.Mvc
             //}
             //catch { }
 
-            if (mapsCache.ContainsKey(pk))
-            {
-                RemoveMap(pk);
-            }
-            else if (mapsCache.ContainsKey(pk.ToLower()))
-            {
-                RemoveMap(pk.ToLower());
-            }
-
-
+            mapsCache.Remove(pk);
+            mapsCache.Remove(pk.ToLower());
 
             try
             {
@@ -6466,6 +6473,8 @@ namespace Durados.Web.Mvc
             else
                 return (OnBoardingStatus)Convert.ToInt32(scalar);
         }
+
+       
     }
 
     public class FieldProperty
