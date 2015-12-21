@@ -4,6 +4,7 @@
   <Deployment>
     <DeploymentItem filename="BackAnd.UnitTests\Config\" />
     <DeploymentItem filename="BackAnd.UnitTests\deployment\" />
+    <DeploymentItem filename="BackAnd.UnitTests\" />
     <DeploymentItem filename="Backand.Config\data.json" />
   </Deployment>
   <Execution>
