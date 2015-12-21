@@ -1010,6 +1010,24 @@ namespace Durados.Web.Mvc.UI.Helpers
 
             string role = map.Database.GetUserRole(map.Database.GetCurrentUsername());
 
+            if (string.IsNullOrEmpty(role))
+            {
+                int? appId = Maps.Instance.AppExists(appName);
+
+                if (!appId.HasValue)
+                {
+                    throw new DuradosException("App not exists");
+                }
+                else if (Maps.Instance.GetOnBoardingStatus(appId.Value.ToString()) != OnBoardingStatus.Ready)
+                {
+                    throw new DuradosException("App not ready");
+                }
+                else
+                {
+                    throw new DuradosException("Unexpected error when get app keys");
+                }
+            }
+
             if (!(role == "Admin" || role == "Developer"))
                 throw new DuradosException("Only admin can get keys. your role is " + role);
 

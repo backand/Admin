@@ -6,6 +6,7 @@ using System.Text;
 
 using Durados.DataAccess;
 using Durados.Web.Mvc.UI.Helpers;
+using System.Web;
 
 namespace Durados.Web.Mvc
 {
@@ -871,7 +872,7 @@ namespace Durados.Web.Mvc
 
             object role = null;
             string sessionKey = GetSessionKey("-role");
-            if ((string.IsNullOrEmpty(System.Web.HttpContext.Current.Request.Headers["Authorization"]) && !string.IsNullOrEmpty(System.Web.HttpContext.Current.Request.Headers[Database.AnonymousToken])) || (!string.IsNullOrEmpty(System.Web.HttpContext.Current.Request.Headers["Authorization"]) && System.Web.HttpContext.Current.Request.Headers["Authorization"].Contains("anonymous")))
+            if (UserIsAuthorizedOrAnonymous())
             {
                 if (SecureLevel != Durados.SecureLevel.AllUsers)
                 {
@@ -884,7 +885,10 @@ namespace Durados.Web.Mvc
                 return DefaultGuestRole;
             }
 
-            if (((!string.IsNullOrEmpty(System.Web.HttpContext.Current.Request.QueryString["public"]) && System.Web.HttpContext.Current.Request.QueryString["public"].Equals("true")) || (!string.IsNullOrEmpty(System.Web.HttpContext.Current.Request.QueryString["public2"]) && System.Web.HttpContext.Current.Request.QueryString["public2"].Equals("true"))) && SecureLevel == Durados.SecureLevel.AllUsers && !string.IsNullOrEmpty(DefaultGuestRole))
+            if (((!string.IsNullOrEmpty(System.Web.HttpContext.Current.Request.QueryString["public"]) && 
+                  System.Web.HttpContext.Current.Request.QueryString["public"].Equals("true")) || 
+                  (!string.IsNullOrEmpty(System.Web.HttpContext.Current.Request.QueryString["public2"]) && System.Web.HttpContext.Current.Request.QueryString["public2"].Equals("true"))) && 
+                  SecureLevel == Durados.SecureLevel.AllUsers && !string.IsNullOrEmpty(DefaultGuestRole))
             {
                 return DefaultGuestRole;
             }
@@ -915,6 +919,7 @@ namespace Durados.Web.Mvc
                 return string.Empty;
 
             DataRow userRow = null;
+            
             if (username == null)
             {
                 userRow = GetUserRow();
@@ -948,6 +953,14 @@ namespace Durados.Web.Mvc
                 }
             }
             return role.ToString();
+        }
+
+        private static bool UserIsAuthorizedOrAnonymous()
+        {
+            return (string.IsNullOrEmpty(HttpContext.Current.Request.Headers["Authorization"]) &&
+                            !string.IsNullOrEmpty(HttpContext.Current.Request.Headers[Database.AnonymousToken])) ||
+                            (!string.IsNullOrEmpty(HttpContext.Current.Request.Headers["Authorization"]) &&
+                            HttpContext.Current.Request.Headers["Authorization"].Contains("anonymous"));
         }
 
         public virtual View GetUserFirstView()
