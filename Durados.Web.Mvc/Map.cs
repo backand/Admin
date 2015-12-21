@@ -3792,7 +3792,10 @@ namespace Durados.Web.Mvc
 
                 try
                 {
-                    Maps.Instance.DuradosMap.Logger.Log("Map", "WriteConfigToCloud", map.AppName ?? string.Empty, string.Empty, string.Empty, -8, containerName + " started", started);
+                    if (map != null)
+                    {
+                        Maps.Instance.DuradosMap.Logger.Log("Map", "WriteConfigToCloud", map.AppName ?? string.Empty, string.Empty, string.Empty, -8, containerName + " started", started);
+                    }
                 }
                 catch { }
             }
@@ -3801,7 +3804,9 @@ namespace Durados.Web.Mvc
         private void BlobTransferCompletedCallback(IAsyncResult result)
         {
             BlobTransferAsyncState state = (BlobTransferAsyncState)result.AsyncState;
-
+            if (state == null || state.Map == null)
+                return;
+                
             try
             {
                 Maps.Instance.DuradosMap.Logger.Log("Map", "WriteConfigToCloud", state.Map.AppName ?? string.Empty, DateTime.Now.Subtract(state.Started).TotalMilliseconds.ToString(), string.Empty, -8, state.BlobName + " ended", DateTime.Now);

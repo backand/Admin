@@ -1791,7 +1791,7 @@ namespace BackAnd.Web.Api.Controllers
                 if (isNewDatabase)
                 {
                     int? appIdFromPool = null;
-                    poolSuccess = new AppsPool().Pop(id, Maps.Instance.DuradosMap.Database.GetCurrentUsername(), out appIdFromPool);
+                    poolSuccess = new AppsPool().Pop(id, title, Maps.Instance.DuradosMap.Database.GetCurrentUsername(), out appIdFromPool);
 
                     if (poolSuccess)
                     {

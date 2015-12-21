@@ -7526,10 +7526,10 @@ namespace Durados.Web.Mvc.UI.Helpers
 
     public class AppsPool
     {
-        public bool Pop(string appName, string username, out int? appId)
+        public bool Pop(string appName, string title, string username, out int? appId)
         {
             int creator = GetCreator(username);
-            return Pop(appName, username, creator, out appId);
+            return Pop(appName, title, username, creator, out appId);
         }
 
         private int GetCreator(string username)
@@ -7537,21 +7537,33 @@ namespace Durados.Web.Mvc.UI.Helpers
             return Maps.Instance.DuradosMap.Database.GetUserID(username);
         }
 
-        public bool Pop(string appName, string username, int creator, out int? appId)
+        public bool Pop(string appName, string title, string username, int creator, out int? appId)
         {
             Map mainMap = null;
             appId = null;
             if (!ShouldBeUsed())
                 return false;
-            if (GetPoolCreator() == creator)
-                return false;
-
+            
             try
             {
                 mainMap = Maps.Instance.DuradosMap;
-                appId = FindAndUpdateAppInMain(appName, creator, mainMap.connectionString);
+                int poolCreator = GetPoolCreator();
+                if (poolCreator == creator)
+                {
+                    mainMap.Logger.Log("AppsPool", "Pop", "", string.Format("pool creator equals creator, id = {0}", creator), "", 8, string.Empty, DateTime.Now);
+                    return false;
+                }
+
+                appId = FindAndUpdateAppInMain(appName, title, creator, mainMap.connectionString);
+                if (!appId.HasValue)
+                {
+                    mainMap.Logger.Log("AppsPool", "Pop", "", string.Format("Could not find app in pool for user id {0} where pool creator is {1}", creator, poolCreator), "", 2, string.Empty, DateTime.Now);
+                    return false;
+                }
                 ReplaceUsernameInSysDb(mainMap, appName, username);
 
+                mainMap.Logger.Log("AppsPool", "Pop", "", string.Format("success for creator id = {0}, pool creator = {1}, app id = {2} ", creator, poolCreator, appId), "", 3, string.Empty, DateTime.Now);
+                
                 return true;
             }
             catch (Exception exception)
@@ -7577,9 +7589,9 @@ namespace Durados.Web.Mvc.UI.Helpers
             userView.Edit(new Dictionary<string, object>() { { "Username", username }, { "Email", username }, { "FirstName", firstName }, { "LastName", lastName } }, pk, null, null, null, null);
         }
 
-        private int? FindAndUpdateAppInMain(string appName, int creator, string connectionString)
+        private int? FindAndUpdateAppInMain(string appName, string title, int creator, string connectionString)
         {
-            return FindAndUpdateAppInMain(appName, creator, GetPoolCreator(), connectionString);
+            return FindAndUpdateAppInMain(appName, title, creator, GetPoolCreator(), connectionString);
         }
 
         private int GetPoolCreator()
@@ -7592,7 +7604,7 @@ namespace Durados.Web.Mvc.UI.Helpers
             return Maps.PoolShouldBeUsed;
         }
 
-        private int? FindAndUpdateAppInMain(string appName, int creator, int poolCreator, string connectionString)
+        private int? FindAndUpdateAppInMain(string appName, string title, int creator, int poolCreator, string connectionString)
         {
             string sql =
                 "begin tran getFromPool " +
@@ -7602,11 +7614,12 @@ namespace Durados.Web.Mvc.UI.Helpers
                 "update durados_App " +
                 "set creator = @creator, " +
                 "[CreatedDate] = @CreatedDate, " +
-                "[Name] = @Name " +
+                "[Name] = @Name, " +
+                "[Title] = @Title " +
                 "where id = @appId; " +
                 "select @appId " +
                 "commit tran getFromPool";
-            string scalar = new SqlAccess().ExecuteScalar(connectionString, sql, new Dictionary<string, object>() { { "poolCreator", poolCreator }, { "creator", creator }, { "CreatedDate", DateTime.Now }, { "Name", appName } });
+            string scalar = new SqlAccess().ExecuteScalar(connectionString, sql, new Dictionary<string, object>() { { "poolCreator", poolCreator }, { "creator", creator }, { "CreatedDate", DateTime.Now }, { "Name", appName }, { "Title", title } });
             if (!string.IsNullOrEmpty(scalar))
             {
                 return Convert.ToInt32(scalar);
