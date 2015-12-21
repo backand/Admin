@@ -1009,8 +1009,9 @@ namespace Durados.Web.Mvc.UI.Helpers
             }
 
             string role = map.Database.GetUserRole(map.Database.GetCurrentUsername());
+
             if (!(role == "Admin" || role == "Developer"))
-                throw new DuradosException("Only admin can get keys");
+                throw new DuradosException("Only admin can get keys. your role is " + role);
 
             string sql = string.Format("SELECT * FROM [durados_app] WITH(NOLOCK)  WHERE [Name] = '{0}'", appName);
 
