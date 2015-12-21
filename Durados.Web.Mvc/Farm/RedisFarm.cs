@@ -54,13 +54,20 @@ namespace Durados.Web.Mvc.Farm
                 }
             });
         }
-        
-         public void Publish(FarmMessage message)
+
+        public void Publish(FarmMessage message)
         {
             PublishCount++;
             var wrappedMessage = new FarmMessageWrapper { Message = message, SenderId = this.SubscriberID };
             var str = JsonConvert.SerializeObject(wrappedMessage);
-            subscriber.Publish(this.roomName, str);
+            try
+            {
+                subscriber.Publish(this.roomName, str);
+            }
+            catch (Exception exception)
+            {
+
+            }
         }
 
         private static ISubscriber CreateRedisConnection(string connectionString)

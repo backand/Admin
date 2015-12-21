@@ -3665,16 +3665,26 @@ namespace Durados.Web.Mvc
         {
             
             string blobName = Maps.GetStorageBlobName(filename);
-            object cachedDs = Maps.Instance.StorageCache.Get(blobName);
+            DataSet cachedDs = Maps.Instance.StorageCache.Get(blobName);
             
             // check exist in cache
             if (cachedDs != null)
             {
                 using (MemoryStream stream = new MemoryStream())
                 {
-                    ((DataSet)cachedDs).WriteXml(stream, XmlWriteMode.WriteSchema);
-                    stream.Seek(0, SeekOrigin.Begin);
-                    ds.ReadXml(stream);
+                    try
+                    {
+                        cachedDs.WriteXml(stream, XmlWriteMode.WriteSchema);
+                        stream.Seek(0, SeekOrigin.Begin);
+                        ds.ReadXml(stream);
+                    }
+                    catch(ConstraintException e)
+                    {
+                        StringWriter sw = new StringWriter();
+                        ds.WriteXml(sw);
+                        string result = sw.ToString();
+                        Maps.Instance.DuradosMap.Logger.Log("ReadConfigFromCloud", "ReadConfigFromCloud", "ReadConfigFromCloud", e, 1, result);
+                    }
                 }
                 return;
             }
@@ -6478,8 +6488,6 @@ namespace Durados.Web.Mvc
             else
                 return (OnBoardingStatus)Convert.ToInt32(scalar);
         }
-
-       
     }
 
     public class FieldProperty
