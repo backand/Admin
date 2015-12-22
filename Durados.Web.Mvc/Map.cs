@@ -460,7 +460,7 @@ namespace Durados.Web.Mvc
             catch (Exception exception)
             {
                 string appName = Maps.Instance.GetAppName();
-                Maps.Instance.DuradosMap.Logger.Log("Map", "Initiate", "Initiate", exception, 1, "App name:" + appName);
+                Maps.Instance.DuradosMap.Logger.Log("Map", "Initiate", "Initiate", exception, 1, exception.StackTrace);
                 throw new DuradosException("Failed to initiate app", exception);
             }
         }
