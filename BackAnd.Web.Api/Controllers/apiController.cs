@@ -644,8 +644,12 @@ namespace BackAnd.Web.Api.Controllers
             return result;
         }
 
+        private static bool RefreshOldAdminFailure = false;
         protected virtual void RefreshOldAdmin(string appName)
         {
+            if (RefreshOldAdminFailure)
+                return;
+
             string id = GetMasterGuid();
 
             string qstring = "id=" + id;
@@ -658,7 +662,12 @@ namespace BackAnd.Web.Api.Controllers
             {
                 Durados.Web.Mvc.Infrastructure.Http.AsynWebRequest(url, null);
             }
-            catch { }
+            catch (Exception exception)
+            {
+                RefreshOldAdminFailure = true;
+                Maps.Instance.DuradosMap.Logger.Log("RefreshOldAdmin", "", "", exception, 2, null);
+
+            }
            
         }
 

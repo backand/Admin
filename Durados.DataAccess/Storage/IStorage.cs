@@ -21,6 +21,7 @@ namespace Durados.DataAccess.Storage
         void ReadFromStorage(DataSet ds, string filename);
 
         bool Exists(string filename);
-       
+
+        Durados.Data.ICache<DataSet> ConfigCache { get; }
     }
 }

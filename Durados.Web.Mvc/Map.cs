@@ -3680,10 +3680,22 @@ namespace Durados.Web.Mvc
                     }
                     catch(ConstraintException e)
                     {
-                        StringWriter sw = new StringWriter();
-                        ds.WriteXml(sw);
-                        string result = sw.ToString();
-                        Maps.Instance.DuradosMap.Logger.Log("ReadConfigFromCloud", "ReadConfigFromCloud", "ReadConfigFromCloud", e, 1, result);
+                        string errMsg = string.Empty;
+                        foreach (DataTable dt in ds.Tables)
+                        {
+                            if (dt.HasErrors)
+                            {
+                                string rowErr = string.Empty;
+                                foreach (DataRow dr in dt.GetErrors())
+                                {
+                                    rowErr += dr.RowError + "\n";
+                                }
+                                errMsg += string.Format("Errors occurred in Table {0} :\n{1}\n", dt.TableName, rowErr.TrimEnd('\n'));
+
+                            }
+                        }
+
+                        Maps.Instance.DuradosMap.Logger.Log("ReadConfigFromCloud", "ReadConfigFromCloud", "ReadConfigFromCloud", e, 1, errMsg);
                     }
                 }
                 return;
@@ -4368,6 +4380,16 @@ namespace Durados.Web.Mvc
             }
         }
 
+        Durados.Data.ICache<DataSet> configCache = CacheFactory.CreateCache<DataSet>("configCache");
+
+        public Durados.Data.ICache<DataSet> ConfigCache
+        {
+            get
+            {
+                return configCache;
+            }
+        }
+
         Dictionary<string, Dictionary<string, object>> allKindOfCache = new Dictionary<string, Dictionary<string, object>>();
 
         public Dictionary<string, Dictionary<string, object>> AllKindOfCache
@@ -4943,7 +4965,7 @@ namespace Durados.Web.Mvc
         public static string[] AllowedDownloadFileTypes { get; private set; }
         public static string[] DenyDownloadFileTypes { get; private set; }
 
-        private ICache<Map> mapsCache = null;
+        private Durados.Data.ICache<Map> mapsCache = null;
         public static Dictionary<string, string> DnsAliases = null;
         private IPersistency persistency = null;
         private static bool multiTenancy = false;
@@ -6438,9 +6460,9 @@ namespace Durados.Web.Mvc
 
         }
 
-        ICache<DataSet> storageCache = CacheFactory.CreateCache<DataSet>("storageCache");
+        Durados.Data.ICache<DataSet> storageCache = CacheFactory.CreateCache<DataSet>("storageCache");
 
-        public ICache<DataSet> StorageCache
+        public Durados.Data.ICache<DataSet> StorageCache
         {
             get
             {
