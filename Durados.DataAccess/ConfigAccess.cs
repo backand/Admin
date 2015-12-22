@@ -138,36 +138,47 @@ namespace Durados.DataAccess
         //    }
         //}
 
+
+
         private static DataSet GetDataSet(string fileName)
         {
             if (multiTenancy)
             {
-                if (!dataSets.ContainsKey(fileName))
+               
+                DataSet myDataSet = dataSets.Get(fileName);
+                
+                // no double lock avoid optimistic concurrency
+                if (myDataSet == null)
                 {
+                    // create dataset
                     try
                     {
-                        dataSets.Add(fileName, new DataSet());
+                        var dataset = new DataSet();
 
                         if (cloud && storage != null && !storage.IsMainApp(fileName))
                         {
-                            storage.ReadConfigFromCloud(dataSets[fileName], fileName);
+                            storage.ReadConfigFromCloud(dataset, fileName);
                         }
                         else
                         {
-                            dataSets[fileName].ReadXml(fileName, XmlReadMode.ReadSchema);
+                            dataset.ReadXml(fileName, XmlReadMode.ReadSchema);
                         }
+
+                        // add to cache
+                        dataSets.Add(fileName, dataset);
+                        myDataSet = dataset;
                     }
-                    catch (ArgumentException)
+                    catch (Exception e)
                     {
-
+                        throw new DuradosException("could not read configuration from cloud into datasdet properly for " + fileName, e);
                     }
+                      
                 }
-
-                HandleOrder(dataSets[fileName], fileName);
-
-                return dataSets[fileName];
+               
+                HandleOrder(myDataSet, fileName);
+                return myDataSet;
             }
-            else
+            else  // non multitenancy, shouldn't arrive  here
             {
                 if (dataSet2 == null)
                 {
@@ -187,9 +198,11 @@ namespace Durados.DataAccess
             const string View = "View";
             if (!dataSet.Tables.Contains(View))
                 return;
+
             DataTable table = dataSet.Tables[View];
             if (table.Rows.Count <= 0)
                 return;
+
             DataRow[] rows = table.Select(string.Empty, Order + " desc");
 
             if (rows.Length == 0)
