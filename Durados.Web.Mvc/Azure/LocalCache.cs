@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Durados.Data;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.Caching;
@@ -41,6 +42,10 @@ namespace Durados.Web.Mvc.Azure
             get
             {
                 return (T)cache[key];
+            }
+            set
+            {
+                cache[key] = value;
             }
         }
 

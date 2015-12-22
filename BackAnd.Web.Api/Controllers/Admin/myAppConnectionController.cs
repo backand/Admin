@@ -2080,7 +2080,15 @@ namespace BackAnd.Web.Api.Controllers
 
             int appId = Maps.Instance.AppExists(appName).Value;
             AsyncCallback asyncCallback = new AsyncCallback(RespCallbackNew);
-            Durados.Web.Mvc.Infrastructure.Http.AsyncPostWebRequest(url, json, headers, new SendAsyncErrorHandler(appId), asyncCallback);
+            try
+            {
+                Durados.Web.Mvc.Infrastructure.Http.AsyncPostWebRequest(url, json, headers, new SendAsyncErrorHandler(appId), asyncCallback);
+            }
+            catch (Exception exception)
+            {
+                Map.Logger.Log(GetControllerNameForLog(this.ControllerContext), "CallHttpRequestToCreateTheSchema", exception.Source, exception, 1, null);
+
+            }
         }
 
         private void CallHttpRequestToCreateTheSchemaOld(string appName, string json)

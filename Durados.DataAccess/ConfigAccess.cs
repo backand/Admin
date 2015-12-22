@@ -111,7 +111,18 @@ namespace Durados.DataAccess
         public static bool multiTenancy = false;
         public static bool cloud = false;
         public static Durados.DataAccess.Storage.IStorage storage = null;
-        private static Dictionary<string, DataSet> dataSets = new Dictionary<string, DataSet>();
+        //private static Dictionary<string, DataSet> dataSets = new Dictionary<string, DataSet>();
+        private static Durados.Data.ICache<DataSet> dataSets
+        {
+            get
+            {
+                if (storage != null)
+                {
+                    return storage.ConfigCache;
+                }
+                return null;
+            }
+        }
 
 
         //private static DataSet dataSet

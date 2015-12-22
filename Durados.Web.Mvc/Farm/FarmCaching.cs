@@ -67,7 +67,7 @@ namespace Durados.Web.Mvc.UI.Helpers
             }
 
             this.transport = transport;
-            logger.Log("FarmNormal", null, string.Empty, null, 3, "Start transport with " + this.transport.GetType());
+            logger.Log("FarmNormal", null, transport.SubscriberID, null, 3, "Start transport with " + this.transport.GetType());
             transport.OnMessage += transport_OnMessage;
         }
 
@@ -75,13 +75,13 @@ namespace Durados.Web.Mvc.UI.Helpers
         {
             if(e.Message == null || string.IsNullOrEmpty(e.Message.AppName))
             {
-                logger.Log("FarmNormal", string.Empty, string.Empty, null, 1, "Message Arrive Null");
+                logger.Log("FarmNormal", string.Empty, transport.SubscriberID, null, 1, "Message Arrive Null");
                 // todo: log
                 return;
             }
 
-            logger.Log("FarmNormal", null, string.Empty, null, 3, "Arrive Message for app " + e.Message.AppName);
-            logger.Log("FarmNormal","Perf", string.Empty, null, 3, (DateTime.Now - e.Message.Time).Milliseconds.ToString());
+            logger.Log("FarmNormal", null, transport.SubscriberID, null, 3, "Arrive Message for app " + e.Message.AppName);
+            logger.Log("FarmNormal", "Perf", transport.SubscriberID, null, 3, (DateTime.Now - e.Message.Time).Milliseconds.ToString());
 
             this.ClearInternalCache(e.Message.AppName);
         }
@@ -89,13 +89,17 @@ namespace Durados.Web.Mvc.UI.Helpers
         public void ClearInternalCache(string appName)
         {
             if (Maps.Instance.AppInCach(appName))
+            {
                 RestHelper.Refresh(appName);
+                logger.Log("FarmNormal", null, transport.SubscriberID, null, 3, "Clear internal cache for app " + appName);
+            
+            }
         }
        
         public void AppEnded()
         {
             this.Dispose();
-            logger.Log("FarmNormal", string.Empty, string.Empty, null, 3 , "Finish dispose");
+            logger.Log("FarmNormal", string.Empty, transport.SubscriberID, null, 3, "Finish dispose");
         }
 
         public void Dispose()
@@ -117,7 +121,7 @@ namespace Durados.Web.Mvc.UI.Helpers
                 return;
             }
 
-            logger.Log("FarmNormal", null, string.Empty, null, 3, "Send Message for app " + appName);
+            logger.Log("FarmNormal", null, transport.SubscriberID, null, 3, "Send Message for app " + appName);
             this.transport.Publish(new FarmMessage { AppName = appName, Time = DateTime.Now });
         }
     }
