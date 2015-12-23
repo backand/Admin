@@ -493,6 +493,13 @@ namespace BackAnd.Web.Api.Controllers.Filters
                         new UnknownReasonServerAuthorizationFailureException());
                 }
             }
+            else if (Maps.Instance.GetOnBoardingStatus(Maps.Instance.AppExists(appName).Value.ToString()) != OnBoardingStatus.Ready)
+            {
+                string message = new Durados.Web.Mvc.UI.Helpers.AppNotReadyException(appName).Message;
+                actionContext.Response = actionContext.Request.CreateResponse(
+                        HttpStatusCode.NoContent,
+                        message);
+            }
             else
             {
                 actionContext.Response = actionContext.Request.CreateErrorResponse(
