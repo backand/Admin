@@ -108,6 +108,7 @@ namespace BackAnd.Web.Api.Controllers.Filters
                         actionContext.Response = actionContext.Request.CreateErrorResponse(
                 HttpStatusCode.InternalServerError,
                 string.Format(exception.Message, exception.Message));
+                        return;
                     }
                     catch (Exception exception)
                     {
