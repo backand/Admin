@@ -77,7 +77,7 @@ namespace Durados.Web.Mvc.Infrastructure
                     wreq.Headers.Add(key, headers[key]);
                 }
             }
-            
+
             wreq.Timeout = 60 * 60 * 1000;
             // Create the state object.
             RequestState rs = new RequestState();
@@ -141,26 +141,50 @@ namespace Durados.Web.Mvc.Infrastructure
 
         private static void RespCallback(IAsyncResult ar)
         {
-            // Get the RequestState object from the async result.
-            RequestState rs = (RequestState)ar.AsyncState;
+            RequestState rs = null;
+            WebRequest req = null;
+            try
+            {
+                // Get the RequestState object from the async result.
+                rs = (RequestState)ar.AsyncState;
 
-            // Get the WebRequest from RequestState.
-            WebRequest req = rs.Request;
+                // Get the WebRequest from RequestState.
+                req = rs.Request;
 
-            // Call EndGetResponse, which produces the WebResponse object
-            //  that came from the request issued above.
-            WebResponse resp = req.EndGetResponse(ar);
+                // Call EndGetResponse, which produces the WebResponse object
+                //  that came from the request issued above.
+                WebResponse resp = req.EndGetResponse(ar);
 
-            //  Start reading data from the response stream.
-            Stream ResponseStream = resp.GetResponseStream();
+                //  Start reading data from the response stream.
+                Stream ResponseStream = resp.GetResponseStream();
 
-            // Store the response stream in RequestState to read 
-            // the stream asynchronously.
-            rs.ResponseStream = ResponseStream;
+                // Store the response stream in RequestState to read 
+                // the stream asynchronously.
+                rs.ResponseStream = ResponseStream;
 
-            //  Pass rs.BufferRead to BeginRead. Read data into rs.BufferRead
-            IAsyncResult iarRead = ResponseStream.BeginRead(rs.BufferRead, 0,
-               BUFFER_SIZE, new AsyncCallback(ReadCallBack), rs);
+                //  Pass rs.BufferRead to BeginRead. Read data into rs.BufferRead
+                IAsyncResult iarRead = ResponseStream.BeginRead(rs.BufferRead, 0,
+                   BUFFER_SIZE, new AsyncCallback(ReadCallBack), rs);
+            }
+            catch (WebException e)
+            {
+                string strContent = e.Status + " ";
+
+                if(req != null)
+                {
+                    strContent += req.RequestUri.ToString();
+                }
+
+                if(rs != null)
+                {
+                  OnErrorEvent(new ErrorEventArgs(strContent, rs.SendAsyncErrorHandler));
+                }
+                else
+                {
+                    OnErrorEvent(new ErrorEventArgs(strContent, null));
+                }
+
+            }
         }
 
 
@@ -217,6 +241,7 @@ namespace Durados.Web.Mvc.Infrastructure
                 // Set the ManualResetEvent so the main thread can exit.
                 //allDone.Set();
             }
+
             return;
         }
 
@@ -280,7 +305,7 @@ namespace Durados.Web.Mvc.Infrastructure
             System.Net.WebRequest webRequest = System.Net.WebRequest.Create(url);
             webRequest.Method = "POST";
             webRequest.ContentType = "application/x-www-form-urlencoded";
-            if( Accept != "")
+            if (Accept != "")
                 ((HttpWebRequest)webRequest).Accept = Accept;
             if (header != "")
                 webRequest.Headers.Add(header);
@@ -333,7 +358,7 @@ namespace Durados.Web.Mvc.Infrastructure
                 Map map = Maps.Instance.GetMap();
                 if (map != null)
                     map.Logger.Log("Http", "CallWebRequest", "CallWebRequest", ex, 3, url);
-                
+
             }
 
         }
