@@ -45,6 +45,10 @@ namespace BackAnd.Web.Api.Controllers
             {
                 return Ok(RestHelper.GetKeys(id));
             }
+            catch (AppNotReadyException exception)
+            {
+                return ResponseMessage(Request.CreateResponse(HttpStatusCode.NoContent, exception.Message));
+            }
             catch (Exception exception)
             {
                 throw new BackAndApiUnexpectedResponseException(exception, this);

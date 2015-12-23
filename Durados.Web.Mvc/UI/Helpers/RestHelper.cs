@@ -1016,11 +1016,11 @@ namespace Durados.Web.Mvc.UI.Helpers
 
                 if (!appId.HasValue)
                 {
-                    throw new DuradosException("App not exists");
+                    throw new AppNotFoundException(appName);
                 }
                 else if (Maps.Instance.GetOnBoardingStatus(appId.Value.ToString()) != OnBoardingStatus.Ready)
                 {
-                    throw new DuradosException("App not ready");
+                    throw new AppNotReadyException(appName);
                 }
                 else
                 {
@@ -5265,6 +5265,16 @@ namespace Durados.Web.Mvc.UI.Helpers
                 }
             }
         }
+    }
+
+    public class AppNotReadyException : DuradosException
+    {
+        public AppNotReadyException(string appName)
+            : base(string.Format("The app {0} is not ready.", appName))
+        {
+
+        }
+
     }
 
     public class FilterException : DuradosException
