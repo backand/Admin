@@ -19,6 +19,7 @@ using Durados.Web.Mvc.UI.Helpers;
 using Durados.Web.Mvc.Infrastructure;
 using Durados.Web.Mvc.Azure;
 using Newtonsoft.Json;
+using System.Diagnostics;
 
 namespace Durados.Web.Mvc
 {
@@ -444,6 +445,30 @@ namespace Durados.Web.Mvc
             Initiate(true);
         }
 
+        private string  GetCaller(object message)
+        {
+            // frame 1, true for source info
+            StackFrame frame = new StackFrame(1, true);
+            var method = frame.GetMethod();
+            var fileName = frame.GetFileName();
+            var lineNumber = frame.GetFileLineNumber();
+
+            // we'll just use a simple Console write for now    
+            return string.Format("{0}({1}):{2} - {3}", fileName, lineNumber, method.Name, message);
+        }
+
+        private string GetRequest()
+        {
+            try
+            {
+                return string.Format("url: {0}; method: {1}", System.Web.HttpContext.Current.Request.Url.ToString(), System.Web.HttpContext.Current.Request.HttpMethod);
+            }
+            catch
+            {
+                return "unknown";
+            }
+        }
+
         public bool Initiate(bool save)
         {
             try
@@ -460,8 +485,9 @@ namespace Durados.Web.Mvc
             catch (Exception exception)
             {
                 string appName = Maps.Instance.GetAppName();
-                Maps.Instance.DuradosMap.Logger.Log("Map", "Initiate", "Initiate", exception, 1, exception.StackTrace);
-                throw new DuradosException("Failed to initiate app", exception);
+                Maps.Instance.DuradosMap.Logger.Log("Map", "Initiate", "Initiate", exception, 1, GetCaller("caller") + "; " + GetRequest());
+                throw new AppNotReadyException(appName);
+                //throw new DuradosException("Failed to initiate app", exception);
             }
         }
 
