@@ -53,15 +53,14 @@ namespace Durados.Web.Mvc.Infrastructure
     {
         public delegate void ErrorEventDelegate(object sender, ErrorEventArgs a);
         public static event ErrorEventDelegate ErrorEvent;
-
-
-        //public static ManualResetEvent allDone = new ManualResetEvent(false);
+        
         const int BUFFER_SIZE = 1024;
 
         public static void AsynWebRequest(string url, ISendAsyncErrorHandler sendAsyncErrorHandler)
         {
             AsyncWebRequest(url, sendAsyncErrorHandler, new AsyncCallback(RespCallback));
         }
+        
         public static void AsyncWebRequest(string url, ISendAsyncErrorHandler sendAsyncErrorHandler, AsyncCallback asyncCallback, Dictionary<string, string> headers = null)
         {
             // Get the URI from the command line.
@@ -148,6 +147,8 @@ namespace Durados.Web.Mvc.Infrastructure
                 // Get the RequestState object from the async result.
                 rs = (RequestState)ar.AsyncState;
 
+
+                
                 // Get the WebRequest from RequestState.
                 req = rs.Request;
 
@@ -178,6 +179,11 @@ namespace Durados.Web.Mvc.Infrastructure
                 if(rs != null)
                 {
                   OnErrorEvent(new ErrorEventArgs(strContent, rs.SendAsyncErrorHandler));
+
+                  if (ar is RequestState && ((RequestState)ar).SendAsyncErrorHandler != null)
+                  {
+                      ((RequestState)ar).SendAsyncErrorHandler.HandleError(e);
+                  }
                 }
                 else
                 {
@@ -186,7 +192,6 @@ namespace Durados.Web.Mvc.Infrastructure
 
             }
         }
-
 
         private static void ReadCallBack(IAsyncResult asyncResult)
         {
@@ -244,7 +249,6 @@ namespace Durados.Web.Mvc.Infrastructure
 
             return;
         }
-
 
         public static void OnErrorEvent(ErrorEventArgs e)
         {
@@ -318,6 +322,7 @@ namespace Durados.Web.Mvc.Infrastructure
 
             return result;
         }
+        
         public static string GetWebRequest(string url, string header = "", string UserAgent = "", int? timeout = null)
         {
 
