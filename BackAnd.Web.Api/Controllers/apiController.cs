@@ -20,6 +20,7 @@ using BackAnd.Web.Api.Controllers.Filters;
 using System.Threading.Tasks;
 using System.Collections;
 using System.Data.SqlClient;
+using Durados.Web.Mvc.Infrastructure;
 
 /*
  HTTP Verb	|Entire Collection (e.g. /customers)	                                                        |Specific Item (e.g. /customers/{id})
@@ -660,7 +661,11 @@ namespace BackAnd.Web.Api.Controllers
             string response = string.Empty;
             try
             {
-                Durados.Web.Mvc.Infrastructure.Http.AsynWebRequest(url, null);
+                Durados.Web.Mvc.Infrastructure.Http.AsynWebRequest(url,  
+                    new GenericAsyncErrorHandler((e) => {
+                        RefreshOldAdminFailure = true;
+                        Maps.Instance.DuradosMap.Logger.Log("RefreshOldAdmin", "AsyncResult", url, e, 2, null);
+                    }));
             }
             catch (Exception exception)
             {
@@ -670,6 +675,8 @@ namespace BackAnd.Web.Api.Controllers
             }
            
         }
+
+   
 
         internal protected virtual void Init()
         {
@@ -2082,6 +2089,19 @@ namespace BackAnd.Web.Api.Controllers
             {
                 return Convert.ToBoolean(System.Configuration.ConfigurationManager.AppSettings["DontSend"] ?? "false");
             }
+        }
+    }
+
+    public class GenericAsyncErrorHandler : Durados.Web.Mvc.Infrastructure.ISendAsyncErrorHandler
+    {
+        private Action<Exception> action;
+        public GenericAsyncErrorHandler(Action<Exception> action)
+        {
+            this.action = action;
+        }
+        public void HandleError(Exception exception)
+        {
+            action.Invoke(exception);
         }
     }
 
