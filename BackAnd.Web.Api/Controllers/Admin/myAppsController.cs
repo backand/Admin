@@ -96,6 +96,7 @@ namespace BackAnd.Web.Api.Controllers
             try
             {
                 View view = GetView(null);
+                
                 if (view == null)
                 {
                     return ResponseMessage(Request.CreateResponse(HttpStatusCode.NotFound, string.Format(Messages.ViewNameNotFound, AppViewName)));
@@ -143,7 +144,8 @@ namespace BackAnd.Web.Api.Controllers
                 View databaseView = null;
                 try
                 {
-                    databaseView = (View)Maps.Instance.GetMap(id).GetConfigDatabase().Views["Database"];
+                    if (item["DatabaseStatus"].Equals(1))
+                        databaseView = (View)Maps.Instance.GetMap(id).GetConfigDatabase().Views["Database"];
                 }
                 catch (Exception exception)
                 {
@@ -158,7 +160,8 @@ namespace BackAnd.Web.Api.Controllers
                         HandleInitiationFailure(id);
                         try
                         {
-                            databaseView = (View)Maps.Instance.GetMap(id).GetConfigDatabase().Views["Database"];
+                            if (item["DatabaseStatus"].Equals(1))
+                                databaseView = (View)Maps.Instance.GetMap(id).GetConfigDatabase().Views["Database"];
                         }
                         catch
                         {
@@ -216,21 +219,24 @@ namespace BackAnd.Web.Api.Controllers
                     {
                         try
                         {
-                            Map map = Maps.Instance.GetMap(id);
-                            if (map != null)
+                            if (!item["DatabaseStatus"].Equals(2))
                             {
-                                if (map.Database.TestConnection())
+                                Map map = Maps.Instance.GetMap(id);
+                                if (map != null)
                                 {
-                                    Maps.Instance.UpdateOnBoardingStatus(OnBoardingStatus.Ready, appId.Value.ToString());
+                                    if (map.Database.TestConnection())
+                                    {
+                                        Maps.Instance.UpdateOnBoardingStatus(OnBoardingStatus.Ready, appId.Value.ToString());
+                                    }
+                                    //else
+                                    //{
+                                    //    Maps.Instance.Restart(id);
+                                    //    if (Map.Database.TestConnection())
+                                    //    {
+                                    //        Maps.Instance.UpdateOnBoardingStatus(OnBoardingStatus.Ready, appId.Value.ToString());
+                                    //    }
+                                    //}
                                 }
-                                //else
-                                //{
-                                //    Maps.Instance.Restart(id);
-                                //    if (Map.Database.TestConnection())
-                                //    {
-                                //        Maps.Instance.UpdateOnBoardingStatus(OnBoardingStatus.Ready, appId.Value.ToString());
-                                //    }
-                                //}
                             }
                         }
                         catch (Exception exception)
