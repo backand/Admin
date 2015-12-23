@@ -5270,7 +5270,7 @@ namespace Durados.Web.Mvc.UI.Helpers
     public class AppNotReadyException : DuradosException
     {
         public AppNotReadyException(string appName)
-            : base(string.Format("The app {0} is not ready.", appName))
+            : base(string.Format("App is not ready yet: {0}", appName))
         {
 
         }

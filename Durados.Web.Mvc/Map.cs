@@ -5691,8 +5691,15 @@ namespace Durados.Web.Mvc
             if (map == null)
             {
                 bool newStructure = false;
-                map = CreateMap(appName, out newStructure);
-                
+                try
+                {
+                    map = CreateMap(appName, out newStructure);
+                }
+                catch (Exception)
+                {
+                    throw new AppNotReadyException(appName);
+                }
+
                 // app not exist
                 if(map == null)
                 {
