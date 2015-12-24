@@ -685,7 +685,7 @@ namespace BackAnd.Web.Api.Controllers
 
                 string guid = GetMasterGuid();
 
-                string qstring = "id=" + guid;
+                string qstring = "id=" + guid;     
                 
                 
                 try
