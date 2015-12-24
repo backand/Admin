@@ -180,9 +180,9 @@ namespace Durados.Web.Mvc.Infrastructure
                 {
                   OnErrorEvent(new ErrorEventArgs(strContent, rs.SendAsyncErrorHandler));
 
-                  if (ar is RequestState && ((RequestState)ar).SendAsyncErrorHandler != null)
+                  if (ar != null && ar.AsyncState != null && ar.AsyncState is RequestState && ((RequestState)ar.AsyncState).SendAsyncErrorHandler != null)
                   {
-                      ((RequestState)ar).SendAsyncErrorHandler.HandleError(e);
+                      ((RequestState)ar.AsyncState).SendAsyncErrorHandler.HandleError(e);
                   }
                 }
                 else
