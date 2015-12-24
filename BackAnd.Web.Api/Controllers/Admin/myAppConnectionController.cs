@@ -2598,7 +2598,7 @@ namespace BackAnd.Web.Api.Controllers
                 string server = item[ServernameFieldName].ToString();
                 string productPort = item["ProductPort"].ToString();
 
-                if (!server.Contains(':') && !string.IsNullOrEmpty(productPort))
+                if (!(server.Contains(':') || server.Contains(',')) && !string.IsNullOrEmpty(productPort))
                 {
                     item[ServernameFieldName] = server + ":" + productPort;
                 }
