@@ -5388,7 +5388,7 @@ namespace Durados.DataAccess
         {
             ISqlTextBuilder sqlTextBuilder = GetSqlTextBuilder(view);
 
-            string tableName = GetTableName(view);
+            string tableName = view.DataTable.TableName;
 
             string sql = "select * from " + sqlTextBuilder.EscapeDbObject("{0}") + " where {1}";
             sql = string.Format(sql, tableName, GetWhereStatement(view, tableName));

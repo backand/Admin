@@ -1439,7 +1439,12 @@ namespace Durados.Web.Mvc
                 "   parameters.email = userInput.Username;\n" +
                 "   parameters.firstName = userInput.FirstName;\n" +
                 "   parameters.lastName = userInput.LastName;\n" +
-            GetPostCode("response", USERS, "{parameters: {\"sync\": true}}", "parameters");
+                "   try{\n" +
+            GetPostCode("response", USERS, "{parameters: {\"sync\": true}}", "parameters", 1) + "\n" +
+                "}\n" +
+                "catch(err) {\n" +
+                "   // register user even if there is an error or no users object \n" +
+                "}";
 
             ISqlTextBuilder sqlTextBuilder = GetSqlTextBuilder();
             ConfigAccess configAccess = new DataAccess.ConfigAccess();
