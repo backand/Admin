@@ -1601,9 +1601,24 @@ namespace BackAnd.Web.Api.Controllers
 
             Dictionary<string, object> values = RestHelper.Deserialize(view, json);
 
+            if (!values.ContainsKey(Product))
+                return ResponseMessage(Request.CreateResponse(HttpStatusCode.NotFound, string.Format("Test connection requires " + Product)));
+
             string template = values[Product].ToString();
+
+            if (!values.ContainsKey("database"))
+                return ResponseMessage(Request.CreateResponse(HttpStatusCode.NotFound, string.Format("Test connection requires database")));
+
             string catalog = values["database"].ToString();
+
+            if (!values.ContainsKey("username"))
+                return ResponseMessage(Request.CreateResponse(HttpStatusCode.NotFound, string.Format("Test connection requires username")));
+
             string username = values["username"].ToString();
+
+            if (!values.ContainsKey("password"))
+                return ResponseMessage(Request.CreateResponse(HttpStatusCode.NotFound, string.Format("Test connection requires password")));
+
             string password = values["password"].ToString();
             bool usingSsh = false;
             if (values.ContainsKey("usingSsh"))
