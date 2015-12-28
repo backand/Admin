@@ -38,11 +38,15 @@ namespace Backand.BrowserRunner
                 .CloseIntercom()
                 .FillSignUpPage()
                 .CreateApp()
-                .EnsureAppCreated()
                 .LogOut()
                 .SignIn()
                 .OpenApp()
-                .SelectItems();
+                .SelectItems()
+                .DeleteApp()
+                .GoToAppsPage()
+                .AssertCreatedAppNotExist();
+                
+               
                 context.Log(null, "P" + processId + "; " + i.ToString() + " - ended");
             }
             catch (Exception e)

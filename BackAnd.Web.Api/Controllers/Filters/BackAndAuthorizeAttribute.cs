@@ -105,9 +105,9 @@ namespace BackAnd.Web.Api.Controllers.Filters
                     }
                     catch (Durados.Web.Mvc.UI.Helpers.AppNotReadyException exception)
                     {
-                        actionContext.Response = actionContext.Request.CreateErrorResponse(
-                HttpStatusCode.InternalServerError,
-                string.Format(exception.Message, exception.Message));
+                        actionContext.Response = actionContext.Request.CreateResponse(
+                HttpStatusCode.NoContent,
+                exception.Message);
                         return;
                     }
                     catch (Exception exception)
