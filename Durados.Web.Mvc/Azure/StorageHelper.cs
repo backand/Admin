@@ -63,12 +63,15 @@ namespace Durados.Web.Mvc.Azure
         public int NumberOfCopies { get; set; }
         public string BackupPrefix { get; set; }
         public string VersionPrefix { get; set; }
+        public string UploadPrefix { get; set; }
 
         public BlobBackup()
         {
             NumberOfCopies = 5;
             BackupPrefix = "B";
             VersionPrefix = "ver";
+            VersionPrefix = "up";
+
             if (Maps.IsApi2())
             {
                 NumberOfCopies = 1;

@@ -4671,6 +4671,23 @@ namespace Durados.Web.Mvc
             }
         }
 
+        public string SaveUploadConfig(string appname,Dictionary<string,MemoryStream> configFiles)
+        {
+            int? id = AppExists(appname);
+            if (!id.HasValue)
+                return null;
+            foreach (var configFile in configFiles)
+            {
+                string containerName = Maps.DuradosAppPrefix.Replace("_", "").Replace(".", "").ToLower() + id.ToString();
+                
+                CloudBlobContainer container = GetContainer(containerName);
+                //(new Durados.Web.Mvc.Azure.BlobBackup()).VersionPrefix.CopyBack(container, "-1", containerName);
+                //SaveConfig(ds, filename);
+
+                
+            }
+            return null;
+        }
         Azure.DuradosStorage storage = new Azure.DuradosStorage();
 
         private CloudBlobContainer GetContainer(string filename)
