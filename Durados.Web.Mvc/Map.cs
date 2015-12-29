@@ -75,6 +75,17 @@ namespace Durados.Web.Mvc
 
         public virtual string Url { get; set; }
 
+        private bool? hostedByUs = null;
+        public bool HostedByUs
+        {
+            get
+            {
+                if (!hostedByUs.HasValue)
+                    hostedByUs = (new Durados.Web.Mvc.Infrastructure.AppFactory().GetAppById(Id)).AppType == 2;
+
+                return hostedByUs.Value;
+            }
+        }
         public virtual string DownloadActionName { get { return Maps.DownloadActionName; } }
 
         public DataAccess.AutoGeneration.Dynamic.Mapper DynamicMapper { get; private set; }
