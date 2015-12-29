@@ -1283,16 +1283,16 @@ namespace Durados.Web.Mvc
             databaseView.Edit(new Dictionary<string, object>() { { "NewUserDefaultRole", "User" } }, "0", null, null, null, null);
         }
 
-        public string GetLocalDatabaseHost()
-        {
-            return (System.Configuration.ConfigurationManager.AppSettings["localDatabaseHost"] ?? "yrv-dev.czvbzzd4kpof.eu-central-1.rds.amazonaws.com").ToString();
-        }
+        //public string GetLocalDatabaseHost()
+        //{
+        //    return (System.Configuration.ConfigurationManager.AppSettings["localDatabaseHost"] ?? "yrv-dev.czvbzzd4kpof.eu-central-1.rds.amazonaws.com").ToString();
+        //}
         public string GetConnectionSource()
         {
             try
             {
-                string localDatabaseHost = GetLocalDatabaseHost();
-                if (connectionString.Contains(localDatabaseHost))
+                //string localDatabaseHost = GetLocalDatabaseHost();
+                if(HostedByUs)// (connectionString.Contains(localDatabaseHost))
                 {
                     return "local";
                 }

@@ -591,8 +591,8 @@ namespace Durados.Web.Mvc.UI.Helpers
                     }
                     else
                     {
-                        string localDatabaseHost = GetLocalDatabaseHost();
-                        if (map.connectionString.Contains(localDatabaseHost))
+                        //string localDatabaseHost = GetLocalDatabaseHost();
+                        if (map.HostedByUs)//(map.connectionString.Contains(localDatabaseHost))
                         {
                             return "local";
                         }
@@ -613,10 +613,11 @@ namespace Durados.Web.Mvc.UI.Helpers
             }
         }
 
-        public static string GetLocalDatabaseHost()
-        {
-            return (System.Configuration.ConfigurationManager.AppSettings["localDatabaseHost"] ?? "yrv-dev.czvbzzd4kpof.eu-central-1.rds.amazonaws.com").ToString();
-        }
+        //public static string GetLocalDatabaseHost()
+        //{
+
+        //    return (System.Configuration.ConfigurationManager.AppSettings["localDatabaseHost"] ?? "yrv-dev.czvbzzd4kpof.eu-central-1.rds.amazonaws.com").ToString();
+        //}
 
         private static Dictionary<string, object> GetConfig(View view, string pk, bool deep, BeforeSelectEventHandler beforeSelectCallback, AfterSelectEventHandler afterSelectCallback, bool displayParentValue = false)
         {
