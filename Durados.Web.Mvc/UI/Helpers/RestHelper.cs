@@ -4068,7 +4068,7 @@ namespace Durados.Web.Mvc.UI.Helpers
                     throw new PasswordConfirmationException();
                 }
 
-                if (!IsAppExists(appName))
+                if (!IsAppExists(appName) && appName != Maps.DuradosAppName)
                 {
                     throw new AppDoesNotExistException(appName);
                 }
