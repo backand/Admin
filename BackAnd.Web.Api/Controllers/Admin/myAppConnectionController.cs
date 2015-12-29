@@ -1601,9 +1601,24 @@ namespace BackAnd.Web.Api.Controllers
 
             Dictionary<string, object> values = RestHelper.Deserialize(view, json);
 
+            if (!values.ContainsKey(Product))
+                return ResponseMessage(Request.CreateResponse(HttpStatusCode.NotFound, string.Format("Test connection requires " + Product)));
+
             string template = values[Product].ToString();
+
+            if (!values.ContainsKey("database"))
+                return ResponseMessage(Request.CreateResponse(HttpStatusCode.NotFound, string.Format("Test connection requires database")));
+
             string catalog = values["database"].ToString();
+
+            if (!values.ContainsKey("username"))
+                return ResponseMessage(Request.CreateResponse(HttpStatusCode.NotFound, string.Format("Test connection requires username")));
+
             string username = values["username"].ToString();
+
+            if (!values.ContainsKey("password"))
+                return ResponseMessage(Request.CreateResponse(HttpStatusCode.NotFound, string.Format("Test connection requires password")));
+
             string password = values["password"].ToString();
             bool usingSsh = false;
             if (values.ContainsKey("usingSsh"))
@@ -1791,7 +1806,8 @@ namespace BackAnd.Web.Api.Controllers
                 if (isNewDatabase)
                 {
                     int? appIdFromPool = null;
-                    poolSuccess = new AppsPool().Pop(id, title, Maps.Instance.DuradosMap.Database.GetCurrentUsername(), out appIdFromPool);
+                    if (!IsSampleApp(values))
+                        poolSuccess = new AppsPool().Pop(id, title, Maps.Instance.DuradosMap.Database.GetCurrentUsername(), out appIdFromPool, template);
 
                     if (poolSuccess)
                     {
@@ -1866,6 +1882,16 @@ namespace BackAnd.Web.Api.Controllers
                 throw new BackAndApiUnexpectedResponseException(exception, this);
 
             }
+        }
+
+        private bool IsSampleApp(Dictionary<string, object> values)
+        {
+            if (values.ContainsKey("sampleApp"))
+            {
+                string sampleApp = values["sampleApp"].ToString();
+                return !(string.IsNullOrEmpty(sampleApp));
+            }
+            return false;
         }
 
         private void ValidateSchema(object schema, string appName)

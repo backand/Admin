@@ -334,6 +334,9 @@ namespace Durados
 
         public override string ConvertToString(DataRow dataRow)
         {
+            if (dataRow == null)
+                return null;
+
             DataRow parentRow = dataRow.GetParentRow(DataRelation.RelationName);
 
             if (parentRow == null)

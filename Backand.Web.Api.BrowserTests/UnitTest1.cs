@@ -207,8 +207,8 @@ namespace Backand.Web.Api.BrowserTests
             // check "next" button exist
             // thanks to shmuela
             
-            context.tinyWait.Until(ExpectedConditions.ElementToBeClickable(By.CssSelector("[test-hook='database-edit.create']")));
-            context.driver.FindElement(By.CssSelector("[test-hook='database-edit.create']")).Click();
+            //context.tinyWait.Until(ExpectedConditions.ElementToBeClickable(By.CssSelector("[test-hook='database-edit.create']")));
+            //context.driver.FindElement(By.CssSelector("[test-hook='database-edit.create']")).Click();
             return context;
         }
 
@@ -269,7 +269,8 @@ namespace Backand.Web.Api.BrowserTests
 
         public static AutomationTestContext EnsureAppCreated(this AutomationTestContext context)
         {
-            var res = context.longWait.Until(ExpectedConditions.ElementIsVisible(By.ClassName("ba-icon-objects")));
+            //var res = context.longWait.Until(ExpectedConditions.ElementIsVisible(By.ClassName("ba-icon-objects")));
+            var res = context.longWait.Until(ExpectedConditions.ElementIsVisible(By.XPath("//strong[text()='Your app " + context.AppName + " is ready']")));
             
             if(res == null)
             {
@@ -327,12 +328,42 @@ namespace Backand.Web.Api.BrowserTests
         {
             try
             {
-                context.longWait.Until(ExpectedConditions.ElementIsVisible(By.CssSelector("[test-hook='apps.app-panel.manage-button']"))).Click();
+                context.longWait.Until(ExpectedConditions.ElementIsVisible(By.XPath("//*[text()[contains(.,'Manage')]]"))).Click();
+
+                
+                //context.longWait.Until(ExpectedConditions.ElementIsVisible(By.CssSelector("[test-hook='apps.app-panel.manage-button']"))).Click();
             }
             catch (Exception exception)
             {
                 throw new ElementNotVisibleException("Element probably disappeared because app was not created and logged out", exception);
             }
+
+            return context;
+        }
+
+        public static AutomationTestContext DeleteApp(this AutomationTestContext context)
+        {
+            // close the object to ensure settings visibilty
+            var res = context.tinyWait.Until(ExpectedConditions.ElementIsVisible(By.ClassName("ba-icon-objects")));
+            res.Click();
+
+            res = context.tinyWait.Until(ExpectedConditions.ElementIsVisible(By.ClassName("ba-icon-settings")));
+            context.driver.MoveTo(By.ClassName("ba-icon-settings"));
+            res.Click();
+
+            // wait for fadein animation
+            Thread.Sleep(500);
+            context.driver.FindElements(By.CssSelector("[ng-click=\"nav.goTo('app.edit')\"]")).First(c => c.Enabled).Click();
+
+            context.driver.FindElements(By.CssSelector("[ng-click='settings.delete()']")).First(c => c.Enabled).Click();
+
+            // wait for fadein animation
+            Thread.Sleep(500);
+
+            context.tinyWait.Until(ExpectedConditions.ElementIsVisible(By.CssSelector("[ng-bind='okBtnText']"))).Click();
+
+            // wait for fadeout animation
+            Thread.Sleep(1000);
 
             return context;
         }
@@ -343,19 +374,41 @@ namespace Backand.Web.Api.BrowserTests
             res.Click();
 
             // wait for fadein animation
-            Thread.Sleep(500);
+            Thread.Sleep(1000);
             context.driver.FindElements(By.CssSelector("[ng-click='nav.showTable(table)']")).First(c => c.Enabled).Click();
 
             res = context.longWait.Until(ExpectedConditions.ElementIsVisible(By.XPath("//strong[text()=' Object - items ']")));
 
             return context;
         }
-        
-        
                 
         public static AutomationTestContext Finish(this AutomationTestContext context)
         {
             context.driver.Dispose();
+            return context;
+        }
+
+        public static AutomationTestContext GoToAppsPage(this AutomationTestContext context)
+        {
+            // goto appPage
+            context.driver.Navigate().GoToUrl(context.WebPage + "/#/");
+            return context;
+        }
+
+        public static AutomationTestContext AssertCreatedAppNotExist(this AutomationTestContext context)
+        {
+            //res = context.tinyWait.Until(ExpectedConditions.El(By.ClassName("ba-icon-settings")));
+
+            Thread.Sleep(10 * 1000);
+            var res = new AppPageHelper(context).AppExist(context.AppName);
+
+            if (!res)
+            {
+                throw new Exception("find app " + context.AppName + " but shouldn't");
+ 
+            }
+            Assert.IsFalse(res);
+
             return context;
         }
 
