@@ -114,9 +114,7 @@ namespace Durados.Web.Mvc.Infrastructure
                             Maps.Instance.DuradosMap.Logger.Log("ProductMaintenance", null, "RemoveApp", null, 2, string.Format("Could not drop system db from app {0}, the database server was not found the app type is {1}", app.Name, app.AppType.ToString()));
                         else
                         {
-
                             sysManager.DropDB(app.SystemServer, app.SystemCatalog);
-
                         }
 
                         break;
@@ -223,11 +221,16 @@ namespace Durados.Web.Mvc.Infrastructure
     {
 
 
-        //public App(int appId)
-        //{
-        //    DataTable dt = GetAppDataRowById(appId);
-        //    this.Load(dt.Rows[0]);
-        //}
+        public App GetAppById(string appId)
+        {
+            int id;
+            if(int.TryParse(appId,out id))
+            {
+                return GetAppById(id);
+            }
+            return null;
+        }
+
 
         public App GetAppById(int appId)
         {
@@ -362,6 +365,9 @@ namespace Durados.Web.Mvc.Infrastructure
             //dbo.f_report_is_user_from_wix(a.Creator, NULL) AS inwix,   
         }
 
+
+
+
     }
     public static class Connections
     {
@@ -370,19 +376,18 @@ namespace Durados.Web.Mvc.Infrastructure
         public static Dictionary<string, string> List = new Dictionary<string, string>();
         private static void LoadConnections()
         {
-            foreach (System.Configuration.ConnectionStringSettings connectionString in System.Configuration.ConfigurationManager.ConnectionStrings)
-            {
+            System.Configuration.ConnectionStringSettings systemConnection = System.Configuration.ConfigurationManager.ConnectionStrings["SystemMapsConnectionString"] ?? null;
                 System.Data.Common.DbConnectionStringBuilder csb;
-                if (MySqlAccess.IsMySqlConnectionString(connectionString.ConnectionString))
-                    csb = new MySql.Data.MySqlClient.MySqlConnectionStringBuilder(connectionString.ConnectionString);
+                if (MySqlAccess.IsMySqlConnectionString(systemConnection.ConnectionString))
+                    csb = new MySql.Data.MySqlClient.MySqlConnectionStringBuilder(systemConnection.ConnectionString);
                 else
-                    csb = new System.Data.SqlClient.SqlConnectionStringBuilder(connectionString.ConnectionString);
+                    csb = new System.Data.SqlClient.SqlConnectionStringBuilder(systemConnection.ConnectionString);
 
                 if (!List.ContainsKey(csb["data source"].ToString()))
-                    List.Add(csb["data source"].ToString(), connectionString.ConnectionString);
+                    List.Add(csb["data source"].ToString(), systemConnection.ConnectionString);
                 //else
                 //    List[cnnParameter.serverName]=new SqlServersManager(connectionString) ;
-            }
+            
             AddOnPremissDemoDb();
             AddExternalInstances();
 

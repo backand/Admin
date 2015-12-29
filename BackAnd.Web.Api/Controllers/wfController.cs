@@ -193,15 +193,18 @@ namespace BackAnd.Web.Api.Controllers
                 }
                 LoadValue(values, dataRow, view, field, dynastyPath, prefix, postfix, dicFields, internalDynastyPath);
 
-
-
-                System.Data.DataRow parentRow = dataRow.GetParentRow(field.DataRelation.RelationName);
-                View parentView = (View)field.ParentView;
-                if (parentRow == null)
+                System.Data.DataRow parentRow = null;
+                View parentView = null;
+                if (dataRow != null)
                 {
-                    string key = field.GetValue(dataRow);
-                    if (!string.IsNullOrEmpty(key))
-                        parentRow = parentView.GetDataRow(key, dataRow.Table.DataSet);
+                    parentRow = dataRow.GetParentRow(field.DataRelation.RelationName);
+                    parentView = (View)field.ParentView;
+                    if (parentRow == null)
+                    {
+                        string key = field.GetValue(dataRow);
+                        if (!string.IsNullOrEmpty(key))
+                            parentRow = parentView.GetDataRow(key, dataRow.Table.DataSet);
+                    }
                 }
                 if (parentRow != null && parentField != field)
                 {

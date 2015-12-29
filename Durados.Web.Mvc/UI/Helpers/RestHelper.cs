@@ -591,8 +591,8 @@ namespace Durados.Web.Mvc.UI.Helpers
                     }
                     else
                     {
-                        string localDatabaseHost = GetLocalDatabaseHost();
-                        if (map.connectionString.Contains(localDatabaseHost))
+                        //string localDatabaseHost = GetLocalDatabaseHost();
+                        if (map.HostedByUs)//(map.connectionString.Contains(localDatabaseHost))
                         {
                             return "local";
                         }
@@ -613,10 +613,11 @@ namespace Durados.Web.Mvc.UI.Helpers
             }
         }
 
-        public static string GetLocalDatabaseHost()
-        {
-            return (System.Configuration.ConfigurationManager.AppSettings["localDatabaseHost"] ?? "yrv-dev.czvbzzd4kpof.eu-central-1.rds.amazonaws.com").ToString();
-        }
+        ////public static string GetLocalDatabaseHost()
+        ////{
+
+        ////    return (System.Configuration.ConfigurationManager.AppSettings["localDatabaseHost"] ?? "yrv-dev.czvbzzd4kpof.eu-central-1.rds.amazonaws.com").ToString();
+        ////}
 
         private static Dictionary<string, object> GetConfig(View view, string pk, bool deep, BeforeSelectEventHandler beforeSelectCallback, AfterSelectEventHandler afterSelectCallback, bool displayParentValue = false)
         {
@@ -4068,7 +4069,7 @@ namespace Durados.Web.Mvc.UI.Helpers
                     throw new PasswordConfirmationException();
                 }
 
-                if (!IsAppExists(appName))
+                if (!IsAppExists(appName) && appName != Maps.DuradosAppName)
                 {
                     throw new AppDoesNotExistException(appName);
                 }
@@ -7555,10 +7556,10 @@ namespace Durados.Web.Mvc.UI.Helpers
 
     public class AppsPool
     {
-        public bool Pop(string appName, string title, string username, out int? appId)
+        public bool Pop(string appName, string title, string username, out int? appId, string template)
         {
             int creator = GetCreator(username);
-            return Pop(appName, title, username, creator, out appId);
+            return Pop(appName, title, username, creator, out appId, template);
         }
 
         private int GetCreator(string username)
@@ -7566,10 +7567,14 @@ namespace Durados.Web.Mvc.UI.Helpers
             return Maps.Instance.DuradosMap.Database.GetUserID(username);
         }
 
-        public bool Pop(string appName, string title, string username, int creator, out int? appId)
+        public bool Pop(string appName, string title, string username, int creator, out int? appId, string template)
         {
             Map mainMap = null;
             appId = null;
+            if (template != "10")
+            {
+                return false;
+            }
             if (!ShouldBeUsed())
                 return false;
             
