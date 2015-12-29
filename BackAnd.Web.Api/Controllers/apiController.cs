@@ -110,7 +110,14 @@ namespace BackAnd.Web.Api.Controllers
                 Durados.Web.Mvc.View view = controller.GetView(name);
                 if (view == null)
                 {
-                    throw new Durados.Data.DataHandlerException((int)HttpStatusCode.NotFound, string.Format(Messages.ViewNameNotFound, name));
+                    if (parameters != null && parameters.Equals("{\"sync\":true}"))
+                    {
+                         return Ok();
+                    }
+                    else
+                    {
+                        throw new Durados.Data.DataHandlerException((int)HttpStatusCode.NotFound, string.Format(Messages.ViewNameNotFound, name));
+                    }
                 }
                 if (!view.IsCreatable() && !view.IsDuplicatable())
                 {

@@ -255,6 +255,8 @@ namespace Durados
 
         public override string ConvertToString(DataRow dataRow)
         {
+            if (dataRow == null)
+                return null;
             object value = dataRow[DataColumn.ColumnName];
             if (value is string && this.GetColumnFieldType() == ColumnFieldType.String)
                 value = ((string)value).Trim();
