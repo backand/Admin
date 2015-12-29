@@ -362,19 +362,6 @@ namespace Durados.Web.Mvc.Infrastructure
             //dbo.f_report_is_user_from_wix(a.Creator, NULL) AS inwix,   
         }
 
-
-
-
-
-        internal App GetAppById(string appId)
-        {
-            int id;
-            if(int.TryParse(appId,out id))
-            {
-                return GetAppById(id);
-            }
-            return null;
-        }
     }
     public static class Connections
     {
