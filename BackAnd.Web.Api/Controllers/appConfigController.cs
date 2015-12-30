@@ -256,9 +256,9 @@ namespace BackAnd.Web.Api.Controllers
                 
                 XmlConfigHelper configHelper = new XmlConfigHelper();
                 
-                configHelper.UploadConfigFromFile(appname,(String)jsonPostDict["filedata"]);
+                string version = configHelper.UploadConfigFromFile(appname,(String)jsonPostDict["filedata"]);
                 
-                return Ok();
+                return Ok(String.Format("Config Version {0} was succesfuly loaded to {1}",version,appname));
             }
             catch (Exception exception)
             {

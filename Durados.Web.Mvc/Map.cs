@@ -3864,6 +3864,51 @@ namespace Durados.Web.Mvc
                 catch { }
             }
         }
+        public void WriteConfigToCloud3(DataSet ds, string filename, bool async, Map map,string version)
+        {
+            string containerName = Maps.GetStorageBlobName(filename);
+            //Maps.Instance.StorageCache.Add(containerName, ds);
+
+            CloudBlobContainer container = GetContainer(containerName);
+
+            CloudBlob blob = container.GetBlobReference(containerName + version);
+            blob.Properties.ContentType = "application/xml";
+
+            if (!Maps.Instance.StorageCache.ContainsKey(containerName) || !async)
+            {
+                using (MemoryStream stream = new MemoryStream())
+                {
+                    ds.WriteXml(stream, XmlWriteMode.WriteSchema);
+                    stream.Seek(0, SeekOrigin.Begin);
+
+                    blob.UploadFromStream(stream);
+
+                    //RefreshApis(map);
+
+                    Maps.Instance.Backup.BackupAsync(container, containerName);
+
+                }
+            }
+            else
+            {
+                MemoryStream stream = new MemoryStream();
+                ds.WriteXml(stream, XmlWriteMode.WriteSchema);
+                stream.Seek(0, SeekOrigin.Begin);
+
+                DateTime started = DateTime.Now;
+
+                blob.BeginUploadFromStream(stream, BlobTransferCompletedCallback, new BlobTransferAsyncState(blob, stream, started, container, containerName, map));
+
+                try
+                {
+                    if (map != null)
+                    {
+                        Maps.Instance.DuradosMap.Logger.Log("Map", "WriteConfigToCloud", map.AppName ?? string.Empty, string.Empty, string.Empty, -8, containerName + " started", started);
+                    }
+                }
+                catch { }
+            }
+        }
 
         private void BlobTransferCompletedCallback(IAsyncResult result)
         {
@@ -4687,23 +4732,7 @@ namespace Durados.Web.Mvc
             }
         }
 
-        public string SaveUploadConfig(string appname,Dictionary<string,MemoryStream> configFiles)
-        {
-            int? id = AppExists(appname);
-            if (!id.HasValue)
-                return null;
-            foreach (var configFile in configFiles)
-            {
-                string containerName = Maps.DuradosAppPrefix.Replace("_", "").Replace(".", "").ToLower() + id.ToString();
-                
-                CloudBlobContainer container = GetContainer(containerName);
-                //(new Durados.Web.Mvc.Azure.BlobBackup()).VersionPrefix.CopyBack(container, "-1", containerName);
-                //SaveConfig(ds, filename);
-
-                
-            }
-            return null;
-        }
+       
         Azure.DuradosStorage storage = new Azure.DuradosStorage();
 
         private CloudBlobContainer GetContainer(string filename)

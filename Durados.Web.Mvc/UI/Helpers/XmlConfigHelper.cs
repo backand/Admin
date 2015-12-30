@@ -17,12 +17,47 @@ namespace Durados.Web.Mvc.UI.Helpers
            
             MemoryStream ms = new MemoryStream(Convert.FromBase64String(filedata));
             Dictionary<string,MemoryStream> configFiles= Infrastructure.General.UnZip(ms);
-            string version = Maps.Instance.SaveUploadConfig(appname, configFiles);
+            Map map = Maps.Instance.GetMap();
+            string filename = Maps.DuradosAppPrefix.Replace("_", "").Replace(".", "").ToLower() + map.Id.ToString();
+            Durados.Web.Mvc.Azure.BlobBackup bbk = new Durados.Web.Mvc.Azure.BlobBackup();
+            string version =  bbk.UploadPrefix + DateTime.Now.ToString("yyyyMMddHHmmssfff");
+               
+            foreach(var configFile in configFiles)
+            {    
+                DataSet ds = new DataSet();
+                MemoryStream configStream =(MemoryStream)ChangeAppIdInConfigFiles(configFile.Value, map.Id);
+                ds.ReadXml(configStream);
+                
+                filename = filename + (configFile.Key.EndsWith(".xml.xml") ? "xml" : string.Empty);
+                map.WriteConfigToCloud3(ds, filename, false, map, bbk.VersionPrefix + version);
+
+               
+            }//string version = Maps.Instance.SaveUploadConfig(appname, configFiles);
             Maps.Instance.Restore(appname,version);
-            return null;
+            return version;
         }
 
+        public Stream ChangeAppIdInConfigFiles(Stream stream,string newAppId)
+        {
+            System.Xml.XmlDocument doc = new System.Xml.XmlDocument();
+            doc.Load(stream);
+            System.Xml.XmlNodeList uploadNodes = doc.SelectNodes("/NewDataSet/Upload/UploadVirtualPath/text()[contains(.,'/Uploads/')]");
 
+            foreach (System.Xml.XmlNode node in uploadNodes)
+            {
+                node.InnerText = "/Uploads/"+newAppId+"/";
+            }
+
+            uploadNodes = doc.SelectNodes("/NewDataSet/Database/UploadFolder/text()[contains(.,'/Uploads/')]");
+            foreach (System.Xml.XmlNode node in uploadNodes)
+            {
+                node.InnerText = "/Uploads/" + newAppId + "/";
+            }
+            MemoryStream s = new MemoryStream();
+            doc.Save(s);
+            s.Seek(0, SeekOrigin.Begin);
+            return s;
+        }
 
         public Stream GetZipConfig(string appname)
         {

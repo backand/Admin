@@ -70,7 +70,7 @@ namespace Durados.Web.Mvc.Azure
             NumberOfCopies = 5;
             BackupPrefix = "B";
             VersionPrefix = "ver";
-            VersionPrefix = "up";
+            UploadPrefix = "up";
 
             if (Maps.IsApi2())
             {
