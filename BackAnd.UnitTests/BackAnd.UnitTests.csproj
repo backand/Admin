@@ -100,9 +100,6 @@
     <None Include="App.config">
       <SubType>Designer</SubType>
     </None>
-    <None Include="GenericTest1.GenericTest">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
   </ItemGroup>
   <ItemGroup>
     <Content Include="Config\backand.xml">
