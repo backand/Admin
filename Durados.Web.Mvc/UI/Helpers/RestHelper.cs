@@ -41,7 +41,7 @@ namespace Durados.Web.Mvc.UI.Helpers
             Maps.Instance.Restart(appname);
             Durados.DataAccess.ConfigAccess.Restart(fileName);
            
-            if (Workflow.Engine.CurrentDatabases != null && Workflow.Engine.CurrentDatabases.ContainsKey(appname))
+            if (Workflow.Engine.CurrentDatabases != null && Workflow.Engine.CurrentDatabases.Contains(appname))
             {
                 try
                 {

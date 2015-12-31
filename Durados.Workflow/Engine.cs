@@ -4,6 +4,7 @@ using System.Data.SqlClient;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Runtime.Caching;
 
 namespace Durados.Workflow
 {
@@ -20,7 +21,7 @@ namespace Durados.Workflow
         protected LogicalParser parser;
         protected Step step;
 
-        public static Dictionary<string, Database> CurrentDatabases = new Dictionary<string, Database>();
+        public static MemoryCache CurrentDatabases = new MemoryCache("CurrentDatabases");
        
         public Engine()
         {
@@ -159,9 +160,9 @@ namespace Durados.Workflow
                 string appName = view.Database.GetCurrentAppName();
                 if (appName == null)
                     return;
-                if (!CurrentDatabases.ContainsKey(appName))
+                if (!CurrentDatabases.Contains(appName))
                 {
-                    CurrentDatabases.Add(appName, view.Database);
+                    CurrentDatabases[appName] = view.Database;
                 }
             }
             catch { }
@@ -172,9 +173,9 @@ namespace Durados.Workflow
             if (System.Web.HttpContext.Current.Items[Database.AppName] != null)
             {
                 string appName = System.Web.HttpContext.Current.Items[Database.AppName].ToString();
-                if (CurrentDatabases.ContainsKey(appName))
+                if (CurrentDatabases.Contains(appName))
                 {
-                    return CurrentDatabases[appName];
+                    return (Database)CurrentDatabases[appName];
                 }
                 return null;
             }

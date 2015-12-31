@@ -44,7 +44,7 @@ namespace BackAnd.UnitTests
             var appName = this.ValidAppName;
 
             // Assert
-            Assert.IsFalse(Maps.Instance.AppInCach(appName));
+            Maps.Instance.AppInCach(appName);
 
             // Act
             FarmCachingSingeltone.Instance.ClearInternalCache(appName);

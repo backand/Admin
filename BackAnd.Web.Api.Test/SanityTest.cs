@@ -14,6 +14,7 @@ namespace BackAnd.Web.Api.Test
     [TestClass]
     public class FarmCache
     {
+        
         [TestMethod]
         public void Test()
         {
@@ -27,6 +28,10 @@ namespace BackAnd.Web.Api.Test
 
             string ins1configChanged = ChangeInsConfig(ins1config);
             UpdateConfig(GetClient1(ins1url), ins1configChanged);
+
+            //wait for redis event
+            Thread.Sleep(5000);
+
             ins2config = GetInsConfig(GetClient2(ins2url));
 
             Assert.AreNotEqual(ins1config, ins2config, "ins2 config was not changed.");
@@ -125,12 +130,12 @@ namespace BackAnd.Web.Api.Test
         }
 
 
-        private string GetAppName()
+        private string GetAppName(bool random = false)
         {
             string appName = Backand.Config.ConfigStore.GetConfig().appname;
             string key = Backand.Config.ConfigStore.GetCurrentKey();
                 
-            if (key == "QA" || key == "PROD")
+            if (key == "QA" || key == "PROD" || random)
                 return appName + DateTime.Now.Year + DateTime.Now.Month + DateTime.Now.Day + DateTime.Now.Hour + DateTime.Now.Minute + DateTime.Now.Second;
 
             return appName;
@@ -139,7 +144,7 @@ namespace BackAnd.Web.Api.Test
         [TestMethod]
         public void RunAll()
         {
-            string appName = GetAppName();
+            string appName = GetAppName(true);
             AdminContext admin = new AdminContext();
                 admin.CreateConnectAndWaitUntilAppIsReady(appName)
                 .CreateJsInTransaction(appName);
