@@ -4170,10 +4170,17 @@ namespace Durados.DataAccess
                     }
                     else
                     {
-                        transaction.Commit();
-                        if (!identicalSystemConnection)
+                        try
                         {
-                            sysTransaction.Commit();
+                            transaction.Commit();
+                            if (!identicalSystemConnection)
+                            {
+                                sysTransaction.Commit();
+                            }
+                        }
+                        catch
+                        {
+
                         }
                         Cache.Clear(view.Name);
                     }

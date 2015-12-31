@@ -903,6 +903,12 @@ namespace Durados.Web.Mvc.Logging
                       && System.Web.HttpContext.Current.Request.ServerVariables["HTTP_X_FORWARDED_FOR"] != "")
                      ? System.Web.HttpContext.Current.Request.ServerVariables["HTTP_X_FORWARDED_FOR"]
                      : System.Web.HttpContext.Current.Request.ServerVariables["REMOTE_ADDR"];
+
+            if(ip == null)
+            {
+                return null;
+            }
+
             if (ip.Contains(","))
                 ip = ip.Split(',').First().Trim();
             return ip;

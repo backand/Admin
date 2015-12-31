@@ -48,6 +48,8 @@ namespace BackAnd.UnitTests
         {
             Maps.Version = "4";
             HttpContext.Current = new HttpContext(new HttpRequest(null, "http://tempuri.org", null), new HttpResponse(null));
+
+            Maps.Instance.RemoveMap(ConfigStore.GetConfig().appname);
         }
     }
 }

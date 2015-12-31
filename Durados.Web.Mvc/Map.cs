@@ -20,6 +20,7 @@ using Durados.Web.Mvc.Infrastructure;
 using Durados.Web.Mvc.Azure;
 using Newtonsoft.Json;
 using System.Diagnostics;
+using Durados.Data;
 
 namespace Durados.Web.Mvc
 {
@@ -1206,8 +1207,6 @@ namespace Durados.Web.Mvc
             workspaceView.Edit(values, publicWorkspaceId, null, null, null, null);
 
         }
-
-
 
         private void AddViews(Durados.Web.Mvc.MapDataSet.durados_AppRow dr)
         {
@@ -4478,6 +4477,20 @@ namespace Durados.Web.Mvc
             }
 
         }
+
+
+        private ICache<object> lockerCache = CacheFactory.CreateCache<object>("lockerCache");
+
+        /// <summary>
+        ///  Should not be used if you are not configAccess!!
+        /// </summary>
+        public Data.ICache<object> LockerCache
+        {
+            get 
+            {
+                return lockerCache;
+            }
+        }
     }
 
     public class Theme
@@ -4690,7 +4703,6 @@ namespace Durados.Web.Mvc
         private Maps()
         {
             InitPersistency();
-
 
             if (multiTenancy)
             {
@@ -5102,10 +5114,11 @@ namespace Durados.Web.Mvc
 
                 persistency = sqlPersistency;
                 builder.ConnectionString = sqlPersistency.ConnectionString;
-
+                
+                Durados.DataAccess.ConfigAccess.storage = new Map();
                 Durados.DataAccess.ConfigAccess.multiTenancy = multiTenancy;
                 Durados.DataAccess.ConfigAccess.cloud = cloud;
-                Durados.DataAccess.ConfigAccess.storage = new Map();
+                
 
             }
         }
@@ -6556,7 +6569,8 @@ namespace Durados.Web.Mvc
         private Type parentType = typeof(Durados.Web.Mvc.ParentField);
         private Type childrenType = typeof(Durados.Web.Mvc.ChildrenField);
 
-        private Dictionary<string, Dictionary<string, bool>> properties = new Dictionary<string, Dictionary<string, bool>>();
+        //private Dictionary<string, Dictionary<string, bool>> properties = new Dictionary<string, Dictionary<string, bool>>();
+        private Durados.Data.ICache<Durados.Data.ICache<bool>> properties = CacheFactory.CreateCache<Durados.Data.ICache<bool>>("properties");
 
         public bool IsInType(string fieldName, string fieldType)
         {
@@ -6569,7 +6583,7 @@ namespace Durados.Web.Mvc
         private bool Has(Type type, string fieldType, string fieldName)
         {
             if (!properties.ContainsKey(fieldType))
-                properties.Add(fieldType, new Dictionary<string, bool>());
+                properties.Add(fieldType, CacheFactory.CreateCache<bool>(fieldType));
 
             if (!properties[fieldType].ContainsKey(fieldName))
                 properties[fieldType].Add(fieldName, type != null && type.GetProperty(fieldName) != null);
