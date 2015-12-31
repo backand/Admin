@@ -69,7 +69,6 @@
     <Compile Include="FarmControllerTest.cs" />
     <Compile Include="UnitTest1.cs" />
     <Compile Include="UnitTest2.cs" />
-    <Compile Include="UnitTest3.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Backand.Config\Backand.Test.Config.csproj">
