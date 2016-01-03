@@ -7594,7 +7594,13 @@ namespace Durados.Web.Mvc.UI.Helpers
                     mainMap.Logger.Log("AppsPool", "Pop", "", string.Format("Could not find app in pool for user id {0} where pool creator is {1}", creator, poolCreator), "", 2, string.Empty, DateTime.Now);
                     return false;
                 }
-                ReplaceUsernameInSysDb(mainMap, appName, username);
+
+                System.Data.DataRow userMainRow = mainMap.Database.GetUserRow(username);
+                string firstName = userMainRow["FirstName"].ToString();
+                string lastName = userMainRow["LastName"].ToString();
+
+                ReplaceUsernameInSysDb(mainMap, appName, username, firstName, lastName);
+                ReplaceUsernameInUsers(mainMap, appName, username, firstName, lastName);
 
                 mainMap.Logger.Log("AppsPool", "Pop", "", string.Format("success for creator id = {0}, pool creator = {1}, app id = {2} ", creator, poolCreator, appId), "", 3, string.Empty, DateTime.Now);
                 
@@ -7607,12 +7613,24 @@ namespace Durados.Web.Mvc.UI.Helpers
             }
         }
 
-        private void ReplaceUsernameInSysDb(Map mainMap, string appName, string username)
+        private void ReplaceUsernameInUsers(Map mainMap, string appName, string username, string firstName, string lastName)
         {
             Map map = Maps.Instance.GetMap(appName);
-            System.Data.DataRow userMainRow = mainMap.Database.GetUserRow(username);
-            string firstName = userMainRow["FirstName"].ToString();
-            string lastName = userMainRow["LastName"].ToString();
+            View userView = (View)map.Database.GetView("users");
+            if (userView == null)
+                throw new Durados.DuradosException("users does not exist");
+            int rowCount = 0;
+            DataView dataView = userView.FillPage(1, 2, null, null, null, out rowCount, null, null);
+            if (dataView.Count != 1)
+                throw new Durados.DuradosException("system user should contain one row");
+            System.Data.DataRow currentUserRow = dataView[0].Row;
+            string pk = userView.GetPkValue(currentUserRow);
+            userView.Edit(new Dictionary<string, object>() { { "email", username }, { "firstName", firstName }, { "lastName", lastName } }, pk, null, null, null, null);
+        }
+
+        private void ReplaceUsernameInSysDb(Map mainMap, string appName, string username, string firstName, string lastName)
+        {
+            Map map = Maps.Instance.GetMap(appName);
             View userView = (View)map.Database.GetUserView();
             int rowCount = 0;
             DataView dataView = userView.FillPage(1, 2, null, null, null, out rowCount, null, null);
