@@ -816,7 +816,7 @@ namespace Durados.Web.Mvc.Logging
         {
             if (guid2 == null)
                 guid2 = Guid.NewGuid();
-            SendLogMessage(appName, applicationName, username, machineName, time.ToString(), controller, action, method, LogType.ToString(), message, trace, freeText, guid2.ToString());
+            SendLogMessage(appName, applicationName, username, machineName, time.ToString(), controller, action, method, logType.ToString(), message, trace, freeText, guid2.ToString());
 
 
         }
