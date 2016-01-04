@@ -1,4 +1,5 @@
 ﻿using Durados.Diagnostics;
+using Durados.SmartRun;
 using Durados.Web.Mvc.Farm;
 using Durados.Web.Mvc.Infrastructure;
 using System;
@@ -80,6 +81,7 @@ namespace Durados.Web.Mvc.UI.Helpers
                 return;
             }
 
+            // if machine time is not sync,we can have vey strnage behavior.
             logger.Log("FarmNormal", null, transport.SubscriberID, null, 3, "Arrive Message for app " + e.Message.AppName);
             logger.Log("FarmNormal", "Perf", transport.SubscriberID, null, 3, (DateTime.Now - e.Message.Time).Milliseconds.ToString());
 
@@ -122,7 +124,21 @@ namespace Durados.Web.Mvc.UI.Helpers
             }
 
             logger.Log("FarmNormal", null, transport.SubscriberID, null, 3, "Send Message for app " + appName);
-            this.transport.Publish(new FarmMessage { AppName = appName, Time = DateTime.Now });
+
+            try
+            {
+                RunWithRetry.Run<PublishSyncTimeoutException>(
+                    () =>
+                    {
+                        this.transport.PublishSync(new FarmMessage { AppName = appName, Time = DateTime.Now });
+
+                    }, 3, 200);
+            }
+            catch (PublishSyncTimeoutException exception)
+            {
+                logger.Log("FarmNormal", null, transport.SubscriberID, exception, 1, "Publish failed for app " + appName);
+            
+            }
         }
     }
 }
