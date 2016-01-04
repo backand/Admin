@@ -3834,13 +3834,9 @@ namespace Durados.Web.Mvc
                 {
                     ds.WriteXml(stream, XmlWriteMode.WriteSchema);
                     stream.Seek(0, SeekOrigin.Begin);
-
                     blob.UploadFromStream(stream);
-
                     RefreshApis(map);
-
                     Maps.Instance.Backup.BackupAsync(container, containerName);
-
                 }
             }
             else
@@ -6520,7 +6516,7 @@ namespace Durados.Web.Mvc
 
         }
 
-        Durados.Data.ICache<DataSet> storageCache = CacheFactory.CreateCache<DataSet>("storageCache");
+        Durados.Data.ICache<DataSet> storageCache = new CacheWithStatus(CacheFactory.CreateCache<DataSet>("storageCache"));
 
         public Durados.Data.ICache<DataSet> StorageCache
         {

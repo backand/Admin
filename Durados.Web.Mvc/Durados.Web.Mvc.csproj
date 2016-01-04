@@ -209,9 +209,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Azure\Cache.cs" />
+    <Compile Include="Azure\CacheFactory.cs" />
+    <Compile Include="Azure\ILargeObjectCachingStamp.cs" />
     <Compile Include="Azure\DuradosStorage.cs" />
-    <Compile Include="Azure\LocalCache.cs" />
     <Compile Include="Azure\StorageHelper.cs" />
     <Compile Include="ChildrenField.cs" />
     <Compile Include="ColumnField.cs" />
@@ -244,6 +244,7 @@
     <Compile Include="Controllers\UtilsController.cs" />
     <Compile Include="Controllers\CrmController.cs" />
     <Compile Include="Controllers\ImageOrganizerController.cs" />
+    <Compile Include="Farm\FarmException.cs" />
     <Compile Include="Farm\FarmMessage.cs" />
     <Compile Include="Farm\IPubsubTransport.cs" />
     <Compile Include="Farm\RedisFarm.cs" />

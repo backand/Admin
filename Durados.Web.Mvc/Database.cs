@@ -1171,6 +1171,42 @@ namespace Durados.Web.Mvc
                 return string.Empty;
         }
 
+        public override int? GetCurrentUserId()
+        {
+            try
+            {
+                if (!System.Web.HttpContext.Current.Items.Contains(Database.CurrentUserId))
+                {
+                    if (this.Views.ContainsKey("users"))
+                    {
+                        View usersView = (View)this.Views["users"];
+                        Field emailField = usersView.GetFieldByColumnNames("email");
+                        if (emailField != null)
+                        {
+                            DataRow row = usersView.GetDataRow(emailField, GetCurrentUsername());
+                            if (row != null)
+                            {
+                                string pk = usersView.GetPkValue(row);
+                                if (!string.IsNullOrEmpty(pk))
+                                {
+                                    System.Web.HttpContext.Current.Items[Database.CurrentUserId] = Convert.ToInt32(pk);
+                                }
+                            }
+                        }
+                    }
+                }
+
+                if (System.Web.HttpContext.Current.Items[Database.CurrentUserId] == null)
+                    return null;
+
+                return (int)System.Web.HttpContext.Current.Items[Database.CurrentUserId];
+            }
+            catch
+            {
+                return null;
+            }
+        }
+
         public override string GetCurrentAppName()
         {
             if (Map != null && !string.IsNullOrEmpty(Map.AppName))

@@ -2,6 +2,7 @@
 using Durados.Web.Mvc;
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Diagnostics;
 using System.Linq;
 using System.Text;
@@ -50,6 +51,19 @@ namespace BackAnd.UnitTests
             HttpContext.Current = new HttpContext(new HttpRequest(null, "http://tempuri.org", null), new HttpResponse(null));
 
             Maps.Instance.RemoveMap(ConfigStore.GetConfig().appname);
+        }
+
+        public static DataSet GetSimpleDataSet()
+        {
+            DataSet ds = new DataSet();
+            DataTable table = new DataTable();
+            table.Columns.Add("a", typeof(int));
+            table.Columns.Add("b", typeof(string));
+            table.Columns.Add("c", typeof(bool));
+            table.Rows.Add(1, "s", true);
+            ds.Tables.Add(table);
+
+            return ds;
         }
     }
 }
