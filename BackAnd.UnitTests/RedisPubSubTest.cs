@@ -14,7 +14,7 @@ namespace BackAnd.UnitTests
         {
             var connectionString = ValidConnectionString();
             var pubsubManager = new RedisFarmTransport(connectionString);
-            //pubsubManager.Publish(new F)
+            //pubsubManager.PublishSync(new F)
         }
 
         private static string ValidConnectionString()
@@ -43,8 +43,7 @@ namespace BackAnd.UnitTests
                     throw new NullReferenceException();
             };
 
-            pubsubManager.Publish(new FarmMessage { AppName = "test", Time = DateTime.Now});
-            Thread.Sleep(3000);
+            pubsubManager.PublishSync(new FarmMessage { AppName = "test", Time = DateTime.Now});
 
             Assert.AreEqual(pubsubManager.MessageCount, 1);
             Assert.AreEqual(pubsubManager.ValidMessageCount, 0);
@@ -65,10 +64,18 @@ namespace BackAnd.UnitTests
                 manual1.Set();
             };
 
-            pubsubManagerPublisher.Publish(new FarmMessage { AppName = "test", Time = DateTime.Now });
+            pubsubManagerPublisher.PublishSync(new FarmMessage { AppName = "test", Time = DateTime.Now });
             var res = manual1.WaitOne(5 * 1000);
             
             Assert.IsTrue(res);
+        }
+
+        [TestMethod, Timeout(10000)]
+        public void TestSendSyncNotBlockForever()
+        {
+            var connectionString = ValidConnectionString();
+            var pubsubManagerPublisher = new RedisFarmTransport(connectionString);
+            pubsubManagerPublisher.PublishSync(new FarmMessage { AppName = "test", Time = DateTime.Now });
         }
     }
 }

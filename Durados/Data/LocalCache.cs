@@ -6,7 +6,7 @@ using System.Runtime.Caching;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Durados.Web.Mvc.Azure
+namespace Durados.Data
 {
     public class LocalCache<T> : ICache<T>
     {
@@ -55,6 +55,12 @@ namespace Durados.Web.Mvc.Azure
             {
                 return cache.ToList().Select(a => a.Value).Cast<T>();
             }
+        }
+
+
+        public Dictionary<string, T> ToDictionary()
+        {
+            return cache.ToDictionary(a => a.Key, a => ((T)a.Value));
         }
     }
 }

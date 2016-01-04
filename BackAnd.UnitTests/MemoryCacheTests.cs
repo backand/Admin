@@ -21,7 +21,6 @@ namespace BackAnd.UnitTests
         {
             var cache = CacheFactory.CreateCache<DataSet>("testCache");
             DataSet ds = new DataSet();
-
             DataTable table = new DataTable();
             table.Columns.Add("a", typeof(int));
             table.Columns.Add("b", typeof(string));

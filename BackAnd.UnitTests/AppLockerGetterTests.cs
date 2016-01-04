@@ -1,4 +1,5 @@
-﻿using Durados.DataAccess;
+﻿using Durados.Data;
+using Durados.DataAccess;
 using Durados.Web.Mvc.Azure;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;

@@ -17,20 +17,9 @@ namespace Durados.Web.Mvc.Azure
 
         void UpdateLastCheck();
     }
-    
- 
-    
     public enum CacheType
     {
         Local
     
-    }
-
-    public static class CacheFactory
-    {
-        public static ICache<T> CreateCache<T>(string name)
-        {
-            return new LocalCache<T>(name);
-        }
     }
 }
