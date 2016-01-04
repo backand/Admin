@@ -333,6 +333,7 @@ namespace Durados.Workflow
             userProfile.Add("username", view.Database.GetCurrentUsername());
             userProfile.Add("role", currentUserRole);
             userProfile.Add("app", view.Database.GetCurrentAppName());
+            userProfile.Add("userId", view.Database.GetCurrentUserId());
             userProfile.Add("token", System.Web.HttpContext.Current.Request.Headers["Authorization"] ?? "anonymous-" + System.Web.HttpContext.Current.Request.Headers["AnonymousToken"]);
             userProfile.Add("request", new Dictionary<string, object>() { {"userIP", GetUserIP()}, { "headers", GetHeaders(System.Web.HttpContext.Current.Request.Headers) } });
 

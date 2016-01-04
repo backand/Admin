@@ -45,6 +45,8 @@ namespace Durados
         public static readonly string CurAppName = "curappname";
         public static readonly string AppGuid = "appguid";
         public static readonly string Username = "username";
+        public static readonly string CurrentUserId = "CurrentUserId";
+        
         public static readonly string RequestId = "requestId";
         public static readonly string AnonymousToken = "AnonymousToken";
         public static readonly string CreateSchema = "CreateSchema";
@@ -1143,6 +1145,11 @@ namespace Durados
         public virtual string GetCurrentAppName()
         {
             return string.Empty;
+        }
+
+        public virtual int? GetCurrentUserId()
+        {
+            return null;
         }
 
         public virtual bool IsAllow(Durados.Services.ISecurable securable)
