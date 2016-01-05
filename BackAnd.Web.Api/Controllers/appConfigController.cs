@@ -257,8 +257,8 @@ namespace BackAnd.Web.Api.Controllers
                 XmlConfigHelper configHelper = new XmlConfigHelper();
                 
                 string version = configHelper.UploadConfigFromFile(appname,(String)jsonPostDict["filedata"]);
-                
-                return Ok(String.Format("Config Version {0} was succesfuly loaded to {1}",version,appname));
+
+                return Ok(new { success = true, message = String.Format("Config Version {0} was succesfuly loaded to {1}", version, appname) });
             }
             catch (Exception exception)
             {
@@ -269,7 +269,7 @@ namespace BackAnd.Web.Api.Controllers
         [System.Web.Http.HttpGet]
         [Route("download")]
         [BackAnd.Web.Api.Controllers.Filters.BackAndAuthorize("Admin,Developer")]
-        public HttpResponseMessage download()
+        public HttpResponseMessage download(string version = null)
         {
             XmlConfigHelper configHelper = new XmlConfigHelper();
 
@@ -287,8 +287,14 @@ namespace BackAnd.Web.Api.Controllers
                 return Request.CreateResponse(HttpStatusCode.InternalServerError, Messages.AppNameCannotBeNull);
             }
 
-            HttpResponseMessage response = new HttpResponseMessage(HttpStatusCode.OK);
-            System.IO.Stream s = configHelper.GetZipConfig(appname);
+           
+             
+             System.IO.Stream s = configHelper.GetZipConfig(appname, version);
+            HttpResponseMessage response ;
+            if(s==null)
+                response = new HttpResponseMessage(HttpStatusCode.NotFound);
+
+            response = new HttpResponseMessage(HttpStatusCode.OK);
             response.Content = new StreamContent(s);
             response.Content.Headers.ContentDisposition = new System.Net.Http.Headers.ContentDispositionHeaderValue("attachment");
             response.Content.Headers.ContentDisposition.FileName = Map.AppName + ".zip";

@@ -456,7 +456,7 @@ namespace Durados.Web.Mvc
             Initiate(true);
         }
 
-        private string  GetCaller(object message)
+        private string GetCaller(object message)
         {
             // frame 1, true for source info
             StackFrame frame = new StackFrame(1, true);
@@ -1292,7 +1292,7 @@ namespace Durados.Web.Mvc
             try
             {
                 //string localDatabaseHost = GetLocalDatabaseHost();
-                if(HostedByUs)// (connectionString.Contains(localDatabaseHost))
+                if (HostedByUs)// (connectionString.Contains(localDatabaseHost))
                 {
                     return "local";
                 }
@@ -3062,7 +3062,7 @@ namespace Durados.Web.Mvc
         {
             ConfigFileName = configFileName;
             dataset = dataSetParam;
-            
+
             Refresh();
 
             if (save)
@@ -3705,10 +3705,10 @@ namespace Durados.Web.Mvc
 
         public void ReadConfigFromCloud(DataSet ds, string filename)
         {
-            
+
             string blobName = Maps.GetStorageBlobName(filename);
             DataSet cachedDs = Maps.Instance.StorageCache.Get(blobName);
-            
+
             // check exist in cache
             if (cachedDs != null)
             {
@@ -3720,7 +3720,7 @@ namespace Durados.Web.Mvc
                         stream.Seek(0, SeekOrigin.Begin);
                         ds.ReadXml(stream);
                     }
-                    catch(ConstraintException e)
+                    catch (ConstraintException e)
                     {
                         string errMsg = string.Empty;
                         foreach (DataTable dt in ds.Tables)
@@ -3749,7 +3749,7 @@ namespace Durados.Web.Mvc
             // add to cache for next read
             Maps.Instance.StorageCache.Add(blobName, ds);
         }
-        
+
         public void ReadConfigFromCloudStorage(DataSet ds, string filename)
         {
 
@@ -3864,7 +3864,7 @@ namespace Durados.Web.Mvc
                 catch { }
             }
         }
-        public void WriteConfigToCloud3(DataSet ds, string filename, bool async, Map map,string version)
+        public void WriteConfigToCloud3(DataSet ds, string filename, bool async, Map map, string version)
         {
             string containerName = Maps.GetStorageBlobName(filename);
             //Maps.Instance.StorageCache.Add(containerName, ds);
@@ -3915,7 +3915,7 @@ namespace Durados.Web.Mvc
             BlobTransferAsyncState state = (BlobTransferAsyncState)result.AsyncState;
             if (state == null || state.Map == null)
                 return;
-                
+
             try
             {
                 Maps.Instance.DuradosMap.Logger.Log("Map", "WriteConfigToCloud", state.Map.AppName ?? string.Empty, DateTime.Now.Subtract(state.Started).TotalMilliseconds.ToString(), string.Empty, -8, state.BlobName + " ended", DateTime.Now);
@@ -4732,7 +4732,38 @@ namespace Durados.Web.Mvc
             }
         }
 
-       
+        public Dictionary<string,Stream> GetAllConfigs(string id,string version )
+        {
+            
+            string containerName = Maps.DuradosAppPrefix.Replace("_", "").Replace(".", "").ToLower() + id;
+            Dictionary<string, Stream> configs = new Dictionary<string, Stream>();
+            configs.Add(containerName, GetConfig(containerName, version));
+            configs.Add(containerName + "xml", GetSchemaConfig(id, version));
+            return configs;
+        }
+        public Stream GetSchemaConfig(string id, string version)
+        {
+            string containerName = Maps.DuradosAppPrefix.Replace("_", "").Replace(".", "").ToLower() + id + "xml";
+            return GetConfig(containerName, version);
+        }
+            
+        public Stream GetConfig(string filename,string version )
+        {
+            if (version == null)
+                version = string.Empty;
+            else
+                version = (new Durados.Web.Mvc.Azure.BlobBackup()).VersionPrefix + version;
+
+            CloudBlobContainer container = GetContainer(filename);
+            var source = container.GetBlobReference(filename + version);
+            if (!source.Exists())
+            {
+                throw new DuradosException("Could not find configuration version " + version);
+            }
+            MemoryStream stream = new MemoryStream();
+            source.DownloadToStream(stream);
+            return stream;
+        }
         Azure.DuradosStorage storage = new Azure.DuradosStorage();
 
         private CloudBlobContainer GetContainer(string filename)
@@ -4855,8 +4886,8 @@ namespace Durados.Web.Mvc
             poolCreator = Convert.ToInt32(System.Configuration.ConfigurationManager.AppSettings["poolCreator"] ?? "55555");
             poolShouldBeUsed = Convert.ToBoolean(System.Configuration.ConfigurationManager.AppSettings["poolShouldBeUsed"] ?? "false");
 
-            redisConnectionString = System.Configuration.ConfigurationManager.AppSettings["redisConnectionString"] ?? "pub-redis-10938.us-east-1-4.3.ec2.garantiadata.com:10938,password=bell1234"; 
-        
+            redisConnectionString = System.Configuration.ConfigurationManager.AppSettings["redisConnectionString"] ?? "pub-redis-10938.us-east-1-4.3.ec2.garantiadata.com:10938,password=bell1234";
+
 
             mainAppConfigName = System.Configuration.ConfigurationManager.AppSettings["mainAppConfigName"] ?? "backand";
             hostByUs = Convert.ToBoolean(System.Configuration.ConfigurationManager.AppSettings["hostByUs"] ?? "false");
@@ -4953,7 +4984,7 @@ namespace Durados.Web.Mvc
                 throw new DuradosException("Please add the AzureCacheUrl to the web.config.");
             }
 
-         
+
 
             AzureCachePort = Convert.ToInt32(System.Configuration.ConfigurationManager.AppSettings["AzureCachePort"] ?? "22233");
 
@@ -5274,7 +5305,7 @@ namespace Durados.Web.Mvc
             }
         }
 
-        
+
         public static bool PoolShouldBeUsed
         {
             get
@@ -5774,7 +5805,7 @@ namespace Durados.Web.Mvc
             //{
             //    map = maps[appName.ToLower()];
             //}
-            
+
 
             if (map == null)
             {
@@ -5789,7 +5820,7 @@ namespace Durados.Web.Mvc
                 }
 
                 // app not exist
-                if(map == null)
+                if (map == null)
                 {
                     return null;
                 }
@@ -5946,13 +5977,13 @@ namespace Durados.Web.Mvc
             Field idField = appView.Fields["Id"];
 
             int? id = AppExists(appName, null);
-            
+
             if (!id.HasValue)
             {
                 Durados.Diagnostics.EventViewer.WriteEvent("CreateMap: could not find is for: " + appName);
                 return null;
             }
-            
+
             // if you are here, your application exist but don't have already created map
             MapDataSet.durados_AppRow appRow = null;
             try
@@ -6088,7 +6119,7 @@ namespace Durados.Web.Mvc
             map.Url = GetAppUrl(appName);
             map.SiteInfo.LogoHref = map.Url;
             map.Guid = appRow.Guid;
-            
+
             int themeId = 0;
             string themeName = "";
             string themePath = "";
@@ -6109,7 +6140,7 @@ namespace Durados.Web.Mvc
             map.Theme = new Theme() { Id = themeId, Name = themeName, Path = themePath };
             if (firstTime && Convert.ToBoolean(System.Configuration.ConfigurationManager.AppSettings["NotifyUserOnConsoleReady"] ?? "true"))
                 map.NotifyUser("consoleFirstTimeSubject", "consoleFirstTimeMessage");
-            
+
             RefreshMapDnsAlias(map);
             UpdatePlan(appRow.Id, map);
 

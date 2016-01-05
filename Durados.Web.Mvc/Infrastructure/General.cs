@@ -219,7 +219,7 @@ namespace Durados.Web.Mvc.Infrastructure
             return zipFilename;
         }
 
-        public static Stream Zip(Dictionary<string, MemoryStream> memStreams)
+        public static Stream Zip(Dictionary<string, Stream> memStreams)
         {
             MemoryStream zipStream = new MemoryStream();//)
             using (ZipArchive zip = new ZipArchive(zipStream, ZipArchiveMode.Create, true))
@@ -232,8 +232,13 @@ namespace Durados.Web.Mvc.Infrastructure
                     using (StreamWriter sw = new StreamWriter(entry.Open()))
                     {
                         memStream.Value.Seek(0,SeekOrigin.Begin);
-                        char[] buffer = System.Text.Encoding.UTF8.GetString(memStream.Value.ToArray()).ToCharArray();
-                        sw.Write(buffer, 0, buffer.Length);
+                        if (memStream.Value is MemoryStream)
+                        {
+                            char[] buffer = System.Text.Encoding.UTF8.GetString((memStream.Value as MemoryStream).ToArray()).ToCharArray();
+                            sw.Write(buffer, 0, buffer.Length);
+                        }
+                        else
+                            throw new DuradosException("Fail  zipping configuration streams - stream is not memory stream");
 
                     }
 
