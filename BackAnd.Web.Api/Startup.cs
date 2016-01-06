@@ -40,6 +40,10 @@ namespace BackAnd.Web.Api
 
             var context = new OwinContext(app.Properties);
             var token = context.Get<System.Threading.CancellationToken>("host.OnAppDisposing");
+
+            // load singetone 
+            var u = FarmCachingSingeltone.Instance.ToString();
+
             if (token != System.Threading.CancellationToken.None)
             {
                 token.Register(() =>

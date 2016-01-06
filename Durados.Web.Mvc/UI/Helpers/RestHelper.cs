@@ -7313,7 +7313,7 @@ namespace Durados.Web.Mvc.UI.Helpers
         public static void Clear(string appName)
         {
             Maps.Instance.DuradosMap.AllKindOfCache[key].Clear();
-            FarmCachingSingeltone.Instance.ClearMachinesCache(appName, true);
+            FarmCachingSingeltone.Instance.ClearMachinesCache(appName);
         }
     }
 

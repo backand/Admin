@@ -610,7 +610,11 @@ namespace BackAnd.Web.Api.Controllers
 
         protected virtual string GetAppName()
         {
-            string appName = Request.Headers.GetValues("AppName").FirstOrDefault();
+            string appName = null;
+            if (Request.Headers.Contains("AppName"))
+            {
+                appName = Request.Headers.GetValues("AppName").FirstOrDefault();
+            }
             if (appName == null)
             {
                 appName = Map.AppName;
@@ -695,6 +699,7 @@ namespace BackAnd.Web.Api.Controllers
         {
             lock (Map)
             {
+                FarmCachingSingeltone.Instance.AsyncCacheStarted(Map.AppName);
                 Durados.Web.Mvc.Database configDatabase = Map.GetConfigDatabase();
                 Map.Database.SetNextMinorConfigVersion();
                 Durados.DataAccess.ConfigAccess.UpdateVersion(Map.Database.ConfigVersion, Map.GetConfigDatabase().ConnectionString);
@@ -714,6 +719,8 @@ namespace BackAnd.Web.Api.Controllers
         {
             lock (map)
             {
+                //set flag the azure async cache started and release the flag at Map.BlobTransferCompletedCallback
+                FarmCachingSingeltone.Instance.AsyncCacheStarted(Map.AppName);
                 Durados.Web.Mvc.Database configDatabase = map.GetConfigDatabase();
                 map.Database.SetNextMinorConfigVersion();
                 Durados.DataAccess.ConfigAccess.UpdateVersion(map.Database.ConfigVersion, map.GetConfigDatabase().ConnectionString);

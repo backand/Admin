@@ -274,6 +274,9 @@
     <Content Include="packages.config" />
     <None Include="Properties\PublishProfiles\api.pubxml" />
     <None Include="Properties\PublishProfiles\BackandApi.pubxml" />
+    <None Include="Web.BackandApi.config">
+      <DependentUpon>Web.config</DependentUpon>
+    </None>
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>
