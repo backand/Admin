@@ -2919,7 +2919,69 @@ namespace Durados.Web.Mvc.UI.Helpers
 
             int? size = GetSize(appName, GetConnectionString(appName));
 
-            return new Dictionary<string, object>() { { "last24hours", last24 }, { "diffLastDaytoYesterday", diff24 }, { "last30days", last30 }, { "diffLast30DaysToPrev", diff30 }, { "sizeInMb", size } };
+            return new Dictionary<string, object>() { { "last24hours", last24 }, { "diffLastDaytoYesterday", diff24 }, { "last30days", last30 }, { "diffLast30DaysToPrev", diff30 }, { "sizeInMb", size }, { "totalRows", GetTotalRows(appName) } };
+        }
+
+        private Dictionary<string, object> GetTotalRows(string appName)
+        {
+            string connectionString = GetConnectionString(appName);
+
+            SqlProduct? sqlProduct = GetSqlProduct(appName);
+
+            if (!sqlProduct.HasValue || string.IsNullOrEmpty(connectionString))
+                return null;
+
+            if (sqlProduct != SqlProduct.MySql)
+                return null;
+
+            SqlAccess sqlAccess = GetSqlAccess(sqlProduct.Value);
+            string sql = GetTotalRowsSql(sqlProduct.Value);
+
+            try
+            {
+                DataTable table = sqlAccess.ExecuteTable(connectionString, sql, null, CommandType.Text);
+
+                Dictionary<string, object> totals = new Dictionary<string, object>();
+
+                foreach (DataRow row in table.Rows)
+                {
+                    string tableName = row["TableName"].ToString();
+                    object total = row["TotalRows"];
+                    if (!totals.ContainsKey(tableName))
+                    {
+                        try
+                        {
+                            totals.Add(tableName, total);
+                        }
+                        catch { }
+                    }
+                }
+
+                return totals;
+            }
+            catch { }
+            return null;
+        }
+
+        private string GetTotalRowsSql(SqlProduct sqlProduct)
+        {
+            string sql = null;
+
+            switch (sqlProduct)
+            {
+                case SqlProduct.MySql:
+                    sql = "SELECT table_name as TableName, table_rows as TotalRows  FROM information_schema.tables where table_schema = DATABASE() ";
+                    break;
+                case SqlProduct.Postgre:
+                    break;
+                case SqlProduct.Oracle:
+                    break;
+
+                default:
+                    break;
+            }
+
+            return sql;
         }
 
         private int? GetSize(string appName, string connectionString)
