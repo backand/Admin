@@ -16,10 +16,13 @@ namespace BackAnd.Web.Api.Test
     {
         
         [TestMethod]
-        public void Test()
+        public void TestConfigUpdate()
         {
             string ins1url = GetIns1url();
             string ins2url = GetIns2url();
+
+            ClearCache(GetClient1(ins1url));
+            ClearCache(GetClient2(ins2url));
 
             string ins1config = GetInsConfig(GetClient1(ins1url));
             string ins2config = GetInsConfig(GetClient2(ins2url));
@@ -29,13 +32,104 @@ namespace BackAnd.Web.Api.Test
             string ins1configChanged = ChangeInsConfig(ins1config);
             UpdateConfig(GetClient1(ins1url), ins1configChanged);
 
-            //wait for redis event
-            Thread.Sleep(5000);
-
+            //Thread.Sleep(1000);
             ins2config = GetInsConfig(GetClient2(ins2url));
 
             Assert.AreNotEqual(ins1config, ins2config, "ins2 config was not changed.");
             Assert.AreEqual(ins1configChanged, ins2config, "In the end both instances config should be equal and they are not.");
+        }
+
+        [TestMethod]
+        public void TestModelUpdate()
+        {
+            string ins1url = GetIns1url();
+            string ins2url = GetIns2url();
+
+            ClearCache(GetClient1(ins1url));
+            ClearCache(GetClient2(ins2url));
+
+            string ins1model = GetInsModel(GetClient1(ins1url));
+            string ins2model = GetInsModel(GetClient2(ins2url));
+
+            Assert.AreEqual(ins1model, ins2model, "In the beginning both instances config should be equal and they are not.");
+
+            string ins1ModelChanged = ChangeInsModel(ins1model);
+            UpdateModel(GetClient1(ins1url), ins1ModelChanged);
+
+            //Thread.Sleep(1000);
+            ins2model = GetInsModel(GetClient2(ins2url));
+            
+            Assert.AreNotEqual(ins1model, ins2model, "ins2 config was not changed.");
+            
+        }
+
+        private void UpdateModel(RestClient client, string model)
+        {
+            var request = new RestRequest("/1/model", Method.POST);
+            //var json = JsonConvert.DeserializeObject(config);
+            // request.JsonSerializer = RestSharp.Serialize new JsonSerializer();
+            request.RequestFormat = DataFormat.Json;
+            request.AddParameter("application/json; charset=utf-8", model, ParameterType.RequestBody);
+
+            // Act
+            var response = client.Execute(request);
+
+            // Assert
+            if (response.StatusCode == System.Net.HttpStatusCode.OK)
+            {
+            }
+            else
+            {
+                Assert.Fail("Fail to update model");
+            }
+
+        }
+
+        private string ChangeInsModel(string ins1config)
+        {
+            string changed = ins1config;
+            if (ins1config.Contains("lastName"))
+                changed = ins1config.Replace("lastName", "last1Name");
+            else if (ins1config.Contains("last1Name"))
+                changed = ins1config.Replace("last1Name", "lastName");
+            else
+                Assert.Fail("Fail to change model");
+
+            return "{newSchema: " + changed.Replace("11","") + ", severity: 0}";
+        }
+
+        private string GetInsModel(RestClient client)
+        {
+            var request = new RestRequest("/1/model", Method.GET);
+
+            // Act
+            var response = client.Execute<Dictionary<string, object>>(request);
+            if (response.StatusCode == System.Net.HttpStatusCode.OK)
+            {
+                return response.Content;
+            }
+            else
+            {
+                Assert.Fail("Fail to get model");
+            }
+
+            return null;
+        }
+
+        private void ClearCache(RestClient client)
+        {
+            var request = new RestRequest("/1/app/reload", Method.GET);
+
+            // Act
+            var response = client.Execute<Dictionary<string, object>>(request);
+            if (response.StatusCode == System.Net.HttpStatusCode.OK)
+            {
+            }
+            else
+            {
+                Assert.Fail("Fail to clear cache");
+            }
+
         }
 
         private void UpdateConfig(RestClient client, string config)

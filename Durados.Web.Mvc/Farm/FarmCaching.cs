@@ -43,7 +43,7 @@ namespace Durados.Web.Mvc.UI.Helpers
 
         static FarmCachingSingeltone()
         {
-            
+        
         }
 
 
@@ -116,7 +116,7 @@ namespace Durados.Web.Mvc.UI.Helpers
             }
         }
 
-        public void ClearMachinesCache(string appName, bool async = false)
+        public void ClearMachinesCache(string appName)
         {
             if(string.IsNullOrEmpty(appName))
             {
@@ -140,5 +140,20 @@ namespace Durados.Web.Mvc.UI.Helpers
             
             }
         }
+
+        public void AsyncCacheStarted(string appName)
+        {
+            this.transport.Status.Set(appName);
+        }
+        public void AsyncCacheCompleted(string appName)
+        {
+            this.transport.Status.Clear(appName);
+        }
+
+        public bool IsAsyncCacheCompleted(string appName)
+        {
+            return this.transport.Status.Contains(appName);
+        }
+
     }
 }

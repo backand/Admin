@@ -244,10 +244,13 @@
     <Compile Include="Controllers\UtilsController.cs" />
     <Compile Include="Controllers\CrmController.cs" />
     <Compile Include="Controllers\ImageOrganizerController.cs" />
+    <Compile Include="Farm\AsyncCacheIsNotCompletedException.cs" />
     <Compile Include="Farm\FarmException.cs" />
     <Compile Include="Farm\FarmMessage.cs" />
     <Compile Include="Farm\IPubsubTransport.cs" />
+    <Compile Include="Farm\IStatus.cs" />
     <Compile Include="Farm\RedisFarm.cs" />
+    <Compile Include="Farm\Status.cs" />
     <Compile Include="FtpAzure.cs" />
     <Compile Include="FtpUpload.cs" />
     <Compile Include="GeneralDataAccess.cs" />

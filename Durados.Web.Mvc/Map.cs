@@ -21,6 +21,8 @@ using Durados.Web.Mvc.Azure;
 using Newtonsoft.Json;
 using System.Diagnostics;
 using Durados.Data;
+using Durados.SmartRun;
+using Durados.Web.Mvc.Farm;
 
 namespace Durados.Web.Mvc
 {
@@ -3742,15 +3744,25 @@ namespace Durados.Web.Mvc
                 return;
             }
 
-            // fetch from storage
-            ReadConfigFromCloudStorage(ds, filename);
+          
+                // fetch from storage
+                ReadConfigFromCloudStorage(ds, filename);
+                
+          
+                
+              //  ReadConfigFromCloudStorage(ds, filename);
+           //     Maps.Instance.DuradosMap.Logger.Log("ReadConfigFromCloud", "ReadConfigFromCloud", "ReadConfigFromCloud", exception, 1, "");
 
+            //}
+
+            
             // add to cache for next read
             Maps.Instance.StorageCache.Add(blobName, ds);
         }
         
         public void ReadConfigFromCloudStorage(DataSet ds, string filename)
         {
+            CheckIfConfigIsLockedAndWait(AppName);
 
             string containerName = Maps.GetStorageBlobName(filename);
             CloudBlobContainer container = GetContainer(containerName);
@@ -3773,6 +3785,33 @@ namespace Durados.Web.Mvc
 
             }
             catch { }
+        }
+
+        private void CheckIfConfigIsLockedAndWait(string appName)
+        {
+            try
+            {
+                RunWithRetry.Run<AsyncCacheIsNotCompletedException>(
+                        () =>
+                        {
+                            // for ELB check if caching was completed
+                            if (!IsMainMap && !string.IsNullOrEmpty(appName))
+                            {
+                                if (!FarmCachingSingeltone.Instance.IsAsyncCacheCompleted(appName))
+                                {
+                                    throw new AsyncCacheIsNotCompletedException();
+                                }
+                            }
+
+                        }, 10, 500);
+            }
+            catch (AsyncCacheIsNotCompletedException exception)
+            {
+                // clear lock from redis
+                FarmCachingSingeltone.Instance.AsyncCacheCompleted(appName);
+
+                Maps.Instance.DuradosMap.Logger.Log("ReadConfigFromCloud", "ReadConfigFromCloud", "ReadConfigFromCloud", exception, 1, "");
+            }
         }
 
         public void WriteConfigToCloud(DataSet ds, string filename)
@@ -3865,7 +3904,12 @@ namespace Durados.Web.Mvc
             BlobTransferAsyncState state = (BlobTransferAsyncState)result.AsyncState;
             if (state == null || state.Map == null)
                 return;
-                
+
+            if (IsBigBlob(state.BlobName))
+            {
+                FarmCachingSingeltone.Instance.AsyncCacheCompleted(state.Map.AppName);
+            }
+
             try
             {
                 Maps.Instance.DuradosMap.Logger.Log("Map", "WriteConfigToCloud", state.Map.AppName ?? string.Empty, DateTime.Now.Subtract(state.Started).TotalMilliseconds.ToString(), string.Empty, -8, state.BlobName + " ended", DateTime.Now);
@@ -3887,6 +3931,11 @@ namespace Durados.Web.Mvc
                 Map map = Maps.Instance.GetMap();
                 map.Logger.Log("Map", "BlobTransferCompletedCallback", map.AppName ?? string.Empty, exception, 1, string.Empty);
             }
+        }
+
+        private bool IsBigBlob(string blobName)
+        {
+            return !(blobName.EndsWith("xml"));
         }
 
         public void RefreshApis(Map map)
@@ -4646,7 +4695,16 @@ namespace Durados.Web.Mvc
 
         public static string GetInMemoryKey()
         {
-            return System.Web.HttpContext.Current.Request.Headers["TestKey"];
+            try
+            {
+                if (System.Web.HttpContext.Current != null && System.Web.HttpContext.Current.Request != null)
+                    return System.Web.HttpContext.Current.Request.Headers["TestKey"];
+                return null;
+            }
+            catch
+            {
+                return null;
+            }
         }
 
         public static bool IsInMemoryMode()

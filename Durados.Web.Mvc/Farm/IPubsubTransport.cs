@@ -12,5 +12,7 @@ namespace Durados.Web.Mvc.Farm
         event EventHandler<FarmEventArgs> OnMessage;
 
         void PublishSync(FarmMessage message);
+
+        IStatus Status { get; }
     }
 }

@@ -9,7 +9,13 @@ namespace Durados.Web.Mvc.UI.Helpers
     {
         void ClearInternalCache(string appName);
 
-        void ClearMachinesCache(string appName, bool async = false);
+        void ClearMachinesCache(string appName);
+
+        void AsyncCacheStarted(string appName);
+        
+        void AsyncCacheCompleted(string appName);
+
+        bool IsAsyncCacheCompleted(string appName);
 
         void AppEnded();
     }
@@ -26,7 +32,7 @@ namespace Durados.Web.Mvc.UI.Helpers
             //throw new NotImplementedException();
         }
 
-        public void ClearMachinesCache(string appName, bool async = false)
+        public void ClearMachinesCache(string appName)
         {
             //throw new NotImplementedException();
         }
@@ -45,6 +51,22 @@ namespace Durados.Web.Mvc.UI.Helpers
         {
             //throw new NotImplementedException();
         }
+
+        public void AsyncCacheStarted(string appName)
+        {
+
+        }
+
+        public void AsyncCacheCompleted(string appName)
+        {
+
+        }
+
+        public bool IsAsyncCacheCompleted(string appName)
+        {
+            return true;
+        }
+
     }
 
 }
