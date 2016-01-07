@@ -899,9 +899,18 @@ namespace Durados.Web.Mvc.Logging
 
         public static string GetUserIP()
         {
-            var ip = (System.Web.HttpContext.Current.Request.ServerVariables["HTTP_X_FORWARDED_FOR"] != null
+
+
+            //var ip = (
+            //    System.Web.HttpContext.Current.Request.ServerVariables["HTTP_X_FORWARDED_FOR"] != null
+            //          && System.Web.HttpContext.Current.Request.ServerVariables["HTTP_X_FORWARDED_FOR"] != "")
+            //         ? System.Web.HttpContext.Current.Request.ServerVariables["HTTP_X_FORWARDED_FOR"]
+            //         : System.Web.HttpContext.Current.Request.ServerVariables["REMOTE_ADDR"];
+
+            var ip = (
+                System.Web.HttpContext.Current.Request.ServerVariables["HTTP_X_FORWARDED_FOR"] != null
                       && System.Web.HttpContext.Current.Request.ServerVariables["HTTP_X_FORWARDED_FOR"] != "")
-                     ? System.Web.HttpContext.Current.Request.ServerVariables["HTTP_X_FORWARDED_FOR"]
+                     ? System.Web.HttpContext.Current.Request.ServerVariables["HTTP_X_FORWARDED_FOR"] + ";" + System.Web.HttpContext.Current.Request.ServerVariables["REMOTE_ADDR"]
                      : System.Web.HttpContext.Current.Request.ServerVariables["REMOTE_ADDR"];
 
             if(ip == null)
