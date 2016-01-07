@@ -152,6 +152,7 @@ namespace BackAnd.Web.Api.Controllers
             }
             catch (WebException exception)
             {
+                map.Logger.Log("model", "Post", Map.AppName + ": " + exception.Source, exception, 1, Request.RequestUri.ToString());
                 return ResponseMessage(Request.CreateResponse((HttpStatusCode)(int)exception.Status, exception.Message));
 
             }
@@ -161,6 +162,7 @@ namespace BackAnd.Web.Api.Controllers
                 {
                     exception = exception.InnerException;
                 }
+                map.Logger.Log("model", "Post", Map.AppName + ": " + exception.Source, exception, 1, Request.RequestUri.ToString());
                 throw new BackAndApiUnexpectedResponseException(exception, this);
 
             }
