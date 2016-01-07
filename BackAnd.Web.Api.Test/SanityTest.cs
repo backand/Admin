@@ -15,29 +15,29 @@ namespace BackAnd.Web.Api.Test
     public class FarmCache
     {
         
-        [TestMethod]
-        public void TestConfigUpdate()
-        {
-            string ins1url = GetIns1url();
-            string ins2url = GetIns2url();
+        //[TestMethod]
+        //public void TestConfigUpdate()
+        //{
+        //    string ins1url = GetIns1url();
+        //    string ins2url = GetIns2url();
 
-            ClearCache(GetClient1(ins1url));
-            ClearCache(GetClient2(ins2url));
+        //    ClearCache(GetClient1(ins1url));
+        //    ClearCache(GetClient2(ins2url));
 
-            string ins1config = GetInsConfig(GetClient1(ins1url));
-            string ins2config = GetInsConfig(GetClient2(ins2url));
+        //    string ins1config = GetInsConfig(GetClient1(ins1url));
+        //    string ins2config = GetInsConfig(GetClient2(ins2url));
 
-            Assert.AreEqual(ins1config, ins2config, "In the beginning both instances config should be equal and they are not.");
+        //    Assert.AreEqual(ins1config, ins2config, "In the beginning both instances config should be equal and they are not.");
 
-            string ins1configChanged = ChangeInsConfig(ins1config);
-            UpdateConfig(GetClient1(ins1url), ins1configChanged);
+        //    string ins1configChanged = ChangeInsConfig(ins1config);
+        //    UpdateConfig(GetClient1(ins1url), ins1configChanged);
 
-            //Thread.Sleep(1000);
-            ins2config = GetInsConfig(GetClient2(ins2url));
+        //    //Thread.Sleep(1000);
+        //    ins2config = GetInsConfig(GetClient2(ins2url));
 
-            Assert.AreNotEqual(ins1config, ins2config, "ins2 config was not changed.");
-            Assert.AreEqual(ins1configChanged, ins2config, "In the end both instances config should be equal and they are not.");
-        }
+        //    Assert.AreNotEqual(ins1config, ins2config, "ins2 config was not changed.");
+        //    Assert.AreEqual(ins1configChanged, ins2config, "In the end both instances config should be equal and they are not.");
+        //}
 
         [TestMethod]
         public void TestModelUpdate()
@@ -95,7 +95,7 @@ namespace BackAnd.Web.Api.Test
             else
                 Assert.Fail("Fail to change model");
 
-            return "{newSchema: " + changed.Replace("11","") + ", severity: 0}";
+            return "{newSchema: " + changed + ", severity: 0}";
         }
 
         private string GetInsModel(RestClient client)
