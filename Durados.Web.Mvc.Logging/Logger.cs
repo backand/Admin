@@ -596,7 +596,9 @@ namespace Durados.Web.Mvc.Logging
                 return "origin=" + System.Web.HttpContext.Current.Server.UrlDecode(System.Web.HttpContext.Current.Request.Headers["origin"] ?? string.Empty) + "; " +
                     "host=" + System.Web.HttpContext.Current.Server.UrlDecode(System.Web.HttpContext.Current.Request.Headers["host"] ?? string.Empty) + "; " +
                     "referer=" + System.Web.HttpContext.Current.Server.UrlDecode(System.Web.HttpContext.Current.Request.Headers["referer"] ?? string.Empty) + "; " +
-                    "user-agent=" + System.Web.HttpContext.Current.Server.UrlDecode(System.Web.HttpContext.Current.Request.Headers["user-agent"] ?? string.Empty);
+                    "user-agent=" + System.Web.HttpContext.Current.Server.UrlDecode(System.Web.HttpContext.Current.Request.Headers["user-agent"] ?? string.Empty)
+
+                    + "; keys=" + string.Join(",", System.Web.HttpContext.Current.Request.ServerVariables.AllKeys) + " forwarded=" + System.Web.HttpContext.Current.Request.ServerVariables["HTTP_X_FORWARDED_FOR"];
             }
             catch
             {
