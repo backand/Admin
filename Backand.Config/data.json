@@ -22,7 +22,7 @@
 	{
 		"name" : "QA",
 		"serverAddress" : "http://api.backand.co:8099/",
-		"appname" : "backandtest",
+		"appname" : "farmtest",
 		"mainAppName" : "bko",
 		"username": "relly@backand.com",
 		"pwd" : "relly2805",
