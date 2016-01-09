@@ -127,7 +127,7 @@ namespace BackAnd.Web.Api.Test
             }
             else
             {
-                Assert.Fail("Fail to clear cache for " + client.BaseUrl);
+                Assert.Fail("Fail to clear cache for " + client.BaseUrl + ";\n error: " + response.Content);
             }
 
         }
