@@ -34,6 +34,11 @@ namespace Durados
                 ExcludeInUpdate = true;
             }
 
+            if (dataColumn.ExtendedProperties["dataType"].ToString().ToLower().Equals("point"))
+            {
+                DataType = Durados.DataType.Point;
+            }
+
             Searchable = (ColumnFieldType == ColumnFieldType.String);
             Required = GetRequired();
             TrimSpaces = true;
@@ -583,6 +588,9 @@ namespace Durados
 
                     case ColumnFieldType.DateTime:
                         return DataType.DateTime;
+
+                    case ColumnFieldType.Point:
+                        return DataType.Point;
 
                     case ColumnFieldType.Integer:
                         return DataType.Numeric;

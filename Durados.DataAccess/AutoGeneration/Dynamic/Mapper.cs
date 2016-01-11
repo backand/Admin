@@ -1635,6 +1635,12 @@ namespace Durados.DataAccess.AutoGeneration.Dynamic
 
                 LoadNewFieldDefaults(defaultField, values);
 
+                if (column.ExtendedProperties["dataType"].ToString().ToLower().Equals("point"))
+                {
+                    values["DataType"] = "Point";
+                    
+                }
+
                 //Handle date format ny database date format
                 if (column.DataType == typeof(DateTime))
                 {

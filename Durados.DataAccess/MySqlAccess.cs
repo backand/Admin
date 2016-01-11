@@ -62,6 +62,11 @@ namespace Durados.DataAccess
 
         //    return Convert.ChangeType(value, dataColumn.DataType);
         //}
+
+        protected override string GetPointFieldStatement(Field field)
+        {
+            return string.Format("CONCAT(X(`{0}`.`{1}`), \", \", Y(`{0}`.`{1}`))  as {1}", field.View.DataTable.TableName, field.GetColumnsNames()[0]);
+        }
        
         protected override System.Data.IDataAdapter GetNewAdapter(System.Data.IDbCommand command)
         {

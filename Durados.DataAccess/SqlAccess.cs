@@ -2797,6 +2797,12 @@ namespace Durados.DataAccess
                     calculated = field.IsCalculated;
                     if (calculated)
                         selectCalculated = GetCalculatedFieldStatement(field, null);
+
+                    if (field.IsPoint)
+                    {
+                        calculated = true;
+                        selectCalculated = GetPointFieldStatement(field, null);
+                    }
                 }
 
                 if (!hidden)
@@ -2812,8 +2818,18 @@ namespace Durados.DataAccess
             }
 
             selectStatement += GetEncryptedColumnsStatement(view);
+            if (view.Name == "items")
+            {
+                int x = 0;
+                x++;
+            }
 
             return selectStatement.Trim().TrimEnd(',');
+        }
+
+        protected virtual string GetPointFieldStatement(Field field)
+        {
+            return field.Name;
         }
 
         public string GetCalculatedFieldStatement(Field field)
