@@ -697,9 +697,18 @@ namespace BackAnd.Web.Api.Controllers
 
         protected void RefreshConfigCache()
         {
+            string appName = null;
             lock (Map)
             {
-                FarmCachingSingeltone.Instance.AsyncCacheStarted(Map.AppName);
+                appName = Map.AppName;
+                if (string.IsNullOrEmpty(appName))
+                {
+                    appName = (System.Web.HttpContext.Current.Items[Durados.Web.Mvc.Database.AppName] ?? string.Empty).ToString();
+                }
+                if (!string.IsNullOrEmpty(appName) && appName != Maps.DuradosAppName)
+                {
+                    FarmCachingSingeltone.Instance.AsyncCacheStarted(appName);
+                }
                 Durados.Web.Mvc.Database configDatabase = Map.GetConfigDatabase();
                 Map.Database.SetNextMinorConfigVersion();
                 Durados.DataAccess.ConfigAccess.UpdateVersion(Map.Database.ConfigVersion, Map.GetConfigDatabase().ConnectionString);
@@ -708,19 +717,30 @@ namespace BackAnd.Web.Api.Controllers
                 Map.Refresh();
                 Map.JsonConfigCache.Clear();
                 Map.AllKindOfCache.Clear();
-                RefreshOldAdmin(Map.AppName);
+                RefreshOldAdmin(appName);
             }
-
-            FarmCachingSingeltone.Instance.ClearMachinesCache(Map.AppName);
+            if (!string.IsNullOrEmpty(appName) && appName != Maps.DuradosAppName)
+            {
+                FarmCachingSingeltone.Instance.ClearMachinesCache(appName);
+            }
 
         }
 
         protected void RefreshConfigCache(Map map)
         {
+            string appName = null;
             lock (map)
             {
                 //set flag the azure async cache started and release the flag at Map.BlobTransferCompletedCallback
-                FarmCachingSingeltone.Instance.AsyncCacheStarted(Map.AppName);
+                appName = Map.AppName;
+                if (string.IsNullOrEmpty(appName))
+                {
+                    appName = (System.Web.HttpContext.Current.Items[Durados.Web.Mvc.Database.AppName] ?? string.Empty).ToString();
+                }
+                if (!string.IsNullOrEmpty(appName) && appName != Maps.DuradosAppName)
+                {
+                    FarmCachingSingeltone.Instance.AsyncCacheStarted(appName);
+                }
                 Durados.Web.Mvc.Database configDatabase = map.GetConfigDatabase();
                 map.Database.SetNextMinorConfigVersion();
                 Durados.DataAccess.ConfigAccess.UpdateVersion(map.Database.ConfigVersion, map.GetConfigDatabase().ConnectionString);
@@ -730,13 +750,15 @@ namespace BackAnd.Web.Api.Controllers
                 Map.JsonConfigCache.Clear();
                 try
                 {
-                    RefreshOldAdmin(map.AppName);
+                    RefreshOldAdmin(appName);
                 }
                 catch { }
             }
 
-            FarmCachingSingeltone.Instance.ClearMachinesCache(map.AppName);
-
+            if (!string.IsNullOrEmpty(appName) && appName != Maps.DuradosAppName)
+            {
+                FarmCachingSingeltone.Instance.ClearMachinesCache(appName);
+            }
         }
 
         protected bool IsAdmin()
