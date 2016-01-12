@@ -7,6 +7,9 @@ using Newtonsoft.Json;
 using System.Collections;
 using RestSharp;
 using System.Collections.Generic;
+using System.Net;
+using System.Security.Cryptography.X509Certificates;
+using System.Net.Security;
 
 namespace BackAnd.Web.Api.Test
 {
@@ -122,11 +125,14 @@ namespace BackAnd.Web.Api.Test
 
             // Act
             var response = client.Execute<Dictionary<string, object>>(request);
+
+
             if (response.StatusCode == System.Net.HttpStatusCode.OK)
             {
             }
             else
             {
+                Console.WriteLine("status: " + response.StatusCode + "; ErrorMessage:" + response.ErrorMessage);
                 Assert.Fail("Fail to clear cache for " + client.BaseUrl + ";\n error: " + response.Content);
             }
 

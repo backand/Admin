@@ -878,6 +878,14 @@ namespace Durados
             }
         }
 
+        public virtual bool IsPoint
+        {
+            get
+            {
+                return false;
+            }
+        }
+
         public virtual bool IsBoolean
         {
             get

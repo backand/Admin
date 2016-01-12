@@ -45,6 +45,30 @@ namespace Durados.DataAccess
                 return base.GetNewParameter(command, parameterName, value);
         }
 
+        protected override string GetPointParameterValue(Field field, Dictionary<string, object> values)
+        {
+            if (!(values[field.Name] is object[]))
+                return values[field.Name].ToString();
+
+            object[] point = (object[])values[field.Name];
+            if (point.Length != 2)
+                return values[field.Name].ToString();
+
+            return string.Format("POINT({0} {1})", point[0], point[1]);
+        }
+
+        const char comma = ',';
+
+        protected override string GetPointUpdateSetColumn(Field field, string columnName, ISqlTextBuilder sqlTextBuilder)
+        {
+            return sqlTextBuilder.EscapeDbObject(columnName) + sqlTextBuilder.DbEquals + "GeomFromText(" + sqlTextBuilder.DbParameterPrefix + columnName.ReplaceNonAlphaNumeric() + ")" + comma;
+        }
+
+        protected override string GetPointForInsert(Field field, string columnName, ISqlTextBuilder sqlTextBuilder)
+        {
+            return "GeomFromText(" + sqlTextBuilder.DbParameterPrefix + columnName.ReplaceNonAlphaNumeric() + ")" + comma;
+        }
+
         protected override System.Data.IDataParameter GetNewParameter(View view, string parameterName, object value)
         {
             if (IsMySqlConnectionString(view.ConnectionString))
@@ -62,6 +86,12 @@ namespace Durados.DataAccess
 
         //    return Convert.ChangeType(value, dataColumn.DataType);
         //}
+
+        protected override string GetPointFieldStatement(Field field)
+        {
+            return string.Format("CONCAT(X(`{0}`.`{1}`), \", \", Y(`{0}`.`{1}`))  as {1}", field.View.DataTable.TableName, field.GetColumnsNames()[0]);
+            //return string.Format("AsText(`{0}`.`{1}`) as `{1}`", field.View.DataTable.TableName, field.GetColumnsNames()[0]);
+        }
        
         protected override System.Data.IDataAdapter GetNewAdapter(System.Data.IDbCommand command)
         {
