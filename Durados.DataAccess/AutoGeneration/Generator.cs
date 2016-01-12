@@ -274,6 +274,14 @@ namespace Durados.DataAccess.AutoGeneration
                             }
                         }
 
+                        if (maxLength.Value == 100001)
+                        {
+                            maxLength = 100000;
+                        }
+                        if (dataType.ToLower() == "point")
+                        {
+                            maxLength = 100001;
+                        }
                         column.MaxLength = maxLength.Value;
                     }
 

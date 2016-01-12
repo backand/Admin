@@ -882,13 +882,7 @@ namespace Durados
         {
             get
             {
-                switch (GetColumnFieldType())
-                {
-                    case ColumnFieldType.Point:
-                        return true;
-                    default:
-                        return false;
-                }
+                return false;
             }
         }
 
@@ -1241,8 +1235,7 @@ namespace Durados
         Integer,
         Real,
         Guid,
-        String,
-        Point
+        String
     }
 
 
@@ -1267,8 +1260,7 @@ namespace Durados
         SingleSelect = 9,
         MultiSelect = 10,
         ImageList = 11,
-        Email = 12,
-        Point = 13
+        Email = 12
     }
 
     [Durados.Config.Attributes.EnumDisplay(EnumDisplayNames = new string[7] { "Date (05/28/2013)", "Date (28/05/2013)", "DateTime (05/28/2013 01:10:00 PM)", "DateTime (28/05/2013 01:10:00 PM)", "DateTime (05/28/2013 13:10:00)", "DateTime (28/05/2013 13:10:00)", "Custom" }, EnumNames = new string[7] { "Date_mm_dd", "Date_dd_mm", "Date_mm_dd_12", "Date_dd_mm_12", "Date_mm_dd_24", "Date_dd_mm_24", "Date_Custom" })]

@@ -1359,6 +1359,15 @@ namespace Durados.Web.Mvc.UI.Helpers
             }
             else if (IsField(view))
             {
+                if (columnField.Name == "DataType")
+                {
+                    Field realField = GetFieldFromFieldRow(view, dataRow);
+                    if (realField.IsPoint)
+                    {
+                        return "Point";
+                    }
+                    return value;
+                }
                 if (columnField.Name == "HideInCreate")
                 {
                     Field realField = GetFieldFromFieldRow(view, dataRow);
@@ -1830,6 +1839,8 @@ namespace Durados.Web.Mvc.UI.Helpers
                         value = row.Row[((ColumnField)field).DataColumn.ColumnName];
                     else if (field.FieldType == FieldType.Children && field.IsCheckList())
                         value = tableViewer.GetFieldValue(field, row.Row);
+                    else if (field.FieldType == FieldType.Column && field.IsPoint)
+                        value = GetPoint(field, row.Row);
                     else
                         value = System.Web.HttpContext.Current.Server.HtmlDecode(field.GetValue(row.Row));
                     //}
@@ -1852,6 +1863,22 @@ namespace Durados.Web.Mvc.UI.Helpers
             AddSpecialValues(dictionary, view, row.Row, dataView);
 
             return dictionary;
+        }
+
+        private object GetPoint(Field field, DataRow dataRow)
+        {
+            try
+            {
+                string s = field.GetValue(dataRow);
+                if (string.IsNullOrEmpty(s))
+                    return null;
+                string[] a = s.Split(",".ToCharArray(), StringSplitOptions.RemoveEmptyEntries);
+                return new double[2] { Convert.ToDouble(a[0]), Convert.ToDouble(a[1]) };
+            }
+            catch (Exception exception)
+            {
+                throw new DuradosException("Fail to retrieve point value", exception);
+            }
         }
 
         private void AddSpecialValues(Dictionary<string, object> dictionary, View view, System.Data.DataRow row, DataView dataView)
@@ -2298,6 +2325,8 @@ namespace Durados.Web.Mvc.UI.Helpers
                 {
                     if (field.FieldType == FieldType.Column && (field.IsDate || field.IsBoolean))
                         dictionary.Add(name, row[((ColumnField)field).DataColumn.ColumnName]);
+                    else if (field.IsPoint)
+                        dictionary.Add(name, GetPoint(field, row));
                     else
                         dictionary.Add(name, JsonField.Value);
                 }
@@ -3315,7 +3344,8 @@ namespace Durados.Web.Mvc.UI.Helpers
             if (withSystemTokens)
             {
                 DataView dataView = GetDataViewForDictionary(null, DictionaryType.PlaceHolders);
-                dictionary.Add("systemTokens", GetDictionary(dataView));
+                if (dataView != null)
+                    dictionary.Add("systemTokens", GetDictionary(dataView));
             }
 
             if (view != null)
@@ -3384,9 +3414,13 @@ namespace Durados.Web.Mvc.UI.Helpers
 
             foreach (System.Data.DataRowView row in dataView)
             {
-                string label = row.Row["Tag"].ToString();
-                string token = row.Row["Token"].ToString();
-                if (!IsExcluded(view, label))
+                string label = null;
+                if (!row.Row.IsNull("Tag"))
+                    label = row.Row["Tag"].ToString();
+                string token = null;
+                if (!row.Row.IsNull("Token"))
+                    token = row.Row["Token"].ToString();
+                if (!IsExcluded(view, label) && label != null && token != null)
                 {
                     dictionary.Add(new Dictionary<string, object>() { { "label", label }, { "token", token } });
                 }

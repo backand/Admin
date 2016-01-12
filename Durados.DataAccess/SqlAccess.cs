@@ -2801,7 +2801,7 @@ namespace Durados.DataAccess
                     if (field.IsPoint)
                     {
                         calculated = true;
-                        selectCalculated = GetPointFieldStatement(field, null);
+                        selectCalculated = GetPointFieldStatement(field);
                     }
                 }
 
@@ -6611,12 +6611,21 @@ namespace Durados.DataAccess
             {
                 if (view.Fields.ContainsKey(columnName) && view.Fields[columnName].FieldType == FieldType.Column && ((ColumnField)view.Fields[columnName]).Encrypted)
                     delimitedColumns += "ENCRYPTBYKEY(KEY_GUID('" + ((ColumnField)view.Fields[columnName]).GetSymmetricKeyName() + "'),"+sqlTextBuilder.DbParameterPrefix +  GetVarFromName(columnName) + ")" + comma;
+                else if (view.Fields.ContainsKey(columnName) && view.Fields[columnName].IsPoint)
+                {
+                    delimitedColumns += GetPointForInsert(view.Fields[columnName], columnName, sqlTextBuilder);
+                }
                 else
                     delimitedColumns += sqlTextBuilder.DbParameterPrefix + GetVarFromName(columnName) + comma;
 
             }
 
             return delimitedColumns.TrimEnd(comma);
+        }
+
+        protected virtual string GetPointForInsert(Field field, string columnName, ISqlTextBuilder sqlTextBuilder)
+        {
+            return sqlTextBuilder.DbParameterPrefix + GetVarFromName(columnName) + comma;
         }
 
         private string GetDelimitedColumns(View view, DataAction dataAction, Dictionary<string, object> values)
@@ -6697,6 +6706,10 @@ namespace Durados.DataAccess
                                     {
                                         byteArray = StrToByteArray(values[field.Name].ToString());
                                     }
+                                }
+                                else if (field.IsPoint)
+                                {
+                                    value = GetPointParameterValue(field, values);
                                 }
                                 else
                                 {
@@ -6825,6 +6838,11 @@ namespace Durados.DataAccess
             }
 
             return parameters.ToArray();
+        }
+
+        protected virtual string GetPointParameterValue(Field field, Dictionary<string, object> values)
+        {
+            return values[field.Name].ToString(); 
         }
 
         protected virtual IDataParameter GetNewSqlParameter(View view, string name, object value)
@@ -7207,11 +7225,20 @@ namespace Durados.DataAccess
             {
                 if (view.Fields.ContainsKey(columnName) && view.Fields[columnName].FieldType == FieldType.Column && ((ColumnField)view.Fields[columnName]).Encrypted)
                     updateSetColumns += sqlTextBuilder.EscapeDbObject(((ColumnField)view.Fields[columnName]).EncryptedName) + sqlTextBuilder.DbEquals + "ENCRYPTBYKEY(KEY_GUID('" + ((ColumnField)view.Fields[columnName]).GetSymmetricKeyName() + "')," + sqlTextBuilder.DbParameterPrefix + columnName + ")" + comma;
+                else if (view.Fields.ContainsKey(columnName) && view.Fields[columnName].IsPoint)
+                {
+                    updateSetColumns += GetPointUpdateSetColumn(view.Fields[columnName], columnName, sqlTextBuilder);
+                }
                 else
                     updateSetColumns += sqlTextBuilder.EscapeDbObject(columnName) + sqlTextBuilder.DbEquals + sqlTextBuilder.DbParameterPrefix + GetVarFromName(columnName) + comma;
             }
 
             return updateSetColumns.TrimEnd(comma);
+        }
+
+        protected virtual string GetPointUpdateSetColumn(Field field, string columnName, ISqlTextBuilder sqlTextBuilder)
+        {
+            return sqlTextBuilder.EscapeDbObject(columnName) + sqlTextBuilder.DbEquals + sqlTextBuilder.DbParameterPrefix + GetVarFromName(columnName) + comma;
         }
 
         //private string GetUpdateSetColumns(View view, Dictionary<string, object> values)

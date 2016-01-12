@@ -34,11 +34,6 @@ namespace Durados
                 ExcludeInUpdate = true;
             }
 
-            if (dataColumn.ExtendedProperties["dataType"].ToString().ToLower().Equals("point"))
-            {
-                DataType = Durados.DataType.Point;
-            }
-
             Searchable = (ColumnFieldType == ColumnFieldType.String);
             Required = GetRequired();
             TrimSpaces = true;
@@ -573,7 +568,14 @@ namespace Durados
                 return View.DataTable.PrimaryKey.Count() == 1 && View.DataTable.PrimaryKey[0].ColumnName == DataColumn.ColumnName && DataColumn.DataType.Equals(typeof(Guid));
             }
         }
-        
+
+        public override bool IsPoint
+        {
+            get
+            {
+                return DataColumn.MaxLength == 100001;
+            }
+        }
 
         [Durados.Config.Attributes.ColumnProperty(DoNotCopy = true, Description = "Gets or sets the field data type.")]
         public override DataType DataType
@@ -588,9 +590,6 @@ namespace Durados
 
                     case ColumnFieldType.DateTime:
                         return DataType.DateTime;
-
-                    case ColumnFieldType.Point:
-                        return DataType.Point;
 
                     case ColumnFieldType.Integer:
                         return DataType.Numeric;
