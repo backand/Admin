@@ -335,7 +335,7 @@ namespace Durados.Workflow
             userProfile.Add("app", view.Database.GetCurrentAppName());
             userProfile.Add("userId", view.Database.GetCurrentUserId());
             userProfile.Add("token", System.Web.HttpContext.Current.Request.Headers["Authorization"] ?? "anonymous-" + System.Web.HttpContext.Current.Request.Headers["AnonymousToken"]);
-            userProfile.Add("request", new Dictionary<string, object>() { {"userIP", GetUserIP()}, { "headers", GetHeaders(System.Web.HttpContext.Current.Request.Headers) } });
+            userProfile.Add("request", new Dictionary<string, object>() { { "userIP", GetUserIP() }, { "method", System.Web.HttpContext.Current.Request.HttpMethod }, { "headers", GetHeaders(System.Web.HttpContext.Current.Request.Headers) } });
 
             var call = new Jint.Engine(cfg => cfg.AllowClr(typeof(Backand.XMLHttpRequest).Assembly));
 
@@ -481,7 +481,7 @@ namespace Durados.Workflow
             }
         }
 
-        private Dictionary<string, object> GetHeaders(System.Collections.Specialized.NameValueCollection headers)
+        public static Dictionary<string, object> GetHeaders(System.Collections.Specialized.NameValueCollection headers)
         {
             Dictionary<string, object> dic = new Dictionary<string, object>();
 
