@@ -1207,6 +1207,11 @@ namespace Durados.Web.Mvc
             }
         }
 
+        public override Guid GetAnonymousToken()
+        {
+            return Map.AnonymousToken;
+        }
+
         public override string GetCurrentAppName()
         {
             if (Map != null && !string.IsNullOrEmpty(Map.AppName))
