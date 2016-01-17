@@ -303,6 +303,8 @@ namespace Backand.Web.Api.BrowserTests
             }
             try
             {
+                // wait for fadeout animation
+                Thread.Sleep(500);
                 res.Click();
             }
             catch (Exception exception)
@@ -347,6 +349,10 @@ namespace Backand.Web.Api.BrowserTests
             var res = context.tinyWait.Until(ExpectedConditions.ElementIsVisible(By.ClassName("ba-icon-objects")));
             res.Click();
 
+            // wait for fadein animation
+            Thread.Sleep(500);
+
+            // open sttings menu
             res = context.tinyWait.Until(ExpectedConditions.ElementIsVisible(By.ClassName("ba-icon-settings")));
             context.driver.MoveTo(By.ClassName("ba-icon-settings"));
             res.Click();
@@ -402,7 +408,7 @@ namespace Backand.Web.Api.BrowserTests
             Thread.Sleep(10 * 1000);
             var res = new AppPageHelper(context).AppExist(context.AppName);
 
-            if (!res)
+            if (res == true)
             {
                 throw new Exception("find app " + context.AppName + " but shouldn't");
  

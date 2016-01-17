@@ -1782,6 +1782,10 @@ namespace Durados.Web.Mvc
       "*/\n" +
       "\'use strict\';\n" +
       "function backandCallback(userInput, dbRow, parameters, userProfile) {\n" +
+      "   // get facebook id and put in fuid field that you need to add to your user object\n" +
+      "   // userInput.fuid = parameters.socialProfile.additionalValues.id;\n" +
+      "   // get gender from facebook and put in gender field that you need to add to your user object\n" +
+      "   // userInput.gender = parameters.socialProfile.additionalValues.gender;\n" +
       "}";
             values.Add("Code", code);
 
@@ -4547,6 +4551,8 @@ namespace Durados.Web.Mvc
                 return lockerCache;
             }
         }
+
+        public System.Guid AnonymousToken { get; set; }
     }
 
     public class Theme
@@ -6109,6 +6115,7 @@ namespace Durados.Web.Mvc
             map.Url = GetAppUrl(appName);
             map.SiteInfo.LogoHref = map.Url;
             map.Guid = appRow.Guid;
+            map.AnonymousToken = appRow.AnonymousToken;
             
             int themeId = 0;
             string themeName = "";

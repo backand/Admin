@@ -99,6 +99,7 @@ namespace BackAnd.Web.Api.Controllers
         {
             try
             {
+                Maps.Instance.DuradosMap.Logger.Log("myapp", "", "", "started", null, -39, null, DateTime.Now);
                 View view = GetView(null);
                 
                 if (view == null)
@@ -215,7 +216,10 @@ namespace BackAnd.Web.Api.Controllers
 
                 if (deep.HasValue && deep.Value && item["DatabaseStatus"].Equals(1))
                 {
+                    Maps.Instance.DuradosMap.Logger.Log("myapp", "AddStat", "", "started", null, -39, null, DateTime.Now);
                     RestHelper.AddStat(item, id);
+                    Maps.Instance.DuradosMap.Logger.Log("myapp", "AddStat", "", "ended", null, -39, null, DateTime.Now);
+                   
                 }
                 else
                 {
@@ -250,6 +254,8 @@ namespace BackAnd.Web.Api.Controllers
                     }
                 }
 
+                Maps.Instance.DuradosMap.Logger.Log("myapp", "", "", "ended", null, -39, null, DateTime.Now);
+                
                 return Ok(item);
 
 
