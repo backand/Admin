@@ -2893,15 +2893,11 @@ namespace Durados.Web.Mvc.UI.Helpers
             if (string.IsNullOrEmpty(sysConnectionString))
                 return null;
 
-            Maps.Instance.DuradosMap.Logger.Log("myapp", "GetStat", "GetLast24Hours", "started", null, -39, null, DateTime.Now);
             object scalar = GetLast24Hours(sysConnectionString);
-            Maps.Instance.DuradosMap.Logger.Log("myapp", "GetStat", "GetLast24Hours", "ended", null, -39, null, DateTime.Now);
             int? last24 = null;
             if (scalar != null) last24 = Convert.ToInt32(scalar);
 
-            Maps.Instance.DuradosMap.Logger.Log("myapp", "GetStat", "GetLast48Hours", "started", null, -39, null, DateTime.Now);
             scalar = GetLast48Hours(sysConnectionString);
-            Maps.Instance.DuradosMap.Logger.Log("myapp", "GetStat", "GetLast48Hours", "ended", null, -39, null, DateTime.Now);
             int? last48 = null;
             if (scalar != null) last48 = Convert.ToInt32(scalar);
 
@@ -2925,15 +2921,11 @@ namespace Durados.Web.Mvc.UI.Helpers
                 }
             }
 
-            Maps.Instance.DuradosMap.Logger.Log("myapp", "GetStat", "GetLast30Days", "started", null, -39, null, DateTime.Now);
             scalar = GetLast30Days(sysConnectionString);
-            Maps.Instance.DuradosMap.Logger.Log("myapp", "GetStat", "GetLast30Days", "ended", null, -39, null, DateTime.Now);
             int? last30 = null;
             if (scalar != null) last30 = Convert.ToInt32(scalar);
 
-            Maps.Instance.DuradosMap.Logger.Log("myapp", "GetStat", "GetLast60Days", "started", null, -39, null, DateTime.Now);
             scalar = GetLast60Days(sysConnectionString);
-            Maps.Instance.DuradosMap.Logger.Log("myapp", "GetStat", "GetLast60Days", "ended", null, -39, null, DateTime.Now);
             int? last60 = null;
             if (scalar != null) last60 = Convert.ToInt32(scalar);
 
@@ -2957,13 +2949,9 @@ namespace Durados.Web.Mvc.UI.Helpers
                 }
             }
 
-            Maps.Instance.DuradosMap.Logger.Log("myapp", "GetStat", "GetSize", "started", null, -39, null, DateTime.Now);
             int? size = GetSize(appName, GetConnectionString(appName));
-            Maps.Instance.DuradosMap.Logger.Log("myapp", "GetStat", "GetSize", "ended", null, -39, null, DateTime.Now);
-
-            Maps.Instance.DuradosMap.Logger.Log("myapp", "GetStat", "GetTotalRows", "started", null, -39, null, DateTime.Now);
+            
             Dictionary<string, object> totalRows = GetTotalRows(appName);
-            Maps.Instance.DuradosMap.Logger.Log("myapp", "GetStat", "GetTotalRows", "ended", null, -39, null, DateTime.Now);
             
             return new Dictionary<string, object>() { { "last24hours", last24 }, { "diffLastDaytoYesterday", diff24 }, { "last30days", last30 }, { "diffLast30DaysToPrev", diff30 }, { "sizeInMb", size }, { "totalRows", totalRows } };
         }

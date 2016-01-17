@@ -99,7 +99,6 @@ namespace BackAnd.Web.Api.Controllers
         {
             try
             {
-                Maps.Instance.DuradosMap.Logger.Log("myapp", "", "", "started", null, -39, null, DateTime.Now);
                 View view = GetView(null);
                 
                 if (view == null)
@@ -254,7 +253,6 @@ namespace BackAnd.Web.Api.Controllers
                     }
                 }
 
-                Maps.Instance.DuradosMap.Logger.Log("myapp", "", "", "ended", null, -39, null, DateTime.Now);
                 
                 return Ok(item);
 
