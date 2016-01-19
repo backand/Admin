@@ -38,6 +38,7 @@ namespace BackAnd.Web.Api.Controllers
 
         [Route("{name}")]
         [HttpGet]
+        [HttpPost]
         public IHttpActionResult Get(string name, int? pageNumber = null, int? pageSize = null, bool dataSeries = false, string parameters = null)
         {
             try
@@ -61,9 +62,21 @@ namespace BackAnd.Web.Api.Controllers
                 {
                     values = Durados.Web.Mvc.UI.Json.JsonSerializer.Deserialize((System.Web.HttpContext.Current.Server.UrlDecode(parameters)));
                 }
-                var json = query.Get(pageNumber ?? 0, pageSize ?? 1000, values, dataSeries);
+                else if (Request.Method == HttpMethod.Post)
+                {
+                    string json = Request.Content.ReadAsStringAsync().Result;
+                    if (!string.IsNullOrEmpty(json))
+                    {
+                        values = Durados.Web.Mvc.UI.Json.JsonSerializer.Deserialize((System.Web.HttpContext.Current.Server.UrlDecode(json)));
+                        if (values.ContainsKey("parameters") && values["parameters"] is Dictionary<string, object>)
+                        {
+                            values = (Dictionary<string, object>)values["parameters"];
+                        }
+                    }
+                }
+                var data = query.Get(pageNumber ?? 0, pageSize ?? 1000, values, dataSeries);
 
-                return Ok(json);
+                return Ok(data);
             }
             catch (Exception exception)
             {

@@ -215,10 +215,7 @@ namespace BackAnd.Web.Api.Controllers
 
                 if (deep.HasValue && deep.Value && item["DatabaseStatus"].Equals(1))
                 {
-                    Maps.Instance.DuradosMap.Logger.Log("myapp", "AddStat", "", "started", null, -39, null, DateTime.Now);
                     RestHelper.AddStat(item, id);
-                    Maps.Instance.DuradosMap.Logger.Log("myapp", "AddStat", "", "ended", null, -39, null, DateTime.Now);
-                   
                 }
                 else
                 {

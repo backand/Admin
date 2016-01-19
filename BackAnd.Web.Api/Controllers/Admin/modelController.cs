@@ -339,12 +339,15 @@ namespace BackAnd.Web.Api.Controllers
 
                 for (int j = 0; j < columns.Count; j++)
                 {
-                    string fieldJsonName = columns[j].ToString();
-                    string fieldName = view.GetFieldsByJsonName(fieldJsonName)[0].Name;
+                    string columnName = columns[j].ToString();
+                    Field field = view.GetFieldByColumnNames(columnName);
+                    if (field != null)
+                    {
+                        string fieldName = field.Name;
 
-                    string fpk = ca.GetFieldPK(viewName, fieldName, Map.GetConfigDatabase().ConnectionString);
-                    fieldView.Edit(new Dictionary<string, object>() { { "Order", 500 + j * 10 } }, fpk, view_BeforeEdit, view_BeforeEditInDatabase, view_AfterEditBeforeCommit, view_AfterEditAfterCommit);
-
+                        string fpk = ca.GetFieldPK(viewName, fieldName, Map.GetConfigDatabase().ConnectionString);
+                        fieldView.Edit(new Dictionary<string, object>() { { "Order", 500 + j * 10 } }, fpk, view_BeforeEdit, view_BeforeEditInDatabase, view_AfterEditBeforeCommit, view_AfterEditAfterCommit);
+                    }
                 }
             }
 
