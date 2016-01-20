@@ -291,6 +291,9 @@ namespace BackAnd.Web.Api.Controllers
                 try
                 {
                     Durados.Web.Mvc.UI.Helpers.Account.SignUpResults signUpResults = account.SignUp(appName, firstName, lastName, email, role, byAdmin, password, confirmPassword, isSignupEmailVerification, parameters, view_BeforeCreate, view_BeforeCreateInDatabase, view_AfterCreateBeforeCommit, view_AfterCreateAfterCommit, view_BeforeEdit, view_BeforeEditInDatabase, view_AfterEditBeforeCommit, view_AfterEditAfterCommit);
+
+                    GetMap(appName).Logger.Log(GetControllerNameForLog(ControllerContext), string.Empty, string.Empty, null, -37, signUpResults.Username + ": " + account.GetSignUpStatusMessage(signUpResults.Status));
+
                     if (signUpResults.Status == Account.SignUpStatus.Ready)
                     {
                         var identity = new ClaimsIdentity("Bearer");
@@ -313,7 +316,7 @@ namespace BackAnd.Web.Api.Controllers
                 }
                 catch (Durados.Web.Mvc.UI.Helpers.Account.SignUpException exception)
                 {
-                    Log(appName, exception, 3);
+                    Log(appName, exception, 2);
                     return ResponseMessage(Request.CreateResponse(HttpStatusCode.NotAcceptable, exception.GetJsonError("signup_error")));
                 }
             }

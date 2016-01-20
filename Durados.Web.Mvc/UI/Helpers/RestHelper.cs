@@ -2952,8 +2952,43 @@ namespace Durados.Web.Mvc.UI.Helpers
             int? size = GetSize(appName, GetConnectionString(appName));
             
             Dictionary<string, object> totalRows = GetTotalRows(appName);
-            
-            return new Dictionary<string, object>() { { "last24hours", last24 }, { "diffLastDaytoYesterday", diff24 }, { "last30days", last30 }, { "diffLast30DaysToPrev", diff30 }, { "sizeInMb", size }, { "totalRows", totalRows } };
+
+            Dictionary<string, object> authorizationSecurity = GetAuthorizationSecurity(appName);
+            Dictionary<string, object> dataSecurity = GetDataSecurity(appName);
+
+            return new Dictionary<string, object>() { { "last24hours", last24 }, { "diffLastDaytoYesterday", diff24 }, { "last30days", last30 }, { "diffLast30DaysToPrev", diff30 }, { "sizeInMb", size }, { "totalRows", totalRows }, { "authorizationSecurity", authorizationSecurity }, { "dataSecurity", dataSecurity } };
+        }
+
+        private Dictionary<string, object> GetDataSecurity(string appName)
+        {
+            Map map = Maps.Instance.GetMap(appName);
+            if (map == null)
+                return null;
+
+            Dictionary<string, object> dataSecurity = new Dictionary<string, object>();
+
+            foreach (View view in map.Database.Views.Values.Where(v => !v.SystemView && !v.IsCloned).OrderBy(v => v.JsonName))
+            {
+                dataSecurity.Add(view.JsonName, !string.IsNullOrEmpty(view.PermanentFilter));
+            }
+                    
+            return dataSecurity;
+        }
+
+        private Dictionary<string, object> GetAuthorizationSecurity(string appName)
+        {
+            Map map = Maps.Instance.GetMap(appName);
+            if (map == null)
+                return null;
+
+            Dictionary<string, object> dataSecurity = new Dictionary<string, object>();
+
+            foreach (View view in map.Database.Views.Values.Where(v => !v.SystemView && !v.IsCloned).OrderBy(v => v.JsonName))
+            {
+                dataSecurity.Add(view.JsonName, view.Precedent);
+            }
+
+            return dataSecurity;
         }
 
         private Dictionary<string, object> GetTotalRows(string appName)
@@ -3004,7 +3039,7 @@ namespace Durados.Web.Mvc.UI.Helpers
             switch (sqlProduct)
             {
                 case SqlProduct.MySql:
-                    sql = "SELECT table_name as TableName, table_rows as TotalRows  FROM information_schema.tables where table_schema = DATABASE() ";
+                    sql = "SELECT table_name as TableName, table_rows as TotalRows  FROM information_schema.tables where table_schema = DATABASE() order by table_name ";
                     break;
                 case SqlProduct.Postgre:
                     break;

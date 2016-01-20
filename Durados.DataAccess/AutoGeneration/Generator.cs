@@ -189,7 +189,7 @@ namespace Durados.DataAccess.AutoGeneration
             while (reader.Read())
             {
                 string columnName = reader.GetString(reader.GetOrdinal("column_name"));
-                if (columnName == "p10" || columnName == "p11")
+                if (columnName == "b1")
                 {
                     int x = 0;
                     x++;

@@ -86,7 +86,7 @@ namespace BackAnd.Web.Api.Controllers
 
                  if (rules.Where(r => r.Name.Equals(name)).Count() == 0)
                  {
-                     return Request.CreateResponse(HttpStatusCode.NotFound, "Action not found, or rule is not on demand");
+                     return Request.CreateResponse(HttpStatusCode.NotFound, "Action not found, or is not on demand");
                  }
 
 
