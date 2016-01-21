@@ -7691,7 +7691,7 @@ namespace Durados.Web.Mvc.UI.Helpers
 
     public class AppsPool
     {
-        public bool Pop(string appName, string title, string username, out int? appId, string template)
+        public bool? Pop(string appName, string title, string username, out int? appId, string template)
         {
             int creator = GetCreator(username);
             return Pop(appName, title, username, creator, out appId, template);
@@ -7702,7 +7702,7 @@ namespace Durados.Web.Mvc.UI.Helpers
             return Maps.Instance.DuradosMap.Database.GetUserID(username);
         }
 
-        public bool Pop(string appName, string title, string username, int creator, out int? appId, string template)
+        public bool? Pop(string appName, string title, string username, int creator, out int? appId, string template)
         {
             Map mainMap = null;
             appId = null;
@@ -7712,7 +7712,7 @@ namespace Durados.Web.Mvc.UI.Helpers
             }
             if (!ShouldBeUsed())
                 return false;
-            
+
             try
             {
                 mainMap = Maps.Instance.DuradosMap;
@@ -7730,6 +7730,8 @@ namespace Durados.Web.Mvc.UI.Helpers
                     return false;
                 }
 
+                RestHelper.Refresh(appName);
+                        
                 System.Data.DataRow userMainRow = mainMap.Database.GetUserRow(username);
                 string firstName = userMainRow["FirstName"].ToString();
                 string lastName = userMainRow["LastName"].ToString();
@@ -7737,15 +7739,37 @@ namespace Durados.Web.Mvc.UI.Helpers
                 ReplaceUsernameInSysDb(mainMap, appName, username, firstName, lastName);
                 ReplaceUsernameInUsers(mainMap, appName, username, firstName, lastName);
 
-                mainMap.Logger.Log("AppsPool", "Pop", "", string.Format("success for creator id = {0}, pool creator = {1}, app id = {2} ", creator, poolCreator, appId), "", 3, string.Empty, DateTime.Now);
-                
+                mainMap.Logger.Log("AppsPool", "Pop", "", string.Format("success for creator id = {0}, pool creator = {1}, app id = {2}, appName = {3} ", creator, poolCreator, appId, appName), "", 3, string.Empty, DateTime.Now);
+
                 return true;
             }
             catch (Exception exception)
             {
-                mainMap.Logger.Log("AppsPool", "Pop", "", exception, 1, string.Empty);
+                if (appId.HasValue)
+                {
+                    try
+                    {
+                        DeleteBadApp(appId.Value, mainMap.connectionString);
+                        RestHelper.Refresh(appName);
+                        return null;
+                    }
+                    catch (Exception exception2)
+                    {
+                        mainMap.Logger.Log("AppsPool", "Pop", "fail to delete app id: " + appId, exception2, 1, string.Empty);
+                    }
+                }
+                mainMap.Logger.Log("AppsPool", "Pop", "app id: " + appId, exception, 1, string.Empty);
                 return false;
             }
+        }
+
+        private void DeleteBadApp(int appId, string connectionString)
+        {
+
+            string sql =
+                "delete from durados_App where [id] = @id ";
+            new SqlAccess().ExecuteNonQuery(connectionString, sql, new Dictionary<string, object>() { { "id", appId } }, null);
+
         }
 
         private void ReplaceUsernameInUsers(Map mainMap, string appName, string username, string firstName, string lastName)
@@ -7757,7 +7781,7 @@ namespace Durados.Web.Mvc.UI.Helpers
             int rowCount = 0;
             DataView dataView = userView.FillPage(1, 2, null, null, null, out rowCount, null, null);
             if (dataView.Count != 1)
-                throw new Durados.DuradosException("system user should contain one row");
+                throw new Durados.DuradosException("users should contain one row for " + appName);
             System.Data.DataRow currentUserRow = dataView[0].Row;
             string pk = userView.GetPkValue(currentUserRow);
             userView.Edit(new Dictionary<string, object>() { { "email", username }, { "firstName", firstName }, { "lastName", lastName } }, pk, null, null, null, null);
@@ -7770,7 +7794,7 @@ namespace Durados.Web.Mvc.UI.Helpers
             int rowCount = 0;
             DataView dataView = userView.FillPage(1, 2, null, null, null, out rowCount, null, null);
             if (dataView.Count != 1)
-                throw new Durados.DuradosException("system user should contain one row");
+                throw new Durados.DuradosException("system user should contain one row for " + appName);
             System.Data.DataRow currentUserRow = dataView[0].Row;
             string pk = userView.GetPkValue(currentUserRow);
             userView.Edit(new Dictionary<string, object>() { { "Username", username }, { "Email", username }, { "FirstName", firstName }, { "LastName", lastName } }, pk, null, null, null, null);
@@ -7796,7 +7820,7 @@ namespace Durados.Web.Mvc.UI.Helpers
             string sql =
                 "begin tran getFromPool " +
                 "declare @appId int " +
-                "select top(1) @appId = id from durados_App where creator = @poolCreator and DatabaseStatus = 1 order by id asc; " +
+                "select top(1) @appId = id from durados_App with(UPDLOCK) where creator = @poolCreator and DatabaseStatus = 1 order by id asc; " +
                 "delete from durados_App where [Name] = @Name; " +
                 "update durados_App " +
                 "set creator = @creator, " +

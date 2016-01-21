@@ -1789,14 +1789,26 @@ namespace BackAnd.Web.Api.Controllers
                 Dictionary<string, object> result;
                 bool success = false;
                 bool isNewDatabase = IsNewDatabase(template);
-                bool poolSuccess = false;
+                bool? poolSuccess = false;
                 if (isNewDatabase)
                 {
                     int? appIdFromPool = null;
                     if (!IsSampleApp(values))
                         poolSuccess = new AppsPool().Pop(id, title, Maps.Instance.DuradosMap.Database.GetCurrentUsername(), out appIdFromPool, template);
 
-                    if (poolSuccess)
+                    for (int i = 0; i < 3; i++)
+                    {
+                        if (!poolSuccess.HasValue)
+                        {
+                            poolSuccess = new AppsPool().Pop(id, title, Maps.Instance.DuradosMap.Database.GetCurrentUsername(), out appIdFromPool, template);
+                        }
+                        else
+                        {
+                            break;
+                        }
+                    }
+
+                    if (poolSuccess.Value)
                     {
                         result = new Dictionary<string, object>() { { "Success", true } };
                     }

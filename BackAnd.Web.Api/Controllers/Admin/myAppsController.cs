@@ -15,6 +15,7 @@ using Durados.Web.Mvc;
 using System.Net.Http.Headers;
 using Durados.Web.Mvc.Controllers.Api;
 using System.Text.RegularExpressions;
+using Durados.Web.Mvc.Farm;
 /*
  HTTP Verb	|Entire Collection (e.g. /customers)	                                                        |Specific Item (e.g. /customers/{id})
 -----------------------------------------------------------------------------------------------------------------------------------------------
@@ -212,7 +213,15 @@ namespace BackAnd.Web.Api.Controllers
 
                 item.Add("connectionSource", RestHelper.GetConnectionSource(id));
 
+                bool debugMode = false;
+                try
+                {
+                    debugMode = SharedMemorySingeltone.Instance.Contains(id, SharedMemoryKey.DebugMode);
+                }
+                catch { }
+                item.Add("debugMode", debugMode);
 
+                
                 if (deep.HasValue && deep.Value && item["DatabaseStatus"].Equals(1))
                 {
                     RestHelper.AddStat(item, id);
