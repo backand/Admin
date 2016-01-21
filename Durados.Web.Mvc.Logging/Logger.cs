@@ -475,6 +475,11 @@ namespace Durados.Web.Mvc.Logging
             {
                 try
                 {
+                    guid = GetRequestGuid();
+                }
+                catch{}
+                try
+                {
                     System.Threading.ThreadPool.QueueUserWorkItem(delegate
                     {
                         try
@@ -569,6 +574,15 @@ namespace Durados.Web.Mvc.Logging
                 }
             }
             return log;
+        }
+
+        private Guid? GetRequestGuid()
+        {
+            if (System.Web.HttpContext.Current == null)
+                    return null;
+            if (System.Web.HttpContext.Current.Items["requestId"] == null)
+                return null;
+            return Guid.Parse((string)System.Web.HttpContext.Current.Items["requestId"]);
         }
 
         private string GetClientIP()

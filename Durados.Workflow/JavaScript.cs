@@ -289,6 +289,11 @@ namespace Durados.Workflow
             //System.Web.HttpContext.Current.Request.Files[0].InputStream
             //}
             bool debug = false;
+            if (IsDebug())
+            {
+                debug = true;
+            }
+                        
             if (values != null)
             {
                 foreach (string key in values.Keys)

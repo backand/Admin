@@ -21,6 +21,7 @@ using System.Threading.Tasks;
 using System.Collections;
 using System.Data.SqlClient;
 using Durados.Web.Mvc.Infrastructure;
+using Durados.Web.Mvc.Farm;
 
 /*
  HTTP Verb	|Entire Collection (e.g. /customers)	                                                        |Specific Item (e.g. /customers/{id})
@@ -337,6 +338,7 @@ namespace BackAnd.Web.Api.Controllers
         public apiController()
             : base()
         {
+            
             if (this is viewDataController)
                 DataHandler = new DataHandler((viewDataController)this);
             //else if (this is userController)

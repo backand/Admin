@@ -248,8 +248,10 @@
     <Compile Include="Farm\FarmException.cs" />
     <Compile Include="Farm\FarmMessage.cs" />
     <Compile Include="Farm\IPubsubTransport.cs" />
+    <Compile Include="Farm\ISharedMemory.cs" />
     <Compile Include="Farm\IStatus.cs" />
     <Compile Include="Farm\RedisFarm.cs" />
+    <Compile Include="Farm\SharedMemory.cs" />
     <Compile Include="Farm\Status.cs" />
     <Compile Include="FtpAzure.cs" />
     <Compile Include="FtpUpload.cs" />

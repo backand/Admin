@@ -5002,7 +5002,21 @@ namespace Durados.Web.Mvc
 
             UserPreviewUrl = System.Configuration.ConfigurationManager.AppSettings["UserPreviewUrl"] ?? ".backand.loc:4012/";
 
-            S3Bucket = System.Configuration.ConfigurationManager.AppSettings["S3Bucket"] ?? "hosting.backand.net";
+            S3Bucket = System.Configuration.ConfigurationManager.AppSettings["S3Bucket"];
+            if (string.IsNullOrEmpty(S3Bucket))
+            {
+                throw new DuradosException("Missing S3Bucket key in web config");
+            }
+
+            S3FilesBucket = System.Configuration.ConfigurationManager.AppSettings["S3FilesBucket"];
+
+            if (string.IsNullOrEmpty(S3FilesBucket))
+            {
+                throw new DuradosException("Missing S3FilesBucket key in web config");
+            }
+
+            SendWelcomeEmail = System.Configuration.ConfigurationManager.AppSettings["SendWelcomeEmail"] ?? "true";
+            
 
         }
 
@@ -5070,6 +5084,10 @@ namespace Durados.Web.Mvc
         public static int AzureCachePort { get; private set; }
         public static string UserPreviewUrl { get; private set; }
         public static string S3Bucket { get; private set; }
+        public static string S3FilesBucket { get; private set; }
+        public static string SendWelcomeEmail { get; private set; }
+
+        
 
         public static TimeSpan AzureCacheUpdateInterval { get; private set; }
 

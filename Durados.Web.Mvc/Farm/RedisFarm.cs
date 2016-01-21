@@ -127,7 +127,7 @@ namespace Durados.Web.Mvc.Farm
             return res;
         }
 
-        private static ConnectionMultiplexer CreateRedisConnection(string connectionString)
+        internal static ConnectionMultiplexer CreateRedisConnection(string connectionString)
         {
             ConfigurationOptions options = ConfigurationOptions.Parse(connectionString);
             ConnectionMultiplexer redis = null;
