@@ -45,7 +45,6 @@ namespace BackAnd.Web.Api.Controllers
         {
             try
             {
-                
                 if (path == null)
                     path = string.Empty;
 
