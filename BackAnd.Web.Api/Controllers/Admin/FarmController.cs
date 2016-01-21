@@ -11,7 +11,7 @@ namespace BackAnd.Web.Api.Controllers.Admin
 {
     [RoutePrefix("1")]
     [BackAnd.Web.Api.Controllers.Filters.BackAndAuthorize("Developer")]
-    public class FarmController : ApiController
+    public class FarmController : apiController
     {
         [Route("~/1/farm")]
         public IHttpActionResult Get()
