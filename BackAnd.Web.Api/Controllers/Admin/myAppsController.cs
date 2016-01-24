@@ -338,6 +338,7 @@ namespace BackAnd.Web.Api.Controllers
 
         public virtual IHttpActionResult Post()
         {
+            string appName = "";
             try
             {
                 View view = GetView(null);
@@ -389,7 +390,7 @@ namespace BackAnd.Web.Api.Controllers
                 values.Add(Creator, view.Database.GetUserID());
                 values.Add(DatabaseStatus, (int)OnBoardingStatus.NotStarted);
 
-                
+                appName = values[Name].ToString();
 
                 string key = view.Create(values, false, view_BeforeCreate, view_BeforeCreateInDatabase, view_AfterCreateBeforeCommit, view_AfterCreateAfterCommit);
 
@@ -402,7 +403,7 @@ namespace BackAnd.Web.Api.Controllers
                 const int DuplicateUniqueIndex = 2601;
                 if (exception.Number == DuplicateUniqueIndex)
                 {
-                    return ResponseMessage(Request.CreateResponse(HttpStatusCode.Conflict, Messages.AppNameAlreadyExists));
+                    return ResponseMessage(Request.CreateResponse(HttpStatusCode.Conflict, string.Format(Messages.AppNameAlreadyExists, appName)));
                 }
                 else
                 {
