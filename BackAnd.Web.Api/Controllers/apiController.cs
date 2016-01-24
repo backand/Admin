@@ -2158,7 +2158,7 @@ namespace BackAnd.Web.Api.Controllers
         public static readonly string UploadNotFound = "The column has no upload configuration";
         public static readonly string InvalidFileType = "Invalid file type";
         public static readonly string InvalidFileType2 = "Invalid file type in field [{0}].<br><br>Allowed formats: {1}";
-        public static readonly string AppNameAlreadyExists = "An application by this name already exists.";
+        public static readonly string AppNameAlreadyExists = "An application by the name {0} already exists.";
         public static readonly string AppNameCannotBeNull = "App name cannot be empty.";
         public static readonly string AppNameInvalid = "App name must be alphanumeric.";
         public static readonly string RuleWithNameAlreadyExists = "A rule with the name {0} already exists for table {1}.";
