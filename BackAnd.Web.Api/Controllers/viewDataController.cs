@@ -782,6 +782,11 @@ namespace BackAnd.Web.Api.Controllers
                 {
                     values = GetParameters(parameters, view, values2);
                 }
+
+                if (values.Count == 0 || (values.Count == 1 && values.ContainsKey("__metadata")))
+                {
+                    return ResponseMessage(Request.CreateResponse(HttpStatusCode.NotFound, string.Format(Messages.ItemWithNoFieldsToUpdate, id, name)));
+                }
                     
 
                 int affected = view.Update(values, id, deep ?? false, view_BeforeEdit, view_BeforeEditInDatabase, view_AfterEditBeforeCommit, view_AfterEditAfterCommit, view_BeforeCreate, view_BeforeCreateInDatabase, view_AfterCreateBeforeCommit, view_AfterCreateAfterCommit, overwrite ?? false, view_BeforeDelete, view_AfterDeleteBeforeCommit, view_AfterDeleteAfterCommit);
