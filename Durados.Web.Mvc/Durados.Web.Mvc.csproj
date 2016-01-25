@@ -272,6 +272,22 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>MapDataSet.xsd</DependentUpon>
     </Compile>
+    <Compile Include="Map\BlobTransferAsyncState.cs" />
+    <Compile Include="Map\DuradosMap.cs" />
+    <Compile Include="Map\DuradosProject.cs" />
+    <Compile Include="Map\FieldProperty.cs" />
+    <Compile Include="Map\IEnumerableExtension.cs" />
+    <Compile Include="Map\IPersistency.cs" />
+    <Compile Include="Map\JsonConfigCache.cs" />
+    <Compile Include="Map\Maps.cs" />
+    <Compile Include="Map\MapSimpleCache.cs" />
+    <Compile Include="Map\NoMorePortsAvailableException.cs" />
+    <Compile Include="Map\OnBoardingStatus.cs" />
+    <Compile Include="Map\PendingPool.cs" />
+    <Compile Include="Map\PluginCache.cs" />
+    <Compile Include="Map\PortManager.cs" />
+    <Compile Include="Map\SqlPersistency.cs" />
+    <Compile Include="Map\Theme.cs" />
     <Compile Include="PersistentSession.cs" />
     <Compile Include="Properties\Settings.Designer.cs">
       <AutoGen>True</AutoGen>

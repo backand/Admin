@@ -16,6 +16,7 @@ namespace Durados.DataAccess
         private List<int> pendingHistoryForCommit = new List<int>();
         private History history = null;
         private Func<IStorage> storageGetter;
+       
         private AppLockerGetter lockGetter {
             get
             {
