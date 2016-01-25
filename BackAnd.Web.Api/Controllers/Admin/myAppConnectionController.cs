@@ -61,7 +61,7 @@ namespace BackAnd.Web.Api.Controllers
             try
             {
                 newDbParameters = appFactory.GetNewExternalDBParameters(sqlProduct.Value, id, out  server, out port, sampleApp);//, out  catalog
-                Maps.Instance.DuradosMap.Logger.Log(GetControllerNameForLog(ControllerContext), GetActionName(), this.Request.Method.Method, "start create new app in api", HttpStatusCode.OK.ToString(), 3, null, DateTime.Now);
+                Maps.Instance.DuradosMap.Logger.Log(GetControllerNameForLog(ControllerContext), GetActionName(), this.Request.Method.Method, "continue create new app in api", HttpStatusCode.OK.ToString(), 3, null, DateTime.Now);
 
             }
             catch (Exception ex)
@@ -2114,18 +2114,6 @@ namespace BackAnd.Web.Api.Controllers
                 Map.Logger.Log(GetControllerNameForLog(this.ControllerContext), "CallHttpRequestToCreateTheSchema", exception.Source, exception, 1, null);
 
             }
-        }
-
-        private void CallHttpRequestToCreateTheSchemaOld(string appName, string json)
-        {
-            json = "{newSchema: " + json + ", severity: 0}";
-
-
-            string url = GetUrl();
-            Dictionary<string, string> headers = GetHeaders(appName);
-            string response = Durados.Web.Mvc.Infrastructure.Http.WebRequestingJson(url, json, headers);
-            //Dictionary<string, object> ret = Durados.Web.Mvc.UI.Json.JsonSerializer.Deserialize(response);
-            //return ret;
         }
 
         private Dictionary<string, string> GetHeaders(string appName)

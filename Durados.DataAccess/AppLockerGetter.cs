@@ -15,6 +15,11 @@ namespace Durados.DataAccess
             this.cache = cache;
         }
 
+        public AppLockerGetter(string key)
+        {
+            this.cache = new LocalCache<object>(key);
+        }
+
         private object locker2 = new object();
 
         public object GetLock(string key)
