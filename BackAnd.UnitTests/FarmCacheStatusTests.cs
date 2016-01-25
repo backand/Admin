@@ -28,7 +28,6 @@ namespace BackAnd.UnitTests
             var res = new FarmController().Get();
 
             var contentResult = res as OkNegotiatedContentResult<Dictionary<string,string>>;
-            Assert.AreEqual(1, contentResult.Content.Count);
             Assert.IsTrue(!string.IsNullOrEmpty(contentResult.Content["test"]));
         }
 

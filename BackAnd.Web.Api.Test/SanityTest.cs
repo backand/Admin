@@ -232,13 +232,7 @@ namespace BackAnd.Web.Api.Test
 
         private string GetAppName(bool random = false)
         {
-            string appName = Backand.Config.ConfigStore.GetConfig().appname;
-            string key = Backand.Config.ConfigStore.GetCurrentKey();
-                
-            if (key == "QA" || key == "PROD" || random)
-                return appName + DateTime.Now.Year + DateTime.Now.Month + DateTime.Now.Day + DateTime.Now.Hour + DateTime.Now.Minute + DateTime.Now.Second;
-
-            return appName;
+            return "testcrud" + DateTime.Now.Ticks;
         }
 
         [TestMethod]
