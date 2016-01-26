@@ -1113,6 +1113,8 @@ namespace Durados.Web.Mvc
 
         public void Delete(string pk)
         {
+            FarmCachingSingeltone.Instance.ClearMachinesCache(pk);
+
             if (mapsCache.ContainsKey(pk))
             {
                 RemoveMap(pk);

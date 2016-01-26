@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 namespace Durados.Web.Mvc.Logging
 {
    
-    public class LogMessage
+    public class StashLogMessage
     {
         public string ID { get; set; }
         public string ApplicationName { get; set; }
@@ -22,5 +22,9 @@ namespace Durados.Web.Mvc.Logging
         public string Trace { get; set; }
         public string FreeText { get; set; }
         public string Guid { get; set; }
+
+        public string ClientInfo { get; set; }
+
+        public string ClienIP { get; set; }
     }
 }

@@ -121,6 +121,7 @@
     <Compile Include="LogMessage.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SegmentLogger.cs" />
+    <Compile Include="WritingEvents.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Durados\Durados.csproj">
