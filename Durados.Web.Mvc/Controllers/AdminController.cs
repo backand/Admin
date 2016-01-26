@@ -3938,7 +3938,7 @@ namespace Durados.Web.Mvc.Controllers
             }
             catch (Exception exception)
             {
-                Durados.Diagnostics.ILog log = Map.Logger.Log(GetControllerNameForLog(this.ControllerContext), this.ControllerContext.RouteData.Values["action"].ToString(), exception.Source, exception, 1, null);
+               Map.Logger.Log(GetControllerNameForLog(this.ControllerContext), this.ControllerContext.RouteData.Values["action"].ToString(), exception.Source, exception, 1, null);
                 return PartialView("~/Views/Shared/Controls/ErrorMessage.ascx", exception.Message);
             }
         }

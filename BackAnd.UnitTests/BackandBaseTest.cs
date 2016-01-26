@@ -21,6 +21,16 @@ namespace BackAnd.UnitTests
             }
         }
 
+        public Map ValidMap
+        {
+            get
+            {
+                var appName = this.ValidAppName;
+                var res = Maps.Instance.GetMap(appName);
+                return res;
+            }
+        }
+
 
         protected void InitInner()
         {
