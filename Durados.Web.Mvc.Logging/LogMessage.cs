@@ -25,6 +25,8 @@ namespace Durados.Web.Mvc.Logging
 
         public string ClientInfo { get; set; }
 
-        public string ClienIP { get; set; }
+        public string ClientIP { get; set; }
+
+        public string Source = "WebApi";
     }
 }

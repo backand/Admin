@@ -89,14 +89,14 @@ namespace BackAnd.Web.Api.Controllers
             return (View)Maps.Instance.DuradosMap.Database.Views[AppViewName];
         }
 
-        public IHttpActionResult Get(string id = null, bool? deep = null, bool? withSelectOptions = null, int? pageNumber = null, int? pageSize = null, string filter = null, string sort = null, string search = null)
+        public IHttpActionResult Get(string id = null, bool? deep = null, bool? withSelectOptions = null, int? pageNumber = null, int? pageSize = null, string filter = null, string sort = null, string search = null, bool? stat = null)
         {
             if (id != null)
-                return Get(id, deep);
+                return Get(id, deep, stat);
             else
                 return Get(withSelectOptions, pageNumber, pageSize, filter, sort, search);
         }
-        private IHttpActionResult Get(string id = null, bool? deep = null)
+        private IHttpActionResult Get(string id = null, bool? deep = null, bool? stat = null)
         {
             try
             {
@@ -224,7 +224,12 @@ namespace BackAnd.Web.Api.Controllers
                 
                 if (deep.HasValue && deep.Value && item["DatabaseStatus"].Equals(1))
                 {
-                    RestHelper.AddStat(item, id);
+                    bool reset = false;
+                    if (stat.HasValue && stat.Value)
+                    {
+                        reset = true;
+                    }
+                    RestHelper.AddStat(item, id, reset);
                 }
                 else
                 {

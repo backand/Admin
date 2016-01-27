@@ -855,7 +855,7 @@ namespace Durados.Web.Mvc.Logging
                 Trace = Trace,
                 FreeText = FreeText,
                 Guid = Guid,
-                ClienIP = ClientIP,
+                ClientIP = ClientIP,
                 ClientInfo = ClientInfo
             };
             var javaScriptSerializer = new System.Web.Script.Serialization.JavaScriptSerializer();
@@ -920,8 +920,8 @@ namespace Durados.Web.Mvc.Logging
                 return null;
             }
 
-            if (ip.Contains(","))
-                ip = ip.Split(',').First().Trim();
+            if (ip.Contains(";"))
+                ip = ip.Split(';').First().Trim();
             return ip;
         }
     }
