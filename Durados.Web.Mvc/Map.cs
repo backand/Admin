@@ -23,6 +23,7 @@ using System.Diagnostics;
 using Durados.Data;
 using Durados.SmartRun;
 using Durados.Web.Mvc.Farm;
+using System.Runtime.Caching;
 
 namespace Durados.Web.Mvc
 {
@@ -3125,6 +3126,7 @@ namespace Durados.Web.Mvc
 
         public void Refresh()
         {
+            stat = null;
             IsConfigChanged = true;
             DataSet ds1 = null;
             try
@@ -4474,6 +4476,19 @@ namespace Durados.Web.Mvc
             get
             {
                 return configCache;
+            }
+        }
+
+        Durados.Web.Mvc.UI.Helpers.Stat.StatAndTime stat = null;
+        public Durados.Web.Mvc.UI.Helpers.Stat.StatAndTime Stat
+        {
+            get
+            {
+                return stat;
+            }
+            set
+            {
+                stat = value;
             }
         }
 

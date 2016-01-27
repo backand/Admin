@@ -46,6 +46,10 @@ namespace BackAnd.Web.Api.Controllers
         {
             try
             {
+                if (Map is DuradosMap)
+                {
+                    return BadRequest("missing AppName in header");
+                }
                 return Ok(SharedMemorySingeltone.Instance.Contains(Map.AppName, SharedMemoryKey.DebugMode));
             }
             catch (Exception exception)
@@ -65,6 +69,10 @@ namespace BackAnd.Web.Api.Controllers
                 if (!mode.HasValue)
                 {
                     return BadRequest("missing mode");
+                }
+                if (Map is DuradosMap)
+                {
+                    return BadRequest("missing AppName in header");
                 }
                 if (mode.Value)
                 {

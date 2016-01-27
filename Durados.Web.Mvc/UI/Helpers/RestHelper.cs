@@ -66,11 +66,11 @@ namespace Durados.Web.Mvc.UI.Helpers
             }
         }
 
-        public static void AddStat(Dictionary<string, object> item, string appName)
+        public static void AddStat(Dictionary<string, object> item, string appName, bool reset)
         {
             Stat stat = StatFactory.GetState(Maps.Instance.GetMap(appName).SystemSqlProduct);
 
-            stat.AddStat(item, appName);
+            stat.AddStat(item, appName, reset);
         }
 
         public static Dictionary<string, Dictionary<string, object>> ReferenceTableToDictionary(View view, DataView dataView, bool deep = false, bool descriptive = true)
@@ -2857,32 +2857,33 @@ namespace Durados.Web.Mvc.UI.Helpers
         {
             sqlAccess = new SqlAccess();
         }
-        public void AddStat(Dictionary<string, object> item, string appName)
+        public void AddStat(Dictionary<string, object> item, string appName, bool reset)
         {
             if (item.ContainsKey("durados_App_Stat"))
                 item.Remove("durados_App_Stat");
 
-            object stat = null;
-            if (!cache.ContainsKey(appName) || cache[appName].Time < DateTime.Now.Subtract(new TimeSpan(1, 0, 0)))
+            Map map = Maps.Instance.GetMap(appName);
+
+            if (map == null || map is DuradosMap)
             {
-                if (cache.ContainsKey(appName))
-                    cache.Remove(appName);
-                try
-                {
-                    cache.Add(appName, new StatAndTime() { Time = DateTime.Now, Stat = GetStat(appName) });
-                }
-                catch { }
+                return;
             }
-            stat = cache[appName].Stat;
+
+            object stat = null;
+            if (reset || map.Stat == null || map.Stat.Time < DateTime.Now.Subtract(new TimeSpan(1, 0, 0)))
+            {
+                map.Stat = new StatAndTime() { Time = DateTime.Now, Stat = GetStat(appName) };
+            }
+            stat = map.Stat.Stat;
             item.Add("stat", stat);
         }
 
-        class StatAndTime
+        public class StatAndTime
         {
             public DateTime Time;
             public object Stat;
         }
-        private static Dictionary<string, StatAndTime> cache = new Dictionary<string, StatAndTime>();
+        //private static Dictionary<string, StatAndTime> cache = new Dictionary<string, StatAndTime>();
         //private static MemoryCache cache = new MemoryCache("AppStat",);
 
 
@@ -3285,6 +3286,11 @@ namespace Durados.Web.Mvc.UI.Helpers
             Dictionary<string, object> result = AddNewViews(map, out errorMessage);
             result.Add("errors", errorMessage);
             SyncAll(map);
+
+            map.JsonConfigCache.Clear();
+            map.AllKindOfCache.Clear();
+            map.Stat = null;
+            
             result = RemoveDropedViews(map, result, out errorMessage);
             result["errors"] += errorMessage;
             return result;

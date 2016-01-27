@@ -65,7 +65,35 @@ namespace BackAnd.UnitTests
             Assert.AreEqual(dataView.Count, 1);
         }
 
+        [TestMethod]
+        public void TestCanLogWithSameGuidTwice()
+        {
 
+            var controller = "contrller";
+            var action = "action";
+            var method = "method";
+            var message = "message";
+            var trace = "trace";
+            var logType = 3;
+            var freeText = "freeText";
+            var time = DateTime.Now;
+            Guid? guid = Guid.NewGuid();
+            Log log = new Log();
+            var applicationName = "applicationName";
+            var username = "username";
+
+            var appName = "appName";
+            var clientIp = "clientIP";
+            var clientInfo = "clientInfo";
+
+            this.ValidMap.Logger.WriteToSpecificAppLog(controller, action, method, message, trace, logType, freeText, time, guid, log, applicationName, username);
+            this.ValidMap.Logger.WriteToSpecificAppLog(controller, action, method, message, trace, logType, freeText, time, guid, log, applicationName, username);
+
+            this.ValidMap.Logger.WriteToReportLogger(controller, action, method, message, trace, logType, freeText, time, guid, log, applicationName, username,
+               appName, clientIp, clientInfo);
+            this.ValidMap.Logger.WriteToReportLogger(controller, action, method, message, trace, logType, freeText, time, guid, log, applicationName, username,
+               appName, clientIp, clientInfo);
+        }
 
 
         [TestMethod]
@@ -116,7 +144,7 @@ namespace BackAnd.UnitTests
         [TestMethod]
         public void TestCanWriteToKibana()
         {
-            var controller = "contrller";
+            var controller = "shondaoson";
             var action = "action";
             var method = "method";
             var message = "message";
