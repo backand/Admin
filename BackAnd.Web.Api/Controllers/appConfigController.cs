@@ -202,7 +202,7 @@ namespace BackAnd.Web.Api.Controllers
             {
                 Dictionary<string,object> result = (new Sync()).AddNewViewsAndSyncAll(Map);
 
-                FarmCachingSingeltone.Instance.ClearMachinesCache(map.AppName);
+                RefreshConfigCache(Map);
 
                 try
                 {
