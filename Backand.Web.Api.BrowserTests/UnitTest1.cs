@@ -33,7 +33,7 @@ namespace Backand.Web.Api.BrowserTests
         public void TestLoginWithValidUsernameAndPasswordArriveToAppPage()
         {
             string username = "relly@backand.com";
-            string password = "123456";
+            string password = "relly2805";
             string url = WebAddress;
 
             WebDriverWait wait = new WebDriverWait(driver, new TimeSpan(0, 0, 5));

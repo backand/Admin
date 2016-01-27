@@ -71,6 +71,7 @@
     <Compile Include="RetryPolicyTests.cs" />
     <Compile Include="FarmCacheStatusTests.cs" />
     <Compile Include="LoggerTests.cs" />
+    <Compile Include="SqlDdl.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Backand.Config\Backand.Test.Config.csproj">

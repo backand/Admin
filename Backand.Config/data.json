@@ -5,9 +5,10 @@
 		"appname" : "rellytest04420",
 		"mainAppName" : "www",
 		"username": "relly@backand.com",
-		"pwd" : "123456",
+		"pwd" : "relly2805",
 		"ins1url":"http://localhost:4110",
-		"ins2url":"http://localhost:41101"
+		"ins2url":"http://localhost:41101",
+		"connectionString":"server=localhost;database=backands145146843j1cgezvu;uid=root;port=3306;convert zero datetime=True;default command timeout=90;Connection Timeout=60;"
 	},
 	{
 		"name" : "RELLY",
@@ -15,9 +16,10 @@
 		"appname" : "rellytest0442020161416479",
 		"mainAppName" : "www",
 		"username": "relly@backand.com",
-		"pwd" : "123456",
+		"pwd" : "relly2805",
 		"ins1url":"http://localhost:4110",
-		"ins2url":"http://localhost:41101"
+		"ins2url":"http://localhost:41101",
+		"connectionString":"server=localhost;database=backands145146843j1cgezvu;uid=root;port=3306;convert zero datetime=True;default command timeout=90;Connection Timeout=60;"
 	},
 	{
 		"name" : "QA",

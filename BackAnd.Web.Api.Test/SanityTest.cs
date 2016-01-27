@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using System.Net;
 using System.Security.Cryptography.X509Certificates;
 using System.Net.Security;
+using BackAnd.UnitTests;
 
 namespace BackAnd.Web.Api.Test
 {
@@ -64,6 +65,66 @@ namespace BackAnd.Web.Api.Test
             
             Assert.AreNotEqual(ins1model, ins2model, "ins2 config was not changed.");
             
+        }
+
+        [TestMethod]
+        public void TestSync()
+        {
+            TestSync(DebugMode.DebugSubscriber);
+        }
+
+        private void TestSync(DebugMode debugMode)
+        {
+            string debugUrl = GetIns1url();
+            string nonDebugUrl = GetIns2url();
+            
+            var debugClient = GetClient1(debugUrl);
+            var nonDebugClient = GetClient2(nonDebugUrl);
+
+            ClearCache(debugClient);
+            ClearCache(nonDebugClient);
+
+            string ins1model = GetInsModel(debugClient);
+            string ins2model = GetInsModel(nonDebugClient);
+
+            Assert.AreEqual(ins1model, ins2model, "In the beginning both instances config should be equal and they are not.");
+
+            string tableName = "t" + DateTime.Now.Ticks;
+            AddTable(tableName);
+
+            var syncClient = debugMode == DebugMode.DebugPublisher ? debugClient : nonDebugClient;
+            Sync(syncClient);
+
+            ins1model = GetInsModel(debugClient);
+            ins2model = GetInsModel(nonDebugClient);
+
+            Assert.IsTrue(ins1model.Contains(tableName), "model must contain the new table created.");
+
+            Assert.AreEqual(ins1model, ins2model, "After sync both instances config should be equal and they are not.");
+
+
+        }
+
+        private void Sync(RestClient client)
+        {
+            var request = new RestRequest("/1/app/sync", Method.GET);
+            
+            // Act
+            var response = client.Execute(request);
+
+            // Assert
+            if (response.StatusCode == System.Net.HttpStatusCode.OK)
+            {
+            }
+            else
+            {
+                Assert.Fail("Fail to update model");
+            }
+        }
+
+        private void AddTable(string tableName)
+        {
+            SqlDdl.AddBasicTable(GetConfig().connectionString ,GetConfig().appname, tableName);
         }
 
         private void UpdateModel(RestClient client, string model)
@@ -168,11 +229,22 @@ namespace BackAnd.Web.Api.Test
         private RestClient _client1 = null;
         private RestClient _client2 = null;
 
+        ServerConfig config = null;
+
+        private ServerConfig GetConfig()
+        {
+            if (config == null)
+            {
+                config = Backand.Config.ConfigStore.GetConfig();
+            }
+            return config;
+        }
+
         private RestClient GetClient1(string ins1url)
         {
             if (_client1 == null)
             {
-                ServerConfig config = Backand.Config.ConfigStore.GetConfig();
+                ServerConfig config = GetConfig();
                 _client1 = new TestUtil().GetAuthentificatedClient(config.appname, config.username, config.pwd, ins1url);
             }
             return _client1;
@@ -182,7 +254,7 @@ namespace BackAnd.Web.Api.Test
         {
             if (_client2 == null)
             {
-                ServerConfig config = Backand.Config.ConfigStore.GetConfig();
+                ServerConfig config = GetConfig();
                 _client2 = new TestUtil().GetAuthentificatedClient(config.appname, config.username, config.pwd, ins2url);
             }
             return _client2;
@@ -407,4 +479,9 @@ namespace BackAnd.Web.Api.Test
         
     }
 
+    public enum DebugMode
+    {
+        DebugSubscriber,
+        DebugPublisher
+    }
 }

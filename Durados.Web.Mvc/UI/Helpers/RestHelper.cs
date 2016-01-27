@@ -3287,10 +3287,6 @@ namespace Durados.Web.Mvc.UI.Helpers
             result.Add("errors", errorMessage);
             SyncAll(map);
 
-            map.JsonConfigCache.Clear();
-            map.AllKindOfCache.Clear();
-            map.Stat = null;
-            
             result = RemoveDropedViews(map, result, out errorMessage);
             result["errors"] += errorMessage;
             return result;
@@ -3349,11 +3345,6 @@ namespace Durados.Web.Mvc.UI.Helpers
                         string viewName = view.Name;
                         string configViewPk = configAccess.GetViewPK(viewName, map.GetConfigDatabase().ConnectionString);
                         map.Sync(viewName, configViewPk);
-                        try
-                        {
-                            map.Logger.WriteToEventLog("The view " + viewName + " was synced by " + map.Database.GetCurrentUsername(), System.Diagnostics.EventLogEntryType.Error, 2030);
-                        }
-                        catch { }
                     }
                     Initiate(map);
                 }
