@@ -87,7 +87,26 @@ namespace BackAnd.Web.Api.Test
             string ins1model = GetInsModel(debugClient);
             string ins2model = GetInsModel(nonDebugClient);
 
-            Assert.AreEqual(ins1model, ins2model, "In the beginning both instances config should be equal and they are not.");
+            try
+            {
+                Assert.AreEqual(ins1model, ins2model, "In the beginning both instances config should be equal and they are not.");
+            }
+            catch
+            {
+                if (!ins1model.Equals(ins2model))
+                {
+                    throw new Exception("In the beginning both instances config should be equal and they are not.");
+                }
+            }
+
+            Console.WriteLine("before sync:");
+            Console.WriteLine("model1:");
+            Console.WriteLine(ins1model);
+            Console.WriteLine();
+            Console.WriteLine("model2:");
+            Console.WriteLine(ins2model);
+            Console.WriteLine();
+           
 
             string tableName = "t" + DateTime.Now.Ticks;
             AddTable(tableName);
@@ -98,11 +117,98 @@ namespace BackAnd.Web.Api.Test
             ins1model = GetInsModel(debugClient);
             ins2model = GetInsModel(nonDebugClient);
 
-            Assert.IsTrue(ins1model.Contains(tableName), "model must contain the new table created.");
+            Console.WriteLine("after sync:");
+            Console.WriteLine("model1:");
+            Console.WriteLine(ins1model);
+            Console.WriteLine();
+            Console.WriteLine("model2:");
+            Console.WriteLine(ins2model);
+            Console.WriteLine();
+           
+            try
+            {
+                Assert.IsTrue(ins1model.Contains(tableName), "model must contain the new table created.");
+            }
+            catch
+            {
+                if (!ins1model.Contains(tableName))
+                {
+                    throw new Exception("model must contain the new table created.");
+                }
+            }
 
-            Assert.AreEqual(ins1model, ins2model, "After sync both instances config should be equal and they are not.");
+            try
+            {
+                Assert.AreEqual(ins1model, ins2model, "After sync both instances config should be equal and they are not.");
+            }
+            catch
+            {
+                if (!ins1model.Equals(ins2model))
+                {
+                    throw new Exception("After sync both instances config should be equal and they are not.");
+                }
+            }
 
+            // restore to previous state
+            Console.WriteLine("restore to previous state");
+           
+            DeleteTable(tableName);
+            Sync(syncClient);
+            ins1model = GetInsModel(debugClient);
+            ins2model = GetInsModel(nonDebugClient);
 
+            Console.WriteLine("after restore:");
+            Console.WriteLine("model1:");
+            Console.WriteLine(ins1model);
+            
+            try
+            {
+                Assert.IsFalse(ins1model.Contains(tableName), "model must not contain the new table created.");
+            }
+            catch
+            {
+                if (!ins1model.Contains(tableName))
+                {
+                    throw new Exception("model must contain the new table created.");
+                }
+            }
+
+            try
+            {
+                Assert.AreEqual(ins1model, ins2model, "After sync both instances config should be equal and they are not.");
+            }
+            catch
+            {
+                if (!ins1model.Equals(ins2model))
+                {
+                    throw new Exception("After sync both instances config should be equal and they are not.");
+                }
+            }
+
+            Console.WriteLine("SUCCESS!!!!");
+           
+        }
+
+        private void DeleteTable(string tableName)
+        {
+            try
+            {
+                SqlDdl.DeleteTable(GetConfig().connectionString, GetConfig().appname, tableName);
+            }
+            catch (Exception exception)
+            {
+                Console.WriteLine("Error: Failed to DeleteTable;");
+                Console.WriteLine("ErrorMessage:" + exception.Message);
+                Console.WriteLine("StackTrace:" + exception.StackTrace);
+                try
+                {
+                    Assert.Fail("Failed to DeleteTable " + exception.Message);
+                }
+                catch
+                {
+                    throw new Exception("Failed to DeleteTable " + exception.Message);
+                }
+            }
         }
 
         private void Sync(RestClient client)
@@ -118,13 +224,39 @@ namespace BackAnd.Web.Api.Test
             }
             else
             {
-                Assert.Fail("Fail to update model");
+                Console.WriteLine("Fail to request: /1/app/sync");
+                Console.WriteLine("Error: " + response.StatusCode + "; ErrorMessage:" + response.ErrorMessage + "; content:" + response.Content);
+                try
+                {
+                    Assert.Fail("Fail to sync");
+                }
+                catch
+                {
+                    throw new Exception("Fail to sync");
+                }
             }
         }
 
         private void AddTable(string tableName)
         {
-            SqlDdl.AddBasicTable(GetConfig().connectionString ,GetConfig().appname, tableName);
+            try
+            {
+                SqlDdl.AddBasicTable(GetConfig().connectionString, GetConfig().appname, tableName);
+            }
+            catch (Exception exception)
+            {
+                Console.WriteLine("Error: Failed to AddTable;");
+                Console.WriteLine("ErrorMessage:" + exception.Message);
+                Console.WriteLine("StackTrace:" + exception.StackTrace);
+                try
+                {
+                    Assert.Fail("Failed to AddTable " + exception.Message);
+                }
+                catch
+                {
+                    throw new Exception("Failed to AddTable " + exception.Message);
+                }
+            }
         }
 
         private void UpdateModel(RestClient client, string model)
@@ -174,7 +306,17 @@ namespace BackAnd.Web.Api.Test
             }
             else
             {
-                Assert.Fail("Fail to get model");
+                Console.WriteLine("Fail to request: /1/model");
+                Console.WriteLine("Error: " + response.StatusCode + "; ErrorMessage:" + response.ErrorMessage + "; content:" + response.Content);
+                try
+                {
+                    Assert.Fail("Fail to get model " + response.Content, response.Content);
+                }
+                catch
+                {
+                    throw new Exception("Fail to get model");
+                }
+                
             }
 
             return null;
@@ -194,7 +336,14 @@ namespace BackAnd.Web.Api.Test
             else
             {
                 Console.WriteLine("status: " + response.StatusCode + "; ErrorMessage:" + response.ErrorMessage);
-                Assert.Fail("Fail to clear cache for " + client.BaseUrl + ";\n error: " + response.Content);
+                try
+                {
+                    Assert.Fail("Fail to clear cache for " + client.BaseUrl + ";\n error: " + response.Content);
+                }
+                catch
+                {
+                    throw new Exception("Fail to clear cache for " + client.BaseUrl + ";\n error: " + response.Content);
+                }
             }
 
         }
