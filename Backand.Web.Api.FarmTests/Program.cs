@@ -20,8 +20,27 @@ namespace Backand.Web.Api.FarmTests
                     };
 
             FarmCache farmCache = new FarmCache();
+            if (args == null || args.Length == 0)
+            {
+                farmCache.TestModelUpdate();
+            }
 
-            farmCache.TestModelUpdate();
+            Console.WriteLine(args[0]);
+                        
+            switch (args[0])
+            {
+                case "model":
+                    farmCache.TestModelUpdate();
+                    break;
+
+                case "sync":
+                    farmCache.TestSync();
+                    break;
+
+                default:
+                    farmCache.TestModelUpdate();
+                    break;
+            }
         }
     }
 }

@@ -22,5 +22,14 @@ namespace BackAnd.UnitTests
 
             sqlAccess.ExecuteNonQuery(connectionString, sql, SqlProduct.MySql);
         }
+
+        public static void DeleteTable(string connectionString, string appName, string tableName)
+        {
+            MySqlAccess sqlAccess = new MySqlAccess();
+
+            string sql = string.Format("drop TABLE `{0}` ", tableName);
+
+            sqlAccess.ExecuteNonQuery(connectionString, sql, SqlProduct.MySql);
+        }
     }
 }

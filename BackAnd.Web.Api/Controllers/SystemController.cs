@@ -8,6 +8,7 @@ using System.Net.Http;
 using System.Net.Http.Formatting;
 using System.Net.Http.Headers;
 using System.Threading.Tasks;
+using System.Web;
 using System.Web.Http;
 
 
@@ -22,6 +23,7 @@ namespace BackAnd.Web.Api.Controllers
             {
                 string json = "{\"newSchema\":[],\"oldSchema\":[],\"severity\":0}";
                 string node = "node is running";
+                string nodeVersion = "Failed to get the node version";
 
                 try
                 {
@@ -31,13 +33,64 @@ namespace BackAnd.Web.Api.Controllers
                 {
                     node = exception.InnerException == null ? exception.Message : exception.InnerException.Message;
                 }
-                return Ok(new { version = Durados.Web.Mvc.Infrastructure.General.Version(), node = node });
+
+                try
+                {
+                    nodeVersion = GetNodeVersion();
+                }
+                catch (Exception exception)
+                {
+                    nodeVersion += ": " + exception.Message;
+                }
+
+                string instance = "unknown";
+                try
+                {
+                    instance = GetInstance();
+                }
+                catch (Exception exception)
+                {
+                    instance += ": " + exception.Message;
+                }
+
+                return Ok(new { version = Durados.Web.Mvc.Infrastructure.General.Version(), node = node, nodeVersion = nodeVersion, instance = instance });
       
             }
             catch (Exception exception)
             {
                 throw new BackAndApiUnexpectedResponseException(exception, this);
             }
+        }
+
+        private string GetInstance()
+        {
+            return (System.Web.HttpContext.Current != null) ? System.Web.HttpContext.Current.Server.MachineName : System.Environment.MachineName;
+        }
+
+        private string GetNodeVersion()
+        {
+           
+            string url = GetSocketUrl();
+            var httpWebRequest = (HttpWebRequest)WebRequest.Create(url);
+            httpWebRequest.Method = "GET";
+            var response = httpWebRequest.GetResponse();
+            Stream dataStream = response.GetResponseStream();
+            // Open the stream using a StreamReader for easy access.
+            StreamReader reader = new StreamReader(dataStream);
+            // Read the content.
+            string responseFromServer = reader.ReadToEnd();
+            return responseFromServer;
+        }
+
+        private string GetSocketUrl()
+        {
+            string http = "http";
+            if (HttpContext.Current.Request.IsSecureConnection)
+            {
+                http = "https";
+            }
+            return System.Configuration.ConfigurationManager.AppSettings["socketUrl"] ?? http + "://localhost:4000";
+ 
         }
         
     }
