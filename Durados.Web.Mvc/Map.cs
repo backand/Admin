@@ -460,7 +460,7 @@ namespace Durados.Web.Mvc
             Initiate(true);
         }
 
-        private string  GetCaller(object message)
+        private string GetCaller(object message)
         {
             // frame 1, true for source info
             StackFrame frame = new StackFrame(1, true);
@@ -610,7 +610,7 @@ namespace Durados.Web.Mvc
                 ds.Tables["User"].Columns["Password"].AllowDBNull = true;
 
             DynamicMapper.AddSchema(ds);
-            
+
             Initiate(ds, connectionString, this.ConfigFileName, save); //"~/bugit2.xml");
 
             if (firstTime && Maps.MultiTenancy)
@@ -1291,7 +1291,7 @@ namespace Durados.Web.Mvc
             try
             {
                 //string localDatabaseHost = GetLocalDatabaseHost();
-                if(HostedByUs)// (connectionString.Contains(localDatabaseHost))
+                if (HostedByUs)// (connectionString.Contains(localDatabaseHost))
                 {
                     return "local";
                 }
@@ -3724,7 +3724,7 @@ namespace Durados.Web.Mvc
                         stream.Seek(0, SeekOrigin.Begin);
                         ds.ReadXml(stream);
                     }
-                    catch(ConstraintException e)
+                    catch (ConstraintException e)
                     {
                         string errMsg = string.Empty;
                         foreach (DataTable dt in ds.Tables)
@@ -3748,9 +3748,9 @@ namespace Durados.Web.Mvc
             }
 
           
-                // fetch from storage
-                ReadConfigFromCloudStorage(ds, filename);
-                
+            // fetch from storage
+            ReadConfigFromCloudStorage(ds, filename);
+
           
                 
               //  ReadConfigFromCloudStorage(ds, filename);
@@ -3946,44 +3946,58 @@ namespace Durados.Web.Mvc
                 catch { }
             }
         }
-        public Dictionary<string, Stream> GetAllConfigs(string id, string version)
+        public void WriteConfigToCloud3(DataSet ds, string filename, bool async, Map map, string version)
         {
+            string containerName = Maps.GetStorageBlobName(filename);
+            //Maps.Instance.StorageCache.Add(containerName, ds);
 
-            string containerName = Maps.DuradosAppPrefix.Replace("_", "").Replace(".", "").ToLower() + id;
-            Dictionary<string, Stream> configs = new Dictionary<string, Stream>();
-            configs.Add(containerName, GetConfig(containerName, version));
-            configs.Add(containerName + "xml", GetSchemaConfig(id, version));
-            return configs;
-        }
-        public Stream GetSchemaConfig(string id, string version)
-        {
-            string containerName = Maps.DuradosAppPrefix.Replace("_", "").Replace(".", "").ToLower() + id + "xml";
-            return GetConfig(containerName, version);
-        }
+            CloudBlobContainer container = GetContainer(containerName);
 
-        public Stream GetConfig(string filename, string version)
-        {
-            if (version == null)
-                version = string.Empty;
-            else
-                version = (new Durados.Web.Mvc.Azure.BlobBackup()).VersionPrefix + version;
+            CloudBlob blob = container.GetBlobReference(containerName + version);
+            blob.Properties.ContentType = "application/xml";
 
-            CloudBlobContainer container = GetContainer(filename);
-            var source = container.GetBlobReference(filename + version);
-            if (!source.Exists())
+            if (!Maps.Instance.StorageCache.ContainsKey(containerName) || !async)
             {
-                throw new DuradosException("Could not find configuration version " + version);
+                using (MemoryStream stream = new MemoryStream())
+                {
+                    ds.WriteXml(stream, XmlWriteMode.WriteSchema);
+                    stream.Seek(0, SeekOrigin.Begin);
+
+                    blob.UploadFromStream(stream);
+
+                    //RefreshApis(map);
+
+                    Maps.Instance.Backup.BackupAsync(container, containerName);
+
+                }
             }
-            MemoryStream stream = new MemoryStream();
-            source.DownloadToStream(stream);
-            return stream;
+            else
+            {
+                MemoryStream stream = new MemoryStream();
+                ds.WriteXml(stream, XmlWriteMode.WriteSchema);
+                stream.Seek(0, SeekOrigin.Begin);
+
+                DateTime started = DateTime.Now;
+
+                blob.BeginUploadFromStream(stream, BlobTransferCompletedCallback, new BlobTransferAsyncState(blob, stream, started, container, containerName, map));
+
+                try
+                {
+                    if (map != null)
+                    {
+                        Maps.Instance.DuradosMap.Logger.Log("Map", "WriteConfigToCloud", map.AppName ?? string.Empty, string.Empty, string.Empty, -8, containerName + " started", started);
+                    }
+                }
+                catch { }
+            }
         }
+
         private void BlobTransferCompletedCallback(IAsyncResult result)
         {
             BlobTransferAsyncState state = (BlobTransferAsyncState)result.AsyncState;
             if (state == null || state.Map == null)
                 return;
-
+                
             if (IsBigBlob(state.BlobName))
             {
                 FarmCachingSingeltone.Instance.AsyncCacheCompleted(state.Map.AppName);
@@ -4633,8 +4647,8 @@ namespace Durados.Web.Mvc
         ///  Should not be used if you are not configAccess!!
         /// </summary>
         public Data.ICache<object> LockerCache
-        {
-            get 
+    {
+            get
             {
                 return lockerCache;
             }

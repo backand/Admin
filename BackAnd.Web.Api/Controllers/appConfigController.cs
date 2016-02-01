@@ -221,6 +221,89 @@ namespace BackAnd.Web.Api.Controllers
             }
         }
 
+        [System.Web.Http.HttpPost]
+        [Route("upload")]
+        [BackAnd.Web.Api.Controllers.Filters.BackAndAuthorize("Admin,Developer")]
+        public IHttpActionResult upload()
+        {
+            if (!IsAdmin())
+            {
+                return ResponseMessage(Request.CreateResponse(HttpStatusCode.NotFound, Messages.ActionIsUnauthorized));
+            }
+
+            string appname= string.Empty;
+            try
+            {
+                appname = System.Web.HttpContext.Current.Items[Durados.Database.AppName].ToString();
+                if (appname == Maps.DuradosAppName)
+                {
+                    return ResponseMessage(Request.CreateResponse(HttpStatusCode.InternalServerError, Messages.AppNameCannotBeNull));
+                }
+            }
+            catch (Exception ex)
+            {
+                return ResponseMessage(Request.CreateResponse(HttpStatusCode.InternalServerError, Messages.AppNameCannotBeNull));
+            }
+            try
+            {
+                string jsonPost = Request.Content.ReadAsStringAsync().Result;
+                Dictionary<string, object> jsonPostDict = Durados.Web.Mvc.UI.Json.JsonSerializer.Deserialize(jsonPost);
+
+
+                if (!jsonPostDict.ContainsKey("filename"))
+                    return ResponseMessage(Request.CreateResponse(HttpStatusCode.Conflict, "You must send the filename parameter"));
+                String filename = System.Web.HttpContext.Current.Server.UrlDecode((String)jsonPostDict["filename"]);
+                if (!jsonPostDict.ContainsKey("filedata"))
+                    return ResponseMessage(Request.CreateResponse(HttpStatusCode.Conflict, "You must send the filedata parameter"));
+                
+                XmlConfigHelper configHelper = new XmlConfigHelper();
+                
+                string version = configHelper.UploadConfigFromFile(appname,(String)jsonPostDict["filedata"]);
+
+                return Ok(new { success = true, message = String.Format("Config Version {0} was succesfuly loaded to {1}", version, appname) });
+            }
+            catch (Exception exception)
+            {
+                throw new BackAndApiUnexpectedResponseException(exception, this);
+            }
+        }
+
+        [System.Web.Http.HttpGet]
+        [Route("download")]
+        [BackAnd.Web.Api.Controllers.Filters.BackAndAuthorize("Admin,Developer")]
+        public HttpResponseMessage download(string version = null)
+        {
+            XmlConfigHelper configHelper = new XmlConfigHelper();
+
+            string appname;
+            try
+            {
+                appname = System.Web.HttpContext.Current.Items[Durados.Database.AppName].ToString();
+                if (appname == Maps.DuradosAppName)
+                {
+                    return Request.CreateResponse(HttpStatusCode.InternalServerError, Messages.AppNameCannotBeNull);
+                }
+            }
+            catch (Exception ex)
+            {
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, Messages.AppNameCannotBeNull);
+            }
+
+           
+             
+             System.IO.Stream s = configHelper.GetZipConfig(appname, version);
+            HttpResponseMessage response ;
+            if(s==null)
+                response = new HttpResponseMessage(HttpStatusCode.NotFound);
+
+            response = new HttpResponseMessage(HttpStatusCode.OK);
+            response.Content = new StreamContent(s);
+            response.Content.Headers.ContentDisposition = new System.Net.Http.Headers.ContentDispositionHeaderValue("attachment");
+            response.Content.Headers.ContentDisposition.FileName = Map.AppName + ".zip";
+
+            return response;
+
+        }
         
     }
 
