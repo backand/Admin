@@ -90,6 +90,38 @@ namespace Durados.Web.Mvc
                 (new Durados.Web.Mvc.Azure.BlobBackup()).CopyBack(container, version, containerName);
             }
         }
+            public Dictionary<string, Stream> GetAllConfigs(string id, string version)
+        {
+
+            string containerName = Maps.DuradosAppPrefix.Replace("_", "").Replace(".", "").ToLower() + id;
+            Dictionary<string, Stream> configs = new Dictionary<string, Stream>();
+            configs.Add(containerName, GetConfig(containerName, version));
+            configs.Add(containerName + "xml", GetSchemaConfig(id, version));
+            return configs;
+        }
+        public Stream GetSchemaConfig(string id, string version)
+        {
+            string containerName = Maps.DuradosAppPrefix.Replace("_", "").Replace(".", "").ToLower() + id + "xml";
+            return GetConfig(containerName, version);
+        }
+
+        public Stream GetConfig(string filename, string version)
+        {
+            if (version == null)
+                version = string.Empty;
+            else
+                version = (new Durados.Web.Mvc.Azure.BlobBackup()).VersionPrefix + version;
+
+            CloudBlobContainer container = GetContainer(filename);
+            var source = container.GetBlobReference(filename + version);
+            if (!source.Exists())
+            {
+                throw new DuradosException("Could not find configuration version " + version);
+            }
+            MemoryStream stream = new MemoryStream();
+            source.DownloadToStream(stream);
+            return stream;
+        }
 
         Azure.DuradosStorage storage = new Azure.DuradosStorage();
 
