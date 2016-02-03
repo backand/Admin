@@ -139,7 +139,7 @@ namespace BackAnd.Web.Api.Test
         [TestMethod]
         public void RunAll()
         {
-            string appName = GetAppName();
+            string appName = "test" + DateTime.Now.Ticks;
             AdminContext admin = new AdminContext();
                 admin.CreateConnectAndWaitUntilAppIsReady(appName)
                 .CreateJsInTransaction(appName);

@@ -11,7 +11,7 @@ namespace BackAnd.Web.Api.Test
         public void TestValidLogin()
         {
             string username = "relly@backand.com";
-            string password = "123456";
+            string password = "relly2805";
             string appName = "app185";
 
             var response = new TestUtil().SignIn(username, password, appName);
