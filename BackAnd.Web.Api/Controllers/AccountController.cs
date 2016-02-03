@@ -722,7 +722,7 @@ namespace BackAnd.Web.Api.Controllers
 
         protected virtual Dictionary<string, object> SignUp(string fullName, string email, string password)
         {
-            Dictionary<string, object> json = new Durados.Web.Mvc.UI.Helpers.Account(this).SignUpToBackand(email, password, "true", null, fullName, "100", null);
+            Dictionary<string, object> json = new Durados.Web.Mvc.UI.Helpers.Account(this).SignUpToBackand(email, password, Durados.Web.Mvc.Maps.SendWelcomeEmail, null, fullName, "100", null);
             Durados.Web.Mvc.Maps.Instance.DuradosMap.Logger.Log("Account", "SignUp", "Post", "SignUp call", email, 3, null, DateTime.Now);
             return json;
         }

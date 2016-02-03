@@ -15,6 +15,7 @@ using Durados.Web.Mvc;
 using System.Net.Http.Headers;
 using Durados.Web.Mvc.Controllers.Api;
 using System.Text.RegularExpressions;
+using Durados.Web.Mvc.Farm;
 /*
  HTTP Verb	|Entire Collection (e.g. /customers)	                                                        |Specific Item (e.g. /customers/{id})
 -----------------------------------------------------------------------------------------------------------------------------------------------
@@ -88,14 +89,14 @@ namespace BackAnd.Web.Api.Controllers
             return (View)Maps.Instance.DuradosMap.Database.Views[AppViewName];
         }
 
-        public IHttpActionResult Get(string id = null, bool? deep = null, bool? withSelectOptions = null, int? pageNumber = null, int? pageSize = null, string filter = null, string sort = null, string search = null)
+        public IHttpActionResult Get(string id = null, bool? deep = null, bool? withSelectOptions = null, int? pageNumber = null, int? pageSize = null, string filter = null, string sort = null, string search = null, bool? stat = null)
         {
             if (id != null)
-                return Get(id, deep);
+                return Get(id, deep, stat);
             else
                 return Get(withSelectOptions, pageNumber, pageSize, filter, sort, search);
         }
-        private IHttpActionResult Get(string id = null, bool? deep = null)
+        private IHttpActionResult Get(string id = null, bool? deep = null, bool? stat = null)
         {
             try
             {
@@ -212,10 +213,23 @@ namespace BackAnd.Web.Api.Controllers
 
                 item.Add("connectionSource", RestHelper.GetConnectionSource(id));
 
+                bool debugMode = false;
+                try
+                {
+                    debugMode = SharedMemorySingeltone.Instance.Contains(id, SharedMemoryKey.DebugMode);
+                }
+                catch { }
+                item.Add("debugMode", debugMode);
 
+                
                 if (deep.HasValue && deep.Value && item["DatabaseStatus"].Equals(1))
                 {
-                    RestHelper.AddStat(item, id);
+                    bool reset = false;
+                    if (stat.HasValue && stat.Value)
+                    {
+                        reset = true;
+                    }
+                    RestHelper.AddStat(item, id, reset);
                 }
                 else
                 {
@@ -250,6 +264,7 @@ namespace BackAnd.Web.Api.Controllers
                     }
                 }
 
+                
                 return Ok(item);
 
 
@@ -328,6 +343,7 @@ namespace BackAnd.Web.Api.Controllers
 
         public virtual IHttpActionResult Post()
         {
+            string appName = "";
             try
             {
                 View view = GetView(null);
@@ -379,7 +395,7 @@ namespace BackAnd.Web.Api.Controllers
                 values.Add(Creator, view.Database.GetUserID());
                 values.Add(DatabaseStatus, (int)OnBoardingStatus.NotStarted);
 
-                
+                appName = values[Name].ToString();
 
                 string key = view.Create(values, false, view_BeforeCreate, view_BeforeCreateInDatabase, view_AfterCreateBeforeCommit, view_AfterCreateAfterCommit);
 
@@ -392,7 +408,7 @@ namespace BackAnd.Web.Api.Controllers
                 const int DuplicateUniqueIndex = 2601;
                 if (exception.Number == DuplicateUniqueIndex)
                 {
-                    return ResponseMessage(Request.CreateResponse(HttpStatusCode.Conflict, Messages.AppNameAlreadyExists));
+                    return ResponseMessage(Request.CreateResponse(HttpStatusCode.Conflict, string.Format(Messages.AppNameAlreadyExists, appName)));
                 }
                 else
                 {

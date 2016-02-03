@@ -47,7 +47,7 @@ namespace BackAnd.Web.Api.Controllers.Filters
                 }
                 catch { }
 
-                map.Logger.Log(apiController.GetControllerNameForLog(apiController.ControllerContext), verb, appName + ": " + exceptionSource, exception, logType, actionContext.Request.RequestUri.ToString());
+                map.Logger.Log(apiController.GetControllerNameForLog(apiController.ControllerContext), verb, appName + ": " + exceptionSource, exception, logType, actionContext.Request.RequestUri.ToString(), DateTime.Now);
             }
             catch (Exception e)
             {

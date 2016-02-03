@@ -7,6 +7,7 @@ using System.Security.Claims;
 using System.Web.Http;
 using System.Net;
 using Durados.Web.Mvc;
+using Durados.Web.Mvc.Farm;
 
 namespace BackAnd.Web.Api.Controllers.Filters
 {
@@ -85,6 +86,16 @@ namespace BackAnd.Web.Api.Controllers.Filters
                 if (!System.Web.HttpContext.Current.Items.Contains(Database.AppName))
                     System.Web.HttpContext.Current.Items.Add(Database.AppName, appname);
 
+                try
+                {
+                    if (SharedMemorySingeltone.Instance.Contains(appname, SharedMemoryKey.DebugMode))
+                    {
+                        System.Web.HttpContext.Current.Items[Durados.Workflow.JavaScript.Debug] = true;
+                    }
+
+                }
+                catch { }
+
                 if (!System.Web.HttpContext.Current.Items.Contains(Database.RequestId))
                     System.Web.HttpContext.Current.Items.Add(Database.RequestId, Guid.NewGuid().ToString());
 
@@ -148,6 +159,18 @@ namespace BackAnd.Web.Api.Controllers.Filters
                         return;
                     }
                 }
+                if (_allowedRoles == "Developer")
+                {
+                    string userRole = Maps.Instance.GetMap(appname).Database.GetUserRole();
+                    if (userRole != "Developer")
+                    {
+                        actionContext.ActionArguments.Add(Database.backand_serverAuthorizationAttempt, true);
+                        actionContext.ActionArguments.Add(UserRoleNotSufficient, true);
+
+                        HandleUnauthorized(actionContext, appname, username);
+                        return;
+                    }
+                }
                 ((apiController)actionContext.ControllerContext.Controller).Init();
             }
             catch
@@ -198,6 +221,16 @@ namespace BackAnd.Web.Api.Controllers.Filters
 
             if (!System.Web.HttpContext.Current.Items.Contains(Database.AppName))
                 System.Web.HttpContext.Current.Items.Add(Database.AppName, appName);
+
+            try
+            {
+                if (SharedMemorySingeltone.Instance.Contains(appName, SharedMemoryKey.DebugMode))
+                {
+                    System.Web.HttpContext.Current.Items[Durados.Workflow.JavaScript.Debug] = true;
+                }
+
+            }
+            catch { }
 
             if (!System.Web.HttpContext.Current.Items.Contains(Database.RequestId))
                 System.Web.HttpContext.Current.Items.Add(Database.RequestId, Guid.NewGuid().ToString());
@@ -281,6 +314,16 @@ namespace BackAnd.Web.Api.Controllers.Filters
 
             if (!System.Web.HttpContext.Current.Items.Contains(Database.AppName))
                 System.Web.HttpContext.Current.Items.Add(Database.AppName, appName);
+
+            try
+            {
+                if (SharedMemorySingeltone.Instance.Contains(appName, SharedMemoryKey.DebugMode))
+                {
+                    System.Web.HttpContext.Current.Items[Durados.Workflow.JavaScript.Debug] = true;
+                }
+
+            }
+            catch { }
 
             if (!System.Web.HttpContext.Current.Items.Contains(Database.RequestId))
                 System.Web.HttpContext.Current.Items.Add(Database.RequestId, Guid.NewGuid().ToString());

@@ -21,6 +21,7 @@ using MySql.Data.MySqlClient;
 using Durados;
 using System.Collections;
 using System.Data;
+using Backand;
 /*
  HTTP Verb	|Entire Collection (e.g. /customers)	                                                        |Specific Item (e.g. /customers/{id})
 -----------------------------------------------------------------------------------------------------------------------------------------------
@@ -37,6 +38,59 @@ namespace BackAnd.Web.Api.Controllers
     [BackAnd.Web.Api.Controllers.Filters.BackAndAuthorize("Admin,Developer")]
     public class hostingController : apiController
     {
+
+        [Route("~/1/hosting/folder")]
+        [HttpGet]
+        public IHttpActionResult smartListFolder(string path = null)
+        {
+            try
+            {
+                if (path == null)
+                    path = string.Empty;
+
+                string url = GetNodeUrl() + "/smartListFolder";
+                XMLHttpRequest request = new XMLHttpRequest();
+                request.open("POST", url, false);
+                Dictionary<string, object> data = new Dictionary<string, object>();
+                string appName = Map.AppName;
+
+                data.Add("bucket", Maps.S3Bucket);
+                data.Add("folder", appName);
+                data.Add("pathInFolder", path);
+
+
+                request.setRequestHeader("content-type", "application/json");
+
+                System.Web.Script.Serialization.JavaScriptSerializer jss = new System.Web.Script.Serialization.JavaScriptSerializer();
+                request.send(jss.Serialize(data));
+
+                if (request.status != 200)
+                {
+                    Maps.Instance.DuradosMap.Logger.Log("hosting", "folder", request.responseText, null, 1, "status: " + request.status);
+                    return ResponseMessage(Request.CreateResponse(HttpStatusCode.InternalServerError, request.responseText));
+                }
+
+                Dictionary<string, object>[] response = null;
+                try
+                {
+                    response = jss.Deserialize<Dictionary<string, object>[]>(request.responseText);
+                }
+                catch (Exception exception)
+                {
+                    Maps.Instance.DuradosMap.Logger.Log("hosting", "folder", exception.Source, exception, 1, request.responseText);
+                    return ResponseMessage(Request.CreateResponse(HttpStatusCode.InternalServerError, "Could not parse upload response: " + request.responseText + ". With the following error: " +  exception.Message));
+                }
+
+                
+                return Ok(response);
+            }
+            catch (Exception exception)
+            {
+                throw new BackAndApiUnexpectedResponseException(exception, this);
+
+            }
+        }
+
         
         [Route("~/1/hosting")]
         [HttpPost]

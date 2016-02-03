@@ -21,6 +21,7 @@ using System.Threading.Tasks;
 using System.Collections;
 using System.Data.SqlClient;
 using Durados.Web.Mvc.Infrastructure;
+using Durados.Web.Mvc.Farm;
 
 /*
  HTTP Verb	|Entire Collection (e.g. /customers)	                                                        |Specific Item (e.g. /customers/{id})
@@ -337,8 +338,11 @@ namespace BackAnd.Web.Api.Controllers
         public apiController()
             : base()
         {
+            
             if (this is viewDataController)
                 DataHandler = new DataHandler((viewDataController)this);
+            //else if (this is userController)
+            //    DataHandler = new DataHandler((userController)this);
             //Init();
         }
 
@@ -610,7 +614,11 @@ namespace BackAnd.Web.Api.Controllers
 
         protected virtual string GetAppName()
         {
-            string appName = Request.Headers.GetValues("AppName").FirstOrDefault();
+            string appName = null;
+            if (Request.Headers.Contains("AppName"))
+            {
+                appName = Request.Headers.GetValues("AppName").FirstOrDefault();
+            }
             if (appName == null)
             {
                 appName = Map.AppName;
@@ -693,8 +701,18 @@ namespace BackAnd.Web.Api.Controllers
 
         protected void RefreshConfigCache()
         {
+            string appName = null;
             lock (Map)
             {
+                appName = Map.AppName;
+                if (string.IsNullOrEmpty(appName))
+                {
+                    appName = (System.Web.HttpContext.Current.Items[Durados.Web.Mvc.Database.AppName] ?? string.Empty).ToString();
+                }
+                if (!string.IsNullOrEmpty(appName) && appName != Maps.DuradosAppName)
+                {
+                    FarmCachingSingeltone.Instance.AsyncCacheStarted(appName);
+                }
                 Durados.Web.Mvc.Database configDatabase = Map.GetConfigDatabase();
                 Map.Database.SetNextMinorConfigVersion();
                 Durados.DataAccess.ConfigAccess.UpdateVersion(Map.Database.ConfigVersion, Map.GetConfigDatabase().ConnectionString);
@@ -703,17 +721,30 @@ namespace BackAnd.Web.Api.Controllers
                 Map.Refresh();
                 Map.JsonConfigCache.Clear();
                 Map.AllKindOfCache.Clear();
-                RefreshOldAdmin(Map.AppName);
+                RefreshOldAdmin(appName);
             }
-
-            FarmCachingSingeltone.Instance.ClearMachinesCache(Map.AppName);
+            if (!string.IsNullOrEmpty(appName) && appName != Maps.DuradosAppName)
+            {
+                FarmCachingSingeltone.Instance.ClearMachinesCache(appName);
+            }
 
         }
 
         protected void RefreshConfigCache(Map map)
         {
+            string appName = null;
             lock (map)
             {
+                //set flag the azure async cache started and release the flag at Map.BlobTransferCompletedCallback
+                appName = Map.AppName;
+                if (string.IsNullOrEmpty(appName))
+                {
+                    appName = (System.Web.HttpContext.Current.Items[Durados.Web.Mvc.Database.AppName] ?? string.Empty).ToString();
+                }
+                if (!string.IsNullOrEmpty(appName) && appName != Maps.DuradosAppName)
+                {
+                    FarmCachingSingeltone.Instance.AsyncCacheStarted(appName);
+                }
                 Durados.Web.Mvc.Database configDatabase = map.GetConfigDatabase();
                 map.Database.SetNextMinorConfigVersion();
                 Durados.DataAccess.ConfigAccess.UpdateVersion(map.Database.ConfigVersion, map.GetConfigDatabase().ConnectionString);
@@ -723,13 +754,15 @@ namespace BackAnd.Web.Api.Controllers
                 Map.JsonConfigCache.Clear();
                 try
                 {
-                    RefreshOldAdmin(map.AppName);
+                    RefreshOldAdmin(appName);
                 }
                 catch { }
             }
 
-            FarmCachingSingeltone.Instance.ClearMachinesCache(map.AppName);
-
+            if (!string.IsNullOrEmpty(appName) && appName != Maps.DuradosAppName)
+            {
+                FarmCachingSingeltone.Instance.ClearMachinesCache(appName);
+            }
         }
 
         protected bool IsAdmin()
@@ -2131,6 +2164,7 @@ namespace BackAnd.Web.Api.Controllers
         public static readonly string FieldNameNotFound = "The field \"{0}\" was not found.";
         public static readonly string TheFieldMustBeTextual = "The field must be textual.";
         public static readonly string ItemWithIdNotFound = "An item with id \"{0}\" was not found or filtered by predefined filter in Table \"{1}\".";
+        public static readonly string ItemWithNoFieldsToUpdate = "An item with id \"{0}\" has no fields to update in Table \"{1}\".";
         public static readonly string AppNotFound = "The app \"{0}\" was not found.";
         public static readonly string ChartWithIdNotFound = "An chart with id \"{0}\" was not found.";
         public static readonly string Unexpected = "An error occurred, please try again or contact the administrator. Error details: {0}";
@@ -2146,7 +2180,7 @@ namespace BackAnd.Web.Api.Controllers
         public static readonly string UploadNotFound = "The column has no upload configuration";
         public static readonly string InvalidFileType = "Invalid file type";
         public static readonly string InvalidFileType2 = "Invalid file type in field [{0}].<br><br>Allowed formats: {1}";
-        public static readonly string AppNameAlreadyExists = "An application by this name already exists.";
+        public static readonly string AppNameAlreadyExists = "An application by the name {0} already exists.";
         public static readonly string AppNameCannotBeNull = "App name cannot be empty.";
         public static readonly string AppNameInvalid = "App name must be alphanumeric.";
         public static readonly string RuleWithNameAlreadyExists = "A rule with the name {0} already exists for table {1}.";

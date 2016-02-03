@@ -62,7 +62,9 @@
     </When>
     <Otherwise>
       <ItemGroup>
-        <Reference Include="Microsoft.VisualStudio.QualityTools.UnitTestFramework" />
+        <Reference Include="Microsoft.VisualStudio.QualityTools.UnitTestFramework">
+          <Private>True</Private>
+        </Reference>
       </ItemGroup>
     </Otherwise>
   </Choose>
@@ -91,6 +93,10 @@
     <ProjectReference Include="..\Backand.Config\Backand.Test.Config.csproj">
       <Project>{c35122b9-b306-497c-a5a1-01e4dd2c6cc8}</Project>
       <Name>Backand.Test.Config</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\BackAnd.UnitTests\BackAnd.UnitTests.csproj">
+      <Project>{6d63d615-1b03-4e1a-a55d-93c8af9860f9}</Project>
+      <Name>BackAnd.UnitTests</Name>
     </ProjectReference>
   </ItemGroup>
   <Choose>

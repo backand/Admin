@@ -245,11 +245,12 @@ namespace Durados.Workflow
 
         public virtual void Execute(object controller, Dictionary<string, Parameter> parameters, View view, Dictionary<string, object> values, DataRow prevRow, string pk, string connectionString, int currentUsetId, string currentUserRole, IDbCommand command, IDbCommand sysCommand, string actionName)
         {
-            if (pk != null && prevRow == null)
+            if (pk != null && prevRow == null && controller is Durados.Data.IData)
             {
                 try
                 {
-                    prevRow = ((Durados.Data.IData)controller).DataHandler.GetDataRow(view, pk, command);
+                    if (((Durados.Data.IData)controller).DataHandler != null)
+                        prevRow = ((Durados.Data.IData)controller).DataHandler.GetDataRow(view, pk, command);
                 }
                 catch { }
             }
@@ -268,11 +269,15 @@ namespace Durados.Workflow
 
             string currentUsername = view.Database.GetCurrentUsername();
 
-            code = code.Replace(Durados.Database.UserPlaceHolder, currentUsetId.ToString(), false).Replace(Durados.Database.SysUserPlaceHolder.AsToken(), currentUsetId.ToString(), false)
-                  .Replace(Durados.Database.UsernamePlaceHolder, currentUsername, false).Replace(Durados.Database.SysUsernamePlaceHolder.AsToken(), currentUsername)
-                  .Replace(Durados.Database.RolePlaceHolder, currentUserRole, false).Replace(Durados.Database.SysRolePlaceHolder.AsToken(), currentUserRole)
-                  .ReplaceConfig(view);
-                  //.ReplaceGlobals(view);
+            try
+            {
+                code = code.Replace(Durados.Database.UserPlaceHolder, currentUsetId.ToString(), false).Replace(Durados.Database.SysUserPlaceHolder.AsToken(), currentUsetId.ToString(), false)
+                      .Replace(Durados.Database.UsernamePlaceHolder, currentUsername, false).Replace(Durados.Database.SysUsernamePlaceHolder.AsToken(), currentUsername)
+                      .Replace(Durados.Database.RolePlaceHolder, currentUserRole, false).Replace(Durados.Database.SysRolePlaceHolder.AsToken(), currentUserRole)
+                      .ReplaceConfig(view);
+                //.ReplaceGlobals(view);
+            }
+            catch { }
 
             Dictionary<string, object> clientParameters = new Dictionary<string, object>();
             Dictionary<string, object> newRow = new Dictionary<string, object>();
@@ -284,6 +289,11 @@ namespace Durados.Workflow
             //System.Web.HttpContext.Current.Request.Files[0].InputStream
             //}
             bool debug = false;
+            if (IsDebug())
+            {
+                debug = true;
+            }
+                        
             if (values != null)
             {
                 foreach (string key in values.Keys)
@@ -333,8 +343,9 @@ namespace Durados.Workflow
             userProfile.Add("username", view.Database.GetCurrentUsername());
             userProfile.Add("role", currentUserRole);
             userProfile.Add("app", view.Database.GetCurrentAppName());
-            userProfile.Add("token", System.Web.HttpContext.Current.Request.Headers["Authorization"] ?? "anonymous-" + System.Web.HttpContext.Current.Request.Headers["AnonymousToken"]);
-            userProfile.Add("request", new Dictionary<string, object>() { {"userIP", GetUserIP()}, { "headers", GetHeaders(System.Web.HttpContext.Current.Request.Headers) } });
+            userProfile.Add("userId", view.Database.GetCurrentUserId());
+            userProfile.Add("token", System.Web.HttpContext.Current.Request.Headers["Authorization"] ?? "anonymous-" + (System.Web.HttpContext.Current.Request.Headers["AnonymousToken"] ?? view.Database.GetAnonymousToken().ToString()));
+            userProfile.Add("request", new Dictionary<string, object>() { { "userIP", GetUserIP() }, { "method", System.Web.HttpContext.Current.Request.HttpMethod }, { "headers", GetHeaders(System.Web.HttpContext.Current.Request.Headers) } });
 
             var call = new Jint.Engine(cfg => cfg.AllowClr(typeof(Backand.XMLHttpRequest).Assembly));
 
@@ -480,7 +491,7 @@ namespace Durados.Workflow
             }
         }
 
-        private Dictionary<string, object> GetHeaders(System.Collections.Specialized.NameValueCollection headers)
+        public static Dictionary<string, object> GetHeaders(System.Collections.Specialized.NameValueCollection headers)
         {
             Dictionary<string, object> dic = new Dictionary<string, object>();
 

@@ -189,6 +189,11 @@ namespace Durados.DataAccess.AutoGeneration
             while (reader.Read())
             {
                 string columnName = reader.GetString(reader.GetOrdinal("column_name"));
+                if (columnName == "b1")
+                {
+                    int x = 0;
+                    x++;
+                }
                 string dataType = reader.GetString(reader.GetOrdinal("data_type"));
                 bool isNullable = reader.GetString(reader.GetOrdinal("is_nullable")).Equals("YES");
                 string defaultValue = null;
@@ -269,6 +274,14 @@ namespace Durados.DataAccess.AutoGeneration
                             }
                         }
 
+                        if (maxLength.Value == 100001)
+                        {
+                            maxLength = 100000;
+                        }
+                        if (dataType.ToLower() == "point")
+                        {
+                            maxLength = 100001;
+                        }
                         column.MaxLength = maxLength.Value;
                     }
 
@@ -439,6 +452,7 @@ namespace Durados.DataAccess.AutoGeneration
                 //case SqlDbType.time_with_time_zone:
                 case SqlDbType.character_varying:
                 case SqlDbType.Geography:
+                case SqlDbType.Point:
                     return typeof(string);
 
                 case SqlDbType.Year:
@@ -524,6 +538,7 @@ namespace Durados.DataAccess.AutoGeneration
         //timestamp_with_time_zone = 2008,
         //time_without_time_zone = 2009,
         //abstime = 2010,
-        boolean =2006
+        boolean =2006,
+        Point = 2100,
     }
 }

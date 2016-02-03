@@ -283,7 +283,11 @@ namespace Durados.Web.Mvc.UI
                 jsonView.Fields.Add(field.Name, jsonField);
             }
 
-            LoadDerivation(view, jsonView);
+            try
+            {
+                LoadDerivation(view, jsonView);
+            }
+            catch { }
 
             jsonView.InlineAddingCreateUrl = view.GetInlineAddingCreateUrl();
             jsonView.InlineEditingCreateUrl = view.GetInlineEditingEditUrl();
@@ -556,7 +560,11 @@ namespace Durados.Web.Mvc.UI
                 }
             }
 
-            LoadDerivation(view, jsonView);
+            try
+            {
+                LoadDerivation(view, jsonView);
+            }
+            catch { }
 
             jsonView.InlineAddingCreateUrl = view.GetInlineAddingCreateUrl();
             jsonView.ViewName = view.Name;

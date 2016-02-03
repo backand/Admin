@@ -225,6 +225,9 @@
     <Compile Include="ChallengeResult.cs" />
     <Compile Include="Controllers\accountController.cs" />
     <Compile Include="Controllers\Admin\actionTemplateController.cs" />
+    <Compile Include="Controllers\Admin\FarmController.cs" />
+    <Compile Include="Controllers\Admin\debugModeController.cs" />
+    <Compile Include="Controllers\Admin\filesController.cs" />
     <Compile Include="Controllers\Admin\hostingController.cs" />
     <Compile Include="Controllers\Admin\nosqlController.cs" />
     <Compile Include="Controllers\Admin\myAppConnectionController.cs" />
@@ -273,6 +276,9 @@
     <Content Include="packages.config" />
     <None Include="Properties\PublishProfiles\api.pubxml" />
     <None Include="Properties\PublishProfiles\BackandApi.pubxml" />
+    <None Include="Web.BackandApi.config">
+      <DependentUpon>Web.config</DependentUpon>
+    </None>
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>

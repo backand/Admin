@@ -135,7 +135,7 @@ namespace Backand
                 }
 
                 byte[] bytes;
-                if (request.ContentType.ToLower().Contains("multipart/form-data"))
+                if (request.ContentType != null && request.ContentType.ToLower().Contains("multipart/form-data"))
                 {
                     if (!request.ContentType.Contains("boundary="))
                     {

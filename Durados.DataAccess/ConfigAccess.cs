@@ -5,6 +5,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.IO;
+using Durados.Data;
+using Durados.DataAccess.Storage;
 
 namespace Durados.DataAccess
 {
@@ -13,9 +15,32 @@ namespace Durados.DataAccess
         private Guid tranGuid = Guid.NewGuid();
         private List<int> pendingHistoryForCommit = new List<int>();
         private History history = null;
+        private Func<IStorage> storageGetter;
+       
+        private AppLockerGetter lockGetter {
+            get
+            {
+                if (storageGetter() != null)
+                {
+                    if (_lockGetter == null)
+                    {
+                        _lockGetter = new AppLockerGetter(storageGetter().LockerCache);
+                    }
+
+                    return _lockGetter;
+                }
+
+                throw new NotSupportedException("You have to initalize storage in MAP before call ConfigTransaction");
+            }
+        }
+
+        private AppLockerGetter _lockGetter;
+
         /**/
-        public ConfigTransaction()
+        public ConfigTransaction(Func<IStorage> storage)
         {
+            this.storageGetter = storage;
+            
         }
 
         private void InitTransaction()
@@ -32,7 +57,7 @@ namespace Durados.DataAccess
         public void Commit(string connectionString, DataSet dataSet, string filename, Durados.Diagnostics.ILogger logger)
         {
             history = DataAccess.History.GetHistory(DataAccess.History.GetProduct(connectionString));
-            lock (this)
+            lock (GetLocker(filename))
             {
                 dataSet.AcceptChanges();
 
@@ -103,6 +128,18 @@ namespace Durados.DataAccess
                 }
             }
         }
+
+
+        private object GetLocker(string filename)
+        {
+            if (filename == null)
+            {
+                throw new ArgumentNullException("filename can't be null");
+            }
+
+            return lockGetter.GetLock(filename);
+            
+        }
     }
 
     public class ConfigAccess : SqlAccess, IDataTableAccess
@@ -110,7 +147,11 @@ namespace Durados.DataAccess
         private static DataSet dataSet2 = null;
         public static bool multiTenancy = false;
         public static bool cloud = false;
-        public static Durados.DataAccess.Storage.IStorage storage = null;
+        
+        public static Durados.DataAccess.Storage.IStorage storage { get; set; }
+
+        public static Func<IStorage> storageGetter = () => storage; 
+
         //private static Dictionary<string, DataSet> dataSets = new Dictionary<string, DataSet>();
         private static Durados.Data.ICache<DataSet> dataSets
         {
@@ -123,6 +164,8 @@ namespace Durados.DataAccess
                 return null;
             }
         }
+
+        private static ConfigTransaction configTransaction = new ConfigTransaction(storageGetter);
 
 
         //private static DataSet dataSet
@@ -275,7 +318,8 @@ namespace Durados.DataAccess
         }
 
         private static string connectionString;
-        private static ConfigTransaction configTransaction = new ConfigTransaction();
+        
+        
 
         const char comma = ',';
         const string PageIndexerColumnName = "PageIndexer";

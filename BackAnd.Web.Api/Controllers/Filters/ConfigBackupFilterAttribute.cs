@@ -13,6 +13,11 @@ namespace BackAnd.Web.Api.Controllers.Filters
 {
     public class ConfigBackupFilterAttribute : ActionFilterAttribute  
     {
+        /// <summary>
+        /// Backup app configuration <bold>sync</bold>
+        /// Note: Function don't stop execution on failure
+        /// </summary>
+        /// <param name="actionContext"></param>
         public override void OnActionExecuting(System.Web.Http.Controllers.HttpActionContext actionContext)
         {
             try

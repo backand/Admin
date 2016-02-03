@@ -61,7 +61,7 @@ namespace BackAnd.Web.Api.Controllers
             try
             {
                 newDbParameters = appFactory.GetNewExternalDBParameters(sqlProduct.Value, id, out  server, out port, sampleApp);//, out  catalog
-                Maps.Instance.DuradosMap.Logger.Log(GetControllerNameForLog(ControllerContext), GetActionName(), this.Request.Method.Method, "start create new app in api", HttpStatusCode.OK.ToString(), 3, null, DateTime.Now);
+                Maps.Instance.DuradosMap.Logger.Log(GetControllerNameForLog(ControllerContext), GetActionName(), this.Request.Method.Method, "continue create new app in api", HttpStatusCode.OK.ToString(), 3, null, DateTime.Now);
 
             }
             catch (Exception ex)
@@ -215,15 +215,25 @@ namespace BackAnd.Web.Api.Controllers
         }
         int? tempAppId = null;
 
+        //private object locker1 = new object();
+
         protected override void BeforeCreate(Durados.CreateEventArgs e)
         {
             if (e.View.Name == "durados_App")
             {
                 if (IsTempAppBelongToCreator(e, out tempAppId))
                 {
-                    string sqlDeleteTempApp = "delete durados_App where Id = " + tempAppId.Value;
+                    string sqlDeleteTempApp = "delete durados_App with (rowlock) where Id = " + tempAppId.Value;
                     e.Command.CommandText = sqlDeleteTempApp;
-                    e.Command.ExecuteNonQuery();
+
+                    //lock (locker1)
+                   // {
+                    Durados.SmartRun.RunWithRetry.Run<System.Data.SqlClient.SqlException>(() =>
+                    {
+                        e.Command.ExecuteNonQuery();
+                    }, 8, 2000);
+                   // }
+                    
                 }
             }
             const string DatabaseStatus = "DatabaseStatus";
@@ -896,7 +906,7 @@ namespace BackAnd.Web.Api.Controllers
                 }
                 catch (Exception exception)
                 {
-                    string sql = "delete durados_App where Id = " + e.PrimaryKey;
+                    string sql = "delete durados_App with (rowlock) where Id = " + e.PrimaryKey;
                     sqlAccess.ExecuteNonQuery(e.View.ConnectionString, sql);
                     Map.Logger.Log(GetControllerNameForLog(this.ControllerContext), "CreateApp", exception.Source, exception, 1, null);
                     throw new Durados.DuradosException("Failed to create app, please try again later", exception);
@@ -923,32 +933,9 @@ namespace BackAnd.Web.Api.Controllers
                     }
             }
 
-            //UpdateCache(name);
-            CreateDns(cleanName);
         }
 
-        protected virtual void CreateDns(string name)
-        {
-            if (Maps.Debug)
-            {
-                try
-                {
-                    string windowsPath = System.Environment.GetEnvironmentVariable("windir");
-
-                    using (System.IO.StreamWriter sw = new System.IO.StreamWriter(windowsPath + @"\system32\drivers\etc\hosts", true))
-                    {
-
-                        sw.WriteLine(string.Format("127.0.0.1   {0}", name + "." + Maps.Host));
-
-                        sw.Close();
-
-                    }
-                }
-                catch { }
-            }
-
-
-        }
+        
 
         private bool IsValidConnectionData(Durados.SqlProduct product, string name, string title, string server, string catalog, string username, string password, bool usingSsh, bool usingSsl, string sshRemoteHost, string sshUser, string sshPassword, string sshPrivateKey, int sshPort, int productPort, out string errors)
         {
@@ -1802,14 +1789,26 @@ namespace BackAnd.Web.Api.Controllers
                 Dictionary<string, object> result;
                 bool success = false;
                 bool isNewDatabase = IsNewDatabase(template);
-                bool poolSuccess = false;
+                bool? poolSuccess = false;
                 if (isNewDatabase)
                 {
                     int? appIdFromPool = null;
                     if (!IsSampleApp(values))
                         poolSuccess = new AppsPool().Pop(id, title, Maps.Instance.DuradosMap.Database.GetCurrentUsername(), out appIdFromPool, template);
 
-                    if (poolSuccess)
+                    for (int i = 0; i < 3; i++)
+                    {
+                        if (!poolSuccess.HasValue)
+                        {
+                            poolSuccess = new AppsPool().Pop(id, title, Maps.Instance.DuradosMap.Database.GetCurrentUsername(), out appIdFromPool, template);
+                        }
+                        else
+                        {
+                            break;
+                        }
+                    }
+
+                    if (poolSuccess.Value)
                     {
                         result = new Dictionary<string, object>() { { "Success", true } };
                     }
@@ -2115,18 +2114,6 @@ namespace BackAnd.Web.Api.Controllers
                 Map.Logger.Log(GetControllerNameForLog(this.ControllerContext), "CallHttpRequestToCreateTheSchema", exception.Source, exception, 1, null);
 
             }
-        }
-
-        private void CallHttpRequestToCreateTheSchemaOld(string appName, string json)
-        {
-            json = "{newSchema: " + json + ", severity: 0}";
-
-
-            string url = GetUrl();
-            Dictionary<string, string> headers = GetHeaders(appName);
-            string response = Durados.Web.Mvc.Infrastructure.Http.WebRequestingJson(url, json, headers);
-            //Dictionary<string, object> ret = Durados.Web.Mvc.UI.Json.JsonSerializer.Deserialize(response);
-            //return ret;
         }
 
         private Dictionary<string, string> GetHeaders(string appName)

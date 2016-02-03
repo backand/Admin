@@ -434,6 +434,11 @@ namespace BackAnd.Web.Api.Controllers
             {
                 return ResponseMessage(Request.CreateResponse(HttpStatusCode.NotAcceptable, exception.Message));
             }
+            catch (System.Data.Common.DbException exception)
+            {
+                return ResponseMessage(Request.CreateResponse(HttpStatusCode.NotAcceptable, "Check the security Pre-defined Filter for the following sql errors: " + exception.Message));
+
+            }
             catch (Exception exception)
             {
                 throw new BackAndApiUnexpectedResponseException(exception, this);
@@ -777,6 +782,11 @@ namespace BackAnd.Web.Api.Controllers
                 {
                     values = GetParameters(parameters, view, values2);
                 }
+
+                if (values.Count == 0 || (values.Count == 1 && values.ContainsKey("__metadata")))
+                {
+                    return ResponseMessage(Request.CreateResponse(HttpStatusCode.NotFound, string.Format(Messages.ItemWithNoFieldsToUpdate, id, name)));
+                }
                     
 
                 int affected = view.Update(values, id, deep ?? false, view_BeforeEdit, view_BeforeEditInDatabase, view_AfterEditBeforeCommit, view_AfterEditAfterCommit, view_BeforeCreate, view_BeforeCreateInDatabase, view_AfterCreateBeforeCommit, view_AfterCreateAfterCommit, overwrite ?? false, view_BeforeDelete, view_AfterDeleteBeforeCommit, view_AfterDeleteAfterCommit);
@@ -1006,6 +1016,11 @@ namespace BackAnd.Web.Api.Controllers
                 }
             }
 
+            if (requests.Length > 1000)
+            {
+                Map.Logger.Log("viewData", "bulk", "", null, 2, "more than 1000 requests");
+                return ResponseMessage(Request.CreateResponse(HttpStatusCode.NotAcceptable, "bulk is limited to 1000 requests at a time"));
+            }
             IEnumerable<string> headers = Request.Headers.GetValues("Authorization");
             string authorization = headers.FirstOrDefault();
             headers = Request.Headers.GetValues("AppName");

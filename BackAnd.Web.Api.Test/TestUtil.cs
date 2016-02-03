@@ -61,6 +61,7 @@ namespace BackAnd.Web.Api.Test
             var res = SignIn(username, password, appName);
             Assert.IsTrue(res != null && res.token_type != null && res.access_token != null, "Fail to sign in");
             rest.AddDefaultHeader("Authorization", res.token_type + " " + res.access_token);
+            Console.WriteLine(res.access_token);
             return rest;
         }
     }

@@ -1006,7 +1006,7 @@
     <FirstViewName>durados_App</FirstViewName>
     <True>Yes</True>
     <False>No</False>
-    <ConfigVersion>1.0.404</ConfigVersion>
+    <ConfigVersion>1.0.406</ConfigVersion>
     <SecureLevel>RegisteredUsers</SecureLevel>
     <DefaultLevelOfDept>3</DefaultLevelOfDept>
     <SelectionLimit>2000</SelectionLimit>
@@ -7107,6 +7107,174 @@
     <ShowColumnHeader>true</ShowColumnHeader>
     <AutoIncrement>false</AutoIncrement>
     <JsonName>HostingStatus</JsonName>
+    <Fields>0</Fields>
+    <BooleanHtmlControlType>Check</BooleanHtmlControlType>
+    <TextHtmlControlType>Text</TextHtmlControlType>
+    <RadioOrientation>Horizontal</RadioOrientation>
+    <Rich>false</Rich>
+    <BrowserAutocomplete>false</BrowserAutocomplete>
+    <Dialog>true</Dialog>
+    <PartialLength>50</PartialLength>
+    <Custom>false</Custom>
+    <AdvancedFilter>true</AdvancedFilter>
+    <TrimSpaces>true</TrimSpaces>
+    <Encrypt>false</Encrypt>
+    <Encrypted>false</Encrypted>
+    <SymmetricKeyAlgorithm>DES</SymmetricKeyAlgorithm>
+  </Field>
+  <Field>
+    <ID>3135</ID>
+    <Name>SignUpToken</Name>
+    <RelatedViewName />
+    <FieldType>Column</FieldType>
+    <DataType>ShortText</DataType>
+    <IncludeInDuplicate>true</IncludeInDuplicate>
+    <EditInTableView>false</EditInTableView>
+    <GroupFilterDisplayLabel>Inherit</GroupFilterDisplayLabel>
+    <GroupFilterWidth>80</GroupFilterWidth>
+    <NoHyperlink>true</NoHyperlink>
+    <Dashboard>false</Dashboard>
+    <Preview>false</Preview>
+    <IsCalculated>false</IsCalculated>
+    <DisplayName>Sign Up Token</DisplayName>
+    <DatabaseNames>SignUpToken</DatabaseNames>
+    <ExportToXml>true</ExportToXml>
+    <SpecialColumn>None</SpecialColumn>
+    <IsUnique>false</IsUnique>
+    <AutocompleteMathing>StartsWith</AutocompleteMathing>
+    <AutocompleteFilter>false</AutocompleteFilter>
+    <ContainerGraphicProperties>d_fieldContainer</ContainerGraphicProperties>
+    <NullString />
+    <Excluded>false</Excluded>
+    <HideInTableMobile>false</HideInTableMobile>
+    <HideInTable>false</HideInTable>
+    <HideInEdit>false</HideInEdit>
+    <HideInCreate>false</HideInCreate>
+    <DisableInEdit>false</DisableInEdit>
+    <DisableInCreate>false</DisableInCreate>
+    <DisableInDuplicate>false</DisableInDuplicate>
+    <ExcludeInUpdate>false</ExcludeInUpdate>
+    <ExcludeInInsert>false</ExcludeInInsert>
+    <DisableInFilter>false</DisableInFilter>
+    <HideInFilter>false</HideInFilter>
+    <Order>340</Order>
+    <OrderForCreate>340</OrderForCreate>
+    <OrderForEdit>340</OrderForEdit>
+    <Sortable>true</Sortable>
+    <UpdateParentInGrid>false</UpdateParentInGrid>
+    <GridEditable>true</GridEditable>
+    <Seperator>false</Seperator>
+    <ColSpanInDialog>1</ColSpanInDialog>
+    <MinWidth>0</MinWidth>
+    <HideInDerivation>false</HideInDerivation>
+    <InlineSearch>false</InlineSearch>
+    <Import>true</Import>
+    <Precedent>false</Precedent>
+    <AllowCreateRoles>everyone</AllowCreateRoles>
+    <AllowEditRoles>everyone</AllowEditRoles>
+    <AllowSelectRoles>everyone</AllowSelectRoles>
+    <TableCellMinWidth>0</TableCellMinWidth>
+    <LabelContentLayout>Horizontal</LabelContentLayout>
+    <Searchable>false</Searchable>
+    <Required>false</Required>
+    <Refresh>false</Refresh>
+    <Unique>false</Unique>
+    <PartFromUniqueIndex>false</PartFromUniqueIndex>
+    <SaveHistory>true</SaveHistory>
+    <Min>0</Min>
+    <Max>0</Max>
+    <Format />
+    <OriginalFieldName>SignUpToken</OriginalFieldName>
+    <DisplayFormat>None</DisplayFormat>
+    <TextAlignment>inherit</TextAlignment>
+    <Width>200</Width>
+    <ShowColumnHeader>true</ShowColumnHeader>
+    <AutoIncrement>false</AutoIncrement>
+    <JsonName>SignUpToken</JsonName>
+    <Fields>0</Fields>
+    <BooleanHtmlControlType>Check</BooleanHtmlControlType>
+    <TextHtmlControlType>Text</TextHtmlControlType>
+    <RadioOrientation>Horizontal</RadioOrientation>
+    <Rich>false</Rich>
+    <BrowserAutocomplete>false</BrowserAutocomplete>
+    <Dialog>true</Dialog>
+    <PartialLength>50</PartialLength>
+    <Custom>false</Custom>
+    <AdvancedFilter>true</AdvancedFilter>
+    <TrimSpaces>true</TrimSpaces>
+    <Encrypt>false</Encrypt>
+    <Encrypted>false</Encrypted>
+    <SymmetricKeyAlgorithm>DES</SymmetricKeyAlgorithm>
+  </Field>
+  <Field>
+    <ID>3136</ID>
+    <Name>AnonymousToken</Name>
+    <RelatedViewName />
+    <FieldType>Column</FieldType>
+    <DataType>ShortText</DataType>
+    <IncludeInDuplicate>true</IncludeInDuplicate>
+    <EditInTableView>false</EditInTableView>
+    <GroupFilterDisplayLabel>Inherit</GroupFilterDisplayLabel>
+    <GroupFilterWidth>80</GroupFilterWidth>
+    <NoHyperlink>true</NoHyperlink>
+    <Dashboard>false</Dashboard>
+    <Preview>false</Preview>
+    <IsCalculated>false</IsCalculated>
+    <DisplayName>Anonymous Token</DisplayName>
+    <DatabaseNames>AnonymousToken</DatabaseNames>
+    <ExportToXml>true</ExportToXml>
+    <SpecialColumn>None</SpecialColumn>
+    <IsUnique>false</IsUnique>
+    <AutocompleteMathing>StartsWith</AutocompleteMathing>
+    <AutocompleteFilter>false</AutocompleteFilter>
+    <ContainerGraphicProperties>d_fieldContainer</ContainerGraphicProperties>
+    <NullString />
+    <Excluded>false</Excluded>
+    <HideInTableMobile>false</HideInTableMobile>
+    <HideInTable>false</HideInTable>
+    <HideInEdit>false</HideInEdit>
+    <HideInCreate>false</HideInCreate>
+    <DisableInEdit>false</DisableInEdit>
+    <DisableInCreate>false</DisableInCreate>
+    <DisableInDuplicate>false</DisableInDuplicate>
+    <ExcludeInUpdate>false</ExcludeInUpdate>
+    <ExcludeInInsert>false</ExcludeInInsert>
+    <DisableInFilter>false</DisableInFilter>
+    <HideInFilter>false</HideInFilter>
+    <Order>350</Order>
+    <OrderForCreate>350</OrderForCreate>
+    <OrderForEdit>350</OrderForEdit>
+    <Sortable>true</Sortable>
+    <UpdateParentInGrid>false</UpdateParentInGrid>
+    <GridEditable>true</GridEditable>
+    <Seperator>false</Seperator>
+    <ColSpanInDialog>1</ColSpanInDialog>
+    <MinWidth>0</MinWidth>
+    <HideInDerivation>false</HideInDerivation>
+    <InlineSearch>false</InlineSearch>
+    <Import>true</Import>
+    <Precedent>false</Precedent>
+    <AllowCreateRoles>everyone</AllowCreateRoles>
+    <AllowEditRoles>everyone</AllowEditRoles>
+    <AllowSelectRoles>everyone</AllowSelectRoles>
+    <TableCellMinWidth>0</TableCellMinWidth>
+    <LabelContentLayout>Horizontal</LabelContentLayout>
+    <Searchable>false</Searchable>
+    <Required>false</Required>
+    <Refresh>false</Refresh>
+    <Unique>false</Unique>
+    <PartFromUniqueIndex>false</PartFromUniqueIndex>
+    <SaveHistory>true</SaveHistory>
+    <Min>0</Min>
+    <Max>0</Max>
+    <Format />
+    <OriginalFieldName>AnonymousToken</OriginalFieldName>
+    <DisplayFormat>None</DisplayFormat>
+    <TextAlignment>inherit</TextAlignment>
+    <Width>200</Width>
+    <ShowColumnHeader>true</ShowColumnHeader>
+    <AutoIncrement>false</AutoIncrement>
+    <JsonName>AnonymousToken</JsonName>
     <Fields>0</Fields>
     <BooleanHtmlControlType>Check</BooleanHtmlControlType>
     <TextHtmlControlType>Text</TextHtmlControlType>
@@ -23568,7 +23736,7 @@
     <TableCellMinWidth>0</TableCellMinWidth>
     <LabelContentLayout>Horizontal</LabelContentLayout>
     <Searchable>false</Searchable>
-    <Required>true</Required>
+    <Required>false</Required>
     <Refresh>false</Refresh>
     <Unique>true</Unique>
     <PartFromUniqueIndex>false</PartFromUniqueIndex>

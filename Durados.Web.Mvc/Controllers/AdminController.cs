@@ -2191,11 +2191,6 @@ namespace Durados.Web.Mvc.Controllers
                     Durados.DataAccess.ConfigAccess configAccess = new Durados.DataAccess.ConfigAccess();
                     string configViewPk = configAccess.GetViewPK(viewName, Map.GetConfigDatabase().ConnectionString);
                     Map.Sync(viewName, configViewPk);
-                    try
-                    {
-                        Map.Logger.WriteToEventLog("The view " + viewName + " was synced by " + HttpContext.User.Identity.Name, System.Diagnostics.EventLogEntryType.Information, 2030);
-                    }
-                    catch { }
                     Initiate();
 
                 }
@@ -2223,11 +2218,6 @@ namespace Durados.Web.Mvc.Controllers
                         string viewName = view.Name;
                         string configViewPk = configAccess.GetViewPK(viewName, Map.GetConfigDatabase().ConnectionString);
                         Map.Sync(viewName, configViewPk);
-                        try
-                        {
-                            Map.Logger.WriteToEventLog("The view " + viewName + " was synced by " + HttpContext.User.Identity.Name, System.Diagnostics.EventLogEntryType.Error, 2030);
-                        }
-                        catch { }
                     }
                     Initiate();
 
@@ -2255,11 +2245,6 @@ namespace Durados.Web.Mvc.Controllers
                     {
                         string viewName = configAccess.GetViewNameByPK(configViewPk, Database.ConnectionString);
                         Map.Sync(viewName, configViewPk);
-                        try
-                        {
-                            Map.Logger.WriteToEventLog("The view " + viewName + " was synced by " + HttpContext.User.Identity.Name, System.Diagnostics.EventLogEntryType.Error, 2030);
-                        }
-                        catch { }
                     }
                     if (Map.Database.AutoCommit)
                     {
@@ -3938,7 +3923,7 @@ namespace Durados.Web.Mvc.Controllers
             }
             catch (Exception exception)
             {
-                Durados.Diagnostics.ILog log = Map.Logger.Log(GetControllerNameForLog(this.ControllerContext), this.ControllerContext.RouteData.Values["action"].ToString(), exception.Source, exception, 1, null);
+               Map.Logger.Log(GetControllerNameForLog(this.ControllerContext), this.ControllerContext.RouteData.Values["action"].ToString(), exception.Source, exception, 1, null);
                 return PartialView("~/Views/Shared/Controls/ErrorMessage.ascx", exception.Message);
             }
         }

@@ -54,7 +54,7 @@ namespace Durados.Web.Mvc.Controllers
             int logType = filterContext.Exception is Durados.FileNotFoundException ? 3 : 1;
             try
             {
-                log = logger.Log(controller, action, filterContext.Exception.Source, filterContext.Exception, logType, null);
+                logger.Log(controller, action, filterContext.Exception.Source, filterContext.Exception, logType, null);
             }
             catch { }
             logger.WriteToEventLog("Message: " + filterContext.Exception.Message + "; Trace: " + filterContext.Exception.StackTrace, System.Diagnostics.EventLogEntryType.Error, logType);
@@ -68,7 +68,6 @@ namespace Durados.Web.Mvc.Controllers
                 {
                     log.ExceptionMessage = filterContext.Exception.Message;
                     log.Trace = filterContext.Exception.StackTrace;
-
                 }
             }
             SendError(logType, filterContext.Exception, controller, action, logger);

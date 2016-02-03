@@ -23,5 +23,7 @@ namespace Durados.DataAccess.Storage
         bool Exists(string filename);
 
         Durados.Data.ICache<DataSet> ConfigCache { get; }
+
+        Durados.Data.ICache<object> LockerCache { get; }
     }
 }

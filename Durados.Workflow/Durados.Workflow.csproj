@@ -96,6 +96,7 @@
     <Reference Include="System.Core">
       <RequiredTargetFramework>3.5</RequiredTargetFramework>
     </Reference>
+    <Reference Include="System.Runtime.Caching" />
     <Reference Include="System.Runtime.Serialization">
       <RequiredTargetFramework>3.0</RequiredTargetFramework>
     </Reference>
@@ -115,6 +116,8 @@
     <Compile Include="console.cs" />
     <Compile Include="Cookie.cs" />
     <Compile Include="JavaScript.cs" />
+    <Compile Include="files.cs" />
+    <Compile Include="request.cs" />
     <Compile Include="socket.cs" />
     <Compile Include="WebService.cs" />
     <Compile Include="Graph.cs" />

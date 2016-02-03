@@ -22,6 +22,7 @@ using System.Security.Claims;
 using System.Web.Script.Serialization;
 using System.Net.Http;
 using Newtonsoft.Json;
+using System.Runtime.Caching;
 
 namespace Durados.Web.Mvc.UI.Helpers
 {
@@ -41,7 +42,7 @@ namespace Durados.Web.Mvc.UI.Helpers
             Maps.Instance.Restart(appname);
             Durados.DataAccess.ConfigAccess.Restart(fileName);
            
-            if (Workflow.Engine.CurrentDatabases != null && Workflow.Engine.CurrentDatabases.ContainsKey(appname))
+            if (Workflow.Engine.CurrentDatabases != null && Workflow.Engine.CurrentDatabases.Contains(appname))
             {
                 try
                 {
@@ -65,11 +66,11 @@ namespace Durados.Web.Mvc.UI.Helpers
             }
         }
 
-        public static void AddStat(Dictionary<string, object> item, string appName)
+        public static void AddStat(Dictionary<string, object> item, string appName, bool reset)
         {
             Stat stat = StatFactory.GetState(Maps.Instance.GetMap(appName).SystemSqlProduct);
 
-            stat.AddStat(item, appName);
+            stat.AddStat(item, appName, reset);
         }
 
         public static Dictionary<string, Dictionary<string, object>> ReferenceTableToDictionary(View view, DataView dataView, bool deep = false, bool descriptive = true)
@@ -591,8 +592,8 @@ namespace Durados.Web.Mvc.UI.Helpers
                     }
                     else
                     {
-                        string localDatabaseHost = GetLocalDatabaseHost();
-                        if (map.connectionString.Contains(localDatabaseHost))
+                        //string localDatabaseHost = GetLocalDatabaseHost();
+                        if (map.HostedByUs)//(map.connectionString.Contains(localDatabaseHost))
                         {
                             return "local";
                         }
@@ -613,10 +614,11 @@ namespace Durados.Web.Mvc.UI.Helpers
             }
         }
 
-        public static string GetLocalDatabaseHost()
-        {
-            return (System.Configuration.ConfigurationManager.AppSettings["localDatabaseHost"] ?? "yrv-dev.czvbzzd4kpof.eu-central-1.rds.amazonaws.com").ToString();
-        }
+        ////public static string GetLocalDatabaseHost()
+        ////{
+
+        ////    return (System.Configuration.ConfigurationManager.AppSettings["localDatabaseHost"] ?? "yrv-dev.czvbzzd4kpof.eu-central-1.rds.amazonaws.com").ToString();
+        ////}
 
         private static Dictionary<string, object> GetConfig(View view, string pk, bool deep, BeforeSelectEventHandler beforeSelectCallback, AfterSelectEventHandler afterSelectCallback, bool displayParentValue = false)
         {
@@ -1358,6 +1360,15 @@ namespace Durados.Web.Mvc.UI.Helpers
             }
             else if (IsField(view))
             {
+                if (columnField.Name == "DataType")
+                {
+                    Field realField = GetFieldFromFieldRow(view, dataRow);
+                    if (realField.IsPoint)
+                    {
+                        return "Point";
+                    }
+                    return value;
+                }
                 if (columnField.Name == "HideInCreate")
                 {
                     Field realField = GetFieldFromFieldRow(view, dataRow);
@@ -1829,6 +1840,8 @@ namespace Durados.Web.Mvc.UI.Helpers
                         value = row.Row[((ColumnField)field).DataColumn.ColumnName];
                     else if (field.FieldType == FieldType.Children && field.IsCheckList())
                         value = tableViewer.GetFieldValue(field, row.Row);
+                    else if (field.FieldType == FieldType.Column && field.IsPoint)
+                        value = GetPoint(field, row.Row);
                     else
                         value = System.Web.HttpContext.Current.Server.HtmlDecode(field.GetValue(row.Row));
                     //}
@@ -1851,6 +1864,22 @@ namespace Durados.Web.Mvc.UI.Helpers
             AddSpecialValues(dictionary, view, row.Row, dataView);
 
             return dictionary;
+        }
+
+        private object GetPoint(Field field, DataRow dataRow)
+        {
+            try
+            {
+                string s = field.GetValue(dataRow);
+                if (string.IsNullOrEmpty(s))
+                    return null;
+                string[] a = s.Split(",".ToCharArray(), StringSplitOptions.RemoveEmptyEntries);
+                return new double[2] { Convert.ToDouble(a[0]), Convert.ToDouble(a[1]) };
+            }
+            catch (Exception exception)
+            {
+                throw new DuradosException("Fail to retrieve point value", exception);
+            }
         }
 
         private void AddSpecialValues(Dictionary<string, object> dictionary, View view, System.Data.DataRow row, DataView dataView)
@@ -2297,6 +2326,8 @@ namespace Durados.Web.Mvc.UI.Helpers
                 {
                     if (field.FieldType == FieldType.Column && (field.IsDate || field.IsBoolean))
                         dictionary.Add(name, row[((ColumnField)field).DataColumn.ColumnName]);
+                    else if (field.IsPoint)
+                        dictionary.Add(name, GetPoint(field, row));
                     else
                         dictionary.Add(name, JsonField.Value);
                 }
@@ -2826,32 +2857,34 @@ namespace Durados.Web.Mvc.UI.Helpers
         {
             sqlAccess = new SqlAccess();
         }
-        public void AddStat(Dictionary<string, object> item, string appName)
+        public void AddStat(Dictionary<string, object> item, string appName, bool reset)
         {
             if (item.ContainsKey("durados_App_Stat"))
                 item.Remove("durados_App_Stat");
 
-            object stat = null;
-            if (!cache.ContainsKey(appName) || cache[appName].Time < DateTime.Now.Subtract(new TimeSpan(1, 0, 0)))
+            Map map = Maps.Instance.GetMap(appName);
+
+            if (map == null || map is DuradosMap)
             {
-                if (cache.ContainsKey(appName))
-                    cache.Remove(appName);
-                try
-                {
-                    cache.Add(appName, new StatAndTime() { Time = DateTime.Now, Stat = GetStat(appName) });
-                }
-                catch { }
+                return;
             }
-            stat = cache[appName].Stat;
+
+            object stat = null;
+            if (reset || map.Stat == null || map.Stat.Time < DateTime.Now.Subtract(new TimeSpan(1, 0, 0)))
+            {
+                map.Stat = new StatAndTime() { Time = DateTime.Now, Stat = GetStat(appName) };
+            }
+            stat = map.Stat.Stat;
             item.Add("stat", stat);
         }
 
-        class StatAndTime
+        public class StatAndTime
         {
             public DateTime Time;
             public object Stat;
         }
-        private static Dictionary<string, StatAndTime> cache = new Dictionary<string, StatAndTime>();
+        //private static Dictionary<string, StatAndTime> cache = new Dictionary<string, StatAndTime>();
+        //private static MemoryCache cache = new MemoryCache("AppStat",);
 
 
         private object GetStat(string appName)
@@ -2918,8 +2951,107 @@ namespace Durados.Web.Mvc.UI.Helpers
             }
 
             int? size = GetSize(appName, GetConnectionString(appName));
+            
+            Dictionary<string, object> totalRows = GetTotalRows(appName);
 
-            return new Dictionary<string, object>() { { "last24hours", last24 }, { "diffLastDaytoYesterday", diff24 }, { "last30days", last30 }, { "diffLast30DaysToPrev", diff30 }, { "sizeInMb", size } };
+            Dictionary<string, object> authorizationSecurity = GetAuthorizationSecurity(appName);
+            Dictionary<string, object> dataSecurity = GetDataSecurity(appName);
+
+            return new Dictionary<string, object>() { { "last24hours", last24 }, { "diffLastDaytoYesterday", diff24 }, { "last30days", last30 }, { "diffLast30DaysToPrev", diff30 }, { "sizeInMb", size }, { "totalRows", totalRows }, { "authorizationSecurity", authorizationSecurity }, { "dataSecurity", dataSecurity } };
+        }
+
+        private Dictionary<string, object> GetDataSecurity(string appName)
+        {
+            Map map = Maps.Instance.GetMap(appName);
+            if (map == null)
+                return null;
+
+            Dictionary<string, object> dataSecurity = new Dictionary<string, object>();
+
+            foreach (View view in map.Database.Views.Values.Where(v => !v.SystemView && !v.IsCloned).OrderBy(v => v.JsonName))
+            {
+                dataSecurity.Add(view.JsonName, !string.IsNullOrEmpty(view.PermanentFilter));
+            }
+                    
+            return dataSecurity;
+        }
+
+        private Dictionary<string, object> GetAuthorizationSecurity(string appName)
+        {
+            Map map = Maps.Instance.GetMap(appName);
+            if (map == null)
+                return null;
+
+            Dictionary<string, object> dataSecurity = new Dictionary<string, object>();
+
+            foreach (View view in map.Database.Views.Values.Where(v => !v.SystemView && !v.IsCloned).OrderBy(v => v.JsonName))
+            {
+                dataSecurity.Add(view.JsonName, view.Precedent);
+            }
+
+            return dataSecurity;
+        }
+
+        private Dictionary<string, object> GetTotalRows(string appName)
+        {
+            string connectionString = GetConnectionString(appName);
+
+            SqlProduct? sqlProduct = GetSqlProduct(appName);
+
+            if (!sqlProduct.HasValue || string.IsNullOrEmpty(connectionString))
+                return null;
+
+            if (sqlProduct != SqlProduct.MySql)
+                return null;
+
+            SqlAccess sqlAccess = GetSqlAccess(sqlProduct.Value);
+            string sql = GetTotalRowsSql(sqlProduct.Value);
+
+            try
+            {
+                DataTable table = sqlAccess.ExecuteTable(connectionString, sql, null, CommandType.Text);
+
+                Dictionary<string, object> totals = new Dictionary<string, object>();
+
+                foreach (DataRow row in table.Rows)
+                {
+                    string tableName = row["TableName"].ToString();
+                    object total = row["TotalRows"];
+                    if (!totals.ContainsKey(tableName))
+                    {
+                        try
+                        {
+                            totals.Add(tableName, total);
+                        }
+                        catch { }
+                    }
+                }
+
+                return totals;
+            }
+            catch { }
+            return null;
+        }
+
+        private string GetTotalRowsSql(SqlProduct sqlProduct)
+        {
+            string sql = null;
+
+            switch (sqlProduct)
+            {
+                case SqlProduct.MySql:
+                    sql = "SELECT table_name as TableName, table_rows as TotalRows  FROM information_schema.tables where table_schema = DATABASE() order by table_name ";
+                    break;
+                case SqlProduct.Postgre:
+                    break;
+                case SqlProduct.Oracle:
+                    break;
+
+                default:
+                    break;
+            }
+
+            return sql;
         }
 
         private int? GetSize(string appName, string connectionString)
@@ -3154,6 +3286,7 @@ namespace Durados.Web.Mvc.UI.Helpers
             Dictionary<string, object> result = AddNewViews(map, out errorMessage);
             result.Add("errors", errorMessage);
             SyncAll(map);
+
             result = RemoveDropedViews(map, result, out errorMessage);
             result["errors"] += errorMessage;
             return result;
@@ -3212,11 +3345,6 @@ namespace Durados.Web.Mvc.UI.Helpers
                         string viewName = view.Name;
                         string configViewPk = configAccess.GetViewPK(viewName, map.GetConfigDatabase().ConnectionString);
                         map.Sync(viewName, configViewPk);
-                        try
-                        {
-                            map.Logger.WriteToEventLog("The view " + viewName + " was synced by " + map.Database.GetCurrentUsername(), System.Diagnostics.EventLogEntryType.Error, 2030);
-                        }
-                        catch { }
                     }
                     Initiate(map);
                 }
@@ -3252,7 +3380,8 @@ namespace Durados.Web.Mvc.UI.Helpers
             if (withSystemTokens)
             {
                 DataView dataView = GetDataViewForDictionary(null, DictionaryType.PlaceHolders);
-                dictionary.Add("systemTokens", GetDictionary(dataView));
+                if (dataView != null)
+                    dictionary.Add("systemTokens", GetDictionary(dataView));
             }
 
             if (view != null)
@@ -3321,9 +3450,13 @@ namespace Durados.Web.Mvc.UI.Helpers
 
             foreach (System.Data.DataRowView row in dataView)
             {
-                string label = row.Row["Tag"].ToString();
-                string token = row.Row["Token"].ToString();
-                if (!IsExcluded(view, label))
+                string label = null;
+                if (!row.Row.IsNull("Tag"))
+                    label = row.Row["Tag"].ToString();
+                string token = null;
+                if (!row.Row.IsNull("Token"))
+                    token = row.Row["Token"].ToString();
+                if (!IsExcluded(view, label) && label != null && token != null)
                 {
                     dictionary.Add(new Dictionary<string, object>() { { "label", label }, { "token", token } });
                 }
@@ -7313,7 +7446,7 @@ namespace Durados.Web.Mvc.UI.Helpers
         public static void Clear(string appName)
         {
             Maps.Instance.DuradosMap.AllKindOfCache[key].Clear();
-            FarmCachingSingeltone.Instance.ClearMachinesCache(appName, true);
+            FarmCachingSingeltone.Instance.ClearMachinesCache(appName);
         }
     }
 
@@ -7555,7 +7688,7 @@ namespace Durados.Web.Mvc.UI.Helpers
 
     public class AppsPool
     {
-        public bool Pop(string appName, string title, string username, out int? appId, string template)
+        public bool? Pop(string appName, string title, string username, out int? appId, string template)
         {
             int creator = GetCreator(username);
             return Pop(appName, title, username, creator, out appId, template);
@@ -7566,7 +7699,7 @@ namespace Durados.Web.Mvc.UI.Helpers
             return Maps.Instance.DuradosMap.Database.GetUserID(username);
         }
 
-        public bool Pop(string appName, string title, string username, int creator, out int? appId, string template)
+        public bool? Pop(string appName, string title, string username, int creator, out int? appId, string template)
         {
             Map mainMap = null;
             appId = null;
@@ -7576,7 +7709,7 @@ namespace Durados.Web.Mvc.UI.Helpers
             }
             if (!ShouldBeUsed())
                 return false;
-            
+
             try
             {
                 mainMap = Maps.Instance.DuradosMap;
@@ -7593,30 +7726,72 @@ namespace Durados.Web.Mvc.UI.Helpers
                     mainMap.Logger.Log("AppsPool", "Pop", "", string.Format("Could not find app in pool for user id {0} where pool creator is {1}", creator, poolCreator), "", 2, string.Empty, DateTime.Now);
                     return false;
                 }
-                ReplaceUsernameInSysDb(mainMap, appName, username);
 
-                mainMap.Logger.Log("AppsPool", "Pop", "", string.Format("success for creator id = {0}, pool creator = {1}, app id = {2} ", creator, poolCreator, appId), "", 3, string.Empty, DateTime.Now);
-                
+                RestHelper.Refresh(appName);
+                        
+                System.Data.DataRow userMainRow = mainMap.Database.GetUserRow(username);
+                string firstName = userMainRow["FirstName"].ToString();
+                string lastName = userMainRow["LastName"].ToString();
+
+                ReplaceUsernameInSysDb(mainMap, appName, username, firstName, lastName);
+                ReplaceUsernameInUsers(mainMap, appName, username, firstName, lastName);
+
+                mainMap.Logger.Log("AppsPool", "Pop", "", string.Format("success for creator id = {0}, pool creator = {1}, app id = {2}, appName = {3} ", creator, poolCreator, appId, appName), "", 3, string.Empty, DateTime.Now);
+
                 return true;
             }
             catch (Exception exception)
             {
-                mainMap.Logger.Log("AppsPool", "Pop", "", exception, 1, string.Empty);
+                if (appId.HasValue)
+                {
+                    try
+                    {
+                        DeleteBadApp(appId.Value, mainMap.connectionString);
+                        RestHelper.Refresh(appName);
+                        return null;
+                    }
+                    catch (Exception exception2)
+                    {
+                        mainMap.Logger.Log("AppsPool", "Pop", "fail to delete app id: " + appId, exception2, 1, string.Empty);
+                    }
+                }
+                mainMap.Logger.Log("AppsPool", "Pop", "app id: " + appId, exception, 1, string.Empty);
                 return false;
             }
         }
 
-        private void ReplaceUsernameInSysDb(Map mainMap, string appName, string username)
+        private void DeleteBadApp(int appId, string connectionString)
+        {
+
+            string sql =
+                "delete from durados_App where [id] = @id ";
+            new SqlAccess().ExecuteNonQuery(connectionString, sql, new Dictionary<string, object>() { { "id", appId } }, null);
+
+        }
+
+        private void ReplaceUsernameInUsers(Map mainMap, string appName, string username, string firstName, string lastName)
         {
             Map map = Maps.Instance.GetMap(appName);
-            System.Data.DataRow userMainRow = mainMap.Database.GetUserRow(username);
-            string firstName = userMainRow["FirstName"].ToString();
-            string lastName = userMainRow["LastName"].ToString();
+            View userView = (View)map.Database.GetView("users");
+            if (userView == null)
+                throw new Durados.DuradosException("users does not exist");
+            int rowCount = 0;
+            DataView dataView = userView.FillPage(1, 2, null, null, null, out rowCount, null, null);
+            if (dataView.Count != 1)
+                throw new Durados.DuradosException("users should contain one row for " + appName);
+            System.Data.DataRow currentUserRow = dataView[0].Row;
+            string pk = userView.GetPkValue(currentUserRow);
+            userView.Edit(new Dictionary<string, object>() { { "email", username }, { "firstName", firstName }, { "lastName", lastName } }, pk, null, null, null, null);
+        }
+
+        private void ReplaceUsernameInSysDb(Map mainMap, string appName, string username, string firstName, string lastName)
+        {
+            Map map = Maps.Instance.GetMap(appName);
             View userView = (View)map.Database.GetUserView();
             int rowCount = 0;
             DataView dataView = userView.FillPage(1, 2, null, null, null, out rowCount, null, null);
             if (dataView.Count != 1)
-                throw new Durados.DuradosException("system user should contain one row");
+                throw new Durados.DuradosException("system user should contain one row for " + appName);
             System.Data.DataRow currentUserRow = dataView[0].Row;
             string pk = userView.GetPkValue(currentUserRow);
             userView.Edit(new Dictionary<string, object>() { { "Username", username }, { "Email", username }, { "FirstName", firstName }, { "LastName", lastName } }, pk, null, null, null, null);
@@ -7642,7 +7817,7 @@ namespace Durados.Web.Mvc.UI.Helpers
             string sql =
                 "begin tran getFromPool " +
                 "declare @appId int " +
-                "select top(1) @appId = id from durados_App where creator = @poolCreator and DatabaseStatus = 1 order by id asc; " +
+                "select top(1) @appId = id from durados_App with(UPDLOCK) where creator = @poolCreator and DatabaseStatus = 1 order by id asc; " +
                 "delete from durados_App where [Name] = @Name; " +
                 "update durados_App " +
                 "set creator = @creator, " +

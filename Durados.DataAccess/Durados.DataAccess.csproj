@@ -106,6 +106,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AppLockerGetter.cs" />
     <Compile Include="AutoGeneration\Content.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -139,6 +140,7 @@
     <Compile Include="AutoGeneration\Link.cs" />
     <Compile Include="ConfigAccess.cs" />
     <Compile Include="FKPath.cs" />
+    <Compile Include="ILockGetter.cs" />
     <Compile Include="MailingServices\GroBootPushAppNotification.cs" />
     <Compile Include="OracleAccess.cs" />
     <Compile Include="PostgreAccess.cs" />

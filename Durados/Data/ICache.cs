@@ -19,6 +19,8 @@ namespace Durados.Data
         T this[string key] { get; set; }
 
         IEnumerable<T> Values { get; }
+
+        Dictionary<string, T> ToDictionary();
     }
 
 }

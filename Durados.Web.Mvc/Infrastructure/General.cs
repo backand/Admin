@@ -145,6 +145,29 @@ namespace Durados.Web.Mvc.Infrastructure
             return fileNames.ToArray();
         }
 
+        public static Dictionary<string, MemoryStream> UnZip(MemoryStream memStream)
+        {
+            
+            Dictionary<string, MemoryStream> configFiles = new Dictionary<string, MemoryStream>();
+
+            using (ZipArchive archive = new ZipArchive(memStream))
+            {
+                foreach (ZipArchiveEntry entry in archive.Entries)
+                {
+
+                    var ms = new MemoryStream();
+
+                    entry.Open().CopyTo(ms);
+                    ms.Seek(0, SeekOrigin.Begin);
+                    configFiles.Add(entry.FullName, ms);
+
+                }
+            }
+
+            return configFiles;
+        }
+
+
         public static string Zip(string[] filenames)
         {
             return Zip(filenames, null);
@@ -189,6 +212,35 @@ namespace Durados.Web.Mvc.Infrastructure
             return zipFilename;
         }
 
+        public static Stream Zip(Dictionary<string, Stream> memStreams)
+        {
+            MemoryStream zipStream = new MemoryStream();
+            using (ZipArchive zip = new ZipArchive(zipStream, ZipArchiveMode.Create, true))
+            {
+                foreach (var memStream in memStreams)
+                {
+
+                    var entry = zip.CreateEntry(memStream.Key);
+
+                    using (StreamWriter sw = new StreamWriter(entry.Open()))
+                    {
+                        memStream.Value.Seek(0, SeekOrigin.Begin);
+                        if (memStream.Value is MemoryStream)
+                        {
+                            char[] buffer = System.Text.Encoding.UTF8.GetString((memStream.Value as MemoryStream).ToArray()).ToCharArray();
+                            sw.Write(buffer, 0, buffer.Length);
+                        }
+                        else
+                            throw new DuradosException("Fail  zipping configuration streams - stream is not memory stream");
+
+                    }
+
+                }
+            }
+
+            return zipStream;
+
+        }
         //public static string Zip(string filename)
         //{
         //    return Zip(filename, null);

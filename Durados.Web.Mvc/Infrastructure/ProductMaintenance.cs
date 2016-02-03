@@ -221,11 +221,16 @@ namespace Durados.Web.Mvc.Infrastructure
     {
 
 
-        //public App(int appId)
-        //{
-        //    DataTable dt = GetAppDataRowById(appId);
-        //    this.Load(dt.Rows[0]);
-        //}
+        public App GetAppById(string appId)
+        {
+            int id;
+            if(int.TryParse(appId,out id))
+            {
+                return GetAppById(id);
+            }
+            return null;
+        }
+
 
         public App GetAppById(int appId)
         {
@@ -295,17 +300,18 @@ namespace Durados.Web.Mvc.Infrastructure
                 RETURNS int
                 AS
                 BEGIN
-	                Declare @hostedServer varchar(250)
-	                -- Declare the return variable here
+	                 -- Declare the return variable here
 	                DECLARE @ResultVar int
-					SELECT @hostedServer=ServerName FROM durados_ExternaInstance WITH(NOLOCK) INNER JOIN durados_SqlConnection WITH(NOLOCK) on durados_SqlConnection.Id = durados_ExternaInstance.SqlConnectionId
-					--1:console  --2:free   --3:nw     --4:wix --5:system
+					 --1	console   --2	free
 	                -- Add the T-SQL statements to compute the return value here
-	                select @ResultVar = CASE WHEN ServerName = @hostedServer  THEN 2 ELSE 
-	                CASE WHEN ServerName  <> @hostedServer THEN 1
-	                ELSE 5 END END
+	                select @ResultVar = CASE 
+						WHEN ServerName IN(SELECT ServerName 
+						FROM durados_ExternaInstance WITH(NOLOCK) 
+						INNER JOIN durados_SqlConnection WITH(NOLOCK) ON durados_SqlConnection.Id = durados_ExternaInstance.SqlConnectionId)
+						  THEN 2  
+	                ELSE 1 END 
 	                FROM dbo.durados_SqlConnection c with (NOLOCK) 
-	                WHERE id=@id
+	                where id=@id
 
 	                -- Return the result of the function
 	                RETURN @ResultVar

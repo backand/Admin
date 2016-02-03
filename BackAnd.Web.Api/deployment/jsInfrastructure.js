@@ -1,5 +1,5 @@
 var Backand = importNamespace('Backand');
-var console = new Backand.console(); var socket = new Backand.socket();
+var console = new Backand.console(); var socket = new Backand.socket(); var files = new Backand.files(); var request = new Backand.request();
 
 (function (root, factory) {
     if (typeof define === 'function' && define.amd) {

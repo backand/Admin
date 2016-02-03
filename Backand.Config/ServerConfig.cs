@@ -17,6 +17,9 @@ namespace Backand.Config
         public string pwd { get; set; }
         public string ins1url { get; set; }
         public string ins2url { get; set; }
+        public string connectionString { get; set; }
+
+        
     }
 
 }

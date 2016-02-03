@@ -1927,8 +1927,9 @@ namespace Durados.DataAccess.AutoGeneration.Dynamic
                 {
                     fieldRow.MaxLength = column.MaxLength;
                     fieldRow.DefaultValue = column.DefaultValue == null ? null : column.DefaultValue.ToString();
-                    fieldRow.Required = !column.AllowDBNull;
+                    fieldRow.Required = !column.AllowDBNull && !column.AutoIncrement;
                     fieldRow.Unique = column.Unique;
+                    fieldRow.AutoIncrement = column.AutoIncrement;
                     fieldRow.DbType = column.DataType.FullName;
                     fieldRow.PK = IsColumnPartOfPK(column);
                 }
@@ -2110,7 +2111,7 @@ namespace Durados.DataAccess.AutoGeneration.Dynamic
             Type dbType = System.Type.GetType(fieldRow.DbType);
             bool isParent = fieldRow.RelationRow != null;
             int maxLength = fieldRow.IsMaxLengthNull() ? -1 : fieldRow.MaxLength;
-            bool required = fieldRow.IsRequiredNull() ? false : fieldRow.Required;
+            bool required = fieldRow.IsRequiredNull() ? false : fieldRow.Required && !fieldRow.AutoIncrement;
             bool unique = fieldRow.IsUniqueNull() ? false : fieldRow.Unique;
             string defaultValue = fieldRow.IsDefaultValueNull() ? null : fieldRow.DefaultValue;
 
