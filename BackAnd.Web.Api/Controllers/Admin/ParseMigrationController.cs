@@ -51,7 +51,8 @@ namespace BackAnd.Web.Api.Controllers.Admin
             }
             catch (Exception exception)
             {
-                throw new BackAndApiUnexpectedResponseException(exception, this);
+                //throw new BackAndApiUnexpectedResponseException(exception, this);
+                return ResponseMessage(Request.CreateResponse(HttpStatusCode.InternalServerError, "appName:" + GetCurrentAppName() + ", baseUrl: " + GetCurrentBaseUrl() + "; error" + exception.Message + "; trace: " + exception.StackTrace));
             }
         }
 
@@ -119,7 +120,8 @@ namespace BackAnd.Web.Api.Controllers.Admin
             }
             catch (Exception exception)
             {
-                throw new BackAndApiUnexpectedResponseException(exception, this);
+                //throw new BackAndApiUnexpectedResponseException(exception, this);
+                return ResponseMessage(Request.CreateResponse(HttpStatusCode.InternalServerError, "appName:" + GetCurrentAppName() + ", baseUrl: " + GetCurrentBaseUrl() + "; error" + exception.Message + "; trace: " + exception.StackTrace));
             }
         }
 
