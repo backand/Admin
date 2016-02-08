@@ -2191,6 +2191,13 @@ namespace BackAnd.Web.Api.Controllers
         public static readonly string GetFilterError = "Failed to translate filter";
         public static readonly string StringifySort = "Please JSON.stringify the sort parameter";
         public static readonly string InvalidSchema = "Invalid schema";
+
+        public static readonly string MoreThanOneParseConversions = "{0} has more than one parse conversions.";
+        public static readonly string MigrationAlreadyStartedWithoutGettingItsStatus = "{0} has already created a migration request.";
+        public static readonly string MigrationAlreadyStartedWithStatusIdle = "{0} has already created a migration request and it is now waiting to start.";
+        public static readonly string MigrationAlreadyStartedWithStatusStarted = "{0} has already started its migration.";
+        public static readonly string MigrationAlreadyStartedWithStatusFinished = "{0} has already finished its migration. If you want to migrate again please create a new app.";
+        
         
     }
 }

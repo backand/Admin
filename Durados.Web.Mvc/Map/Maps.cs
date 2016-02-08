@@ -378,6 +378,24 @@ namespace Durados.Web.Mvc
                 throw new DuradosException("Missing S3FilesBucket key in web config");
             }
 
+            ParseConverterMasterKey = System.Configuration.ConfigurationManager.AppSettings["ParseConverterMasterKey"];
+            if (string.IsNullOrEmpty(ParseConverterMasterKey))
+            {
+                throw new DuradosException("Missing ParseConverterMasterKey key in web config");
+            }
+
+            ParseConverterAdminKey = System.Configuration.ConfigurationManager.AppSettings["ParseConverterAdminKey"];
+            if (string.IsNullOrEmpty(ParseConverterAdminKey))
+            {
+                throw new DuradosException("Missing ParseConverterAdminKey key in web config");
+            }
+
+            ParseConverterObjectName = System.Configuration.ConfigurationManager.AppSettings["ParseConverterObjectName"];
+            if (string.IsNullOrEmpty(ParseConverterObjectName))
+            {
+                throw new DuradosException("Missing ParseConverterObjectName key in web config");
+            }
+
             SendWelcomeEmail = System.Configuration.ConfigurationManager.AppSettings["SendWelcomeEmail"] ?? "true";
 
 
@@ -450,8 +468,11 @@ namespace Durados.Web.Mvc
         public static string S3FilesBucket { get; private set; }
         public static string SendWelcomeEmail { get; private set; }
 
-
-
+        public static string ParseConverterMasterKey { get; private set; }
+        public static string ParseConverterAdminKey { get; private set; }
+        public static string ParseConverterObjectName { get; private set; }
+        
+        
         public static TimeSpan AzureCacheUpdateInterval { get; private set; }
 
         public static string ConfigPath { get; private set; }
