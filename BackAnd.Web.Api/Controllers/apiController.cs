@@ -2197,6 +2197,10 @@ namespace BackAnd.Web.Api.Controllers
         public static readonly string MigrationAlreadyStartedWithStatusIdle = "{0} has already created a migration request and it is now waiting to start.";
         public static readonly string MigrationAlreadyStartedWithStatusStarted = "{0} has already started its migration.";
         public static readonly string MigrationAlreadyStartedWithStatusFinished = "{0} has already finished its migration. If you want to migrate again please create a new app.";
+        public static readonly string NotSignInToApp = "Please sign in to an app";
+
+        
+        
         
         
     }

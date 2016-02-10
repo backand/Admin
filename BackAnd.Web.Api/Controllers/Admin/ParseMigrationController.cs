@@ -34,6 +34,10 @@ namespace BackAnd.Web.Api.Controllers.Admin
             {
                 ArrayList list = GetParseConverterStatus();
 
+                if (Map.IsMainMap)
+                {
+                    return ResponseMessage(Request.CreateResponse(HttpStatusCode.Forbidden, Messages.NotSignInToApp));
+                }
                 if (list == null)
                 {
                     return Ok(new Dictionary<string, object> { { Status, null } });
@@ -93,6 +97,11 @@ namespace BackAnd.Web.Api.Controllers.Admin
            
             try
             {
+                if (Map.IsMainMap)
+                {
+                    return ResponseMessage(Request.CreateResponse(HttpStatusCode.Forbidden, Messages.NotSignInToApp));
+                }
+                
                 var invalidStatusResponse = GetInvalidStatusResponse();
                 if (invalidStatusResponse != null)
                     return invalidStatusResponse;
