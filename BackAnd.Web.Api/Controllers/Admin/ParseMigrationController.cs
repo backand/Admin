@@ -189,7 +189,17 @@ namespace BackAnd.Web.Api.Controllers.Admin
 
         private object GetAppToken(Dictionary<string, object> parseConversionData)
         {
-            return System.Web.HttpContext.Current.Request.Headers[Authorization];
+            return GetCurrentAppMasterToken() + ":" + GetCurrentUserToken();
+        }
+
+        private string GetCurrentUserToken()
+        {
+            return Map.Database.GetUserGuid();
+        }
+
+        private string GetCurrentAppMasterToken()
+        {
+            return Map.Guid.ToString();
         }
 
         private object GetParseUrl(Dictionary<string, object> parseConversionData)
