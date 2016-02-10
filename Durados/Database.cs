@@ -1159,6 +1159,10 @@ namespace Durados
 
         [Durados.Config.Attributes.ColumnProperty(Description = "Groboot Push Notification Access Key")]
         public string GrobootNotificationAccessKey { get; set; }
+
+        [Durados.Config.Attributes.ColumnProperty(Description = "Primary Key type")]
+        public string PkType { get; set; }
+
         public FilterParameterOption[] FilterParameterOptions { get; private set; }
         public virtual string GetUserID()
         {

@@ -482,6 +482,8 @@ namespace BackAnd.Web.Api.Controllers
                 data["oldSchema"] = GetBackandToObject();
             }
 
+            HandlePkType(data);
+
             json = jss.Serialize(data);
 
             var tasks = new List<Task<string>>();
@@ -512,6 +514,14 @@ namespace BackAnd.Web.Api.Controllers
 
 
 
+        }
+
+        private void HandlePkType(Dictionary<string, object> data)
+        {
+            if (Map.Database.PkType != null && Map.Database.PkType == "char(36)")
+            {
+                data.Add("isSpecialPrimary", true);
+            }
         }
 
         protected void LogModel(string input, string output, string valid, string action = "model")

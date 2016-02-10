@@ -11,6 +11,8 @@ using System.Net.Http;
 using System.Web.Http;
 using System.Web.Script.Serialization;
 
+using Durados.DataAccess;
+
 namespace BackAnd.Web.Api.Controllers.Admin
 {
     [RoutePrefix("1")]
@@ -125,6 +127,8 @@ namespace BackAnd.Web.Api.Controllers.Admin
                     
                 }
 
+                UpdatePkType();
+
                 return Ok();
             }
             catch (Exception exception)
@@ -132,6 +136,13 @@ namespace BackAnd.Web.Api.Controllers.Admin
                 //throw new BackAndApiUnexpectedResponseException(exception, this);
                 return ResponseMessage(Request.CreateResponse(HttpStatusCode.InternalServerError, "appName:" + GetCurrentAppName() + ", baseUrl: " + GetCurrentBaseUrl() + "; error" + exception.Message + "; trace: " + exception.StackTrace));
             }
+        }
+
+        private void UpdatePkType()
+        {
+            View view = (View)Map.GetConfigDatabase().Views["Database"];
+            view.Edit(new Dictionary<string, object>() { {"PkType", "char(36)"}}, "0", view_BeforeEdit, view_BeforeEditInDatabase, view_AfterEditBeforeCommit, view_AfterEditAfterCommit);
+            RefreshConfigCache(Map);
         }
 
         private byte[] GetRequestBody()
