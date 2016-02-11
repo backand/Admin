@@ -37,6 +37,7 @@ namespace Durados.Web.Mvc.Logging
 
         string logStashServer = null;
         int logStashPort;
+        int logStashLogType;
         bool writeToLogStash = false;
 
         private WritingEvents events;
@@ -108,6 +109,8 @@ namespace Durados.Web.Mvc.Logging
             }
             else
                 writeToLogStash = false;
+
+            logStashLogType = Convert.ToInt32(System.Configuration.ConfigurationManager.AppSettings["LogStashLogType"] ?? "1");
 
             machineName = (System.Web.HttpContext.Current != null) ? System.Web.HttpContext.Current.Server.MachineName : System.Environment.MachineName;
             superDeveloper = Convert.ToString(System.Configuration.ConfigurationManager.AppSettings["superDeveloper"] ?? "dev@devitout.com").ToLower();
@@ -421,7 +424,11 @@ namespace Durados.Web.Mvc.Logging
                 Initiate();
 
             Log log = new Log();
-            if (LogType < logType && logType != 500 && logType != 501)
+
+            bool writeLogTypeToSpecificAppLog = !(LogType < logType && logType != 500 && logType != 501);
+            bool writeLogTypeToGeneralLog = !(logStashLogType < logType && logType != 500 && logType != 501);
+
+            if (!writeLogTypeToGeneralLog && !writeLogTypeToSpecificAppLog)
                 return;
 
             //if (LogFailed)
@@ -466,7 +473,7 @@ namespace Durados.Web.Mvc.Logging
                 catch { }
                 try
                 {
-                    WriteLogAsync(controller, action, method, message, trace, logType, freeText, time, guid, log, applicationName, appName, username, clientIP, clientInfo);
+                    WriteLogAsync(controller, action, method, message, trace, logType, freeText, time, guid, log, applicationName, appName, username, clientIP, clientInfo, writeLogTypeToSpecificAppLog, writeLogTypeToGeneralLog);
                 }
                 catch (Exception logException)
                 {
@@ -493,15 +500,18 @@ namespace Durados.Web.Mvc.Logging
             }
         }
 
-        private void WriteLogAsync(string controller, string action, string method, string message, string trace, int logType, string freeText, DateTime time, Guid? guid, Log log, string applicationName, string appName, string username, string clientIP, string clientInfo)
+        private void WriteLogAsync(string controller, string action, string method, string message, string trace, int logType, string freeText, DateTime time, Guid? guid, Log log, string applicationName, string appName, string username, string clientIP, string clientInfo, bool writeLogTypeToSpecificAppLog, bool writeLogTypeToGeneralLog)
         {
-            Task.Factory.StartNew(() =>
+            if (writeLogTypeToSpecificAppLog)
             {
-                WriteToSpecificAppLog(controller, action, method, message, trace, logType, freeText, time, guid, log, applicationName, username);
-            });
+                Task.Factory.StartNew(() =>
+                {
+                    WriteToSpecificAppLog(controller, action, method, message, trace, logType, freeText, time, guid, log, applicationName, username);
+                });
+            }
 
 
-            if (writeToReport)
+            if (writeToReport && writeLogTypeToGeneralLog)
             {
                 Task.Factory.StartNew(() =>
                 {
@@ -509,7 +519,7 @@ namespace Durados.Web.Mvc.Logging
                 });
             }
 
-            if (writeToLogStash)
+            if (writeToLogStash && writeLogTypeToGeneralLog)
             {
                 Task.Factory.StartNew(() =>
                 {
