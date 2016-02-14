@@ -721,11 +721,18 @@ namespace Durados.DataAccess.AutoGeneration.Dynamic
                 {
                     if (relationDictionary[column.ColumnName] != null)
                     {
-                        foreach (DataRelation relation in relationDictionary[column.ColumnName].Values)
+                        try
                         {
-                            dataset.Relations.Remove(relation);
-                            if (column.Table.Constraints.Contains(relation.RelationName))
-                                column.Table.Constraints.Remove(relation.RelationName);
+                            foreach (DataRelation relation in relationDictionary[column.ColumnName].Values)
+                            {
+                                dataset.Relations.Remove(relation);
+                                if (column.Table.Constraints.Contains(relation.RelationName))
+                                    column.Table.Constraints.Remove(relation.RelationName);
+                            }
+                        }
+                        catch
+                        {
+                            
                         }
                     }
                 }
