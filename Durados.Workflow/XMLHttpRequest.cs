@@ -16,13 +16,12 @@ namespace Backand
 
         }
 
-        HttpWebRequest request = null;
+        WebRequest request = null;
 
         public int status { get; private set; }
         public string responseText { get; private set; }
         public void open(string type, string url, bool async)
         {
-       
             if (url.Contains("objects/action") && System.Web.HttpContext.Current.Request.RawUrl.Contains("$$debug$$") && !url.Contains("url.Contains"))
             {
                 if (url.Contains("&parameters="))
@@ -49,12 +48,7 @@ namespace Backand
                 }
                 url += "&" + Durados.Workflow.JavaScript.GuidKey + "=" + Durados.Workflow.JavaScript.GetCacheInCurrentRequest(Durados.Workflow.JavaScript.GuidKey);
             }
-            ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12 | SecurityProtocolType.Tls11 | SecurityProtocolType.Tls;
-            request = HttpWebRequest.CreateHttp(url);
-
-            //ServicePoint servicePoint = ServicePointManager.FindServicePoint(new Uri(url));
-
-            //request.ClientCertificates.Add(servicePoint.ClientCertificate);
+            request = WebRequest.Create(url);
             request.Method = type;
         }
 
@@ -160,7 +154,6 @@ namespace Backand
                     bytes = System.Text.Encoding.ASCII.GetBytes(data);
                 }
                 request.ContentLength = bytes.Length;
-                
                 
                 if (request.ContentType == null)
                 {
