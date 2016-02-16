@@ -425,10 +425,10 @@ namespace Durados.Web.Mvc.Logging
 
             Log log = new Log();
 
-            bool writeLogTypeToSpecificAppLog = !(LogType < logType && logType != 500 && logType != 501);
-            bool writeLogTypeToGeneralLog = !(logStashLogType < logType && logType != 500 && logType != 501);
-
-            if (!writeLogTypeToGeneralLog && !writeLogTypeToSpecificAppLog)
+            bool writeTolog = (logType == 500 || logType == 501);
+            bool writeLogTypeToSpecificAppLog = !(LogType < logType) || writeTolog;
+            bool writeLogTypeToGeneralLog = !(logStashLogType < logType) || writeTolog;
+            if (!writeLogTypeToGeneralLog && !writeLogTypeToSpecificAppLog )
                 return;
 
             //if (LogFailed)

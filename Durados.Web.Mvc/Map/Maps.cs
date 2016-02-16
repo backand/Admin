@@ -404,7 +404,8 @@ namespace Durados.Web.Mvc
             }
 
             SendWelcomeEmail = System.Configuration.ConfigurationManager.AppSettings["SendWelcomeEmail"] ?? "true";
-
+            
+            System.Net.ServicePointManager.SecurityProtocol = System.Net.SecurityProtocolType.Ssl3 | System.Net.SecurityProtocolType.Tls | System.Net.SecurityProtocolType.Tls11 | System.Net.SecurityProtocolType.Tls12;
 
         }
 
