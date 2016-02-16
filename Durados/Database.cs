@@ -52,6 +52,7 @@ namespace Durados
         public static readonly string CreateSchema = "CreateSchema";
         public static readonly string CustomValidationActionName = "backandAuthOverride";
         public static readonly string CustomTokenAttrKey = "CustomTokenAttr";
+        public static readonly string AutoGuidPkType = "char(36)";
         
         
         public virtual Guid Guid

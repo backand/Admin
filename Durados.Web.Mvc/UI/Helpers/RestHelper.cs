@@ -1379,7 +1379,7 @@ namespace Durados.Web.Mvc.UI.Helpers
                 {
                     Field realField = GetFieldFromFieldRow(view, dataRow);
                     if (realField.FieldType == FieldType.Column)
-                        if (((ColumnField)realField).DataColumn.AutoIncrement)
+                        if (((ColumnField)realField).DataColumn.AutoIncrement || ((ColumnField)realField).IsAutoGuid)
                             return true;
                 }
                 if (columnField.Name == "Required")

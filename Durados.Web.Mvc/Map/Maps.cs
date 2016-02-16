@@ -58,7 +58,14 @@ namespace Durados.Web.Mvc
             string containerName = Maps.DuradosAppPrefix.Replace("_", "").Replace(".", "").ToLower() + id.ToString();
             CloudBlobContainer container = GetContainer(containerName);
 
-            return (new Durados.Web.Mvc.Azure.BlobBackup()).GetVersions(container);
+            List<string> versions = (new Durados.Web.Mvc.Azure.BlobBackup()).GetVersions(container);
+            try
+            {
+                Map map = GetMap(name);
+                versions.Add(map.Database.ConfigVersion);
+            }
+            catch { }
+            return versions.ToArray();
         }
 
         public void Restore(string name, string version = null)

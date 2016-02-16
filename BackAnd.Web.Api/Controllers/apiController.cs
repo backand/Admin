@@ -518,7 +518,7 @@ namespace BackAnd.Web.Api.Controllers
 
         private void HandlePkType(Dictionary<string, object> data)
         {
-            if (Map.Database.PkType != null && Map.Database.PkType == "char(36)")
+            if (Map.Database.PkType != null && Map.Database.PkType == Durados.Database.AutoGuidPkType)
             {
                 data.Add("isSpecialPrimary", true);
             }

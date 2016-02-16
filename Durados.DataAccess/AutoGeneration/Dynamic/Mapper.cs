@@ -1632,7 +1632,7 @@ namespace Durados.DataAccess.AutoGeneration.Dynamic
 
                 bool notInEditable = column.ExtendedProperties.ContainsKey("NotInEditable");
 
-                if (column.AutoIncrement || column.ExtendedProperties.ContainsKey("Calculated") || column.DataType.Equals(typeof(byte[])) || notInEditable)
+                if (column.AutoIncrement || column.ExtendedProperties.ContainsKey("Calculated") || column.DataType.Equals(typeof(byte[])) || notInEditable || (column.Table.PrimaryKey.Length > 0 && column.MaxLength == 36 && column == column.Table.PrimaryKey[0]))
                 {
                     values.Add("HideInCreate", true);
                     values.Add("ExcludeInInsert", true);

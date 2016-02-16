@@ -469,7 +469,7 @@ namespace BackAnd.Web.Api.Controllers
 
         string ShortenForeignKey(string longForeignKey)
         {
-            return "b" + Guid.NewGuid().ToString().Replace("-", "") + _bkname_ + longForeignKey.Split(new string[] { _bkname_ }, StringSplitOptions.None).LastOrDefault();
+            return "b" + Guid.NewGuid().ToString().Split('-').First() + _bkname_ + longForeignKey.Split(new string[] { _bkname_ }, StringSplitOptions.None).LastOrDefault();
         }
 
 

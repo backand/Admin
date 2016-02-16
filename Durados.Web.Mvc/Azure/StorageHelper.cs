@@ -226,7 +226,7 @@ namespace Durados.Web.Mvc.Azure
             return verBlobs;
         }
 
-        public string[] GetVersions(CloudBlobContainer cloudBlobContainer)
+        public List<string> GetVersions(CloudBlobContainer cloudBlobContainer)
         {
             IEnumerable<IListBlobItem> blobItems = cloudBlobContainer.ListBlobs();
             SortedDictionary<long, CloudBlob> verBlobs = GetVerBlobs(cloudBlobContainer, blobItems);
@@ -239,7 +239,7 @@ namespace Durados.Web.Mvc.Azure
                 }
             }
 
-            return versions.ToArray();
+            return versions;
         }
 
         public class CopyAsyncState

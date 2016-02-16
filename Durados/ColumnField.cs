@@ -34,6 +34,14 @@ namespace Durados
                 ExcludeInUpdate = true;
             }
 
+            if (IsAutoGuid)
+            {
+                HideInCreate = true;
+                //HideInEdit = true;
+                ExcludeInInsert = true;
+                ExcludeInUpdate = true;
+            }
+
             Searchable = (ColumnFieldType == ColumnFieldType.String);
             Required = GetRequired();
             TrimSpaces = true;
@@ -43,6 +51,8 @@ namespace Durados
 
             SetValidationProperties();
         }
+
+        
 
         public virtual Dictionary<string, string> GetSelectOptions()
         {
@@ -70,7 +80,17 @@ namespace Durados
 
         protected bool GetRequired()
         {
-            return !DataColumn.AllowDBNull && !DataColumn.AutoIncrement; 
+            return !DataColumn.AllowDBNull && !DataColumn.AutoIncrement && !IsAutoGuid; 
+        }
+
+        public bool IsAutoGuid
+        {
+            get
+            {
+                if (DataColumn.Table.PrimaryKey.Length  == 0)
+                    return false;
+                return View.Database.PkType == Database.AutoGuidPkType && DataColumn == DataColumn.Table.PrimaryKey[0] && DataColumn.DataType == typeof(string) && DataColumn.MaxLength == 36;
+            }
         }
 
         public override bool GetDbRequired()

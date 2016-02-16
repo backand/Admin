@@ -141,7 +141,7 @@ namespace BackAnd.Web.Api.Controllers.Admin
         private void UpdatePkType()
         {
             View view = (View)Map.GetConfigDatabase().Views["Database"];
-            view.Edit(new Dictionary<string, object>() { {"PkType", "char(36)"}}, "0", view_BeforeEdit, view_BeforeEditInDatabase, view_AfterEditBeforeCommit, view_AfterEditAfterCommit);
+            view.Edit(new Dictionary<string, object>() { { "PkType", Durados.Database.AutoGuidPkType } }, "0", view_BeforeEdit, view_BeforeEditInDatabase, view_AfterEditBeforeCommit, view_AfterEditAfterCommit);
             RefreshConfigCache(Map);
         }
 
