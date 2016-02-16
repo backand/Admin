@@ -13,7 +13,7 @@ namespace Backand
 
         public XMLHttpRequest()
         {
-
+            ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls11 | SecurityProtocolType.Tls12 | SecurityProtocolType.Tls | SecurityProtocolType.Ssl3;
         }
 
         WebRequest request = null;
@@ -183,7 +183,7 @@ namespace Backand
 
             try
             {
-
+               
 
                 response = (HttpWebResponse)request.GetResponse();
 
