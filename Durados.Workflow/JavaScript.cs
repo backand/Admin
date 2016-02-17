@@ -221,13 +221,7 @@ namespace Durados.Workflow
             requests.Add(request.RequestUri.AbsoluteUri + request.Method + json);
             return false;
 
-            //string prevUrl = (GetCacheInCurrentRequest("request" + GetCacheInCurrentRequest(GuidKey)) ?? string.Empty).ToString();
-            //string prevJson = (GetCacheInCurrentRequest("json" + GetCacheInCurrentRequest(GuidKey)) ?? string.Empty).ToString();
-
-            //SetCacheInCurrentRequest("request" + GetCacheInCurrentRequest(GuidKey), request.RequestUri.AbsoluteUri);
-            //SetCacheInCurrentRequest("json" + GetCacheInCurrentRequest(GuidKey), json);
             
-            //return json.Equals(prevJson) && prevUrl.Equals(request.RequestUri.AbsoluteUri);
         }
 
         private static string GetActionName()
@@ -275,7 +269,6 @@ namespace Durados.Workflow
                       .Replace(Durados.Database.UsernamePlaceHolder, currentUsername, false).Replace(Durados.Database.SysUsernamePlaceHolder.AsToken(), currentUsername)
                       .Replace(Durados.Database.RolePlaceHolder, currentUserRole, false).Replace(Durados.Database.SysRolePlaceHolder.AsToken(), currentUserRole)
                       .ReplaceConfig(view);
-                //.ReplaceGlobals(view);
             }
             catch { }
 
@@ -284,10 +277,6 @@ namespace Durados.Workflow
             Dictionary<string, object> oldRow = new Dictionary<string, object>();
             Dictionary<string, object> userProfile = new Dictionary<string, object>();
 
-            //if (System.Web.HttpContext.Current.Request.Files.Count > 0){
-            //    clientParameters.Add("__bko_file", System.Web.HttpContext.Current.Request.Files[0].InputStream.)
-            //System.Web.HttpContext.Current.Request.Files[0].InputStream
-            //}
             bool debug = false;
             if (IsDebug())
             {
@@ -336,7 +325,16 @@ namespace Durados.Workflow
                 foreach (Field field in view.Fields.Values)
                 {
                     if (!oldRow.ContainsKey(field.JsonName))
-                        oldRow.Add(field.JsonName, field.GetValue(prevRow));
+                    {
+                        if (field.IsDate)
+                        {
+                            oldRow.Add(field.JsonName, prevRow[((ColumnField)field).DataColumn.ColumnName]);
+                        }
+                        else
+                        {
+                            oldRow.Add(field.JsonName, field.GetValue(prevRow));
+                        }
+                    }
                 }
             }
 
@@ -352,14 +350,34 @@ namespace Durados.Workflow
             
             var CONSTS = new Dictionary<string, object>() { { "apiUrl", System.Web.HttpContext.Current.Request.Url.Scheme + "://" + System.Web.HttpContext.Current.Request.Url.Host + ":" + System.Web.HttpContext.Current.Request.Url.Port + System.Web.HttpContext.Current.Request.ApplicationPath } };
 
-
+            //Newtonsoft.Json.JsonConvert.SerializeObject
+            
             var theJavaScriptSerializer = new System.Web.Script.Serialization.JavaScriptSerializer();
             var parser = new Jint.Native.Json.JsonParser(call);
-            var userInput = parser.Parse(new System.Web.Script.Serialization.JavaScriptSerializer().Serialize(newRow));
+            //var userInput = parser.Parse(theJavaScriptSerializer.Serialize(newRow));
+            //Object clientParametersToSend = null;
+            //if (!clientParameters.ContainsKey("filedata"))
+            //{
+            //    clientParametersToSend = parser.Parse(theJavaScriptSerializer.Serialize(clientParameters));
+            //}
+            //else
+            //{
+            //    System.Web.HttpContext.Current.Items["file_stream"] = clientParameters["filedata"];
+            //    clientParameters["filedata"] = "file_stream";
+            //    clientParametersToSend = clientParameters;
+            //}
+            //var dbRow = parser.Parse(theJavaScriptSerializer.Serialize(oldRow));
+            //var userProfile2 = parser.Parse(theJavaScriptSerializer.Serialize(userProfile));
+            //var CONSTS2 = parser.Parse(theJavaScriptSerializer.Serialize(CONSTS));
+            
+            
+            //var Config = view.Database.GetConfigDictionary();
+            //var Config2 = parser.Parse(theJavaScriptSerializer.Serialize(Config));
+            var userInput = parser.Parse(Newtonsoft.Json.JsonConvert.SerializeObject(newRow));
             Object clientParametersToSend = null;
             if (!clientParameters.ContainsKey("filedata"))
             {
-                clientParametersToSend = parser.Parse(theJavaScriptSerializer.Serialize(clientParameters));
+                clientParametersToSend = parser.Parse(Newtonsoft.Json.JsonConvert.SerializeObject(clientParameters));
             }
             else
             {
@@ -367,14 +385,13 @@ namespace Durados.Workflow
                 clientParameters["filedata"] = "file_stream";
                 clientParametersToSend = clientParameters;
             }
-            var dbRow = parser.Parse(new System.Web.Script.Serialization.JavaScriptSerializer().Serialize(oldRow));
-            var userProfile2 = parser.Parse(new System.Web.Script.Serialization.JavaScriptSerializer().Serialize(userProfile));
-            var CONSTS2 = parser.Parse(new System.Web.Script.Serialization.JavaScriptSerializer().Serialize(CONSTS));
+            var dbRow = parser.Parse(Newtonsoft.Json.JsonConvert.SerializeObject(oldRow));
+            var userProfile2 = parser.Parse(Newtonsoft.Json.JsonConvert.SerializeObject(userProfile));
+            var CONSTS2 = parser.Parse(Newtonsoft.Json.JsonConvert.SerializeObject(CONSTS));
 
-            //var Globals = view.Database.GetGlobalsDictionary();
-            //var Globals2 = parser.Parse(new System.Web.Script.Serialization.JavaScriptSerializer().Serialize(Globals));
+
             var Config = view.Database.GetConfigDictionary();
-            var Config2 = parser.Parse(new System.Web.Script.Serialization.JavaScriptSerializer().Serialize(Config));
+            var Config2 = parser.Parse(Newtonsoft.Json.JsonConvert.SerializeObject(Config));
 
             try
             {
@@ -385,7 +402,6 @@ namespace Durados.Workflow
                 .SetValue("userProfile", userProfile2)
                 .SetValue("CONSTS", CONSTS2)
                 .SetValue("Config", Config2)
-                //.SetValue("Globals", Globals2)
                 .Execute(GetXhrWrapper() + code + "; function call(){return backandCallback(userInput, dbRow, parameters, userProfile);}");
             }
             catch (Exception exception)
@@ -414,74 +430,45 @@ namespace Durados.Workflow
                     throw e;
             }
 
-            var v = call.GetValue("userInput").ToObject();
+            //var v = call.GetValue("userInput").ToObject();
 
-            if (v != null && v is System.Dynamic.ExpandoObject)
-            {
-                IDictionary<string, object> newValues = v as IDictionary<string, object>;
-                foreach (string key in newValues.Keys)
-                {
-                    if (values.ContainsKey(key))
-                    {
-                        object val = newValues[key];
-                        Field[] fields = view.GetFieldsByJsonName(key);
-                        if (fields[0].DataType == DataType.DateTime)
-                        {
-                            if (val != null && !(val is DateTime))
-                            {
-                                if (val.ToString().StartsWith("/Date("))
-                                {
-                                    try
-                                    {
-                                        long l = Convert.ToInt64(val.ToString().Replace("/Date(", "").Replace(")/", ""));
-                                        view.Database.Logger.Log("!date", "", "", null, -14, l.ToString());
-                                        val = new DateTime(1970, 1, 1).AddTicks(l * 10000); 
-                                    }
-                                    catch { }
-                                }
-                            }
-                        }
-                        values[key] = val;
-                    }
-                    else
-                    {
-                        Field[] fields = view.GetFieldsByJsonName(key);
-                        if (fields.Length > 0)
-                        {
-                            string fieldName = fields[0].Name;
-                            object val = newValues[key];
-                            if (fields[0].DataType == DataType.DateTime)
-                            {
-                                if (!(val is DateTime))
-                                {
-                                    if (val.ToString().StartsWith("/Date("))
-                                    {
-                                        try
-                                        {
-                                            long l = Convert.ToInt64(val.ToString().Replace("/Date(", "").Replace(")/", ""));
-                                            view.Database.Logger.Log("!date", "", "", null, -14, l.ToString());
-                                            val = new DateTime(1970, 1, 1).AddTicks(l * 10000);
-                                        }
-                                        catch { }
-                                    }
-                                }
-                            }
-                            if (values.ContainsKey(fieldName))
-                            {
-                                values[fieldName] = val;
-                            }
-                            else
-                            {
-                                values.Add(fieldName, val);
-                            }
-                        }
-                        else
-                        {
-                            values.Add(key, newValues[key]);
-                        }
-                    }
-                }
-            }
+            //if (v != null && v is System.Dynamic.ExpandoObject)
+            //{
+            //    IDictionary<string, object> newValues = v as IDictionary<string, object>;
+            //    foreach (string key in newValues.Keys)
+            //    {
+            //        if (values.ContainsKey(key))
+            //        {
+            //            object val = newValues[key];
+            //            Field[] fields = view.GetFieldsByJsonName(key);
+            //            val = DateConversion(view, val, fields);
+            //            values[key] = val;
+            //        }
+            //        else
+            //        {
+            //            Field[] fields = view.GetFieldsByJsonName(key);
+            //            if (fields.Length > 0)
+            //            {
+            //                string fieldName = fields[0].Name;
+            //                object val = newValues[key];
+            //                val = DateConversion(view, val, fields);
+            //                if (values.ContainsKey(fieldName))
+            //                {
+            //                    values[fieldName] = val;
+            //                }
+            //                else
+            //                {
+            //                    values.Add(fieldName, val);
+            //                }
+            //            }
+            //            else
+            //            {
+            //                values.Add(key, newValues[key]);
+            //            }
+            //        }
+            //    }
+            //}
+
             if (r != null && values != null)
             {
                 if (!values.ContainsKey(ReturnedValueKey))
@@ -489,6 +476,27 @@ namespace Durados.Workflow
                 else
                     values[ReturnedValueKey] = r;
             }
+        }
+
+        private static object DateConversion(View view, object val, Field[] fields)
+        {
+            if (fields[0].DataType == DataType.DateTime)
+            {
+                if (val != null && !(val is DateTime))
+                {
+                    if (val.ToString().StartsWith("/Date("))
+                    {
+                        try
+                        {
+                            long l = Convert.ToInt64(val.ToString().Replace("/Date(", "").Replace(")/", ""));
+                            view.Database.Logger.Log("!date", "", "", null, -14, l.ToString());
+                            val = new DateTime(1970, 1, 1).AddTicks(l * 10000);
+                        }
+                        catch { }
+                    }
+                }
+            }
+            return val;
         }
 
         public static Dictionary<string, object> GetHeaders(System.Collections.Specialized.NameValueCollection headers)
