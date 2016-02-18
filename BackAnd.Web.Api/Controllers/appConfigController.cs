@@ -165,11 +165,17 @@ namespace BackAnd.Web.Api.Controllers
                 return ResponseMessage(Request.CreateResponse(HttpStatusCode.NotFound, Messages.ActionIsUnauthorized));
             }
 
+            string currentVersion = string.Empty;
             try
             {
                 string appName = System.Web.HttpContext.Current.Items[Durados.Database.AppName].ToString();
-
-                return Ok(new { versions = Maps.Instance.GetVersions(appName) });
+                try
+                {
+                    Map map = Maps.Instance.GetMap(appName);
+                    currentVersion = map.Database.ConfigVersion;
+                }
+                catch { }
+                return Ok(new { versions = Maps.Instance.GetVersions(appName), current = currentVersion });
             }
             catch (Exception exception)
             {

@@ -430,44 +430,44 @@ namespace Durados.Workflow
                     throw e;
             }
 
-            //var v = call.GetValue("userInput").ToObject();
+            var v = call.GetValue("userInput").ToObject();
 
-            //if (v != null && v is System.Dynamic.ExpandoObject)
-            //{
-            //    IDictionary<string, object> newValues = v as IDictionary<string, object>;
-            //    foreach (string key in newValues.Keys)
-            //    {
-            //        if (values.ContainsKey(key))
-            //        {
-            //            object val = newValues[key];
-            //            Field[] fields = view.GetFieldsByJsonName(key);
-            //            val = DateConversion(view, val, fields);
-            //            values[key] = val;
-            //        }
-            //        else
-            //        {
-            //            Field[] fields = view.GetFieldsByJsonName(key);
-            //            if (fields.Length > 0)
-            //            {
-            //                string fieldName = fields[0].Name;
-            //                object val = newValues[key];
-            //                val = DateConversion(view, val, fields);
-            //                if (values.ContainsKey(fieldName))
-            //                {
-            //                    values[fieldName] = val;
-            //                }
-            //                else
-            //                {
-            //                    values.Add(fieldName, val);
-            //                }
-            //            }
-            //            else
-            //            {
-            //                values.Add(key, newValues[key]);
-            //            }
-            //        }
-            //    }
-            //}
+            if (v != null && v is System.Dynamic.ExpandoObject)
+            {
+                IDictionary<string, object> newValues = v as IDictionary<string, object>;
+                foreach (string key in newValues.Keys)
+                {
+                    if (values.ContainsKey(key))
+                    {
+                        object val = newValues[key];
+                        Field[] fields = view.GetFieldsByJsonName(key);
+                        val = DateConversion(view, val, fields);
+                        values[key] = val;
+                    }
+                    else
+                    {
+                        Field[] fields = view.GetFieldsByJsonName(key);
+                        if (fields.Length > 0)
+                        {
+                            string fieldName = fields[0].Name;
+                            object val = newValues[key];
+                            val = DateConversion(view, val, fields);
+                            if (values.ContainsKey(fieldName))
+                            {
+                                values[fieldName] = val;
+                            }
+                            else
+                            {
+                                values.Add(fieldName, val);
+                            }
+                        }
+                        else
+                        {
+                            values.Add(key, newValues[key]);
+                        }
+                    }
+                }
+            }
 
             if (r != null && values != null)
             {

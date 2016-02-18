@@ -59,12 +59,7 @@ namespace Durados.Web.Mvc
             CloudBlobContainer container = GetContainer(containerName);
 
             List<string> versions = (new Durados.Web.Mvc.Azure.BlobBackup()).GetVersions(container);
-            try
-            {
-                Map map = GetMap(name);
-                versions.Add(map.Database.ConfigVersion);
-            }
-            catch { }
+            
             return versions.ToArray();
         }
 
