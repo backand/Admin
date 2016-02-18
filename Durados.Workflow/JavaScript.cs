@@ -326,7 +326,7 @@ namespace Durados.Workflow
                 {
                     if (!oldRow.ContainsKey(field.JsonName))
                     {
-                        if (field.IsDate)
+                        if (field.FieldType == FieldType.Column && field.IsDate)
                         {
                             oldRow.Add(field.JsonName, prevRow[((ColumnField)field).DataColumn.ColumnName]);
                         }
