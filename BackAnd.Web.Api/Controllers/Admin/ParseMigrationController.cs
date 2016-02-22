@@ -12,6 +12,7 @@ using System.Web.Http;
 using System.Web.Script.Serialization;
 
 using Durados.DataAccess;
+using System.Data;
 
 namespace BackAnd.Web.Api.Controllers.Admin
 {
@@ -27,6 +28,42 @@ namespace BackAnd.Web.Api.Controllers.Admin
         const string ParseUrl = "parseUrl";
         
         const string Authorization = "Authorization";
+
+        [System.Web.Http.HttpPut]
+        [Route("~/1/parse/updateCurrentUser")]
+        public IHttpActionResult UpdateCurrentUser()
+        {
+            if (Map.IsMainMap)
+            {
+                return ResponseMessage(Request.CreateResponse(HttpStatusCode.Forbidden, Messages.NotSignInToApp));
+            }
+
+            try
+            {
+                DataRow row = Map.Database.GetUserRow();
+
+                string firstName = row.IsNull("FirstName") ? string.Empty : row["FirstName"].ToString();
+                string lastName = row.IsNull("LastName") ? string.Empty : row["LastName"].ToString();
+                string email = row.IsNull("Email") ? string.Empty : row["Email"].ToString();
+
+                if (!Map.Database.Views.ContainsKey("users"))
+                {
+                    return ResponseMessage(Request.CreateResponse(HttpStatusCode.NotFound, "users was not found"));
+                }
+
+                View usersView = (View)Map.Database.Views["users"];
+
+                Dictionary<string, object> values = new Dictionary<string, object>() { { "email", email }, { "username", email }, { "firstName", firstName }, { "lastName", lastName } };
+                usersView.Create(values, null, null, null, null, null);
+
+            }
+            catch (Exception exception)
+            {
+                return ResponseMessage(Request.CreateResponse(HttpStatusCode.InternalServerError, "appName:" + GetCurrentAppName() + ", baseUrl: " + GetCurrentBaseUrl() + "; error" + exception.Message + "; trace: " + exception.StackTrace));
+
+            }
+            return Ok();
+        }
             
         [Route("~/1/parse")]
         public IHttpActionResult Get()

@@ -99,7 +99,9 @@ namespace BackAnd.Web.Api.Controllers
             {
                 string json = System.Web.HttpContext.Current.Server.UrlDecode(Request.Content.ReadAsStringAsync().Result);
 
+                string sql = string.Empty;
 
+                
                 Dictionary<string, object> transformResult = Transform(json);
 
                 if (!transformResult.ContainsKey("alter"))
@@ -108,8 +110,13 @@ namespace BackAnd.Web.Api.Controllers
 
                 }
 
-                string sql = string.Join(";", ((System.Collections.ArrayList)transformResult["alter"]).ToArray());
+                sql = string.Join(";", ((System.Collections.ArrayList)transformResult["alter"]).ToArray());
                 sql = AdjustSql(sql);
+
+                if (json == "{\"newSchema\":[],\"severity\":0}")
+                {
+                    sql = GetDtopAllTablesSQL();
+                }
 
                 if (!string.IsNullOrEmpty(sql))
                 {
@@ -166,6 +173,22 @@ namespace BackAnd.Web.Api.Controllers
                 throw new BackAndApiUnexpectedResponseException(exception, this);
 
             }
+        }
+
+        private string GetDtopAllTablesSQL()
+        {
+            string sql = string.Empty;
+            sql += "SET FOREIGN_KEY_CHECKS = 0;";
+
+            foreach (Durados.View view in Map.Database.Views.Values.Where(v => !v.SystemView))
+            {
+                sql += "drop table if exists `" + view.DataTable.TableName + "`;";
+            }
+
+            sql += "SET FOREIGN_KEY_CHECKS = 1;";
+
+
+            return sql;
         }
 
         private void HandleFirstTime()

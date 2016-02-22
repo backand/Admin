@@ -1171,7 +1171,7 @@ namespace Durados.Web.Mvc
                 return string.Empty;
         }
 
-        public override int? GetCurrentUserId()
+        public override object GetCurrentUserId()
         {
             try
             {
@@ -1189,7 +1189,7 @@ namespace Durados.Web.Mvc
                                 string pk = usersView.GetPkValue(row);
                                 if (!string.IsNullOrEmpty(pk))
                                 {
-                                    System.Web.HttpContext.Current.Items[Database.CurrentUserId] = Convert.ToInt32(pk);
+                                    System.Web.HttpContext.Current.Items[Database.CurrentUserId] = pk;
                                 }
                             }
                         }
@@ -1199,7 +1199,7 @@ namespace Durados.Web.Mvc
                 if (System.Web.HttpContext.Current.Items[Database.CurrentUserId] == null)
                     return null;
 
-                return (int)System.Web.HttpContext.Current.Items[Database.CurrentUserId];
+                return System.Web.HttpContext.Current.Items[Database.CurrentUserId];
             }
             catch
             {

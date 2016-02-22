@@ -1148,7 +1148,7 @@ namespace Durados
             return string.Empty;
         }
 
-        public virtual int? GetCurrentUserId()
+        public virtual object GetCurrentUserId()
         {
             return null;
         }
