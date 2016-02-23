@@ -9,9 +9,9 @@ namespace Durados.Diagnostics
     public interface ILogger
     {
         void Log(string controller, string action, string method, Exception exception, int logType, string freeText);
-        void Log(string controller, string action, string method, Exception exception, int logType, string freeText, DateTime time);
-        void Log(string controller, string action, string method, string message, string trace, int logType, string freeText, DateTime time);
-        void Log(string controller, string action, string method, string message, string trace, int logType, string freeText, DateTime time, Guid? guid);
+        void Log(string controller, string action, string method, Exception exception, int logType, string freeText, DateTime time, int? requestTime=null);
+        void Log(string controller, string action, string method, string message, string trace, int logType, string freeText, DateTime time, int? requestTime=null);
+        void Log(string controller, string action, string method, string message, string trace, int logType, string freeText, DateTime time, Guid? guid, int? requestTime=null);
 
         void WriteToEventLog(string sEvent, EventLogEntryType eventLogEntryType, int id);
         void WriteToEventLog(string controller, string action, string method, string message, string trace, int logType, string freeText);

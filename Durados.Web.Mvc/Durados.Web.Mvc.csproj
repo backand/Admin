@@ -361,6 +361,7 @@
     <Compile Include="UI\RdlcReport.cs" />
     <Compile Include="UI\Styler.cs" />
     <Compile Include="UI\TableViewer.cs" />
+    <Compile Include="UI\Helpers\UserMigrator.cs" />
     <Compile Include="UI\Views\BaseViewPage.cs">
       <SubType>ASPXCodeBehind</SubType>
     </Compile>

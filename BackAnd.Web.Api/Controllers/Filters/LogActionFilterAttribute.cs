@@ -13,6 +13,7 @@ namespace BackAnd.Web.Api.Controllers.Filters
 {
     public class LogActionFilterAttribute : ActionFilterAttribute  
     {
+        
         public override void OnActionExecuted(HttpActionExecutedContext actionExecutedContext)
         {
             Log(actionExecutedContext.ActionContext, actionExecutedContext.Exception);
@@ -47,7 +48,17 @@ namespace BackAnd.Web.Api.Controllers.Filters
                 }
                 catch { }
 
-                map.Logger.Log(apiController.GetControllerNameForLog(apiController.ControllerContext), verb, appName + ": " + exceptionSource, exception, logType, actionContext.Request.RequestUri.ToString(), DateTime.Now);
+                int? reqMilli = null;
+                if (!apiController.started.HasValue)
+                {
+                    apiController.started = DateTime.Now;
+                }
+                else
+                {
+                    reqMilli = DateTime.Now.Subtract(apiController.started.Value).Milliseconds;
+                }
+
+                map.Logger.Log(apiController.GetControllerNameForLog(apiController.ControllerContext), verb, appName + ": " + exceptionSource, exception , logType, actionContext.Request.RequestUri.ToString(), DateTime.Now, reqMilli);
             }
             catch (Exception e)
             {

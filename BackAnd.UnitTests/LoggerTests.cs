@@ -162,7 +162,7 @@ namespace BackAnd.UnitTests
             var clientInfo = "clientInfo";
 
             this.ValidMap.Logger.WriteToLogstash(controller, action, method, message, trace, logType, freeText, time, guid, log, applicationName, username,
-                appName, clientIp, clientInfo);
+                appName, clientIp, clientInfo, 3550);
         }
 
         private static DataView FetchLogEntry(Guid? guid, View view)

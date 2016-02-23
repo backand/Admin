@@ -27,6 +27,8 @@ namespace Durados.Web.Mvc.Logging
 
         public string ClientIP { get; set; }
 
+        public int? RequestTime { get; set; }
+
         public string Source = "WebApi";
     }
 }

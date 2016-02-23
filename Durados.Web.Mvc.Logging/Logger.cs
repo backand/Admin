@@ -369,7 +369,7 @@ namespace Durados.Web.Mvc.Logging
 
         public void Log(string controller, string action, string method, Exception exception, int logType, string freeText)
         {
-            Log(controller, action, method, exception, logType, freeText, DateTime.Now);
+            Log(controller, action, method, exception, logType, freeText, DateTime.Now, null);
         }
 
         public void LogSync(string controller, string action, string method, Exception exception, int logType, string freeText)
@@ -393,7 +393,7 @@ namespace Durados.Web.Mvc.Logging
 
             LogSync(controller, action, method, message, trace, logType, freeText, time);
         }
-        public void Log(string controller, string action, string method, Exception exception, int logType, string freeText, DateTime time)
+        public void Log(string controller, string action, string method, Exception exception, int logType, string freeText, DateTime time, int? requestTime=null)
         {
             string message = string.Empty;
             if (exception != null)
@@ -408,17 +408,17 @@ namespace Durados.Web.Mvc.Logging
                 trace = exception.StackTrace;
             }
 
-            Log(controller, action, method, message, trace, logType, freeText, time);
+            Log(controller, action, method, message, trace, logType, freeText, time, requestTime);
         }
 
         public bool LogFailed { get; private set; }
 
-        public void Log(string controller, string action, string method, string message, string trace, int logType, string freeText, DateTime time)
+        public void Log(string controller, string action, string method, string message, string trace, int logType, string freeText, DateTime time, int? requestTime=null )
         {
-            Log(controller, action, method, message, trace, logType, freeText, time, null);
+            Log(controller, action, method, message, trace, logType, freeText, time, null, requestTime);
         }
 
-        public void Log(string controller, string action, string method, string message, string trace, int logType, string freeText, DateTime time, Guid? guid)
+        public void Log(string controller, string action, string method, string message, string trace, int logType, string freeText, DateTime time, Guid? guid, int? requestTime)
         {
             if (!initiated)
                 Initiate();
@@ -473,7 +473,7 @@ namespace Durados.Web.Mvc.Logging
                 catch { }
                 try
                 {
-                    WriteLogAsync(controller, action, method, message, trace, logType, freeText, time, guid, log, applicationName, appName, username, clientIP, clientInfo, writeLogTypeToSpecificAppLog, writeLogTypeToGeneralLog);
+                    WriteLogAsync(controller, action, method, message, trace, logType, freeText, time, guid, log, applicationName, appName, username, clientIP, clientInfo, writeLogTypeToSpecificAppLog, writeLogTypeToGeneralLog, requestTime);
                 }
                 catch (Exception logException)
                 {
@@ -500,7 +500,7 @@ namespace Durados.Web.Mvc.Logging
             }
         }
 
-        private void WriteLogAsync(string controller, string action, string method, string message, string trace, int logType, string freeText, DateTime time, Guid? guid, Log log, string applicationName, string appName, string username, string clientIP, string clientInfo, bool writeLogTypeToSpecificAppLog, bool writeLogTypeToGeneralLog)
+        private void WriteLogAsync(string controller, string action, string method, string message, string trace, int logType, string freeText, DateTime time, Guid? guid, Log log, string applicationName, string appName, string username, string clientIP, string clientInfo , bool writeLogTypeToSpecificAppLog, bool writeLogTypeToGeneralLog, int? requestTime)
         {
             if (writeLogTypeToSpecificAppLog)
             {
@@ -524,7 +524,7 @@ namespace Durados.Web.Mvc.Logging
                 Task.Factory.StartNew(() =>
                 {
                     WriteToLogstash(controller, action, method, message, trace, logType, freeText, time, guid, log, applicationName,
-                        appName, username, clientIP, clientInfo);
+                        appName, username, clientIP, clientInfo, requestTime);
                 });
             }
         }
@@ -560,11 +560,11 @@ namespace Durados.Web.Mvc.Logging
             }
         }
 
-        public void WriteToLogstash(string controller, string action, string method, string message, string trace, int logType, string freeText, DateTime time, Guid? guid, Log log, string applicationName, string appName, string username, string clientIP, string clientInfo)
+        public void WriteToLogstash(string controller, string action, string method, string message, string trace, int logType, string freeText, DateTime time, Guid? guid, Log log, string applicationName, string appName, string username, string clientIP, string clientInfo, int? requestTime)
         {
             try
             {
-                SendLogMessage(applicationName, appName, username, controller, action, method, message, trace, logType, freeText, time, log, guid, clientIP, clientInfo);
+                SendLogMessage(applicationName, appName, username, controller, action, method, message, trace, logType, freeText, time, log, guid, clientIP, clientInfo, requestTime);
             }
             catch { }
         }
@@ -825,11 +825,11 @@ namespace Durados.Web.Mvc.Logging
             }
         }
 
-        void SendLogMessage(string applicationName, string appName, string username, string controller, string action, string method, string message, string trace, int logType, string freeText, DateTime time, Logging.Log log, Guid? guid2, string clientIP, string clientInfo)
+        void SendLogMessage(string applicationName, string appName, string username, string controller, string action, string method, string message, string trace, int logType, string freeText, DateTime time, Logging.Log log, Guid? guid2, string clientIP, string clientInfo, int? requestTime)
         {
             if (guid2 == null)
                 guid2 = Guid.NewGuid();
-            SendLogMessage(appName, applicationName, username, machineName, time.ToString(), controller, action, method, logType.ToString(), message, trace, freeText, guid2.ToString(), clientIP, clientInfo);
+            SendLogMessage(appName, applicationName, username, machineName, time.ToString(), controller, action, method, logType.ToString(), message, trace, freeText, guid2.ToString(), clientIP, clientInfo, requestTime);
         }
 
         void SendLogMessage(
@@ -847,7 +847,8 @@ namespace Durados.Web.Mvc.Logging
              string FreeText,
              string Guid,
              string ClientIP,
-             string ClientInfo
+             string ClientInfo,
+             int? RequestTime
         )
         {
             StashLogMessage message = new StashLogMessage
@@ -866,7 +867,8 @@ namespace Durados.Web.Mvc.Logging
                 FreeText = FreeText,
                 Guid = Guid,
                 ClientIP = ClientIP,
-                ClientInfo = ClientInfo
+                ClientInfo = ClientInfo,
+                RequestTime = RequestTime
             };
             var javaScriptSerializer = new System.Web.Script.Serialization.JavaScriptSerializer();
             string jsonString = javaScriptSerializer.Serialize(message);

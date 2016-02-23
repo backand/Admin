@@ -4611,5 +4611,7 @@ namespace Durados.Web.Mvc
         }
 
         public System.Guid AnonymousToken { get; set; }
+
+        public System.Guid SignUpToken { get; set; }
     }
 }

@@ -328,7 +328,8 @@ namespace BackAnd.Web.Api.Controllers
         }
 
         public Durados.Data.IDataHandler DataHandler { get; private set; }
-        
+
+        public DateTime? started = null;
 
         public Durados.Database Database { get; private set; }
         protected Durados.Web.Mvc.Workflow.Engine wfe = null;
@@ -344,6 +345,12 @@ namespace BackAnd.Web.Api.Controllers
             //else if (this is userController)
             //    DataHandler = new DataHandler((userController)this);
             //Init();
+
+        }
+
+        protected virtual string GetCurrentBaseUrl()
+        {
+            return System.Web.HttpContext.Current.Request.Url.GetLeftPart(UriPartial.Authority);
         }
 
         protected virtual string GetWarnings(Dictionary<string, object> transformResult)

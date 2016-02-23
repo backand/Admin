@@ -566,6 +566,75 @@ namespace BackAnd.Web.Api.Controllers
             }
         }
 
+        [BackAnd.Web.Api.Controllers.Filters.BackAndAuthorize]
+        [Route("migrate")]
+        [HttpPost]
+        public IHttpActionResult MigrateUsers(int? pageSize = null)
+        {
+            if (!IsAdmin())
+                return ResponseMessage(Request.CreateResponse(HttpStatusCode.Unauthorized, Messages.ActionIsUnauthorized));
+
+            try
+            {
+                string json = System.Web.HttpContext.Current.Server.UrlDecode(Request.Content.ReadAsStringAsync().Result.Replace("+", "%2B"));
+                Dictionary<string, object> values = Durados.Web.Mvc.UI.Json.JsonSerializer.Deserialize(json);
+
+                if (values == null)
+                {
+                    return ResponseMessage(Request.CreateResponse(HttpStatusCode.NotAcceptable, "please send the following parameters\n{\"usersObjectName\":\"<object name>\", \"emailFieldName\" : \"<email field name>\", \"firstNameFieldName\" : \"<first name field name>\", \"lastNameFieldName\" : \"<last name field name>\", \"passwordFieldName\" : \"<password field name>\"}"));
+                }
+                string usersObjectName = null;
+                if (!values.ContainsKey("usersObjectName"))
+                {
+                    return ResponseMessage(Request.CreateResponse(HttpStatusCode.NotAcceptable, "The usersObjectName is missing"));
+
+                }
+                usersObjectName = values["usersObjectName"].ToString();
+
+                string emailFieldName = null;
+                if (!values.ContainsKey("emailFieldName"))
+                {
+                    return ResponseMessage(Request.CreateResponse(HttpStatusCode.NotAcceptable, "The emailFieldName is missing"));
+
+                }
+                emailFieldName = values["emailFieldName"].ToString();
+
+                string firstNameFieldName = null;
+                if (!values.ContainsKey("firstNameFieldName"))
+                {
+                    return ResponseMessage(Request.CreateResponse(HttpStatusCode.NotAcceptable, "The firstNameFieldName is missing"));
+
+                }
+                firstNameFieldName = values["firstNameFieldName"].ToString();
+
+                string lastNameFieldName = null;
+                if (!values.ContainsKey("lastNameFieldName"))
+                {
+                    return ResponseMessage(Request.CreateResponse(HttpStatusCode.NotAcceptable, "The lastNameFieldName is missing"));
+
+                }
+                lastNameFieldName = values["lastNameFieldName"].ToString();
+
+                string passwordFieldName = null;
+                if (!values.ContainsKey("passwordFieldName"))
+                {
+                    return ResponseMessage(Request.CreateResponse(HttpStatusCode.NotAcceptable, "The passwordFieldName is missing"));
+
+                }
+                passwordFieldName = values["passwordFieldName"].ToString();
+
+                UserMigrator userMigrator = new UserMigrator();
+
+                return Ok(userMigrator.Migrate(Map, usersObjectName, emailFieldName, emailFieldName, firstNameFieldName, lastNameFieldName, passwordFieldName, pageSize ?? 1000, GetCurrentBaseUrl()));
+            }
+            catch (Exception exception)
+            {
+                throw new BackAndApiUnexpectedResponseException(exception, this);
+            }
+
+            
+        }
+
         [AllowAnonymous]
         [Route("signInFacebook")]
         [HttpGet]

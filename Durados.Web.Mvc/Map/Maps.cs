@@ -1416,7 +1416,7 @@ namespace Durados.Web.Mvc
             {
                 return null;
             }
-
+            
             //Durados.Diagnostics.EventViewer.WriteEvent("appRow found for: " + appName + " id: " + id, System.Diagnostics.EventLogEntryType.SuccessAudit, 500);
 
             Map map = new Map();
@@ -1528,6 +1528,7 @@ namespace Durados.Web.Mvc
             map.SiteInfo.LogoHref = map.Url;
             map.Guid = appRow.Guid;
             map.AnonymousToken = appRow.AnonymousToken;
+            map.SignUpToken = appRow.SignUpToken;
 
             int themeId = 0;
             string themeName = "";

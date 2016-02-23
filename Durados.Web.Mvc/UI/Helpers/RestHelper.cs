@@ -5641,7 +5641,22 @@ namespace Durados.Web.Mvc.UI.Helpers
                         if (webException.Response != null)
                         {
                             status = (int)((System.Net.HttpWebResponse)webException.Response).StatusCode;
-                            message = webException.Message;
+
+                            try
+                            {
+                                using (var responseStream = ((System.Net.HttpWebResponse)webException.Response).GetResponseStream())
+                                {
+                                    var reader = new StreamReader(responseStream);
+                                    message = reader.ReadToEnd();
+                                    reader.Close();
+                                }
+                            }
+                            catch 
+                            {
+                                message = webException.Message;
+                            }
+
+                            
                         }
                     }
                 }

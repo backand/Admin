@@ -296,11 +296,6 @@ namespace BackAnd.Web.Api.Controllers.Admin
             return Basic + Space + Convert.ToBase64String(System.Text.Encoding.Default.GetBytes(Maps.ParseConverterMasterKey + Colon + Maps.ParseConverterAdminKey));
         }
 
-        private string GetCurrentBaseUrl()
-        {
-            return System.Web.HttpContext.Current.Request.Url.GetLeftPart(UriPartial.Authority);
-        }
-
         private string GetCurrentAppName()
         {
             return (string)System.Web.HttpContext.Current.Items[Durados.Web.Mvc.Database.AppName];
