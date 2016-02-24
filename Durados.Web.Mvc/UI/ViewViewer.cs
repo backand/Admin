@@ -534,29 +534,37 @@ namespace Durados.Web.Mvc.UI
                     jsonView.Fields.Add(field.Name, jsonField);
                 }
 
-                else if (field.FieldType == FieldType.Children && ((ChildrenField)field).ChildrenHtmlControlType == ChildrenHtmlControlType.CheckList)
+                else if (field.FieldType == FieldType.Children)
                 {
-                    string value = string.Empty;
-                    if (dataAction == DataAction.Create)
+                    if (((ChildrenField)field).ChildrenHtmlControlType == ChildrenHtmlControlType.CheckList)
                     {
-                        if (field.IncludeInDuplicate)
+                        string value = string.Empty;
+                        if (dataAction == DataAction.Create)
                         {
-                            value = ((ChildrenField)field).GetSelectedChildrenPKDelimited(pk);
+                            if (field.IncludeInDuplicate)
+                            {
+                                value = ((ChildrenField)field).GetSelectedChildrenPKDelimited(pk);
+                            }
+                            else
+                            {
+                                if (field.DefaultValue != null)
+                                    value = field.DefaultValue.ToString();
+                            }
                         }
                         else
                         {
-                            if (field.DefaultValue != null)
-                                value = field.DefaultValue.ToString();
+                            value = ((ChildrenField)field).GetSelectedChildrenPKDelimited(pk);
                         }
+
+                        Json.Field jsonField = GetChildrenJsonField(((ChildrenField)field), value);
+
+                        jsonView.Fields.Add(field.Name, jsonField);
                     }
                     else
                     {
-                        value = ((ChildrenField)field).GetSelectedChildrenPKDelimited(pk);
+                        Json.Field jsonField = GetChildrenJsonField(((ChildrenField)field), null);
+                        jsonView.Fields.Add(field.Name, jsonField);
                     }
-                    
-                    Json.Field jsonField = GetChildrenJsonField(((ChildrenField)field), value);
-
-                    jsonView.Fields.Add(field.Name, jsonField);
                 }
             }
 

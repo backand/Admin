@@ -1834,9 +1834,12 @@ namespace Durados.Web.Mvc.UI.Helpers
                     //if (deep)
                     //{
                     if (field.FieldType == FieldType.Children && !field.IsCheckList())
-                        continue;
+                    {
+                        value = null;
+                    }
+                        //continue;
 
-                    if (field.FieldType == FieldType.Column && (field.IsDate || field.IsBoolean || field.IsNumeric))
+                    else if (field.FieldType == FieldType.Column && (field.IsDate || field.IsBoolean || field.IsNumeric))
                         value = row.Row[((ColumnField)field).DataColumn.ColumnName];
                     else if (field.FieldType == FieldType.Children && field.IsCheckList())
                         value = tableViewer.GetFieldValue(field, row.Row);
