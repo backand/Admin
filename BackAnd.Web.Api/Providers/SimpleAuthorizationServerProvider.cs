@@ -38,15 +38,21 @@ namespace BackAnd.Web.Api.Providers
                     context.Properties.ExpiresUtc = currentUtc.Add(System.TimeSpan.FromSeconds(expiration));
 
                     string role = map.Database.GetUserRole(username);
-                    string userId = map.Database.GetUserID(username).ToString();
+                    int backandUserId = map.Database.GetUserID(username);
+                    object userId = map.Database.GetCurrentUserId();
                     
                     context.AdditionalResponseParameters.Add("role", role);
                     try
                     {
+                        string firstName = map.Database.GetUserFirstName();
+                        context.AdditionalResponseParameters.Add("firstName", firstName);
+                        string lastName = map.Database.GetUserLastName();
+                        context.AdditionalResponseParameters.Add("lastName", lastName);
                         string fullName = map.Database.GetUserFullName(username).ToString();
                         context.AdditionalResponseParameters.Add("fullName", fullName);
                     }
                     catch { }
+                    context.AdditionalResponseParameters.Add("regId", backandUserId);
                     context.AdditionalResponseParameters.Add("userId", userId);
                 }
                 catch { }

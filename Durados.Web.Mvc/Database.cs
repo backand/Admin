@@ -767,6 +767,40 @@ namespace Durados.Web.Mvc
             return firstName.ToString();
         }
 
+        public virtual string GetUserLastName()
+        {
+            string sessionKey = GetSessionKey("-lastName");
+            string lastNameFieldName = "LastName";
+            object lastName = Map.Session[sessionKey];
+
+            if (!Maps.Skin)
+            {
+                if (lastName != null)
+                    return lastName.ToString();
+            }
+
+            View userView = (View)GetUserView();
+            if (userView == null)
+                return string.Empty;
+
+            DataRow userRow = GetUserRow();
+
+            if (userRow == null)
+                return string.Empty;
+
+            if (!userRow.Table.Columns.Contains(lastNameFieldName))
+                lastNameFieldName = UsernameFieldName;
+
+            if (userRow.IsNull(lastNameFieldName))
+                return string.Empty;
+
+            lastName = userRow[lastNameFieldName];
+
+            Map.Session[sessionKey] = lastName;
+
+            return lastName.ToString();
+        }
+
         public virtual string GetUserFullName()
         {
             const string FullNameColumnName = "FullName";

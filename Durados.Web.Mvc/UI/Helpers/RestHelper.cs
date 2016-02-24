@@ -1949,7 +1949,14 @@ namespace Durados.Web.Mvc.UI.Helpers
 
             Dictionary<string, object> metadata = new Dictionary<string, object>();
             metadata.Add("id", view.GetPkValue(row));
-
+            try
+            {
+                metadata.Add("fields", GetFieldsTypes(view));
+            }
+            catch (Exception exception)
+            {
+                Maps.Instance.DuradosMap.Logger.Log("RestHelper", "GetRowMetadata", "GetFieldsTypes", exception, 1, null);
+            }
             if (!view.Database.IsConfig)
             {
                 if (descriptive)
@@ -2001,6 +2008,11 @@ namespace Durados.Web.Mvc.UI.Helpers
             HandleMetadataExceptions(metadata, view, row, tableViewer, descriptive);
 
             return metadata;
+        }
+
+        private object GetFieldsTypes(View view)
+        {
+            return view.GetFieldsTypes();
         }
 
         private void HandleMetadataExceptions(Dictionary<string, object> metadata, View view, DataRow row, TableViewer tableViewer, bool descriptive)

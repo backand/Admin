@@ -128,8 +128,8 @@ namespace Durados.Web.Mvc.UI.Helpers
 
             string password = GetFieldValue(dataRow, passwordFieldName, GetRandomPassword()).Replace("+", "%2B");
             string email = GetFieldValue(dataRow, emailFieldName, null).Replace("+", "%2B");
-            string firstName = GetFieldValue(dataRow, emailFieldName, email.Split('@').FirstOrDefault()).Replace("+", "%2B");
-            string lastName = GetFieldValue(dataRow, emailFieldName, string.Empty).Replace("+", "%2B");
+            string firstName = GetFieldValue(dataRow, firstNameFieldName, email.Split('@').FirstOrDefault()).Replace("+", "%2B");
+            string lastName = GetFieldValue(dataRow, lastNameFieldName, string.Empty).Replace("+", "%2B");
 
             values.Add("email", email);
             values.Add("firstName", firstName);

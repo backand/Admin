@@ -557,6 +557,64 @@ namespace Durados.Web.Mvc
             }
         }
 
+        private Dictionary<string, object> fieldTypes = null;
+        public Dictionary<string, object> GetFieldsTypes()
+        {
+            if (fieldTypes == null)
+            {
+                fieldTypes = GetFieldsTypesInner();
+            }
+
+            return fieldTypes;
+        }
+        private Dictionary<string, object> GetFieldsTypesInner()
+        {
+            Dictionary<string, object> types = new Dictionary<string, object>();
+
+            foreach (Field field in GetVisibleFieldsForRow(DataAction.Edit).OrderBy(f => f.Order))
+            {
+                string type = field.GetRestType();
+                Dictionary<string, object> values = new Dictionary<string, object>();
+
+                if (type == "object")
+                {
+                    string relatedObject = ((ParentField)field).ParentView.JsonName;
+                    values.Add(type, relatedObject);
+                    types.Add(field.JsonName, values);
+                }
+                else if (type == "collection")
+                {
+                    string relatedObject = ((ChildrenField)field).ChildrenView.JsonName;
+                    string via = ((ChildrenField)field).GetRelatedParentField().JsonName;
+                    values.Add(type, relatedObject);
+                    values.Add("via", via);
+                    types.Add(field.JsonName, values);
+                }
+                else
+                {
+                    if (field.IsAutoIdentity)
+                    {
+                        type = "int";
+                    }
+                    if (((ColumnField)field).IsAutoGuid)
+                    {
+                        type = "guid";
+                    }
+                    values.Add("type", type);
+                    if (field.Required && !field.IsAutoIdentity)
+                    {
+                        values.Add("required", true);
+                    }
+                    if (field.Unique)
+                    {
+                        values.Add("unique", true);
+                    }
+                    types.Add(field.JsonName, values);
+                }
+            }
+
+            return types;
+        }
 
         public List<Field> GetVisibleFieldsForRow(DataAction dataAction)
         {

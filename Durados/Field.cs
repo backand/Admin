@@ -1226,6 +1226,40 @@ namespace Durados
 
             return jsonName;
         }
+
+        public string GetRestType()
+        {
+            string restType = "string";
+
+            if (IsPoint)
+                return "point";
+
+            switch (DataType)
+            {
+                case Durados.DataType.Boolean:
+                    restType = "boolean";
+                    break;
+                case Durados.DataType.DateTime:
+                    restType = "datetime";
+                    break;
+                case Durados.DataType.LongText:
+                    restType = "text";
+                    break;
+                case Durados.DataType.MultiSelect:
+                    restType = "collection";
+                    break;
+                case Durados.DataType.Numeric:
+                    restType = "float";
+                    break;
+                case Durados.DataType.SingleSelect:
+                    restType = "object";
+                    break;
+                default:
+                    break;
+            }
+
+            return restType;
+        }
     }
 
     public enum ColumnFieldType
