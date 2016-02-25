@@ -792,24 +792,28 @@ namespace Durados.DataAccess.AutoGeneration.Dynamic
 
             }
 
-            IEnumerable<DataColumn> designTimeNonDeletedColumns = Persist(viewRows[viewName], newColumns, delColumns, changedColumns, database, dataset.Tables[viewName], view.EditableTableName, defaultParentField, dataset, command);
-
-            foreach (DataColumn column in designTimeNonDeletedColumns)
+            if (viewRows.ContainsKey(viewName))
             {
-                delColumns.Remove(column);
-            }
+                IEnumerable<DataColumn> designTimeNonDeletedColumns = Persist(viewRows[viewName], newColumns, delColumns, changedColumns, database, dataset.Tables[viewName], view.EditableTableName, defaultParentField, dataset, command);
 
-            DelColumnsConfiguration(view, delColumns, configAccess, configViewPk, configFieldView);
 
-            if (designTimeNonDeletedColumns.Count() > 0)
-            {
-                string columnsNames = string.Empty;
                 foreach (DataColumn column in designTimeNonDeletedColumns)
                 {
-                    columnsNames += column.ColumnName + ",";
+                    delColumns.Remove(column);
                 }
-                columnsNames = columnsNames.TrimEnd(',');
-                throw new DuradosException("The operation succeeded, but the following design time columns were removed from the server and need to be manually removed from the dataset: " + columnsNames + ".");
+
+                DelColumnsConfiguration(view, delColumns, configAccess, configViewPk, configFieldView);
+
+                if (designTimeNonDeletedColumns.Count() > 0)
+                {
+                    string columnsNames = string.Empty;
+                    foreach (DataColumn column in designTimeNonDeletedColumns)
+                    {
+                        columnsNames += column.ColumnName + ",";
+                    }
+                    columnsNames = columnsNames.TrimEnd(',');
+                    throw new DuradosException("The operation succeeded, but the following design time columns were removed from the server and need to be manually removed from the dataset: " + columnsNames + ".");
+                }
             }
         }
 
@@ -886,6 +890,9 @@ namespace Durados.DataAccess.AutoGeneration.Dynamic
         private List<DataColumn> GetDelColumns(DataTable oldTable, DataTable newTable)
         {
             List<DataColumn> delColumns = new List<DataColumn>();
+
+            if (oldTable == null) 
+                return delColumns;
 
             foreach (DataColumn column in oldTable.Columns)
             {
