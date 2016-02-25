@@ -5604,7 +5604,7 @@ namespace Durados.Web.Mvc.UI.Helpers
             if (!string.IsNullOrEmpty(data) && data != "null")
             {
                 byte[] bytes;
-                bytes = System.Text.Encoding.ASCII.GetBytes(data);
+                bytes = System.Text.Encoding.UTF8.GetBytes(data);
                 httpWebRequest.ContentLength = bytes.Length;
 
                 using (Stream requestStream = httpWebRequest.GetRequestStream())

@@ -3369,7 +3369,13 @@ namespace Durados.Web.Mvc.Config
                 FacebookClientSecret.Category = rolesCategory;
                 FacebookClientSecret.HideInTable = true;
             }
-
+            if (databaseView.Fields.ContainsKey("PkType"))
+            {
+                ColumnField PkType = (ColumnField)databaseView.Fields["PkType"];
+                PkType.Order = 600;
+                PkType.Category = rolesCategory;
+                PkType.HideInTable = true;
+            }
 
             if (databaseView.Fields.ContainsKey("EnableGithub"))
             {
