@@ -2343,6 +2343,8 @@ namespace Durados.Web.Mvc.UI.Helpers
                         dictionary.Add(name, row[((ColumnField)field).DataColumn.ColumnName]);
                     else if (field.IsPoint)
                         dictionary.Add(name, GetPoint(field, row));
+                    else if (field.FieldType == FieldType.Children)
+                        dictionary.Add(name, null);
                     else
                         dictionary.Add(name, JsonField.Value);
                 }
