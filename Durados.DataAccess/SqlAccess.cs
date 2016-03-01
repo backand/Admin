@@ -626,12 +626,16 @@ namespace Durados.DataAccess
                 {
                     table = FillDataTable(view, page, pageSize, filter, sortColumn, direction, out rowCount, null, null, beforeSelectCallback, afterSelectCallback);
                 }
-                else
+                else if (field is ParentField)
                 {
                     ParentField parentField = (ParentField)field;
                     sortColumn = parentField.GetSortByParent();
                     string join = GetJoin(parentField);
                     table = FillDataTable(view, page, pageSize, filter, sortColumn, direction, out rowCount, parentField, join, beforeSelectCallback, afterSelectCallback);
+                }
+                else
+                {
+                    throw new DuradosException("Cannot sort according to collection field");
                 }
             }
             else if (sortColumns != null && sortColumns.Count > 1)
