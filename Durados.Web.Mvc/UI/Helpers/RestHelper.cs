@@ -6938,8 +6938,8 @@ namespace Durados.Web.Mvc.UI.Helpers
                     string accessToken = validateResponse["access_token"].ToString();
                     string expires = validateResponse["expires"].ToString();
 
-                    string GraphApiEndpoint = "https://graph.facebook.com/me";
-                    string graphAddress = GraphApiEndpoint + "?access_token=" + Uri.EscapeDataString(accessToken);
+                    string GraphApiEndpoint = "https://graph.facebook.com/me?fields=id,email,name";
+                    string graphAddress = GraphApiEndpoint + "&access_token=" + Uri.EscapeDataString(accessToken);
 
                     /* if (Options.SendAppSecretProof)
                      {

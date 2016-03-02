@@ -66,6 +66,8 @@ namespace Durados.Workflow
             {
                 value = Guid.Parse(System.Web.HttpContext.Current.Request.QueryString[Durados.Workflow.JavaScript.GuidKey]);
             }
+            if (key == Durados.Workflow.JavaScript.GuidKey && System.Web.HttpContext.Current.Items.Contains(key))
+                return;
             if (System.Web.HttpContext.Current.Items.Contains(key))
                 System.Web.HttpContext.Current.Items[key] = value;
             else
