@@ -2078,7 +2078,7 @@ namespace Durados.Web.Mvc
 
             ds.Tables.Add(v_durados_UserTable);
             v_durados_UserTable.PrimaryKey = new DataColumn[1] { v_durados_UserTable.Columns["ID"] };
-
+            // add another table
 
             //DataTable durados_UserRoleTable = Durados.DataAccess.AutoGeneration.Generator.CreateTable(durados_UserRole, systemConnectionString);
             DataTable durados_UserRoleTable = systemGenerator.CreateTable(durados_UserRole, systemConnectionString);

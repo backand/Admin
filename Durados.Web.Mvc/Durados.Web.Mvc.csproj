@@ -292,7 +292,6 @@
     <Compile Include="IUpload.cs" />
     <Compile Include="MapDataSet.cs">
       <DependentUpon>MapDataSet.xsd</DependentUpon>
-      <SubType>Component</SubType>
     </Compile>
     <Compile Include="MapDataSet.Designer.cs">
       <AutoGen>True</AutoGen>
@@ -322,6 +321,14 @@
       <DependentUpon>Settings.settings</DependentUpon>
     </Compile>
     <Compile Include="SiteInfo.cs" />
+    <Compile Include="SocialLogin\ExternalLoginData.cs" />
+    <Compile Include="SocialLogin\FacebookSocial.cs" />
+    <Compile Include="SocialLogin\GithubSocial.cs" />
+    <Compile Include="SocialLogin\GoogleSocial.cs" />
+    <Compile Include="SocialLogin\Profile.cs" />
+    <Compile Include="SocialLogin\Social.cs" />
+    <Compile Include="SocialLogin\SocialException.cs" />
+    <Compile Include="SocialLogin\SocialProviderFactory.cs" />
     <Compile Include="UI\Charting\BasicChartBuilder.cs" />
     <Compile Include="UI\CheckList.cs" />
     <Compile Include="UI\ClientParams.cs" />

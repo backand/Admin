@@ -1,39 +1,23 @@
-using System;
+using Durados.Web.Mvc;
+using Durados.Web.Mvc.SocialLogin;
+using Durados.Web.Mvc.UI.Helpers;
 //﻿using Backand.Web.Api;
-using BackAnd.Web.Api.Models;
 //using BackAnd.Web.Api.Providers;
 using Microsoft.Owin.Infrastructure;
 using Microsoft.Owin.Security;
-using Microsoft.Owin.Security.Cookies;
-using Microsoft.Owin.Security.OAuth;
+using System;
 using System.Collections.Generic;
+using System.Data;
+using System.Globalization;
 using System.Linq;
 using System.Net;
-using System.Web.Http;
-using System.Web.Http.ModelBinding;
 using System.Net.Http;
 using System.Security.Claims;
 using System.Security.Cryptography;
-using System.Threading.Tasks;
-using Microsoft.AspNet.Identity;
-using Microsoft.AspNet.Identity.EntityFramework;
-using Durados.Web.Mvc.Controllers;
-using System.Web;
-using Microsoft.Owin.Security.Infrastructure;
-using Owin.Security.Providers.GitHub;
-using Backand.Web.Api;
-using BackAnd.Web.Api.Providers;
-using Durados.Web.Mvc.UI.Helpers;
-using Durados.Web.Mvc;
-using System.Data;
-using System.Web.Script.Serialization;
 using System.Text;
-using System.Globalization;
-using Microsoft.Owin;
-using Newtonsoft.Json;
-using Microsoft.Owin.Helpers;
-using Newtonsoft.Json.Linq;
-
+using System.Threading.Tasks;
+using System.Web.Http;
+using System.Web.Script.Serialization;
 
 namespace BackAnd.Web.Api.Controllers
 {
@@ -137,7 +121,7 @@ namespace BackAnd.Web.Api.Controllers
 
             string role = map.Database.GetUserRole(map.Database.GetCurrentUsername());
             if (!(role == "Admin" || role == "Developer"))
-                return ResponseMessage(Request.CreateResponse(HttpStatusCode.Forbidden,"Only admin can get keys"));
+                return ResponseMessage(Request.CreateResponse(HttpStatusCode.Forbidden, "Only admin can get keys"));
 
             try
             {
@@ -154,8 +138,6 @@ namespace BackAnd.Web.Api.Controllers
 
             }
         }
-
-
 
         [HttpGet]
         [BackAnd.Web.Api.Controllers.Filters.BackAndAuthorize]
@@ -189,7 +171,7 @@ namespace BackAnd.Web.Api.Controllers
             }
 
             string appName = System.Web.HttpContext.Current.Items[Durados.Web.Mvc.Database.AppName].ToString();
-                
+
             if (!Account.IsValidRole(appName, role))
                 return ResponseMessage(Request.CreateResponse(HttpStatusCode.NotAcceptable, "The user role does not match any of the app roles."));
 
@@ -251,7 +233,7 @@ namespace BackAnd.Web.Api.Controllers
 
                 }
                 string lastName = values["lastName"].ToString();
-                
+
 
                 if (!values.ContainsKey("password"))
                 {
@@ -296,14 +278,7 @@ namespace BackAnd.Web.Api.Controllers
 
                     if (signUpResults.Status == Account.SignUpStatus.Ready)
                     {
-                        var identity = new ClaimsIdentity("Bearer");
-                        identity.AddClaim(new Claim("username", email));
-                        identity.AddClaim(new Claim(ClaimTypes.AuthenticationMethod, "Backand"));
-                        identity.AddClaim(new Claim("appname", appName));
-
-
-                        // create token
-                        string accessToken = CreateToken(identity);
+                        string accessToken = CreateToken(email, appName);
 
                         var response = new { username = signUpResults.Username, currentStatus = (int)signUpResults.Status, message = account.GetSignUpStatusMessage(signUpResults.Status), listOfPossibleStatus = account.GetListOfPossibleStatus(), token = accessToken };
                         return Ok(response);
@@ -334,6 +309,7 @@ namespace BackAnd.Web.Api.Controllers
             }
         }
 
+
         private Map GetMap(string appName)
         {
             Map map = Maps.Instance.GetMap(appName);
@@ -363,9 +339,9 @@ namespace BackAnd.Web.Api.Controllers
             if (map == null || map is DuradosMap)
                 return Request.CreateResponse(HttpStatusCode.NotFound, "app was not found");
 
-            if (string.IsNullOrEmpty( map.Database.SignInRedirectUrl))
+            if (string.IsNullOrEmpty(map.Database.SignInRedirectUrl))
                 return Request.CreateResponse(HttpStatusCode.NotFound, "SignIn redirect url was not supplied in configuration");
-            if (string.IsNullOrEmpty( map.Database.RegistrationRedirectUrl))
+            if (string.IsNullOrEmpty(map.Database.RegistrationRedirectUrl))
                 return Request.CreateResponse(HttpStatusCode.NotFound, "SignUp redirect url was not supplied in configuration");
 
             try
@@ -542,7 +518,7 @@ namespace BackAnd.Web.Api.Controllers
 
                 Account account = new Account(this);
 
-               string  userName = account.ChangePassword(token, password);
+                string userName = account.ChangePassword(token, password);
 
                 try
                 {
@@ -632,139 +608,25 @@ namespace BackAnd.Web.Api.Controllers
                 throw new BackAndApiUnexpectedResponseException(exception, this);
             }
 
-            
+
         }
 
-        [AllowAnonymous]
-        [Route("signInFacebook")]
-        [HttpGet]
-        public async Task<IHttpActionResult> facebookSignin(string code, string state)
-        {
-             var _httpClient = new HttpClient();
-           // _httpClient.Timeout = Options.BackchannelTimeout;
-            _httpClient.MaxResponseContentBufferSize = 1024 * 1024 * 10; // 10 MB
-
-            var appId = "1106885725994585";
-            var appSecret = "2c0a87bf88bffacd8d9c80b6bd567bc1";
-            var properties = JsonConvert.DeserializeObject<AuthenticationProperties>(state);
-            
-            if (properties == null)
-            {
-                return null;
-            }
-
-                // OAuth2 10.12 CSRF
-            /*    if (!ValidateCorrelationId(properties, _logger))
-                {
-                    return new AuthenticationTicket(null, properties);
-                }
-
-                if (code == null)
-                {
-                    // Null if the remote server returns an error.
-                    return new AuthenticationTicket(null, properties);
-                }
-            */
-                
-                
-                string redirectUri = Request.RequestUri.Scheme + "://" + Request.RequestUri.Authority + "/1/user/signInFacebook";
-                string tokenRequest = "grant_type=authorization_code" +
-                    "&code=" + Uri.EscapeDataString(code) +
-                    "&redirect_uri=" + Uri.EscapeDataString(redirectUri) +
-                    "&client_id=" + Uri.EscapeDataString(appId) +
-                    "&client_secret=" + Uri.EscapeDataString(appSecret);
-
-                HttpResponseMessage tokenResponse = await _httpClient.GetAsync(TokenEndpoint + "?" + tokenRequest, HttpCompletionOption.ResponseContentRead);
-                tokenResponse.EnsureSuccessStatusCode();
-                string text = await tokenResponse.Content.ReadAsStringAsync();
-                IFormCollection form = WebHelpers.ParseForm(text);
-
-                string accessToken = form["access_token"];
-                string expires = form["expires"];
-                string graphAddress = GraphApiEndpoint + "?access_token=" + Uri.EscapeDataString(accessToken);
-                
-               /* if (Options.SendAppSecretProof)
-                {
-                    graphAddress += "&appsecret_proof=" + GenerateAppSecretProof(accessToken);
-                }*/
-
-                HttpResponseMessage graphResponse = await _httpClient.GetAsync(graphAddress,HttpCompletionOption.ResponseContentRead);
-                graphResponse.EnsureSuccessStatusCode();
-                text = await graphResponse.Content.ReadAsStringAsync();
-                JObject user = JObject.Parse(text);
-
-                var email = user["email"].Value<string>();
-                var redirectUrl = properties.RedirectUri;
-                var appName = properties.Dictionary["appname"];
-                
-   
-            // Dear Relly,
-            // You have here the 3 parameters you need to finsih authentification.
-            // So i don't block you for tomorrow.
-            // My todo's are:
-            // 1. Handle unsucessful login
-            // 2. Securize State data
-
-
-                return null;
-                /*var context = new FacebookAuthenticatedContext(Context, user, accessToken, expires);
-                context.Identity = new ClaimsIdentity(
-                    Options.AuthenticationType,
-                    ClaimsIdentity.DefaultNameClaimType,
-                    ClaimsIdentity.DefaultRoleClaimType);
-                if (!string.IsNullOrEmpty(context.Id))
-                {
-                    context.Identity.AddClaim(new Claim(ClaimTypes.NameIdentifier, context.Id, XmlSchemaString, Options.AuthenticationType));
-                }
-                if (!string.IsNullOrEmpty(context.UserName))
-                {
-                    context.Identity.AddClaim(new Claim(ClaimsIdentity.DefaultNameClaimType, context.UserName, XmlSchemaString, Options.AuthenticationType));
-                }
-                if (!string.IsNullOrEmpty(context.Email))
-                {
-                    context.Identity.AddClaim(new Claim(ClaimTypes.Email, context.Email, XmlSchemaString, Options.AuthenticationType));
-                }
-                if (!string.IsNullOrEmpty(context.Name))
-                {
-                    context.Identity.AddClaim(new Claim("urn:facebook:name", context.Name, XmlSchemaString, Options.AuthenticationType));
-
-                    // Many Facebook accounts do not set the UserName field.  Fall back to the Name field instead.
-                    if (string.IsNullOrEmpty(context.UserName))
-                    {
-                        context.Identity.AddClaim(new Claim(ClaimsIdentity.DefaultNameClaimType, context.Name, XmlSchemaString, Options.AuthenticationType));
-                    }
-                }
-                if (!string.IsNullOrEmpty(context.Link))
-                {
-                    context.Identity.AddClaim(new Claim("urn:facebook:link", context.Link, XmlSchemaString, Options.AuthenticationType));
-                }
-                context.Properties = properties;
-
-                await Options.Provider.Authenticated(context);
-
-                return new AuthenticationTicket(context.Identity, context.Properties);
-            */
-        }
-
-        private const string XmlSchemaString = "http://www.w3.org/2001/XMLSchema#string";
-        private const string TokenEndpoint = "https://graph.facebook.com/oauth/access_token";
-        private const string GraphApiEndpoint = "https://graph.facebook.com/me";
         [AllowAnonymous]
         [Route("socialSignin")]
         [HttpGet]
         public async Task<IHttpActionResult> socialSignin(string provider, string appName, string returnAddress = null, string code = null)
         {
 
+            SocialProvider social = SocialProviderFactory.GetSocialProvider(provider);
+
             if (code != null)
             {
-                Social social = Social.GetSocialProvider(provider);
-                Social.Profile profile = social.Authenticate(appName, code);
-                social.Signin(profile);
+                SocialProfile profile = social.Authenticate(appName, code, returnAddress);
+                Signin(profile);
                 return Ok(GetAccessToken(profile.email, appName, provider));
             }
             try
             {
-                Social social = Social.GetSocialProvider(provider);
                 return Redirect(social.GetAuthUrl(appName, returnAddress ?? GetCurrentAddress(), null, "signin"));
             }
             catch (Exception exception)
@@ -772,9 +634,8 @@ namespace BackAnd.Web.Api.Controllers
                 Map.Logger.Log("user", "socialSignin", exception.Source, exception, 1, null);
                 return BadRequest(exception.Message);
             }
-           
+
         }
-        
 
         private string GetCurrentAddress()
         {
@@ -788,32 +649,7 @@ namespace BackAnd.Web.Api.Controllers
         {
             try
             {
-                //if (provider == "facebook")
-                //{
-                //    string appId = "1106885725994585";
-                //    string redirectUri = Request.RequestUri.Scheme + "://" + Request.RequestUri.Authority + "/1/user/signInFacebook";
-
-                //    AuthenticationProperties properties = new AuthenticationProperties { RedirectUri = returnAddress, };
-                //    properties.Dictionary.Add("appname", appName);
-                //    // OAuth2 10.12 CSRF
-                //    //GenerateCorrelationId(properties);
-
-                //    // comma separated
-                //    string scope = "email";
-
-                //    string state = JsonConvert.SerializeObject(properties);
-
-                //    string authorizationEndpoint =
-                //        "https://www.facebook.com/dialog/oauth" +
-                //            "?response_type=code" +
-                //            "&client_id=" + Uri.EscapeDataString(appId) +
-                //            "&redirect_uri=" + Uri.EscapeDataString(redirectUri) +
-                //            "&scope=" + Uri.EscapeDataString(scope) +
-                //            "&state=" + Uri.EscapeDataString(state);
-                //    return Redirect(authorizationEndpoint);
-                //}
-
-                Social social = Social.GetSocialProvider(provider);
+                SocialProvider social = SocialProviderFactory.GetSocialProvider(provider);
                 return Redirect(social.GetAuthUrl(appName, returnAddress ?? GetCurrentAddress(), parameters, "signup"));
             }
             catch (Exception exception)
@@ -858,14 +694,131 @@ namespace BackAnd.Web.Api.Controllers
 
             foreach (string provider in providers)
             {
-                providersUrls.Add(new { name = provider, 
-                    signin = "1/user/socialSignin?provider=" + provider + "&appname=" + appName + (string.IsNullOrEmpty(returnAddress) ? "" : "&returnAddress=" + System.Web.HttpContext.Current.Server.UrlEncode(returnAddress)), 
-                    signup = "1/user/socialSignup?provider=" + provider + "&appname=" + appName + (string.IsNullOrEmpty(returnAddress) ? "" : "&returnAddress=" + System.Web.HttpContext.Current.Server.UrlEncode(returnAddress)) 
+                providersUrls.Add(new
+                {
+                    name = provider,
+                    signin = "1/user/socialSignin?provider=" + provider + "&appname=" + appName + (string.IsNullOrEmpty(returnAddress) ? "" : "&returnAddress=" + System.Web.HttpContext.Current.Server.UrlEncode(returnAddress)),
+                    signup = "1/user/socialSignup?provider=" + provider + "&appname=" + appName + (string.IsNullOrEmpty(returnAddress) ? "" : "&returnAddress=" + System.Web.HttpContext.Current.Server.UrlEncode(returnAddress))
                 });
-           
+
             }
 
             return Ok(providersUrls);
+        }
+
+        [AllowAnonymous]
+        [Route("{provider}/token")]
+        [HttpGet]
+        public async Task<IHttpActionResult> socialToken(string provider, string appName, string accessToken)
+        {
+            try
+            {
+                string returnAddress = null;
+                SocialProvider social = SocialProviderFactory.GetSocialProvider(provider);
+                SocialProfile profile = social.GetProfile(appName, accessToken);
+
+                if (profile == null)
+                {
+                    return BadRequest("can't validate social token of " + provider);
+                }
+
+                returnAddress = profile.returnAddress;
+
+                Signin(profile);
+
+                string email = profile.email;
+
+                // create token
+                string AccessToken = CreateToken(email, appName);
+
+                string role, userId;
+                int expiration;
+                GetNeededParamsForToken(appName, email, out role, out userId, out expiration);
+
+                //var data = "data={\"access_token\":\"" + accessToken + "\",\"token_type\":\"bearer\",\"expires_in\":" + expiration + ",\"appName\":\""
+                //+ appName + "\",\"username\":\"" + email + "\",\"role\":\"" + role + "\",\"userId\":\"" + userId + "\"}";
+
+                return Ok(new
+                {
+                    access_token = AccessToken,
+                    token_type = "bearer",
+                    expires_in = expiration,
+                    appName = appName,
+                    username = email,
+                    role = role,
+                    userId = userId
+                });
+
+            }
+            catch (Exception e)
+            {
+                Map.Logger.Log("user", "socialToken", e.Source, e, 1, null);
+                return BadRequest(e.Message);
+            }
+
+        }
+
+
+
+       
+
+
+        [AllowAnonymous]
+        [Route("{provider}/code")]
+        [HttpPost]
+        public async Task<IHttpActionResult> socialCode(string provider, [FromBody]SopcialLoginUserData userLoginData)
+        {
+           
+
+            if (string.IsNullOrEmpty(userLoginData.code) || userLoginData.code == "undefined") // js is greart...
+            {
+                return BadRequest("code can't be null or undefiend");
+            }
+
+            try
+            {
+                string returnAddress = null;
+                SocialProvider social = SocialProviderFactory.GetSocialProvider(provider);
+                SocialProfile profile = social.Authenticate(userLoginData);
+
+                if (profile == null)
+                {
+                    return BadRequest("can't validate social code of " + provider);
+                }
+
+                string appName = userLoginData.appName;
+
+                returnAddress = profile.returnAddress;
+
+                Signin(profile);
+
+                string email = profile.email;
+
+                // create token
+                string AccessToken = CreateToken(email, appName);
+
+                string role, userId;
+                int expiration;
+                GetNeededParamsForToken(appName, email, out role, out userId, out expiration);
+
+                return Ok(new
+                {
+                    access_token = AccessToken,
+                    token_type = "bearer",
+                    expires_in = expiration,
+                    appName = appName,
+                    username = email,
+                    role = role,
+                    userId = userId
+                });
+
+            }
+            catch (Exception e)
+            {
+                Map.Logger.Log("user", "socialToken", e.Source, e, 1, null);
+                return BadRequest(e.Message);
+            }
+
         }
 
 
@@ -877,14 +830,14 @@ namespace BackAnd.Web.Api.Controllers
             string returnAddress = null;
             try
             {
-                Social social = Social.GetSocialProvider(provider);
+                SocialProvider social = SocialProviderFactory.GetSocialProvider(provider);
 
-                Social.Profile profile = social.Authenticate();
+                SocialProfile profile = social.Authenticate();
                 returnAddress = profile.returnAddress;
-                    
+
                 if (profile.activity == "signin")
                 {
-                    social.Signin(profile);
+                    Signin(profile);
                 }
                 else if (profile.activity == "signup")
                 {
@@ -960,7 +913,7 @@ namespace BackAnd.Web.Api.Controllers
                         {
                             lastName = values["lastName"].ToString();
                         }
-                        
+
                         var password = DuradosAuthorizationHelper.GeneratePassword(4, 4, 4);
 
                         account.SignUp(appName, firstName, lastName, email, null, false, password, password, false, values, view_BeforeCreate, view_BeforeCreateInDatabase, view_AfterCreateBeforeCommit, view_AfterCreateAfterCommit, view_BeforeEdit, view_BeforeEditInDatabase, view_AfterEditBeforeCommit, view_AfterEditAfterCommit);
@@ -988,7 +941,7 @@ namespace BackAnd.Web.Api.Controllers
 
                             }
                         }
- 
+
                     }
                     else
                     {
@@ -1002,13 +955,10 @@ namespace BackAnd.Web.Api.Controllers
                 {
                     string email = profile.email;
                     string appName = profile.appName;
-                    
+
                     //login the user use email
                     //string returnUrl = LoginOrRegister(mode, email, name, "Google", returnUrl);
-                    var identity = new ClaimsIdentity("Bearer");
-                    identity.AddClaim(new Claim("username", email));
-                    identity.AddClaim(new Claim(ClaimTypes.AuthenticationMethod, provider));
-                    identity.AddClaim(new Claim("appname", appName));
+                    ClaimsIdentity identity = CreateIdentity(email, appName, provider);
 
 
                     // create token
@@ -1051,16 +1001,47 @@ namespace BackAnd.Web.Api.Controllers
             }
         }
 
+        private string CreateToken(string username, string appName)
+        {
+            return GetAccessToken(username, appName, "Backand");
+        }
+
+
         private string GetAccessToken(string username, string appName, string provider)
+        {
+            ClaimsIdentity identity = CreateIdentity(username, appName, provider);
+
+            // create token
+            return CreateToken(identity);
+        }
+
+        private static ClaimsIdentity CreateIdentity(string username, string appName, string provider)
         {
             var identity = new ClaimsIdentity("Bearer");
             identity.AddClaim(new Claim("username", username));
             identity.AddClaim(new Claim(ClaimTypes.AuthenticationMethod, provider));
             identity.AddClaim(new Claim("appname", appName));
+            return identity;
+        }
 
+        private static string CreateToken(ClaimsIdentity identity)
+        {
+            AuthenticationTicket ticket = new AuthenticationTicket(identity, new AuthenticationProperties());
 
-            // create token
-            return CreateToken(identity);
+            var appName = identity.Claims.FirstOrDefault(a => a.Type == "appname").ValueType;
+
+            Durados.Web.Mvc.Map map = Maps.Instance.GetMap();
+            //Map map = Maps.Instance.GetMap();
+
+            var currentUtc = new SystemClock().UtcNow;
+            ticket.Properties.IssuedUtc = currentUtc;
+            int expiration = map.Database.TokenExpiration;
+            if (expiration == 0 || expiration == 8640)
+                expiration = 86400;
+
+            ticket.Properties.ExpiresUtc = currentUtc.Add(TimeSpan.FromSeconds(expiration));
+            string AccessToken = Startup.OAuthBearerOptions.AccessTokenFormat.Protect(ticket);
+            return AccessToken;
         }
 
         private string GetReturnAddress()
@@ -1083,9 +1064,10 @@ namespace BackAnd.Web.Api.Controllers
 
         private string GetSuccessUrl(string url, string accessToken, string appName, string email)
         {
-            Durados.Web.Mvc.Map map = Durados.Web.Mvc.Maps.Instance.GetMap(appName);
-            string role = map.Database.GetUserRole(email);
-            string userId = map.Database.GetUserID(email).ToString();
+            string role, userId;
+            int expiration;
+            GetNeededParamsForToken(appName, email, out role, out userId, out expiration);
+
             if (!url.Contains("#/"))
                 url += "#/";
             if (url.Contains('?')) // already have query string
@@ -1097,11 +1079,19 @@ namespace BackAnd.Web.Api.Controllers
                 url += "?";
             }
 
-            int expiration = map.Database.TokenExpiration;
+            var data = "data={\"access_token\":\"" + accessToken + "\",\"token_type\":\"bearer\",\"expires_in\":" + expiration + ",\"appName\":\""
+                + appName + "\",\"username\":\"" + email + "\",\"role\":\"" + role + "\",\"userId\":\"" + userId + "\"}";
+            return url + data;
+        }
+
+        private static void GetNeededParamsForToken(string appName, string email, out string role, out string userId, out int expiration)
+        {
+            Durados.Web.Mvc.Map map = Durados.Web.Mvc.Maps.Instance.GetMap(appName);
+            role = map.Database.GetUserRole(email);
+            userId = map.Database.GetUserID(email).ToString();
+            expiration = map.Database.TokenExpiration;
             if (expiration == 0 || expiration == 8640)
                 expiration = 86400;
-
-            return url + "data={\"access_token\":\"" + accessToken + "\",\"token_type\":\"bearer\",\"expires_in\":" + expiration + ",\"appName\":\"" + appName + "\",\"username\":\"" + email + "\",\"role\":\"" + role + "\",\"userId\":\"" + userId + "\"}";
         }
 
         private string GetErrorUrl(string url, string message, string provider)
@@ -1118,209 +1108,7 @@ namespace BackAnd.Web.Api.Controllers
             return url + "error={\"message\":\"" + message + "\",\"provider\":\"" + provider + "\"}";
         }
 
-        /*
-        // GET api/Account/socialSignin
-        [OverrideAuthentication]
-        [HostAuthentication(Startup.ExternalCookieAuthenticationType)]
-        [AllowAnonymous]
-        [Route("socialSigninOwin")]
-        [HttpGet]
-        public async Task<IHttpActionResult> socialSigninOwin(string provider, string appName, string returnAddress)
-        {
-            if (!User.Identity.IsAuthenticated)
-            {
-                return new ChallengeResult(provider, this);
-            }
-
-            Social.ExternalLoginData externalLogin = Social.ExternalLoginData.FromIdentity(User.Identity as ClaimsIdentity);
-            var result = Request.GetOwinContext().Authentication.AuthenticateAsync(Startup.ExternalCookieAuthenticationType).Result;
-            //            Authentication.SignOut(Startup.ExternalCookieAuthenticationType);
-
-            string email = ExtractEmailAddress(result.Identity);
-
-            if (email != null &&
-                !string.IsNullOrWhiteSpace(appName) &&
-                !string.IsNullOrWhiteSpace(returnAddress) &&
-                (new DuradosAuthorizationHelper().IsAppExists(appName) || appName == Maps.DuradosAppName))
-            {
-                // check if user belongs to app
-                DataRow userRow = null;
-                if (appName == Maps.DuradosAppName)
-                {
-                    userRow = Maps.Instance.DuradosMap.Database.GetUserRow(email);
-                    if (userRow == null)
-                    {
-                        return BadRequest("The user is not signed up to " + appName);
-                    }
-                }
-                else
-                {
-                    userRow = Maps.Instance.GetMap(appName).Database.GetUserRow(email);
-                    if (userRow == null || (!userRow.IsNull("IsApproved") && !(bool)userRow["IsApproved"]))
-                    {
-                        return BadRequest("The user is not signed up to " + appName);
-                    }
-                }
-                
-
-                var identity = new ClaimsIdentity("Bearer");
-                identity.AddClaim(new Claim("username", email));
-                identity.AddClaim(new Claim(ClaimTypes.AuthenticationMethod, provider));
-                identity.AddClaim(new Claim("appname", appName));
-
-                
-                // create token
-                string AccessToken = CreateToken(identity);
-
-                // return token
-                if (returnAddress.Contains('?')) // already have query string
-                {
-                    returnAddress += "&";
-                }
-                else
-                {
-                    returnAddress += "?";
-                }
-
-                return Redirect(returnAddress + "token=" + AccessToken);
-            }
-            else //validation problem
-            {
-                return BadRequest("Email and appname must be valid");
-            };
-        }
-
-        // GET api/Account/socialSignup
-        [OverrideAuthentication]
-        [HostAuthentication(Startup.ExternalCookieAuthenticationType)]
-        [AllowAnonymous]
-        [Route("socialSignupOwin")]
-        [HttpGet]
-        public async Task<IHttpActionResult> socialSignupOwin(string provider, string appName, string returnAddress, string parameters = null)
-        {
-            if (!User.Identity.IsAuthenticated)
-            {
-                return new ChallengeResult(provider, this);
-            }
-
-            System.Web.HttpContext.Current.Items.Add(Durados.Database.AppName, appName);
-            if (!System.Web.HttpContext.Current.Items.Contains(Durados.Database.RequestId))
-                System.Web.HttpContext.Current.Items.Add(Durados.Database.RequestId, Guid.NewGuid().ToString());
-
-            ClaimsIdentity claimsIdentity = User.Identity as ClaimsIdentity;
-            Social.ExternalLoginData externalLogin = Social.ExternalLoginData.FromIdentity(claimsIdentity);
-            var result = Request.GetOwinContext().Authentication.AuthenticateAsync(Startup.ExternalCookieAuthenticationType).Result;
-            //            Authentication.SignOut(Startup.ExternalCookieAuthenticationType);
-
-            string email = ExtractEmailAddress(result.Identity);
-
-            if (email != null &&
-                !string.IsNullOrWhiteSpace(appName) &&
-                !string.IsNullOrWhiteSpace(returnAddress) &&
-                (new DuradosAuthorizationHelper().IsAppExists(appName) || appName == Maps.DuradosAppName))
-            {
-                // check if user belongs to app
-                DataRow userRow = null;
-                if (appName == Maps.DuradosAppName)
-                {
-                    userRow = Maps.Instance.DuradosMap.Database.GetUserRow(email);
-                }
-                else
-                {
-                    userRow = Maps.Instance.GetMap(appName).Database.GetUserRow(email);
-                }
-                if (userRow != null)
-                {
-                    return BadRequest("The user already signed up to " + appName);
-                }
-                
-
-                Dictionary<string, object> values = new Dictionary<string, object>();
-
-                if (!string.IsNullOrEmpty(parameters) && parameters != "parameters")
-                {
-                    try
-                    {
-                        values = Durados.Web.Mvc.Controllers.Api.JsonConverter.Deserialize(parameters);
-                    }
-                    catch (Exception exception)
-                    {
-                        Log(appName, exception, 1);
-                        return BadRequest("Failed to get parameters");
-                    }
-                }
-                if (!values.ContainsKey("socialProfile"))
-                {
-                    values.Add("socialProfile", claimsIdentity.Claims.ToList());
-                }
-
-                try
-                {
-                    CallActionBeforeSignup(appName, email, claimsIdentity, values);
-                }
-                catch (Exception exception)
-                {
-                    Log(appName, exception, 1);
-                    return BadRequest("Failed to run beforeSocialSignup action");
-                }
-
-                Account account = new Account(this);
-
-                string firstName = ExtractFirstName(claimsIdentity);
-                if (values.ContainsKey("firstName") && values["firstName"] != null)
-                {
-                    firstName = values["firstName"].ToString(); 
-                }
-                if (firstName == null)
-                {
-                    firstName = email.Split('@').FirstOrDefault();
-                }
-
-                string lastName = ExtractLastName(claimsIdentity);
-                if (values.ContainsKey("lastName") && values["lastName"] != null)
-                {
-                    lastName = values["lastName"].ToString();
-                }
-                if (lastName == null)
-                {
-                    lastName = string.Empty;
-                }
-
-                var password = GeneratePassword(4, 4, 4);
-
-                Durados.Web.Mvc.UI.Helpers.Account.SignUpResults signUpResults = account.SignUp(appName, firstName, lastName, email, null, false, password, password, false, values, view_BeforeCreate, view_BeforeCreateInDatabase, view_AfterCreateBeforeCommit, view_AfterCreateAfterCommit, view_BeforeEdit, view_BeforeEditInDatabase, view_AfterEditBeforeCommit, view_AfterEditAfterCommit);
-                var response = new { username = signUpResults.Username, currentStatus = (int)signUpResults.Status, message = account.GetSignUpStatusMessage(signUpResults.Status), listOfPossibleStatus = account.GetListOfPossibleStatus() };
-                
-
-
-                var identity = new ClaimsIdentity("Bearer");
-                identity.AddClaim(new Claim("username", email));
-                identity.AddClaim(new Claim(ClaimTypes.AuthenticationMethod, provider));
-                identity.AddClaim(new Claim("appname", appName));
-
-                // create token
-                string AccessToken = CreateToken(identity);
-
-                // return token
-                if (returnAddress.Contains('?')) // already have query string
-                {
-                    returnAddress += "&";
-                }
-                else
-                {
-                    returnAddress += "?";
-                }
-
-                return Redirect(returnAddress + "token=" + AccessToken);
-            }
-            else //validation problem
-            {
-                return BadRequest("Email and appname must be valid");
-            };
-        }
-        */
-        
-        private void CallActionBeforeSignup(string appName, string username, Social.Profile profile, Dictionary<string, object> values)
+        private void CallActionBeforeSignup(string appName, string username, SocialProfile profile, Dictionary<string, object> values)
         {
             Map map = Maps.Instance.GetMap(appName);
             Durados.View view = map.Database.GetUserView();
@@ -1340,75 +1128,48 @@ namespace BackAnd.Web.Api.Controllers
             }
         }
 
-        /*
-        private void CallActionBeforeSignup(string appName, string username, ClaimsIdentity claimsIdentity, Dictionary<string, object> values)
+        public virtual void Signin(SocialProfile profile)
         {
-            Map map = Maps.Instance.GetMap(appName);
-            Durados.View view = map.Database.GetUserView();
-            if (view == null)
-                throw new Durados.DuradosException("user view not found");
+            string email = profile.email;
+            string appName = profile.appName;
+            string returnAddress = profile.returnAddress;
 
-
-
-            values.Add("firstName".AsToken(), ExtractFirstName(claimsIdentity));
-            values.Add("lastName".AsToken(), ExtractLastName(claimsIdentity));
-            values.Add("email".AsToken(), username);
-
-            if (map.HasRule("beforeSocialSignup"))
+            if (email != null &&
+                 !string.IsNullOrWhiteSpace(appName) &&
+                 !string.IsNullOrWhiteSpace(returnAddress) &&
+                 (new DuradosAuthorizationHelper().IsAppExists(appName) || appName == Maps.DuradosAppName))
             {
-                Durados.Web.Mvc.Workflow.Engine wfe = CreateWorkflowEngine();
-                wfe.PerformActions(this, view, Durados.TriggerDataAction.OnDemand, values, null, null, map.Database.ConnectionString, -1, null, null, "beforeSocialSignup");
+                // check if user belongs to app
+                DataRow userRow = null;
+                if (appName == Maps.DuradosAppName)
+                {
+                    userRow = Maps.Instance.DuradosMap.Database.GetUserRow(email);
+                    if (userRow == null)
+                    {
+                        throw new SocialException("The user is not signed up to " + appName);
+                    }
+                }
+                else
+                {
+                    userRow = Maps.Instance.GetMap(appName).Database.GetUserRow(email);
+                    if (userRow == null)
+                    {
+                        throw new SocialException("The user is not signed up to " + appName);
+                    }
+                    if (!userRow.IsNull("IsApproved"))
+                    {
+                        object isApproved = userRow["IsApproved"];
+                        if (isApproved.Equals(false) || isApproved.Equals(0))
+                        {
+                            throw new SocialException("The user did not finish signing up to " + appName);
+                        }
+                    }
+                }
             }
-        }
-
-        private static string ExtractEmailAddress(ClaimsIdentity result)
-        {
-            var claims = result.Claims.ToList().FirstOrDefault(a => a.Type == "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress");
-            if (claims != null)
+            else
             {
-                return claims.Value;
+                throw new SocialException("Email and appname must be valid");
             }
-
-            return null;
-        }
-
-        private static string ExtractFirstName(ClaimsIdentity result)
-        {
-            var claims = result.Claims.ToList().FirstOrDefault(a => a.Type == "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/givenname");
-            if (claims != null)
-            {
-                return claims.Value;
-            }
-
-            return null;
-        }
-
-        private static string ExtractLastName(ClaimsIdentity result)
-        {
-            var claims = result.Claims.ToList().FirstOrDefault(a => a.Type == "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/surname");
-            if (claims != null)
-            {
-                return claims.Value;
-            }
-
-            return null;
-        }
-        */
-
-        private static string CreateToken(ClaimsIdentity identity)
-        {
-            AuthenticationTicket ticket = new AuthenticationTicket(identity, new AuthenticationProperties());
-            Durados.Web.Mvc.Map map = Durados.Web.Mvc.Maps.Instance.GetMap(System.Web.HttpContext.Current.Items[Durados.Web.Mvc.Database.AppName].ToString());
-           
-            var currentUtc = new SystemClock().UtcNow;
-            ticket.Properties.IssuedUtc = currentUtc;
-            int expiration = map.Database.TokenExpiration;
-            if (expiration == 0 || expiration == 8640)
-                expiration = 86400;
-
-            ticket.Properties.ExpiresUtc = currentUtc.Add(TimeSpan.FromSeconds(expiration));
-            string AccessToken = Startup.OAuthBearerOptions.AccessTokenFormat.Protect(ticket);
-            return AccessToken;
         }
     }
 }
