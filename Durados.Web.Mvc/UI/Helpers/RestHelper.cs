@@ -3972,7 +3972,45 @@ namespace Durados.Web.Mvc.UI.Helpers
             return accountMembershipService.AuthenticateUser(username, password);
         }
 
+        public string GetEmailBySocialId(string provider, string socialId)
+        {
+            View view = GetUserSocialView();
 
+
+            int rowCount = -1;
+            DataView dataView = view.FillPage(1, 1, new Dictionary<string, object>() { { "Provider", provider }, { "SocialId", socialId } }, null, null, out rowCount, null, null);
+
+            if (dataView.Count == 0)
+            {
+                return null;
+            }
+
+            if (dataView.Count > 1)
+            {
+                throw new DuradosException("More than one found!");
+            }
+
+            string userId = dataView[0]["UserId"].ToString();
+            return GetDuradosMap().Database.GetUsernameById(userId);
+        }
+
+        private View GetUserSocialView()
+        {
+            string UserSocialViewName = "durados_UserSocial";
+            if (!GetDuradosMap().Database.Views.ContainsKey(UserSocialViewName))
+            {
+                throw new DuradosException("Missing user social table");
+            }
+            View view = (View)GetDuradosMap().Database.Views[UserSocialViewName];
+            return view;
+        }
+
+        public void SetEmailBySocialId(string provider, string socialId, string email)
+        {
+            View view = GetUserSocialView();
+            int userId = GetDuradosMap().Database.GetUserID(email);
+            view.Create(new Dictionary<string, object>() { { "Provider", provider }, { "UserId", userId }, { "SocialId", socialId } });
+        }
 
         private static MembershipProvider _provider = System.Web.Security.Membership.Provider;
 
