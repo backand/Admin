@@ -7,13 +7,14 @@ namespace Backand
     {
         private string BaseUrl = System.Configuration.ConfigurationManager.AppSettings["nodeHost"] ?? "http://127.0.0.1:9000";
         private string S3FilesBucket = System.Configuration.ConfigurationManager.AppSettings["S3FilesBucket"] ?? "files.backand.net";
-
+        private int MaxJSONSize = System.Convert.ToInt32(System.Configuration.ConfigurationManager.AppSettings["FtpMaxFileSize"] ?? "5")*1024*1024;
+        
         public string upload(string fileName, string fileData)
         {
             return upload(fileName, fileData, null);
         }
 
-        public string upload(string fileName, string fileData, string fileType)
+         public string upload(string fileName, string fileData, string fileType)
         {
             if (fileData == "file_stream" && System.Web.HttpContext.Current.Items["file_stream"] != null)
                 fileData = System.Web.HttpContext.Current.Items["file_stream"].ToString();
@@ -35,6 +36,7 @@ namespace Backand
             request.setRequestHeader("content-type", "application/json");
 
             System.Web.Script.Serialization.JavaScriptSerializer jss = new System.Web.Script.Serialization.JavaScriptSerializer();
+            jss.MaxJsonLength = MaxJSONSize;
             request.send(jss.Serialize(data));
 
             if (request.status != 200)
