@@ -604,7 +604,7 @@ namespace BackAnd.Web.Api.Controllers
             }
             catch (Exception exception)
             {
-                
+
                 //if (System.Web.HttpContext.Current.Items.Contains(GuidKey))
                 //{
                 //    string actionHeaderGuidValue = System.Web.HttpContext.Current.Items[GuidKey].ToString();
