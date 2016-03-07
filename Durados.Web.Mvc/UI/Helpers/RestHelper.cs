@@ -2127,7 +2127,7 @@ namespace Durados.Web.Mvc.UI.Helpers
             if (deep)
                 return RowToDeepDictionary(view, row, level, hideMetadata);
             else
-                return RowToShallowDictionary(view, row, pk, displayParentValue);
+                return RowToShallowDictionary(view, row, pk, displayParentValue, hideMetadata);
 
         }
 
@@ -2322,12 +2322,12 @@ namespace Durados.Web.Mvc.UI.Helpers
             return fk;
         }
 
-        public Dictionary<string, object> RowToShallowDictionary(View view, DataRow row, string pk, bool displayParentValue)
+        public Dictionary<string, object> RowToShallowDictionary(View view, DataRow row, string pk, bool displayParentValue, bool hideMetadata)
         {
             Json.View jsonView = view.GetJsonViewNotSerialized(DataAction.Edit, pk, row, string.Empty);
 
             Dictionary<string, object> dictionary = new Dictionary<string, object>();
-            dictionary.Add(Database.__metadata, GetRowMetadata(view, row));
+            dictionary.Add(Database.__metadata, GetRowMetadata(view, row, null, true, hideMetadata));
 
             foreach (string fieldName in jsonView.Fields.Keys)
             {
