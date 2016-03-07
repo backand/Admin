@@ -548,7 +548,7 @@ namespace BackAnd.Web.Api.Controllers
         }
 
         [BackAnd.Web.Api.Controllers.Filters.ResponseHeaderFilter]
-        public virtual IHttpActionResult Post(string name, bool? deep = null, bool? returnObject = null, string parameters = null)
+        public virtual IHttpActionResult Post(string name, bool? deep = null, bool? returnObject = null, string parameters = null, string exclude = null)
         {
             Dictionary<string, object>[] values = null;
             try
@@ -576,9 +576,11 @@ namespace BackAnd.Web.Api.Controllers
                 string[] pkArray = pk.Split(';');
                 int pkArrayLength = pkArray.Length;
 
+                bool hideMetadata = exclude != null && exclude.ToLower().Contains("metadata");
+                
                 if (returnObject.HasValue && returnObject.Value && pkArrayLength == 1)
                 {
-                    var item = RestHelper.Get(view, pk, deep ?? false, view_BeforeSelect, view_AfterSelect);
+                    var item = RestHelper.Get(view, pk, deep ?? false, view_BeforeSelect, view_AfterSelect, false, false, false, 3, hideMetadata);
                     return Ok(item);
                 }
                 else if (returnObject.HasValue && returnObject.Value && pkArrayLength > 1 && pkArrayLength <= 100)
@@ -586,7 +588,7 @@ namespace BackAnd.Web.Api.Controllers
                     List<Dictionary<string, object>> data = new List<Dictionary<string, object>>();
                     foreach (string key in pkArray)
                     {
-                        var item = RestHelper.Get(view, key, deep ?? false, view_BeforeSelect, view_AfterSelect);
+                        var item = RestHelper.Get(view, key, deep ?? false, view_BeforeSelect, view_AfterSelect, false, false, false, 3, hideMetadata);
                         data.Add(item);
                     }
 
@@ -745,7 +747,7 @@ namespace BackAnd.Web.Api.Controllers
         }
 
         [BackAnd.Web.Api.Controllers.Filters.ResponseHeaderFilter]
-        public virtual IHttpActionResult Put(string name, string id, bool? deep = null, bool? returnObject = null, string parameters = null, bool? overwrite = null)
+        public virtual IHttpActionResult Put(string name, string id, bool? deep = null, bool? returnObject = null, string parameters = null, bool? overwrite = null, string exclude = null)
         {
             try
             {
@@ -802,9 +804,11 @@ namespace BackAnd.Web.Api.Controllers
                     return ResponseMessage(Request.CreateResponse(HttpStatusCode.NotFound, string.Format(Messages.ItemWithIdNotFound, id, name)));
                 }
 
+                bool hideMetadata = exclude != null && exclude.ToLower().Contains("metadata");
+                
                 if (returnObject.HasValue && returnObject.Value)
                 {
-                    var item = RestHelper.Get(view, id, deep ?? false, view_BeforeSelect, view_AfterSelect);
+                    var item = RestHelper.Get(view, id, deep ?? false, view_BeforeSelect, view_AfterSelect, false, false, false, 3, hideMetadata);
                     return Ok(item);
                 }
 
