@@ -163,7 +163,7 @@ namespace Backand
                 }
                 else
                 {
-                    bytes = System.Text.Encoding.ASCII.GetBytes(data);
+                    bytes = System.Text.Encoding.UTF8.GetBytes(data);
                 }
                 request.ContentLength = bytes.Length;
                 
@@ -182,7 +182,7 @@ namespace Backand
                 {
                     try
                     {
-                        string requestBody = System.Text.Encoding.ASCII.GetString(bytes); 
+                        string requestBody = System.Text.Encoding.UTF8.GetString(bytes); 
 
                     }
                     catch { }
@@ -231,7 +231,7 @@ namespace Backand
                 if (we.Status == WebExceptionStatus.Timeout)
                     status = (int)HttpStatusCode.RequestTimeout;
                 responseText = we.Message;
-                var encoding = ASCIIEncoding.ASCII;
+                var encoding = UTF8Encoding.UTF8;
                 if (we.Response != null)
                 {
                     using (var reader = new System.IO.StreamReader(we.Response.GetResponseStream(), encoding))
