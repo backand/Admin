@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using System.Data.SqlClient;
+using System.Collections.Specialized;
 
 namespace BackAnd.UnitTests
 {
@@ -144,7 +145,7 @@ namespace BackAnd.UnitTests
         [TestMethod]
         public void TestCanWriteToKibana()
         {
-            var controller = "shondaoson";
+            var controller = "RavivDruker";
             var action = "action";
             var method = "method";
             var message = "message";
@@ -161,8 +162,12 @@ namespace BackAnd.UnitTests
             var clientIp = "clientIP";
             var clientInfo = "clientInfo";
 
+            var cc = new NameValueCollection();
+            cc.Add("keykey", "valueluve");
+            cc.Add("keykey", 123.ToString());
+
             this.ValidMap.Logger.WriteToLogstash(controller, action, method, message, trace, logType, freeText, time, guid, log, applicationName, username,
-                appName, clientIp, clientInfo, 3550);
+                appName, clientIp, clientInfo, 3550, cc);
         }
 
         private static DataView FetchLogEntry(Guid? guid, View view)
@@ -185,3 +190,4 @@ namespace BackAnd.UnitTests
         }
     }
 }
+
