@@ -297,6 +297,12 @@ namespace Durados.Workflow
                     {
                         string keyWithoutToken = key.TrimStart("{{".ToCharArray()).TrimEnd("}}".ToCharArray());
 
+                        if (key.StartsWith("{{"))
+                        {
+                            if (!clientParameters.ContainsKey(keyWithoutToken))
+                                clientParameters.Add(keyWithoutToken, values[key]);
+                        }
+
                         if (view.GetFieldsByJsonName(keyWithoutToken) == null || view.GetFieldsByJsonName(keyWithoutToken).Length == 0)
                         {
                             if (view.Fields.ContainsKey(keyWithoutToken))
@@ -306,11 +312,7 @@ namespace Durados.Workflow
                                 if (!newRow.ContainsKey(jsonName))
                                     newRow.Add(jsonName, values[key]);
                             }
-                            else
-                            {
-                                if (!clientParameters.ContainsKey(keyWithoutToken))
-                                    clientParameters.Add(keyWithoutToken, values[key]);
-                            }
+                            
                         }
                         else
                         {

@@ -463,9 +463,13 @@ namespace Durados.Web.Mvc.Logging
             string clientIP = GetClientIP();
             string clientInfo = GetClientInfo();
             var refferer = GetClientUrl();
+            var clientAgent = GetClientAgent();
+            var clientLanguages = GetClientLanguages();
 
             NameValueCollection coll = new NameValueCollection();
             coll.Add("Refferer", refferer);
+            coll.Add("Agent", clientAgent);
+            coll.Add("Languages", clientLanguages == null ? null : string.Join(",", clientLanguages));
 
 
             if (guid != null)
@@ -495,6 +499,18 @@ namespace Durados.Web.Mvc.Logging
         {
             return System.Web.HttpContext.Current != null ? System.Web.HttpContext.Current.Request != null ? 
                 System.Web.HttpContext.Current.Request.UrlReferrer != null ? System.Web.HttpContext.Current.Request.UrlReferrer.AbsoluteUri : null : null : null;
+        }
+
+        private static string GetClientAgent()
+        {
+            return System.Web.HttpContext.Current != null ? System.Web.HttpContext.Current.Request != null ?
+                System.Web.HttpContext.Current.Request.UrlReferrer != null ? System.Web.HttpContext.Current.Request.UserAgent : null : null : null;
+        }
+
+        private static string[] GetClientLanguages()
+        {
+            return System.Web.HttpContext.Current != null ? System.Web.HttpContext.Current.Request != null ?
+                System.Web.HttpContext.Current.Request.UrlReferrer != null ? System.Web.HttpContext.Current.Request.UserLanguages : null : null : null;
         }
 
         private void WriteToJavaScriptDebugLogger(string controller, string action, string method, string message, string trace, int logType, string freeText, DateTime time, Guid? guid, Log log, string applicationName, string username)

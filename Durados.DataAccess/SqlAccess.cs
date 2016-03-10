@@ -9826,6 +9826,11 @@ namespace Durados.DataAccess
         }
         */
 
+        private bool IsSameResource(IDbConnection connection, string connectionString)
+        {
+            return connectionString.Contains(connection.Database);
+        }
+
         public string Create(View view, Dictionary<string, object>[] deepObjects, bool deep, BeforeCreateEventHandler beforeCreateCallback, BeforeCreateInDatabaseEventHandler beforeCreateInDatabaseCallback, AfterCreateEventHandler afterCreateBeforeCommitCallback, AfterCreateEventHandler afterCreateAfterCommitCallback, IDbCommand command = null, IDbCommand sysCommand = null)
         {
             string pk = string.Empty;
@@ -9838,7 +9843,7 @@ namespace Durados.DataAccess
 
             try
             {
-                if (command == null || command.Connection.State == ConnectionState.Closed || command.Connection.ConnectionString != view.ConnectionString)
+                if (command == null || command.Connection.State == ConnectionState.Closed || !IsSameResource(command.Connection, view.ConnectionString))
                 {
                     connection = SqlAccess.GetNewConnection(GetProduct(view));
 
@@ -9850,7 +9855,7 @@ namespace Durados.DataAccess
                     command.Transaction = transaction;
                 }
 
-                if (sysCommand == null || sysCommand.Connection.State == ConnectionState.Closed || command.Connection.ConnectionString != view.ConnectionString)
+                if (sysCommand == null || sysCommand.Connection.State == ConnectionState.Closed || !IsSameResource(command.Connection, view.ConnectionString))
                 {
                     if (!identicalSystemConnection)
                     {
@@ -10043,7 +10048,7 @@ namespace Durados.DataAccess
 
             try
             {
-                if (command == null || command.Connection.State == ConnectionState.Closed || command.Connection.ConnectionString != view.ConnectionString)
+                if (command == null || command.Connection.State == ConnectionState.Closed || !IsSameResource(command.Connection, view.ConnectionString))
                 {
                     connection = SqlAccess.GetNewConnection(GetProduct(view));
 
@@ -10055,7 +10060,7 @@ namespace Durados.DataAccess
                     command.Transaction = transaction;
                 }
 
-                if (sysCommand == null || sysCommand.Connection.State == ConnectionState.Closed || command.Connection.ConnectionString != view.ConnectionString)
+                if (sysCommand == null || sysCommand.Connection.State == ConnectionState.Closed || !IsSameResource(command.Connection, view.ConnectionString))
                 {
                     if (!identicalSystemConnection)
                     {
@@ -10278,9 +10283,9 @@ namespace Durados.DataAccess
 
         public int Delete(View view, string pk, bool deep, BeforeDeleteEventHandler beforeDeleteCallback, AfterDeleteEventHandler afterDeleteBeforeCommitCallback, AfterDeleteEventHandler afterDeleteAfterCommitCallback, IDbCommand command = null, IDbCommand sysCommand = null, Dictionary<string, object> values = null)
         {
-            if ((command != null && command.Connection.State == ConnectionState.Closed) || (command != null && command.Connection.ConnectionString != view.ConnectionString))
+            if ((command != null && command.Connection.State == ConnectionState.Closed) || (command != null && !IsSameResource(command.Connection, view.ConnectionString)))
                 command = null;
-            if ((sysCommand != null && sysCommand.Connection.State == ConnectionState.Closed) || (command != null && command.Connection.ConnectionString != view.ConnectionString))
+            if ((sysCommand != null && sysCommand.Connection.State == ConnectionState.Closed) || (command != null && !IsSameResource(command.Connection, view.ConnectionString)))
                 sysCommand = null;
             return GetSqlAccess(view).Delete(view, pk, beforeDeleteCallback, afterDeleteBeforeCommitCallback, afterDeleteAfterCommitCallback, command, sysCommand, values);
         }
