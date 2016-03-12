@@ -312,6 +312,11 @@ namespace Durados.Workflow
                                 if (!newRow.ContainsKey(jsonName))
                                     newRow.Add(jsonName, values[key]);
                             }
+                            else
+                            {
+                                if (!clientParameters.ContainsKey(keyWithoutToken))
+                                    clientParameters.Add(keyWithoutToken, values[key]);
+                            }
                             
                         }
                         else
