@@ -1,14 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Collections.Specialized;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 
 namespace Durados.Web.Mvc.Logging
 {
-   
-    public class StashLogMessage : Dictionary<string,string>
+
+    public class StashLogMessage : Dictionary<string, string>
     {
         public string ID
         {
@@ -27,46 +22,48 @@ namespace Durados.Web.Mvc.Logging
         }
         public string Username
         {
-            
+
             set
             {
                 this["Username"] = value;
             }
         }
-        public string MachineName 
+        public string MachineName
         {
-           set 
-           {
+            set
+            {
                 this["MachineName"] = value;
-            } 
+            }
         }
 
-        public string Time 
-        { 
-            set 
+        public string Time
+        {
+            set
             {
                 this["Time"] = value;
             }
         }
         public string Controller
         {
-            
+
             set
             {
                 this["Controller"] = value;
             }
         }
-        public string Action { 
-            set 
+        public string Action
+        {
+            set
             {
                 this["Action"] = value;
-            } 
+            }
         }
-        public string MethodName { 
-            set 
+        public string MethodName
+        {
+            set
             {
                 this["MethodName"] = value;
-            } 
+            }
         }
         public string LogType
         {
@@ -89,23 +86,24 @@ namespace Durados.Web.Mvc.Logging
                 this["Trace"] = value;
             }
         }
-        public string FreeText 
-        { 
-            set 
+        public string FreeText
+        {
+            set
             {
                 this["FreeText"] = value;
             }
         }
-        public string Guid 
-        { 
-            set 
+        public string Guid
+        {
+            set
             {
                 this["Guid"] = value;
             }
         }
 
-        public string ClientInfo { 
-            set 
+        public string ClientInfo
+        {
+            set
             {
                 this["ClientInfo"] = value;
             }
@@ -119,11 +117,18 @@ namespace Durados.Web.Mvc.Logging
             }
         }
 
-        public int? RequestTime 
-        { 
-            set 
+        public int? RequestTime
+        {
+            set
             {
-                this["RequestTime"] = value.Value.ToString(); 
+
+                if (value != null && value.HasValue)
+
+                {
+
+                    this["RequestTime"] = value.Value.ToString();
+
+                }
             }
         }
 

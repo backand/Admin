@@ -142,7 +142,9 @@ namespace Durados.Web.Mvc.SocialLogin
 
         protected override SocialApplicationKeys GetSocialKeysFromDatabase(Map map)
         {
-            return new SocialApplicationKeys { ClientId = map.Database.GoogleClientId, ClientSecret = map.Database.GoogleClientSecret };
+            return new SocialApplicationKeys {
+                ClientId = map.Database.GoogleClientId,
+                ClientSecret = map.Database.GoogleClientSecret };
         }
 
 
