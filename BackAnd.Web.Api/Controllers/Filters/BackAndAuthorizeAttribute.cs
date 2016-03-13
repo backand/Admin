@@ -240,6 +240,12 @@ namespace BackAnd.Web.Api.Controllers.Filters
 
         private bool IsBasicAuthorized(BasicAuthenticationIdentity basicAuthenticationIdentity, out string username, out string appName)
         {
+            if (basicAuthenticationIdentity == null)
+            {
+                appName = null;
+                username = null;
+                return false;
+            }
             appName = Maps.Instance.GetAppNameByGuid(basicAuthenticationIdentity.AppGuid);
             Map map = Maps.Instance.GetMap(appName);
             if (map == null || map.IsMainMap)

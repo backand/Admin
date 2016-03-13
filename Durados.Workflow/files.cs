@@ -7,7 +7,8 @@ namespace Backand
     {
         private string BaseUrl = System.Configuration.ConfigurationManager.AppSettings["nodeHost"] ?? "http://127.0.0.1:9000";
         private string S3FilesBucket = System.Configuration.ConfigurationManager.AppSettings["S3FilesBucket"] ?? "files.backand.net";
-
+        private int MaxJSONSizeMB = System.Convert.ToInt32(System.Configuration.ConfigurationManager.AppSettings["FtpMaxFileSize"] ?? "5");
+        
         public string upload(string fileName, string fileData)
         {
             return upload(fileName, fileData, null);
@@ -15,8 +16,14 @@ namespace Backand
 
         public string upload(string fileName, string fileData, string fileType)
         {
+            int MaxJSONSize = MaxJSONSizeMB * 1024 * 1024;
             if (fileData == "file_stream" && System.Web.HttpContext.Current.Items["file_stream"] != null)
                 fileData = System.Web.HttpContext.Current.Items["file_stream"].ToString();
+            if (IsSizeExceeded(fileData, MaxJSONSize))
+            {
+                throw new Durados.DuradosException("File size is limited to " + MaxJSONSizeMB + " MB");
+            }
+            
             string url = BaseUrl + "/uploadFile";
             XMLHttpRequest request = new XMLHttpRequest();
             request.open("POST", url, false);
@@ -35,6 +42,7 @@ namespace Backand
             request.setRequestHeader("content-type", "application/json");
 
             System.Web.Script.Serialization.JavaScriptSerializer jss = new System.Web.Script.Serialization.JavaScriptSerializer();
+            jss.MaxJsonLength = int.MaxValue;
             request.send(jss.Serialize(data));
 
             if (request.status != 200)
@@ -57,6 +65,12 @@ namespace Backand
                 throw new Durados.DuradosException("The response does not contain the link");
             }
             return response["link"].ToString();
+        }
+
+        private bool IsSizeExceeded(string fileData, int MaxJSONSize)
+        {
+            int size = fileData.Length;
+            return size > MaxJSONSize * 4 / 3;
         }
 
         public void delete(string fileName)

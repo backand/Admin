@@ -1132,8 +1132,10 @@ namespace Durados
             //Categories.Add("General", new Category() { Name = "General", View = this });
             OpenSingleRow = false;
 
-            CreateDateColumnName = "CreateDate";
-            ModifiedDateColumnName = "ModifiedDate";
+            //CreateDateColumnName = "CreateDate";
+            //ModifiedDateColumnName = "ModifiedDate";
+            CreateDateColumnName = "createdAt";
+            ModifiedDateColumnName = "updatedAt";
             CreatedByColumnName = "CreateUserId";
             ModifiedByColumnName = "ModifiedUserId";
             GroupFilterDisplayLabel = true;

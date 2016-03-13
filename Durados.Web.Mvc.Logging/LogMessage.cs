@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -7,28 +8,129 @@ using System.Threading.Tasks;
 namespace Durados.Web.Mvc.Logging
 {
    
-    public class StashLogMessage
+    public class StashLogMessage : Dictionary<string,string>
     {
-        public string ID { get; set; }
-        public string ApplicationName { get; set; }
-        public string Username { get; set; }
-        public string MachineName { get; set; }
-        public string Time { get; set; }
-        public string Controller { get; set; }
-        public string Action { get; set; }
-        public string MethodName { get; set; }
-        public string LogType { get; set; }
-        public string ExceptionMessage { get; set; }
-        public string Trace { get; set; }
-        public string FreeText { get; set; }
-        public string Guid { get; set; }
+        public string ID
+        {
+            set
+            {
+                this["ID"] = value;
+            }
+        }
 
-        public string ClientInfo { get; set; }
+        public string ApplicationName
+        {
+            set
+            {
+                this["ApplicationName"] = value;
+            }
+        }
+        public string Username
+        {
+            
+            set
+            {
+                this["Username"] = value;
+            }
+        }
+        public string MachineName 
+        {
+           set 
+           {
+                this["MachineName"] = value;
+            } 
+        }
 
-        public string ClientIP { get; set; }
+        public string Time 
+        { 
+            set 
+            {
+                this["Time"] = value;
+            }
+        }
+        public string Controller
+        {
+            
+            set
+            {
+                this["Controller"] = value;
+            }
+        }
+        public string Action { 
+            set 
+            {
+                this["Action"] = value;
+            } 
+        }
+        public string MethodName { 
+            set 
+            {
+                this["MethodName"] = value;
+            } 
+        }
+        public string LogType
+        {
+            set
+            {
+                this["LogType"] = value;
+            }
+        }
+        public string ExceptionMessage
+        {
+            set
+            {
+                this["ExceptionMessage"] = value;
+            }
+        }
+        public string Trace
+        {
+            set
+            {
+                this["Trace"] = value;
+            }
+        }
+        public string FreeText 
+        { 
+            set 
+            {
+                this["FreeText"] = value;
+            }
+        }
+        public string Guid 
+        { 
+            set 
+            {
+                this["Guid"] = value;
+            }
+        }
 
-        public int? RequestTime { get; set; }
+        public string ClientInfo { 
+            set 
+            {
+                this["ClientInfo"] = value;
+            }
+        }
 
-        public string Source = "WebApi";
+        public string ClientIP
+        {
+            set
+            {
+                this["ClientIP"] = value;
+            }
+        }
+
+        public int? RequestTime 
+        { 
+            set 
+            {
+                this["RequestTime"] = value.Value.ToString(); 
+            }
+        }
+
+
+        public StashLogMessage()
+        {
+            this["Source"] = "WebApi";
+        }
     }
 }

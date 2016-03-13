@@ -73,8 +73,20 @@ namespace Backand
             send(null);
         }
 
+        private void Log(int logType, string freeText, Exception exception = null)
+        {
+            try
+            {
+                Durados.Database database = Durados.Workflow.Engine.GetCurrentDatabase();
+                database.Logger.Log(request.RequestUri.AbsoluteUri, request.Method, "Durados.Workflow", exception == null ? string.Empty : exception.Message, exception == null ? string.Empty : exception.StackTrace, logType, freeText, DateTime.Now);
+            }
+            catch { }
+        }
+
         public void send(string data)
         {
+            Log(3, "Started");
+
             try
             {
                 if (Durados.Workflow.JavaScript.IsCrud(request))
@@ -151,7 +163,7 @@ namespace Backand
                 }
                 else
                 {
-                    bytes = System.Text.Encoding.ASCII.GetBytes(data);
+                    bytes = System.Text.Encoding.UTF8.GetBytes(data);
                 }
                 request.ContentLength = bytes.Length;
                 
@@ -170,7 +182,7 @@ namespace Backand
                 {
                     try
                     {
-                        string requestBody = System.Text.Encoding.ASCII.GetString(bytes); 
+                        string requestBody = System.Text.Encoding.UTF8.GetString(bytes); 
 
                     }
                     catch { }
@@ -210,13 +222,16 @@ namespace Backand
                     }
                 }
                 response.Close();//Close HttpWebResponse
+
+                Log(3, "Ended with status " + status);
+
             }
             catch (WebException we)
             {   //TODO: Add custom exception handling
                 if (we.Status == WebExceptionStatus.Timeout)
                     status = (int)HttpStatusCode.RequestTimeout;
                 responseText = we.Message;
-                var encoding = ASCIIEncoding.ASCII;
+                var encoding = UTF8Encoding.UTF8;
                 if (we.Response != null)
                 {
                     using (var reader = new System.IO.StreamReader(we.Response.GetResponseStream(), encoding))
@@ -225,9 +240,15 @@ namespace Backand
                     }
                     status = (int)((System.Net.HttpWebResponse)(we.Response)).StatusCode;
                 }
-                
+                Log(1, "Ended with status " + status, we);
+
             }
-            catch (Exception ex) { throw new Exception(ex.Message); }
+            catch (Exception ex) 
+            {
+                Log(1, "Ended with status " + status, ex);
+
+                throw new Exception(ex.Message); 
+            }
             finally
             {
                 if (response != null)

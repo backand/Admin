@@ -46,7 +46,13 @@ namespace BackAnd.Web.Api.Controllers.Filters
 
                 HandleConnectionFailure(map, exception);
 
-                map.Logger.Log(apiController.GetControllerNameForLog(apiController.ControllerContext), (apiController.ControllerContext.RouteData.Values["action"] ?? string.Empty).ToString(), appName + ": " + exception.Source, exception, 1, actionExecutedContext.Request.RequestUri.ToString(), DateTime.Now);
+                string actionName = string.Empty;
+                if (apiController.ControllerContext.RouteData.Values.ContainsKey("action"))
+                {
+                    actionName = (apiController.ControllerContext.RouteData.Values["action"] ?? string.Empty).ToString();
+                }
+
+                map.Logger.Log(apiController.GetControllerNameForLog(apiController.ControllerContext), actionName, appName + ": " + exception.Source, exception, 1, actionExecutedContext.Request.RequestUri.ToString(), DateTime.Now);
             }
             catch (Exception e)
             {

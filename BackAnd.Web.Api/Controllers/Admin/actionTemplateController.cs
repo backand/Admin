@@ -272,10 +272,10 @@ namespace BackAnd.Web.Api.Controllers
                 Dictionary<string, object> rulesParameters = view.Deserialize(System.Web.HttpContext.Current.Server.UrlDecode(parameters));
                 foreach (string key in rulesParameters.Keys)
                 {
-                    if (values.ContainsKey(key))
-                    {
-                        throw new Durados.DuradosException("The name of a parameter cannot be the same as a field.");
-                    }
+                    //if (values.ContainsKey(key))
+                    //{
+                    //    throw new Durados.DuradosException("The name of a parameter cannot be the same as a field.");
+                    //}
                     values2.Add(key.AsToken(), rulesParameters[key]);
                 }
             }

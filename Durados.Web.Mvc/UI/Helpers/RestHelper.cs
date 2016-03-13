@@ -73,15 +73,15 @@ namespace Durados.Web.Mvc.UI.Helpers
             stat.AddStat(item, appName, reset);
         }
 
-        public static Dictionary<string, Dictionary<string, object>> ReferenceTableToDictionary(View view, DataView dataView, bool deep = false, bool descriptive = true)
+        public static Dictionary<string, Dictionary<string, object>> ReferenceTableToDictionary(View view, DataView dataView, bool deep = false, bool descriptive = true, bool hideMetadata = false)
         {
-            return new DictionaryConverter().ReferenceTableToDictionary(view, dataView, deep, descriptive);
+            return new DictionaryConverter().ReferenceTableToDictionary(view, dataView, deep, descriptive, hideMetadata);
         }
 
 
-        public static Dictionary<string, object>[] TableToDictionary(View view, DataView dataView, bool deep = false, bool descriptive = true, bool relatedObjects = false)
+        public static Dictionary<string, object>[] TableToDictionary(View view, DataView dataView, bool deep = false, bool descriptive = true, bool relatedObjects = false, bool hideMetadata = false)
         {
-            return new DictionaryConverter().TableToDictionary(view, dataView, deep, descriptive, relatedObjects);
+            return new DictionaryConverter().TableToDictionary(view, dataView, deep, descriptive, relatedObjects, 3, hideMetadata);
         }
 
         public static Dictionary<string, object> RowToDictionary(View view, DataRow row, string pk, bool deep, bool displayParentValue = false, int level = 3, bool hideMetadata = false)
@@ -275,7 +275,7 @@ namespace Durados.Web.Mvc.UI.Helpers
             return System.Web.HttpContext.Current.Request.Url.PathAndQuery;
         }
 
-        public static object Get(this View view, bool withSelectOptions, bool withFilterOptions, int page, int pageSize, Dictionary<string, object>[] filter, string search, Dictionary<string, object>[] sort, out int rowCount, bool deep, BeforeSelectEventHandler beforeSelectCallback, AfterSelectEventHandler afterSelectCallback, bool returnDataView = false, bool descriptive = true, bool useCache = false, bool relatedObjects = false, string where = null)
+        public static object Get(this View view, bool withSelectOptions, bool withFilterOptions, int page, int pageSize, Dictionary<string, object>[] filter, string search, Dictionary<string, object>[] sort, out int rowCount, bool deep, BeforeSelectEventHandler beforeSelectCallback, AfterSelectEventHandler afterSelectCallback, bool returnDataView = false, bool descriptive = true, bool useCache = false, bool relatedObjects = false, string where = null, bool hideMetadata = false, bool hideTotalRows = false)
         {
             if (useCache)
             {
@@ -311,10 +311,11 @@ namespace Durados.Web.Mvc.UI.Helpers
                 return dataView;
 
             Dictionary<string, object> json = new Dictionary<string, object>();
-            json.Add("totalRows", rowCount);
+            if (!hideTotalRows)
+                json.Add("totalRows", rowCount);
             if (!relatedObjects)
                 relatedObjects = deep;
-            json.Add("data", TableToDictionary(view, dataView, deep, descriptive, relatedObjects));
+            json.Add("data", TableToDictionary(view, dataView, deep, descriptive, relatedObjects, hideMetadata));
 
             if (relatedObjects)
             {
@@ -324,7 +325,7 @@ namespace Durados.Web.Mvc.UI.Helpers
                     if (table.TableName != dataView.Table.TableName && table.Rows.Count > 0)
                     {
                         View referenceView = (View)view.Database.Views[table.TableName];
-                        referenceTables.Add(referenceView.JsonName, ReferenceTableToDictionary(referenceView, new DataView(table), deep));
+                        referenceTables.Add(referenceView.JsonName, ReferenceTableToDictionary(referenceView, new DataView(table), deep, descriptive, hideMetadata));
                     }
                 }
                 json.Add("relatedObjects", referenceTables);
@@ -1799,13 +1800,13 @@ namespace Durados.Web.Mvc.UI.Helpers
                 }
                 else
                 {
-                    list.Add(RowToDictionary(view, dataView, tableViewer, row, deep, descriptive));
+                    list.Add(RowToDictionary(view, dataView, tableViewer, row, deep, descriptive, hideMetadata));
                 }
             }
             return list.ToArray();
         }
 
-        public Dictionary<string, Dictionary<string, object>> ReferenceTableToDictionary(View view, DataView dataView, bool deep = false, bool descriptive = true)
+        public Dictionary<string, Dictionary<string, object>> ReferenceTableToDictionary(View view, DataView dataView, bool deep = false, bool descriptive = true, bool hideMetadata = false)
         {
             Dictionary<string, Dictionary<string, object>> dictionary = new Dictionary<string, Dictionary<string, object>>();
 
@@ -1816,15 +1817,15 @@ namespace Durados.Web.Mvc.UI.Helpers
 
             foreach (System.Data.DataRowView row in dataView)
             {
-                dictionary.Add(view.GetPkValue(row.Row), RowToDictionary(view, dataView, tableViewer, row, deep, descriptive));
+                dictionary.Add(view.GetPkValue(row.Row), RowToDictionary(view, dataView, tableViewer, row, deep, descriptive, hideMetadata));
             }
             return dictionary;
         }
 
-        private Dictionary<string, object> RowToDictionary(View view, DataView dataView, Durados.Web.Mvc.UI.TableViewer tableViewer, System.Data.DataRowView row, bool deep = false, bool descriptive = true)
+        private Dictionary<string, object> RowToDictionary(View view, DataView dataView, Durados.Web.Mvc.UI.TableViewer tableViewer, System.Data.DataRowView row, bool deep = false, bool descriptive = true, bool hideMetadata = false)
         {
             Dictionary<string, object> dictionary = new Dictionary<string, object>();
-            dictionary.Add(Database.__metadata, GetRowMetadata(view, row.Row, tableViewer, descriptive));
+            dictionary.Add(Database.__metadata, GetRowMetadata(view, row.Row, tableViewer, descriptive, hideMetadata));
 
             foreach (Durados.Field field in view.VisibleFieldsForTableFirstRow)
             {
@@ -1947,69 +1948,71 @@ namespace Durados.Web.Mvc.UI.Helpers
             return false;
         }
 
-        private Dictionary<string, object> GetRowMetadata(View view, DataRow row, Durados.Web.Mvc.UI.TableViewer tableViewer = null, bool descriptive = true)
+        private Dictionary<string, object> GetRowMetadata(View view, DataRow row, Durados.Web.Mvc.UI.TableViewer tableViewer = null, bool descriptive = true, bool hideMetadata = false)
         {
 
             Dictionary<string, object> metadata = new Dictionary<string, object>();
             metadata.Add("id", view.GetPkValue(row));
-            try
+            if (!hideMetadata)
             {
-                metadata.Add("fields", GetFieldsTypes(view));
-            }
-            catch (Exception exception)
-            {
-                Maps.Instance.DuradosMap.Logger.Log("RestHelper", "GetRowMetadata", "GetFieldsTypes", exception, 1, null);
-            }
-            if (!view.Database.IsConfig)
-            {
-                if (descriptive)
+                try
                 {
-                    Dictionary<string, object> descriptives = new Dictionary<string, object>();
-                    //foreach (ParentField field in view.Fields.Values.Where(f => f.GetHtmlControlType() == HtmlControlType.Autocomplete))
-                    foreach (ParentField field in view.Fields.Values.Where(f => f.FieldType == FieldType.Parent))
-                    {
-                        string value = field.GetValue(row);
-                        string label = string.Empty;
-                        if (row.GetParentRow(field.DataRelation.RelationName) == null)
-                            label = field.GetDisplayValue(value);
-                        else
-                            label = field.ConvertToString(row);
-
-                        descriptives.Add(GetName(field), new Dictionary<string, object>() { { "label", label }, { "value", value } });
-                    }
-                    foreach (ChildrenField field in view.Fields.Values.Where(f => f.FieldType == FieldType.Children && f.IsCheckList()))
-                    {
-                        string value = field.GetValue(row);
-                        string label = null;
-                        if (tableViewer != null)
-                        {
-                            value = tableViewer.GetFieldValue(field, row);
-                            label = tableViewer.GetFieldDisplayValue(field, row, false).Replace(",", ", ");
-                        }
-                        else
-                        {
-                            string pk = field.View.GetPkValue(row);
-                            value = field.GetSelectedChildrenPKDelimited(pk);
-                            label = field.GetDisplayValue(pk);
-                        }
-
-                        descriptives.Add(GetName(field), new Dictionary<string, object>() { { "label", label }, { "value", value } });
-                    }
-                    metadata.Add("descriptives", descriptives);
+                    metadata.Add("fields", GetFieldsTypes(view));
                 }
-                System.Web.Script.Serialization.JavaScriptSerializer javaScriptSerializer = new System.Web.Script.Serialization.JavaScriptSerializer();
-
-                Dictionary<string, object> dates = new Dictionary<string, object>();
-                foreach (ColumnField field in view.Fields.Values.Where(f => f.FieldType == FieldType.Column && f.GetColumnFieldType() == ColumnFieldType.DateTime))
+                catch (Exception exception)
                 {
-                    string value = row.IsNull(field.DataColumn.ColumnName) ? string.Empty : ((DateTime)row[field.DataColumn.ColumnName]).ToUniversalTime().ToString("u");
-                    dates.Add(GetName(field), value);
+                    Maps.Instance.DuradosMap.Logger.Log("RestHelper", "GetRowMetadata", "GetFieldsTypes", exception, 1, null);
                 }
-                metadata.Add("dates", dates);
+                if (!view.Database.IsConfig)
+                {
+                    if (descriptive)
+                    {
+                        Dictionary<string, object> descriptives = new Dictionary<string, object>();
+                        //foreach (ParentField field in view.Fields.Values.Where(f => f.GetHtmlControlType() == HtmlControlType.Autocomplete))
+                        foreach (ParentField field in view.Fields.Values.Where(f => f.FieldType == FieldType.Parent))
+                        {
+                            string value = field.GetValue(row);
+                            string label = string.Empty;
+                            if (row.GetParentRow(field.DataRelation.RelationName) == null)
+                                label = field.GetDisplayValue(value);
+                            else
+                                label = field.ConvertToString(row);
+
+                            descriptives.Add(GetName(field), new Dictionary<string, object>() { { "label", label }, { "value", value } });
+                        }
+                        foreach (ChildrenField field in view.Fields.Values.Where(f => f.FieldType == FieldType.Children && f.IsCheckList()))
+                        {
+                            string value = field.GetValue(row);
+                            string label = null;
+                            if (tableViewer != null)
+                            {
+                                value = tableViewer.GetFieldValue(field, row);
+                                label = tableViewer.GetFieldDisplayValue(field, row, false).Replace(",", ", ");
+                            }
+                            else
+                            {
+                                string pk = field.View.GetPkValue(row);
+                                value = field.GetSelectedChildrenPKDelimited(pk);
+                                label = field.GetDisplayValue(pk);
+                            }
+
+                            descriptives.Add(GetName(field), new Dictionary<string, object>() { { "label", label }, { "value", value } });
+                        }
+                        metadata.Add("descriptives", descriptives);
+                    }
+                    System.Web.Script.Serialization.JavaScriptSerializer javaScriptSerializer = new System.Web.Script.Serialization.JavaScriptSerializer();
+
+                    Dictionary<string, object> dates = new Dictionary<string, object>();
+                    foreach (ColumnField field in view.Fields.Values.Where(f => f.FieldType == FieldType.Column && f.GetColumnFieldType() == ColumnFieldType.DateTime))
+                    {
+                        string value = row.IsNull(field.DataColumn.ColumnName) ? string.Empty : ((DateTime)row[field.DataColumn.ColumnName]).ToUniversalTime().ToString("u");
+                        dates.Add(GetName(field), value);
+                    }
+                    metadata.Add("dates", dates);
+                }
+
+                HandleMetadataExceptions(metadata, view, row, tableViewer, descriptive);
             }
-
-            HandleMetadataExceptions(metadata, view, row, tableViewer, descriptive);
-
             return metadata;
         }
 
@@ -2124,7 +2127,7 @@ namespace Durados.Web.Mvc.UI.Helpers
             if (deep)
                 return RowToDeepDictionary(view, row, level, hideMetadata);
             else
-                return RowToShallowDictionary(view, row, pk, displayParentValue);
+                return RowToShallowDictionary(view, row, pk, displayParentValue, hideMetadata);
 
         }
 
@@ -2150,8 +2153,7 @@ namespace Durados.Web.Mvc.UI.Helpers
             else
                 pks.Add(pk, dictionary);
 
-            if (!hideMetadata)
-                dictionary.Add(Database.__metadata, GetRowMetadata(view, dataRow));
+            dictionary.Add(Database.__metadata, GetRowMetadata(view, dataRow, null, true, hideMetadata));
 
             var fields = GetFields(view);
 
@@ -2320,12 +2322,12 @@ namespace Durados.Web.Mvc.UI.Helpers
             return fk;
         }
 
-        public Dictionary<string, object> RowToShallowDictionary(View view, DataRow row, string pk, bool displayParentValue)
+        public Dictionary<string, object> RowToShallowDictionary(View view, DataRow row, string pk, bool displayParentValue, bool hideMetadata)
         {
             Json.View jsonView = view.GetJsonViewNotSerialized(DataAction.Edit, pk, row, string.Empty);
 
             Dictionary<string, object> dictionary = new Dictionary<string, object>();
-            dictionary.Add(Database.__metadata, GetRowMetadata(view, row));
+            dictionary.Add(Database.__metadata, GetRowMetadata(view, row, null, true, hideMetadata));
 
             foreach (string fieldName in jsonView.Fields.Keys)
             {
@@ -2343,6 +2345,8 @@ namespace Durados.Web.Mvc.UI.Helpers
                         dictionary.Add(name, row[((ColumnField)field).DataColumn.ColumnName]);
                     else if (field.IsPoint)
                         dictionary.Add(name, GetPoint(field, row));
+                    else if (field.FieldType == FieldType.Children)
+                        dictionary.Add(name, null);
                     else
                         dictionary.Add(name, JsonField.Value);
                 }
@@ -6936,8 +6940,8 @@ namespace Durados.Web.Mvc.UI.Helpers
                     string accessToken = validateResponse["access_token"].ToString();
                     string expires = validateResponse["expires"].ToString();
 
-                    string GraphApiEndpoint = "https://graph.facebook.com/me";
-                    string graphAddress = GraphApiEndpoint + "?access_token=" + Uri.EscapeDataString(accessToken);
+                    string GraphApiEndpoint = "https://graph.facebook.com/me?fields=id,email,name";
+                    string graphAddress = GraphApiEndpoint + "&access_token=" + Uri.EscapeDataString(accessToken);
 
                     /* if (Options.SendAppSecretProof)
                      {
