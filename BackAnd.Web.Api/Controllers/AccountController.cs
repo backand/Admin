@@ -1,4 +1,3 @@
-using System;
 //﻿using Backand.Web.Api;
 using BackAnd.Web.Api.Models;
 //using BackAnd.Web.Api.Providers;
@@ -6,23 +5,15 @@ using Microsoft.Owin.Infrastructure;
 using Microsoft.Owin.Security;
 using Microsoft.Owin.Security.Cookies;
 using Microsoft.Owin.Security.OAuth;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
-using System.Web.Http;
-using System.Web.Http.ModelBinding;
 using System.Net.Http;
 using System.Security.Claims;
 using System.Security.Cryptography;
-using System.Threading.Tasks;
-using Microsoft.AspNet.Identity;
-using Microsoft.AspNet.Identity.EntityFramework;
-using Durados.Web.Mvc.Controllers;
 using System.Web;
-using Microsoft.Owin.Security.Infrastructure;
-using Owin.Security.Providers.GitHub;
-using Backand.Web.Api;
-using BackAnd.Web.Api.Providers;
+using System.Web.Http;
 
 
 namespace BackAnd.Web.Api.Controllers
@@ -92,61 +83,6 @@ namespace BackAnd.Web.Api.Controllers
             return Ok(new { success = success });
         }
 
-        [HttpGet]
-
-        [AllowAnonymous]
-        public async Task<IHttpActionResult> Github(string code, string state)
-        {
-           var context = new GitHubAuthenticationHandler().ChallengeResult(code, state);
-
-            if(context == null)
-            {
-                return null;
-            }
-
-            var query = HttpUtility.ParseQueryString(context.Properties.RedirectUri);
-            
-            string email = ExtractEmailAddress(context.Identity);
-            var appName = query["appName"];
-            var returnAddress = query["returnAddress"];
-            var provider = "github";
-            
-            if (email != null &&
-                !string.IsNullOrWhiteSpace(appName) &&
-                !string.IsNullOrWhiteSpace(returnAddress) &&
-                SimpleAuthorizationServerProvider.IsAppExists(appName))
-            {
-                var identity = new ClaimsIdentity("Bearer");
-                identity.AddClaim(new Claim("username", email));
-                identity.AddClaim(new Claim(ClaimTypes.AuthenticationMethod, provider));
-                identity.AddClaim(new Claim("appname", appName));
-
-
-                // create token
-                string AccessToken = CreateToken(identity);
-
-                // add cookie
-                return Redirect(returnAddress + "?token=" + AccessToken);
-
-            }
-            else //validation problem
-            {
-                return BadRequest("Email and appname must be valid");
-            };
-
-
-        }
-
-        //protected virtual Dictionary<string, object> changePasswordOld(string newPassword, string confirmPassword, string userSysGuid)
-        //{
-        //    string data = string.Format("newPassword={0}&confirmPassword={1}&userSysGuid={2}", System.Web.HttpUtility.UrlEncode(newPassword), System.Web.HttpUtility.UrlEncode(confirmPassword), userSysGuid);
-        //    string url = Durados.Web.Mvc.UI.Helpers.RestHelper.GetAppUrl(Durados.Web.Mvc.Maps.DuradosAppName, Durados.Web.Mvc.Maps.OldAdminHttp) + "/Account/ForgotPassword?" + data;
-
-        //    Durados.Web.Mvc.Maps.Instance.DuradosMap.Logger.Log("Account", "changePassword", "Post", "changePassword call", url, 3, null, DateTime.Now);
-        //    string response = Durados.Web.Mvc.Infrastructure.Http.PostWebRequest(url, data);
-        //    Dictionary<string, object> json = Durados.Web.Mvc.UI.Json.JsonSerializer.Deserialize(response);
-        //    return json;
-        //}
 
         protected virtual Dictionary<string, object> changePassword(string newPassword, string confirmPassword, string userSysGuid)
         {
@@ -154,6 +90,7 @@ namespace BackAnd.Web.Api.Controllers
         }
 
         Durados.Web.Mvc.Controllers.AccountMembershipService MembershipService = new Durados.Web.Mvc.Controllers.AccountMembershipService();
+
         private bool ValidateNewPassword(string newPassword, string confirmPassword)
         {
             if (newPassword == null || newPassword.Length < MembershipService.MinPasswordLength)
@@ -198,7 +135,7 @@ namespace BackAnd.Web.Api.Controllers
         protected string UsernameNotfinishRegister
         {
             get { return Map.Database.Localizer.Translate("User didn't finish registration. Please follow the email instruction in order to finish registration."); }
-        }                
+        }
 
         protected string UsernameNotExistsMessage
         {
@@ -255,7 +192,7 @@ namespace BackAnd.Web.Api.Controllers
         {
             string usernameForgot = null;
             string currentPassword = null;
-            
+
             if (string.IsNullOrEmpty(userSysGuid))
             {
                 return new Dictionary<string, object>() { { "success", false }, { "message", "missing user identification" } };
@@ -437,7 +374,7 @@ namespace BackAnd.Web.Api.Controllers
 
                 if (!MembershipService.ValidateUserExists(userName))
                     if (string.IsNullOrEmpty(Map.Database.GetGuidByUsername(userName)))
-                        return new Dictionary<string, object>() { { "error", "error" }, { "message", UsernameNotExistsMessage } }; 
+                        return new Dictionary<string, object>() { { "error", "error" }, { "message", UsernameNotExistsMessage } };
                     else
                         return new Dictionary<string, object>() { { "error", "error" }, { "message", UsernameNotfinishRegister } };
 
@@ -482,7 +419,7 @@ namespace BackAnd.Web.Api.Controllers
             catch (Durados.DuradosException exception)
             {
                 Map.Logger.Log(this.ControllerContext.RouteData.Values["controller"].ToString(), this.ControllerContext.RouteData.Values["action"].ToString(), exception.Source, exception, 3, null);
-                return new Dictionary<string, object>() { { "error", "error" }, { "message", exception.Message } }; 
+                return new Dictionary<string, object>() { { "error", "error" }, { "message", exception.Message } };
             }
 
         }
@@ -602,7 +539,7 @@ namespace BackAnd.Web.Api.Controllers
                 mapId = appRow != null ? appRow["Id"].ToString() : string.Empty;
             }
             string userId = map.Database.GetUserID(username).ToString();
-                
+
             Dictionary<string, object> parameters2 = new Dictionary<string, object>();
             parameters2.Add("@UserId", userId);
             parameters2.Add("@AppId", mapId);
@@ -638,11 +575,11 @@ namespace BackAnd.Web.Api.Controllers
             return (map.Database.EnableUserRegistration);
         }
 
-        
+
         private bool GetIsApproved(string appName)
         {
             return !Durados.Web.Mvc.Maps.Instance.GetMap(appName).Database.ApproveNewUsersManually;
-            
+
         }
 
         private string GetDefaultRole(string appName)
@@ -699,7 +636,7 @@ namespace BackAnd.Web.Api.Controllers
             message = message.Replace("[Url]", siteWithoutQueryString);
             message = message.Replace("[Username]", username ?? email);
             message = message.Replace("[Product]", Map.Database.SiteInfo.GetTitle());
-            
+
             string to = email;
 
 
@@ -722,7 +659,7 @@ namespace BackAnd.Web.Api.Controllers
 
         protected virtual Dictionary<string, object> SignUp(string fullName, string email, string password)
         {
-            Dictionary<string, object> json = new Durados.Web.Mvc.UI.Helpers.Account(this).SignUpToBackand(email, password, Durados.Web.Mvc.Maps.SendWelcomeEmail, null, fullName, "100", null);
+            Dictionary<string, object> json = new Durados.Web.Mvc.UI.Helpers.AccountService(this).SignUpToBackand(email, password, Durados.Web.Mvc.Maps.SendWelcomeEmail, null, fullName, "100", null);
             Durados.Web.Mvc.Maps.Instance.DuradosMap.Logger.Log("Account", "SignUp", "Post", "SignUp call", email, 3, null, DateTime.Now);
             return json;
         }
@@ -774,9 +711,9 @@ namespace BackAnd.Web.Api.Controllers
 
                 if (jsonResponse.ContainsKey("Message") && jsonResponse["Message"].Equals("Success"))
                 {
-                    Durados.Web.Mvc.UI.Helpers.Account account = new Durados.Web.Mvc.UI.Helpers.Account(this);
+                    Durados.Web.Mvc.UI.Helpers.AccountService account = new Durados.Web.Mvc.UI.Helpers.AccountService(this);
                     account.InviteAdminAfterSignUp(email);
-                    Durados.Web.Mvc.UI.Helpers.Analytics.Log(Durados.Web.Mvc.Logging.ExternalAnalyticsAction.SignedUp, email,new Dictionary<string, object>() { 
+                    Durados.Web.Mvc.UI.Helpers.Analytics.Log(Durados.Web.Mvc.Logging.ExternalAnalyticsAction.SignedUp, email, new Dictionary<string, object>() {
                         { Durados.Database.AppName, Durados.Web.Mvc.Maps.DuradosAppName }
                         , { Durados.Web.Mvc.Logging.ExternalAnalyticsTraitsKey.name.ToString(), fullName } });
                     return Ok();
@@ -798,7 +735,7 @@ namespace BackAnd.Web.Api.Controllers
             }
         }
 
-        
+
 
 
         private static string ExtractEmailAddress(ClaimsIdentity result)
@@ -882,298 +819,298 @@ namespace BackAnd.Web.Api.Controllers
             return Convert.ToBase64String(data);
         }
 
-        
+
     }
 }
-     
-        /*[BackAnd.Web.Api.Controllers.Filters.BackAndAuthorize]
+
+/*[BackAnd.Web.Api.Controllers.Filters.BackAndAuthorize]
 =======
-        public AccountController(OAuthAuthorizationServerOptions oAuthOptions,
-            CookieAuthenticationOptions cookieOptions)
-        {
-            OAuthOptions = oAuthOptions;
-            CookieOptions = cookieOptions;
-        }
+public AccountController(OAuthAuthorizationServerOptions oAuthOptions,
+    CookieAuthenticationOptions cookieOptions)
+{
+    OAuthOptions = oAuthOptions;
+    CookieOptions = cookieOptions;
+}
 
-        public OAuthAuthorizationServerOptions OAuthOptions { get; private set; }
-        public CookieAuthenticationOptions CookieOptions { get; private set; }
+public OAuthAuthorizationServerOptions OAuthOptions { get; private set; }
+public CookieAuthenticationOptions CookieOptions { get; private set; }
 
-        // GET api/Account/ExternalLogin
-        [OverrideAuthentication]
-        [HostAuthentication(Startup.ExternalCookieAuthenticationType)]
-        [AllowAnonymous]
-        [Route("ExternalLogin")]
-        [HttpGet]
-        public async Task<IHttpActionResult> ExternalLogin(string provider, string appName, string returnAddress)
-        {
-            if (!User.Identity.IsAuthenticated)
-            {
-                return new ChallengeResult(provider, this);
-            }
+// GET api/Account/ExternalLogin
+[OverrideAuthentication]
+[HostAuthentication(Startup.ExternalCookieAuthenticationType)]
+[AllowAnonymous]
+[Route("ExternalLogin")]
+[HttpGet]
+public async Task<IHttpActionResult> ExternalLogin(string provider, string appName, string returnAddress)
+{
+    if (!User.Identity.IsAuthenticated)
+    {
+        return new ChallengeResult(provider, this);
+    }
 
-            ExternalLoginData externalLogin = ExternalLoginData.FromIdentity(User.Identity as ClaimsIdentity);
-            var result = Request.GetOwinContext().Authentication.AuthenticateAsync(Startup.ExternalCookieAuthenticationType).Result;
-            //            Authentication.SignOut(Startup.ExternalCookieAuthenticationType);
+    ExternalLoginData externalLogin = ExternalLoginData.FromIdentity(User.Identity as ClaimsIdentity);
+    var result = Request.GetOwinContext().Authentication.AuthenticateAsync(Startup.ExternalCookieAuthenticationType).Result;
+    //            Authentication.SignOut(Startup.ExternalCookieAuthenticationType);
 
-            string email = ExtractEmailAddress(result);
+    string email = ExtractEmailAddress(result);
 
-            if (email != null &&
-                !string.IsNullOrWhiteSpace(appName) &&
-                !string.IsNullOrWhiteSpace(returnAddress) &&
-                new DuradosAuthorizationHelper().IsAppExists(appName))
-            {
-                var identity = new ClaimsIdentity("Bearer");
-                identity.AddClaim(new Claim("username", email));
-                identity.AddClaim(new Claim(ClaimTypes.AuthenticationMethod, provider));
-                identity.AddClaim(new Claim("appname", appName));
+    if (email != null &&
+        !string.IsNullOrWhiteSpace(appName) &&
+        !string.IsNullOrWhiteSpace(returnAddress) &&
+        new DuradosAuthorizationHelper().IsAppExists(appName))
+    {
+        var identity = new ClaimsIdentity("Bearer");
+        identity.AddClaim(new Claim("username", email));
+        identity.AddClaim(new Claim(ClaimTypes.AuthenticationMethod, provider));
+        identity.AddClaim(new Claim("appname", appName));
 
-                // create token
-                string AccessToken = CreateToken(identity);
+        // create token
+        string AccessToken = CreateToken(identity);
 
-                // add cookie
-                return Redirect(returnAddress + "?token=" + AccessToken);
-            }
-            else //validation problem
-            {
-                return BadRequest("Email and appname must be valid");
-            };
-        }
+        // add cookie
+        return Redirect(returnAddress + "?token=" + AccessToken);
+    }
+    else //validation problem
+    {
+        return BadRequest("Email and appname must be valid");
+    };
+}
 
 
 
 >>>>>>> .r3849
-        [System.Web.Http.HttpPost]
-        public IHttpActionResult unlock()
-        {
-            if (!IsAdmin())
-                return ResponseMessage(Request.CreateResponse(HttpStatusCode.Unauthorized, Messages.ActionIsUnauthorized));
+[System.Web.Http.HttpPost]
+public IHttpActionResult unlock()
+{
+    if (!IsAdmin())
+        return ResponseMessage(Request.CreateResponse(HttpStatusCode.Unauthorized, Messages.ActionIsUnauthorized));
 
-            Durados.Web.Mvc.Controllers.AccountMembershipService accountMembershipService = new Durados.Web.Mvc.Controllers.AccountMembershipService();
+    Durados.Web.Mvc.Controllers.AccountMembershipService accountMembershipService = new Durados.Web.Mvc.Controllers.AccountMembershipService();
 
-            string json = System.Web.HttpContext.Current.Server.UrlDecode(Request.Content.ReadAsStringAsync().Result);
-            if (string.IsNullOrEmpty(json))
-            {
-                return ResponseMessage(Request.CreateResponse(HttpStatusCode.NotFound, Messages.FieldNameIsMissing));
-            }
-            Dictionary<string, object> data = Durados.Web.Mvc.UI.Json.JsonSerializer.Deserialize(json);
+    string json = System.Web.HttpContext.Current.Server.UrlDecode(Request.Content.ReadAsStringAsync().Result);
+    if (string.IsNullOrEmpty(json))
+    {
+        return ResponseMessage(Request.CreateResponse(HttpStatusCode.NotFound, Messages.FieldNameIsMissing));
+    }
+    Dictionary<string, object> data = Durados.Web.Mvc.UI.Json.JsonSerializer.Deserialize(json);
 
-            if (!data.ContainsKey("username"))
-            {
-                return ResponseMessage(Request.CreateResponse(HttpStatusCode.NotFound, Messages.FieldNameIsMissing));
-            }
+    if (!data.ContainsKey("username"))
+    {
+        return ResponseMessage(Request.CreateResponse(HttpStatusCode.NotFound, Messages.FieldNameIsMissing));
+    }
 
-            string username = data["username"].ToString();
+    string username = data["username"].ToString();
 
-            bool success = accountMembershipService.UnlockUser(username);
+    bool success = accountMembershipService.UnlockUser(username);
 
-            return Ok(new { success = success });
-        }
+    return Ok(new { success = success });
+}
 <<<<<<< .mine
 
 
-     
-        #region Helpers
 
-        private IAuthenticationManager Authentication
+#region Helpers
+
+private IAuthenticationManager Authentication
+{
+    get { return Request.GetOwinContext().Authentication; }
+}
+
+private static RandomNumberGenerator _random = new RNGCryptoServiceProvider();
+private string GenerateAntiForgeryState()
+{
+    const int strengthInBits = 256;
+    const int strengthInBytes = strengthInBits / 8;
+    byte[] data = new byte[strengthInBytes];
+    _random.GetBytes(data);
+    return Convert.ToBase64String(data);
+}
+
+private class ExternalLoginData
+{
+    public string LoginProvider { get; set; }
+    public string ProviderKey { get; set; }
+    public string UserName { get; set; }
+
+    public IList<Claim> GetClaims()
+    {
+        IList<Claim> claims = new List<Claim>();
+        claims.Add(new Claim(ClaimTypes.NameIdentifier, ProviderKey, null, LoginProvider));
+
+        if (UserName != null)
         {
-            get { return Request.GetOwinContext().Authentication; }
+            claims.Add(new Claim(ClaimTypes.Name, UserName, null, LoginProvider));
         }
 
-        private static RandomNumberGenerator _random = new RNGCryptoServiceProvider();
-        private string GenerateAntiForgeryState()
+        return claims;
+    }
+
+    public static ExternalLoginData FromIdentity(ClaimsIdentity identity)
+    {
+        if (identity == null)
         {
-            const int strengthInBits = 256;
-            const int strengthInBytes = strengthInBits / 8;
-            byte[] data = new byte[strengthInBytes];
-            _random.GetBytes(data);
-            return Convert.ToBase64String(data);
-        }
-
-        private class ExternalLoginData
-        {
-            public string LoginProvider { get; set; }
-            public string ProviderKey { get; set; }
-            public string UserName { get; set; }
-
-            public IList<Claim> GetClaims()
-            {
-                IList<Claim> claims = new List<Claim>();
-                claims.Add(new Claim(ClaimTypes.NameIdentifier, ProviderKey, null, LoginProvider));
-
-                if (UserName != null)
-                {
-                    claims.Add(new Claim(ClaimTypes.Name, UserName, null, LoginProvider));
-                }
-
-                return claims;
-            }
-
-            public static ExternalLoginData FromIdentity(ClaimsIdentity identity)
-            {
-                if (identity == null)
-                {
-                    return null;
-                }
-
-                Claim providerKeyClaim = identity.FindFirst(ClaimTypes.NameIdentifier);
-
-                if (providerKeyClaim == null || String.IsNullOrEmpty(providerKeyClaim.Issuer)
-                    || String.IsNullOrEmpty(providerKeyClaim.Value))
-                {
-                    return null;
-                }
-
-                if (providerKeyClaim.Issuer == ClaimsIdentity.DefaultIssuer)
-                {
-                    return null;
-                }
-
-                return new ExternalLoginData
-                {
-                    LoginProvider = providerKeyClaim.Issuer,
-                    ProviderKey = providerKeyClaim.Value,
-                    UserName = identity.Claims.FirstOrDefault().Value//FindFirstValue(ClaimTypes.Name)
-                };
-            }
-        }
-
-        #endregion
-=======
-
-        private static string ExtractEmailAddress(AuthenticateResult result)
-        {
-            var claims = result.Identity.Claims.ToList().FirstOrDefault(a => a.Type == "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress");
-            if (claims != null)
-            {
-                return claims.Value;
-            }
-
             return null;
         }
 
-        private static string CreateToken(ClaimsIdentity identity)
+        Claim providerKeyClaim = identity.FindFirst(ClaimTypes.NameIdentifier);
+
+        if (providerKeyClaim == null || String.IsNullOrEmpty(providerKeyClaim.Issuer)
+            || String.IsNullOrEmpty(providerKeyClaim.Value))
         {
-            AuthenticationTicket ticket = new AuthenticationTicket(identity, new AuthenticationProperties());
-            var currentUtc = new SystemClock().UtcNow;
-            ticket.Properties.IssuedUtc = currentUtc;
-            ticket.Properties.ExpiresUtc = currentUtc.Add(TimeSpan.FromMinutes(30));
-            string AccessToken = Startup.OAuthBearerOptions.AccessTokenFormat.Protect(ticket);
-            return AccessToken;
+            return null;
         }
 
-
-        // GET api/Account/ExternalLogins?returnUrl=%2F&generateState=true
-        [OverrideAuthentication]
-        [AllowAnonymous]
-        [Route("ExternalLogins")]
-        [HttpGet]
-        public IEnumerable<ExternalLoginViewModel> ExternalLogins(string returnUrl, bool generateState = false)
+        if (providerKeyClaim.Issuer == ClaimsIdentity.DefaultIssuer)
         {
-            IEnumerable<AuthenticationDescription> descriptions = Authentication.GetExternalAuthenticationTypes();
-            List<ExternalLoginViewModel> logins = new List<ExternalLoginViewModel>();
-
-
-            string state;
-
-            if (generateState)
-            {
-                state = GenerateAntiForgeryState();
-            }
-            else
-            {
-                state = null;
-            }
-
-            foreach (AuthenticationDescription description in descriptions)
-            {
-
-                ExternalLoginViewModel login = new ExternalLoginViewModel
-                {
-                    name = description.Caption,
-                    url = Url.Route("ExternalLogin", new
-                    {
-                        provider = description.AuthenticationType,
-                        response_type = "token",
-                        client_id = Startup.PublicClientId,
-                        redirect_uri = "www.google.com",
-                        state = state
-                    }),
-                    state = state
-                };
-                logins.Add(login);
-            }
-
-            return logins;
+            return null;
         }
 
-        #region Helpers
-
-        private IAuthenticationManager Authentication
+        return new ExternalLoginData
         {
-            get { return Request.GetOwinContext().Authentication; }
-        }
-
-        private static RandomNumberGenerator _random = new RNGCryptoServiceProvider();
-        private string GenerateAntiForgeryState()
-        {
-            const int strengthInBits = 256;
-            const int strengthInBytes = strengthInBits / 8;
-            byte[] data = new byte[strengthInBytes];
-            _random.GetBytes(data);
-            return Convert.ToBase64String(data);
-        }
-
-        private class ExternalLoginData
-        {
-            public string LoginProvider { get; set; }
-            public string ProviderKey { get; set; }
-            public string UserName { get; set; }
-
-            public IList<Claim> GetClaims()
-            {
-                IList<Claim> claims = new List<Claim>();
-                claims.Add(new Claim(ClaimTypes.NameIdentifier, ProviderKey, null, LoginProvider));
-
-                if (UserName != null)
-                {
-                    claims.Add(new Claim(ClaimTypes.Name, UserName, null, LoginProvider));
-                }
-
-                return claims;
-            }
-
-            public static ExternalLoginData FromIdentity(ClaimsIdentity identity)
-            {
-                if (identity == null)
-                {
-                    return null;
-                }
-
-                Claim providerKeyClaim = identity.FindFirst(ClaimTypes.NameIdentifier);
-
-                if (providerKeyClaim == null || String.IsNullOrEmpty(providerKeyClaim.Issuer)
-                    || String.IsNullOrEmpty(providerKeyClaim.Value))
-                {
-                    return null;
-                }
-
-                if (providerKeyClaim.Issuer == ClaimsIdentity.DefaultIssuer)
-                {
-                    return null;
-                }
-
-                return new ExternalLoginData
-                {
-                    LoginProvider = providerKeyClaim.Issuer,
-                    ProviderKey = providerKeyClaim.Value,
-                    UserName = identity.Claims.FirstOrDefault().Value//FindFirstValue(ClaimTypes.Name)
-                };
-            }
-        }
-
-        #endregion
->>>>>>> .r3849
+            LoginProvider = providerKeyClaim.Issuer,
+            ProviderKey = providerKeyClaim.Value,
+            UserName = identity.Claims.FirstOrDefault().Value//FindFirstValue(ClaimTypes.Name)
+        };
     }
+}
+
+#endregion
+=======
+
+private static string ExtractEmailAddress(AuthenticateResult result)
+{
+    var claims = result.Identity.Claims.ToList().FirstOrDefault(a => a.Type == "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress");
+    if (claims != null)
+    {
+        return claims.Value;
+    }
+
+    return null;
+}
+
+private static string CreateToken(ClaimsIdentity identity)
+{
+    AuthenticationTicket ticket = new AuthenticationTicket(identity, new AuthenticationProperties());
+    var currentUtc = new SystemClock().UtcNow;
+    ticket.Properties.IssuedUtc = currentUtc;
+    ticket.Properties.ExpiresUtc = currentUtc.Add(TimeSpan.FromMinutes(30));
+    string AccessToken = Startup.OAuthBearerOptions.AccessTokenFormat.Protect(ticket);
+    return AccessToken;
+}
+
+
+// GET api/Account/ExternalLogins?returnUrl=%2F&generateState=true
+[OverrideAuthentication]
+[AllowAnonymous]
+[Route("ExternalLogins")]
+[HttpGet]
+public IEnumerable<ExternalLoginViewModel> ExternalLogins(string returnUrl, bool generateState = false)
+{
+    IEnumerable<AuthenticationDescription> descriptions = Authentication.GetExternalAuthenticationTypes();
+    List<ExternalLoginViewModel> logins = new List<ExternalLoginViewModel>();
+
+
+    string state;
+
+    if (generateState)
+    {
+        state = GenerateAntiForgeryState();
+    }
+    else
+    {
+        state = null;
+    }
+
+    foreach (AuthenticationDescription description in descriptions)
+    {
+
+        ExternalLoginViewModel login = new ExternalLoginViewModel
+        {
+            name = description.Caption,
+            url = Url.Route("ExternalLogin", new
+            {
+                provider = description.AuthenticationType,
+                response_type = "token",
+                client_id = Startup.PublicClientId,
+                redirect_uri = "www.google.com",
+                state = state
+            }),
+            state = state
+        };
+        logins.Add(login);
+    }
+
+    return logins;
+}
+
+#region Helpers
+
+private IAuthenticationManager Authentication
+{
+    get { return Request.GetOwinContext().Authentication; }
+}
+
+private static RandomNumberGenerator _random = new RNGCryptoServiceProvider();
+private string GenerateAntiForgeryState()
+{
+    const int strengthInBits = 256;
+    const int strengthInBytes = strengthInBits / 8;
+    byte[] data = new byte[strengthInBytes];
+    _random.GetBytes(data);
+    return Convert.ToBase64String(data);
+}
+
+private class ExternalLoginData
+{
+    public string LoginProvider { get; set; }
+    public string ProviderKey { get; set; }
+    public string UserName { get; set; }
+
+    public IList<Claim> GetClaims()
+    {
+        IList<Claim> claims = new List<Claim>();
+        claims.Add(new Claim(ClaimTypes.NameIdentifier, ProviderKey, null, LoginProvider));
+
+        if (UserName != null)
+        {
+            claims.Add(new Claim(ClaimTypes.Name, UserName, null, LoginProvider));
+        }
+
+        return claims;
+    }
+
+    public static ExternalLoginData FromIdentity(ClaimsIdentity identity)
+    {
+        if (identity == null)
+        {
+            return null;
+        }
+
+        Claim providerKeyClaim = identity.FindFirst(ClaimTypes.NameIdentifier);
+
+        if (providerKeyClaim == null || String.IsNullOrEmpty(providerKeyClaim.Issuer)
+            || String.IsNullOrEmpty(providerKeyClaim.Value))
+        {
+            return null;
+        }
+
+        if (providerKeyClaim.Issuer == ClaimsIdentity.DefaultIssuer)
+        {
+            return null;
+        }
+
+        return new ExternalLoginData
+        {
+            LoginProvider = providerKeyClaim.Issuer,
+            ProviderKey = providerKeyClaim.Value,
+            UserName = identity.Claims.FirstOrDefault().Value//FindFirstValue(ClaimTypes.Name)
+        };
+    }
+}
+
+#endregion
+>>>>>>> .r3849
+}
 }
 
 */

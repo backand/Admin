@@ -1516,7 +1516,7 @@ namespace Durados.Web.Mvc
                 tunnel.PrivateKey = appRow.durados_SqlConnectionRowByFK_durados_App_durados_SqlConnection.IsSshPrivateKeyNull() ? null : appRow.durados_SqlConnectionRowByFK_durados_App_durados_SqlConnection.SshPrivateKey;
 
                 map.SshSession = new Durados.DataAccess.Ssh.ChilkatSession(tunnel, Convert.ToInt32(appRow.durados_SqlConnectionRowByFK_durados_App_durados_SqlConnection.ProductPort), localPort);
-                //map.SshSession = new Durados.DataAccess.Ssh.TamirSession(tunnel, 3306);
+                ////map.SshSession = new Durados.DataAccess.Ssh.TamirSession(tunnel, 3306);
                 map.OpenSshSession();
             }
 

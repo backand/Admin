@@ -1203,7 +1203,7 @@ namespace BackAnd.Web.Api.Controllers
                    string appName = Map.AppName;
                    string username = e.Values["Username"].ToString();
 
-                   Account account = new Account(this);
+                   AccountService account = new AccountService(this);
                    account.ActivateAdmin(username, appName);
                }
             }

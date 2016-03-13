@@ -1,29 +1,20 @@
-﻿using System;
-using System.Data;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Xml;
-using System.Web;
-using System.IO;
-using System.Reflection;
-using System.Data.SqlClient;
-
-using Microsoft.WindowsAzure;
-using Microsoft.WindowsAzure.ServiceRuntime;
-using Microsoft.WindowsAzure.StorageClient;
-using Microsoft.WindowsAzure.StorageClient.Protocol;
-
+﻿using Durados.Data;
 using Durados.DataAccess;
-using Durados.Web.Mvc.UI.Helpers;
-using Durados.Web.Mvc.Infrastructure;
-using Durados.Web.Mvc.Azure;
-using Newtonsoft.Json;
-using System.Diagnostics;
-using Durados.Data;
 using Durados.SmartRun;
+using Durados.Web.Mvc.Azure;
 using Durados.Web.Mvc.Farm;
-using System.Runtime.Caching;
+using Durados.Web.Mvc.UI.Helpers;
+using Microsoft.WindowsAzure.StorageClient;
+using Newtonsoft.Json;
+using System;
+using System.Collections.Generic;
+using System.Data;
+using System.Data.SqlClient;
+using System.Diagnostics;
+using System.IO;
+using System.Linq;
+using System.Reflection;
+using System.Text;
 
 namespace Durados.Web.Mvc
 {
@@ -460,7 +451,7 @@ namespace Durados.Web.Mvc
             Initiate(true);
         }
 
-        private string  GetCaller(object message)
+        private string GetCaller(object message)
         {
             // frame 1, true for source info
             StackFrame frame = new StackFrame(1, true);
@@ -610,7 +601,7 @@ namespace Durados.Web.Mvc
                 ds.Tables["User"].Columns["Password"].AllowDBNull = true;
 
             DynamicMapper.AddSchema(ds);
-            
+
             Initiate(ds, connectionString, this.ConfigFileName, save); //"~/bugit2.xml");
 
             if (firstTime && Maps.MultiTenancy)
@@ -1291,7 +1282,7 @@ namespace Durados.Web.Mvc
             try
             {
                 //string localDatabaseHost = GetLocalDatabaseHost();
-                if(HostedByUs)// (connectionString.Contains(localDatabaseHost))
+                if (HostedByUs)// (connectionString.Contains(localDatabaseHost))
                 {
                     return "local";
                 }
@@ -2065,7 +2056,6 @@ namespace Durados.Web.Mvc
             if (this is DuradosMap)
                 return;
 
-
             string v_durados_User = "v_durados_User";
             string durados_User = "durados_User";
             string durados_UserRole = "durados_UserRole";
@@ -2078,14 +2068,16 @@ namespace Durados.Web.Mvc
 
             ds.Tables.Add(v_durados_UserTable);
             v_durados_UserTable.PrimaryKey = new DataColumn[1] { v_durados_UserTable.Columns["ID"] };
-
-
             //DataTable durados_UserRoleTable = Durados.DataAccess.AutoGeneration.Generator.CreateTable(durados_UserRole, systemConnectionString);
             DataTable durados_UserRoleTable = systemGenerator.CreateTable(durados_UserRole, systemConnectionString);
 
             ds.Tables.Add(durados_UserRoleTable);
 
             ds.Relations.Add("UserRole", durados_UserRoleTable.Columns["Name"], v_durados_UserTable.Columns["Role"]);
+
+            // add external login table
+
+
 
             durados_UserRoleTable.ExtendedProperties.Add("system", true);
             v_durados_UserTable.ExtendedProperties.Add("system", true);
@@ -3065,7 +3057,7 @@ namespace Durados.Web.Mvc
         {
             ConfigFileName = configFileName;
             dataset = dataSetParam;
-            
+
             Refresh();
 
             if (save)
@@ -3709,10 +3701,10 @@ namespace Durados.Web.Mvc
 
         public void ReadConfigFromCloud(DataSet ds, string filename)
         {
-            
+
             string blobName = Maps.GetStorageBlobName(filename);
             DataSet cachedDs = Maps.Instance.StorageCache.Get(blobName);
-            
+
             // check exist in cache
             if (cachedDs != null)
             {
@@ -3724,7 +3716,7 @@ namespace Durados.Web.Mvc
                         stream.Seek(0, SeekOrigin.Begin);
                         ds.ReadXml(stream);
                     }
-                    catch(ConstraintException e)
+                    catch (ConstraintException e)
                     {
                         string errMsg = string.Empty;
                         foreach (DataTable dt in ds.Tables)
@@ -3747,22 +3739,22 @@ namespace Durados.Web.Mvc
                 return;
             }
 
-          
-                // fetch from storage
-                ReadConfigFromCloudStorage(ds, filename);
-                
-          
-                
-              //  ReadConfigFromCloudStorage(ds, filename);
-           //     Maps.Instance.DuradosMap.Logger.Log("ReadConfigFromCloud", "ReadConfigFromCloud", "ReadConfigFromCloud", exception, 1, "");
+
+            // fetch from storage
+            ReadConfigFromCloudStorage(ds, filename);
+
+
+
+            //  ReadConfigFromCloudStorage(ds, filename);
+            //     Maps.Instance.DuradosMap.Logger.Log("ReadConfigFromCloud", "ReadConfigFromCloud", "ReadConfigFromCloud", exception, 1, "");
 
             //}
 
-            
+
             // add to cache for next read
             Maps.Instance.StorageCache.Add(blobName, ds);
         }
-        
+
         public void ReadConfigFromCloudStorage(DataSet ds, string filename)
         {
             CheckIfConfigIsLockedAndWait(AppName);
@@ -3947,7 +3939,7 @@ namespace Durados.Web.Mvc
                 catch { }
             }
         }
-    
+
         private void BlobTransferCompletedCallback(IAsyncResult result)
         {
             BlobTransferAsyncState state = (BlobTransferAsyncState)result.AsyncState;
@@ -4604,7 +4596,7 @@ namespace Durados.Web.Mvc
         /// </summary>
         public Data.ICache<object> LockerCache
         {
-            get 
+            get
             {
                 return lockerCache;
             }

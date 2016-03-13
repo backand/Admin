@@ -14,7 +14,6 @@ namespace Owin.Security.Providers.Yahoo.Messages
         /// </summary>
         public string Token { get; set; }
 
-        /// <summary>
         /// Gets or sets the Yahoo token secret
         /// </summary>
         public string TokenSecret { get; set; }
