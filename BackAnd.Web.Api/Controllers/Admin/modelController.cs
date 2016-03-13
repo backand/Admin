@@ -195,7 +195,7 @@ namespace BackAnd.Web.Api.Controllers
         {
             try
             {
-                Account.DefaultUsersTable.HandleFirstTime(Map);
+                AccountService.DefaultUsersTable.HandleFirstTime(Map);
                 RefreshConfigCache(Map);
             }
             catch (Exception exception)

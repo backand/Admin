@@ -273,7 +273,7 @@ namespace Durados.Web.Mvc.Controllers
 
         protected override void SendRegistrationRequest(FormCollection collection)
         {
-            Account.SendRegistrationRequest(collection["First_Name"], collection["Last_Name"], collection["Email"], collection["Guid"], collection["Username"], collection["Password"], Map, DontSend);
+            AccountService.SendRegistrationRequest(collection["First_Name"], collection["Last_Name"], collection["Email"], collection["Guid"], collection["Username"], collection["Password"], Map, DontSend);
         }
 
 

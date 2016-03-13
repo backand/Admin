@@ -2,8 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Durados.Web.Mvc.SocialLogin
 {
@@ -61,5 +59,12 @@ namespace Durados.Web.Mvc.SocialLogin
         public string clientId { get; set; }
         public string redirectUri { get; set; }
         public string appName { get; set; }
+    }
+
+    public class SocialSignupUserData : SopcialLoginUserData
+    {
+        public string userName { get; set; }
+        public string firstName { get; set; }
+        public string lastName { get; set; }
     }
 }

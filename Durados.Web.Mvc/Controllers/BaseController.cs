@@ -592,8 +592,8 @@ namespace Durados.Web.Mvc.Controllers
                 int remotePort = productPort;
                 localPort = Maps.Instance.AssignLocalPort();
 
-                //session = new Durados.DataAccess.Ssh.ChilkatSession(tunnel, remotePort, localPort);
-                //session.Open(15);
+                session = new Durados.DataAccess.Ssh.ChilkatSession(tunnel, remotePort, localPort);
+                session.Open(15);
             }
         }
 

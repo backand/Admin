@@ -1,3 +1,4 @@
+using BackAnd.Web.Api.Controllers.Filters;
 using Durados.Web.Mvc;
 using Durados.Web.Mvc.SocialLogin;
 using Durados.Web.Mvc.UI.Helpers;
@@ -8,13 +9,10 @@ using Microsoft.Owin.Security;
 using System;
 using System.Collections.Generic;
 using System.Data;
-using System.Globalization;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Security.Claims;
-using System.Security.Cryptography;
-using System.Text;
 using System.Threading.Tasks;
 using System.Web.Http;
 using System.Web.Script.Serialization;
@@ -38,7 +36,7 @@ namespace BackAnd.Web.Api.Controllers
                     return ResponseMessage(Request.CreateResponse(HttpStatusCode.Unauthorized, Messages.ActionIsUnauthorized));
                 }
 
-                Account account = new Account(this);
+                AccountService account = new AccountService(this);
                 string appName = null;
                 if (map != Maps.Instance.DuradosMap)
                 {
@@ -172,7 +170,7 @@ namespace BackAnd.Web.Api.Controllers
 
             string appName = System.Web.HttpContext.Current.Items[Durados.Web.Mvc.Database.AppName].ToString();
 
-            if (!Account.IsValidRole(appName, role))
+            if (!AccountService.IsValidRole(appName, role))
                 return ResponseMessage(Request.CreateResponse(HttpStatusCode.NotAcceptable, "The user role does not match any of the app roles."));
 
 
@@ -268,15 +266,15 @@ namespace BackAnd.Web.Api.Controllers
                     return ResponseMessage(Request.CreateResponse(HttpStatusCode.NotFound, "App not found"));
                 }
                 string appName = System.Web.HttpContext.Current.Items[Durados.Web.Mvc.Database.AppName].ToString();
-                Account account = new Account(this);
+                AccountService account = new AccountService(this);
 
                 try
                 {
-                    Durados.Web.Mvc.UI.Helpers.Account.SignUpResults signUpResults = account.SignUp(appName, firstName, lastName, email, role, byAdmin, password, confirmPassword, isSignupEmailVerification, parameters, view_BeforeCreate, view_BeforeCreateInDatabase, view_AfterCreateBeforeCommit, view_AfterCreateAfterCommit, view_BeforeEdit, view_BeforeEditInDatabase, view_AfterEditBeforeCommit, view_AfterEditAfterCommit);
+                    Durados.Web.Mvc.UI.Helpers.AccountService.SignUpResults signUpResults = account.SignUp(appName, firstName, lastName, email, role, byAdmin, password, confirmPassword, isSignupEmailVerification, parameters, view_BeforeCreate, view_BeforeCreateInDatabase, view_AfterCreateBeforeCommit, view_AfterCreateAfterCommit, view_BeforeEdit, view_BeforeEditInDatabase, view_AfterEditBeforeCommit, view_AfterEditAfterCommit);
 
                     GetMap(appName).Logger.Log(GetControllerNameForLog(ControllerContext), string.Empty, string.Empty, null, -37, signUpResults.Username + ": " + account.GetSignUpStatusMessage(signUpResults.Status));
 
-                    if (signUpResults.Status == Account.SignUpStatus.Ready)
+                    if (signUpResults.Status == AccountService.SignUpStatus.Ready)
                     {
                         string accessToken = CreateToken(email, appName);
 
@@ -289,7 +287,7 @@ namespace BackAnd.Web.Api.Controllers
                         return Ok(response);
                     }
                 }
-                catch (Durados.Web.Mvc.UI.Helpers.Account.SignUpException exception)
+                catch (Durados.Web.Mvc.UI.Helpers.AccountService.SignUpException exception)
                 {
                     Log(appName, exception, 2);
                     return ResponseMessage(Request.CreateResponse(HttpStatusCode.NotAcceptable, exception.GetJsonError("signup_error")));
@@ -346,16 +344,16 @@ namespace BackAnd.Web.Api.Controllers
 
             try
             {
-                Account account = new Account(this);
+                AccountService account = new AccountService(this);
 
                 try
                 {
-                    Durados.Web.Mvc.UI.Helpers.Account.SignUpResults signUpResults = account.Verify(appName, parameters, view_BeforeEdit, view_BeforeEditInDatabase, view_AfterEditBeforeCommit, view_AfterEditAfterCommit);
+                    Durados.Web.Mvc.UI.Helpers.AccountService.SignUpResults signUpResults = account.Verify(appName, parameters, view_BeforeEdit, view_BeforeEditInDatabase, view_AfterEditBeforeCommit, view_AfterEditAfterCommit);
                     var response = Request.CreateResponse(HttpStatusCode.Moved);
                     response.Headers.Location = new Uri(signUpResults.Redirect);
                     return response;
                 }
-                catch (Durados.Web.Mvc.UI.Helpers.Account.SignUpException exception)
+                catch (Durados.Web.Mvc.UI.Helpers.AccountService.SignUpException exception)
                 {
                     Log(exception, 3);
                     return Request.CreateResponse(HttpStatusCode.NotAcceptable, exception.Message);
@@ -394,7 +392,7 @@ namespace BackAnd.Web.Api.Controllers
                 string username = values["username"].ToString();
                 string password = values["password"].ToString();
 
-                Account account = new Account(this);
+                AccountService account = new AccountService(this);
                 account.ChangePassword(username, password);
 
 
@@ -433,7 +431,7 @@ namespace BackAnd.Web.Api.Controllers
                 string username = Map.Database.GetCurrentUsername();
 
 
-                Account account = new Account(this);
+                AccountService account = new AccountService(this);
                 account.ChangePassword(username, newPassword, oldPassword);
 
 
@@ -481,7 +479,7 @@ namespace BackAnd.Web.Api.Controllers
                     return ResponseMessage(Request.CreateResponse(HttpStatusCode.NotFound, "The username is not correct or does not belong to this app."));
                 }
 
-                Account account = new Account(this);
+                AccountService account = new AccountService(this);
 
                 account.SendForgotPasswordToken(appName, username);
 
@@ -516,7 +514,7 @@ namespace BackAnd.Web.Api.Controllers
                 Guid token = Guid.Parse(values["resetToken"].ToString());
                 string password = values["newPassword"].ToString();
 
-                Account account = new Account(this);
+                AccountService account = new AccountService(this);
 
                 string userName = account.ChangePassword(token, password);
 
@@ -617,17 +615,17 @@ namespace BackAnd.Web.Api.Controllers
         public async Task<IHttpActionResult> socialSignin(string provider, string appName, string returnAddress = null, string code = null)
         {
 
-            SocialProvider social = SocialProviderFactory.GetSocialProvider(provider);
+            AbstractSocialProvider social = SocialProviderFactory.GetSocialProvider(provider);
 
             if (code != null)
             {
                 SocialProfile profile = social.Authenticate(appName, code, returnAddress);
-                Signin(profile);
+                SocialSigninInner(profile);
                 return Ok(GetAccessToken(profile.email, appName, provider));
             }
             try
             {
-                return Redirect(social.GetAuthUrl(appName, returnAddress ?? GetCurrentAddress(), null, "signin"));
+                return Redirect(social.GetAuthUrl(appName, returnAddress ?? GetCurrentAddress(), null, "signin", null));
             }
             catch (Exception exception)
             {
@@ -645,12 +643,12 @@ namespace BackAnd.Web.Api.Controllers
         [AllowAnonymous]
         [Route("socialSignup")]
         [HttpGet]
-        public async Task<IHttpActionResult> socialSignup(string provider, string appName, string returnAddress = null, string parameters = null)
+        public async Task<IHttpActionResult> socialSignup(string provider, string appName, string returnAddress = null, string parameters = null, string email = null)
         {
             try
             {
-                SocialProvider social = SocialProviderFactory.GetSocialProvider(provider);
-                return Redirect(social.GetAuthUrl(appName, returnAddress ?? GetCurrentAddress(), parameters, "signup"));
+                AbstractSocialProvider social = SocialProviderFactory.GetSocialProvider(provider);
+                return Redirect(social.GetAuthUrl(appName, returnAddress ?? GetCurrentAddress(), parameters, "signup", email));
             }
             catch (Exception exception)
             {
@@ -659,27 +657,6 @@ namespace BackAnd.Web.Api.Controllers
             }
         }
 
-        private static readonly DateTime Epoch = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
-
-        private static string GenerateTimeStamp()
-        {
-            TimeSpan secondsSinceUnixEpocStart = DateTime.UtcNow - Epoch;
-            return Convert.ToInt64(secondsSinceUnixEpocStart.TotalSeconds).ToString(CultureInfo.InvariantCulture);
-        }
-
-        private static string ComputeSignature(string consumerSecret, string tokenSecret, string signatureData)
-        {
-            using (var algorithm = new HMACSHA1())
-            {
-                algorithm.Key = Encoding.ASCII.GetBytes(
-                    string.Format(CultureInfo.InvariantCulture,
-                        "{0}&{1}",
-                        Uri.EscapeDataString(consumerSecret),
-                        string.IsNullOrEmpty(tokenSecret) ? string.Empty : Uri.EscapeDataString(tokenSecret)));
-                byte[] hash = algorithm.ComputeHash(Encoding.ASCII.GetBytes(signatureData));
-                return Convert.ToBase64String(hash);
-            }
-        }
 
         [AllowAnonymous]
         [Route("socialProviders")]
@@ -714,7 +691,7 @@ namespace BackAnd.Web.Api.Controllers
             try
             {
                 string returnAddress = null;
-                SocialProvider social = SocialProviderFactory.GetSocialProvider(provider);
+                AbstractSocialProvider social = SocialProviderFactory.GetSocialProvider(provider);
                 SocialProfile profile = social.GetProfile(appName, accessToken);
 
                 if (profile == null)
@@ -724,7 +701,7 @@ namespace BackAnd.Web.Api.Controllers
 
                 returnAddress = profile.returnAddress;
 
-                Signin(profile);
+                SocialSigninInner(profile);
 
                 string email = profile.email;
 
@@ -758,17 +735,54 @@ namespace BackAnd.Web.Api.Controllers
 
         }
 
+        [Route("{provider}/link")]
+        [BackAndAuthorize]
+        [HttpPost]
+        public async Task<IHttpActionResult> LinkSocialProviderToExistingUser(string provider, [FromBody]SopcialLoginUserData userLoginData)
+        {
 
 
-       
+            if (string.IsNullOrEmpty(userLoginData.code) || userLoginData.code == "undefined") // js is greart...
+            {
+                return BadRequest("code can't be null or undefiend");
+            }
 
+            var username = RestHelper.GetCurrentUsername();
+
+            if (string.IsNullOrEmpty(username))
+            {
+                return BadRequest("user must be logged in to link a social provider");
+            }
+
+            try
+            {
+                AbstractSocialProvider social = SocialProviderFactory.GetSocialProvider(provider);
+                SocialProfile profile = social.Authenticate(userLoginData);
+
+                // link
+                new AccountService(null).SetEmailBySocialId(provider, profile.id, username);
+
+                if (profile == null)
+                {
+                    return BadRequest("can't validate social code of " + provider);
+                }
+
+
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+                // todo: stringBuilder + log!
+                throw new SocialException("can't linq user " + username + " to external provider " + provider + " " + ex);
+            }
+        }
 
         [AllowAnonymous]
         [Route("{provider}/code")]
         [HttpPost]
-        public async Task<IHttpActionResult> socialCode(string provider, [FromBody]SopcialLoginUserData userLoginData)
+        public async Task<IHttpActionResult> socialLoginCode(string provider, [FromBody]SopcialLoginUserData userLoginData)
         {
-           
+
 
             if (string.IsNullOrEmpty(userLoginData.code) || userLoginData.code == "undefined") // js is greart...
             {
@@ -778,7 +792,7 @@ namespace BackAnd.Web.Api.Controllers
             try
             {
                 string returnAddress = null;
-                SocialProvider social = SocialProviderFactory.GetSocialProvider(provider);
+                AbstractSocialProvider social = SocialProviderFactory.GetSocialProvider(provider);
                 SocialProfile profile = social.Authenticate(userLoginData);
 
                 if (profile == null)
@@ -787,10 +801,9 @@ namespace BackAnd.Web.Api.Controllers
                 }
 
                 string appName = userLoginData.appName;
-
                 returnAddress = profile.returnAddress;
 
-                Signin(profile);
+                SocialSigninInner(profile);
 
                 string email = profile.email;
 
@@ -821,6 +834,67 @@ namespace BackAnd.Web.Api.Controllers
 
         }
 
+        [AllowAnonymous]
+        [Route("{provider}/signupCode")]
+        [HttpPost]
+        public async Task<IHttpActionResult> socialSignupCode(string provider, [FromBody]SocialSignupUserData userLoginData)
+        {
+
+            if (string.IsNullOrEmpty(userLoginData.code) || userLoginData.code == "undefined") // js is greart...
+            {
+                return BadRequest("code can't be null or undefiend");
+            }
+
+            try
+            {
+                var social = SocialProviderFactory.GetSocialProvider(provider);
+                SocialProfile profile = social.Authenticate(userLoginData);
+
+                if (profile == null)
+                {
+                    return BadRequest("can't validate social code of " + provider);
+                }
+
+
+                // change from facebook data to user sent data
+                profile.email = userLoginData.userName;
+                profile.firstName = string.IsNullOrEmpty(userLoginData.firstName) ? profile.firstName : userLoginData.firstName;
+                profile.lastName = string.IsNullOrEmpty(userLoginData.lastName) ? profile.lastName : userLoginData.lastName;
+
+                SocialSignupInner(profile);
+
+                string appName = userLoginData.appName;
+
+                SocialSigninInner(profile);
+
+                string email = profile.email;
+
+                // create token
+                string AccessToken = CreateToken(email, userLoginData.appName);
+
+                string role, userId;
+                int expiration;
+                GetNeededParamsForToken(appName, email, out role, out userId, out expiration);
+
+                return Ok(new
+                {
+                    access_token = AccessToken,
+                    token_type = "bearer",
+                    expires_in = expiration,
+                    appName = appName,
+                    username = email,
+                    role = role,
+                    userId = userId
+                });
+
+            }
+            catch (Exception e)
+            {
+                Map.Logger.Log("user", "socialToken", e.Source, e, 1, null);
+                return BadRequest(e.Message);
+            }
+
+        }
 
         [AllowAnonymous]
         [Route("{provider}/auth")]
@@ -830,145 +904,36 @@ namespace BackAnd.Web.Api.Controllers
             string returnAddress = null;
             try
             {
-                SocialProvider social = SocialProviderFactory.GetSocialProvider(provider);
-
+                AbstractSocialProvider social = SocialProviderFactory.GetSocialProvider(provider);
                 SocialProfile profile = social.Authenticate();
                 returnAddress = profile.returnAddress;
 
-                if (profile.activity == "signin")
-                {
-                    Signin(profile);
-                }
-                else if (profile.activity == "signup")
-                {
-                    string email = profile.email;
-                    string appName = profile.appName;
-                    string parameters = profile.parameters;
-
-                    System.Web.HttpContext.Current.Items.Add(Durados.Database.AppName, appName);
-                    if (!System.Web.HttpContext.Current.Items.Contains(Durados.Database.RequestId))
-                        System.Web.HttpContext.Current.Items.Add(Durados.Database.RequestId, Guid.NewGuid().ToString());
-
-
-                    if (email != null &&
-                        !string.IsNullOrWhiteSpace(appName) &&
-                        !string.IsNullOrWhiteSpace(returnAddress) &&
-                        (new DuradosAuthorizationHelper().IsAppExists(appName) || appName == Maps.DuradosAppName))
-                    {
-                        // check if user belongs to app
-                        DataRow userRow = null;
-                        if (appName == Maps.DuradosAppName)
-                        {
-                            userRow = Maps.Instance.DuradosMap.Database.GetUserRow(email);
-                        }
-                        else
-                        {
-                            userRow = Maps.Instance.GetMap(appName).Database.GetUserRow(email);
-                        }
-                        if (userRow != null)
-                        {
-                            return Redirect(GetErrorUrl(returnAddress, "The user already signed up to " + appName, provider));
-                        }
-
-
-                        Dictionary<string, object> values = new Dictionary<string, object>();
-
-                        if (!string.IsNullOrEmpty(parameters) && parameters != "parameters")
-                        {
-                            try
-                            {
-                                values = Durados.Web.Mvc.Controllers.Api.JsonConverter.Deserialize(parameters);
-                            }
-                            catch (Exception exception)
-                            {
-                                Log(appName, exception, 1);
-                                return Redirect(GetErrorUrl(returnAddress, "Failed to get parameters", provider));
-                            }
-                        }
-                        if (!values.ContainsKey("socialProfile"))
-                        {
-                            values.Add("socialProfile", profile);
-                        }
-
-                        try
-                        {
-                            CallActionBeforeSignup(appName, email, profile, values);
-                        }
-                        catch (Exception exception)
-                        {
-                            Log(appName, exception, 1);
-                            return Redirect(GetErrorUrl(returnAddress, "Failed to run beforeSocialSignup action", provider));
-                        }
-
-                        Account account = new Account(this);
-
-                        string firstName = profile.firstName;
-                        if (values.ContainsKey("firstName") && values["firstName"] != null)
-                        {
-                            firstName = values["firstName"].ToString();
-                        }
-
-                        string lastName = profile.lastName;
-                        if (values.ContainsKey("lastName") && values["lastName"] != null)
-                        {
-                            lastName = values["lastName"].ToString();
-                        }
-
-                        var password = DuradosAuthorizationHelper.GeneratePassword(4, 4, 4);
-
-                        account.SignUp(appName, firstName, lastName, email, null, false, password, password, false, values, view_BeforeCreate, view_BeforeCreateInDatabase, view_AfterCreateBeforeCommit, view_AfterCreateAfterCommit, view_BeforeEdit, view_BeforeEditInDatabase, view_AfterEditBeforeCommit, view_AfterEditAfterCommit);
-                        if (appName == Maps.DuradosAppName)
-                        {
-                            Account.SendRegistrationRequest(firstName, lastName, email, string.Empty, email, string.Empty, Maps.Instance.DuradosMap, DontSend);
-                            try
-                            {
-                                Account.UpdateWebsiteUsers(email, Convert.ToInt32(Maps.Instance.GetMap(appName).Database.GetUserID()));
-                            }
-                            catch (Exception ex)
-                            {
-                                Maps.Instance.DuradosMap.Logger.Log("user", "SignUp", "SignUp", ex, 1, "failed to update websiteusercookie with userid");
-
-                            }
-
-                            //Insert into website users
-                            try
-                            {
-                                Account.InsertContactUsUsers(email, firstName + " " + lastName, null, string.Empty, 10, 100, null); //10=welcome email
-                            }
-                            catch (Exception ex)
-                            {
-                                Maps.Instance.DuradosMap.Logger.Log("user", "SignUp", "SignUp", ex, 1, "failed to update websiteuser in ContactUs");
-
-                            }
-                        }
-
-                    }
-                    else
-                    {
-                        return Redirect(GetErrorUrl(returnAddress, "The user does not belong to " + appName, provider));
-                    }
-                }
-                else
+                if (profile.activity != "signin" && profile.activity != "signup")
                 {
                     return Redirect(GetErrorUrl(returnAddress, "missing activity", provider));
                 }
+
+                if (profile.activity == "signin")
                 {
-                    string email = profile.email;
-                    string appName = profile.appName;
-
-                    //login the user use email
-                    //string returnUrl = LoginOrRegister(mode, email, name, "Google", returnUrl);
-                    ClaimsIdentity identity = CreateIdentity(email, appName, provider);
-
-
-                    // create token
-                    string AccessToken = Durados.Web.Mvc.UI.Helpers.SecurityHelper.GetTmpUserGuidFromGuid(Account.GetUserGuid(email));//CreateToken(identity);
-
-                    // return token
-
-                    string url = GetSuccessUrl(returnAddress, AccessToken, appName, email);
-                    return Redirect(url);
+                    SocialSigninInner(profile);
                 }
+                else if (profile.activity == "signup")
+                {
+                    SocialSignupInner(profile);
+                }
+
+
+                //login the user use email
+                ClaimsIdentity identity = CreateIdentity(profile.email, profile.appName, provider);
+
+                // create token
+                string AccessToken = SecurityHelper.GetTmpUserGuidFromGuid(AccountService.GetUserGuid(profile.email));//CreateToken(identity);
+
+                // return token
+
+                string url = GetSuccessUrl(returnAddress, AccessToken, profile.appName, profile.email);
+                return Redirect(url);
+
             }
             catch (Exception exception)
             {
@@ -1001,11 +966,86 @@ namespace BackAnd.Web.Api.Controllers
             }
         }
 
+        private static bool GetCanLoginWithProfile(SocialProfile profile)
+        {
+            return profile.email != null &&
+                            !string.IsNullOrWhiteSpace(profile.appName) &&
+                            !string.IsNullOrWhiteSpace(profile.returnAddress) &&
+                            (new DuradosAuthorizationHelper().IsAppExists(profile.appName) || profile.appName == Maps.DuradosAppName);
+        }
+
+        private static void EnsureUserNotAlreadySingedUp(SocialProfile profile)
+        {
+            DataRow userRow = null;
+            if (profile.appName == Maps.DuradosAppName)
+            {
+                userRow = Maps.Instance.DuradosMap.Database.GetUserRow(profile.email);
+            }
+            else
+            {
+                userRow = Maps.Instance.GetMap(profile.appName).Database.GetUserRow(profile.email);
+            }
+
+            if (userRow != null)
+            {
+                throw new SocialException("The user already signed up to " + profile.appName);
+            }
+        }
+
+        private Dictionary<string, object> CreateLoginValuesForAction(SocialProfile profile, string appName, string parameters)
+        {
+            Dictionary<string, object> values = new Dictionary<string, object>();
+
+            if (!string.IsNullOrEmpty(parameters) && parameters != "parameters")
+            {
+                try
+                {
+                    values = Durados.Web.Mvc.Controllers.Api.JsonConverter.Deserialize(parameters);
+                }
+                catch (Exception exception)
+                {
+                    Log(profile.appName, exception, 1);
+                    throw new SocialException("Failed to get parameters");
+                }
+            }
+
+            if (!values.ContainsKey("socialProfile"))
+            {
+                values.Add("socialProfile", profile);
+            }
+
+            return values;
+        }
+
+        private void RegisterUserToMainApp(string email, string appName, string firstName, string lastName)
+        {
+            AccountService.SendRegistrationRequest(firstName, lastName, email, string.Empty, email, string.Empty, Maps.Instance.DuradosMap, DontSend);
+            try
+            {
+                AccountService.UpdateWebsiteUsers(email, Convert.ToInt32(Maps.Instance.GetMap(appName).Database.GetUserID()));
+            }
+            catch (Exception ex)
+            {
+                Maps.Instance.DuradosMap.Logger.Log("user", "SignUp", "SignUp", ex, 1, "failed to update websiteusercookie with userid");
+
+            }
+
+            //Insert into website users
+            try
+            {
+                AccountService.InsertContactUsUsers(email, firstName + " " + lastName, null, string.Empty, 10, 100, null); //10=welcome email
+            }
+            catch (Exception ex)
+            {
+                Maps.Instance.DuradosMap.Logger.Log("user", "SignUp", "SignUp", ex, 1, "failed to update websiteuser in ContactUs");
+
+            }
+        }
+
         private string CreateToken(string username, string appName)
         {
             return GetAccessToken(username, appName, "Backand");
         }
-
 
         private string GetAccessToken(string username, string appName, string provider)
         {
@@ -1128,42 +1168,136 @@ namespace BackAnd.Web.Api.Controllers
             }
         }
 
-        public virtual void Signin(SocialProfile profile)
+        private void SocialSignupInner(SocialProfile profile)
         {
-            string email = profile.email;
-            string appName = profile.appName;
-            string returnAddress = profile.returnAddress;
 
-            if (email != null &&
-                 !string.IsNullOrWhiteSpace(appName) &&
-                 !string.IsNullOrWhiteSpace(returnAddress) &&
-                 (new DuradosAuthorizationHelper().IsAppExists(appName) || appName == Maps.DuradosAppName))
+            System.Web.HttpContext.Current.Items.Add(Durados.Database.AppName, profile.appName);
+
+            if (!System.Web.HttpContext.Current.Items.Contains(Durados.Database.RequestId))
+                System.Web.HttpContext.Current.Items.Add(Durados.Database.RequestId, Guid.NewGuid().ToString());
+
+            var canLoginWithProfile = GetCanLoginWithProfile(profile);
+
+            if (profile.email == null)
+            {
+                throw new SocialException("cna't signup without email. NO_EMAIL_SOCIAL");
+            }
+
+            if (canLoginWithProfile)
+            {
+                // check if user belongs to app
+                EnsureUserNotAlreadySingedUp(profile);
+                Dictionary<string, object> values = CreateLoginValuesForAction(profile, profile.appName, profile.parameters);
+
+                try
+                {
+                    CallActionBeforeSignup(profile.appName, profile.email, profile, values);
+                }
+                catch (Exception exception)
+                {
+                    Log(profile.appName, exception, 1);
+                    throw new SocialException("Failed to run beforeSocialSignup action");
+                }
+
+                string firstName = profile.firstName;
+
+                if (values.ContainsKey("firstName") && values["firstName"] != null)
+                {
+                    firstName = values["firstName"].ToString();
+                }
+
+                string lastName = profile.lastName;
+
+                if (values.ContainsKey("lastName") && values["lastName"] != null)
+                {
+                    lastName = values["lastName"].ToString();
+                }
+
+                var password = DuradosAuthorizationHelper.GeneratePassword(4, 4, 4);
+
+
+                // todo: start transaction
+
+                SignUpCommand(profile, values, firstName, lastName, password);
+
+                // todo: stop transaction
+
+                // handle case of bko application
+                if (profile.appName == Maps.DuradosAppName)
+                {
+                    RegisterUserToMainApp(profile.email, profile.appName, firstName, lastName);
+                }
+            }
+            else
+            {
+                throw new SocialException("The user does not belong to " + profile.appName);
+            }
+
+        }
+
+        private void SignUpCommand(SocialProfile profile, Dictionary<string, object> values, string firstName, string lastName, string password)
+        {
+            AccountService accountService = new AccountService(this);
+            accountService.SignUp(profile.appName, firstName, lastName, profile.email, null, false, password,
+                password, false, values,
+                view_BeforeCreate, view_BeforeCreateInDatabase,
+                view_AfterCreateBeforeCommit, view_AfterCreateAfterCommit,
+                view_BeforeEdit, view_BeforeEditInDatabase,
+                view_AfterEditBeforeCommit, view_AfterEditAfterCommit);
+
+            accountService.SetEmailBySocialId(profile.Provider, profile.id, profile.email);
+        }
+
+        public virtual void SocialSigninInner(SocialProfile profile)
+        {
+            var accountService = new AccountService(null);
+            var emailFromService = accountService
+                                    .GetEmailBySocialId(profile.Provider, profile.id);
+
+            profile.email = emailFromService ?? profile.email;
+
+            if (profile.email == null)
+            {
+                throw new SocialException("can't login wihtout email. NO_EMAIL_SOCIAL");
+            }
+
+            if (GetCanLoginWithProfile(profile))
             {
                 // check if user belongs to app
                 DataRow userRow = null;
-                if (appName == Maps.DuradosAppName)
+                if (profile.appName == Maps.DuradosAppName)
                 {
-                    userRow = Maps.Instance.DuradosMap.Database.GetUserRow(email);
+                    userRow = Maps.Instance.DuradosMap.Database.GetUserRow(profile.email);
+
                     if (userRow == null)
                     {
-                        throw new SocialException("The user is not signed up to " + appName);
+                        throw new SocialException("The user is not signed up to " + profile.appName);
                     }
                 }
                 else
                 {
-                    userRow = Maps.Instance.GetMap(appName).Database.GetUserRow(email);
+                    userRow = Maps.Instance.GetMap(profile.appName).Database.GetUserRow(profile.email);
+
                     if (userRow == null)
                     {
-                        throw new SocialException("The user is not signed up to " + appName);
+                        throw new SocialException("The user is not signed up to " + profile.appName);
                     }
+
                     if (!userRow.IsNull("IsApproved"))
                     {
                         object isApproved = userRow["IsApproved"];
                         if (isApproved.Equals(false) || isApproved.Equals(0))
                         {
-                            throw new SocialException("The user did not finish signing up to " + appName);
+                            throw new SocialException("The user did not finish signing up to " + profile.appName);
                         }
                     }
+                }
+
+                // here we are with a valid user
+                // user that already exist in backand, and signup before we add external provider link 
+                if (emailFromService == null && profile.email != null)
+                {
+                    accountService.SetEmailBySocialId(profile.Provider, profile.id, profile.email);
                 }
             }
             else

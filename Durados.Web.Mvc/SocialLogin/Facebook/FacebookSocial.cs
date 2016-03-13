@@ -1,13 +1,13 @@
-﻿using Durados.Web.Mvc.UI.Helpers;
+﻿using Durados.Web.Mvc.SocialLogin.Facebook;
+using Durados.Web.Mvc.UI.Helpers;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Net.Http;
 using System.Web.Script.Serialization;
 
 namespace Durados.Web.Mvc.SocialLogin
 {
-    public class FacebookSocialProvider : SocialProvider
+    public class FacebookSocialProvider : AbstractSocialProvider
     {
         protected override SocialProfile GetNewProfile(Dictionary<string, object> dictionary)
         {
@@ -19,14 +19,29 @@ namespace Durados.Web.Mvc.SocialLogin
             get { return "facebook"; }
         }
 
-        public override string GetAuthUrl(string appName, string returnAddress, string parameters, string activity)
+        protected override string ConfigPrefix
         {
-            Dictionary<string, object> keys = GetKeys(appName);
-            string clientId = keys["ClientId"].ToString();
-            string redirectUri = GetRedirectUrl();
-            var state = new { appName = appName, returnAddress = System.Web.HttpContext.Current.Server.UrlEncode(returnAddress), activity = activity, parameters = parameters ?? string.Empty };
-            var jss = new JavaScriptSerializer();
+            get
+            {
+                return "Facebook";
+            }
+        }
 
+        public override string GetAuthUrl(string appName, string returnAddress, string parameters, string activity, string email)
+        {
+            var keys = GetSocialKeys(appName);
+            string clientId = keys.ClientId;
+            string redirectUri = GetRedirectUrl();
+            var state = new
+            {
+                appName = appName,
+                returnAddress = System.Web.HttpContext.Current.Server.UrlEncode(returnAddress),
+                activity = activity,
+                parameters = parameters ?? string.Empty,
+                email = email
+            };
+
+            var jss = new JavaScriptSerializer();
 
             // OAuth2 10.12 CSRF
             //GenerateCorrelationId(properties);
@@ -41,12 +56,8 @@ namespace Durados.Web.Mvc.SocialLogin
                     "&redirect_uri=" + Uri.EscapeDataString(redirectUri) +
                     "&scope=" + Uri.EscapeDataString(scope) +
                     "&state=" + Uri.EscapeDataString(jss.Serialize(state));
-            return authorizationEndpoint;
-        }
 
-        protected override Dictionary<string, object> GetKeys(string appName)
-        {
-            return GetFacebookKeys(appName);
+            return authorizationEndpoint;
         }
 
         private Dictionary<string, object> GetFacebookKeys(string appName)
@@ -75,8 +86,6 @@ namespace Durados.Web.Mvc.SocialLogin
 
             return keys;
         }
-
-
 
         public override SocialProfile Authenticate()
         {
@@ -126,7 +135,15 @@ namespace Durados.Web.Mvc.SocialLogin
                 }
                 string parameters = stateObject["parameters"].ToString();
 
-                return FetchProfileByCode(code, appName, returnAddress, activity, parameters, null);
+
+                string email = null;
+
+                if (stateObject.ContainsKey("email") && stateObject["email"] != null && !string.IsNullOrEmpty(stateObject["email"].ToString()))
+                {
+                    email = stateObject["email"].ToString();
+                }
+
+                return FetchProfileByCode(code, appName, returnAddress, activity, parameters, null, email);
 
 
                 //HttpResponseMessage graphResponse = await _httpClient.GetAsync(graphAddress, HttpCompletionOption.ResponseContentRead);
@@ -149,11 +166,11 @@ namespace Durados.Web.Mvc.SocialLogin
 
         }
 
-        protected override SocialProfile FetchProfileByCode(string code, string appName, string returnAddress, string activity, string parameters, string redirectUrl)
+        protected override SocialProfile FetchProfileByCode(string code, string appName, string returnAddress, string activity, string parameters, string redirectUrl, string email)
         {
-            Dictionary<string, object> keys = GetKeys(appName);
-            string clientId = keys["ClientId"].ToString();
-            string clientSecret = keys["ClientSecret"].ToString();
+            var socialKeys = GetSocialKeys(appName);
+            string clientId = socialKeys.ClientId;
+            string clientSecret = socialKeys.ClientSecret;
 
             string redirectUri = string.IsNullOrEmpty(redirectUrl) ? GetRedirectUrl() : redirectUrl;
 
@@ -171,103 +188,30 @@ namespace Durados.Web.Mvc.SocialLogin
             string accessToken = validateResponse["access_token"].ToString();
             string expires = validateResponse["expires"].ToString();
 
-            SocialProfile profile = GetProfile(appName, accessToken, returnAddress, activity, parameters);
+            SocialProfile profile = GetProfile(appName, accessToken, returnAddress, activity, parameters, email);
 
-            if (string.IsNullOrEmpty(profile.email))
-            {
-                Exception exception = new FacebookException("Facebook account authenticated but did not return an email.");
-                Maps.Instance.DuradosMap.Logger.Log("userController", "Authenticate", "email", exception, 1, "");
-                throw exception;
-            }
+            // don't email more socialLogin V2
+            //if (string.IsNullOrEmpty(profile.email))
+            //{
+            //    Exception exception = new FacebookException("Facebook account authenticated but did not return an email.");
+            //    Maps.Instance.DuradosMap.Logger.Log("userController", "Authenticate", "email", exception, 1, "");
+            //    throw exception;
+            //}
 
             return profile;
         }
 
-        protected override SocialProfile GetProfileUnsafe(string appName, string accessToken, string returnAddress, string activity, string parameters)
+        protected override SocialApplicationKeys GetSocialKeysFromDatabase(Map map)
+        {
+            return new SocialApplicationKeys { ClientId = map.Database.FacebookClientId, ClientSecret = map.Database.FacebookClientSecret };
+        }
+
+        protected override string FetchProfileFromService(string accessToken)
         {
             string GraphApiEndpoint = "https://graph.facebook.com/me?fields=id,email,name";
             string graphAddress = GraphApiEndpoint + "&access_token=" + Uri.EscapeDataString(accessToken);
 
-            string profiel = Durados.Web.Mvc.Infrastructure.Http.GetWebRequest(graphAddress);
-            Dictionary<string, object> facebookProfile = Durados.Web.Mvc.UI.Json.JsonSerializer.Deserialize(profiel);
-            facebookProfile.Add("appName", appName);
-            facebookProfile.Add("returnAddress", returnAddress);
-            facebookProfile.Add("activity", activity);
-            facebookProfile.Add("parameters", parameters);
-
-            SocialProfile profile = GetNewProfile(facebookProfile);
-            return profile;
-        }
-
-
-
-        public class FacebookProfile : SocialProfile
-        {
-            public FacebookProfile(Dictionary<string, object> dictionary) :
-                base(dictionary)
-            {
-
-            }
-
-            protected virtual string GetPart(string key)
-            {
-                if (dictionary.ContainsKey(key))
-                {
-                    return dictionary[key].ToString();
-                }
-                else
-                {
-                    if (key != "email")
-                    {
-                        if (string.IsNullOrEmpty(email))
-                        {
-                            return null;
-                        }
-                        else
-                        {
-                            return email.Split('@').FirstOrDefault();
-                        }
-                    }
-                    else
-                    {
-                        return null;
-                    }
-                }
-            }
-            public override string firstName
-            {
-                get { return GetPart("first_name"); }
-            }
-
-            public override string lastName
-            {
-                get { return GetPart("last_name"); }
-            }
-
-            public override string email
-            {
-                get { return GetPart("email"); }
-            }
-
-            public override string Provider
-            {
-                get { return "facebook"; }
-            }
-        }
-
-        public class FacebookException : SocialException
-        {
-            public FacebookException(string message)
-                : base(message)
-            {
-
-            }
-
-            public FacebookException(string message, Exception innerException)
-                : base(message)
-            {
-
-            }
+            return Durados.Web.Mvc.Infrastructure.Http.GetWebRequest(graphAddress);
         }
     }
 }

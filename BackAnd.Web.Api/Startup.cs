@@ -52,7 +52,7 @@ namespace BackAnd.Web.Api
 
                 });
             }
-            
+
             Analytics.Init();
         }
 
@@ -83,21 +83,21 @@ namespace BackAnd.Web.Api
 
             // Token Generation
             app.UseOAuthAuthorizationServer(OAuthOptions);
-            
+
             // Enable the application to use cookies to authenticate users
             CookieOptions = new CookieAuthenticationOptions();
             app.UseCookieAuthentication(CookieOptions);
 
             // Enable the application to use a cookie to store temporary information about a user logging in with a third party login provider
             app.UseExternalSignInCookie(ExternalCookieAuthenticationType);
-            SetUpGithubAuth(app);
-            SetUpGoogleAuth(app);
+            //SetUpGithubAuth(app);
+            //SetUpGoogleAuth(app);
 
-            SetUpFacebookAuth(app);
+            //SetUpFacebookAuth(app);
         }
 
         String XmlSchemaString = "http://schemas.xmlsoap.org/ws/2005/05/identity/claims";
-       
+
         private void SetUpGithubAuth(IAppBuilder app)
         {
             if (ConfigurationManager.AppSettings["GithubClientId"] != null && ConfigurationManager.AppSettings["GithubClientSecret"] != null)

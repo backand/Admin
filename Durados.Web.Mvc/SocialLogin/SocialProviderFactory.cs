@@ -9,7 +9,7 @@ namespace Durados.Web.Mvc.SocialLogin
 {
     public static class SocialProviderFactory
     {
-        public static SocialProvider GetSocialProvider(string providerName)
+        public static AbstractSocialProvider GetSocialProvider(string providerName)
         {
             switch (providerName.ToLower())
             {
@@ -19,6 +19,8 @@ namespace Durados.Web.Mvc.SocialLogin
                     return new GithubSocialProvider();
                 case "facebook":
                     return new FacebookSocialProvider();
+                case "twitter":
+                    return new TwitterSocialProvider();
 
                 default:
                     return null;

@@ -2065,7 +2065,6 @@ namespace Durados.Web.Mvc
             if (this is DuradosMap)
                 return;
 
-
             string v_durados_User = "v_durados_User";
             string durados_User = "durados_User";
             string durados_UserRole = "durados_UserRole";
@@ -2086,6 +2085,10 @@ namespace Durados.Web.Mvc
             ds.Tables.Add(durados_UserRoleTable);
 
             ds.Relations.Add("UserRole", durados_UserRoleTable.Columns["Name"], v_durados_UserTable.Columns["Role"]);
+
+            // add external login table
+
+
 
             durados_UserRoleTable.ExtendedProperties.Add("system", true);
             v_durados_UserTable.ExtendedProperties.Add("system", true);

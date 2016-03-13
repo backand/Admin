@@ -658,7 +658,7 @@ namespace BackAnd.Web.Api.Controllers
 
         protected virtual Dictionary<string, object> SignUp(string fullName, string email, string password)
         {
-            Dictionary<string, object> json = new Durados.Web.Mvc.UI.Helpers.Account(this).SignUpToBackand(email, password, Durados.Web.Mvc.Maps.SendWelcomeEmail, null, fullName, "100", null);
+            Dictionary<string, object> json = new Durados.Web.Mvc.UI.Helpers.AccountService(this).SignUpToBackand(email, password, Durados.Web.Mvc.Maps.SendWelcomeEmail, null, fullName, "100", null);
             Durados.Web.Mvc.Maps.Instance.DuradosMap.Logger.Log("Account", "SignUp", "Post", "SignUp call", email, 3, null, DateTime.Now);
             return json;
         }
@@ -710,7 +710,7 @@ namespace BackAnd.Web.Api.Controllers
 
                 if (jsonResponse.ContainsKey("Message") && jsonResponse["Message"].Equals("Success"))
                 {
-                    Durados.Web.Mvc.UI.Helpers.Account account = new Durados.Web.Mvc.UI.Helpers.Account(this);
+                    Durados.Web.Mvc.UI.Helpers.AccountService account = new Durados.Web.Mvc.UI.Helpers.AccountService(this);
                     account.InviteAdminAfterSignUp(email);
                     Durados.Web.Mvc.UI.Helpers.Analytics.Log(Durados.Web.Mvc.Logging.ExternalAnalyticsAction.SignedUp, email, new Dictionary<string, object>() {
                         { Durados.Database.AppName, Durados.Web.Mvc.Maps.DuradosAppName }

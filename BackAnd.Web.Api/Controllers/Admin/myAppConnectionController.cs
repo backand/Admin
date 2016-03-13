@@ -2551,8 +2551,8 @@ namespace BackAnd.Web.Api.Controllers
                 int remotePort = e.Values.ContainsKey(ProductPort) && !e.Values[ProductPort].Equals(string.Empty) ? Convert.ToInt32(e.Values[ProductPort]) : 3306;
                 localPort = Maps.Instance.AssignLocalPort();
 
-                //session = new Durados.DataAccess.Ssh.ChilkatSession(tunnel, remotePort, localPort);
-                //session.Open();
+                session = new Durados.DataAccess.Ssh.ChilkatSession(tunnel, remotePort, localPort);
+                session.Open();
             }
         }
 
@@ -3049,8 +3049,8 @@ namespace BackAnd.Web.Api.Controllers
                 int remotePort = productPort;
                 localPort = Maps.Instance.AssignLocalPort();
 
-                //session = new Durados.DataAccess.Ssh.ChilkatSession(tunnel, remotePort, localPort);
-                //session.Open(15);
+                session = new Durados.DataAccess.Ssh.ChilkatSession(tunnel, remotePort, localPort);
+                session.Open(15);
             }
         }
 

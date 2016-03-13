@@ -291,7 +291,6 @@
   <ItemGroup>
     <Folder Include="App_Data\" />
     <Folder Include="bin\" />
-    <Folder Include="SocialLogin\" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Durados.Cms\Durados.Cms.csproj">
