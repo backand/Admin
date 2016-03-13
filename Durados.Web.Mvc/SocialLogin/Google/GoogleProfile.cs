@@ -19,17 +19,17 @@ namespace Durados.Web.Mvc.SocialLogin.Google
                 if (names.ContainsKey(key))
                     return names[key].ToString();
                 else
-                    return email.Split('@').FirstOrDefault();
+                    return emailInner.Split('@').FirstOrDefault();
             }
             else
             {
-                if (string.IsNullOrEmpty(email))
+                if (string.IsNullOrEmpty(emailInner))
                 {
                     return null;
                 }
                 else
                 {
-                    return email.Split('@').FirstOrDefault();
+                    return emailInner.Split('@').FirstOrDefault();
                 }
             }
         }

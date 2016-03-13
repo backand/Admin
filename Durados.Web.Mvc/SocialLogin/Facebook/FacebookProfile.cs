@@ -21,13 +21,13 @@ namespace Durados.Web.Mvc.SocialLogin.Facebook
             {
                 if (key != "email")
                 {
-                    if (string.IsNullOrEmpty(email))
+                    if (string.IsNullOrEmpty(emailInner))
                     {
                         return null;
                     }
                     else
                     {
-                        return email.Split('@').FirstOrDefault();
+                        return emailInner.Split('@').FirstOrDefault();
                     }
                 }
                 else
