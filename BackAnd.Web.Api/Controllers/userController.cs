@@ -1213,6 +1213,11 @@ namespace BackAnd.Web.Api.Controllers
                     lastName = values["lastName"].ToString();
                 }
 
+                if (string.IsNullOrEmpty(lastName))
+                {
+                    lastName = firstName;
+                }
+
                 var password = DuradosAuthorizationHelper.GeneratePassword(4, 4, 4);
 
 
