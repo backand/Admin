@@ -10087,7 +10087,12 @@ namespace Durados.DataAccess
                         transaction.Rollback();
                         if (!identicalSystemConnection)
                         {
-                            sysTransaction.Rollback();
+                            if (sysTransaction != null)
+                                try
+                                {
+                                    sysTransaction.Rollback();
+                                }
+                                catch { }
                         }
                     }
                     else
@@ -10096,7 +10101,12 @@ namespace Durados.DataAccess
                         transaction.Commit();
                         if (!identicalSystemConnection)
                         {
-                            sysTransaction.Commit();
+                            if (sysTransaction != null)
+                                try
+                                {
+                                    sysTransaction.Commit();
+                                }
+                                catch { }
                         }
                     }
                 }
