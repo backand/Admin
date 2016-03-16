@@ -90,6 +90,7 @@ namespace BackAnd.Web.Api.Controllers
         }
 
         Durados.Web.Mvc.Controllers.AccountMembershipService MembershipService = new Durados.Web.Mvc.Controllers.AccountMembershipService();
+
         private bool ValidateNewPassword(string newPassword, string confirmPassword)
         {
             if (newPassword == null || newPassword.Length < MembershipService.MinPasswordLength)

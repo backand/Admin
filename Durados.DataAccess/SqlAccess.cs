@@ -626,12 +626,16 @@ namespace Durados.DataAccess
                 {
                     table = FillDataTable(view, page, pageSize, filter, sortColumn, direction, out rowCount, null, null, beforeSelectCallback, afterSelectCallback);
                 }
-                else
+                else if (field is ParentField)
                 {
                     ParentField parentField = (ParentField)field;
                     sortColumn = parentField.GetSortByParent();
                     string join = GetJoin(parentField);
                     table = FillDataTable(view, page, pageSize, filter, sortColumn, direction, out rowCount, parentField, join, beforeSelectCallback, afterSelectCallback);
+                }
+                else
+                {
+                    throw new DuradosException("Cannot sort according to collection field");
                 }
             }
             else if (sortColumns != null && sortColumns.Count > 1)
@@ -5347,7 +5351,7 @@ namespace Durados.DataAccess
         {
             foreach (ChildrenField field in view.Fields.Values.Where(f => f.FieldType == FieldType.Children && ((ChildrenField)f).Persist))
             {
-                if (values.ContainsKey(field.Name))
+                if (values.ContainsKey(field.Name) && values[field.Name] != null)
                 {
                     UpdateCheckList(field, pk, values[field.Name].ToString(), command, sysCommand);
                 }
@@ -9822,6 +9826,11 @@ namespace Durados.DataAccess
         }
         */
 
+        private bool IsSameResource(IDbConnection connection, string connectionString)
+        {
+            return connectionString.Contains(connection.Database);
+        }
+
         public string Create(View view, Dictionary<string, object>[] deepObjects, bool deep, BeforeCreateEventHandler beforeCreateCallback, BeforeCreateInDatabaseEventHandler beforeCreateInDatabaseCallback, AfterCreateEventHandler afterCreateBeforeCommitCallback, AfterCreateEventHandler afterCreateAfterCommitCallback, IDbCommand command = null, IDbCommand sysCommand = null)
         {
             string pk = string.Empty;
@@ -9834,7 +9843,7 @@ namespace Durados.DataAccess
 
             try
             {
-                if (command == null || command.Connection.State == ConnectionState.Closed || command.Connection.ConnectionString != view.ConnectionString)
+                if (command == null || command.Connection.State == ConnectionState.Closed || !IsSameResource(command.Connection, view.ConnectionString))
                 {
                     connection = SqlAccess.GetNewConnection(GetProduct(view));
 
@@ -9846,7 +9855,7 @@ namespace Durados.DataAccess
                     command.Transaction = transaction;
                 }
 
-                if (sysCommand == null || sysCommand.Connection.State == ConnectionState.Closed || command.Connection.ConnectionString != view.ConnectionString)
+                if (sysCommand == null || sysCommand.Connection.State == ConnectionState.Closed || !IsSameResource(command.Connection, view.ConnectionString))
                 {
                     if (!identicalSystemConnection)
                     {
@@ -10039,7 +10048,7 @@ namespace Durados.DataAccess
 
             try
             {
-                if (command == null || command.Connection.State == ConnectionState.Closed || command.Connection.ConnectionString != view.ConnectionString)
+                if (command == null || command.Connection.State == ConnectionState.Closed || !IsSameResource(command.Connection, view.ConnectionString))
                 {
                     connection = SqlAccess.GetNewConnection(GetProduct(view));
 
@@ -10051,7 +10060,7 @@ namespace Durados.DataAccess
                     command.Transaction = transaction;
                 }
 
-                if (sysCommand == null || sysCommand.Connection.State == ConnectionState.Closed || command.Connection.ConnectionString != view.ConnectionString)
+                if (sysCommand == null || sysCommand.Connection.State == ConnectionState.Closed || !IsSameResource(command.Connection, view.ConnectionString))
                 {
                     if (!identicalSystemConnection)
                     {
@@ -10078,7 +10087,12 @@ namespace Durados.DataAccess
                         transaction.Rollback();
                         if (!identicalSystemConnection)
                         {
-                            sysTransaction.Rollback();
+                            if (sysTransaction != null)
+                                try
+                                {
+                                    sysTransaction.Rollback();
+                                }
+                                catch { }
                         }
                     }
                     else
@@ -10087,7 +10101,12 @@ namespace Durados.DataAccess
                         transaction.Commit();
                         if (!identicalSystemConnection)
                         {
-                            sysTransaction.Commit();
+                            if (sysTransaction != null)
+                                try
+                                {
+                                    sysTransaction.Commit();
+                                }
+                                catch { }
                         }
                     }
                 }
@@ -10137,33 +10156,36 @@ namespace Durados.DataAccess
                             View childrenView = childrenField.ChildrenView;
                             Dictionary<string, string> keys = GetPrevChildren(childrenField, pk);
 
-                            var children = (object[])deepObject[key];
-                            
-                            if (overwrite)
+                            if (deepObject.ContainsKey(key) && deepObject[key] != null)
                             {
-                                GetChildrenToDelete(keys, children);
+                                var children = (object[])deepObject[key];
 
-                                foreach (string keyToDelete in keys.Keys)
+                                if (overwrite)
                                 {
-                                    Delete(childrenView, keyToDelete, true, beforeDeleteCallback, afterDeleteBeforeCommitCallback, afterDeleteAfterCommitCallback, command, sysCommand, null);
-                                }
-                            }
+                                    GetChildrenToDelete(keys, children);
 
-                            foreach (Dictionary<string, object> child in children)
-                            {
-                                string childPk = GetPk(child);
-                                if (childPk == null)
-                                {
-                                    ParentField parentField = childrenField.GetEquivalentParentField();
-                                    if (!child.ContainsKey(parentField.JsonName))
+                                    foreach (string keyToDelete in keys.Keys)
                                     {
-                                        child.Add(parentField.JsonName, pk);
+                                        Delete(childrenView, keyToDelete, true, beforeDeleteCallback, afterDeleteBeforeCommitCallback, afterDeleteAfterCommitCallback, command, sysCommand, null);
                                     }
-                                    Create(childrenView, child, deep, command, sysCommand, beforeCreateCallback, beforeCreateInDatabaseCallback, afterCreateBeforeCommitCallback, afterCreateAfterCommitCallback);
                                 }
-                                else
+
+                                foreach (Dictionary<string, object> child in children)
                                 {
-                                    Update(childrenView, child, childPk, deep, command, sysCommand, beforeEditCallback, beforeEditInDatabaseCallback, afterEditBeforeCommitCallback, afterEditAfterCommitCallback);
+                                    string childPk = GetPk(child);
+                                    if (childPk == null)
+                                    {
+                                        ParentField parentField = childrenField.GetEquivalentParentField();
+                                        if (!child.ContainsKey(parentField.JsonName))
+                                        {
+                                            child.Add(parentField.JsonName, pk);
+                                        }
+                                        Create(childrenView, child, deep, command, sysCommand, beforeCreateCallback, beforeCreateInDatabaseCallback, afterCreateBeforeCommitCallback, afterCreateAfterCommitCallback);
+                                    }
+                                    else
+                                    {
+                                        Update(childrenView, child, childPk, deep, command, sysCommand, beforeEditCallback, beforeEditInDatabaseCallback, afterEditBeforeCommitCallback, afterEditAfterCommitCallback);
+                                    }
                                 }
                             }
                         }
@@ -10177,28 +10199,35 @@ namespace Durados.DataAccess
                                 ParentField parentField = ((ChildrenField)field).GetFirstNonEquivalentParentField();
                                 if (parentField != null)
                                 {
-                                    List<string> clItems = new List<string>();
-                                    foreach (Dictionary<string, object> child in (System.Collections.IEnumerable)deepObject[key])
+                                    if (deepObject.ContainsKey(key) && deepObject[key] != null && deepObject[key] is System.Collections.IEnumerable)
                                     {
-                                        if (child.ContainsKey(parentField.JsonName))
+                                        List<string> clItems = new List<string>();
+                                        foreach (Dictionary<string, object> child in (System.Collections.IEnumerable)deepObject[key])
                                         {
-                                            string clItem = null;
-                                            if (child[parentField.JsonName] is Dictionary<string, object>)
+                                            if (child.ContainsKey(parentField.JsonName))
                                             {
-                                                clItem = ((Dictionary<string, object>)((Dictionary<string, object>)child[parentField.JsonName])["__metadata"])["id"].ToString();
+                                                string clItem = null;
+                                                if (child[parentField.JsonName] is Dictionary<string, object>)
+                                                {
+                                                    clItem = ((Dictionary<string, object>)((Dictionary<string, object>)child[parentField.JsonName])["__metadata"])["id"].ToString();
+                                                }
+                                                else if (child[parentField.JsonName] is string || child[parentField.JsonName] is int)
+                                                {
+                                                    clItem = child[parentField.JsonName].ToString();
+                                                }
+                                                else
+                                                {
+                                                    continue;
+                                                }
+                                                clItems.Add(clItem);
                                             }
-                                            else if (child[parentField.JsonName] is string || child[parentField.JsonName] is int)
-                                            {
-                                                clItem = child[parentField.JsonName].ToString();
-                                            }
-                                            else
-                                            {
-                                                continue;
-                                            }
-                                            clItems.Add(clItem);
                                         }
+                                        values.Add(field.Name, clItems.ToArray().Delimited());
                                     }
-                                    values.Add(field.Name, clItems.ToArray().Delimited());
+                                    else
+                                    {
+                                        values.Add(field.Name, null);
+                                    }
                                 }
                             }
                             catch { }
@@ -10264,9 +10293,9 @@ namespace Durados.DataAccess
 
         public int Delete(View view, string pk, bool deep, BeforeDeleteEventHandler beforeDeleteCallback, AfterDeleteEventHandler afterDeleteBeforeCommitCallback, AfterDeleteEventHandler afterDeleteAfterCommitCallback, IDbCommand command = null, IDbCommand sysCommand = null, Dictionary<string, object> values = null)
         {
-            if ((command != null && command.Connection.State == ConnectionState.Closed) || (command != null && command.Connection.ConnectionString != view.ConnectionString))
+            if ((command != null && command.Connection.State == ConnectionState.Closed) || (command != null && !IsSameResource(command.Connection, view.ConnectionString)))
                 command = null;
-            if ((sysCommand != null && sysCommand.Connection.State == ConnectionState.Closed) || (command != null && command.Connection.ConnectionString != view.ConnectionString))
+            if ((sysCommand != null && sysCommand.Connection.State == ConnectionState.Closed) || (command != null && !IsSameResource(command.Connection, view.ConnectionString)))
                 sysCommand = null;
             return GetSqlAccess(view).Delete(view, pk, beforeDeleteCallback, afterDeleteBeforeCommitCallback, afterDeleteAfterCommitCallback, command, sysCommand, values);
         }

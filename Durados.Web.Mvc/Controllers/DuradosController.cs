@@ -1,26 +1,20 @@
+using Amazon.S3;
+using Amazon.S3.Model;
+using Amazon.S3.Transfer;
+using Durados.DataAccess;
+using Durados.Diagnostics;
+using Durados.Web.Mvc.Controllers.Filters;
+using Durados.Web.Mvc.Infrastructure;
+using Durados.Web.Mvc.UI.Helpers;
+using Microsoft.WindowsAzure;
+using Microsoft.WindowsAzure.StorageClient;
 using System;
 using System.Collections.Generic;
+using System.Data;
+using System.IO;
 using System.Linq;
 using System.Web;
 using System.Web.Mvc;
-using System.Web.Mvc.Ajax;
-using System.Data;
-using System.IO;
-using System.Web.Script.Serialization;
-
-using Durados;
-using Durados.DataAccess;
-using Durados.Web.Mvc.UI.Helpers;
-using Durados.Web.Mvc.Controllers.Filters;
-using Durados.Diagnostics;
-using Durados.Web.Mvc.Infrastructure;
-
-using Microsoft.WindowsAzure;
-using Microsoft.WindowsAzure.StorageClient;
-using Amazon.S3.Transfer;
-using Amazon.S3;
-using Amazon.S3.Model;
-using Oracle.ManagedDataAccess.Client;
 
 
 namespace Durados.Web.Mvc.Controllers
@@ -267,18 +261,18 @@ namespace Durados.Web.Mvc.Controllers
         public virtual JsonResult ChangeFilterVisibilty(string viewName, bool filterVisibilty)
         {
             Durados.Web.Mvc.View view = GetView(viewName);
-            
+
             string viewFilterVisibility = view.Name + "_filterVisibility";
-           
+
             Map.Session[viewFilterVisibility] = filterVisibilty;
-          
+
             return Json(null);
         }
 
 
         protected virtual void HandleSafety(View view, bool? safety)
         {
-            if(view == null)
+            if (view == null)
                 throw new DuradosException("View does not exist");
 
             string viewSafety = view.Name + "_safety";
@@ -394,7 +388,7 @@ namespace Durados.Web.Mvc.Controllers
                     }
                     catch { }
                     Map.Logger.Log(GetControllerNameForLog(this.ControllerContext), this.ControllerContext.RouteData.Values["action"].ToString(), "", null, 4, message);
-                        
+
                     return RedirectToAction("LogOn", "Account", new { returnUrl = Request.Url.ToString() });
                 }
             }
@@ -405,7 +399,7 @@ namespace Durados.Web.Mvc.Controllers
                 if (!(workspaceId.Equals(Database.GetAdminWorkspaceId()) && Map.Database.GetUserRole() == "View Owner"))
                 {
                     workspace = Map.Database.Workspaces[workspaceId.Value];
-                
+
                 }
             }
             else if (!string.IsNullOrEmpty(Map.Database.FirstViewName))
@@ -494,10 +488,10 @@ namespace Durados.Web.Mvc.Controllers
 
         public virtual ActionResult IndexWithButtons(string url, string backUrl)
         {
-             ViewData["url"] = url;
-             ViewData["backUrl"] = backUrl;
+            ViewData["url"] = url;
+            ViewData["backUrl"] = backUrl;
 
-             return View();
+            return View();
         }
 
         public virtual ActionResult ViewDeleted(string viewName)
@@ -513,7 +507,7 @@ namespace Durados.Web.Mvc.Controllers
             {
                 Database.Logger.Log(viewName, "Start", "Index", "Controller", "", 12, Map.Logger.NowWithMilliseconds(), DateTime.Now);
             }
-            
+
             ViewData["DeleteConfirmationMessage"] = GetDeleteConfirmationMessage();
 
             string d_filter = Request.QueryString["d_filter"];
@@ -526,7 +520,7 @@ namespace Durados.Web.Mvc.Controllers
                 return RedirectToAction("FirstTime");
 
             Durados.Web.Mvc.View view = GetView(viewName, "Index");
-            
+
             if (view == null)
             {
                 string menu = "on";
@@ -875,15 +869,15 @@ namespace Durados.Web.Mvc.Controllers
                 string username = (System.Web.HttpContext.Current.User != null && System.Web.HttpContext.Current.User.Identity != null) ? System.Web.HttpContext.Current.User.Identity.Name : string.Empty;
                 string message = "The view: " + view.Name + " is not allowed for user: " + username;
                 Map.Logger.Log(GetControllerNameForLog(this.ControllerContext), this.ControllerContext.RouteData.Values["action"].ToString(), "", null, 4, message);
-                return RedirectToAction("LogOn", "Account", new { returnUrl = Request.Url.ToString() });  
+                return RedirectToAction("LogOn", "Account", new { returnUrl = Request.Url.ToString() });
             }
-             if( !SecurityHelper.IsAllowForView(view,"durados_v_ChangeHistory",null,"Admin,Developer"))
-             {
-                 string username = (System.Web.HttpContext.Current.User != null && System.Web.HttpContext.Current.User.Identity != null) ? System.Web.HttpContext.Current.User.Identity.Name : string.Empty;
-                 string message = "The view: " + view.Name + " is not allowed for user: " + username;
-                 Map.Logger.Log(GetControllerNameForLog(this.ControllerContext), this.ControllerContext.RouteData.Values["action"].ToString(), "", null, 4, message);
-                 return RedirectToAction("Default");
-             }
+            if (!SecurityHelper.IsAllowForView(view, "durados_v_ChangeHistory", null, "Admin,Developer"))
+            {
+                string username = (System.Web.HttpContext.Current.User != null && System.Web.HttpContext.Current.User.Identity != null) ? System.Web.HttpContext.Current.User.Identity.Name : string.Empty;
+                string message = "The view: " + view.Name + " is not allowed for user: " + username;
+                Map.Logger.Log(GetControllerNameForLog(this.ControllerContext), this.ControllerContext.RouteData.Values["action"].ToString(), "", null, 4, message);
+                return RedirectToAction("Default");
+            }
             if (!Database.IsConfig && view.GetRules().Where(r => r.DataAction.Equals(TriggerDataAction.BeforeViewOpen)).Count() > 0)
             {
                 using (System.Data.IDbCommand command = view.GetNewCommand())
@@ -893,7 +887,7 @@ namespace Durados.Web.Mvc.Controllers
                     command.Connection.Close();
                 }
             }
-            
+
 
             ViewData["jsonView"] = GetJsonViewSerialized(view, DataAction.Create, view.GetJsonViewNotSerialized(DataAction.Create, guid));
 
@@ -1048,7 +1042,7 @@ namespace Durados.Web.Mvc.Controllers
             if (!view.Database.IsConfig)
                 return true;
 
-            if (view.Database.IsConfig && (view.Name == "Field" || view.Name =="View"))
+            if (view.Database.IsConfig && (view.Name == "Field" || view.Name == "View"))
                 return true;
 
             return false;
@@ -1276,7 +1270,7 @@ namespace Durados.Web.Mvc.Controllers
                         System.IO.File.Delete(newSchemaFileName);
                     }
                     catch { }
-                    
+
                 }
                 //Map.Initiate();
 
@@ -1526,13 +1520,13 @@ namespace Durados.Web.Mvc.Controllers
             //return view.Name;
         }
 
-       
-        public virtual FileResult ExportToExcel(string viewName, string guid,bool? noData)
+
+        public virtual FileResult ExportToExcel(string viewName, string guid, bool? noData)
         {
             Durados.Web.Mvc.View view = GetView(viewName, "ExportToExcel");
             string SortColumn = SortHelper.GetSortColumn(view);
             string direction = SortHelper.GetSortDirection(view);
-            int recordCount = (noData.HasValue && noData.Value) ? 0 :100000000;
+            int recordCount = (noData.HasValue && noData.Value) ? 0 : 100000000;
             FormCollection collection = new FormCollection(ViewHelper.GetSessionState(guid + "Filter"));
             //FormCollection collection = (FormCollection)ViewHelper.SetSessionState(viewName + "Filter");
             DataView dataView = GetDataTable(view, 1, recordCount, collection, ViewHelper.GetSessionString(guid + "Search"), SortColumn, direction, guid);
@@ -1541,12 +1535,12 @@ namespace Durados.Web.Mvc.Controllers
 
             string filename = viewName + new Random(2).Next(98).ToString() + ".xlsx";
 
-            string physicalPath = Server.MapPath(string.Format("/Uploads/{0}/{1}",Maps.Instance.GetCurrentAppId(),name ));
+            string physicalPath = Server.MapPath(string.Format("/Uploads/{0}/{1}", Maps.Instance.GetCurrentAppId(), name));
 
             //string filePath = Server.MapPath("/Uploads/" + Maps.Instance.GetCurrentAppId() + "/" + view.Name + ".xlsx");
 
             DataAccess.Csv csv = new DataAccess.Csv();
-            
+
             UI.TableViewer tableViewer = GetNewTableViewer();
             tableViewer.DataView = dataView;
             DataTable content = csv.ExportToDataTable(dataView, view, SecurityHelper.GetCurrentUserRoles(), tableViewer, guid);
@@ -1558,7 +1552,7 @@ namespace Durados.Web.Mvc.Controllers
             Response.Charset = "utf-8";
             Response.ContentEncoding = System.Text.Encoding.Unicode;
             Response.AppendHeader("content-disposition", "attachment; filename=" + filename);
-            return File(bytes,filename);
+            return File(bytes, filename);
 
             //Response.Charset = "utf-8";
 
@@ -1649,7 +1643,7 @@ namespace Durados.Web.Mvc.Controllers
             return this.Content(content, "application/vnd.ms-excel");
         }
 
-        
+
         public virtual ActionResult ExportToCsv(string viewName, string guid, bool? noData)
         {
             //if (Database.DefaultExportImportFormat == ExportFileType.Excel)
@@ -1666,7 +1660,7 @@ namespace Durados.Web.Mvc.Controllers
 
                 FormCollection collection = new FormCollection(ViewHelper.GetSessionState(guid + "Filter"));
                 //FormCollection collection = (FormCollection)ViewHelper.SetSessionState(viewName + "Filter");
-                int recordCount = (noData.HasValue && noData.Value) ?0 : 100000000;
+                int recordCount = (noData.HasValue && noData.Value) ? 0 : 100000000;
                 DataView dataView = GetDataTable(view, 1, recordCount, collection, ViewHelper.GetSessionString(guid + "Search"), SortColumn, direction, guid);
                 if (dataView.Count == 0)
                     return ExportToExcel(viewName, guid, noData);
@@ -1693,7 +1687,7 @@ namespace Durados.Web.Mvc.Controllers
 
                 Durados.Xml.Sdk.Excel.ExcelHandler.CreateNewDocument(view.Name, filePath, GetDataTable(view), true);
                 Response.AppendHeader("content-disposition", "attachment; filename=" + view.Name + ".xlsx");
-                return this.Content(filePath, "application//vnd.ms-excel"); 
+                return this.Content(filePath, "application//vnd.ms-excel");
             }
         }
 
@@ -1701,11 +1695,11 @@ namespace Durados.Web.Mvc.Controllers
         {
             string mimeType = "application/unknown";
             string ext = System.IO.Path.GetExtension(fileName).ToLower();
-            
+
             Microsoft.Win32.RegistryKey regKey = Microsoft.Win32.Registry.ClassesRoot.OpenSubKey(ext);
             if (regKey != null && regKey.GetValue("Content Type") != null)
                 mimeType = regKey.GetValue("Content Type").ToString();
-            
+
             return mimeType;
         }
 
@@ -1846,9 +1840,9 @@ namespace Durados.Web.Mvc.Controllers
         }
         protected virtual void HandleMultiTenancyDownLoadAuthorization(string virtualPath)
         {
-            
+
         }
-      
+
         private void HandleIE7(string physicalPath)
         {
             if (IsIe7())
@@ -1976,7 +1970,7 @@ namespace Durados.Web.Mvc.Controllers
                 if (wfe2.Check(view, rule, TriggerDataAction.BeforeEdit, null, pk, row, rule.UseSqlParser, Map.Database.ConnectionString, currentUserId, currentUserRole))
                 {
                     Durados.Workflow.Validator validator = new Durados.Workflow.Validator();
-                    message = validator.GetMessage(this, rule.Parameters, view, null, null, new Durados.Workflow.LogicalParser(), out disabled,pk,currentUserId,currentUserRole);
+                    message = validator.GetMessage(this, rule.Parameters, view, null, null, new Durados.Workflow.LogicalParser(), out disabled, pk, currentUserId, currentUserRole);
                     if (disabled)
                         break;
                 }
@@ -2272,7 +2266,7 @@ namespace Durados.Web.Mvc.Controllers
                         if (text != string.Empty) text += " | ";
 
                         text += view.Fields[jsonField.Name].DisplayName + "=" + jsonField.Format.ToString();
-                        
+
                     }
                 }
             }
@@ -2284,7 +2278,7 @@ namespace Durados.Web.Mvc.Controllers
         {
             //string where = string.Empty;
             string[] children = jsonField.Value.ToString().Split(',');
-            
+
             ChildrenField field = (ChildrenField)view.Fields[jsonField.Name];
             View childrenView = (View)field.ChildrenView;
 
@@ -2313,12 +2307,12 @@ namespace Durados.Web.Mvc.Controllers
                 exists += ")";
                 //filter.WhereStatement += exists + " " + logicCondition.ToString() + " ";
                 //filter.WhereStatementWithoutTablePrefix += exists + " " + logicCondition.ToString() + " ";
-                
+
                 if (children.Length > 1)
                 {
                     exists += " or ";
                 }
-                
+
             }
             //else
             //{
@@ -2346,7 +2340,7 @@ namespace Durados.Web.Mvc.Controllers
                             c = "'" + c + "'";
                         }
                         exists += "[" + columnName + "]" + " = " + c + " or ";
-                        
+
                         k++;
                     }
                 }
@@ -2655,7 +2649,7 @@ namespace Durados.Web.Mvc.Controllers
 
 
         [AcceptVerbs(HttpVerbs.Post)]
-        public virtual JsonResult Import(string viewName, string fileName, string sheetName, bool? writeErrors, bool? rollBackOnError, int ImportModeIndex,ImportType? importType)
+        public virtual JsonResult Import(string viewName, string fileName, string sheetName, bool? writeErrors, bool? rollBackOnError, int ImportModeIndex, ImportType? importType)
         {
 
             string uploadPath = ((ColumnField)Map.Database.Views["durados_Import"].Fields["FileName"]).GetUploadPath();
@@ -2724,14 +2718,14 @@ namespace Durados.Web.Mvc.Controllers
                 if (importType.HasValue)
                 {
                     //consider transaction
-                    SyncViewSchemaToExcel(view, table,importer.getCommand());
+                    SyncViewSchemaToExcel(view, table, importer.getCommand());
                     if (viewName != "View")
                     {
                         view = (Durados.Web.Mvc.View)Map.Database.Views[viewName];
                         if (importType.Value == ImportType.Replace)
                             importer.CleanUpDbTable(view, GetControllerNameForLog(ControllerContext));
                     }
-                    
+
                 }
 
                 int userId = 1;
@@ -3099,11 +3093,11 @@ namespace Durados.Web.Mvc.Controllers
             return Json(new { success = success, message = message, viewName = view.Name, hasErrors = hasErrors });
         }
 
-       
-        protected virtual void SyncViewSchemaToExcel(Mvc.View view, DataTable table,IDbCommand command)
+
+        protected virtual void SyncViewSchemaToExcel(Mvc.View view, DataTable table, IDbCommand command)
         {
 
-            
+
         }
 
         protected virtual void ImportTerm(bool cancelCommit)
@@ -3314,9 +3308,9 @@ namespace Durados.Web.Mvc.Controllers
         //FtpDownLoad
         protected virtual FileResult FtpDownLoad(ColumnField field, string strFileName)
         {
-            #if DebugLocal
+#if DebugLocal
                         return null;
-            #endif
+#endif
             Stream ftpStream = null;
             IUpload upload = UploadFactory.GetUpload(field);
             strFileName = upload.GetUploadPath(strFileName);
@@ -3410,12 +3404,12 @@ namespace Durados.Web.Mvc.Controllers
                 DataleUploadedFileFromAzure(field.FtpUpload.AzureAccountName, field.FtpUpload.GetDecryptedAzureAccountKey(Map.GetConfigDatabase()), field.FtpUpload.DirectoryBasePath, filename);
                 return Json("Success");
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 Map.Logger.Log(GetControllerNameForLog(this.ControllerContext), this.ControllerContext.RouteData.Values["action"].ToString(), ex.Source, ex, 5, null);
                 return Json("Failure");
             }
-        
+
         }
 
         protected virtual void DataleUploadedFileFromAzure(string accountName, string accountKey, string folder, string strFileName)
@@ -3510,10 +3504,10 @@ namespace Durados.Web.Mvc.Controllers
                     containerPermissions.PublicAccess = BlobContainerPublicAccessType.Blob;
                     blobContainer.SetPermissions(containerPermissions);
                 }
-                
+
                 // Get a reference to the blob.
                 blob = blobContainer.GetBlobReference(strFileName);
-                
+
                 blob.Properties.ContentType = Request.Files[0].ContentType;
 
                 // Upload a file from the local system to the blob.
@@ -3558,7 +3552,7 @@ namespace Durados.Web.Mvc.Controllers
                 // 3. Upload data from a type of System.IO.Stream.
                 string keyName = strFileName;
                 fileTransferUtility.Upload(Request.Files[0].InputStream, existingBucketName, keyName);
-               
+
                 Console.WriteLine("Upload 3 completed");
 
                 //// 4.// Specify advanced settings/options.
@@ -3737,9 +3731,9 @@ namespace Durados.Web.Mvc.Controllers
                 {
                     SaveUploadedFileToFtp(field, strFileName);
 
-                    if ( field.FtpUpload.StorageType != StorageType.Azure)
+                    if (field.FtpUpload.StorageType != StorageType.Azure)
                     {
-                        src = field.FtpUpload.DirectoryVirtualPath.TrimEnd('/')+"/" + ((string.IsNullOrEmpty(field.FtpUpload.DirectoryBasePath)) ?string.Empty:( field.FtpUpload.DirectoryBasePath.TrimStart('/').TrimEnd('/')+"/"))+ strFileName;
+                        src = field.FtpUpload.DirectoryVirtualPath.TrimEnd('/') + "/" + ((string.IsNullOrEmpty(field.FtpUpload.DirectoryBasePath)) ? string.Empty : (field.FtpUpload.DirectoryBasePath.TrimStart('/').TrimEnd('/') + "/")) + strFileName;
                     }
                     else
                     {
@@ -4201,7 +4195,7 @@ namespace Durados.Web.Mvc.Controllers
                 return exception.Message;
 
             string generalErrorMessage = Map.Database.Localizer.Translate("GeneralErrorMessage");
-            generalErrorMessage =  generalErrorMessage == "GeneralErrorMessage" ? Maps.Instance.GetMap().Database.GeneralErrorMessage : generalErrorMessage;
+            generalErrorMessage = generalErrorMessage == "GeneralErrorMessage" ? Maps.Instance.GetMap().Database.GeneralErrorMessage : generalErrorMessage;
             generalErrorMessage = "<div class='general-error-message'>" + generalErrorMessage + "</div>";
             string userRole = Map.Database.GetUserRole();
             if (userRole == "Admin" || userRole == "Developer")
@@ -4222,7 +4216,7 @@ namespace Durados.Web.Mvc.Controllers
             sb.Append("<div class='additional-info'>");
             sb.Append(message);
             sb.Append("div");
-            
+
             return sb.ToString();
         }
 
@@ -4278,7 +4272,7 @@ namespace Durados.Web.Mvc.Controllers
 
             Desc = GetFilterText(new FormCollection(ViewHelper.GetSessionState(viewName + "Filter")), view);
 
-            
+
             //Durados.Web.Mvc.UI.ViewViewer viewViewer = new Durados.Web.Mvc.UI.ViewViewer();
             //FormCollection filter = new FormCollection(ViewHelper.GetSessionState(viewName + "Filter"));
 
@@ -4912,8 +4906,8 @@ namespace Durados.Web.Mvc.Controllers
             bool valuesLoaded = true;
 
             if (dataAction == DataAction.Edit) valuesLoaded = false;
-            
-            foreach (Field field in view.Fields.Values.Where(f => f.FieldType == FieldType.Column && (((ColumnField)f).Upload != null && !string.IsNullOrEmpty(((ColumnField)f).Upload.TemplatePath) || ((ColumnField)f).FtpUpload != null && !string.IsNullOrEmpty(((ColumnField)f).FtpUpload.TemplatePath)) && !f.IsExcluded(dataAction) && f.IsDerivationEditable(values))) 
+
+            foreach (Field field in view.Fields.Values.Where(f => f.FieldType == FieldType.Column && (((ColumnField)f).Upload != null && !string.IsNullOrEmpty(((ColumnField)f).Upload.TemplatePath) || ((ColumnField)f).FtpUpload != null && !string.IsNullOrEmpty(((ColumnField)f).FtpUpload.TemplatePath)) && !f.IsExcluded(dataAction) && f.IsDerivationEditable(values)))
             {
 
                 if (!valuesLoaded)
@@ -4937,12 +4931,12 @@ namespace Durados.Web.Mvc.Controllers
 
                 IUpload upload = UploadFactory.GetUpload(cField);
 
-                string oldPath ;
+                string oldPath;
 
                 if (upload != null) oldPath = upload.GetBaseUploadPath(fileName);//cField.GetUploadPath();
 
                 else throw new DuradosException("Upload is not recognized.");
-               // else uploadPath = cField.FtpUpload.GetFtpBasePath(fileName);
+                // else uploadPath = cField.FtpUpload.GetFtpBasePath(fileName);
 
                 //string oldPath;
                 //string oldPath = uploadBasePath + fileName;
@@ -4965,7 +4959,7 @@ namespace Durados.Web.Mvc.Controllers
 
                 upload.CreateNewDirectory2(newPhisicalPath);
 
-                MoveUploadedFile(upload,oldPath, newPhisicalPath);
+                MoveUploadedFile(upload, oldPath, newPhisicalPath);
 
                 Dictionary<string, object> newFileNameValues = new Dictionary<string, object>();
 
@@ -4996,7 +4990,7 @@ namespace Durados.Web.Mvc.Controllers
         //    Directory.CreateDirectory(newDirPath);
         //}
 
-        public static string CreateTemplatePath(Dictionary<string, object> values, string pk, string fileName,  ref string template, ref string newPath)
+        public static string CreateTemplatePath(Dictionary<string, object> values, string pk, string fileName, ref string template, ref string newPath)
         {
             if (template.Contains("["))
             {
@@ -5019,7 +5013,7 @@ namespace Durados.Web.Mvc.Controllers
 
             //template = template.Replace("/", "\\");
 
-            string newDirPath =  template.Replace("/", "\\");
+            string newDirPath = template.Replace("/", "\\");
 
             if (!newDirPath.EndsWith(@"\") && newDirPath.Contains(@"\"))
             {
@@ -5033,7 +5027,7 @@ namespace Durados.Web.Mvc.Controllers
             }
             else
             {
-                newPath = (template + "/" + MakeValidFileName(fileName)).Replace("\\","/").Replace("//","/");
+                newPath = (template + "/" + MakeValidFileName(fileName)).Replace("\\", "/").Replace("//", "/");
             }
             return newDirPath;
         }
@@ -5052,7 +5046,7 @@ namespace Durados.Web.Mvc.Controllers
             }
         }
 
-        protected virtual void MoveUploadedFile(IUpload upload ,string oldPath, string newPhisicalPath)
+        protected virtual void MoveUploadedFile(IUpload upload, string oldPath, string newPhisicalPath)
         {
             upload.MoveUploadedFile(oldPath, newPhisicalPath);
         }
@@ -5870,7 +5864,7 @@ namespace Durados.Web.Mvc.Controllers
                     else
                     {
                         e.SysCommand = GetCommand(Map.Database.SystemSqlProduct);// new System.Data.SqlClient.SqlCommand();
-                        e.SysCommand.Connection = GetConnection(Map.Database.SystemSqlProduct,Map.Database.SystemConnectionString);// new System.Data.SqlClient.SqlConnection();
+                        e.SysCommand.Connection = GetConnection(Map.Database.SystemSqlProduct, Map.Database.SystemConnectionString);// new System.Data.SqlClient.SqlConnection();
                     }
                 }
             }
@@ -5955,7 +5949,7 @@ namespace Durados.Web.Mvc.Controllers
                         else
                         {
                             e.SysCommand = GetCommand(Map.Database.SystemSqlProduct);// new System.Data.SqlClient.SqlCommand();
-                            e.SysCommand.Connection = GetConnection(Map.Database.SystemSqlProduct,Map.Database.SystemConnectionString);
+                            e.SysCommand.Connection = GetConnection(Map.Database.SystemSqlProduct, Map.Database.SystemConnectionString);
                         }
                     }
                 }
@@ -6529,20 +6523,20 @@ namespace Durados.Web.Mvc.Controllers
         }
 
 
-        public virtual ActionResult AddItemsBulk(string viewName,  string parentFieldName, string fk, FormCollection collection, string guid, string searchGuid)
+        public virtual ActionResult AddItemsBulk(string viewName, string parentFieldName, string fk, FormCollection collection, string guid, string searchGuid)
         {
             Durados.Web.Mvc.View view = GetView(viewName, "AddItemsBulk");
             SqlAccess sqlAccess = new SqlAccess();
             if (sqlAccess == null)
                 throw new DuradosException("Failed to create SqlAccess in Add Items Bulk");
-           int asyncAddItemsRowsAmount = GetAsyncAddItemsRowsAmount();
-           
-            if (!view.IsCreatable())
-               throw new AccessViolationException();
+            int asyncAddItemsRowsAmount = GetAsyncAddItemsRowsAmount();
 
-           ParentField field = (ParentField)view.AddItemsField;
-           if (field == null)
-               return PartialView("~/Views/Shared/Controls/ErrorMessage.ascx", Map.Database.Localizer.Translate("Illegal operation"));
+            if (!view.IsCreatable())
+                throw new AccessViolationException();
+
+            ParentField field = (ParentField)view.AddItemsField;
+            if (field == null)
+                return PartialView("~/Views/Shared/Controls/ErrorMessage.ascx", Map.Database.Localizer.Translate("Illegal operation"));
             Durados.Web.Mvc.ParentField addItemsField = (Durados.Web.Mvc.ParentField)view.AddItemsField;
 
             Durados.Web.Mvc.View parentView = (Durados.Web.Mvc.View)addItemsField.ParentView;
@@ -6560,13 +6554,13 @@ namespace Durados.Web.Mvc.Controllers
                     {
                         values.Add(jsonField.Name, jsonField.Value);
                     }
-                   
+
                 }
             }
             Durados.DataAccess.Filter filter = sqlAccess.GetFilter(parentView, values);
             int totalRows = filter.Parameters.Count() > 0 ? sqlAccess.RowFilterCount(parentView, filter) : sqlAccess.RowCount(parentView);
             int timeout = GetAddItemsAsyncTimeout();
-            string email=Map.Database.GetEmailByUsername(GetUsername());
+            string email = Map.Database.GetEmailByUsername(GetUsername());
             Dictionary<string, object> defaultValues = new Dictionary<string, object>();
             var hasDefaultValues = view.Fields.Values.Where(f => f.IsExcluded(DataAction.Create) == false && f.DefaultValue != null);
 
@@ -6574,7 +6568,7 @@ namespace Durados.Web.Mvc.Controllers
             {
                 if (!defaultValues.ContainsKey(field2.DatabaseNames))
                 {
-                    defaultValues.Add(field2.DatabaseNames, ReplaceToken(field2.DefaultValue.ToString(),view));
+                    defaultValues.Add(field2.DatabaseNames, ReplaceToken(field2.DefaultValue.ToString(), view));
                 }
             }
             if (parentFieldName != null && fk != null)
@@ -6587,34 +6581,34 @@ namespace Durados.Web.Mvc.Controllers
                         defaultValues.Add(parentField.DatabaseNames, fk);
                 }
 
-               
+
             }
             try
             {
-                sqlAccess.InsertSelectBulk(view, addItemsField, filter, defaultValues, asyncAddItemsRowsAmount, totalRows, timeout,email,Map, HandleAddItemsAsyncCallback_success, HandleAddItemsAsyncCallback_failure, RunningAsyncOperationCallback, IsAsyncOperationRuningCallback);
+                sqlAccess.InsertSelectBulk(view, addItemsField, filter, defaultValues, asyncAddItemsRowsAmount, totalRows, timeout, email, Map, HandleAddItemsAsyncCallback_success, HandleAddItemsAsyncCallback_failure, RunningAsyncOperationCallback, IsAsyncOperationRuningCallback);
             }
-            catch (DuradosAsyncRunningException )
+            catch (DuradosAsyncRunningException)
             {
                 return PartialView("~/Views/Shared/Controls/ErrorMessage.ascx", Map.Database.Localizer.Translate("A previous long request is undergoing, Please try again later."));
             }
-            if(totalRows>asyncAddItemsRowsAmount)
+            if (totalRows > asyncAddItemsRowsAmount)
                 return PartialView("~/Views/Shared/Controls/ErrorMessage.ascx", Map.Database.Localizer.Translate("Your request is performed. You will receive an email when it is complete."));
             else
-                 return RedirectToAction("Index", new { viewName = viewName, ajax = true, guid = guid });
-           
+                return RedirectToAction("Index", new { viewName = viewName, ajax = true, guid = guid });
+
         }
 
         protected void RunningAsyncOperationCallback()
         {
             Map.AsyncOperationRuning = true;
         }
-        
+
         protected bool IsAsyncOperationRuningCallback()
         {
             return Map.AsyncOperationRuning;
         }
-        
-        private object ReplaceToken(string value,View view)
+
+        private object ReplaceToken(string value, View view)
         {
 
             if (value.Contains(Durados.Web.Mvc.Database.UserPlaceHolder) || value.ToLower().Contains(Durados.Web.Mvc.Database.UserPlaceHolder.ToLower()))
@@ -6630,7 +6624,7 @@ namespace Durados.Web.Mvc.Controllers
 
         protected void HandleAddItemsAsyncCallback_success(IAsyncResult ar)
         {
-            System.Data.SqlClient.SqlCommand command=null;
+            System.Data.SqlClient.SqlCommand command = null;
 
             try
             {
@@ -6643,12 +6637,12 @@ namespace Durados.Web.Mvc.Controllers
 
                 string AddItemsErrEmailMessage = map.Database.Localizer.Translate("AddItemsErrEmailMessage");
                 AddItemsErrEmailMessage = AddItemsErrEmailMessage != "AddItemsErrEmailMessage" ? AddItemsErrEmailMessage : "Your request to add items to {0} has terminated prior to completion, Please contact your administrator.\r\n Go to {1} to review the results";
-                   
+
                 if (view != null)
                 {
                     message = string.Format(message, view.DisplayName, Map.Url + "/Home/Index/" + view.Name);//args["time"].ToString(),
                 }
-                string to = args["email"]!=null? args["email"].ToString(): Map.GetUserEmail(GetUserRow()[GetUserRow().Table.PrimaryKey[0].ToString()].ToString());
+                string to = args["email"] != null ? args["email"].ToString() : Map.GetUserEmail(GetUserRow()[GetUserRow().Table.PrimaryKey[0].ToString()].ToString());
                 try
                 {
                     int rowCount = command.EndExecuteNonQuery(ar);
@@ -6663,7 +6657,7 @@ namespace Durados.Web.Mvc.Controllers
 
                 map.Logger.Log(GetControllerNameForLog(ControllerContext), "AddItemsBulk", "HandleAddItemsAsyncCallback", null, 3, "end  Async Add items callback and sent mail");
 
-               
+
 
             }
             catch (Exception exception)
@@ -6676,27 +6670,27 @@ namespace Durados.Web.Mvc.Controllers
                     command.Connection.Close();
                 Map.AsyncOperationRuning = false;
             }
-           
+
         }
 
-      
+
         protected void HandleAddItemsAsyncCallback_failure(Dictionary<string, object> args)
         {
-            if(args.ContainsKey("exception"))
+            if (args.ContainsKey("exception"))
                 try
                 {
                     string message = "Your request to add items to {0} from {1} has failed. Please review the error\r\n{2}\r\n{3}.";
                     Durados.View view = (Durados.View)args["view"];
                     if (view != null)
                     {
-                        message = string.Format(message, view.DisplayName, args["time"].ToString(), ((Exception)args["exception"]).Message,((Exception)args["exception"]).StackTrace);
-                            
+                        message = string.Format(message, view.DisplayName, args["time"].ToString(), ((Exception)args["exception"]).Message, ((Exception)args["exception"]).StackTrace);
+
                     }
-                    
+
                     string to = Map.GetUserEmail(GetUserRow()[GetUserRow().Table.PrimaryKey[0].ToString()].ToString());
                     SendEmail(GetDefaultFrom(), to, GetDefaultFrom(), message, Durados.Database.ShortProductName + " ModuBiz Add Items to  view has finished!");
                 }
-                catch(Exception exception)
+                catch (Exception exception)
                 {
                     throw new DuradosException(exception.Message, exception);
                 }
@@ -6707,9 +6701,9 @@ namespace Durados.Web.Mvc.Controllers
         {
             return Convert.ToInt32(System.Configuration.ConfigurationManager.AppSettings["AsyncAddItemsRowsAmount"] ?? "100000");
         }
-       
+
         [AcceptVerbs(HttpVerbs.Post)]
-        public virtual ActionResult AddItems(string viewName, string pks, string parentViewName, string fk, FormCollection collection, string guid,bool? isSelectAll,string searchGuid)
+        public virtual ActionResult AddItems(string viewName, string pks, string parentViewName, string fk, FormCollection collection, string guid, bool? isSelectAll, string searchGuid)
         {
             Durados.Web.Mvc.View view = GetView(viewName, "EditSelection");
             Durados.Web.Mvc.View parentView = null;
@@ -6811,7 +6805,7 @@ namespace Durados.Web.Mvc.Controllers
                             {
                                 if (!values.ContainsKey(field2.Name))
                                 {
-                                    string val = field2.DefaultValue !=null ?field2.DefaultValue.ToString() : string.Empty;
+                                    string val = field2.DefaultValue != null ? field2.DefaultValue.ToString() : string.Empty;
                                     values.Add(field2.Name, val);
                                 }
                             }
@@ -7398,13 +7392,13 @@ namespace Durados.Web.Mvc.Controllers
 
         public virtual void CronCycle(string cycle)
         {
-            int cycleNumber= Convert.ToInt32(Enum.Parse(typeof(CycleEnum),cycle));
-            string url = "http://"+System.Web.HttpContext.Current.Request.Headers["Host"];
+            int cycleNumber = Convert.ToInt32(Enum.Parse(typeof(CycleEnum), cycle));
+            string url = "http://" + System.Web.HttpContext.Current.Request.Headers["Host"];
             DataTable cronsTable = CronHelper.GetCycleCrons(cycleNumber);
             foreach (DataRow cronRow in cronsTable.Rows)
             {
                 url += Url.Action("AsyncCron", "Home", new { appId = cronRow["AppId"].ToString(), cycle = cycleNumber });
-                ISendAsyncErrorHandler SendAsyncErrorHandler=null;
+                ISendAsyncErrorHandler SendAsyncErrorHandler = null;
                 Infrastructure.Http.AsynWebRequest(url, SendAsyncErrorHandler);
                 //Infrastructure.Http.CallWebService(url);
                 //Call httprequest  to AsyncCron
@@ -7496,7 +7490,7 @@ namespace Durados.Web.Mvc.Controllers
 
         public virtual int GetAddItemsAsyncTimeout()
         {
-            return Convert.ToInt32(System.Configuration.ConfigurationManager.AppSettings["AddItemsAsyncTimeOut"]??"0");
+            return Convert.ToInt32(System.Configuration.ConfigurationManager.AppSettings["AddItemsAsyncTimeOut"] ?? "0");
         }
 
         protected virtual void SendCron(Cron cron, DataRow dataRow, int userId, string template)
@@ -7945,9 +7939,9 @@ namespace Durados.Web.Mvc.Controllers
                     //connectionString = "HOST={0};DATABASE={1};USER ID={2};PASSWORD={3}";//test1.cb8bfk90dnws.us-west-2.rds.amazonaws.com;DATABASE=demo;USER ID=root;PASSWORD=Modubiz2012
                     else
                         if (usesSsh)
-                            connectionString = "server=localhost;database={1};User Id={2};password={3};port={4};Encoding=UNICODE;";
-                        else
-                            connectionString = "server={0};database={1};User Id={2};password={3};port={4};Encoding=UNICODE;";
+                        connectionString = "server=localhost;database={1};User Id={2};password={3};port={4};Encoding=UNICODE;";
+                    else
+                        connectionString = "server={0};database={1};User Id={2};password={3};port={4};Encoding=UNICODE;";
                     // connectionString = "HOST={0};DATABASE={1};USER ID={2};PASSWORD={3}";//
                 }
                 if (sqlProduct == SqlProduct.Oracle)
@@ -7962,13 +7956,13 @@ namespace Durados.Web.Mvc.Controllers
                     //connectionString = "POOLING=False;USER ID=yariv;PASSWORD=Back2014;DATA SOURCE=oracletrail1.cb8bfk90dnws.us-west-2.rds.amazonaws.com:1521/ORCL";
                     //connectionString = "USER ID=yariv;PASSWORD=Back2014;DATA SOURCE=oracletrail1.cb8bfk90dnws.us-west-2.rds.amazonaws.com:1521/ORCL";
                     // connectionString = "Data Source=(DESCRIPTION=(ADDRESS_LIST=(ADDRESS=(PROTOCOL=TCP)(HOST={0})(PORT=1521)))(CONNECT_DATA=(SERVER=DEDICATED)(SERVICE_NAME=ORCL)));User Id = {2}; Password = {3};";
-                  
+
 
                 }//POOLING=False;USER ID=yariv;PASSWORD=Back2014;DATA SOURCE=oracletrail1.cb8bfk90dnws.us-west-2.rds.amazonaws.com:1521/ORCL
-            
-                    //        connectionString = "USER ID=itay;CONNECTION TIMEOUT=600;PASSWORD=itay123;DATA SOURCE=199.203.211.166:1521/XE;POOLING=False";
-                      
-                
+
+                //        connectionString = "USER ID=itay;CONNECTION TIMEOUT=600;PASSWORD=itay123;DATA SOURCE=199.203.211.166:1521/XE;POOLING=False";
+
+
                 bool hasUsername = !string.IsNullOrEmpty(username);
                 bool hasPassword = !string.IsNullOrEmpty(password);
 
@@ -8048,7 +8042,7 @@ namespace Durados.Web.Mvc.Controllers
 
         protected virtual void ValidateConnectionString(bool integratedSecurity, string serverName, string catalog, string username, string password, bool usesSsh, bool usesSsl, string duradosUserId, SqlProduct sqlProduct, string sshRemoteHost, string sshUser, string sshPassword, string sshPrivateKey, int sshPort, int productPort)
         {
-            OpenSshSessionIfNecessary(usesSsh, sshRemoteHost, sshUser, sshPassword, sshPrivateKey, sshPort, productPort,sqlProduct);
+            OpenSshSessionIfNecessary(usesSsh, sshRemoteHost, sshUser, sshPassword, sshPrivateKey, sshPort, productPort, sqlProduct);
 
             int port = productPort;
             if (usesSsh)
@@ -8112,8 +8106,8 @@ namespace Durados.Web.Mvc.Controllers
                 int remotePort = productPort;
                 localPort = Maps.Instance.AssignLocalPort();
 
-                //session = new Durados.DataAccess.Ssh.ChilkatSession(tunnel, remotePort, localPort);
-                //session.Open(15);
+                session = new Durados.DataAccess.Ssh.ChilkatSession(tunnel, remotePort, localPort);
+                session.Open(15);
             }
         }
         protected virtual DataView GetDataViewByBookmark(int bookmarkId)
@@ -8174,12 +8168,12 @@ namespace Durados.Web.Mvc.Controllers
                 }
                 int errorCount = (errors == null) ? 0 : errors.Count;
                 string msg = string.Format("{0} {1}, {2} {3}", subscribers.Rows.Count, Map.Database.Localizer.Translate("items were subscribed"), errorCount, Map.Database.Localizer.Translate("items had errors."));
-                
+
                 Map.Logger.Log(GetControllerNameForLog(ControllerContext), "SubscribeBatch", msg, null, 3, null);
 
                 return msg;
             }
-            catch(Exception exception)
+            catch (Exception exception)
             {
                 return string.Format("The following error occured:<br>{0}.<br><br> The call stuck:<br><br><br>   {1} ", exception.Message.Replace("{", "{{").Replace("}", "}}"), exception.StackTrace.Replace("{", "{{").Replace("}", "}}"));
             }
@@ -8306,10 +8300,10 @@ namespace Durados.Web.Mvc.Controllers
         DatabaseName
     }
 
-     public enum ImportType
+    public enum ImportType
     {
         Merg,
         Replace
-        
+
     }
 }

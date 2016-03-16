@@ -66,6 +66,8 @@ namespace Durados.Workflow
             {
                 value = Guid.Parse(System.Web.HttpContext.Current.Request.QueryString[Durados.Workflow.JavaScript.GuidKey]);
             }
+            if (key == Durados.Workflow.JavaScript.GuidKey && System.Web.HttpContext.Current.Items.Contains(key))
+                return;
             if (System.Web.HttpContext.Current.Items.Contains(key))
                 System.Web.HttpContext.Current.Items[key] = value;
             else
@@ -295,6 +297,12 @@ namespace Durados.Workflow
                     {
                         string keyWithoutToken = key.TrimStart("{{".ToCharArray()).TrimEnd("}}".ToCharArray());
 
+                        if (key.StartsWith("{{"))
+                        {
+                            if (!clientParameters.ContainsKey(keyWithoutToken))
+                                clientParameters.Add(keyWithoutToken, values[key]);
+                        }
+
                         if (view.GetFieldsByJsonName(keyWithoutToken) == null || view.GetFieldsByJsonName(keyWithoutToken).Length == 0)
                         {
                             if (view.Fields.ContainsKey(keyWithoutToken))
@@ -309,6 +317,7 @@ namespace Durados.Workflow
                                 if (!clientParameters.ContainsKey(keyWithoutToken))
                                     clientParameters.Add(keyWithoutToken, values[key]);
                             }
+                            
                         }
                         else
                         {

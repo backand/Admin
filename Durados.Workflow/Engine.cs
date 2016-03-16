@@ -193,7 +193,12 @@ namespace Durados.Workflow
                 if (key.StartsWith("{{"))
                     asToken.Add(key, values[key]);
                 else
-                    asToken.Add(key.AsToken(), values[key]);
+                {
+                    if (!asToken.ContainsKey(key.AsToken()))
+                    {
+                        asToken.Add(key.AsToken(), values[key]);
+                    }
+                }
             }
 
             return asToken;

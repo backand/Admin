@@ -101,19 +101,21 @@ namespace BackAnd.Web.Api.Controllers
 
                 string sql = string.Empty;
 
-                
-                Dictionary<string, object> transformResult = Transform(json);
-
-                if (!transformResult.ContainsKey("alter"))
+                Dictionary<string, object> transformResult = null;
+                if (!IsDropAllTables(json))
                 {
-                    return ResponseMessage(Request.CreateResponse(HttpStatusCode.ExpectationFailed, Messages.InvalidSchema + ": " + GetWarnings(transformResult)));
+                    transformResult = Transform(json);
 
+                    if (!transformResult.ContainsKey("alter"))
+                    {
+                        return ResponseMessage(Request.CreateResponse(HttpStatusCode.ExpectationFailed, Messages.InvalidSchema + ": " + GetWarnings(transformResult)));
+
+                    }
+
+                    sql = string.Join(";", ((System.Collections.ArrayList)transformResult["alter"]).ToArray());
+                    sql = AdjustSql(sql);
                 }
-
-                sql = string.Join(";", ((System.Collections.ArrayList)transformResult["alter"]).ToArray());
-                sql = AdjustSql(sql);
-
-                if (json == "{\"newSchema\":[],\"severity\":0}")
+                else
                 {
                     sql = GetDtopAllTablesSQL();
                 }
@@ -173,6 +175,11 @@ namespace BackAnd.Web.Api.Controllers
                 throw new BackAndApiUnexpectedResponseException(exception, this);
 
             }
+        }
+
+        private bool IsDropAllTables(string json)
+        {
+            return json == "{\"newSchema\":[],\"severity\":0}";
         }
 
         private string GetDtopAllTablesSQL()
