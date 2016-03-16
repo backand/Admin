@@ -8,6 +8,9 @@ using System.Linq;
 using System.Web;
 using MySql.Data.MySqlClient;
 using System.Threading.Tasks;
+using System.Web.Script.Serialization;
+using System.Collections.Specialized;
+using Newtonsoft.Json;
 
 namespace Durados.Web.Mvc.Logging
 {
@@ -459,6 +462,15 @@ namespace Durados.Web.Mvc.Logging
 
             string clientIP = GetClientIP();
             string clientInfo = GetClientInfo();
+            var refferer = GetClientUrl();
+            var clientAgent = GetClientAgent();
+            var clientLanguages = GetClientLanguages();
+
+            NameValueCollection coll = new NameValueCollection();
+            coll.Add("Refferer", refferer);
+            coll.Add("Agent", clientAgent);
+            coll.Add("Languages", clientLanguages == null ? null : string.Join(",", clientLanguages));
+
 
             if (guid != null)
             {
@@ -473,7 +485,7 @@ namespace Durados.Web.Mvc.Logging
                 catch { }
                 try
                 {
-                    WriteLogAsync(controller, action, method, message, trace, logType, freeText, time, guid, log, applicationName, appName, username, clientIP, clientInfo, writeLogTypeToSpecificAppLog, writeLogTypeToGeneralLog, requestTime);
+                    WriteLogAsync(controller, action, method, message, trace, logType, freeText, time, guid, log, applicationName, appName, username, clientIP, clientInfo, writeLogTypeToSpecificAppLog, writeLogTypeToGeneralLog, requestTime, coll);
                 }
                 catch (Exception logException)
                 {
@@ -481,6 +493,24 @@ namespace Durados.Web.Mvc.Logging
                     WriteToEventLog(controller, action, method, message, trace, logType, freeText);
                 }
             }
+        }
+
+        private static string GetClientUrl()
+        {
+            return System.Web.HttpContext.Current != null ? System.Web.HttpContext.Current.Request != null ? 
+                System.Web.HttpContext.Current.Request.UrlReferrer != null ? System.Web.HttpContext.Current.Request.UrlReferrer.AbsoluteUri : null : null : null;
+        }
+
+        private static string GetClientAgent()
+        {
+            return System.Web.HttpContext.Current != null ? System.Web.HttpContext.Current.Request != null ?
+                System.Web.HttpContext.Current.Request.UrlReferrer != null ? System.Web.HttpContext.Current.Request.UserAgent : null : null : null;
+        }
+
+        private static string[] GetClientLanguages()
+        {
+            return System.Web.HttpContext.Current != null ? System.Web.HttpContext.Current.Request != null ?
+                System.Web.HttpContext.Current.Request.UrlReferrer != null ? System.Web.HttpContext.Current.Request.UserLanguages : null : null : null;
         }
 
         private void WriteToJavaScriptDebugLogger(string controller, string action, string method, string message, string trace, int logType, string freeText, DateTime time, Guid? guid, Log log, string applicationName, string username)
@@ -500,7 +530,7 @@ namespace Durados.Web.Mvc.Logging
             }
         }
 
-        private void WriteLogAsync(string controller, string action, string method, string message, string trace, int logType, string freeText, DateTime time, Guid? guid, Log log, string applicationName, string appName, string username, string clientIP, string clientInfo , bool writeLogTypeToSpecificAppLog, bool writeLogTypeToGeneralLog, int? requestTime)
+        private void WriteLogAsync(string controller, string action, string method, string message, string trace, int logType, string freeText, DateTime time, Guid? guid, Log log, string applicationName, string appName, string username, string clientIP, string clientInfo, bool writeLogTypeToSpecificAppLog, bool writeLogTypeToGeneralLog, int? requestTime, NameValueCollection additional)
         {
             if (writeLogTypeToSpecificAppLog)
             {
@@ -524,7 +554,7 @@ namespace Durados.Web.Mvc.Logging
                 Task.Factory.StartNew(() =>
                 {
                     WriteToLogstash(controller, action, method, message, trace, logType, freeText, time, guid, log, applicationName,
-                        appName, username, clientIP, clientInfo, requestTime);
+                        appName, username, clientIP, clientInfo, requestTime, additional);
                 });
             }
         }
@@ -560,11 +590,11 @@ namespace Durados.Web.Mvc.Logging
             }
         }
 
-        public void WriteToLogstash(string controller, string action, string method, string message, string trace, int logType, string freeText, DateTime time, Guid? guid, Log log, string applicationName, string appName, string username, string clientIP, string clientInfo, int? requestTime)
+        public void WriteToLogstash(string controller, string action, string method, string message, string trace, int logType, string freeText, DateTime time, Guid? guid, Log log, string applicationName, string appName, string username, string clientIP, string clientInfo, int? requestTime, NameValueCollection additional)
         {
             try
             {
-                SendLogMessage(applicationName, appName, username, controller, action, method, message, trace, logType, freeText, time, log, guid, clientIP, clientInfo, requestTime);
+                SendLogMessage(applicationName, appName, username, controller, action, method, message, trace, logType, freeText, time, log, guid, clientIP, clientInfo, requestTime, additional);
             }
             catch { }
         }
@@ -825,11 +855,11 @@ namespace Durados.Web.Mvc.Logging
             }
         }
 
-        void SendLogMessage(string applicationName, string appName, string username, string controller, string action, string method, string message, string trace, int logType, string freeText, DateTime time, Logging.Log log, Guid? guid2, string clientIP, string clientInfo, int? requestTime)
+        void SendLogMessage(string applicationName, string appName, string username, string controller, string action, string method, string message, string trace, int logType, string freeText, DateTime time, Logging.Log log, Guid? guid2, string clientIP, string clientInfo, int? requestTime, NameValueCollection additional)
         {
             if (guid2 == null)
                 guid2 = Guid.NewGuid();
-            SendLogMessage(appName, applicationName, username, machineName, time.ToString(), controller, action, method, logType.ToString(), message, trace, freeText, guid2.ToString(), clientIP, clientInfo, requestTime);
+            SendLogMessage(appName, applicationName, username, machineName, time.ToString(), controller, action, method, logType.ToString(), message, trace, freeText, guid2.ToString(), clientIP, clientInfo, requestTime, additional);
         }
 
         void SendLogMessage(
@@ -848,7 +878,8 @@ namespace Durados.Web.Mvc.Logging
              string Guid,
              string ClientIP,
              string ClientInfo,
-             int? RequestTime
+             int? RequestTime,
+            NameValueCollection additional
         )
         {
             StashLogMessage message = new StashLogMessage
@@ -870,11 +901,24 @@ namespace Durados.Web.Mvc.Logging
                 ClientInfo = ClientInfo,
                 RequestTime = RequestTime
             };
-            var javaScriptSerializer = new System.Web.Script.Serialization.JavaScriptSerializer();
-            string jsonString = javaScriptSerializer.Serialize(message);
+
+            if (additional != null)
+            {
+
+                for (int i = 0; i < additional.Count; i++)
+                {
+                    message.Add(additional.Keys[i], additional[i]);
+                }
+            }
+
+
+            string jsonString  = JsonConvert.SerializeObject(message);
             Connect(logStashServer, logStashPort, jsonString);
 
         }
+
+        private JavaScriptSerializer javaScriptSerializer = new JavaScriptSerializer();
+
 
         void Connect(String server, Int32 port, String message)
         {

@@ -68,16 +68,23 @@ namespace Durados.Web.Mvc.UI.Helpers
                 return GetDefaultApplicationKeys();
             }
 
-
             Map map = Maps.Instance.GetMap(appName);
 
-
+            // application not exist strange case
             if (map == null)
             {
                 return GetDefaultApplicationKeys();
             }
 
-            return GetSocialKeysFromDatabase(map);
+            var keys = GetSocialKeysFromDatabase(map);
+
+            // don't have custom keys, use Backand global keys            
+            if (keys.ClientId == null || keys.ClientSecret == null)
+            {
+                keys = GetDefaultApplicationKeys();
+            }
+
+            return keys;
         }
 
         protected SocialApplicationKeys GetDefaultApplicationKeys()

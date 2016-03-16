@@ -1,16 +1,14 @@
-﻿using System;
-using System.Data;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-
-using Durados.DataAccess;
+﻿using Durados.DataAccess;
 using Durados.Web.Mvc.UI.Helpers;
+using System;
+using System.Collections.Generic;
+using System.Data;
+using System.Linq;
 using System.Web;
 
 namespace Durados.Web.Mvc
 {
-    public partial class Database : Durados.Database,Durados.Services.IStyleable
+    public partial class Database : Durados.Database, Durados.Services.IStyleable
     {
         public Map Map;
 
@@ -22,7 +20,7 @@ namespace Durados.Web.Mvc
             {
                 return Map.ForeignKeys;
             }
-            
+
         }
 
         public View FirstView
@@ -114,7 +112,7 @@ namespace Durados.Web.Mvc
             get
             {
                 return Convert.ToBoolean(System.Configuration.ConfigurationManager.AppSettings["UseSmtpDefaultCredentials"] ?? "false");
-            
+
             }
         }
 
@@ -172,10 +170,11 @@ namespace Durados.Web.Mvc
             EnableGoogle = true;
             EnableGithub = true;
             EnableFacebook = true;
+            EnableTwitter = true;
             EnableSecretKeyAccess = true;
             TokenExpiration = 86400;
             UseRefreshToken = false;
-            
+
         }
 
         public override bool IsMain()
@@ -215,15 +214,28 @@ namespace Durados.Web.Mvc
 
         [Durados.Config.Attributes.ColumnProperty()]
         public string GoogleClientSecret { get; set; }
+
+        [Durados.Config.Attributes.ColumnProperty()]
+        public string TwitterClientId { get; set; }
+
+        [Durados.Config.Attributes.ColumnProperty()]
+        public string TwitterClientSecret { get; set; }
+
         [Durados.Config.Attributes.ColumnProperty()]
         public string GithubClientId { get; set; }
 
         [Durados.Config.Attributes.ColumnProperty()]
         public string GithubClientSecret { get; set; }
+
         [Durados.Config.Attributes.ColumnProperty()]
         public bool EnableGithub { get; set; }
+
         [Durados.Config.Attributes.ColumnProperty()]
         public bool EnableGoogle { get; set; }
+
+        [Durados.Config.Attributes.ColumnProperty()]
+        public bool EnableTwitter { get; set; }
+
 
         [Durados.Config.Attributes.ColumnProperty()]
         public string FacebookClientId { get; set; }
@@ -232,7 +244,7 @@ namespace Durados.Web.Mvc
         public string FacebookClientSecret { get; set; }
         [Durados.Config.Attributes.ColumnProperty()]
         public bool EnableFacebook { get; set; }
-        
+
 
         [Durados.Config.Attributes.ColumnProperty()]
         public bool EnableSecretKeyAccess { get; set; }
@@ -253,6 +265,10 @@ namespace Durados.Web.Mvc
             {
                 providers.Add("facebook");
             }
+            if (EnableTwitter)
+            {
+                providers.Add("twitter");
+            }
 
             return providers;
         }
@@ -260,7 +276,7 @@ namespace Durados.Web.Mvc
 
         [Durados.Config.Attributes.ColumnProperty()]
         public string RegistrationRedirectUrl { get; set; }
-        
+
         [Durados.Config.Attributes.ColumnProperty()]
         public string SignInRedirectUrl { get; set; }
 
@@ -276,7 +292,7 @@ namespace Durados.Web.Mvc
         [Durados.Config.Attributes.ColumnProperty()]
         public bool EnableUserRegistration { get; set; }
 
-        
+
         [Durados.Config.Attributes.ColumnProperty()]
         public string UploadFolder { get; set; }
 
@@ -288,7 +304,7 @@ namespace Durados.Web.Mvc
 
         [Durados.Config.Attributes.ColumnProperty()]
         public string ActiveDirectoryConnectionString { get; set; }
-        
+
         [Durados.Config.Attributes.ColumnProperty()]
         public string DefaultController { get; set; }
 
@@ -404,7 +420,7 @@ namespace Durados.Web.Mvc
             }
         }
 
-        protected virtual  Durados.Localization.LocalizationConfig GetLocalization()
+        protected virtual Durados.Localization.LocalizationConfig GetLocalization()
         {
             return localization;
         }
@@ -438,7 +454,7 @@ namespace Durados.Web.Mvc
 
         [Durados.Config.Attributes.ColumnProperty()]
         public string UserIdFieldName { get; set; }
-        
+
         [Durados.Config.Attributes.ParentProperty(TableName = "SiteInfo")]
         public SiteInfo SiteInfo { get; set; }
 
@@ -451,7 +467,7 @@ namespace Durados.Web.Mvc
         [Durados.Config.Attributes.ColumnProperty()]
         public string DuplicateButtonDescription { get; set; }
 
-        [Durados.Config.Attributes.ColumnProperty(Description="Enables to replace the default Powered by logo")]
+        [Durados.Config.Attributes.ColumnProperty(Description = "Enables to replace the default Powered by logo")]
         public string PoweredByLogo { get; set; }
 
         [Durados.Config.Attributes.ColumnProperty(Description = "Enables to replace the default Powered by logo")]
@@ -459,7 +475,7 @@ namespace Durados.Web.Mvc
 
         //[Durados.Config.Attributes.ColumnProperty()]
         //public bool AutoCommit { get; set; }
-        
+
 
         //[Durados.Config.Attributes.ParentProperty(TableName = "Upload")]
         //public Upload Upload { get; set; }
@@ -491,7 +507,7 @@ namespace Durados.Web.Mvc
             }
         }
 
-        
+
         public override Durados.View GetUserView()
         {
             if (Views.ContainsKey(UserViewName))
@@ -535,7 +551,7 @@ namespace Durados.Web.Mvc
             if (username == null)
                 return null;
             return GetUserRow(username);
-            
+
         }
 
         public override string SysDbConnectionString
@@ -613,7 +629,7 @@ namespace Durados.Web.Mvc
 
         public virtual DataRow GetUserRow(int userId)
         {
-           View userView = (View)GetUserView();
+            View userView = (View)GetUserView();
             if (userView == null)
                 return null;
 
@@ -702,7 +718,7 @@ namespace Durados.Web.Mvc
 
             if (!userRow.Table.Columns.Contains(fullNameFieldName))
                 fullNameFieldName = UsernameFieldName;
-            
+
             if (userRow.IsNull(fullNameFieldName))
                 return null;
 
@@ -756,7 +772,7 @@ namespace Durados.Web.Mvc
 
             if (!userRow.Table.Columns.Contains(firstNameFieldName))
                 firstNameFieldName = UsernameFieldName;
-            
+
             if (userRow.IsNull(firstNameFieldName))
                 return string.Empty;
 
@@ -893,7 +909,7 @@ namespace Durados.Web.Mvc
             string username = GetCurrentUsername();
             if (!string.IsNullOrEmpty(username))
                 currentUser = username;
-           
+
             string sessionKey = Map.AppName + "-" + currentUser + suffix;
 
             return sessionKey;
@@ -919,9 +935,9 @@ namespace Durados.Web.Mvc
                 return DefaultGuestRole;
             }
 
-            if (((!string.IsNullOrEmpty(System.Web.HttpContext.Current.Request.QueryString["public"]) && 
-                  System.Web.HttpContext.Current.Request.QueryString["public"].Equals("true")) || 
-                  (!string.IsNullOrEmpty(System.Web.HttpContext.Current.Request.QueryString["public2"]) && System.Web.HttpContext.Current.Request.QueryString["public2"].Equals("true"))) && 
+            if (((!string.IsNullOrEmpty(System.Web.HttpContext.Current.Request.QueryString["public"]) &&
+                  System.Web.HttpContext.Current.Request.QueryString["public"].Equals("true")) ||
+                  (!string.IsNullOrEmpty(System.Web.HttpContext.Current.Request.QueryString["public2"]) && System.Web.HttpContext.Current.Request.QueryString["public2"].Equals("true"))) &&
                   SecureLevel == Durados.SecureLevel.AllUsers && !string.IsNullOrEmpty(DefaultGuestRole))
             {
                 return DefaultGuestRole;
@@ -953,7 +969,7 @@ namespace Durados.Web.Mvc
                 return string.Empty;
 
             DataRow userRow = null;
-            
+
             if (username == null)
             {
                 userRow = GetUserRow();
@@ -1032,7 +1048,7 @@ namespace Durados.Web.Mvc
 
             if (role == null)
                 return null;
-                //return (View)base.FirstView;
+            //return (View)base.FirstView;
 
             DataRow roleRow = GetRoleRow(role);
 
@@ -1149,25 +1165,25 @@ namespace Durados.Web.Mvc
             if (Map.IsMainMap)
                 return Durados.Database.ShortProductName;
 
-            string title =SiteInfo.Product;
+            string title = SiteInfo.Product;
             if (Maps.MultiTenancy && title == string.Empty)
                 title = Maps.GetCurrentAppName();
             return title;
         }
 
         public override int Plan
-        { 
-            get 
+        {
+            get
             {
                 if (Map.Plan == 0)
                 {
                     return 1;
                 }
-                return Map.Plan; 
-            } 
-            set 
-            { 
-            } 
+                return Map.Plan;
+            }
+            set
+            {
+            }
         }
 
         public override Guid Guid
@@ -1273,7 +1289,7 @@ namespace Durados.Web.Mvc
             return "/Home/ChartsDashboard?Id=";
         }
 
-        
+
         [Durados.Config.Attributes.ColumnProperty(Description = "General CSS file")]
         public virtual string StyleSheets { get; set; }
         [Durados.Config.Attributes.ColumnProperty(Description = "General JS file")]
@@ -1316,7 +1332,7 @@ namespace Durados.Web.Mvc
         [Durados.Config.Attributes.ColumnProperty(Description = "Console Administror Email")]
         public string UserPreviewUrl { get; set; }
 
-        
+
         public override Durados.Data.IDataAccess GetDataAccess(string connectionString)
         {
             return DataAccessFactory.GetDataAccess(connectionString);
