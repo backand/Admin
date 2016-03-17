@@ -75,7 +75,7 @@
     <Compile Include="AuthentificationTest.cs" />
     <Compile Include="CrudUtil.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="SanityTest.cs">
+    <Compile Include="FarmCacheTest.cs">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="SocketHelper.cs" />

@@ -53,7 +53,9 @@
     </When>
     <Otherwise>
       <ItemGroup>
-        <Reference Include="Microsoft.VisualStudio.QualityTools.UnitTestFramework" />
+        <Reference Include="Microsoft.VisualStudio.QualityTools.UnitTestFramework">
+          <Private>False</Private>
+        </Reference>
       </ItemGroup>
     </Otherwise>
   </Choose>
@@ -64,6 +66,7 @@
     <Compile Include="MemoryCacheTests.cs" />
     <Compile Include="RestHelperKeysTests.cs" />
     <Compile Include="MapCreationTest.cs" />
+    <Compile Include="SocialLogin\SocialLoginProfileGlobalTest.cs" />
     <Compile Include="SocketEmitTest.cs" />
     <Compile Include="RedisPubSubTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -72,6 +75,7 @@
     <Compile Include="FarmCacheStatusTests.cs" />
     <Compile Include="LoggerTests.cs" />
     <Compile Include="SqlDdl.cs" />
+    <Compile Include="SocialLogin\SocialLoginProviderTest.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Backand.Config\Backand.Test.Config.csproj">
