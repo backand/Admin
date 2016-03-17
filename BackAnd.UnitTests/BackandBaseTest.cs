@@ -1,11 +1,8 @@
 ﻿using Backand.Config;
 using Durados.Web.Mvc;
 using System;
-using System.Collections.Generic;
 using System.Data;
 using System.Diagnostics;
-using System.Linq;
-using System.Text;
 using System.Web;
 
 namespace BackAnd.UnitTests
@@ -20,6 +17,9 @@ namespace BackAnd.UnitTests
                 return ConfigStore.GetConfig().appname;
             }
         }
+
+        public ServerConfig Configuration { get { return ConfigStore.GetConfig(); } }
+
 
         public Map ValidMap
         {
@@ -39,7 +39,7 @@ namespace BackAnd.UnitTests
                 Trace.WriteLine("Start Init");
                 TestHelper.Init();
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 Trace.WriteLine(e.StackTrace);
                 Trace.WriteLine(e);
@@ -48,7 +48,7 @@ namespace BackAnd.UnitTests
 
         protected void CleanupInner()
         {
-           
+
         }
     }
 

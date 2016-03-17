@@ -1,12 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Durados.Web.Mvc;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Durados.Web.Mvc;
-using System.Web;
-using Backand.Config;
+using System;
 
 namespace BackAnd.UnitTests
 {
@@ -29,9 +23,10 @@ namespace BackAnd.UnitTests
         [TestMethod]
         public void TestCreateMapWithAdminAppReturnDuradosApp()
         {
-            var res = Maps.Instance.GetMap("www");
+            var mainName = this.Configuration.mainAppName;
+            var res = Maps.Instance.GetMap(mainName);
             Assert.IsInstanceOfType(res, typeof(DuradosMap));
-            Assert.IsFalse(Maps.Instance.AppInCach("www"));
+            Assert.IsFalse(Maps.Instance.AppInCach(mainName));
         }
 
         [TestMethod]
@@ -71,5 +66,5 @@ namespace BackAnd.UnitTests
             Assert.IsTrue(Maps.Instance.AppInCach(appName));
         }
     }
-    
+
 }

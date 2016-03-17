@@ -99,11 +99,15 @@ namespace Durados.Web.Mvc.UI.Helpers
         protected SocialProfile GetProfileUnsafe(string appName, string accessToken, string returnAddress, string activity, string parameters, string email)
         {
             //get the Google user profile using the access token
-            string profiel = FetchProfileFromService(accessToken);
 
-            //get the user email out of goolge profile
-            //GoogleProfile googleProfile = (GoogleProfile)jsonSerializer.Deserialize<GoogleProfile>(profiel); ;
-            Dictionary<string, object> profile = Durados.Web.Mvc.UI.Json.JsonSerializer.Deserialize(profiel);
+            Dictionary<string, object> profile = MockReturnFromService;
+
+            if (profile == null)
+            {
+                string profiel = FetchProfileFromService(accessToken);
+                profile = Durados.Web.Mvc.UI.Json.JsonSerializer.Deserialize(profiel);
+            }
+
             profile.Add("appName", appName);
             profile.Add("returnAddress", returnAddress);
             profile.Add("activity", activity);
@@ -123,5 +127,7 @@ namespace Durados.Web.Mvc.UI.Helpers
         }
 
         protected abstract string FetchProfileFromService(string accessToken);
+
+        public Dictionary<string, object> MockReturnFromService { get; set; }
     }
 }

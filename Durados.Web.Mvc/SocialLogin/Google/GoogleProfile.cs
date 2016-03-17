@@ -17,9 +17,14 @@ namespace Durados.Web.Mvc.SocialLogin.Google
             {
                 Dictionary<string, object> names = (Dictionary<string, object>)dictionary["name"];
                 if (names.ContainsKey(key))
+                {
                     return names[key].ToString();
-                else
+                }
+                else if (!string.IsNullOrEmpty(emailInner))
+                {
                     return emailInner.Split('@').FirstOrDefault();
+                }
+                return null;
             }
             else
             {
@@ -46,7 +51,15 @@ namespace Durados.Web.Mvc.SocialLogin.Google
 
         protected override string emailInner
         {
-            get { return ((Dictionary<string, object>)((object[])dictionary["emails"])[0])["value"].ToString(); }
+            get
+            {
+                if (dictionary.ContainsKey("emails"))
+                {
+                    return ((Dictionary<string, object>)((object[])dictionary["emails"])[0])["value"].ToString();
+                }
+
+                return null;
+            }
         }
 
         public override string Provider

@@ -4966,7 +4966,8 @@ namespace Durados.Web.Mvc.UI.Helpers
             }
             if (!((Dictionary<string, object>)((Dictionary<string, object>)map.AllKindOfCache[key])[view.JsonName]).ContainsKey(System.Web.Helpers.Crypto.SHA256(json)))
             {
-                ((Dictionary<string, object>)((Dictionary<string, object>)map.AllKindOfCache[key])[view.JsonName]).Add(System.Web.Helpers.Crypto.SHA256(json), result);
+                ((Dictionary<string, object>)((Dictionary<string, object>)map.AllKindOfCache[key])[view.JsonName])
+                    .Add(System.Web.Helpers.Crypto.SHA256(json), result);
             }
 
 
