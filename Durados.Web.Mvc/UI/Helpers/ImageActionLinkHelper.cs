@@ -10,23 +10,13 @@ namespace System.Web.Mvc
     {
         public static string ImageActionLink(this AjaxHelper helper, string imageUrl, string altText, string actionName, object routeValues, AjaxOptions ajaxOptions)
         {
-            var builder = new TagBuilder("img");
-            builder.MergeAttribute("src", imageUrl);
-            builder.MergeAttribute("alt", altText);
-            builder.MergeAttribute("title", altText);
-            var link = helper.ActionLink("[replaceme]", actionName, routeValues, ajaxOptions);
-            return link.ToString().Replace("[replaceme]", builder.ToString(TagRenderMode.SelfClosing));
+            return null;
         }
 
         public static string ImageActionLink(this AjaxHelper helper, string className, string altText, string actionName, string controllerName, object routeValues, AjaxOptions ajaxOptions)
         {
-            var builder = new TagBuilder("span");
-           // builder.MergeAttribute("src", imageUrl);
-            builder.MergeAttribute("alt", altText);
-            builder.MergeAttribute("title", altText);
-            builder.MergeAttribute("class", "img " + className);
-            var link = helper.ActionLink("[replaceme]", actionName, controllerName, routeValues, ajaxOptions);
-            return link.ToString().Replace("[replaceme]", builder.ToString(TagRenderMode.SelfClosing));
+            return null;
+            
         }
 
         /// <summary>
@@ -42,10 +32,7 @@ namespace System.Web.Mvc
         /// <returns></returns>
         public static string ImageLink(this AjaxHelper helper, string className)
         {
-            var link="<a>[replaceme]</a>";
-            var builder = new TagBuilder("span");
-            builder.MergeAttribute("class", "img disabled " + className);
-            return link.Replace("[replaceme]", builder.ToString(TagRenderMode.SelfClosing));
+            return null;
         }
     }
 }
