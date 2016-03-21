@@ -314,8 +314,30 @@ namespace BackAnd.Web.Api.Controllers
             return base.Delete(id);
         }
 
-         
 
+        protected override void BeforeCreate(Durados.CreateEventArgs e)
+        {
+            if (IsNodeJSFunction(e))
+            {
+                CreateNodeJSFunction(e);
+            }
+            base.BeforeCreate(e);
+        }
+
+        private void CreateNodeJSFunction(Durados.CreateEventArgs e)
+        {
+            throw new NotImplementedException();
+        }
+
+        private bool IsNodeJSFunction(Durados.CreateEventArgs e)
+        {
+            return IsNodeJSFunction(e.Values["WorkflowAction"]);
+        }
+
+        private bool IsNodeJSFunction(object value)
+        {
+            return value != null && value.Equals(Durados.WorkflowAction.NodeJS.ToString());
+        }
     }
 
 }

@@ -13,6 +13,7 @@ namespace Durados.Workflow
         protected Notifier notifier;
         protected Executer executer;
         protected JavaScript javaScript;
+        protected NodeJS nodeJS;
         protected WebService webService;
         protected Document document;
         protected ApprovalProcess approvalProcess;
@@ -28,6 +29,7 @@ namespace Durados.Workflow
             notifier = GetNotifier();
             executer = GetExecuter();
             javaScript = GetJavaScript();
+            nodeJS = GetNodeJS();
             webService = GetWebService();
             step = GetStep();
             document = GetDocument();
@@ -50,6 +52,11 @@ namespace Durados.Workflow
         protected virtual JavaScript GetJavaScript()
         {
             return new JavaScript();
+        }
+
+        protected virtual NodeJS GetNodeJS()
+        {
+            return new NodeJS();
         }
 
         protected virtual WebService GetWebService()
@@ -428,6 +435,8 @@ namespace Durados.Workflow
                     return Execute(controller, parameters, view, prevRow, values, pk, connectionString, currentUserId, currentUserRole, command);
                 case WorkflowAction.JavaScript:
                     return ExecuteJs(controller, parameters, view, prevRow, values, pk, connectionString, currentUserId, currentUserRole, command, sysCommand, actionName);
+                case WorkflowAction.NodeJS:
+                    return ExecuteNodeJS(controller, parameters, view, prevRow, values, pk, connectionString, currentUserId, currentUserRole, command, sysCommand, actionName);
                 case WorkflowAction.WebService:
                     return CallWebService(controller, parameters, view, prevRow, values, pk, connectionString, currentUserId, currentUserRole, command);
                 case WorkflowAction.CompleteStep:
@@ -480,6 +489,12 @@ namespace Durados.Workflow
         protected virtual object ExecuteJs(object controller, Dictionary<string, Parameter> parameters, View view, DataRow prevRow, Dictionary<string, object> values, string pk, string connectionString, int currentUserId, string currentUserRole, IDbCommand command, IDbCommand sysCommand, string actionName)
         {
             javaScript.Execute(controller, parameters, view, values, prevRow, pk, connectionString, currentUserId, currentUserRole, command, sysCommand, actionName);
+            return null;
+        }
+
+        protected virtual object ExecuteNodeJS(object controller, Dictionary<string, Parameter> parameters, View view, DataRow prevRow, Dictionary<string, object> values, string pk, string connectionString, int currentUserId, string currentUserRole, IDbCommand command, IDbCommand sysCommand, string actionName)
+        {
+            nodeJS.Execute(controller, parameters, view, values, prevRow, pk, connectionString, currentUserId, currentUserRole, command, sysCommand, actionName);
             return null;
         }
 
