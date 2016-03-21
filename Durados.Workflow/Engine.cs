@@ -173,6 +173,7 @@ namespace Durados.Workflow
             if (System.Web.HttpContext.Current.Items[Database.AppName] != null)
             {
                 string appName = System.Web.HttpContext.Current.Items[Database.AppName].ToString();
+
                 if (CurrentDatabases.Contains(appName))
                 {
                     return (Database)CurrentDatabases[appName];

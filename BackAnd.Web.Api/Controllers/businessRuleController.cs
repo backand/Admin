@@ -73,6 +73,55 @@ namespace BackAnd.Web.Api.Controllers
             }
         }
 
+        [Route("action/config/getActionId")]
+        [HttpGet]
+        public virtual IHttpActionResult GetActionId(string objectName, string actionName)
+        {
+            if (!IsAdmin())
+            {
+                return ResponseMessage(Request.CreateResponse(HttpStatusCode.Forbidden, Messages.ActionIsUnauthorized));
+            }
+
+           
+            if (!map.Database.Views.ContainsKey(objectName))
+            {
+                return ResponseMessage(Request.CreateResponse(HttpStatusCode.NotFound, Messages.RuleNotFound));
+            }
+
+            View view = (View)map.Database.Views[objectName];
+
+            Durados.Rule rule = view.GetRules().Where(r => r.Name == actionName).FirstOrDefault();
+
+            if (rule == null)
+            {
+                return ResponseMessage(Request.CreateResponse(HttpStatusCode.NotFound, Messages.RuleNotFound));
+            }
+
+            return Ok(new { id = rule.ID });
+        }
+
+        [Route("action/config/GetSecurityActionId")]
+        [HttpGet]
+        public virtual IHttpActionResult GetSecurityActionId(string actionName)
+        {
+            if (!IsAdmin())
+            {
+                return ResponseMessage(Request.CreateResponse(HttpStatusCode.Forbidden, Messages.ActionIsUnauthorized));
+            }
+
+
+            View view = (View)map.Database.GetUserView();
+
+            Durados.Rule rule = view.GetRules().Where(r => r.Name == actionName).FirstOrDefault();
+
+            if (rule == null)
+            {
+                return ResponseMessage(Request.CreateResponse(HttpStatusCode.NotFound, Messages.RuleNotFound));
+            }
+
+            return Ok(new { id = rule.ID });
+        }
+
 
          [Route("businessrule/{id}")]
          [Route("action/config/{id}")]

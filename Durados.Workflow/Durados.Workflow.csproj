@@ -118,6 +118,7 @@
     <Compile Include="ApprovalProcess.cs" />
     <Compile Include="console.cs" />
     <Compile Include="Cookie.cs" />
+    <Compile Include="ParseAuth.cs" />
     <Compile Include="JavaScript.cs" />
     <Compile Include="files.cs" />
     <Compile Include="request.cs" />
