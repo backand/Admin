@@ -85,7 +85,8 @@ namespace Durados.Web.Mvc.UI.Helpers
         {
             View view = GetUserSocialView();
             int userId = GetDuradosMap().Database.GetUserID(email);
-            view.Create(new Dictionary<string, object>() { { "Provider", provider }, { view.GetFieldByColumnNames("UserId").Name, userId }, { "SocialId", socialId } });
+            view.Create(new Dictionary<string, object>() { { "Provider", provider }, { view.GetFieldByColumnNames("UserId").Name, userId },
+                { "SocialId", socialId } });
         }
 
         private static MembershipProvider _provider = System.Web.Security.Membership.Provider;

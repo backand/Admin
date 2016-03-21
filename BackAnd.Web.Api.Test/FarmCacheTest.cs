@@ -440,7 +440,7 @@ namespace BackAnd.Web.Api.Test
     }
 
     [TestClass]
-    public class SanityTest
+    public class FarmCacheTest
     {
 
         private TestContext m_testContext;

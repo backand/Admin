@@ -1250,7 +1250,13 @@ namespace BackAnd.Web.Api.Controllers
                 view_BeforeEdit, view_BeforeEditInDatabase,
                 view_AfterEditBeforeCommit, view_AfterEditAfterCommit);
 
-            accountService.SetEmailBySocialId(profile.Provider, profile.id, profile.email);
+            var currentData = accountService.GetEmailBySocialId(profile.Provider, profile.id);
+
+            if (string.IsNullOrEmpty(currentData))
+            {
+                accountService.SetEmailBySocialId(profile.Provider, profile.id, profile.email);
+            }
+
         }
 
         public virtual void SocialSigninInner(SocialProfile profile)
