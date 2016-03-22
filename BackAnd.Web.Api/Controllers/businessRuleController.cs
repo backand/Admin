@@ -14,6 +14,7 @@ using Durados.Web.Mvc;
 using Durados.DataAccess;
 using Durados.Web.Mvc.Controllers.Api;
 using System.Reflection;
+using Durados.Workflow;
 /*
  HTTP Verb	|Entire Collection (e.g. /customers)	                                                        |Specific Item (e.g. /customers/{id})
 -----------------------------------------------------------------------------------------------------------------------------------------------
@@ -326,7 +327,19 @@ namespace BackAnd.Web.Api.Controllers
 
         private void CreateNodeJSFunction(Durados.CreateEventArgs e)
         {
-            throw new NotImplementedException();
+            string FileName = "FileName";
+            string FunctionName = "FunctionName";
+
+            NodeJS nodeJS = new NodeJS();
+
+            string fileName = null;
+            if (e.Values.ContainsKey(FileName))
+                fileName = e.Values[FileName].ToString();
+            string functionName = null;
+            if (e.Values.ContainsKey(FunctionName))
+                functionName = e.Values[FunctionName].ToString();
+
+            nodeJS.Create(Maps.NodeJSBucket, Map.AppName, fileName + ".zip", Map.AppName + "-" + functionName, fileName + ".js", functionName);
         }
 
         private bool IsNodeJSFunction(Durados.CreateEventArgs e)
