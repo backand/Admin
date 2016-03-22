@@ -14,6 +14,7 @@ using Durados.Web.Mvc;
 using Durados.DataAccess;
 using Durados.Web.Mvc.Controllers.Api;
 using System.Reflection;
+using Durados.Workflow;
 /*
  HTTP Verb	|Entire Collection (e.g. /customers)	                                                        |Specific Item (e.g. /customers/{id})
 -----------------------------------------------------------------------------------------------------------------------------------------------
@@ -314,8 +315,42 @@ namespace BackAnd.Web.Api.Controllers
             return base.Delete(id);
         }
 
-         
 
+        protected override void BeforeCreate(Durados.CreateEventArgs e)
+        {
+            if (IsNodeJSFunction(e))
+            {
+                CreateNodeJSFunction(e);
+            }
+            base.BeforeCreate(e);
+        }
+
+        private void CreateNodeJSFunction(Durados.CreateEventArgs e)
+        {
+            string FileName = "FileName";
+            string FunctionName = "FunctionName";
+
+            NodeJS nodeJS = new NodeJS();
+
+            string fileName = null;
+            if (e.Values.ContainsKey(FileName))
+                fileName = e.Values[FileName].ToString();
+            string functionName = null;
+            if (e.Values.ContainsKey(FunctionName))
+                functionName = e.Values[FunctionName].ToString();
+
+            nodeJS.Create(Maps.NodeJSBucket, Map.AppName, fileName + ".zip", Map.AppName + "-" + functionName, fileName + ".js", functionName);
+        }
+
+        private bool IsNodeJSFunction(Durados.CreateEventArgs e)
+        {
+            return IsNodeJSFunction(e.Values["WorkflowAction"]);
+        }
+
+        private bool IsNodeJSFunction(object value)
+        {
+            return value != null && value.Equals(Durados.WorkflowAction.NodeJS.ToString());
+        }
     }
 
 }

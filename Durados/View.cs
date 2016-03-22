@@ -2165,6 +2165,7 @@ namespace Durados
         Document,
         Xml,
         Custom,
+        NodeJS,
         JavaScript
     }
 
