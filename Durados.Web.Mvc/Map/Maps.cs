@@ -1493,6 +1493,8 @@ namespace Durados.Web.Mvc
             }
             map.systemConnectionString = persistency.GetSystemConnection(appRow, builder).ToString();
             map.securityConnectionString = Convert.ToString(persistency.GetSecurityConnection(appRow, builder));
+            map.Logger.RedisProvider = SharedMemorySingeltone.Instance;
+
             map.Logger.ConnectionString = persistency.GetLogConnection(appRow, builder).ToString();
             string pk = appRow.Id.ToString();
             map.Id = pk;

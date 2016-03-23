@@ -209,7 +209,6 @@
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
   </ItemGroup>
-
   <ItemGroup>
     <Compile Include="Azure\CacheFactory.cs" />
     <Compile Include="Azure\ILargeObjectCachingStamp.cs" />
@@ -250,7 +249,6 @@
     <Compile Include="Farm\FarmException.cs" />
     <Compile Include="Farm\FarmMessage.cs" />
     <Compile Include="Farm\IPubsubTransport.cs" />
-    <Compile Include="Farm\ISharedMemory.cs" />
     <Compile Include="Farm\IStatus.cs" />
     <Compile Include="Farm\RedisFarm.cs" />
     <Compile Include="Farm\SharedMemory.cs" />
