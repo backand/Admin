@@ -120,6 +120,7 @@
     <Compile Include="Logger.cs" />
     <Compile Include="LogMessage.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="RedisLogger.cs" />
     <Compile Include="SegmentLogger.cs" />
     <Compile Include="WritingEvents.cs" />
   </ItemGroup>

@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Durados.Web.Mvc.Farm
+namespace Durados.Data
 {
     public interface ISharedMemory
     {
@@ -15,6 +15,8 @@ namespace Durados.Web.Mvc.Farm
         void Delete(string appName, SharedMemoryKey key);
 
         bool Contains(string appName, SharedMemoryKey key);
+
+        void ListRightPush(string key, string value);
     }
 
 

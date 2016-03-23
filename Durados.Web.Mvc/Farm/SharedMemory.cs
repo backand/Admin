@@ -1,4 +1,5 @@
-﻿using StackExchange.Redis;
+﻿using Durados.Data;
+using StackExchange.Redis;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -48,6 +49,12 @@ namespace Durados.Web.Mvc.Farm
         {
             redis = RedisFarmTransport.CreateRedisConnection(connectionString);
             database = redis.GetDatabase();
+          
+        }
+
+        public void ListRightPush(string key, string value)
+        {
+            database.ListRightPush(key, value);
 
         }
 

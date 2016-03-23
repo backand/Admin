@@ -8,6 +8,7 @@ using System.Web.Http;
 using System.Net;
 using Durados.Web.Mvc;
 using Durados.Web.Mvc.Farm;
+using Durados.Data;
 
 namespace BackAnd.Web.Api.Controllers.Filters
 {
