@@ -33,7 +33,7 @@ CREATE TABLE `durados_User` (
   UNIQUE KEY `IX_durados_Username` (`Username`(255)),
   KEY `FK_User_durados_UserRole` (`Role`),
   CONSTRAINT `FK_User_durados_UserRole` FOREIGN KEY (`Role`) REFERENCES `durados_UserRole` (`Name`)
-) ;
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 /****** Object:  View `v_User`    Script Date: 07/19/2011 16:41:38 ******/
 
