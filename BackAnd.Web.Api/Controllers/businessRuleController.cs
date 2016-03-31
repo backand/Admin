@@ -123,13 +123,31 @@ namespace BackAnd.Web.Api.Controllers
             return Ok(new { id = rule.ID });
         }
 
-
-         [Route("businessrule/{id}")]
-         [Route("action/config/{id}")]
+        [Route("businessrule/{id}")]
+        [Route("action/config/{id}")]
         [BackAnd.Web.Api.Controllers.Filters.ConfigBackupFilter]
         [HttpPut]
         public virtual IHttpActionResult Put(string id)
         {
+            return base.Put(id);
+        }
+
+        [Route("action/config/{objectName}/{actionName}")]
+        [BackAnd.Web.Api.Controllers.Filters.ConfigBackupFilter]
+        [HttpPut]
+        public virtual IHttpActionResult Put(string objectName, string actionName)
+        {
+            View view = (View)map.Database.Views[objectName];
+
+            Durados.Rule rule = view.GetRules().Where(r => r.Name == actionName).FirstOrDefault();
+
+            if (rule == null)
+            {
+                return ResponseMessage(Request.CreateResponse(HttpStatusCode.NotFound, Messages.RuleNotFound));
+            }
+
+            string id = rule.ID.ToString();
+
             return base.Put(id);
         }
 
@@ -219,6 +237,21 @@ namespace BackAnd.Web.Api.Controllers
         {
             return base.Post();
             
+        }
+
+        protected override Dictionary<string, object> GetAdjustedValues(Durados.Web.Mvc.View view, Dictionary<string, object> values)
+        {
+            const string viewTable = "viewTable";
+            if (values.ContainsKey(viewTable))
+            {
+                string viewName = values[viewTable].ToString();
+                if (Map.Database.Views.ContainsKey(viewName))
+                {
+                    values[viewTable] = Map.Database.Views[viewName].ID;
+                }
+            }
+
+            return base.GetAdjustedValues(view, values);
         }
 
         private void HandelChiledViewsForPost(Dictionary<string, object> values, string pk)
@@ -328,18 +361,32 @@ namespace BackAnd.Web.Api.Controllers
         private void CreateNodeJSFunction(Durados.CreateEventArgs e)
         {
             string FileName = "FileName";
-            string FunctionName = "FunctionName";
-
+            
             NodeJS nodeJS = new NodeJS();
 
             string fileName = null;
             if (e.Values.ContainsKey(FileName))
                 fileName = e.Values[FileName].ToString();
-            string functionName = null;
-            if (e.Values.ContainsKey(FunctionName))
-                functionName = e.Values[FunctionName].ToString();
 
-            nodeJS.Create(Maps.NodeJSBucket, Map.AppName, fileName + ".zip", Map.AppName + "-" + functionName, fileName + ".js", functionName);
+            string viewId = null;
+            if (e.Values.ContainsKey("Rules_Parent"))
+                viewId = e.Values["Rules_Parent"].ToString();
+            string viewName = null;
+
+            if (viewId != null)
+            {
+                viewName = new ConfigAccess().GetViewNameByPK(viewId, Map.GetConfigDatabase().ConnectionString);
+
+                if (string.IsNullOrEmpty(viewName))
+                {
+                    throw new Durados.DuradosException(string.Format(Messages.ViewNameNotFound, viewId));
+                }
+              
+            }
+
+            string functionName = viewName + "_" + e.Values["Name"].ToString();
+            string folder = Map.AppName + "/" + viewName + "/" + functionName;
+            nodeJS.Create(Maps.NodeJSBucket, Map.AppName, fileName, functionName, "index", "handler");
         }
 
         private bool IsNodeJSFunction(Durados.CreateEventArgs e)
