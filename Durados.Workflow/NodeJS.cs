@@ -12,8 +12,65 @@ namespace Durados.Workflow
         private string BaseUrl = System.Configuration.ConfigurationManager.AppSettings["nodeHost"] ?? "http://127.0.0.1:9000";
         private string NodeJSBucket = System.Configuration.ConfigurationManager.AppSettings["NodeJSBucket"] ?? "nodejs.backand.net";
 
+        private Dictionary<string, object> GetCallLambdaPayload(object controller, Dictionary<string, Parameter> parameters, View view, Dictionary<string, object> values, DataRow prevRow, string pk, string connectionString, int currentUsetId, string currentUserRole, IDbCommand command)
+        {
+            JsActionArguments arguments = new JsActionArguments(controller, parameters, view, values, prevRow, pk, connectionString, currentUsetId, currentUserRole, command);
+
+            Dictionary<string, object> payload = new Dictionary<string, object>();
+
+            payload.Add("userInput", arguments.UserInput);
+            payload.Add("dbRow", arguments.DbRow);
+            payload.Add("parameters", arguments.Parameters);
+            payload.Add("userProfile", arguments.UserProfile);
+            return payload;
+ 
+        }
+
         public virtual void Execute(object controller, Dictionary<string, Parameter> parameters, View view, Dictionary<string, object> values, DataRow prevRow, string pk, string connectionString, int currentUsetId, string currentUserRole, IDbCommand command, IDbCommand sysCommand, string actionName)
         {
+           
+            string url = BaseUrl + "/callLambda";
+            XMLHttpRequest request = new XMLHttpRequest();
+            request.open("POST", url, false);
+            Dictionary<string, object> data = new Dictionary<string, object>();
+            
+            Dictionary<string, object> payload = GetCallLambdaPayload(controller, parameters, view, values, prevRow, pk, connectionString, currentUsetId, currentUserRole, command);
+
+            string functionName = view.Name + "_" + actionName;
+            string folder = view.Database.GetCurrentAppName();
+
+            data.Add("folder", folder);
+            data.Add("functionName", functionName);
+            data.Add("payload", payload);
+
+
+            request.setRequestHeader("content-type", "application/json");
+
+            System.Web.Script.Serialization.JavaScriptSerializer jss = new System.Web.Script.Serialization.JavaScriptSerializer();
+            request.send(jss.Serialize(data));
+
+            if (request.status != 200)
+            {
+                throw new Durados.DuradosException("Server return status " + request.status + ", " + request.responseText);
+            }
+
+            Dictionary<string, object> response = null;
+            try
+            {
+                response = jss.Deserialize<Dictionary<string, object>>(request.responseText);
+            }
+            catch (Exception exception)
+            {
+                throw new Durados.DuradosException("Could not parse upload response", exception);
+            }
+
+            if (response != null && values != null)
+            {
+                if (!values.ContainsKey(JavaScript.ReturnedValueKey))
+                    values.Add(JavaScript.ReturnedValueKey, response);
+                else
+                    values[JavaScript.ReturnedValueKey] = response;
+            }
         }
 
         /// <summary>

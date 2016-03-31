@@ -6,6 +6,7 @@ using System.Text;
 
 using Durados.DataAccess;
 using Durados.Web.Mvc.UI.Helpers;
+using System.Runtime.Caching;
 
 namespace Durados.Web.Mvc
 {
@@ -557,7 +558,7 @@ namespace Durados.Web.Mvc
             }
         }
 
-        private Dictionary<string, object> fieldTypes = null;
+        private MemoryCache fieldTypes = null;
         public Dictionary<string, object> GetFieldsTypes()
         {
             if (fieldTypes == null)
@@ -565,11 +566,11 @@ namespace Durados.Web.Mvc
                 fieldTypes = GetFieldsTypesInner();
             }
 
-            return fieldTypes;
+            return fieldTypes.ToDictionary(a => a.Key, a => a.Value);
         }
-        private Dictionary<string, object> GetFieldsTypesInner()
+        private MemoryCache GetFieldsTypesInner()
         {
-            Dictionary<string, object> types = new Dictionary<string, object>();
+            MemoryCache types = new MemoryCache("fieldTypes_" + Database.GetCurrentAppName() + "_" + Name);
 
             foreach (Field field in GetVisibleFieldsForRow(DataAction.Edit).OrderBy(f => f.Order))
             {
@@ -580,7 +581,7 @@ namespace Durados.Web.Mvc
                 {
                     string relatedObject = ((ParentField)field).ParentView.JsonName;
                     values.Add(type, relatedObject);
-                    types.Add(field.JsonName, values);
+                    types[field.JsonName] = values;
                 }
                 else if (type == "collection")
                 {
@@ -588,7 +589,7 @@ namespace Durados.Web.Mvc
                     string via = ((ChildrenField)field).GetRelatedParentField().JsonName;
                     values.Add(type, relatedObject);
                     values.Add("via", via);
-                    types.Add(field.JsonName, values);
+                    types[field.JsonName] = values;
                 }
                 else
                 {
@@ -609,7 +610,7 @@ namespace Durados.Web.Mvc
                     {
                         values.Add("unique", true);
                     }
-                    types.Add(field.JsonName, values);
+                    types[field.JsonName] = values;
                 }
             }
 
@@ -730,7 +731,7 @@ namespace Durados.Web.Mvc
             Backand.socket socket = new Backand.socket();
             string eventName = crud.ToString() + "d";
             string appName = (System.Web.HttpContext.Current.Items[Durados.Database.AppName] ?? string.Empty).ToString();
-            if (SendRealTimeEvents)
+            if (SendRealTimeEvents || Database.IsConfig)
             {
                 System.Threading.ThreadPool.QueueUserWorkItem(delegate
                     {

@@ -828,6 +828,11 @@ namespace Durados.DataAccess
             createEventArgs.PrimaryKey = pk;
             if (afterCreateAfterCommitCallback != null)
                 afterCreateAfterCommitCallback(this, createEventArgs);
+            try
+            {
+                view.SendRealTimeEvent(pk, Crud.create);
+            }
+            catch { }
 
             return dataRow;
         }
@@ -1196,6 +1201,12 @@ namespace Durados.DataAccess
             if (afterEditAfterCommitCallback != null)
                 afterEditAfterCommitCallback(this, new EditEventArgs(view, null, pk, null, null));
 
+            try
+            {
+                view.SendRealTimeEvent(pk, Crud.update);
+            }
+            catch { }
+
         }
 
         public override void Delete(View view, string pk, BeforeDeleteEventHandler beforeDeleteCallback, AfterDeleteEventHandler afterDeleteBeforeCommitCallback, AfterDeleteEventHandler afterDeleteAfterCommitCallback, Dictionary<string, object> values = null)
@@ -1268,7 +1279,11 @@ namespace Durados.DataAccess
             if (afterDeleteAfterCommitCallback != null)
                 afterDeleteAfterCommitCallback(this, new DeleteEventArgs(view, null, null, null));
 
-
+            try
+            {
+                view.SendRealTimeEvent(pk, Crud.delete);
+            }
+            catch { }
         }
 
         public override string GetDisplayValue(ParentField parentField, string pk)
