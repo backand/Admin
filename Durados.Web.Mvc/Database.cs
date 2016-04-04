@@ -1,6 +1,7 @@
 ﻿using Durados.DataAccess;
 using Durados.Web.Mvc.UI.Helpers;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
@@ -1360,6 +1361,18 @@ namespace Durados.Web.Mvc
             {
                 throw new DuradosException("Failed to parse the configuration JSON: " + exception.Message, exception);
             }
+        }
+
+        public System.Collections.ArrayList GetModel()
+        {
+            ArrayList list = new ArrayList();
+
+            foreach (View view in Views.Values.Where(v => !v.SystemView).OrderBy(v => v.Order))
+            {
+                list.Add(new Dictionary<string, object>() { { "name", view.JsonName }, { "fields", view.GetModelFieldsTypes() } });
+            }
+
+            return list;
         }
     }
 

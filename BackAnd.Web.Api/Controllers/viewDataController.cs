@@ -191,7 +191,7 @@ namespace BackAnd.Web.Api.Controllers
                 bool hideMetadata = exclude != null && exclude.ToLower().Contains("metadata");
                 bool hideTotalRows = exclude != null && exclude.ToLower().Contains("totalRows");
 
-                var items = RestHelper.Get(childrenView, withSelectOptions ?? false, withFilterOptions ?? false, pageNumber ?? 1, pageSize ?? 20, filterArray, search, sortArray, out rowCount, deep ?? false, view_BeforeSelect, view_AfterSelect, false, descriptive, false, relatedObjects ?? false, null, hideMetadata, hideTotalRows);
+                var items = RestHelper.Get(childrenView, withSelectOptions ?? false, withFilterOptions ?? false, pageNumber ?? 1, pageSize ?? childrenView.Database.DefaultPageSize, filterArray, search, sortArray, out rowCount, deep ?? false, view_BeforeSelect, view_AfterSelect, false, descriptive, false, relatedObjects ?? false, null, hideMetadata, hideTotalRows);
                 
                 return Ok(items);
 
@@ -373,7 +373,8 @@ namespace BackAnd.Web.Api.Controllers
                 int rowCount = 0;
 
                 Dictionary<string, object>[] filterArray = null;
-                if (isNosqlFilter(filter))
+                isNosqlFilter = IsNosqlFilter(filter);
+                if (isNosqlFilter)
                 {
                     where = GetWhere(view, filter);
                 }
@@ -427,7 +428,7 @@ namespace BackAnd.Web.Api.Controllers
 
                 bool hideMetadata = exclude != null && exclude.ToLower().Contains("metadata");
                 bool hideTotalRows = exclude != null && exclude.ToLower().Contains("totalrows");
-                var items = RestHelper.Get(view, withSelectOptions ?? false, withFilterOptions ?? false, pageNumber ?? 1, pageSize ?? 20, filterArray, search, sortArray, out rowCount, deep ?? false, view_BeforeSelect, view_AfterSelect, false, descriptive, false, relatedObjects ?? false, where, hideMetadata, hideTotalRows);
+                var items = RestHelper.Get(view, withSelectOptions ?? false, withFilterOptions ?? false, pageNumber ?? 1, pageSize ?? view.Database.DefaultPageSize, filterArray, search, sortArray, out rowCount, deep ?? false, view_BeforeSelect, view_AfterSelect, false, descriptive, false, relatedObjects ?? false, where, hideMetadata, hideTotalRows);
                 
                 return Ok(items);
                 
@@ -453,11 +454,14 @@ namespace BackAnd.Web.Api.Controllers
         }
 
         string where = null;
+        bool isNosqlFilter = false;
+
         protected override void SetPermanentFilter(Durados.Web.Mvc.View view, Durados.DataAccess.Filter filter)
         {
             if (where != null)
             {
                 filter.WhereStatement = " where " + where;
+                filter.IsNosqlFilter = isNosqlFilter;
             }
             base.SetPermanentFilter(view, filter); ;
             
@@ -542,7 +546,7 @@ namespace BackAnd.Web.Api.Controllers
             return NoSqlFilterCache.Get(Map.AppName, view, json);
         }
 
-        private bool isNosqlFilter(string filter)
+        private bool IsNosqlFilter(string filter)
         {
             return !string.IsNullOrEmpty(filter) && filter.Contains("\"q\":");
         }

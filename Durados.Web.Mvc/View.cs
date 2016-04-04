@@ -395,6 +395,39 @@ namespace Durados.Web.Mvc
             //permanentFilter = permanentFilter.ReplaceGlobals(Database);
             permanentFilter = permanentFilter.ReplaceConfig(Database);
 
+            permanentFilter = ReplaceQueryString(permanentFilter);
+            permanentFilter = ReplaceQueryStringParameters(permanentFilter);
+
+
+            return permanentFilter;
+        }
+
+        private string ReplaceQueryString(string permanentFilter)
+        {
+            foreach (string key in System.Web.HttpContext.Current.Request.QueryString.Keys)
+            {
+                permanentFilter = permanentFilter.Replace(key.AsToken(), System.Web.HttpContext.Current.Request.QueryString[key], false);
+            }
+
+            return permanentFilter;
+        }
+
+        private string ReplaceQueryStringParameters(string permanentFilter)
+        {
+            if (System.Web.HttpContext.Current.Request.QueryString["parameters"] == null)
+                return permanentFilter;
+
+            string parameters = System.Web.HttpContext.Current.Request.QueryString["parameters"];
+
+            //Dictionary<string, object> rulesParameters = RestHelper.Deserialize(this, System.Web.HttpContext.Current.Server.UrlDecode(parameters));
+            Dictionary<string, object> values = Durados.Web.Mvc.UI.Json.JsonSerializer.Deserialize(parameters);
+
+            foreach (string key in values.Keys)
+            {
+                permanentFilter = permanentFilter.Replace(key.AsToken(), values[key].ToString(), false);
+            }
+
+
             return permanentFilter;
         }
 
@@ -559,29 +592,55 @@ namespace Durados.Web.Mvc
         }
 
         private MemoryCache fieldTypes = null;
+        private MemoryCache modelFieldTypes = null;
+        
         public Dictionary<string, object> GetFieldsTypes()
         {
             if (fieldTypes == null)
             {
-                fieldTypes = GetFieldsTypesInner();
+                fieldTypes = GetFieldsTypesInner(false);
             }
 
-            return fieldTypes.ToDictionary(a => a.Key, a => a.Value);
+            return (Dictionary<string, object>)fieldTypes[Name];
         }
-        private MemoryCache GetFieldsTypesInner()
+
+        public Dictionary<string, object> GetModelFieldsTypes()
         {
-            MemoryCache types = new MemoryCache("fieldTypes_" + Database.GetCurrentAppName() + "_" + Name);
+            if (modelFieldTypes == null)
+            {
+                modelFieldTypes = GetFieldsTypesInner(true);
+            }
+
+            return (Dictionary<string, object>)modelFieldTypes[Name];
+        }
+        private MemoryCache GetFieldsTypesInner(bool model)
+        {
+            MemoryCache typesCache = new MemoryCache("fieldTypes_" + (model ? "model_" : "").ToString() + Database.GetCurrentAppName() + "_" + Name);
+
+            Dictionary<string, object> types = new Dictionary<string, object>();
 
             foreach (Field field in GetVisibleFieldsForRow(DataAction.Edit).OrderBy(f => f.Order))
             {
                 string type = field.GetRestType();
                 Dictionary<string, object> values = new Dictionary<string, object>();
 
+                if (model)
+                {
+                    if (field.Name == "id")
+                    {
+                        continue;
+                    }
+                    else if (field.Name == CreateDateColumnName || field.Name == ModifiedDateColumnName)
+                    {
+                        continue;
+                    }
+                }
+                
                 if (type == "object")
                 {
                     string relatedObject = ((ParentField)field).ParentView.JsonName;
                     values.Add(type, relatedObject);
-                    types[field.JsonName] = values;
+                    types.Add(field.JsonName, values);
                 }
                 else if (type == "collection")
                 {
@@ -589,7 +648,7 @@ namespace Durados.Web.Mvc
                     string via = ((ChildrenField)field).GetRelatedParentField().JsonName;
                     values.Add(type, relatedObject);
                     values.Add("via", via);
-                    types[field.JsonName] = values;
+                    types.Add(field.JsonName, values);
                 }
                 else
                 {
@@ -610,11 +669,19 @@ namespace Durados.Web.Mvc
                     {
                         values.Add("unique", true);
                     }
-                    types[field.JsonName] = values;
+                    if (model)
+                    {
+                        if (field.DefaultValue != null && field.DefaultValue != string.Empty && field.DefaultValue != System.DBNull.Value)
+                        {
+                            values.Add("defaultValue", field.DefaultValue);
+                        }
+                    }
+                    types.Add(field.JsonName, values);
                 }
             }
 
-            return types;
+            typesCache[Name] = types;
+            return typesCache;
         }
 
         public List<Field> GetVisibleFieldsForRow(DataAction dataAction)

@@ -3369,6 +3369,36 @@ namespace Durados.Web.Mvc.Config
                 FacebookClientSecret.Category = rolesCategory;
                 FacebookClientSecret.HideInTable = true;
             }
+            if (databaseView.Fields.ContainsKey("EnableFacebook"))
+            {
+                ColumnField EnableFacebook = (ColumnField)databaseView.Fields["EnableFacebook"];
+                EnableFacebook.Order = 600;
+                EnableFacebook.Category = rolesCategory;
+                EnableFacebook.HideInTable = true;
+            }
+
+            if (databaseView.Fields.ContainsKey("TwitterClientId"))
+            {
+                ColumnField TwitterClientId = (ColumnField)databaseView.Fields["TwitterClientId"];
+                TwitterClientId.Order = 600;
+                TwitterClientId.Category = rolesCategory;
+                TwitterClientId.HideInTable = true;
+            }
+            if (databaseView.Fields.ContainsKey("TwitterClientSecret"))
+            {
+                ColumnField TwitterClientSecret = (ColumnField)databaseView.Fields["TwitterClientSecret"];
+                TwitterClientSecret.Order = 600;
+                TwitterClientSecret.Category = rolesCategory;
+                TwitterClientSecret.HideInTable = true;
+            }
+            if (databaseView.Fields.ContainsKey("EnableTwitter"))
+            {
+                ColumnField EnableTwitter = (ColumnField)databaseView.Fields["EnableTwitter"];
+                EnableTwitter.Order = 600;
+                EnableTwitter.Category = rolesCategory;
+                EnableTwitter.HideInTable = true;
+            }
+            
             if (databaseView.Fields.ContainsKey("PkType"))
             {
                 ColumnField PkType = (ColumnField)databaseView.Fields["PkType"];
@@ -3390,13 +3420,6 @@ namespace Durados.Web.Mvc.Config
                 EnableGoogle.Order = 600;
                 EnableGoogle.Category = rolesCategory;
                 EnableGoogle.HideInTable = true;
-            }
-            if (databaseView.Fields.ContainsKey("EnableFacebook"))
-            {
-                ColumnField EnableFacebook = (ColumnField)databaseView.Fields["EnableFacebook"];
-                EnableFacebook.Order = 600;
-                EnableFacebook.Category = rolesCategory;
-                EnableFacebook.HideInTable = true;
             }
             if (databaseView.Fields.ContainsKey("EnableSecretKeyAccess"))
             {

@@ -89,7 +89,7 @@ namespace Durados.DataAccess
 
         protected override string GetPointFieldStatement(Field field)
         {
-            return string.Format("CONCAT(X(`{0}`.`{1}`), \", \", Y(`{0}`.`{1}`))  as {1}", field.View.DataTable.TableName, field.GetColumnsNames()[0]);
+            return string.Format("CONCAT(X(`{0}`.`{1}`), \", \", Y(`{0}`.`{1}`))  as `{1}`", field.View.DataTable.TableName, field.GetColumnsNames()[0]);
             //return string.Format("AsText(`{0}`.`{1}`) as `{1}`", field.View.DataTable.TableName, field.GetColumnsNames()[0]);
         }
        
