@@ -625,6 +625,7 @@ namespace BackAnd.Web.Api.Controllers
             }
             try
             {
+                // return Redirect("http://wwww.backand.aaaaaaaaa?message={'hello' : 'world'}");
                 return Redirect(social.GetAuthUrl(appName, returnAddress ?? GetCurrentAddress(), null, "signin", null));
             }
             catch (Exception exception)
@@ -968,7 +969,7 @@ namespace BackAnd.Web.Api.Controllers
 
         private static bool GetCanLoginWithProfile(SocialProfile profile)
         {
-            return profile.email != null &&
+            return
                             !string.IsNullOrWhiteSpace(profile.appName) &&
                             !string.IsNullOrWhiteSpace(profile.returnAddress) &&
                             (new DuradosAuthorizationHelper().IsAppExists(profile.appName) || profile.appName == Maps.DuradosAppName);
@@ -1269,7 +1270,7 @@ namespace BackAnd.Web.Api.Controllers
 
             if (profile.email == null)
             {
-                throw new SocialException("can't login wihtout email. NO_EMAIL_SOCIAL");
+                throw new SocialException("The user is not signed up to " + profile.appName);
             }
 
             if (GetCanLoginWithProfile(profile))
