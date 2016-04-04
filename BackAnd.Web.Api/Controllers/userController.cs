@@ -1019,6 +1019,9 @@ namespace BackAnd.Web.Api.Controllers
 
         private void RegisterUserToMainApp(string email, string appName, string firstName, string lastName)
         {
+            Durados.Web.Mvc.UI.Helpers.AccountService account = new Durados.Web.Mvc.UI.Helpers.AccountService(this);
+            account.InviteAdminAfterSignUp(email);
+            
             AccountService.SendRegistrationRequest(firstName, lastName, email, string.Empty, email, string.Empty, Maps.Instance.DuradosMap, DontSend);
             try
             {
@@ -1040,6 +1043,7 @@ namespace BackAnd.Web.Api.Controllers
                 Maps.Instance.DuradosMap.Logger.Log("user", "SignUp", "SignUp", ex, 1, "failed to update websiteuser in ContactUs");
 
             }
+                    
         }
 
         private string CreateToken(string username, string appName)

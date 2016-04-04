@@ -1044,7 +1044,7 @@ namespace Durados.DataAccess
 
             MarkRows(table, view, keys);
 
-            if (filter.Parameters.Count() > 0 || filter.WhereStatement.Contains("like N") || !string.IsNullOrEmpty(view.PermanentFilter) || filter.WhereStatement.ToLower().Contains(" exists ") || filter.WhereStatement.ToLower().Contains(" is null ") || filter.WhereStatement.ToLower().Contains(" is not null "))
+            if (filter.IsNosqlFilter || filter.Parameters.Count() > 0 || filter.WhereStatement.Contains("like N") || !string.IsNullOrEmpty(view.PermanentFilter) || filter.WhereStatement.ToLower().Contains(" exists ") || filter.WhereStatement.ToLower().Contains(" is null ") || filter.WhereStatement.ToLower().Contains(" is not null "))
             {
                 totalRowCount = RowFilterCount(view, filter);
             }
@@ -4390,7 +4390,7 @@ namespace Durados.DataAccess
             if (!string.IsNullOrEmpty(view.PermanentFilter))
             {
                 command.Parameters.Clear();
-                command.CommandText = string.Format("select 1 from " + sqlTextBuilder.EscapeDbObject("{0}") + " where " + GetWhereStatement(view, tableName, true), tableName);
+                command.CommandText = "select 1 from " + sqlTextBuilder.EscapeDbObject(tableName) + " where " + GetWhereStatement(view, tableName, true);
                 foreach (IDataParameter parameter in GetWhereParemeters(view, pk))
                 {
                     command.Parameters.Add(GetNewParameter(command, parameter.ParameterName, parameter.Value));
@@ -8229,6 +8229,8 @@ namespace Durados.DataAccess
             return value;
         }
         #endregion Methods
+
+        public bool IsNosqlFilter { get; set; }
     }
 
     public class Duplicator : DataAccess.DataAccessObject

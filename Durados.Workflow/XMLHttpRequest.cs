@@ -241,6 +241,14 @@ namespace Backand
                     }
                     status = (int)((System.Net.HttpWebResponse)(we.Response)).StatusCode;
                 }
+                if (we.Response.Headers.AllKeys.Contains("error"))
+                {
+                    if (!string.IsNullOrEmpty(responseText))
+                    {
+                        responseText += "; ";
+                    }
+                    responseText += we.Response.Headers["error"];
+                }
                 Log(1, "Ended with status " + status, we);
 
             }

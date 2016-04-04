@@ -517,6 +517,7 @@ namespace BackAnd.Web.Api.Controllers
 
                     View view = (View)map.GetConfigDatabase().Views["Database"];
                     view.Edit(GetAdjustedValues(view, databaseSettings), "0", view_BeforeEdit, view_BeforeEditInDatabase, view_AfterEditBeforeCommit, view_AfterEditAfterCommit);
+                    UpdateAnonymousUserRole(map, databaseSettings);
                     if (newAppName != null)
                     {
                         map.AppName = newAppName;
@@ -532,6 +533,30 @@ namespace BackAnd.Web.Api.Controllers
                 throw new Durados.DuradosException("Failed to update database configuration", exception);
                 
             }
+        }
+
+        private void UpdateAnonymousUserRole(Map map, Dictionary<string, object> databaseSettings)
+        {
+            string role = GetAnonymousRole(databaseSettings);
+            UpdateAnonymousUserRole(map, role);
+        }
+
+        private void UpdateAnonymousUserRole(Map map, string role)
+        {
+            string sql = "update durados_User set `Role` = '" + role + "' where username = 'Guest'";
+            (new MySqlAccess()).ExecuteNonQuery(map.Database.SystemConnectionString, sql, Durados.SqlProduct.MySql);
+
+        }
+
+        private string GetAnonymousRole(Dictionary<string, object> databaseSettings)
+        {
+            string key = "defaultGuestRole";
+            if (databaseSettings.ContainsKey(key))
+            {
+                return databaseSettings[key].ToString();
+            }
+
+            return null;
         }
 
 

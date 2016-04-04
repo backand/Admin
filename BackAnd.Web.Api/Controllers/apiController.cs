@@ -626,7 +626,18 @@ namespace BackAnd.Web.Api.Controllers
         
         protected virtual ArrayList GetBackandToObject()
         {
-            return GetBackandToObject(Request.Headers.Authorization.ToString());
+            Map map = GetCurrentMap();
+            return map.Database.GetModel();
+            //return GetBackandToObject(Request.Headers.Authorization.ToString());
+        }
+
+         
+
+        private Map GetCurrentMap()
+        {
+            string appName = GetAppName();
+            return Maps.Instance.GetMap(appName);
+            
         }
 
         protected virtual string GetAppName()
