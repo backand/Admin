@@ -1916,6 +1916,11 @@ namespace Durados.DataAccess.AutoGeneration.Dynamic
             {
                 try
                 {
+                    DataRow[] rows = MapDataSet.Field.Select("Name = '" + column.ColumnName + "' and ViewId = " + viewRow.Id);
+                    if (rows.Length == 1)
+                    {
+                        rows[0].Delete();
+                    }
                     MapDataSet.Field.AddFieldRow(viewRow, column.ColumnName, null, column.DataType.FullName, IsColumnPartOfPK(column), false, column.MaxLength, !column.AllowDBNull, column.DefaultValue == null ? string.Empty : column.DefaultValue.ToString(), column.Unique);
                 }
                 catch { }
@@ -2132,6 +2137,10 @@ namespace Durados.DataAccess.AutoGeneration.Dynamic
             if (isParent)
             {
                 string parentViewName = fieldRow.RelationRow.RelatedViewName;
+                if (!viewRows.ContainsKey(parentViewName))
+                {
+                    return columns.ToArray();
+                }
                 DataTable parentTable = null;
                 if (ds.Tables.Contains(parentViewName))
                 {
@@ -2188,7 +2197,7 @@ namespace Durados.DataAccess.AutoGeneration.Dynamic
                                 Log("Mapper", "AddField", "AddField", duradosException, 5, "Parent field: " + fieldName + ", view: " + table.TableName + ", Parent view: " + parentViewName);
                                 //DataColumn column2 = table.Columns.Add(fieldName, dbType);
                                 //columns.Add(column2);
-                                
+
                             }
                             else
                             {
