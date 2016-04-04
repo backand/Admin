@@ -78,6 +78,7 @@ namespace Backand
             try
             {
                 Durados.Database database = Durados.Workflow.Engine.GetCurrentDatabase();
+
                 database.Logger.Log(request.RequestUri.AbsoluteUri, request.Method, "Durados.Workflow", exception == null ? string.Empty : exception.Message, exception == null ? string.Empty : exception.StackTrace, logType, freeText, DateTime.Now);
             }
             catch { }

@@ -4580,16 +4580,20 @@ namespace Durados.Web.Mvc.UI.Helpers
                 return Durados.Web.Mvc.Maps.Instance.AppExists(appname).HasValue;
         }
 
-        public bool IsValid(string username, string password, out UserValidationError userValidationError, out string customError)
+        public bool IsValid(string username, string password, out UserValidationError userValidationError, out string customError, out bool hasCustomValidation, out bool customValid)
         {
+            hasCustomValidation = false;
+            customValid = false;
             if (HasCustomValidation())
             {
+                hasCustomValidation = true;
                 try
                 {
                     bool? customValidation = CustomValidation(username, password, out userValidationError, out customError);
 
                     if (customValidation.HasValue)
                     {
+                        customValid = true;
                         return customValidation.Value;
                     }
                 }

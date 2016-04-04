@@ -6443,7 +6443,7 @@ namespace Durados.DataAccess
                                             }
                                             else
                                             {
-                                                parameterValue = Convert.ChangeType(fkValue, view.DataTable.Columns[columnName].DataType);
+                                                parameterValue = Convert.ChangeType(fkValue.Trim(), view.DataTable.Columns[columnName].DataType);
                                             }
 
                                             whereStatement += sqlTextBuilder.EscapeDbObject(view.DataTable.TableName) + sqlTextBuilder.DbTableColumnSeperator + sqlTextBuilder.EscapeDbObject(columnName) + sqlTextBuilder.DbEquals + parameterName + " " + LogicCondition.And.ToString() + " ";
@@ -9899,7 +9899,11 @@ namespace Durados.DataAccess
                     transaction.Commit();
                     if (!identicalSystemConnection)
                     {
-                        sysTransaction.Commit();
+                        try
+                        {
+                            sysTransaction.Commit();
+                        }
+                        catch { }
                     }
                 }
 

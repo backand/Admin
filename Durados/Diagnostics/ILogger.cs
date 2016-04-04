@@ -3,6 +3,7 @@ using System.Diagnostics;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Durados.Data;
 
 namespace Durados.Diagnostics
 {
@@ -16,6 +17,7 @@ namespace Durados.Diagnostics
         void WriteToEventLog(string sEvent, EventLogEntryType eventLogEntryType, int id);
         void WriteToEventLog(string controller, string action, string method, string message, string trace, int logType, string freeText);
 
+        ISharedMemory RedisProvider { set; }
         string ConnectionString { set; }
 
         void BuildSchema(string connectionString, string logSchemaGeneratorFileName);

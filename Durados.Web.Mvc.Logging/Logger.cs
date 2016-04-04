@@ -11,6 +11,7 @@ using System.Threading.Tasks;
 using System.Web.Script.Serialization;
 using System.Collections.Specialized;
 using Newtonsoft.Json;
+using Durados.Data;
 
 namespace Durados.Web.Mvc.Logging
 {
@@ -42,6 +43,9 @@ namespace Durados.Web.Mvc.Logging
         int logStashPort;
         int logStashLogType;
         bool writeToLogStash = false;
+
+        
+        RedisLogger redisLogger = null;
 
         private WritingEvents events;
         public WritingEvents Events
@@ -103,6 +107,7 @@ namespace Durados.Web.Mvc.Logging
             else
                 writeToReport = false;
 
+            
             writeToLogStash = Convert.ToBoolean(System.Configuration.ConfigurationManager.AppSettings["writeToLogStash"] ?? "true");
             //logStashConnectionString = Convert.ToString(System.Configuration.ConfigurationManager.AppSettings["LogStashConnectionString"] ?? "true");
             if (!string.IsNullOrEmpty(System.Configuration.ConfigurationManager.AppSettings["logStashServer"]) && Convert.ToInt32(System.Configuration.ConfigurationManager.AppSettings["logStashPort"] ?? "-1") > 0)
@@ -300,6 +305,15 @@ namespace Durados.Web.Mvc.Logging
                 return "SELECT 1  FROM INFORMATION_SCHEMA.TABLES  WHERE   table_name = '" + table + "' AND table_schema=DATABASE();";
 
             return "SELECT 1 FROM sysobjects  WHERE xtype='u' AND name='" + table + "'";
+        }
+
+
+        public ISharedMemory RedisProvider
+        {
+            set
+            {
+                redisLogger = new RedisLogger(value);
+            }
         }
 
         public string ConnectionString
@@ -913,12 +927,24 @@ namespace Durados.Web.Mvc.Logging
 
 
             string jsonString  = JsonConvert.SerializeObject(message);
-            Connect(logStashServer, logStashPort, jsonString);
+            //Connect(logStashServer, logStashPort, jsonString);
+            WriteToRedis(jsonString);
 
         }
 
         private JavaScriptSerializer javaScriptSerializer = new JavaScriptSerializer();
 
+        void WriteToRedis(String message)
+        {
+            try
+            {
+                redisLogger.Log(message);
+            }
+            catch (Exception e)
+            {
+                WriteToEventLog(e.Message, EventLogEntryType.FailureAudit, 1);
+            }
+        }
 
         void Connect(String server, Int32 port, String message)
         {

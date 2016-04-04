@@ -14,6 +14,7 @@ using Durados.Web.Mvc;
 using Durados.DataAccess;
 using Durados.Web.Mvc.Controllers.Api;
 using System.Reflection;
+using Durados.Workflow;
 /*
  HTTP Verb	|Entire Collection (e.g. /customers)	                                                        |Specific Item (e.g. /customers/{id})
 -----------------------------------------------------------------------------------------------------------------------------------------------
@@ -73,13 +74,80 @@ namespace BackAnd.Web.Api.Controllers
             }
         }
 
+        [Route("action/config/getActionId")]
+        [HttpGet]
+        public virtual IHttpActionResult GetActionId(string objectName, string actionName)
+        {
+            if (!IsAdmin())
+            {
+                return ResponseMessage(Request.CreateResponse(HttpStatusCode.Forbidden, Messages.ActionIsUnauthorized));
+            }
 
-         [Route("businessrule/{id}")]
-         [Route("action/config/{id}")]
+           
+            if (!map.Database.Views.ContainsKey(objectName))
+            {
+                return ResponseMessage(Request.CreateResponse(HttpStatusCode.NotFound, Messages.RuleNotFound));
+            }
+
+            View view = (View)map.Database.Views[objectName];
+
+            Durados.Rule rule = view.GetRules().Where(r => r.Name == actionName).FirstOrDefault();
+
+            if (rule == null)
+            {
+                return ResponseMessage(Request.CreateResponse(HttpStatusCode.NotFound, Messages.RuleNotFound));
+            }
+
+            return Ok(new { id = rule.ID });
+        }
+
+        [Route("action/config/GetSecurityActionId")]
+        [HttpGet]
+        public virtual IHttpActionResult GetSecurityActionId(string actionName)
+        {
+            if (!IsAdmin())
+            {
+                return ResponseMessage(Request.CreateResponse(HttpStatusCode.Forbidden, Messages.ActionIsUnauthorized));
+            }
+
+
+            View view = (View)map.Database.GetUserView();
+
+            Durados.Rule rule = view.GetRules().Where(r => r.Name == actionName).FirstOrDefault();
+
+            if (rule == null)
+            {
+                return ResponseMessage(Request.CreateResponse(HttpStatusCode.NotFound, Messages.RuleNotFound));
+            }
+
+            return Ok(new { id = rule.ID });
+        }
+
+        [Route("businessrule/{id}")]
+        [Route("action/config/{id}")]
         [BackAnd.Web.Api.Controllers.Filters.ConfigBackupFilter]
         [HttpPut]
         public virtual IHttpActionResult Put(string id)
         {
+            return base.Put(id);
+        }
+
+        [Route("action/config/{objectName}/{actionName}")]
+        [BackAnd.Web.Api.Controllers.Filters.ConfigBackupFilter]
+        [HttpPut]
+        public virtual IHttpActionResult Put(string objectName, string actionName)
+        {
+            View view = (View)map.Database.Views[objectName];
+
+            Durados.Rule rule = view.GetRules().Where(r => r.Name == actionName).FirstOrDefault();
+
+            if (rule == null)
+            {
+                return ResponseMessage(Request.CreateResponse(HttpStatusCode.NotFound, Messages.RuleNotFound));
+            }
+
+            string id = rule.ID.ToString();
+
             return base.Put(id);
         }
 
@@ -169,6 +237,21 @@ namespace BackAnd.Web.Api.Controllers
         {
             return base.Post();
             
+        }
+
+        protected override Dictionary<string, object> GetAdjustedValues(Durados.Web.Mvc.View view, Dictionary<string, object> values)
+        {
+            const string viewTable = "viewTable";
+            if (values.ContainsKey(viewTable))
+            {
+                string viewName = values[viewTable].ToString();
+                if (Map.Database.Views.ContainsKey(viewName))
+                {
+                    values[viewTable] = Map.Database.Views[viewName].ID;
+                }
+            }
+
+            return base.GetAdjustedValues(view, values);
         }
 
         private void HandelChiledViewsForPost(Dictionary<string, object> values, string pk)
@@ -265,8 +348,56 @@ namespace BackAnd.Web.Api.Controllers
             return base.Delete(id);
         }
 
-         
 
+        protected override void BeforeCreate(Durados.CreateEventArgs e)
+        {
+            if (IsNodeJSFunction(e))
+            {
+                CreateNodeJSFunction(e);
+            }
+            base.BeforeCreate(e);
+        }
+
+        private void CreateNodeJSFunction(Durados.CreateEventArgs e)
+        {
+            string FileName = "FileName";
+            
+            NodeJS nodeJS = new NodeJS();
+
+            string fileName = null;
+            if (e.Values.ContainsKey(FileName))
+                fileName = e.Values[FileName].ToString();
+
+            string viewId = null;
+            if (e.Values.ContainsKey("Rules_Parent"))
+                viewId = e.Values["Rules_Parent"].ToString();
+            string viewName = null;
+
+            if (viewId != null)
+            {
+                viewName = new ConfigAccess().GetViewNameByPK(viewId, Map.GetConfigDatabase().ConnectionString);
+
+                if (string.IsNullOrEmpty(viewName))
+                {
+                    throw new Durados.DuradosException(string.Format(Messages.ViewNameNotFound, viewId));
+                }
+              
+            }
+
+            string functionName = viewName + "_" + e.Values["Name"].ToString();
+            string folder = Map.AppName + "/" + viewName + "/" + functionName;
+            nodeJS.Create(Maps.NodeJSBucket, Map.AppName, fileName, functionName, "index", "handler");
+        }
+
+        private bool IsNodeJSFunction(Durados.CreateEventArgs e)
+        {
+            return IsNodeJSFunction(e.Values["WorkflowAction"]);
+        }
+
+        private bool IsNodeJSFunction(object value)
+        {
+            return value != null && value.Equals(Durados.WorkflowAction.NodeJS.ToString());
+        }
     }
 
 }

@@ -166,6 +166,13 @@ namespace Durados
         [Durados.Config.Attributes.ColumnProperty()]
         public string Code { get; set; }
 
+        [Durados.Config.Attributes.Parameter(WFAction = "NodeJS", ParameterName = "fileName")]
+        [Durados.Config.Attributes.ColumnProperty()]
+        public string FileName { get; set; }
+
+        [Durados.Config.Attributes.Parameter(WFAction = "NodeJS", ParameterName = "functionName")]
+        [Durados.Config.Attributes.ColumnProperty()]
+        public string FunctionName { get; set; }
 
         [Durados.Config.Attributes.Parameter(WFAction = "Execute", Pair = "exec1", Role = Durados.Config.Attributes.ParameterRole.Name)]
         [Durados.Config.Attributes.ColumnProperty()]

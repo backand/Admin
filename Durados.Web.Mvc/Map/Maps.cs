@@ -398,6 +398,13 @@ namespace Durados.Web.Mvc
                 throw new DuradosException("Missing ParseConverterObjectName key in web config");
             }
 
+            NodeJSBucket = System.Configuration.ConfigurationManager.AppSettings["NodeJSBucket"];
+
+            if (string.IsNullOrEmpty(NodeJSBucket))
+            {
+                throw new DuradosException("Missing NodeJSBucket key in web config");
+            }
+
             SendWelcomeEmail = System.Configuration.ConfigurationManager.AppSettings["SendWelcomeEmail"] ?? "true";
             
             System.Net.ServicePointManager.SecurityProtocol = System.Net.SecurityProtocolType.Ssl3 | System.Net.SecurityProtocolType.Tls | System.Net.SecurityProtocolType.Tls11 | System.Net.SecurityProtocolType.Tls12;
@@ -474,7 +481,8 @@ namespace Durados.Web.Mvc
         public static string ParseConverterMasterKey { get; private set; }
         public static string ParseConverterAdminKey { get; private set; }
         public static string ParseConverterObjectName { get; private set; }
-        
+        public static string NodeJSBucket { get; private set; }
+       
         
         public static TimeSpan AzureCacheUpdateInterval { get; private set; }
 
@@ -1485,6 +1493,8 @@ namespace Durados.Web.Mvc
             }
             map.systemConnectionString = persistency.GetSystemConnection(appRow, builder).ToString();
             map.securityConnectionString = Convert.ToString(persistency.GetSecurityConnection(appRow, builder));
+            map.Logger.RedisProvider = SharedMemorySingeltone.Instance;
+
             map.Logger.ConnectionString = persistency.GetLogConnection(appRow, builder).ToString();
             string pk = appRow.Id.ToString();
             map.Id = pk;
