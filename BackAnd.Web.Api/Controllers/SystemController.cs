@@ -43,7 +43,8 @@ namespace BackAnd.Web.Api.Controllers
                 }
                 catch (Exception exception)
                 {
-                    hasError = true;
+                    // In production, Server B don't have socket server, so that will fail.
+                    //hasError = true;
                     nodeVersion += ": " + exception.Message;
                 }
 
