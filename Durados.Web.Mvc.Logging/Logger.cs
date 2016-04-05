@@ -314,6 +314,7 @@ namespace Durados.Web.Mvc.Logging
             {
                 redisLogger = new RedisLogger(value);
             }
+
         }
 
         public string ConnectionString
@@ -936,9 +937,17 @@ namespace Durados.Web.Mvc.Logging
 
         void WriteToRedis(String message)
         {
+
             try
             {
-                redisLogger.Log(message);
+                if (redisLogger != null)
+                {
+                    redisLogger.Log(message);
+                }
+                else
+                {
+                    WriteToEventLog(message, EventLogEntryType.Warning, 3);
+                }
             }
             catch (Exception e)
             {
