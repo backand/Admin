@@ -10,7 +10,7 @@ CREATE TABLE `durados_UserRole` (
   `Description` varchar(50) NOT NULL,
   `FirstView` varchar(200) DEFAULT NULL,
   PRIMARY KEY (`Name`)
-) ;
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 -- DROP TABLE IF EXISTS `durados_User`;
 /****** Object:  Table `durados_User`    Script Date: 07/19/2011 16:41:14 ******/
