@@ -1,4 +1,5 @@
 ﻿
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -25,12 +26,14 @@ namespace BackAnd.Web.Api.Controllers
                 string node = "node is running";
                 string nodeVersion = "Failed to get the node version";
 
+                bool hasError = false;
                 try
                 {
                     Dictionary<string, object> transformResult = Transform(json, false);
                 }
                 catch (Exception exception)
                 {
+                    hasError = true;
                     node = exception.InnerException == null ? exception.Message : exception.InnerException.Message;
                 }
 
@@ -40,6 +43,7 @@ namespace BackAnd.Web.Api.Controllers
                 }
                 catch (Exception exception)
                 {
+                    hasError = true;
                     nodeVersion += ": " + exception.Message;
                 }
 
@@ -50,10 +54,18 @@ namespace BackAnd.Web.Api.Controllers
                 }
                 catch (Exception exception)
                 {
+                    hasError = true;
                     instance += ": " + exception.Message;
                 }
 
-                return Ok(new { version = Durados.Web.Mvc.Infrastructure.General.Version(), node = node, nodeVersion = nodeVersion, instance = instance });
+                var response = new HealthCheckResponse { version = Durados.Web.Mvc.Infrastructure.General.Version(), node = node, nodeVersion = nodeVersion, instance = instance };
+
+                if (hasError)
+                {
+                    return BadRequest(JsonConvert.SerializeObject(response));
+                }
+
+                return Ok(response);
       
             }
             catch (Exception exception)
@@ -93,6 +105,17 @@ namespace BackAnd.Web.Api.Controllers
  
         }
         
+    }
+
+    public class HealthCheckResponse
+    {
+        public string version { get; set; }
+
+        public string node { get; set; }
+
+        public string nodeVersion { get; set; }
+
+        public string instance { get; set; }
     }
 
     
