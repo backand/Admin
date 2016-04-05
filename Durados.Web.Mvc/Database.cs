@@ -1367,13 +1367,9 @@ namespace Durados.Web.Mvc
         {
             ArrayList list = new ArrayList();
 
-            foreach (var view1 in Views.Values.Where(v => !v.SystemView).OrderBy(v => v.Order))
+            foreach (View view in Views.Values.Where(v => !v.SystemView).OrderBy(v => v.Order))
             {
-                if (view1 is View)
-                {
-                    View view = (View)view1;
-                    list.Add(new Dictionary<string, object>() { { "name", view.JsonName }, { "fields", view.GetModelFieldsTypes() } });
-                }
+                list.Add(new Dictionary<string, object>() { { "name", view.JsonName }, { "fields", view.GetModelFieldsTypes() } });
             }
 
             return list;
