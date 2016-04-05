@@ -937,6 +937,7 @@ namespace Durados.Web.Mvc.Logging
 
         void WriteToRedis(String message)
         {
+
             try
             {
                 if (redisLogger != null)
