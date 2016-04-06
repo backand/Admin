@@ -1591,7 +1591,7 @@ namespace Durados.DataAccess.AutoGeneration.Dynamic
 
             AddColumnsConfiguration(columns, defaultField, configAccess, configViewPk, configFieldView, 10, displayNames);
 
-            View newView = new View(table, database);
+            View newView = database.CreateView(table); // new View(table, database);
             database.Views.Add(viewName, newView);
 
             Persist(database, table, editableTableName, defaultParentField, dataset, command);

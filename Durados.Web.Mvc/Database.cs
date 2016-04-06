@@ -199,7 +199,7 @@ namespace Durados.Web.Mvc
         public bool RequiresSSL { get; set; }
 
 
-        protected override Durados.View CreateView(DataTable dataTable)
+        public override Durados.View CreateView(DataTable dataTable)
         {
             return new Durados.Web.Mvc.View(dataTable, this);
         }

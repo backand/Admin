@@ -22,7 +22,7 @@ namespace Durados.Web.Mvc.Config
 
 
 
-        protected override Durados.View CreateView(DataTable dataTable)
+        public override Durados.View CreateView(DataTable dataTable)
         {
             return new Durados.Web.Mvc.Config.View(dataTable, this);
         }

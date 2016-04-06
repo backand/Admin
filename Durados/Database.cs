@@ -907,7 +907,7 @@ namespace Durados
         }
 
 
-        protected virtual View CreateView(DataTable dataTable)
+        public virtual View CreateView(DataTable dataTable)
         {
             return new View(dataTable, this);
         }
