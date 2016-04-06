@@ -650,7 +650,12 @@ namespace Durados.DataAccess.AutoGeneration.Dynamic
             foreach (DataColumn changedColumn in changedColumns)
             {
                 DataColumn originalColumn = dataset.Tables[viewName].Columns[changedColumn.ColumnName];
-                originalColumn.DefaultValue = null;
+                try
+                {
+                    if (!originalColumn.AutoIncrement)
+                        originalColumn.DefaultValue = null;
+                }
+                catch { }
                 originalColumn.DataType = changedColumn.DataType;
                 try
                 {
