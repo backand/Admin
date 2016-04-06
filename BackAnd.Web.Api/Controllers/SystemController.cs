@@ -25,41 +25,63 @@ namespace BackAnd.Web.Api.Controllers
                 string json = "{\"newSchema\":[],\"oldSchema\":[],\"severity\":0}";
                 string node = "node is running";
                 string nodeVersion = "Failed to get the node version";
+                string instanceName = "unknown";
 
                 bool hasError = false;
-                try
+                var a = Task.Factory.StartNew(() =>
                 {
-                    Dictionary<string, object> transformResult = Transform(json, false);
-                }
-                catch (Exception exception)
-                {
-                    hasError = true;
-                    node = exception.InnerException == null ? exception.Message : exception.InnerException.Message;
-                }
+                    try
+                    {
+                        Dictionary<string, object> transformResult = Transform(json, false);
+                    }
+                    catch (Exception exception)
+                    {
+                        hasError = true;
+                        node = exception.InnerException == null ? exception.Message : exception.InnerException.Message;
+                    }
+                });
 
-                try
+                var b = Task.Factory.StartNew(() =>
                 {
-                    nodeVersion = GetNodeVersion();
-                }
-                catch (Exception exception)
-                {
-                    // In production, Server B don't have socket server, so that will fail.
-                    //hasError = true;
-                    nodeVersion += ": " + exception.Message;
-                }
+                    try
+                    {
+                        nodeVersion = GetNodeVersion();
+                    }
+                    catch (Exception exception)
+                    {
+                        // In production, Server B don't have socket server, so that will fail.
+                        //hasError = true;
+                        nodeVersion += ": " + exception.Message;
+                    }
+                });
 
-                string instance = "unknown";
-                try
+               
+                var c = Task.Factory.StartNew(() =>
                 {
-                    instance = GetInstance();
-                }
-                catch (Exception exception)
-                {
-                    hasError = true;
-                    instance += ": " + exception.Message;
-                }
+                    try
+                    {
+                        instanceName = GetInstance();
+                    }
+                    catch (Exception exception)
+                    {
+                        hasError = true;
+                        instanceName += ": " + exception.Message;
+                    }
+                });
+                
+                var tasks  = new Task[] {a ,b, c};
 
-                var response = new HealthCheckResponse { version = Durados.Web.Mvc.Infrastructure.General.Version(), node = node, nodeVersion = nodeVersion, instance = instance };
+                // wait all tasks name
+                Task.WaitAll(tasks);
+
+                var response = new HealthCheckResponse 
+                { 
+                    version = Durados.Web.Mvc.Infrastructure.General.Version(), 
+                    node = node, 
+                    nodeVersion = nodeVersion, 
+                    instance = instanceName,
+                    time = DateTime.Now
+                };
 
                 if (hasError)
                 {
@@ -82,10 +104,10 @@ namespace BackAnd.Web.Api.Controllers
 
         private string GetNodeVersion()
         {
-           
             string url = GetSocketUrl();
             var httpWebRequest = (HttpWebRequest)WebRequest.Create(url);
             httpWebRequest.Method = "GET";
+            httpWebRequest.Timeout = 150;
             var response = httpWebRequest.GetResponse();
             Stream dataStream = response.GetResponseStream();
             // Open the stream using a StreamReader for easy access.
@@ -117,6 +139,8 @@ namespace BackAnd.Web.Api.Controllers
         public string nodeVersion { get; set; }
 
         public string instance { get; set; }
+
+        public DateTime time { get; set; }
     }
 
     
