@@ -538,7 +538,11 @@ namespace BackAnd.Web.Api.Controllers
                 string appName = Map.AppName;
                 if (string.IsNullOrEmpty(appName))
                 {
-                    appName = (System.Web.HttpContext.Current.Items[Durados.Web.Mvc.Database.AppName] ?? string.Empty).ToString();
+                    appName = string.Empty;
+                    if (System.Web.HttpContext.Current != null && System.Web.HttpContext.Current.Items != null)
+                    {
+                        appName = (System.Web.HttpContext.Current.Items[Durados.Web.Mvc.Database.AppName] ?? string.Empty).ToString();
+                    }
                 }
                 LogModel(appName, Map.Database.GetCurrentUsername(), DateTime.Now, input, output, valid, action);
             }

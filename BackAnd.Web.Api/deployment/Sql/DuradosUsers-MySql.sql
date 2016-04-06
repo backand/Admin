@@ -1,4 +1,4 @@
- USE `__DB_NAME__`;
+USE `__DB_NAME__`;
 
 
 /****** Object:  Table `durados_UserRole`    Script Date: 07/19/2011 16:41:08 ******/
@@ -6,11 +6,11 @@
 -- DROP TABLE IF EXISTS `durados_UserRole`;
 
 CREATE TABLE `durados_UserRole` (
-  `Name` varchar(256) NOT NULL,
+  `Name` varchar(256)  CHARACTER set latin1  NOT NULL,
   `Description` varchar(50) NOT NULL,
   `FirstView` varchar(200) DEFAULT NULL,
   PRIMARY KEY (`Name`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ;
 
 -- DROP TABLE IF EXISTS `durados_User`;
 /****** Object:  Table `durados_User`    Script Date: 07/19/2011 16:41:14 ******/
@@ -21,7 +21,7 @@ CREATE TABLE `durados_User` (
   `LastName` varchar(50) NOT NULL,
   `Email` varchar(250) NOT NULL,
   `Password` varchar(20) DEFAULT NULL,
-  `Role` varchar(256) NOT NULL,
+  `Role` varchar(256) CHARACTER set latin1 NOT NULL,
   `Guid` varchar(64) NOT NULL,
   `Signature` varchar(4000) DEFAULT NULL,
   `SignatureHTML` varchar(4000) DEFAULT NULL,
@@ -33,7 +33,7 @@ CREATE TABLE `durados_User` (
   UNIQUE KEY `IX_durados_Username` (`Username`(255)),
   KEY `FK_User_durados_UserRole` (`Role`),
   CONSTRAINT `FK_User_durados_UserRole` FOREIGN KEY (`Role`) REFERENCES `durados_UserRole` (`Name`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB ;
 
 /****** Object:  View `v_User`    Script Date: 07/19/2011 16:41:38 ******/
 
