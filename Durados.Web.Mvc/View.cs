@@ -676,6 +676,12 @@ namespace Durados.Web.Mvc
                             values.Add("defaultValue", field.DefaultValue);
                         }
                     }
+
+                    if (types.ContainsKey(field.JsonName))
+                    {
+                        throw new DuplicateFieldException(field.JsonName,field.View.Name);
+                    }
+
                     types.Add(field.JsonName, values);
                 }
             }
