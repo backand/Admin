@@ -1374,6 +1374,21 @@ namespace Durados.Web.Mvc
 
             return list;
         }
+        public string Decrypt(string token)
+        {
+            string text = null;
+            Map duradosMap = Maps.Instance.DuradosMap;
+            try
+            {
+                text = Durados.Security.CipherUtility.Decrypt<System.Security.Cryptography.AesManaged>(token, duradosMap.Database.DefaultMasterKeyPassword, duradosMap.Database.Salt);
+            }
+            catch
+            {
+                text = Durados.Security.CipherUtility.Decrypt<System.Security.Cryptography.AesManaged>(System.Web.HttpContext.Current.Server.UrlDecode(token), duradosMap.Database.DefaultMasterKeyPassword, duradosMap.Database.Salt);
+            }
+            return text;
+        }
+
     }
 
 

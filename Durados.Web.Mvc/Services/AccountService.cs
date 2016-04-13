@@ -544,7 +544,13 @@ namespace Durados.Web.Mvc.UI.Helpers
         private string Encrypt(string appName, string userToken)
         {
             Map duradosMap = GetDuradosMap();
-            string parameters = string.Format("appName={0}&userToken={1}", appName, userToken);
+            VerificationToken token = new VerificationToken
+            {
+                appName = appName,
+                userToken = userToken
+            };
+
+            string parameters = Durados.Web.Mvc.UI.Json.JsonSerializer.Serialize(token);
             return Durados.Security.CipherUtility.Encrypt<System.Security.Cryptography.AesManaged>(parameters, duradosMap.Database.DefaultMasterKeyPassword, duradosMap.Database.Salt);
         }
 
@@ -1036,31 +1042,29 @@ namespace Durados.Web.Mvc.UI.Helpers
         {
             Map duradosMap = GetDuradosMap();
             string text = null;
-            try
-            {
-                text = Durados.Security.CipherUtility.Decrypt<System.Security.Cryptography.AesManaged>(token, duradosMap.Database.DefaultMasterKeyPassword, duradosMap.Database.Salt);
-            }
-            catch
-            {
-                text = Durados.Security.CipherUtility.Decrypt<System.Security.Cryptography.AesManaged>(System.Web.HttpContext.Current.Server.UrlDecode(token), duradosMap.Database.DefaultMasterKeyPassword, duradosMap.Database.Salt);
-            }
+            text = duradosMap.Database.Decrypt(token);
 
             string appName = null;
             string userToken = null;
-            foreach (string parameter in text.Split('&'))
-            {
-                string[] keyValue = parameter.Split('=');
-                string key = keyValue[0];
-                string val = keyValue[1];
-                if (key == "appName")
-                {
-                    appName = val;
-                }
-                else if (key == "userToken")
-                {
-                    userToken = val;
-                }
-            }
+
+            Dictionary<string, object> values = Durados.Web.Mvc.UI.Json.JsonSerializer.Deserialize(text);
+            /* foreach (string parameter in text.Split('&'))
+             {
+                 string[] keyValue = parameter.Split('=');
+                 string key = keyValue[0];
+                 string val = keyValue[1];
+                 if (key == "appName")
+                 {
+                     appName = val;
+                 }
+                 else if (key == "userToken")
+                 {
+                     userToken = val;
+                 }
+             }
+             */
+            appName = (values.ContainsKey("appName") ? values["appName"].ToString() : null);
+            userToken = (values.ContainsKey("userToken") ? values["userToken"].ToString() : null);
 
             if (appName == null)
             {
@@ -1084,6 +1088,8 @@ namespace Durados.Web.Mvc.UI.Helpers
             return new SignUpResults() { Username = username, AppName = appName };
 
         }
+
+
 
         protected virtual bool IsPrivate(string appName)
         {
@@ -1523,5 +1529,10 @@ namespace Durados.Web.Mvc.UI.Helpers
                 }
             }
         }
+    }
+    public class VerificationToken
+    {
+        public string appName;
+        public string userToken;
     }
 }
