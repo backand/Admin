@@ -40,6 +40,7 @@ namespace BackAnd.Web.Api.Controllers
     {
 
         [Route("~/1/hosting/folder")]
+        [Route("~/1/nodejs/folder")]
         [HttpGet]
         public IHttpActionResult smartListFolder(string path = null)
         {
@@ -54,7 +55,14 @@ namespace BackAnd.Web.Api.Controllers
                 Dictionary<string, object> data = new Dictionary<string, object>();
                 string appName = Map.AppName;
 
-                data.Add("bucket", Maps.S3Bucket);
+                string bucket = Maps.S3Bucket;
+                if (Request.GetRouteData().Route.RouteTemplate == "1/nodejs")
+                {
+                    bucket = Maps.NodeJSBucket;
+                
+                }
+
+                data.Add("bucket", bucket);
                 data.Add("folder", appName);
                 data.Add("pathInFolder", path);
 
@@ -112,6 +120,74 @@ namespace BackAnd.Web.Api.Controllers
                 return Ok(new { valid = "never", warnings = new string[1] { exception.Message } });
                 
             }
+        }
+
+        [Route("~/1/syncInfo")]
+        [HttpPost]
+        public IHttpActionResult syncInfo()
+        {
+            try
+            {
+                string dir = Map.AppName;
+                
+                Dictionary<string, string> buckets = new Dictionary<string, string>() { { "hosting", Maps.S3Bucket }, { "nodejs", Maps.NodeJSBucket } };
+
+                Dictionary<string, object> services = new Dictionary<string, object>();
+
+                foreach (string key in buckets.Keys)
+                {
+                    string bucket = buckets[key];
+                    Dictionary<string, object> credentials = GetInfo(dir, bucket);
+                    Dictionary<string, object> adjustedCredentials = AdjustCredentials(credentials);
+
+                    services.Add(key, adjustedCredentials);
+                }
+
+                return Ok(services);
+            }
+            catch (Exception exception)
+            {
+                return Ok(new { valid = "never", warnings = new string[1] { exception.Message } });
+
+            }
+        }
+
+        private Dictionary<string, object> AdjustCredentials(Dictionary<string, object> dic)
+        {
+            Dictionary<string, object> lowerDic = LowerKeys(dic);
+            ((Dictionary<string, object>)lowerDic["credentials"]).Remove("expiration");
+            return lowerDic;
+        }
+
+        private Dictionary<string, object> LowerKeys(Dictionary<string, object> dic)
+        {
+            Dictionary<string, object> lowerDic = new Dictionary<string, object>();
+
+            foreach (string key in dic.Keys)
+            {
+                string lower = key.Substring(0, 1).ToLower() + key.Substring(1);
+                object value = dic[key];
+                if (value is Dictionary<string, object>)
+                {
+                    lowerDic.Add(lower, LowerKeys((Dictionary<string, object>)value));
+                }
+                else
+                {
+                    lowerDic.Add(lower, value);
+                }
+            }
+
+            return lowerDic;
+        }
+
+        private Dictionary<string, object> GetInfo(string dir, string bucket)
+        {
+            JavaScriptSerializer jss = new JavaScriptSerializer();
+            var data = new Dictionary<string, object>() { { "bucket", bucket }, { "dir", dir } };
+            string json = jss.Serialize(data);
+            Dictionary<string, object> credentials = bucketCredentials(json);
+            credentials.Add("Info", new Dictionary<string, object>() { { "Bucket", bucket }, { "Dir", dir } });
+            return credentials;
         }
 
 
