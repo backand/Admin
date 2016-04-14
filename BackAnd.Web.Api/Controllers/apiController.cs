@@ -408,8 +408,11 @@ namespace BackAnd.Web.Api.Controllers
             object responses = null;
             tasks.Add(Task.Factory.StartNew(() =>
             {
-                //, { "Authorization", Request.Headers.Authorization.ToString() }
-                var responseStatusAndData = bulk.GetWebResponse("POST", getNodeUrl, json, null, new Dictionary<string, object>() { { "Content-Type", "application/json" }, { "Authorization", Request.Headers.Authorization.ToString() } }, 0);
+                Dictionary<string, object> headers = new Dictionary<string, object>() { { "Content-Type", "application/json" } };
+
+                // in transformJson take app creator credential to allow get BakandToObject
+                headers.Add("Authorization", Map.GetAuthorization());
+                var responseStatusAndData = bulk.GetWebResponse("POST", getNodeUrl, json, null, headers, 0);
                 responses = responseStatusAndData.data;
                 if (string.IsNullOrEmpty(responseStatusAndData.data))
                 {
@@ -2192,7 +2195,7 @@ namespace BackAnd.Web.Api.Controllers
         public static readonly string CollectionNotFound = "The collection was not found.";
         public static readonly string DuplicateCollectionName = "The collection name exists more than once.";
         public static readonly string ViewIsUnauthorized = "The Table is unauthorized for this current user role.";
-        public static readonly string ViewNameNotFound = "The Table \"{0}\" was not found.";
+        public static readonly string ViewNameNotFound = "The object \"{0}\" was not found.";
         public static readonly string PostContradictsPredefinedFilter = "Post failed because it contradicts the predefined filter.";
         
         public static readonly string MissingObjectToUpdate = "The object to update is missing.";
@@ -2219,7 +2222,7 @@ namespace BackAnd.Web.Api.Controllers
         public static readonly string AppNameCannotBeNull = "App name cannot be empty.";
         public static readonly string AppNameInvalid = "App name must be alphanumeric.";
         public static readonly string RuleWithNameAlreadyExists = "A rule with the name {0} already exists for table {1}.";
-        public static readonly string RuleNotFound = "The rule was not found.";
+        public static readonly string RuleNotFound = "The action does not exist.";
         public static readonly string NotImplemented = "The action is not implemented yet.";
         public static readonly string FailedToGetJsonFromParameters = "Failed to get json from parameters.";
         public static readonly string StringifyFilter = "Please JSON.stringify the filter parameter";
