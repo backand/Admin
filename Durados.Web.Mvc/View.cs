@@ -428,7 +428,15 @@ namespace Durados.Web.Mvc
             }
             catch(Exception ex)
             {
-                string text = Map.Database.Decrypt(parameters);
+                string text;
+                try
+                {
+                     text = Map.Database.Decrypt(parameters);
+                }
+                catch(Exception e)
+                {
+                    throw ex;
+                }
                 values = Durados.Web.Mvc.UI.Json.JsonSerializer.Deserialize(text);
             }
 

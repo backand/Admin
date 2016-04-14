@@ -1048,21 +1048,7 @@ namespace Durados.Web.Mvc.UI.Helpers
             string userToken = null;
 
             Dictionary<string, object> values = Durados.Web.Mvc.UI.Json.JsonSerializer.Deserialize(text);
-            /* foreach (string parameter in text.Split('&'))
-             {
-                 string[] keyValue = parameter.Split('=');
-                 string key = keyValue[0];
-                 string val = keyValue[1];
-                 if (key == "appName")
-                 {
-                     appName = val;
-                 }
-                 else if (key == "userToken")
-                 {
-                     userToken = val;
-                 }
-             }
-             */
+          
             appName = (values.ContainsKey("appName") ? values["appName"].ToString() : null);
             userToken = (values.ContainsKey("userToken") ? values["userToken"].ToString() : null);
 
