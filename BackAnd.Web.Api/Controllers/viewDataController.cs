@@ -446,6 +446,13 @@ namespace BackAnd.Web.Api.Controllers
                 return ResponseMessage(Request.CreateResponse(HttpStatusCode.NotAcceptable, "Check the security Pre-defined Filter for the following sql errors: " + exception.Message));
 
             }
+            catch (AggregateException exception)
+            {
+                if (exception.InnerException != null)
+                    throw new BackAndApiUnexpectedResponseException(exception.InnerException, this);
+                else
+                    throw new BackAndApiUnexpectedResponseException(exception, this);
+            }
             catch (Exception exception)
             {
                 throw new BackAndApiUnexpectedResponseException(exception, this);
