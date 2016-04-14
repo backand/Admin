@@ -4496,6 +4496,21 @@ namespace Durados.Web.Mvc
 
         public virtual Guid Guid { get; set; }
 
+        private string creatorGuid = null;
+        public virtual string GetCreatorGuid()
+        {
+            if (creatorGuid == null)
+                creatorGuid = Maps.Instance.DuradosMap.Database.GetCreatorGuid(Convert.ToInt32(Id));
+
+            return creatorGuid;
+        }
+
+        public string GetAuthorization()
+        {
+            string token = Guid.ToString() + ":" + GetCreatorGuid();
+            return "Basic " + Backand.Convert.btoa(token);
+        } 
+
         public bool AsyncOperationRuning { get; set; }
 
         JsonConfigCache jsonConfigCache = new JsonConfigCache();
@@ -4605,5 +4620,7 @@ namespace Durados.Web.Mvc
         public System.Guid AnonymousToken { get; set; }
 
         public System.Guid SignUpToken { get; set; }
+
+        public int CreatorId { get; set; }
     }
 }
