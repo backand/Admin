@@ -4811,7 +4811,7 @@ namespace Durados.Web.Mvc.UI.Helpers
                 try
                 {
                     View roleView = Map.Database.GetRoleView();
-                    if (roleView.GetDataRow(role) == null)
+                    if (!string.IsNullOrEmpty(role) && roleView.GetDataRow(role) == null)
                     {
                         roleView.Create(new Dictionary<string, object>() { { "Name", role }, { "Description", role } });
                     }
