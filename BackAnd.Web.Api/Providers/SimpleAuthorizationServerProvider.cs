@@ -20,6 +20,10 @@ namespace BackAnd.Web.Api.Providers
             if (usernameObj != null && appnameObj != null)
             {
                 string username = usernameObj.Value;
+                if (System.Web.HttpContext.Current != null && System.Web.HttpContext.Current.Items.Contains(Database.Username))
+                {
+                    username = System.Web.HttpContext.Current.Items[Database.Username].ToString();
+                }
                 string appname = appnameObj.Value;
 
                 context.AdditionalResponseParameters.Add("appName", appname);

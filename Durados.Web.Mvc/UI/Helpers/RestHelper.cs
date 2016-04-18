@@ -4767,6 +4767,11 @@ namespace Durados.Web.Mvc.UI.Helpers
                 username = values["username"].ToString();
             }
 
+            if (System.Web.HttpContext.Current != null && System.Web.HttpContext.Current.Items.Contains(Database.Username) && System.Web.HttpContext.Current.Items[Database.Username] != username)
+            {
+                System.Web.HttpContext.Current.Items[Database.Username] = username;
+            }
+
             string firstName = null;
             if (values.ContainsKey("FirstName"))
             {
