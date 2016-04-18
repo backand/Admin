@@ -408,8 +408,11 @@ namespace BackAnd.Web.Api.Controllers
             object responses = null;
             tasks.Add(Task.Factory.StartNew(() =>
             {
-                //, { "Authorization", Request.Headers.Authorization.ToString() }
-                var responseStatusAndData = bulk.GetWebResponse("POST", getNodeUrl, json, null, new Dictionary<string, object>() { { "Content-Type", "application/json" }, { "Authorization", Request.Headers.Authorization.ToString() } }, 0);
+                Dictionary<string, object> headers = new Dictionary<string, object>() { { "Content-Type", "application/json" } };
+
+                // in transformJson take app creator credential to allow get BakandToObject
+                headers.Add("Authorization", Map.GetAuthorization());
+                var responseStatusAndData = bulk.GetWebResponse("POST", getNodeUrl, json, null, headers, 0);
                 responses = responseStatusAndData.data;
                 if (string.IsNullOrEmpty(responseStatusAndData.data))
                 {
@@ -2185,21 +2188,21 @@ namespace BackAnd.Web.Api.Controllers
         public static readonly string FieldShouldBeParent = "The field \"{0}\" nust be a single-select or a multi-select type.";
         public static readonly string ForeignKeyDeleteViolation = "The row you are trying to delete is referenced in another table ,please check your table constraints";
         public static readonly string FieldShouldBeAutoComplete = "The field \"{0}\" nust be an autocomplete display format.";
-        public static readonly string ViewNameIsMissing = "The Table name is missing.";
+        public static readonly string ViewNameIsMissing = "The object name is missing.";
         public static readonly string FieldNameIsMissing = "The field name is missing.";
         public static readonly string IdIsMissing = "The id is missing.";
         public static readonly string CollectionIsMissing = "The collection is missing.";
         public static readonly string CollectionNotFound = "The collection was not found.";
         public static readonly string DuplicateCollectionName = "The collection name exists more than once.";
-        public static readonly string ViewIsUnauthorized = "The Table is unauthorized for this current user role.";
-        public static readonly string ViewNameNotFound = "The Table \"{0}\" was not found.";
+        public static readonly string ViewIsUnauthorized = "The object is unauthorized for this current user role.";
+        public static readonly string ViewNameNotFound = "The object \"{0}\" was not found.";
         public static readonly string PostContradictsPredefinedFilter = "Post failed because it contradicts the predefined filter.";
         
         public static readonly string MissingObjectToUpdate = "The object to update is missing.";
         public static readonly string FieldNameNotFound = "The field \"{0}\" was not found.";
         public static readonly string TheFieldMustBeTextual = "The field must be textual.";
-        public static readonly string ItemWithIdNotFound = "An item with id \"{0}\" was not found or filtered by predefined filter in Table \"{1}\".";
-        public static readonly string ItemWithNoFieldsToUpdate = "An item with id \"{0}\" has no fields to update in Table \"{1}\".";
+        public static readonly string ItemWithIdNotFound = "An item with id \"{0}\" was not found or filtered by predefined filter in the object \"{1}\".";
+        public static readonly string ItemWithNoFieldsToUpdate = "An item with id \"{0}\" has no fields to update in the object \"{1}\".";
         public static readonly string AppNotFound = "The app \"{0}\" was not found.";
         public static readonly string ChartWithIdNotFound = "An chart with id \"{0}\" was not found.";
         public static readonly string Unexpected = "An error occurred, please try again or contact the administrator. Error details: {0}";
@@ -2218,8 +2221,8 @@ namespace BackAnd.Web.Api.Controllers
         public static readonly string AppNameAlreadyExists = "An application by the name {0} already exists.";
         public static readonly string AppNameCannotBeNull = "App name cannot be empty.";
         public static readonly string AppNameInvalid = "App name must be alphanumeric.";
-        public static readonly string RuleWithNameAlreadyExists = "A rule with the name {0} already exists for table {1}.";
-        public static readonly string RuleNotFound = "The rule was not found.";
+        public static readonly string RuleWithNameAlreadyExists = "An rule with the name {0} already exists for table {1}.";
+        public static readonly string RuleNotFound = "The action does not exist.";
         public static readonly string NotImplemented = "The action is not implemented yet.";
         public static readonly string FailedToGetJsonFromParameters = "Failed to get json from parameters.";
         public static readonly string StringifyFilter = "Please JSON.stringify the filter parameter";

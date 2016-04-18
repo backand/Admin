@@ -241,17 +241,29 @@ namespace BackAnd.Web.Api.Controllers.Filters
 
         private bool IsBasicAuthorized(BasicAuthenticationIdentity basicAuthenticationIdentity, out string username, out string appName)
         {
+            appName = null;
+            username = null;
             if (basicAuthenticationIdentity == null)
             {
-                appName = null;
-                username = null;
                 return false;
             }
-            appName = Maps.Instance.GetAppNameByGuid(basicAuthenticationIdentity.AppGuid);
+            try
+            {
+                appName = Maps.Instance.GetAppNameByGuid(basicAuthenticationIdentity.AppGuid);
+            }
+            catch (ArgumentException)
+            {
+                return false;
+            }
             Map map = Maps.Instance.GetMap(appName);
             if (map == null || map.IsMainMap)
             {
-                username = null;
+                return false;
+            }
+
+            Guid parsedGuid;
+            if (!Guid.TryParse(basicAuthenticationIdentity.UserGuid, out parsedGuid))
+            {
                 return false;
             }
 

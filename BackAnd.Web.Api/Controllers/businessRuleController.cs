@@ -15,6 +15,7 @@ using Durados.DataAccess;
 using Durados.Web.Mvc.Controllers.Api;
 using System.Reflection;
 using Durados.Workflow;
+using System.Data;
 /*
  HTTP Verb	|Entire Collection (e.g. /customers)	                                                        |Specific Item (e.g. /customers/{id})
 -----------------------------------------------------------------------------------------------------------------------------------------------
@@ -37,6 +38,29 @@ namespace BackAnd.Web.Api.Controllers
         {
             return GetItem(id,true);
         }
+
+         [Route("action/config/{objectName}/{actionName}")]
+         [HttpGet]
+         public virtual IHttpActionResult Get(string objectName, string actionName)
+         {
+             if (!map.Database.Views.ContainsKey(objectName))
+             {
+                 return ResponseMessage(Request.CreateResponse(HttpStatusCode.NotFound, Messages.ViewNameNotFound));
+             }
+
+             View view = (View)map.Database.Views[objectName];
+
+             Durados.Rule rule = view.GetRules().FirstOrDefault(r => r.Name == actionName);
+
+             if (rule == null)
+             {
+                 return ResponseMessage(Request.CreateResponse(HttpStatusCode.NotFound, Messages.RuleNotFound));
+             }
+
+             string id = rule.ID.ToString();
+
+             return GetItem(id, true);
+         }
 
         protected override string GetConfigViewName()
         {
@@ -137,6 +161,11 @@ namespace BackAnd.Web.Api.Controllers
         [HttpPut]
         public virtual IHttpActionResult Put(string objectName, string actionName)
         {
+            if (!map.Database.Views.ContainsKey(objectName))
+            {
+                return ResponseMessage(Request.CreateResponse(HttpStatusCode.NotFound, Messages.RuleNotFound));
+            }
+
             View view = (View)map.Database.Views[objectName];
 
             Durados.Rule rule = view.GetRules().Where(r => r.Name == actionName).FirstOrDefault();
@@ -168,8 +197,8 @@ namespace BackAnd.Web.Api.Controllers
         protected override IHttpActionResult ValidateInputForUpdate(string id, View view, Dictionary<string, object> values)
         {
             string ruleName = null;
-            if (values.ContainsKey("Name"))
-                ruleName = values["Name"].ToString();
+            if (values.ContainsKey(Name))
+                ruleName = values[Name].ToString();
             string viewId = null;
             if (values.ContainsKey("Rules_Parent"))
                 viewId = values["Rules_Parent"].ToString();
@@ -267,8 +296,8 @@ namespace BackAnd.Web.Api.Controllers
         protected override IHttpActionResult ValidateInputForPost(View view, Dictionary<string, object> values)
         {
             string ruleName = null;
-            if (values.ContainsKey("Name"))
-                ruleName = values["Name"].ToString();
+            if (values.ContainsKey(Name))
+                ruleName = values[Name].ToString();
             string viewId = null;
             if (values.ContainsKey("Rules_Parent"))
                 viewId = values["Rules_Parent"].ToString();
@@ -358,9 +387,96 @@ namespace BackAnd.Web.Api.Controllers
             base.BeforeCreate(e);
         }
 
+        protected override void BeforeDelete(Durados.DeleteEventArgs e)
+        {
+            if (IsNodeJSFunction(e))
+            {
+                DeleteNodeJSFunction(e);
+            }
+            base.BeforeDelete(e);
+        }
+
+        private void DeleteNodeJSFunction(Durados.DeleteEventArgs e)
+        {
+            NodeJS nodeJS = new NodeJS();
+
+            string ruleId = e.PrimaryKey;
+            DataRow ruleRow = Map.GetConfigDatabase().Views[Rule].GetDataRow(ruleId);
+            string viewId = ruleRow[Rules].ToString();
+            string viewName = null;
+
+            if (viewId != null)
+            {
+                viewName = new ConfigAccess().GetViewNameByPK(viewId, Map.GetConfigDatabase().ConnectionString);
+
+                if (string.IsNullOrEmpty(viewName))
+                {
+                    throw new Durados.DuradosException(string.Format(Messages.ViewNameNotFound, viewId));
+                }
+
+            }
+            else
+            {
+                throw new Durados.DuradosException(string.Format(Messages.ViewNameNotFound, string.Empty));
+            }
+
+            string actionName = ruleRow[Name].ToString();
+            string functionName = Map.AppName + "_" + viewName + "_" + actionName;
+            string folder = Map.AppName + "/" + viewName + "/" + actionName;
+            nodeJS.Delete(folder, functionName);
+        }
+
+        protected override void BeforeEdit(Durados.EditEventArgs e)
+        {
+            if (IsNodeJSFunction(e))
+            {
+                UpdateNodeJSFunction(e);
+            }
+            base.BeforeEdit(e);
+        }
+
+        const string FileName = "FileName";
+        const string Rule = "Rule";
+        const string Rules = "Rules";
+        const string Name = "Name";
+            
+        private void UpdateNodeJSFunction(Durados.EditEventArgs e)
+        {
+            
+            NodeJS nodeJS = new NodeJS();
+
+            string fileName = null;
+            if (e.Values.ContainsKey(FileName))
+                fileName = e.Values[FileName].ToString();
+
+            string ruleId = e.PrimaryKey;
+            DataRow ruleRow = Map.GetConfigDatabase().Views[Rule].GetDataRow(ruleId);
+            string viewId = ruleRow[Rules].ToString();
+            string viewName = null;
+
+            if (viewId != null)
+            {
+                viewName = new ConfigAccess().GetViewNameByPK(viewId, Map.GetConfigDatabase().ConnectionString);
+
+                if (string.IsNullOrEmpty(viewName))
+                {
+                    throw new Durados.DuradosException(string.Format(Messages.ViewNameNotFound, viewId));
+                }
+
+            }
+            else
+            {
+                throw new Durados.DuradosException(string.Format(Messages.ViewNameNotFound, string.Empty));
+            }
+
+            string actionName = ruleRow[Name].ToString();
+            string functionName = Map.AppName + "_" + viewName + "_" + actionName;
+            string folder = Map.AppName + "/" + viewName + "/" + actionName;
+            nodeJS.Update(Maps.NodeJSBucket, folder, fileName, functionName);
+        }
+
         private void CreateNodeJSFunction(Durados.CreateEventArgs e)
         {
-            string FileName = "FileName";
             
             NodeJS nodeJS = new NodeJS();
 
@@ -384,15 +500,36 @@ namespace BackAnd.Web.Api.Controllers
               
             }
 
-            string functionName = viewName + "_" + e.Values["Name"].ToString();
-            string folder = Map.AppName + "/" + viewName + "/" + functionName;
-            nodeJS.Create(Maps.NodeJSBucket, Map.AppName, fileName, functionName, "index", "handler");
+            string actionName = e.Values[Name].ToString();
+            string functionName = Map.AppName + "_" + viewName + "_" + actionName;
+            string folder = Map.AppName + "/" + viewName + "/" + actionName;
+            nodeJS.Create(Maps.NodeJSBucket, folder, fileName, functionName, "handler", "handler");
         }
 
         private bool IsNodeJSFunction(Durados.CreateEventArgs e)
         {
             return IsNodeJSFunction(e.Values["WorkflowAction"]);
         }
+
+        private bool IsNodeJSFunction(Durados.DeleteEventArgs e)
+        {
+            DataRow ruleRow = Map.GetConfigDatabase().Views["Rule"].GetDataRow(e.PrimaryKey);
+
+            return IsNodeJSFunction(ruleRow["WorkflowAction"]);
+        }
+
+        private bool IsNodeJSFunction(Durados.EditEventArgs e)
+        {
+            DataRow ruleRow = e.PrevRow;
+
+            if (ruleRow == null)
+            {
+                ruleRow = Map.GetConfigDatabase().Views["Rule"].GetDataRow(e.PrimaryKey);
+            }
+
+            return IsNodeJSFunction(ruleRow["WorkflowAction"]);
+        }
+
 
         private bool IsNodeJSFunction(object value)
         {

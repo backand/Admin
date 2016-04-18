@@ -1537,6 +1537,7 @@ namespace Durados.Web.Mvc
             map.Url = GetAppUrl(appName);
             map.SiteInfo.LogoHref = map.Url;
             map.Guid = appRow.Guid;
+            map.CreatorId = appRow.Creator;
             map.AnonymousToken = appRow.AnonymousToken;
             map.SignUpToken = appRow.SignUpToken;
 
@@ -1701,6 +1702,12 @@ namespace Durados.Web.Mvc
         {
             SqlAccess sql = new SqlAccess();
             string sSqlCommand = "";
+
+            Guid parsedGuid;
+            if (!Guid.TryParse(guid, out parsedGuid))
+            {
+                throw new ArgumentException("Illegal token");
+            }
 
             sSqlCommand = "select [name] from durados_App with(nolock) where [Guid] = '" + guid + "'";
 
