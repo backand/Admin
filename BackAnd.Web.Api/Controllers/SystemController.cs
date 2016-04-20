@@ -120,7 +120,7 @@ namespace BackAnd.Web.Api.Controllers
         private string GetSocketUrl()
         {
             string http = "http";
-            if (HttpContext.Current.Request.IsSecureConnection)
+            if (HttpContext.Current != null && HttpContext.Current.Request != null && HttpContext.Current.Request.IsSecureConnection)
             {
                 http = "https";
             }
