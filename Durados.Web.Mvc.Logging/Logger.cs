@@ -440,8 +440,7 @@ namespace Durados.Web.Mvc.Logging
         {
             if (!initiated)
                 Initiate();
-
-            Log log = new Log();
+             Log log = new Log();
 
             bool writeTolog = (logType == 500 || logType == 501);
             bool writeLogTypeToSpecificAppLog = !(LogType < logType) || writeTolog;
@@ -486,6 +485,11 @@ namespace Durados.Web.Mvc.Logging
             coll.Add("Agent", clientAgent);
             coll.Add("Languages", clientLanguages == null ? null : string.Join(",", clientLanguages));
 
+            bool excludeFromLog = GetExcludeFromLogEvents(applicationName, controller, action, method, message, trace, logType, freeText, time, clientInfo, null, requestTime);
+
+            if (excludeFromLog)
+                return;
+           
 
             if (guid != null)
             {
@@ -510,6 +514,14 @@ namespace Durados.Web.Mvc.Logging
             }
         }
 
+        public bool GetExcludeFromLogEvents(string applicationName, string controller, string action, string method, string message, string trace, int logType, string freeText, DateTime time, string clientInfo, Guid? guid, int? requestTime)
+        {
+            if (freeText.EndsWith(applicationName + "/api/system"))
+                return true;
+            
+            return false;
+        }
+       
         private static string GetClientUrl()
         {
             return System.Web.HttpContext.Current != null ? System.Web.HttpContext.Current.Request != null ? 
