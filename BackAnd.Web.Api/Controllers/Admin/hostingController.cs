@@ -42,7 +42,7 @@ namespace BackAnd.Web.Api.Controllers
         [Route("~/1/hosting/folder")]
         [Route("~/1/nodejs/folder")]
         [HttpGet]
-        public IHttpActionResult smartListFolder(string path = null)
+        public IHttpActionResult smartListFolder(string path = null, string objectName = null, string actionName = null)
         {
             try
             {
@@ -56,14 +56,17 @@ namespace BackAnd.Web.Api.Controllers
                 string appName = Map.AppName;
 
                 string bucket = Maps.S3Bucket;
-                if (Request.GetRouteData().Route.RouteTemplate == "1/nodejs")
+                string folder = appName;
+                if (Request.GetRouteData().Route.RouteTemplate == "1/nodejs/folder")
                 {
                     bucket = Maps.NodeJSBucket;
+                    if (string.IsNullOrEmpty(path))
+                        folder = appName + "/" + objectName + "/" + actionName;
                 
                 }
 
                 data.Add("bucket", bucket);
-                data.Add("folder", appName);
+                data.Add("folder", folder);
                 data.Add("pathInFolder", path);
 
 

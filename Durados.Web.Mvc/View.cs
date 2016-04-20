@@ -804,8 +804,15 @@ namespace Durados.Web.Mvc
                     {
                         try
                         {
-
-                            socket.emitAll(JsonName + "." + eventName, string.Format("{{\"id\":\"{0}\", \"objectName\":\"{1}\", \"event\":\"{2}\"}}", pk, JsonName, eventName), appName);
+                            string data = string.Format("{{\"id\":\"{0}\", \"objectName\":\"{1}\", \"event\":\"{2}\"}}", pk, JsonName, eventName);
+                            if (Database.IsConfig)
+                            {
+                                socket.emitRole(JsonName + "." + eventName, data, "Admin");
+                            }
+                            else
+                            {
+                                socket.emitAll(JsonName + "." + eventName, data, appName);
+                            }
 
                         }
                         catch (Exception exception)
