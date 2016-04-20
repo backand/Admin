@@ -516,7 +516,7 @@ namespace Durados.Web.Mvc.Logging
 
         public bool GetExcludeFromLogEvents(string applicationName, string controller, string action, string method, string message, string trace, int logType, string freeText, DateTime time, string clientInfo, Guid? guid, int? requestTime)
         {
-            if (freeText.EndsWith(applicationName + "/api/system"))
+            if (!string.IsNullOrEmpty(freeText) && freeText.EndsWith(applicationName + "/api/system"))
                 return true;
             
             return false;
