@@ -2990,7 +2990,10 @@ namespace Durados.Web.Mvc.UI.Helpers
 
             foreach (View view in map.Database.Views.Values.Where(v => !v.SystemView && !v.IsCloned).OrderBy(v => v.JsonName))
             {
-                dataSecurity.Add(view.JsonName, view.Precedent);
+                if (!dataSecurity.ContainsKey(view.JsonName))
+                {
+                    dataSecurity.Add(view.JsonName, view.Precedent);
+                }
             }
 
             return dataSecurity;

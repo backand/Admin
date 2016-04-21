@@ -538,7 +538,16 @@ namespace BackAnd.Web.Api.Controllers
         private void UpdateAnonymousUserRole(Map map, Dictionary<string, object> databaseSettings)
         {
             string role = GetAnonymousRole(databaseSettings);
-            UpdateAnonymousUserRole(map, role);
+            try
+            {
+                if (!string.IsNullOrEmpty(role))
+                    UpdateAnonymousUserRole(map, role);
+            }
+            catch (Exception exception)
+            {
+                Maps.Instance.DuradosMap.Logger.Log("myApps", "UpdateAnonymousUserRole", "", exception, 1, "role: " + role);
+               
+            }
         }
 
         private void UpdateAnonymousUserRole(Map map, string role)
