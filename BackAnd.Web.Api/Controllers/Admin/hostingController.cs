@@ -232,10 +232,31 @@ namespace BackAnd.Web.Api.Controllers
             }
 
             return result;
+        }
 
+        [Route("~/1/template/{service}")]
+        [HttpGet]
+        public IHttpActionResult template(string service)
+        {
+            try
+            {
+                Dictionary<string, object> response = new Dictionary<string, object>();
+                switch (service)
+                {
+                    case "nodejs":
+                        response.Add("url", "http://s3.amazonaws.com/templates.backand.net/action/nodejs/1.0/template.zip");
+                        break;
 
+                    default:
+                        throw new DuradosException("There is no tempalte for this service " + service);
+                }
+                return Ok(response);
+            }
+            catch (Exception exception)
+            {
+                return Ok(new { valid = "never", warnings = new string[1] { exception.Message } });
 
-
+            }
         }
     }
 }
