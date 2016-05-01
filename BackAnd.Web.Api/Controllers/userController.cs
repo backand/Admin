@@ -452,6 +452,7 @@ namespace BackAnd.Web.Api.Controllers
                 string json = System.Web.HttpContext.Current.Server.UrlDecode(Request.Content.ReadAsStringAsync().Result.Replace("+", "%2B"));
                 Dictionary<string, object> values = Durados.Web.Mvc.UI.Json.JsonSerializer.Deserialize(json);
 
+               
                 if (!values.ContainsKey("appName"))
                 {
                     return ResponseMessage(Request.CreateResponse(HttpStatusCode.NotAcceptable, "The appName is missing"));
@@ -464,6 +465,7 @@ namespace BackAnd.Web.Api.Controllers
 
                 }
 
+              
                 string appName = values["appName"].ToString();
                 string username = values["username"].ToString();
 
@@ -478,6 +480,11 @@ namespace BackAnd.Web.Api.Controllers
                 {
                     return ResponseMessage(Request.CreateResponse(HttpStatusCode.NotFound, "The username is not correct or does not belong to this app."));
                 }
+
+
+                if (string.IsNullOrEmpty(map2.Database.ForgotPasswordUrl))
+                    return ResponseMessage(Request.CreateResponse(HttpStatusCode.NotFound, "Reset password url was not supplied in configuration"));
+
 
                 AccountService account = new AccountService(this);
 
@@ -500,9 +507,6 @@ namespace BackAnd.Web.Api.Controllers
                 string json = System.Web.HttpContext.Current.Server.UrlDecode(Request.Content.ReadAsStringAsync().Result.Replace("+", "%2B"));
                 Dictionary<string, object> values = Durados.Web.Mvc.UI.Json.JsonSerializer.Deserialize(json);
                 
-                if (string.IsNullOrEmpty(map.Database.SignInRedirectUrl))
-                    return  ResponseMessage(Request.CreateResponse(HttpStatusCode.NotFound, "Reset password url was not supplied in configuration"));
-
                 if (!values.ContainsKey("newPassword"))
                 {
                     return ResponseMessage(Request.CreateResponse(HttpStatusCode.NotAcceptable, "The newPassword is missing"));
