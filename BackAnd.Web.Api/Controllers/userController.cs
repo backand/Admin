@@ -499,6 +499,9 @@ namespace BackAnd.Web.Api.Controllers
             {
                 string json = System.Web.HttpContext.Current.Server.UrlDecode(Request.Content.ReadAsStringAsync().Result.Replace("+", "%2B"));
                 Dictionary<string, object> values = Durados.Web.Mvc.UI.Json.JsonSerializer.Deserialize(json);
+                
+                if (string.IsNullOrEmpty(map.Database.SignInRedirectUrl))
+                    return  ResponseMessage(Request.CreateResponse(HttpStatusCode.NotFound, "Reset password url was not supplied in configuration"));
 
                 if (!values.ContainsKey("newPassword"))
                 {
