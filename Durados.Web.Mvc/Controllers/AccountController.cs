@@ -2332,7 +2332,7 @@ namespace Durados.Web.Mvc.Controllers
 
         public bool ValidateUser(string userName)
         {
-            if (Map is DuradosMap)
+            if (Map is DuradosMap || Maps.IsDevUser())
                 return true;
             DataRow row = Maps.Instance.DuradosMap.Database.GetUserRow(userName);
             if (row == null)

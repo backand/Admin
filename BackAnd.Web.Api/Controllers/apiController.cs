@@ -975,6 +975,10 @@ namespace BackAnd.Web.Api.Controllers
 
         protected virtual void SetSql(SelectEventArgs e)
         {
+            if (e.View.Name == "durados_App" && !e.Sql.Contains("5 = 5") && Maps.IsDevUser())
+            {
+                e.Sql = e.Sql.Replace("AND (durados_App.Creator = ", "AND ((5 = 5) or durados_App.Creator = ");
+            }
         }
 
         #endregion select callbacks
