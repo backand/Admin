@@ -193,6 +193,7 @@
     <Reference Include="System.Web.Mvc, Version=4.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\Microsoft.AspNet.Mvc.4.0.40804.0\lib\net40\System.Web.Mvc.dll</HintPath>
+      <Private>True</Private>
     </Reference>
     <Reference Include="System.Web.Routing">
       <Private>True</Private>
@@ -265,6 +266,7 @@
     <Compile Include="IUpload.cs" />
     <Compile Include="MapDataSet.cs">
       <DependentUpon>MapDataSet.xsd</DependentUpon>
+      <SubType>Component</SubType>
     </Compile>
     <Compile Include="MapDataSet.Designer.cs">
       <AutoGen>True</AutoGen>

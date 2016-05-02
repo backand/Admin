@@ -12,7 +12,7 @@
 <% bool safetyMode = (bool)Map.Session[viewSafety]; %>
 
 
-<div id="<%=guid %>ajaxDiv" class="ajaxDiv" ajaxdiv="ajaxDiv" guid="<%=guid %>" d_MainPage="<%=mainPage %>" d_domain="<%=Durados.Web.Mvc.Maps.Domain %>"  onmousedown="Durados.FieldEditor.MouseDown(event, this)">
+<div id="<%=guid %>ajaxDiv" class="ajaxDiv" ajaxdiv="ajaxDiv" guid="<%=guid %>" <%--d_MainPage="<%=mainPage %>" d_domain="<%=Durados.Web.Mvc.Maps.Domain %>"--%>  onmousedown="Durados.FieldEditor.MouseDown(event, this)">
     <%  Html.RenderPartial("~/Views/Shared/Controls/DataTableView.ascx", Model); %>
 </div>
 <%

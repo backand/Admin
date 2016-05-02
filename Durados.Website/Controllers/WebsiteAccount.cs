@@ -116,11 +116,11 @@ namespace Durados.Website.Controllers
                 sendEmail = send != null && send == "true";
 
                 if (sendEmail)
-                    Durados.Web.Mvc.UI.Helpers.Account.SendRegistrationRequest(fullname, lastName, email, guid.ToString(), username, password, Map, DontSend);
+                    Durados.Web.Mvc.UI.Helpers.AccountService.SendRegistrationRequest(fullname, lastName, email, guid.ToString(), username, password, Map, DontSend);
 
                 try
                 {
-                    Durados.Web.Mvc.UI.Helpers.Account.UpdateWebsiteUsers(username, identity);
+                    Durados.Web.Mvc.UI.Helpers.AccountService.UpdateWebsiteUsers(username, identity);
                 }
                 catch (Exception ex)
                 {
@@ -131,7 +131,7 @@ namespace Durados.Website.Controllers
                 //Insert into website users
                 try
                 {
-                    Durados.Web.Mvc.UI.Helpers.Account.InsertContactUsUsers(username, fullname, null, phone, 10, int.Parse(dbtype), dbother); //10=welcome email
+                    Durados.Web.Mvc.UI.Helpers.AccountService.InsertContactUsUsers(username, fullname, null, phone, 10, int.Parse(dbtype), dbother); //10=welcome email
                 }
                 catch (Exception ex)
                 {
@@ -160,7 +160,7 @@ namespace Durados.Website.Controllers
         {
             try
             {
-                object cookieGuid = Durados.Web.Mvc.UI.Helpers.Account.GetTrackingCookieGuid();
+                object cookieGuid = Durados.Web.Mvc.UI.Helpers.AccountService.GetTrackingCookieGuid();
                 if (cookieGuid == null)
                     return Json(false);
 
@@ -318,7 +318,7 @@ namespace Durados.Website.Controllers
 
                 try
                 {
-                    Durados.Web.Mvc.UI.Helpers.Account.InsertContactUsUsers(from, name, comments, phone, 100 + int.Parse(requestSubjectId), null, null);
+                    Durados.Web.Mvc.UI.Helpers.AccountService.InsertContactUsUsers(from, name, comments, phone, 100 + int.Parse(requestSubjectId), null, null);
                 }
                 catch (Exception ex)
                 {
@@ -340,7 +340,7 @@ namespace Durados.Website.Controllers
            
                 try
                 {
-                    Durados.Web.Mvc.UI.Helpers.Account.InsertContactUsUsers(email, null, comments, null, int.Parse(actionId), null, null);
+                    Durados.Web.Mvc.UI.Helpers.AccountService.InsertContactUsUsers(email, null, comments, null, int.Parse(actionId), null, null);
                 }
                 catch (Exception ex)
                 {
