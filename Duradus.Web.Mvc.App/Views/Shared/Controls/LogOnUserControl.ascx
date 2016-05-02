@@ -77,11 +77,11 @@
                 </li>
                 <% if (!Durados.Web.Infrastructure.General.IsMobile())
                    { %>
-             <%--   <% if (!Durados.Web.Mvc.Infrastructure.Http.IsAlias())
+                <% if (!Durados.Web.Mvc.Infrastructure.Http.IsAlias())
                    { %>
                 <li><a href='<%= Durados.Web.Mvc.Maps.Instance.DuradosMap.Url + "/apps"%>'>
                     <%= Map.Database.Localizer.Translate("My Consoles")%></a></li>
-                <%} %>--%>
+                <%} %>
                 <li></li>
                 <li><a href="http://blog.backand.com/questions" target="_help">
                     <%= Map.Database.Localizer.Translate("Support")%></a> </li>

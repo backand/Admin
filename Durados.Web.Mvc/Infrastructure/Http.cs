@@ -269,6 +269,27 @@ namespace Durados.Web.Mvc.Infrastructure
 
             return host.AddressList.FirstOrDefault(ip => ip.AddressFamily == AddressFamily.InterNetwork).ToString();
         }
+        public static bool IsAlias()
+        {
+            if (System.Web.HttpContext.Current == null)
+                return false;
+            if (System.Web.HttpContext.Current.Request == null)
+                return false;
+            if (System.Web.HttpContext.Current.Request.Headers == null)
+                return false;
+            if (System.Web.HttpContext.Current.Request.Headers["Host"] == null)
+                return false;
+
+            string headersHost = System.Web.HttpContext.Current.Request.Headers["Host"];
+            string port = System.Web.HttpContext.Current.Request.Url.Port.ToString();
+
+            if (headersHost.Contains(Maps.Host))
+            {
+
+                return false;
+            }
+            else return true;
+        }
 
         public static string WebRequestingJson(string url, string postData, Dictionary<string, string> headers)
         {
