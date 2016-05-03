@@ -2050,5 +2050,20 @@ namespace Durados.Web.Mvc
             else
                 return (OnBoardingStatus)Convert.ToInt32(scalar);
         }
+
+        public void ClearSession()
+        {
+            if (cloud)
+                return;
+
+            foreach (Map map in mapsCache.Values)
+            {
+                try
+                {
+                    map.Session.Clear();
+                }
+                catch { }
+            }
+        }
     }
 }

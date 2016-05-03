@@ -133,7 +133,7 @@ namespace Durados.Web.Mvc.App
             }
             else
             {
-                //Maps.Instance.ClearSession();
+                Maps.Instance.ClearSession();
             }
 
             Logging.Logger logger = new Logging.Logger();
