@@ -831,7 +831,7 @@ namespace Durados.Web.Mvc
                             string data = string.Format("{{\"id\":\"{0}\", \"objectName\":\"{1}\", \"event\":\"{2}\"}}", pk, JsonName, eventName);
                             if (Database.IsConfig)
                             {
-                                socket.emitRole(JsonName + "." + eventName, data, "Admin");
+                                socket.emitRole(JsonName + "." + eventName, data, "Admin", appName);
                             }
                             else
                             {
