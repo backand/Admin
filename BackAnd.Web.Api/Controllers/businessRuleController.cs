@@ -470,6 +470,10 @@ namespace BackAnd.Web.Api.Controllers
             }
 
             string actionName = ruleRow[Name].ToString();
+            if (fileName == null)
+            {
+                fileName = actionName + ".zip";
+            }
             string functionName = Map.AppName + "_" + viewName + "_" + actionName;
             string folder = Map.AppName + "/" + viewName + "/" + actionName;
             nodeJS.Update(Maps.NodeJSBucket, folder, fileName, functionName);
