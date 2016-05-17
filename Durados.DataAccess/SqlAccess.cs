@@ -2362,6 +2362,11 @@ namespace Durados.DataAccess
                     sb.Append(GetCalculatedFieldStatement(view.Fields[column.ColumnName], null));
                     sb.Append(",");
                 }
+                else if(view.Fields[column.ColumnName].IsPoint)
+                {
+                    sb.Append(sqlTextBuilder.GetPointFieldStatement(table.TableName,column.ColumnName));
+                    sb.Append(",");
+                }
                 else
                 {
                     if (excludeLongText && ntext)
@@ -12107,4 +12112,8 @@ public class SqlTextBuilder : ISqlTextBuilder
         return " default values ";
     }
 
+    public virtual string GetPointFieldStatement(string tableName, string columnName)
+    {
+        return string.Empty;
+    }
 }
