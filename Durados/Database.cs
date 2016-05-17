@@ -46,15 +46,15 @@ namespace Durados
         public static readonly string AppGuid = "appguid";
         public static readonly string Username = "username";
         public static readonly string CurrentUserId = "CurrentUserId";
-        
+
         public static readonly string RequestId = "requestId";
         public static readonly string AnonymousToken = "AnonymousToken";
         public static readonly string CreateSchema = "CreateSchema";
         public static readonly string CustomValidationActionName = "backandAuthOverride";
         public static readonly string CustomTokenAttrKey = "CustomTokenAttr";
         public static readonly string AutoGuidPkType = "char(36)";
-        
-        
+
+
         public virtual Guid Guid
         {
             get
@@ -64,7 +64,7 @@ namespace Durados
         }
 
         public Durados.Localization.ILocalizer Localizer { get; set; }
-        
+
         public virtual Dictionary<string, Dictionary<string, string>> ForeignKeys { get; protected set; }
 
         public string DbConnectionString { get; set; }
@@ -73,7 +73,7 @@ namespace Durados
         //[Durados.Config.Attributes.ChildrenProperty(TableName = "SpecialMenu", Type = typeof(SpecialMenu), DictionaryKeyColumnName = "Name")]
         //public Dictionary<string, SpecialMenu> SpecialMenus { get; private set; }
 
-        [Durados.Config.Attributes.ChildrenProperty(TableName = "View", Type = typeof(View), DictionaryKeyColumnName = "Name" )]
+        [Durados.Config.Attributes.ChildrenProperty(TableName = "View", Type = typeof(View), DictionaryKeyColumnName = "Name")]
         public Dictionary<string, View> Views { get; private set; }
         private DataSet dataSet;
 
@@ -89,7 +89,7 @@ namespace Durados
 
         [Durados.Config.Attributes.ColumnProperty()]
         public bool DefaultLast { get; set; }
-        
+
         [Durados.Config.Attributes.ColumnProperty()]
         public string DisplayName { get; set; }
         //[Durados.Config.Attributes.ColumnProperty()]
@@ -99,7 +99,7 @@ namespace Durados
         public string SystemConnectionString { get; set; }
 
         public bool NoSysIndex = false;
-       
+
         //public View FirstView { get; private set; }
 
         public virtual string EncryptedPlaceHolder { get; protected set; }
@@ -127,7 +127,7 @@ namespace Durados
 
         public string SwVersion { get; set; }
 
-        [Durados.Config.Attributes.ColumnProperty(Description="You can enter either '*', '*.*' or '*.*.*'. It will be displayed as '*.*.*'.")]
+        [Durados.Config.Attributes.ColumnProperty(Description = "You can enter either '*', '*.*' or '*.*.*'. It will be displayed as '*.*.*'.")]
         public string ConfigVersion { get; set; }
 
         [Durados.Config.Attributes.ColumnProperty(Description = "This role will be the role for non registered users.")]
@@ -144,15 +144,15 @@ namespace Durados
             {
                 return GetDefaultLevelOfDept();
             }
-            set 
-            { 
-                if (value <= 0) 
+            set
+            {
+                if (value <= 0)
                     throw new DuradosException();
                 defaultLevelOfDept = value;
             }
         }
 
-        public virtual Durados.Data.IDataAccess GetDataAccess(string connectionString) {   return null; }
+        public virtual Durados.Data.IDataAccess GetDataAccess(string connectionString) { return null; }
         public void SetNextMinorConfigVersion()
         {
             Version version = new Version(ConfigVersion);
@@ -185,7 +185,7 @@ namespace Durados
 
         [Durados.Config.Attributes.ColumnProperty(Description = "The number of maximum options to select from dropdowns and checklists")]
         public virtual int SelectionLimit { get; set; }
-        
+
 
         //[Durados.Config.Attributes.ColumnProperty()]
         //public string FirstViewName
@@ -309,8 +309,8 @@ namespace Durados
             {
                 //if (!isPagesInitialized)
                 //{
-                    foreach (Page page in pages.Values)
-                        page.Database = this;
+                foreach (Page page in pages.Values)
+                    page.Database = this;
                 //}
                 //isPagesInitialized = true;
                 return pages;
@@ -341,7 +341,7 @@ namespace Durados
                     {
                         menu = new Menu() { Name = view.Menu.Name, Ordinal = view.Menu.Ordinal, Root = view.Menu.Root, WorkspaceID = view.Menu.WorkspaceID };
 
-                        foreach(UrlLink urllink in view.Menu.UrlLinks.Values)
+                        foreach (UrlLink urllink in view.Menu.UrlLinks.Values)
                             menu.UrlLinks.Add(urllink.Title, urllink);
 
                         menus.Add(menu.Name, menu);
@@ -536,13 +536,13 @@ namespace Durados
             return null;
         }
 
-     
+
         public Database(DataSet dataSet)
         {
             //Menu = new Menu() { Name = "Views", Order = 0 };
 
             this.dataSet = dataSet;
-            
+
             DefaultPageSize = 20;
 
             RecentsCount = 10;
@@ -657,14 +657,14 @@ namespace Durados
             filterParameterOption.Operands = filterOperands.ToArray();
 
             filterParameterOptions.Add(filterParameterOption);
-            
+
             // relation
             filterParameterOption = new FilterParameterOption() { FieldType = FilterFieldType.relation };
             filterOperands = new List<FilterOperand>();
             filterOperands.Add(new FilterOperand() { OperandType = FilterOperandType.@in, ValueType = FilterValueType.array });
-            
+
             filterParameterOptions.Add(filterParameterOption);
-            
+
             return filterParameterOptions.ToArray();
         }
 
@@ -725,7 +725,7 @@ namespace Durados
         {
             return GetWorkspace(GetPublicWorkspaceId());
         }
-        
+
 
         int? adminWorkspaceId = null;
         public int GetAdminWorkspaceId()
@@ -767,7 +767,7 @@ namespace Durados
             if (workspace.Menus == null)
             {
                 workspace.Menus = new List<Menu>();
-                foreach(Menu menu in Menus.Values)
+                foreach (Menu menu in Menus.Values)
                 {
                     if (menu.WorkspaceID == workspace.ID)
                     {
@@ -822,27 +822,27 @@ namespace Durados
         {
             Tooltips = new Dictionary<string, Tooltip>();
 
-            Tooltips.Add(ToolbarActionNames.NEW.ToString(), new Tooltip(ToolbarActionNames.NEW.ToString()){ Description = "Add new row", Title = "New" });
-            Tooltips.Add(ToolbarActionNames.DUPLICATE.ToString(), new Tooltip(ToolbarActionNames.DUPLICATE.ToString()){ Description = "Duplicate selected row", Title = "Duplicate" });
+            Tooltips.Add(ToolbarActionNames.NEW.ToString(), new Tooltip(ToolbarActionNames.NEW.ToString()) { Description = "Add new row", Title = "New" });
+            Tooltips.Add(ToolbarActionNames.DUPLICATE.ToString(), new Tooltip(ToolbarActionNames.DUPLICATE.ToString()) { Description = "Duplicate selected row", Title = "Duplicate" });
             Tooltips.Add(ToolbarActionNames.ADD_ITEMS.ToString(), new Tooltip(ToolbarActionNames.ADD_ITEMS.ToString()) { Description = "Add Items", Title = "Add Items" });
             Tooltips.Add(ToolbarActionNames.UP.ToString(), new Tooltip(ToolbarActionNames.UP.ToString()) { Description = "Move selected row up", Title = "Up" });
-            Tooltips.Add(ToolbarActionNames.DOWN.ToString(), new Tooltip(ToolbarActionNames.DOWN.ToString()){ Description = "Move selected row down", Title = "Down" });
-            Tooltips.Add(ToolbarActionNames.SELECT_ALL.ToString(), new Tooltip(ToolbarActionNames.SELECT_ALL.ToString()){ Description = "Select all rows", Title = "Select All" });
-            Tooltips.Add(ToolbarActionNames.CLEAR.ToString(), new Tooltip(ToolbarActionNames.CLEAR.ToString()){ Description = "Clears all selection", Title = "Clear Selection" });
-            Tooltips.Add(ToolbarActionNames.COPY.ToString(), new Tooltip(ToolbarActionNames.COPY.ToString()){ Description = "Copy selected cells", Title = "Copy" });
-            Tooltips.Add(ToolbarActionNames.PASTE.ToString(), new Tooltip(ToolbarActionNames.PASTE.ToString()){  Description = "Paste copy cells into selected cells", Title = "Paste" });
-            Tooltips.Add(ToolbarActionNames.EDIT.ToString(), new Tooltip(ToolbarActionNames.EDIT.ToString()){  Description = "Edit selected row", Title = "Edit" });
-            Tooltips.Add(ToolbarActionNames.INSERT.ToString(), new Tooltip(ToolbarActionNames.INSERT.ToString()){  Description = "Add new row after selected row", Title = "Insert" });
-            Tooltips.Add(ToolbarActionNames.DELETE.ToString(), new Tooltip(ToolbarActionNames.DELETE.ToString()){  Description = "Delete selected row", Title = "Delete" });
+            Tooltips.Add(ToolbarActionNames.DOWN.ToString(), new Tooltip(ToolbarActionNames.DOWN.ToString()) { Description = "Move selected row down", Title = "Down" });
+            Tooltips.Add(ToolbarActionNames.SELECT_ALL.ToString(), new Tooltip(ToolbarActionNames.SELECT_ALL.ToString()) { Description = "Select all rows", Title = "Select All" });
+            Tooltips.Add(ToolbarActionNames.CLEAR.ToString(), new Tooltip(ToolbarActionNames.CLEAR.ToString()) { Description = "Clears all selection", Title = "Clear Selection" });
+            Tooltips.Add(ToolbarActionNames.COPY.ToString(), new Tooltip(ToolbarActionNames.COPY.ToString()) { Description = "Copy selected cells", Title = "Copy" });
+            Tooltips.Add(ToolbarActionNames.PASTE.ToString(), new Tooltip(ToolbarActionNames.PASTE.ToString()) { Description = "Paste copy cells into selected cells", Title = "Paste" });
+            Tooltips.Add(ToolbarActionNames.EDIT.ToString(), new Tooltip(ToolbarActionNames.EDIT.ToString()) { Description = "Edit selected row", Title = "Edit" });
+            Tooltips.Add(ToolbarActionNames.INSERT.ToString(), new Tooltip(ToolbarActionNames.INSERT.ToString()) { Description = "Add new row after selected row", Title = "Insert" });
+            Tooltips.Add(ToolbarActionNames.DELETE.ToString(), new Tooltip(ToolbarActionNames.DELETE.ToString()) { Description = "Delete selected row", Title = "Delete" });
             Tooltips.Add(ToolbarActionNames.PAINT.ToString(), new Tooltip(ToolbarActionNames.PAINT.ToString()) { Description = "Highlight selected row with background color", Title = "Highlight" });
             Tooltips.Add(ToolbarActionNames.HISTORY.ToString(), new Tooltip(ToolbarActionNames.HISTORY.ToString()) { Description = "View the changes of the selected row", Title = "History" });
-            Tooltips.Add(ToolbarActionNames.EXPORT.ToString(), new Tooltip(ToolbarActionNames.EXPORT.ToString()){  Description = "Export all pages into a CSV file", Title = "Export" });
-            Tooltips.Add(ToolbarActionNames.IMPORT.ToString(), new Tooltip(ToolbarActionNames.IMPORT.ToString()){ Description = "Import data from Excel", Title = "Import" });
-            Tooltips.Add(ToolbarActionNames.PRINT.ToString(), new Tooltip(ToolbarActionNames.PRINT.ToString()){  Description = "Print current page", Title = "Print" });
+            Tooltips.Add(ToolbarActionNames.EXPORT.ToString(), new Tooltip(ToolbarActionNames.EXPORT.ToString()) { Description = "Export all pages into a CSV file", Title = "Export" });
+            Tooltips.Add(ToolbarActionNames.IMPORT.ToString(), new Tooltip(ToolbarActionNames.IMPORT.ToString()) { Description = "Import data from Excel", Title = "Import" });
+            Tooltips.Add(ToolbarActionNames.PRINT.ToString(), new Tooltip(ToolbarActionNames.PRINT.ToString()) { Description = "Print current page", Title = "Print" });
             Tooltips.Add(ToolbarActionNames.SEND.ToString(), new Tooltip(ToolbarActionNames.SEND.ToString()) { Description = "Send a link to the selected row", Title = "Send" });
             Tooltips.Add(ToolbarActionNames.APPLY_FILTER.ToString(), new Tooltip(ToolbarActionNames.APPLY_FILTER.ToString()) { Description = "Apply filter", Title = "Apply" });
-            Tooltips.Add(ToolbarActionNames.CLEAR_FILTER.ToString(), new Tooltip(ToolbarActionNames.CLEAR_FILTER.ToString()){  Description = "Clear the filter", Title = "Clear" });
-            Tooltips.Add(ToolbarActionNames.SEARCH.ToString(), new Tooltip(ToolbarActionNames.SEARCH.ToString()){ Description = "Search on all text fields", Title = "Search" });
+            Tooltips.Add(ToolbarActionNames.CLEAR_FILTER.ToString(), new Tooltip(ToolbarActionNames.CLEAR_FILTER.ToString()) { Description = "Clear the filter", Title = "Clear" });
+            Tooltips.Add(ToolbarActionNames.SEARCH.ToString(), new Tooltip(ToolbarActionNames.SEARCH.ToString()) { Description = "Search on all text fields", Title = "Search" });
             Tooltips.Add(ToolbarActionNames.GRID_EDIT_MODE.ToString(), new Tooltip(ToolbarActionNames.GRID_EDIT_MODE.ToString()) { Description = "Enable/Disable editing on the grid", Title = "Edit Mode" });
             Tooltips.Add(ToolbarActionNames.REFRESH.ToString(), new Tooltip(ToolbarActionNames.REFRESH.ToString()) { Description = "Refresh the view content", Title = "Refresh" });
             Tooltips.Add(ToolbarActionNames.MESSAGE_BOARD.ToString(), new Tooltip(ToolbarActionNames.MESSAGE_BOARD.ToString()) { Description = "View the Message Board messages for the current view", Title = "Messages" });
@@ -950,9 +950,9 @@ namespace Durados
         protected string defaultCulture = "en-US";
 
         [Durados.Config.Attributes.ColumnProperty()]
-        public string DefaultCulture 
-        { 
-            get 
+        public string DefaultCulture
+        {
+            get
             {
                 return defaultCulture;
             }
@@ -961,10 +961,10 @@ namespace Durados
                 defaultCulture = value;
             }
         }
-        
+
         public const string EmptyString = "[null]";
-    
-        public virtual string EmptyDisplay 
+
+        public virtual string EmptyDisplay
         {
             get
             {
@@ -1011,7 +1011,7 @@ namespace Durados
         {
             return isMultiLanguages;
         }
-        
+
         protected bool doLocalizeAdmin = false;
 
         [Durados.Config.Attributes.ColumnProperty()]
@@ -1114,12 +1114,12 @@ namespace Durados
             {
                 return defaultExportImportFormat;
             }
-            set 
-            { 
-                this.defaultExportImportFormat = value; 
+            set
+            {
+                this.defaultExportImportFormat = value;
             }
         }
-        
+
         private bool translateAllViews = false;
         [Durados.Config.Attributes.ColumnProperty(Description = "If true than Translate user table display names and lables. The default is false.")]
         public virtual bool TranslateAllViews
@@ -1211,6 +1211,11 @@ namespace Durados
         public virtual Guid GetAnonymousToken()
         {
             return Guid.NewGuid();
+        }
+
+        public virtual string GetAuthorization()
+        {
+            return null;
         }
     }
 

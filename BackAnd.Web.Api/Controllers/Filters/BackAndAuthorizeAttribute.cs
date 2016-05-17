@@ -14,14 +14,16 @@ namespace BackAnd.Web.Api.Controllers.Filters
 {
     public class BackAndAuthorizeAttribute : System.Web.Http.AuthorizeAttribute
     {
-        
+
         public const string UserRoleNotSufficient = "UserRoleNotSufficient";
         string _allowedRoles = null;
-        public BackAndAuthorizeAttribute():base()
+        public BackAndAuthorizeAttribute()
+            : base()
         {
 
         }
-        public BackAndAuthorizeAttribute(string allowedRoles):base()
+        public BackAndAuthorizeAttribute(string allowedRoles)
+            : base()
         {
             _allowedRoles = allowedRoles;
         }
@@ -76,6 +78,7 @@ namespace BackAnd.Web.Api.Controllers.Filters
 
                 string username = usernameObj.Value;
                 string appname = appnameObj.Value;
+                string appNameFromToken = appnameObj.Value;
                 if (actionContext.Request.Headers.Contains("AppName"))
                 {
                     appname = actionContext.Request.Headers.GetValues("AppName").FirstOrDefault();
@@ -102,56 +105,64 @@ namespace BackAnd.Web.Api.Controllers.Filters
 
                 //if (actionContext.Request.Headers.Contains("AppName"))
                 //{
-                    Durados.Web.Mvc.Controllers.AccountMembershipService accountMembershipService = new Durados.Web.Mvc.Controllers.AccountMembershipService();
-                    try
+                Durados.Web.Mvc.Controllers.AccountMembershipService accountMembershipService = new Durados.Web.Mvc.Controllers.AccountMembershipService();
+                try
+                {
+                    //if (!IsAppReady()) 
+                    //{
+                    //    throw new Durados.DuradosException("App is not ready yet");
+                    //}
+                    if (!accountMembershipService.ValidateUser(username) || !accountMembershipService.IsApproved(username))
                     {
-                        //if (!IsAppReady()) 
-                        //{
-                        //    throw new Durados.DuradosException("App is not ready yet");
-                        //}
-                        if (!accountMembershipService.ValidateUser(username) || !accountMembershipService.IsApproved(username))
-                        {
-                            HandleUnauthorized(actionContext, appname, username);
-                            return;
-                        }
-                    }
-                    catch (Durados.Web.Mvc.UI.Helpers.AppNotReadyException exception)
-                    {
-                        actionContext.Response = actionContext.Request.CreateResponse(
-                HttpStatusCode.NoContent,
-                exception.Message);
+                        HandleUnauthorized(actionContext, appname, username);
                         return;
                     }
-                    catch (Exception exception)
+
+                    if (new Durados.Web.Mvc.UI.Helpers.DuradosAuthorizationHelper().IsAppLocked(appname) || IsAdminLocked(appname, appNameFromToken))
                     {
                         actionContext.Response = actionContext.Request.CreateErrorResponse(
-                HttpStatusCode.InternalServerError,
-                string.Format(Messages.Unexpected, exception.Message));
-
-                        try
-                        {
-                            Maps.Instance.DuradosMap.Logger.Log(actionContext.ControllerContext.Controller.GetType().Name, actionContext.Request.RequestUri.ToString(), "BackAndAuthorizeAttribute", exception, 1, "authorization failure");
-                        }
-                        catch { }
-
-                        try
-                        {
-                            if (Maps.Instance.AppInCach(appname))
-                            {
-                                Durados.Web.Mvc.UI.Helpers.RestHelper.Refresh(appname);
-                            }
-
-
-
-                        }
-                        catch { }
+                    HttpStatusCode.Unauthorized,
+                    string.Format(Durados.Web.Mvc.UI.Helpers.UserValidationErrorMessages.AppLocked, appname));
                         return;
                     }
+                }
+                catch (Durados.Web.Mvc.UI.Helpers.AppNotReadyException exception)
+                {
+                    actionContext.Response = actionContext.Request.CreateResponse(
+            HttpStatusCode.NoContent,
+            exception.Message);
+                    return;
+                }
+                catch (Exception exception)
+                {
+                    actionContext.Response = actionContext.Request.CreateErrorResponse(
+            HttpStatusCode.InternalServerError,
+            string.Format(Messages.Unexpected, exception.Message));
+
+                    try
+                    {
+                        Maps.Instance.DuradosMap.Logger.Log(actionContext.ControllerContext.Controller.GetType().Name, actionContext.Request.RequestUri.ToString(), "BackAndAuthorizeAttribute", exception, 1, "authorization failure");
+                    }
+                    catch { }
+
+                    try
+                    {
+                        if (Maps.Instance.AppInCach(appname))
+                        {
+                            Durados.Web.Mvc.UI.Helpers.RestHelper.Refresh(appname);
+                        }
+
+
+
+                    }
+                    catch { }
+                    return;
+                }
                 //}
                 if (_allowedRoles == "Admin")
                 {
                     string userRole = Maps.Instance.GetMap(appname).Database.GetUserRole();
-                    if (!(userRole == "Admin" || userRole == "Developer") )
+                    if (!(userRole == "Admin" || userRole == "Developer"))
                     {
                         actionContext.ActionArguments.Add(Database.backand_serverAuthorizationAttempt, true);
                         actionContext.ActionArguments.Add(UserRoleNotSufficient, true);
@@ -179,6 +190,14 @@ namespace BackAnd.Web.Api.Controllers.Filters
                 HandleUnauthorized(actionContext, null, null);
                 return;
             }
+        }
+
+        private bool IsAdminLocked(string appName, string appNameFromToken)
+        {
+            if (appNameFromToken != Maps.DuradosAppName)
+                return false;
+
+            return Maps.Instance.PaymentStatus(appName) == 1;
         }
 
         public class BasicAuthenticationIdentity
@@ -215,7 +234,7 @@ namespace BackAnd.Web.Api.Controllers.Filters
                         new BasicAuthorizationDisabledException());
                 return true;
             }
-            
+
 
             if (!System.Web.HttpContext.Current.Items.Contains(Database.Username))
                 System.Web.HttpContext.Current.Items.Add(Database.Username, username);
@@ -279,7 +298,7 @@ namespace BackAnd.Web.Api.Controllers.Filters
         {
             return actionContext.Request.Headers.Authorization != null && actionContext.Request.Headers.Authorization.Scheme.ToLower() == "basic";
         }
-        
+
         private BasicAuthenticationIdentity GetBasicAuthenticationIdentity(System.Web.Http.Controllers.HttpActionContext actionContext)
         {
             string authHeaderValue = null;
@@ -393,17 +412,17 @@ namespace BackAnd.Web.Api.Controllers.Filters
         private bool HasAccessToken(System.Web.Http.Controllers.HttpActionContext actionContext)
         {
             return (actionContext.Request.Headers.Contains("Authorization") && !(actionContext.Request.Headers.Authorization.ToString().Contains("anonymous")));
-            
+
         }
 
         private bool IsServerAuthorized(System.Web.Http.Controllers.HttpActionContext actionContext)
         {
-            if (IsAction(3,"refresh"))
+            if (IsAction(3, "refresh"))
                 return IsServerAuthorizedForRefresh(actionContext);
 
-            if (IsAction(3,"rdsResponse"))
+            if (IsAction(3, "rdsResponse"))
                 return IsServerAuthorizedForRDScallback(actionContext);
-            
+
             return false;
         }
 
@@ -425,8 +444,8 @@ namespace BackAnd.Web.Api.Controllers.Filters
             }
 
             string dbAppGuid = GetAppGuid(appName);
-            
-            if (!dbAppGuid.Equals(appGuid,StringComparison.CurrentCultureIgnoreCase))
+
+            if (!dbAppGuid.Equals(appGuid, StringComparison.CurrentCultureIgnoreCase))
             {
                 actionContext.ActionArguments.Add(Database.backand_appGuidNotMatch, true);
                 return false;
@@ -437,11 +456,11 @@ namespace BackAnd.Web.Api.Controllers.Filters
 
         private string GetAppGuid(string appName)
         {
-            
+
             string sql = "SELECT [Guid] FROM [durados_app] WITH(NOLOCK)  WHERE [Name] =@appName";
-            using(System.Data.SqlClient.SqlConnection cnn = new System.Data.SqlClient.SqlConnection(Maps.Instance.DuradosMap.Database.ConnectionString))
+            using (System.Data.SqlClient.SqlConnection cnn = new System.Data.SqlClient.SqlConnection(Maps.Instance.DuradosMap.Database.ConnectionString))
             {
-                using(System.Data.SqlClient.SqlCommand command = new System.Data.SqlClient.SqlCommand(sql,cnn))
+                using (System.Data.SqlClient.SqlCommand command = new System.Data.SqlClient.SqlCommand(sql, cnn))
                 {
 
                     command.Parameters.AddWithValue("appName", appName);
@@ -454,13 +473,13 @@ namespace BackAnd.Web.Api.Controllers.Filters
             }
         }
 
-        private bool IsAction(int actionIndex,string actionName)
+        private bool IsAction(int actionIndex, string actionName)
         {
             return System.Web.HttpContext.Current.Request.Url.ToString().Contains(actionName);
         }
 
-       
-    
+
+
         private bool IsServerAuthorizedForRefresh(System.Web.Http.Controllers.HttpActionContext actionContext)
         {
             string appGuid = null;
@@ -504,7 +523,7 @@ namespace BackAnd.Web.Api.Controllers.Filters
             appGuid = System.Web.HttpContext.Current.Request.QueryString[Database.AppGuid];
             return (appGuid != null);
         }
-       
+
 
         private void HandleUnauthorized(System.Web.Http.Controllers.HttpActionContext actionContext, string appName, string username)
         {
@@ -539,7 +558,7 @@ namespace BackAnd.Web.Api.Controllers.Filters
                     actionContext.Response = actionContext.Request.CreateErrorResponse(
                         HttpStatusCode.Unauthorized,
                         new AppGuidNotMatcheServerAuthorizationFailureException());
-                    
+
                 }
                 else if (actionContext.ActionArguments.ContainsKey(UserRoleNotSufficient))
                 {

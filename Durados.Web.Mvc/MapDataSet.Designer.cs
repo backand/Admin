@@ -848,6 +848,10 @@ namespace Durados.Web.Mvc {
             
             private global::System.Data.DataColumn columnAnonymousToken;
             
+            private global::System.Data.DataColumn columnPaymentStatus;
+            
+            private global::System.Data.DataColumn columnPaymentLocked;
+            
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
             public durados_AppDataTable() {
@@ -1171,6 +1175,22 @@ namespace Durados.Web.Mvc {
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
+            public global::System.Data.DataColumn PaymentStatusColumn {
+                get {
+                    return this.columnPaymentStatus;
+                }
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
+            public global::System.Data.DataColumn PaymentLockedColumn {
+                get {
+                    return this.columnPaymentLocked;
+                }
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
             [global::System.ComponentModel.Browsable(false)]
             public int Count {
                 get {
@@ -1241,7 +1261,9 @@ namespace Durados.Web.Mvc {
                         int CodeStatus, 
                         int HostingStatus, 
                         System.Guid SignUpToken, 
-                        System.Guid AnonymousToken) {
+                        System.Guid AnonymousToken, 
+                        int PaymentStatus, 
+                        bool PaymentLocked) {
                 durados_AppRow rowdurados_AppRow = ((durados_AppRow)(this.NewRow()));
                 object[] columnValuesArray = new object[] {
                         null,
@@ -1279,7 +1301,9 @@ namespace Durados.Web.Mvc {
                         CodeStatus,
                         HostingStatus,
                         SignUpToken,
-                        AnonymousToken};
+                        AnonymousToken,
+                        PaymentStatus,
+                        PaymentLocked};
                 if ((parentv_durados_UserRowByFK_durados_App_durados_User != null)) {
                     columnValuesArray[2] = parentv_durados_UserRowByFK_durados_App_durados_User[0];
                 }
@@ -1366,6 +1390,8 @@ namespace Durados.Web.Mvc {
                 this.columnHostingStatus = base.Columns["HostingStatus"];
                 this.columnSignUpToken = base.Columns["SignUpToken"];
                 this.columnAnonymousToken = base.Columns["AnonymousToken"];
+                this.columnPaymentStatus = base.Columns["PaymentStatus"];
+                this.columnPaymentLocked = base.Columns["PaymentLocked"];
             }
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
@@ -1443,6 +1469,10 @@ namespace Durados.Web.Mvc {
                 base.Columns.Add(this.columnSignUpToken);
                 this.columnAnonymousToken = new global::System.Data.DataColumn("AnonymousToken", typeof(global::System.Guid), null, global::System.Data.MappingType.Element);
                 base.Columns.Add(this.columnAnonymousToken);
+                this.columnPaymentStatus = new global::System.Data.DataColumn("PaymentStatus", typeof(int), null, global::System.Data.MappingType.Element);
+                base.Columns.Add(this.columnPaymentStatus);
+                this.columnPaymentLocked = new global::System.Data.DataColumn("PaymentLocked", typeof(bool), null, global::System.Data.MappingType.Element);
+                base.Columns.Add(this.columnPaymentLocked);
                 this.Constraints.Add(new global::System.Data.UniqueConstraint("Constraint1", new global::System.Data.DataColumn[] {
                                 this.columnId}, true));
                 this.columnId.AutoIncrement = true;
@@ -6137,6 +6167,38 @@ namespace Durados.Web.Mvc {
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
+            public int PaymentStatus {
+                get {
+                    try {
+                        return ((int)(this[this.tabledurados_App.PaymentStatusColumn]));
+                    }
+                    catch (global::System.InvalidCastException e) {
+                        throw new global::System.Data.StrongTypingException("The value for column \'PaymentStatus\' in table \'durados_App\' is DBNull.", e);
+                    }
+                }
+                set {
+                    this[this.tabledurados_App.PaymentStatusColumn] = value;
+                }
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
+            public bool PaymentLocked {
+                get {
+                    try {
+                        return ((bool)(this[this.tabledurados_App.PaymentLockedColumn]));
+                    }
+                    catch (global::System.InvalidCastException e) {
+                        throw new global::System.Data.StrongTypingException("The value for column \'PaymentLocked\' in table \'durados_App\' is DBNull.", e);
+                    }
+                }
+                set {
+                    this[this.tabledurados_App.PaymentLockedColumn] = value;
+                }
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
             public durados_DataSourceTypeRow durados_DataSourceTypeRow {
                 get {
                     return ((durados_DataSourceTypeRow)(this.GetParentRow(this.Table.ParentRelations["FK_durados_App_durados_DataSourceType"])));
@@ -6558,6 +6620,30 @@ namespace Durados.Web.Mvc {
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
             public void SetAnonymousTokenNull() {
                 this[this.tabledurados_App.AnonymousTokenColumn] = global::System.Convert.DBNull;
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
+            public bool IsPaymentStatusNull() {
+                return this.IsNull(this.tabledurados_App.PaymentStatusColumn);
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
+            public void SetPaymentStatusNull() {
+                this[this.tabledurados_App.PaymentStatusColumn] = global::System.Convert.DBNull;
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
+            public bool IsPaymentLockedNull() {
+                return this.IsNull(this.tabledurados_App.PaymentLockedColumn);
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
+            public void SetPaymentLockedNull() {
+                this[this.tabledurados_App.PaymentLockedColumn] = global::System.Convert.DBNull;
             }
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]

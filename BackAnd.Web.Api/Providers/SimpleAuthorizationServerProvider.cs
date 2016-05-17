@@ -28,8 +28,8 @@ namespace BackAnd.Web.Api.Providers
 
                 context.AdditionalResponseParameters.Add("appName", appname);
                 context.AdditionalResponseParameters.Add("username", username);
-                
-                
+
+
                 try
                 {
                     Durados.Web.Mvc.Map map = Durados.Web.Mvc.Maps.Instance.GetMap(appname);
@@ -44,7 +44,7 @@ namespace BackAnd.Web.Api.Providers
                     string role = map.Database.GetUserRole(username);
                     int backandUserId = map.Database.GetUserID(username);
                     object userId = map.Database.GetCurrentUserId();
-                    
+
                     context.AdditionalResponseParameters.Add("role", role);
                     try
                     {
@@ -84,7 +84,7 @@ namespace BackAnd.Web.Api.Providers
 
             if (!string.IsNullOrEmpty(value))
             {
-             //   context.Token = value;
+                //   context.Token = value;
             }
             string id, secret;
             if (context.TryGetBasicCredentials(out id, out secret))
@@ -130,7 +130,7 @@ namespace BackAnd.Web.Api.Providers
                 return;
             }
 
-            
+
             var identity = new ClaimsIdentity(context.Options.AuthenticationType);
             identity.AddClaim(new Claim(Database.Username, username));
             identity.AddClaim(new Claim(Database.AppName, appName));
@@ -241,26 +241,26 @@ namespace BackAnd.Web.Api.Providers
 
         }
 
-  //      public override async Task GrantRefreshToken(
-  //OAuthGrantRefreshTokenContext context)
-  //      {
-  //          var originalClient = context.Ticket.Properties.Dictionary["as:client_id"];
-  //          var currentClient = context.OwinContext.Get<string>("as:client_id");
+        //      public override async Task GrantRefreshToken(
+        //OAuthGrantRefreshTokenContext context)
+        //      {
+        //          var originalClient = context.Ticket.Properties.Dictionary["as:client_id"];
+        //          var currentClient = context.OwinContext.Get<string>("as:client_id");
 
-  //          // enforce client binding of refresh token
-  //          if (originalClient != currentClient)
-  //          {
-  //              context.Rejected();
-  //              return;
-  //          }
+        //          // enforce client binding of refresh token
+        //          if (originalClient != currentClient)
+        //          {
+        //              context.Rejected();
+        //              return;
+        //          }
 
-  //          // chance to change authentication ticket for refresh token requests
-  //          var newId = new ClaimsIdentity(context.Ticket.Identity);
-  //          newId.AddClaim(new Claim("newClaim", "refreshToken"));
+        //          // chance to change authentication ticket for refresh token requests
+        //          var newId = new ClaimsIdentity(context.Ticket.Identity);
+        //          newId.AddClaim(new Claim("newClaim", "refreshToken"));
 
-  //          var newTicket = new Microsoft.Owin.Security.AuthenticationTicket(newId, context.Ticket.Properties);
-  //          context.Validated(newTicket);
-  //      }
+        //          var newTicket = new Microsoft.Owin.Security.AuthenticationTicket(newId, context.Ticket.Properties);
+        //          context.Validated(newTicket);
+        //      }
 
         public override async Task GrantResourceOwnerCredentials(OAuthGrantResourceOwnerCredentialsContext context)
         {
@@ -279,15 +279,15 @@ namespace BackAnd.Web.Api.Providers
             }
             else if (System.Web.HttpContext.Current.Request.Form["username"] != null && System.Web.HttpContext.Current.Request.Form["refreshToken"] != null)
             {
-                
+
                 if (!System.Web.HttpContext.Current.Items.Contains(Database.AppName))
                     System.Web.HttpContext.Current.Items.Add(Database.AppName, System.Web.HttpContext.Current.Request.Form[Database.AppName]);
 
                 if (!System.Web.HttpContext.Current.Items.Contains(Database.Username))
                     System.Web.HttpContext.Current.Items.Add(Database.Username, System.Web.HttpContext.Current.Request.Form["username"]);
-                
+
                 ValidateByRefreshToken(context, System.Web.HttpContext.Current.Request.Form["username"], System.Web.HttpContext.Current.Request.Form[Database.AppName], System.Web.HttpContext.Current.Request.Form["refreshToken"]);
-                
+
                 return;
             }
 
@@ -303,6 +303,12 @@ namespace BackAnd.Web.Api.Providers
             if (!IsAppExists(appname))
             {
                 context.SetError(UserValidationErrorMessages.InvalidGrant, string.Format(UserValidationErrorMessages.AppNameNotExists, appname));
+                return;
+            }
+
+            if (IsAppLocked(appname))
+            {
+                context.SetError(UserValidationErrorMessages.InvalidGrant, string.Format(UserValidationErrorMessages.AppLocked, appname));
                 return;
             }
 
@@ -325,7 +331,7 @@ namespace BackAnd.Web.Api.Providers
             catch { }
 
 
-           
+
 
 
             if (!System.Web.HttpContext.Current.Items.Contains(Database.AppName))
@@ -333,9 +339,9 @@ namespace BackAnd.Web.Api.Providers
 
             if (!System.Web.HttpContext.Current.Items.Contains(Database.Username))
                 System.Web.HttpContext.Current.Items.Add(Database.Username, username);
-            
+
             Durados.Web.Mvc.Maps.Instance.DuradosMap.Logger.Log("auth-start", appname, username, null, 3, string.Empty);
-            
+
             UserValidationError userValidationError = UserValidationError.Valid;
             string customError = null;
             bool hasCustomValidation = false;
@@ -467,6 +473,14 @@ namespace BackAnd.Web.Api.Providers
             return new DuradosAuthorizationHelper().IsAppExists(appname);
         }
 
+        public static bool IsAppLocked(string appname)
+        {
+            if (appname.Equals(Durados.Web.Mvc.Maps.DuradosAppName))
+                return false;
+            return new DuradosAuthorizationHelper().IsAppLocked(appname);
+        }
+
+
         public bool IsValid(string username, string password, out UserValidationError userValidationError, out string customError, out bool hasCustomValidation, out bool customValid)
         {
 
@@ -478,12 +492,11 @@ namespace BackAnd.Web.Api.Providers
             return base.ValidateAuthorizeRequest(context);
         }
 
-       
+
     }
 
-    
 
-    
+
+
 }
 
-   

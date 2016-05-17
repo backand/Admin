@@ -1416,7 +1416,9 @@ namespace Durados.Web.Mvc
             return text;
         }
 
+        public override string GetAuthorization()
+        {
+            return Map.GetAuthorization();
+        }
     }
-
-
 }

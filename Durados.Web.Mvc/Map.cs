@@ -4622,5 +4622,10 @@ namespace Durados.Web.Mvc
         public System.Guid SignUpToken { get; set; }
 
         public int CreatorId { get; set; }
+
+        public bool PaymentLocked { get; set; }
+
+        public int PaymentStatus { get; set; }
+
     }
 }
