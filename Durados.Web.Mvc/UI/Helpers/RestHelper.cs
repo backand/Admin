@@ -4252,6 +4252,13 @@ namespace Durados.Web.Mvc.UI.Helpers
         public static readonly string InvalidGrant = "invalid_grant";
         public static readonly string AppNameNotSupplied = "The app name was not supplied.";
         public static readonly string AppNameNotExists = "The app {0} does not exist.";
+        public static string AppLocked
+        {
+            get
+            {
+                return Maps.AppLockedMessage;
+            }
+        }
 
         public static readonly string MissingUserIdOrAppId = "Missing userId or appId.";
         public static readonly string WrongUserIdOrAppId = "Wrong userId or appId.";
@@ -4582,6 +4589,13 @@ namespace Durados.Web.Mvc.UI.Helpers
             else
                 return Durados.Web.Mvc.Maps.Instance.AppExists(appname).HasValue;
         }
+
+        public bool IsAppLocked(string appname)
+        {
+            return Durados.Web.Mvc.Maps.Instance.AppLocked(appname);
+        }
+
+        
 
         public bool IsValid(string username, string password, out UserValidationError userValidationError, out string customError, out bool hasCustomValidation, out bool customValid)
         {

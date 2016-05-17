@@ -76,6 +76,7 @@ namespace BackAnd.Web.Api.Controllers.Filters
 
                 string username = usernameObj.Value;
                 string appname = appnameObj.Value;
+                string appNameFromToken = appnameObj.Value;
                 if (actionContext.Request.Headers.Contains("AppName"))
                 {
                     appname = actionContext.Request.Headers.GetValues("AppName").FirstOrDefault();
@@ -112,6 +113,14 @@ namespace BackAnd.Web.Api.Controllers.Filters
                         if (!accountMembershipService.ValidateUser(username) || !accountMembershipService.IsApproved(username))
                         {
                             HandleUnauthorized(actionContext, appname, username);
+                            return;
+                        }
+
+                        if (new Durados.Web.Mvc.UI.Helpers.DuradosAuthorizationHelper().IsAppLocked(appname) || IsAdminLocked(appname, appNameFromToken))
+                        {
+                            actionContext.Response = actionContext.Request.CreateErrorResponse(
+                        HttpStatusCode.Unauthorized,
+                        string.Format(Durados.Web.Mvc.UI.Helpers.UserValidationErrorMessages.AppLocked, appname));
                             return;
                         }
                     }
@@ -179,6 +188,14 @@ namespace BackAnd.Web.Api.Controllers.Filters
                 HandleUnauthorized(actionContext, null, null);
                 return;
             }
+        }
+
+        private bool IsAdminLocked(string appName, string appNameFromToken)
+        {
+            if (appNameFromToken != Maps.DuradosAppName)
+                return false;
+
+            return Maps.Instance.PaymentStatus(appName) == 1;
         }
 
         public class BasicAuthenticationIdentity

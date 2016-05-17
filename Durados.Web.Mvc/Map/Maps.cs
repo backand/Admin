@@ -398,6 +398,13 @@ namespace Durados.Web.Mvc
                 throw new DuradosException("Missing ParseConverterObjectName key in web config");
             }
 
+            AppLockedMessage = System.Configuration.ConfigurationManager.AppSettings["AppLockedMessage"];
+
+            if (string.IsNullOrEmpty(AppLockedMessage))
+            {
+                throw new DuradosException("Missing AppLockedMessage key in web config");
+            }
+
             NodeJSBucket = System.Configuration.ConfigurationManager.AppSettings["NodeJSBucket"];
 
             if (string.IsNullOrEmpty(NodeJSBucket))
@@ -485,6 +492,7 @@ namespace Durados.Web.Mvc
         public static string ParseConverterAdminKey { get; private set; }
         public static string ParseConverterObjectName { get; private set; }
         public static string NodeJSBucket { get; private set; }
+        public static string AppLockedMessage { get; private set; }
        
         
         public static TimeSpan AzureCacheUpdateInterval { get; private set; }
@@ -1541,6 +1549,8 @@ namespace Durados.Web.Mvc
             map.SiteInfo.LogoHref = map.Url;
             map.Guid = appRow.Guid;
             map.CreatorId = appRow.Creator;
+            map.PaymentLocked = appRow.PaymentLocked;
+            map.PaymentStatus = appRow.PaymentStatus;
             map.AnonymousToken = appRow.AnonymousToken;
             map.SignUpToken = appRow.SignUpToken;
 
@@ -1720,6 +1730,56 @@ namespace Durados.Web.Mvc
                 return null;
             else
                 return scalar.ToString();
+        }
+
+        public bool AppLocked(string appName)
+        {
+            if (AppInCach(appName))
+                return GetMap(appName).PaymentLocked;
+
+            try
+            {
+                SqlAccess sql = new SqlAccess();
+                string sSqlCommand = "";
+
+                sSqlCommand = "select PaymentLocked from durados_App with(nolock) where Name = N'" + appName + "'";
+
+                object scalar = sql.ExecuteScalar(duradosMap.connectionString, sSqlCommand);
+
+                if (scalar.Equals(string.Empty) || scalar == null || scalar == DBNull.Value)
+                    return false;
+                else
+                    return Convert.ToBoolean(scalar);
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
+        public int PaymentStatus(string appName)
+        {
+            if (AppInCach(appName))
+                return GetMap(appName).PaymentStatus;
+
+            try
+            {
+                SqlAccess sql = new SqlAccess();
+                string sSqlCommand = "";
+
+                sSqlCommand = "select PaymentStatus from durados_App with(nolock) where Name = N'" + appName + "'";
+
+                object scalar = sql.ExecuteScalar(duradosMap.connectionString, sSqlCommand);
+
+                if (scalar.Equals(string.Empty) || scalar == null || scalar == DBNull.Value)
+                    return 0;
+                else
+                    return Convert.ToInt32(scalar);
+            }
+            catch
+            {
+                return 0;
+            }
         }
 
         public int? AppExists(string appName, int? userId = null)

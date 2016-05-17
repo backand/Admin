@@ -129,6 +129,10 @@ namespace Backand
                             request.Headers.Add("AppName", appName);
                         }
                     }
+                    if (request.Headers["Authorization"] == null && request.Headers["authorization"] == null)
+                    {
+                        request.Headers.Add("Authorization", Durados.Workflow.Engine.GetCurrentDatabase().GetAuthorization());
+                    }
                 }
             }
             catch

@@ -1398,6 +1398,11 @@ namespace Durados.Web.Mvc
 
             return list;
         }
+
+        public override string GetAuthorization()
+        {
+            return Map.GetAuthorization();
+        }
     }
 
 

@@ -306,6 +306,12 @@ namespace BackAnd.Web.Api.Providers
                 return;
             }
 
+            if (IsAppLocked(appname))
+            {
+                context.SetError(UserValidationErrorMessages.InvalidGrant, string.Format(UserValidationErrorMessages.AppLocked, appname));
+                return;
+            }
+
             System.Collections.Specialized.NameValueCollection form = GetFixedForm();
 
             string username = context.UserName;
@@ -467,6 +473,14 @@ namespace BackAnd.Web.Api.Providers
             return new DuradosAuthorizationHelper().IsAppExists(appname);
         }
 
+        public static bool IsAppLocked(string appname)
+        {
+            if (appname.Equals(Durados.Web.Mvc.Maps.DuradosAppName))
+                return false;
+            return new DuradosAuthorizationHelper().IsAppLocked(appname);
+        }
+
+        
         public bool IsValid(string username, string password, out UserValidationError userValidationError, out string customError, out bool hasCustomValidation, out bool customValid)
         {
 

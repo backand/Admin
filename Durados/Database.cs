@@ -1212,6 +1212,11 @@ namespace Durados
         {
             return Guid.NewGuid();
         }
+
+        public virtual string GetAuthorization()
+        {
+            return null;
+        }
     }
 
     public class IlegalDateFormatException : DuradosException

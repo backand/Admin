@@ -121,6 +121,8 @@ namespace Durados.Workflow
 
         public static bool IsCrud(System.Net.WebRequest request)
         {
+            if (System.Web.HttpContext.Current.Request.Headers["Authorization"] == null)
+                return false;
             HashSet<string> methods = new HashSet<string>() { "POST", "PUT", "DELETE" };
             string route = "/objects/";
 
@@ -351,7 +353,7 @@ namespace Durados.Workflow
             userProfile.Add("role", currentUserRole);
             userProfile.Add("app", view.Database.GetCurrentAppName());
             userProfile.Add("userId", view.Database.GetCurrentUserId());
-            userProfile.Add("token", System.Web.HttpContext.Current.Request.Headers["Authorization"] ?? "anonymous-" + (System.Web.HttpContext.Current.Request.Headers["AnonymousToken"] ?? view.Database.GetAnonymousToken().ToString()));
+            userProfile.Add("token", System.Web.HttpContext.Current.Request.Headers["Authorization"] ?? view.Database.GetAuthorization());
             userProfile.Add("request", new Dictionary<string, object>() { { "userIP", GetUserIP() }, { "method", System.Web.HttpContext.Current.Request.HttpMethod }, { "headers", GetHeaders(System.Web.HttpContext.Current.Request.Headers) } });
 
             var call = new Jint.Engine(cfg => cfg.AllowClr(typeof(Backand.XMLHttpRequest).Assembly));
