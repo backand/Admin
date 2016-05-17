@@ -89,7 +89,7 @@ namespace Durados.DataAccess
 
         protected override string GetPointFieldStatement(Field field)
         {
-            return string.Format("CONCAT(X(`{0}`.`{1}`), \", \", Y(`{0}`.`{1}`))  as `{1}`", field.View.DataTable.TableName, field.GetColumnsNames()[0]);
+            return new MySqlTextBuilder().GetPointFieldStatement(field.View.DataTable.TableName, field.GetColumnsNames()[0]);
             //return string.Format("AsText(`{0}`.`{1}`) as `{1}`", field.View.DataTable.TableName, field.GetColumnsNames()[0]);
         }
        
@@ -360,6 +360,12 @@ namespace Durados.DataAccess
         public override string InsertWithoutColumns()
         {
             return " () values () ";
+        }
+
+        public override string GetPointFieldStatement(string tableName, string fieldName)
+        {
+            return string.Format("CONCAT(X(`{0}`.`{1}`), \", \", Y(`{0}`.`{1}`))  as `{1}`", tableName, fieldName);
+           
         }
     }
 
