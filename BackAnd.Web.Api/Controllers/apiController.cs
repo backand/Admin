@@ -99,7 +99,7 @@ namespace BackAnd.Web.Api.Controllers
             return request.RequestUri.ParseQueryString()[name];
         }
 
-        protected virtual string Post(string name, string json, IDbCommand command, IDbCommand sysCommand, bool? deep = null, bool? returnObject = null, string parameters = null)
+        public virtual string Post(string name, string json, IDbCommand command, IDbCommand sysCommand, bool? deep = null, bool? returnObject = null, string parameters = null)
         {
             Dictionary<string, object>[] values = null;
             try
@@ -170,7 +170,7 @@ namespace BackAnd.Web.Api.Controllers
             }
         }
 
-        protected virtual string Put(string name, string id, string json, IDbCommand command, IDbCommand sysCommand, bool? deep = null, bool? returnObject = null, string parameters = null, bool? overwrite = null)
+        public virtual string Put(string name, string id, string json, IDbCommand command, IDbCommand sysCommand, bool? deep = null, bool? returnObject = null, string parameters = null, bool? overwrite = null)
         {
             try
             {
@@ -233,7 +233,7 @@ namespace BackAnd.Web.Api.Controllers
             }
         }
 
-        protected virtual string Delete(string name, string id, IDbCommand command, IDbCommand sysCommand, bool? deep = null, string parameters = null)
+        public virtual string Delete(string name, string id, IDbCommand command, IDbCommand sysCommand, bool? deep = null, string parameters = null)
         {
             try
             {

@@ -1046,10 +1046,12 @@ namespace BackAnd.Web.Api.Controllers
             string authorization = headers.FirstOrDefault();
             headers = Request.Headers.GetValues("AppName");
             string appName = headers.FirstOrDefault();
-            var responses = new bulk().Run(requests, authorization, appName);
-
+            //var responses = new bulk().Run(requests, authorization, appName);
+            var responses = new Bulk().Run(requests, Map, DataHandler);
             return Ok(responses);
         }
+
+       
 
 
         #endregion data
