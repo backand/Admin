@@ -2362,7 +2362,7 @@ namespace Durados.DataAccess
                     sb.Append(GetCalculatedFieldStatement(view.Fields[column.ColumnName], null));
                     sb.Append(",");
                 }
-                else if(view.Fields[column.ColumnName].IsPoint)
+                else if(view.Fields.ContainsKey(column.ColumnName) && view.Fields[column.ColumnName].IsPoint)
                 {
                     sb.Append(sqlTextBuilder.GetPointFieldStatement(table.TableName,column.ColumnName));
                     sb.Append(",");
