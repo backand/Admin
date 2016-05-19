@@ -237,6 +237,7 @@
     <Compile Include="Controllers\Admin\modelController.cs" />
     <Compile Include="Controllers\bannerController.cs" />
     <Compile Include="Controllers\apiController.cs" />
+    <Compile Include="Controllers\Billing\paymentStatusController.cs" />
     <Compile Include="Controllers\Bulk.cs" />
     <Compile Include="Controllers\configurationTableController.cs" />
     <Compile Include="Controllers\contentConfigController.cs" />

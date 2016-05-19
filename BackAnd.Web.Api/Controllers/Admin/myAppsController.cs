@@ -221,8 +221,7 @@ namespace BackAnd.Web.Api.Controllers
                 }
                 catch { }
                 item.Add("debugMode", debugMode);
-
-                
+                                
                 if (deep.HasValue && deep.Value && item["DatabaseStatus"].Equals(1))
                 {
                     bool reset = false;
@@ -276,6 +275,7 @@ namespace BackAnd.Web.Api.Controllers
 
             }
         }
+
 
         private void HandleInitiationFailure(string id)
         {

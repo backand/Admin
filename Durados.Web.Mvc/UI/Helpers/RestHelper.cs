@@ -2880,6 +2880,14 @@ namespace Durados.Web.Mvc.UI.Helpers
             }
             stat = map.Stat.Stat;
             item.Add("stat", stat);
+            if (item.ContainsKey("PaymentStatus"))
+            {
+                item["PaymentStatus"] = map.PaymentStatus;
+            }
+            else
+            {
+                item.Add("PaymentStatus", map.PaymentStatus);
+            }
         }
 
         public class StatAndTime
