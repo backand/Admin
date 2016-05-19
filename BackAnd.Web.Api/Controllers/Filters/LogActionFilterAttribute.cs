@@ -55,7 +55,7 @@ namespace BackAnd.Web.Api.Controllers.Filters
                 }
                 else
                 {
-                    reqMilli = DateTime.Now.Subtract(apiController.started.Value).Milliseconds;
+                    reqMilli = Convert.ToInt32(DateTime.Now.Subtract(apiController.started.Value).TotalMilliseconds);
                 }
 
                 map.Logger.Log(apiController.GetControllerNameForLog(apiController.ControllerContext), verb, appName + ": " + exceptionSource, exception , logType, actionContext.Request.RequestUri.ToString(), DateTime.Now, reqMilli);
