@@ -315,6 +315,13 @@
     <Compile Include="SocialLogin\Twitter\TwitterException.cs" />
     <Compile Include="SocialLogin\Twitter\TwitterProfile.cs" />
     <Compile Include="SocialLogin\Twitter\TwitterSocial.cs" />
+    <Compile Include="Stat\Measurements\Sys\AnonymousUsers.cs" />
+    <Compile Include="Stat\Measurement.cs" />
+    <Compile Include="Stat\Measurements\Sys\SysMeasurement.cs" />
+    <Compile Include="Stat\MeasurementType.cs" />
+    <Compile Include="Stat\Producer.cs" />
+    <Compile Include="Stat\Measurements\Sys\RegisteredUsers.cs" />
+    <Compile Include="Stat\Measurements\Sys\TeamSize.cs" />
     <Compile Include="UI\Charting\BasicChartBuilder.cs" />
     <Compile Include="UI\CheckList.cs" />
     <Compile Include="UI\ClientParams.cs" />

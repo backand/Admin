@@ -412,6 +412,21 @@ namespace Durados.Web.Mvc
                 throw new DuradosException("Missing NodeJSBucket key in web config");
             }
 
+
+            ExcludedEmailDomains = System.Configuration.ConfigurationManager.AppSettings["ExcludedEmailDomains"];
+
+            if (string.IsNullOrEmpty(ExcludedEmailDomains))
+            {
+                throw new DuradosException("Missing ExcludedEmailDomains key in web config");
+            }
+
+            ReportConnectionString = System.Web.Configuration.WebConfigurationManager.ConnectionStrings["reportConnectionString"].ConnectionString;
+
+            if (string.IsNullOrEmpty(ReportConnectionString))
+            {
+                throw new DuradosException("Missing reportConnectionString key in web config");
+            }
+
             SendWelcomeEmail = System.Configuration.ConfigurationManager.AppSettings["SendWelcomeEmail"] ?? "true";
 
             System.Net.ServicePointManager.SecurityProtocol = System.Net.SecurityProtocolType.Ssl3 | System.Net.SecurityProtocolType.Tls | System.Net.SecurityProtocolType.Tls11 | System.Net.SecurityProtocolType.Tls12;
@@ -493,7 +508,9 @@ namespace Durados.Web.Mvc
         public static string ParseConverterObjectName { get; private set; }
         public static string NodeJSBucket { get; private set; }
         public static string AppLockedMessage { get; private set; }
-
+        public static string ExcludedEmailDomains { get; private set; }
+        public static string ReportConnectionString { get; private set; }
+        
         public static TimeSpan AzureCacheUpdateInterval { get; private set; }
 
         public static string ConfigPath { get; private set; }
