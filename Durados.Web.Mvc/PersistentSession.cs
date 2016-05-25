@@ -21,7 +21,7 @@ namespace Durados.Web.Mvc
                 {
                     if (System.Web.HttpContext.Current.Session == null)
                     {
-                        if (System.Web.HttpContext.Current.Items[name] == null)
+                        if (System.Web.HttpContext.Current.Items[name] == null && System.Web.HttpContext.Current.Items[Database.RequestId] != null)
                         {
                             System.Web.HttpContext.Current.Items[name] = base.GetSession(name, System.Web.HttpContext.Current.Items[Database.RequestId].ToString());
                         }

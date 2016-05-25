@@ -52,19 +52,22 @@ namespace Durados.Web.Mvc.Stat
                     int counter = 0;
                     foreach (string appName in apps)
                     {
-                        App app = new App(appName);
-                        counter++;
-                        appsMeasurements.Add(appName, new Dictionary<string, object>());
-
-                        foreach (MeasurementType measurementType in measurementTypes)
+                        if (!appsMeasurements.ContainsKey(appName))
                         {
-                            object measurementValue = ProduceMeasurement(date, measurementType, app, persist, command);
-                            appsMeasurements[appName].Add(measurementType.ToString(), measurementValue);
-                        }
+                            App app = new App(appName);
+                            counter++;
+                            appsMeasurements.Add(appName, new Dictionary<string, object>());
 
-                        if (counter == bulk)
-                        {
-                            System.Threading.Thread.Sleep(sleep);
+                            foreach (MeasurementType measurementType in measurementTypes)
+                            {
+                                object measurementValue = ProduceMeasurement(date, measurementType, app, persist, command);
+                                appsMeasurements[appName].Add(measurementType.ToString(), measurementValue);
+                            }
+
+                            if (counter == bulk)
+                            {
+                                System.Threading.Thread.Sleep(sleep);
+                            }
                         }
                     }
                     transaction.Commit();

@@ -412,7 +412,7 @@ namespace Durados.DataAccess
 
         public override string GetTableRowsCount(string tableName)
         {
-            return "SELECT TABLE_ROWS as rows FROM information_schema.tables WHERE TABLE_NAME = '" + tableName + "'";
+            return "SELECT TABLE_ROWS as rows FROM information_schema.tables WHERE table_schema = DATABASE() and TABLE_NAME = '" + tableName + "'";
         }
 
         public override string GetPrimaryIndexName(string tableName)

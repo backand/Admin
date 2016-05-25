@@ -2971,22 +2971,22 @@ namespace Durados.Web.Mvc.UI.Helpers
 
             Dictionary<string, object> stat = new Dictionary<string, object>() { { "last24hours", last24 }, { "diffLastDaytoYesterday", diff24 }, { "last30days", last30 }, { "diffLast30DaysToPrev", diff30 }, { "sizeInMb", size }, { "totalRows", totalRows }, { "authorizationSecurity", authorizationSecurity }, { "dataSecurity", dataSecurity } };
 
-            try
-            {
-                Mvc.Stat.Producer producer = new Mvc.Stat.Producer();
+            //try
+            //{
+            //    Mvc.Stat.Producer producer = new Mvc.Stat.Producer();
 
-                Dictionary<string, Dictionary<string, object>> appsMeasurements = (Dictionary<string, Dictionary<string, object>>)producer.Produce(DateTime.Today, null, new string[1] { appName }, null, true);
+            //    Dictionary<string, Dictionary<string, object>> appsMeasurements = (Dictionary<string, Dictionary<string, object>>)producer.Produce(DateTime.Today, null, new string[1] { appName }, null, true);
 
-                Dictionary<string, object> measurements = appsMeasurements[appName];
-                foreach (string measurement in measurements.Keys)
-                {
-                    stat.Add(measurement, measurements[measurement]);
-                }
-            }
-            catch (Exception exception)
-            {
-                Maps.Instance.DuradosMap.Logger.Log("producer", "Produce", appName, exception, 1, appName);
-            }
+            //    Dictionary<string, object> measurements = appsMeasurements[appName];
+            //    foreach (string measurement in measurements.Keys)
+            //    {
+            //        stat.Add(measurement, measurements[measurement]);
+            //    }
+            //}
+            //catch (Exception exception)
+            //{
+            //    Maps.Instance.DuradosMap.Logger.Log("producer", "Produce", appName, exception, 1, appName);
+            //}
             return stat;
         }
 
