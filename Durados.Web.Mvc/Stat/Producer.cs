@@ -60,8 +60,16 @@ namespace Durados.Web.Mvc.Stat
 
                             foreach (MeasurementType measurementType in measurementTypes)
                             {
-                                object measurementValue = ProduceMeasurement(date, measurementType, app, persist, command);
-                                appsMeasurements[appName].Add(measurementType.ToString(), measurementValue);
+                                try
+                                {
+                                    object measurementValue = ProduceMeasurement(date, measurementType, app, persist, command);
+                                    appsMeasurements[appName].Add(measurementType.ToString(), measurementValue);
+                                }
+                                catch (Exception exception)
+                                {
+                                    appsMeasurements[appName].Add(measurementType.ToString(), exception.Message);
+                                    Maps.Instance.DuradosMap.Logger.Log("stat", appName, measurementType.ToString(), exception, 1, appName);
+                                }
                             }
 
                             if (counter % bulk == 0)
