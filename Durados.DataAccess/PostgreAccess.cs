@@ -403,11 +403,23 @@ namespace Durados.DataAccess
             return "SELECT tc.table_name as TableName, kcu.column_name as ColumnName, ccu.table_name AS ReferenceTableName, ccu.column_name AS ReferenceColumnName FROM information_schema.table_constraints AS tc JOIN information_schema.key_column_usage AS kcu ON tc.constraint_name = kcu.constraint_name JOIN information_schema.constraint_column_usage AS ccu ON ccu.constraint_name = tc.constraint_name WHERE constraint_type = 'FOREIGN KEY' AND ccu.table_name='" + tableName + "'";
         }
 
-        public virtual string GetTableRowsCount(string tableName)
+        public override string GetTableRowsCount(string tableName)
         {
             return "SELECT n_live_tup   FROM pg_stat_user_tables  where schemaname = current_schema and relname='" + tableName + "' ";
             //return "SELECT rows FROM sys.sysindexes  AS s1 WHERE (rows > 0) AND (indid IN (SELECT MIN(indid) AS Expr1 FROM sys.sysindexes AS s2 WHERE (s1.id = id))) AND (id = OBJECT_ID('" + tableName + "'))";
         }
+
+        public override string GetTotalRowsCount()
+        {
+            return "SELECT sum(n_live_tup)   FROM pg_stat_user_tables  where schemaname = current_schema ";
+           
+        }
+
+        public override string GetMaxTableRowsCount()
+        {
+            return "SELECT max(n_live_tup)   FROM pg_stat_user_tables  where schemaname = current_schema ";
+        }
+
         protected override string GetCreateTableStatement(DataTable table)
         {
 

@@ -140,9 +140,10 @@ namespace Durados.Web.Mvc.Stat
 
             }
 
+            
             command.Parameters.Clear();
             command.CommandText = "update modubiz_LogStats2 set " + MeasurementType.ToString() + " = @value where Id = @Id";
-            command.Parameters.AddWithValue("value", value);
+            command.Parameters.AddWithValue("value", value is ulong ? System.Convert.ToInt64(value) : value);
             command.Parameters.AddWithValue("Id", scalar);
             command.ExecuteNonQuery();
 

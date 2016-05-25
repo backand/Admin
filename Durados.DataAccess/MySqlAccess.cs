@@ -415,6 +415,16 @@ namespace Durados.DataAccess
             return "SELECT TABLE_ROWS as rows FROM information_schema.tables WHERE table_schema = DATABASE() and TABLE_NAME = '" + tableName + "'";
         }
 
+        public override string GetTotalRowsCount()
+        {
+            return "SELECT SUM(TABLE_ROWS) as rows FROM information_schema.tables WHERE table_schema = DATABASE()";
+        }
+
+        public override string GetMaxTableRowsCount()
+        {
+            return "SELECT MAX(TABLE_ROWS) as rows FROM information_schema.tables WHERE table_schema = DATABASE()";
+        }
+
         public override string GetPrimaryIndexName(string tableName)
         {
             return "select index_name from information_schema.statistics where table_schema = DATABASE() and table_name='" + tableName + "' and non_unique = 0";

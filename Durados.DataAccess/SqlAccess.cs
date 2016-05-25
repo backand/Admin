@@ -10408,6 +10408,16 @@ public class SqlSchema : ISchema
         return "SELECT rows FROM sys.sysindexes  AS s1 WHERE (rows > 0) AND (indid IN (SELECT MIN(indid) AS Expr1 FROM sys.sysindexes AS s2 WHERE (s1.id = id))) AND (id = OBJECT_ID('" + tableName + "'))";
     }
 
+    public virtual string GetTotalRowsCount()
+    {
+        return "SELECT sum(rows) FROM sys.sysindexes  AS s1 WHERE (rows > 0) AND (indid IN (SELECT MIN(indid) AS Expr1 FROM sys.sysindexes AS s2 WHERE (s1.id = id)))";
+    }
+
+    public virtual string GetMaxTableRowsCount()
+    {
+        return "SELECT max(rows) FROM sys.sysindexes  AS s1 WHERE (rows > 0) AND (indid IN (SELECT MIN(indid) AS Expr1 FROM sys.sysindexes AS s2 WHERE (s1.id = id)))";
+
+    }
 
     public virtual string GetPrimaryKeyColumns(string tableName)
     {

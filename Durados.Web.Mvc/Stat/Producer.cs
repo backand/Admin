@@ -64,7 +64,7 @@ namespace Durados.Web.Mvc.Stat
                                 appsMeasurements[appName].Add(measurementType.ToString(), measurementValue);
                             }
 
-                            if (counter == bulk)
+                            if (counter % bulk == 0)
                             {
                                 System.Threading.Thread.Sleep(sleep);
                             }

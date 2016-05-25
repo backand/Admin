@@ -15,16 +15,12 @@ namespace Durados.Web.Mvc.Stat.Measurements.Development
 
         }
 
-        
 
-        protected virtual long Calculation(long current, long value)
-        {
-            return Max(current, value);
-        }
 
-        private long Max(long total, long value)
+        protected override string GetSql(SqlProduct sqlProduct)
         {
-            return Math.Max(total, value);
+            SqlSchema schema = GetSchema(sqlProduct);
+            return schema.GetMaxTableRowsCount();
         }
     }
 }
