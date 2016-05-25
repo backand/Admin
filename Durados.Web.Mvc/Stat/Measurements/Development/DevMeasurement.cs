@@ -27,9 +27,15 @@ namespace Durados.Web.Mvc.Stat.Measurements.Development
 
             using (IDbConnection connection = GetConnection(appRow))
             {
+                if (connection == null)
+                    return -1;
+
                 connection.Open();
                 using (IDbCommand command = GetCommand(appRow))
                 {
+                    if (command == null)
+                        return -1;
+
                     command.Connection = connection;
                     command.CommandText = GetSql((SqlProduct)sqlProduct);
                     value = command.ExecuteScalar();

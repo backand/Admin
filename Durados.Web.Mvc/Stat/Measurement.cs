@@ -22,6 +22,10 @@ namespace Durados.Web.Mvc.Stat
         
         protected virtual IDbConnection GetSystemConnection(MapDataSet.durados_AppRow appRow)
         {
+            if (appRow.durados_SqlConnectionRowByFK_durados_App_durados_SqlConnection_System == null)
+            {
+                return null;
+            }
             SqlPersistency persistency = new SqlPersistency();
             System.Data.SqlClient.SqlConnectionStringBuilder builder = new System.Data.SqlClient.SqlConnectionStringBuilder();
 
@@ -36,6 +40,11 @@ namespace Durados.Web.Mvc.Stat
 
         protected virtual IDbConnection GetConnection(MapDataSet.durados_AppRow appRow)
         {
+            if (appRow.durados_SqlConnectionRowByFK_durados_App_durados_SqlConnection == null)
+            {
+                return null;
+            }
+            
             SqlPersistency persistency = new SqlPersistency();
             System.Data.SqlClient.SqlConnectionStringBuilder builder = new System.Data.SqlClient.SqlConnectionStringBuilder();
 
@@ -44,12 +53,51 @@ namespace Durados.Web.Mvc.Stat
 
             string connectionString = persistency.GetConnection(appRow, builder).ToString();
 
+            int localPort = 0;
+
+            if (sqlProduct == (int)SqlProduct.MySql)
+            {
+                if (appRow.durados_SqlConnectionRowByFK_durados_App_durados_SqlConnection.IsSshUsesNull() || !appRow.durados_SqlConnectionRowByFK_durados_App_durados_SqlConnection.SshUses)
+                    localPort = 3306;
+                else
+                    localPort = 11111;
+            }
+            else if (sqlProduct == (int)SqlProduct.Postgre)
+            {
+                localPort = Convert.ToInt32(appRow.durados_SqlConnectionRowByFK_durados_App_durados_SqlConnection.ProductPort ?? "5432");
+            }
+            else if (sqlProduct == (int)SqlProduct.Oracle)
+            {
+                localPort = Convert.ToInt32(appRow.durados_SqlConnectionRowByFK_durados_App_durados_SqlConnection.ProductPort ?? "1521");
+            }
+
+            
+            if (sqlProduct == 3)
+            {
+                connectionString = persistency.GetMySqlConnection(appRow, builder, localPort).ToString();
+            }
+            else if (sqlProduct == 4)
+            {
+                connectionString = persistency.GetPostgreConnection(appRow, builder, localPort).ToString();
+            }
+            else if (sqlProduct == 5)
+            {
+                connectionString = persistency.GetOracleConnection(appRow, builder, localPort).ToString();
+            }
+            else
+            {
+                connectionString = persistency.GetSqlServerConnection(appRow, builder).ToString();
+            }
+
             return SqlAccess.GetNewConnection((SqlProduct)sqlProduct, connectionString);
 
         }
 
         protected virtual IDbCommand GetSystemCommand(MapDataSet.durados_AppRow appRow)
         {
+            if (appRow.durados_SqlConnectionRowByFK_durados_App_durados_SqlConnection_System == null)
+                return null;
+
             int systemSqlProduct = appRow.durados_SqlConnectionRowByFK_durados_App_durados_SqlConnection_System.SqlProductId;
 
             return GetCommand(systemSqlProduct);
@@ -58,6 +106,10 @@ namespace Durados.Web.Mvc.Stat
 
         protected virtual IDbCommand GetCommand(MapDataSet.durados_AppRow appRow)
         {
+            if (appRow.durados_SqlConnectionRowByFK_durados_App_durados_SqlConnection == null)
+                return null;
+
+
             int sqlProduct = appRow.durados_SqlConnectionRowByFK_durados_App_durados_SqlConnection.SqlProductId;
 
             return GetCommand(sqlProduct);
@@ -127,8 +179,13 @@ namespace Durados.Web.Mvc.Stat
 
         public virtual void Persist(DateTime date, object value, SqlCommand command)
         {
-            int sqlConnId = App.GetAppRow().durados_SqlConnectionRowByFK_durados_App_durados_SqlConnection_System.Id;
-                
+            var appRow = App.GetAppRow();
+            if (appRow.durados_SqlConnectionRowByFK_durados_App_durados_SqlConnection_System == null)
+                return;
+
+            int sqlConnId = appRow.durados_SqlConnectionRowByFK_durados_App_durados_SqlConnection_System.Id;
+
+            command.Parameters.Clear();
             command.CommandText = "select Id from modubiz_LogStats2 with(nolock) where SqlConId = @SqlConId and LogDate = @LogDate";
             command.Parameters.AddWithValue("SqlConId", sqlConnId);
             command.Parameters.AddWithValue("LogDate", date);
@@ -171,9 +228,15 @@ namespace Durados.Web.Mvc.Stat
 
             using (IDbConnection connection = GetSystemConnection(appRow))
             {
+                if (connection == null)
+                    return -1;
+
                 connection.Open();
                 using (IDbCommand command = GetSystemCommand(appRow))
                 {
+                    if (command == null)
+                        return -1;
+
                     command.Connection = connection;
                     command.CommandText = GetSql((SqlProduct)systemSqlProduct);
                     value = command.ExecuteScalar();

@@ -41,6 +41,9 @@ namespace Durados.Web.Mvc.Stat.Measurements.Development
 
             var blob = (CloudBlob)listBlobs.Where(b => ((CloudBlob)b).Name == containerName).FirstOrDefault();
 
+            if (blob == null)
+                return -1;
+
             return blob.Properties.Length;
         }
     }
