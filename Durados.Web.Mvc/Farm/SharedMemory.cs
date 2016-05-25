@@ -84,7 +84,5 @@ namespace Durados.Web.Mvc.Farm
         {
             return database.KeyExists(GetKey(appName, key));
         }
-
     }
-
 }
