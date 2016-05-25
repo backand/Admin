@@ -7,8 +7,8 @@ namespace Durados.Web.Mvc.Stat.Measurements.Sys
 {
     public class AnonymousUsers : SysMeasurement
     {
-        public AnonymousUsers(MeasurementType measurementType)
-            : base(measurementType)
+        public AnonymousUsers(App app, MeasurementType measurementType)
+            : base(app, measurementType)
         {
 
         }

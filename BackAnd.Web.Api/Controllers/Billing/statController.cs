@@ -44,6 +44,10 @@ namespace BackAnd.Web.Api.Controllers.Billing
         [HttpPost]
         public IHttpActionResult Post()
         {
+            if (!Maps.IsDevUser())
+            {
+                return ResponseMessage(Request.CreateResponse(HttpStatusCode.Unauthorized, Messages.ActionIsUnauthorized));
+            }
             try
             {
                 string json = System.Web.HttpContext.Current.Server.UrlDecode(Request.Content.ReadAsStringAsync().Result.Replace("%22", "%2522").Replace("%2B", "%252B").Replace("+", "%2B"));
@@ -82,6 +86,22 @@ namespace BackAnd.Web.Api.Controllers.Billing
                     }
                 }
 
+                string sql = null;
+
+                if (values.ContainsKey("sql"))
+                {
+                    sql = values["sql"].ToString();
+                }
+
+                if (apps == null && sql == null)
+                {
+                    return ResponseMessage(Request.CreateResponse(HttpStatusCode.ExpectationFailed, "This action input must contains either apps or sql, it contains neither."));
+                }
+                else if (apps != null && sql != null)
+                {
+                    return ResponseMessage(Request.CreateResponse(HttpStatusCode.ExpectationFailed, "This action input must contains either apps or sql, it contains both."));
+                }
+
                 MeasurementType? measurementType = null;
 
                 string measurment = null;
@@ -100,9 +120,21 @@ namespace BackAnd.Web.Api.Controllers.Billing
                     }
                 }
 
+                int bulk = 100;
+                if (values.ContainsKey("bulk"))
+                {
+                    bulk = System.Convert.ToInt32(values["bulk"]);
+                }
+
+                int sleep = 1000;
+                if (values.ContainsKey("sleep"))
+                {
+                    sleep = System.Convert.ToInt32(values["sleep"]);
+                }
+
                 Producer producer = new Producer();
 
-                return Ok(producer.Produce(date, measurementType, apps, reloadCache));
+                return Ok(producer.Produce(date, measurementType, apps, sql, reloadCache, bulk, sleep));
             }
             catch (Exception exception)
             {

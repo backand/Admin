@@ -1,8 +1,10 @@
 ﻿using Durados.DataAccess;
 using Durados.Web.Mvc.Stat.Measurements;
+using Durados.Web.Mvc.Stat.Measurements.Development;
 using Durados.Web.Mvc.Stat.Measurements.Sys;
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Data.SqlClient;
 using System.Linq;
 using System.Text;
@@ -12,11 +14,11 @@ namespace Durados.Web.Mvc.Stat
 {
     public class Producer
     {
-        public object Produce(DateTime date, MeasurementType? measurementType = null, string[] apps = null, bool? persist = false)
+        public object Produce(DateTime date, MeasurementType? measurementType = null, string[] apps = null, string sql = null, bool? persist = false, int bulk = 100, int sleep = 1000)
         {
-            apps = GetApps(apps);
+            apps = GetApps(apps, sql);
             MeasurementType[] measurementTypes = GetMeasurementTypes(measurementType);
-            return Produce(date, measurementTypes, apps, persist.Value);
+            return Produce(date, measurementTypes, apps, persist.Value, bulk, sleep);
 
         }
 
@@ -33,39 +35,66 @@ namespace Durados.Web.Mvc.Stat
             return (MeasurementType[])Enum.GetValues(typeof(MeasurementType)).Cast<MeasurementType>();
         }
 
-        private object Produce(DateTime date, MeasurementType[] measurementTypes, string[] apps, bool persist)
+        private object Produce(DateTime date, MeasurementType[] measurementTypes, string[] apps, bool persist, int bulk, int sleep)
         {
             Dictionary<string, Dictionary<string, object>> appsMeasurements = new Dictionary<string, Dictionary<string, object>>();
-            
-            foreach (string app in apps)
-            {
-                appsMeasurements.Add(app, new Dictionary<string, object>());
 
-                foreach (MeasurementType measurementType in measurementTypes)
+            using (SqlConnection connection = new SqlConnection(Maps.ReportConnectionString))
+            {
+                connection.Open();
+                SqlTransaction transaction = connection.BeginTransaction(IsolationLevel.ReadCommitted);
+
+                using (SqlCommand command = new SqlCommand())
                 {
-                    object measurementValue = ProduceMeasurement(date, measurementType, app, persist);
-                    appsMeasurements[app].Add(measurementType.ToString(), measurementValue);
+                    command.Connection = connection;
+                    command.Transaction = transaction;
+
+                    int counter = 0;
+                    foreach (string appName in apps)
+                    {
+                        App app = new App(appName);
+                        counter++;
+                        appsMeasurements.Add(appName, new Dictionary<string, object>());
+
+                        foreach (MeasurementType measurementType in measurementTypes)
+                        {
+                            object measurementValue = ProduceMeasurement(date, measurementType, app, persist, command);
+                            appsMeasurements[appName].Add(measurementType.ToString(), measurementValue);
+                        }
+
+                        if (counter == bulk)
+                        {
+                            System.Threading.Thread.Sleep(sleep);
+                        }
+                    }
+                    transaction.Commit();
                 }
             }
-
             return appsMeasurements;
         }
 
-        private string[] GetApps(string[] apps)
+        private string[] GetApps(string[] apps, string sql)
         {
             if (apps != null)
                 return apps;
 
-            return GetApps();
+            try
+            {
+                return GetApps(sql);
+            }
+            catch (Exception exception)
+            {
+                throw new DuradosException("Failed to run the sql " + sql, exception);
+            }
         }
 
-        private string[] GetApps()
+        private string[] GetApps(string sql)
         {
             List<string> apps = new List<string>();
-            using (SqlConnection connection = new SqlConnection(Maps.Instance.DuradosMap.Database.ConnectionString))
+            using (SqlConnection connection = new SqlConnection(Maps.ReportConnectionString))
             {
                 connection.Open();
-                using (SqlCommand command = new SqlCommand(GetAppsSql(), connection))
+                using (SqlCommand command = new SqlCommand(sql, connection))
                 {
                     using (SqlDataReader reader = command.ExecuteReader())
                     {
@@ -80,28 +109,42 @@ namespace Durados.Web.Mvc.Stat
             return apps.ToArray();
         }
 
-        private string GetAppsSql()
+        private object ProduceMeasurement(DateTime date, MeasurementType measurementType, App app, bool persist, SqlCommand persistCommand)
         {
-            return "select Name from v_StatApps";
+            Measurement measurement = GetMeasurement(app, measurementType);
+            object value = measurement.Get(date);
+
+            if (persist)
+            {
+                measurement.Persist(date, value, persistCommand);
+            }
+
+            return value;
         }
 
-        private object ProduceMeasurement(DateTime date, MeasurementType measurementType, string appName, bool persist)
-        {
-            Measurement measurement = GetMeasurement(measurementType);
-            return measurement.Get(date, appName, persist);
-        }
-
-        private Measurement GetMeasurement(MeasurementType measurementType)
+        private Measurement GetMeasurement(App app, MeasurementType measurementType)
         {
             Measurement measurement = null;
 
             switch (measurementType)
             {
                 case MeasurementType.RegisteredUsers:
-                    measurement = new RegisteredUsers(measurementType);
+                    measurement = new RegisteredUsers(app, measurementType);
                     break;
                 case MeasurementType.TeamSize:
-                    measurement = new TeamSize(measurementType);
+                    measurement = new TeamSize(app, measurementType);
+                    break;
+                case MeasurementType.DbSize:
+                    measurement = new DbSize(app, measurementType);
+                    break;
+                case MeasurementType.XmlSize:
+                    measurement = new XmlSize(app, measurementType);
+                    break;
+                case MeasurementType.TotalRows:
+                    measurement = new TotalRows(app, measurementType);
+                    break;
+                case MeasurementType.MaxTableTotalRows:
+                    measurement = new MaxTableTotalRows(app, measurementType);
                     break;
 
 

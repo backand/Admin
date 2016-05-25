@@ -11,5 +11,9 @@ namespace Durados.Web.Mvc.Stat
         TeamSize,
         RegisteredUsers,
         //AnonymousUsers
+        XmlSize,
+        DbSize,
+        TotalRows,
+        MaxTableTotalRows
     }
 }

@@ -10439,6 +10439,11 @@ public class SqlSchema : ISchema
         return "select Name from sys.Tables";
     }
 
+    public virtual string CountTablesSelectStatement()
+    {
+        return "select Count(*) from sys.Tables";
+    }
+
     public virtual string GetTableNamesSelectStatementWithFilter()
     {
         return "select Name from sys.Tables WHERE  Name like N'%[filter]%'";

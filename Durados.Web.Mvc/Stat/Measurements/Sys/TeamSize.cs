@@ -9,8 +9,8 @@ namespace Durados.Web.Mvc.Stat.Measurements.Sys
 {
     public class TeamSize : SysMeasurement
     {
-        public TeamSize(MeasurementType measurementType)
-            : base(measurementType)
+        public TeamSize(App app, MeasurementType measurementType)
+            : base(app, measurementType)
         {
 
         }

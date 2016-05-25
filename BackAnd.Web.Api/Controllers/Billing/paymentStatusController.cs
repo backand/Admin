@@ -45,6 +45,10 @@ namespace BackAnd.Web.Api.Controllers.Billing
         {
             try
             {
+                if (!Maps.IsDevUser())
+                {
+                    return ResponseMessage(Request.CreateResponse(HttpStatusCode.Unauthorized, Messages.ActionIsUnauthorized));
+                }
 
                 string json = Request.Content.ReadAsStringAsync().Result;
 

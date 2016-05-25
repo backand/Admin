@@ -434,6 +434,12 @@ namespace Durados.DataAccess
         {
             return "select table_name as Name, table_schema as `Schema`, table_type as EntityType from information_schema.tables where table_schema = DATABASE() and table_type = 'BASE TABLE'";
         }
+
+        public override string CountTablesSelectStatement()
+        {
+            return "select Count(*) from information_schema.tables where table_schema = DATABASE() and table_type = 'BASE TABLE'";
+        }
+
         public override string GetTableNamesSelectStatementWithFilter()
         {
             return "select table_name as Name, table_schema as `Schema`, table_type as EntityType from information_schema.tables where table_schema = DATABASE() and table_type = 'BASE TABLE' AND table_name  like N'%[filter]%'" ;

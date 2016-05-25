@@ -315,6 +315,13 @@
     <Compile Include="SocialLogin\Twitter\TwitterException.cs" />
     <Compile Include="SocialLogin\Twitter\TwitterProfile.cs" />
     <Compile Include="SocialLogin\Twitter\TwitterSocial.cs" />
+    <Compile Include="Stat\App.cs" />
+    <Compile Include="Stat\Measurements\Development\DbSize.cs" />
+    <Compile Include="Stat\Measurements\Development\DevMeasurement.cs" />
+    <Compile Include="Stat\Measurements\Development\TablesCount.cs" />
+    <Compile Include="Stat\Measurements\Development\MaxTableTotalRows.cs" />
+    <Compile Include="Stat\Measurements\Development\TotalRows.cs" />
+    <Compile Include="Stat\Measurements\Development\XmlSize.cs" />
     <Compile Include="Stat\Measurements\Sys\AnonymousUsers.cs" />
     <Compile Include="Stat\Measurement.cs" />
     <Compile Include="Stat\Measurements\Sys\SysMeasurement.cs" />

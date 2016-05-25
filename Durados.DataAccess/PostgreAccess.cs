@@ -383,6 +383,11 @@ namespace Durados.DataAccess
             return "select table_name as Name, table_schema as \"Schema\", table_type as EntityType from information_schema.tables where table_catalog = current_DATABASE() and table_schema = 'public' and table_type = 'BASE TABLE'";
         }
 
+        public override string CountTablesSelectStatement()
+        {
+            return "select Count(*) from information_schema.tables where table_catalog = current_DATABASE() and table_schema = 'public' and table_type = 'BASE TABLE'";
+        }
+
         protected override string GetMyForeignKeyConstraintsSql(string tableName)
         {
             return "SELECT tc.table_name as TableName, kcu.column_name as ColumnName, ccu.table_name AS ReferenceTableName, ccu.column_name AS ReferenceColumnName FROM information_schema.table_constraints AS tc JOIN information_schema.key_column_usage AS kcu ON tc.constraint_name = kcu.constraint_name JOIN information_schema.constraint_column_usage AS ccu ON ccu.constraint_name = tc.constraint_name WHERE constraint_type = 'FOREIGN KEY' AND tc.table_name='" + tableName + "'";

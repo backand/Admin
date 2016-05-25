@@ -2975,7 +2975,7 @@ namespace Durados.Web.Mvc.UI.Helpers
             {
                 Mvc.Stat.Producer producer = new Mvc.Stat.Producer();
 
-                Dictionary<string, Dictionary<string, object>> appsMeasurements = (Dictionary<string, Dictionary<string, object>>)producer.Produce(DateTime.Today, null, new string[1] { appName }, true);
+                Dictionary<string, Dictionary<string, object>> appsMeasurements = (Dictionary<string, Dictionary<string, object>>)producer.Produce(DateTime.Today, null, new string[1] { appName }, null, true);
 
                 Dictionary<string, object> measurements = appsMeasurements[appName];
                 foreach (string measurement in measurements.Keys)
@@ -3066,7 +3066,7 @@ namespace Durados.Web.Mvc.UI.Helpers
             return null;
         }
 
-        private string GetTotalRowsSql(SqlProduct sqlProduct)
+        public static string GetTotalRowsSql(SqlProduct sqlProduct)
         {
             string sql = null;
 
@@ -3136,7 +3136,7 @@ namespace Durados.Web.Mvc.UI.Helpers
             return sqlAccess;
         }
 
-        private string GetSql(SqlProduct sqlProduct)
+        public static string GetSql(SqlProduct sqlProduct)
         {
             string sql = null;
 

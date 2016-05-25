@@ -9,8 +9,8 @@ namespace Durados.Web.Mvc.Stat.Measurements.Sys
 {
     public class RegisteredUsers : SysMeasurement
     {
-        public RegisteredUsers(MeasurementType measurementType)
-            : base(measurementType)
+        public RegisteredUsers(App app, MeasurementType measurementType)
+            : base(app, measurementType)
         {
 
         }
