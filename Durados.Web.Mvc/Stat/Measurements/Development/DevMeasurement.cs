@@ -22,20 +22,19 @@ namespace Durados.Web.Mvc.Stat.Measurements.Development
         {
 
             var appRow = GetAppRow();
+            if (appRow.durados_SqlConnectionRowByFK_durados_App_durados_SqlConnection == null)
+            {
+                throw new DuradosException("Missing app connection");
+            }
+            
             int sqlProduct = appRow.durados_SqlConnectionRowByFK_durados_App_durados_SqlConnection.SqlProductId;
             object value = null;
 
             using (IDbConnection connection = GetConnection(appRow))
             {
-                if (connection == null)
-                    return -1;
-
                 connection.Open();
                 using (IDbCommand command = GetCommand(appRow))
                 {
-                    if (command == null)
-                        return -1;
-
                     command.Connection = connection;
                     command.CommandText = GetSql((SqlProduct)sqlProduct);
                     value = command.ExecuteScalar();

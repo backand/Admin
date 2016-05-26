@@ -42,8 +42,9 @@ namespace Durados.Web.Mvc.Stat.Measurements.Development
             var blob = (CloudBlob)listBlobs.Where(b => ((CloudBlob)b).Name == containerName).FirstOrDefault();
 
             if (blob == null)
-                return -1;
-
+            {
+                throw new DuradosException("Missing xml");
+            }
             return blob.Properties.Length;
         }
     }

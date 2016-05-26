@@ -23,6 +23,8 @@ using System.Collections;
 using System.Data;
 using Backand;
 using Durados.Web.Mvc.Stat;
+using System.IO;
+using System.Threading;
 /*
  HTTP Verb	|Entire Collection (e.g. /customers)	                                                        |Specific Item (e.g. /customers/{id})
 -----------------------------------------------------------------------------------------------------------------------------------------------
@@ -39,11 +41,72 @@ namespace BackAnd.Web.Api.Controllers.Billing
     [BackAnd.Web.Api.Controllers.Filters.BackAndAuthorize("Admin,Developer")]
     public class statController : apiController
     {
+        [Route("~/1/billing/stat/async")]
+        [HttpPost]
+        public IHttpActionResult PostAsync()
+        {
+            if (!Maps.IsDevUser())
+            {
+                return ResponseMessage(Request.CreateResponse(HttpStatusCode.Unauthorized, Messages.ActionIsUnauthorized));
+            }
+            try
+            {
+                string json = System.Web.HttpContext.Current.Server.UrlDecode(Request.Content.ReadAsStringAsync().Result.Replace("%22", "%2522").Replace("%2B", "%252B").Replace("+", "%2B"));
 
+                if (string.IsNullOrEmpty(json))
+                {
+                    return ResponseMessage(Request.CreateResponse(HttpStatusCode.NotFound, Messages.MissingObjectToUpdate));
+                }
+
+
+                
+                string url = GetUrl();
+                Dictionary<string, string> headers = GetHeaders();
+
+
+                new Thread(() =>
+                {
+                    Thread.CurrentThread.IsBackground = true;
+                    /* run your code here */
+                    Durados.Web.Mvc.Infrastructure.Http.PostWebRequest2(url, json, string.Empty, null, headers, 60 * 60 * 1000);
+                }).Start();
+                
+                
+                return Ok();
+            }
+            catch (Exception exception)
+            {
+                try
+                {
+                    string[] emails = GetEmails();
+                    SendError(emails, exception);
+                }
+                catch { }
+                throw new BackAndApiUnexpectedResponseException(exception, this);
+            }
+        }
+
+        private Dictionary<string, string> GetHeaders()
+        {
+            return new Dictionary<string, string>() { { "Authorization", this.Request.Headers.Authorization.ToString() } };
+        }
+
+        private string GetUrl()
+        {
+            return this.Request.RequestUri.OriginalString.TrimEnd("/async".ToCharArray());
+        }
+
+        private string[] GetEmails()
+        {
+            return Maps.DevUsers;
+        }
+
+       
         [Route("~/1/billing/stat")]
         [HttpPost]
         public IHttpActionResult Post()
         {
+            string[] emails = null;
             if (!Maps.IsDevUser())
             {
                 return ResponseMessage(Request.CreateResponse(HttpStatusCode.Unauthorized, Messages.ActionIsUnauthorized));
@@ -60,10 +123,30 @@ namespace BackAnd.Web.Api.Controllers.Billing
 
                 Dictionary<string, object> values = Durados.Web.Mvc.UI.Json.JsonSerializer.Deserialize(json);
 
+                if (values.ContainsKey("emails"))
+                {
+                    try
+                    {
+                        emails = (string[])Array.ConvertAll<object, string>((object[])values["emails"], System.Convert.ToString);
+                    }
+                    catch (Exception exception)
+                    {
+                        return ResponseMessage(Request.CreateResponse(HttpStatusCode.ExpectationFailed, "Fail to get emails " + exception.Message));
+                    }
+                }
+
                 DateTime date = DateTime.Today;
                 if (values.ContainsKey("date"))
                 {
-                    date = (DateTime)values["date"];
+                    try
+                    {
+                        date = (DateTime)values["date"];
+                        date = date.Date;
+                    }
+                    catch (Exception exception)
+                    {
+                        return ResponseMessage(Request.CreateResponse(HttpStatusCode.ExpectationFailed, "Could not parse date: " + exception.Message));
+                    }
                 }
 
                 bool reloadCache = false;
@@ -102,22 +185,31 @@ namespace BackAnd.Web.Api.Controllers.Billing
                     return ResponseMessage(Request.CreateResponse(HttpStatusCode.ExpectationFailed, "This action input must contains either apps or sql, it contains both."));
                 }
 
-                MeasurementType? measurementType = null;
+                List<MeasurementType> measurementTypes = new List<MeasurementType>();
 
-                string measurment = null;
+                string[] measurements = null;
 
-                if (values.ContainsKey("measurment"))
+                if (values.ContainsKey("measurements"))
                 {
-                    measurment = values["measurment"].ToString();
-                    MeasurementType type;
-                    if (Enum.TryParse<MeasurementType>(measurment, out type))
+                    try
                     {
-                        measurementType = type;
+                        measurements = (string[])Array.ConvertAll<object, string>((object[])values["measurements"], System.Convert.ToString);
                     }
-                    else
+                    catch (Exception exception)
                     {
-                        return ResponseMessage(Request.CreateResponse(HttpStatusCode.NotFound, string.Format("The measurement {0} was not found.", measurment)));
+                        return ResponseMessage(Request.CreateResponse(HttpStatusCode.ExpectationFailed, "Fail to get measurements " + exception.Message));
                     }
+
+                    foreach (string measurement in measurements)
+                    {
+                        MeasurementType measurementType;
+                        if (!Enum.TryParse<MeasurementType>(measurement, out measurementType))
+                        {
+                            return ResponseMessage(Request.CreateResponse(HttpStatusCode.NotFound, string.Format("The measurement {0} was not found.", measurement)));
+                        }
+                        measurementTypes.Add(measurementType);
+                    }
+
                 }
 
                 int bulk = 100;
@@ -134,15 +226,54 @@ namespace BackAnd.Web.Api.Controllers.Billing
 
                 Producer producer = new Producer();
 
-                return Ok(producer.Produce(date, measurementType, apps, sql, reloadCache, bulk, sleep));
+                DateTime started = DateTime.Now;
+
+                var result = producer.Produce(date, measurementTypes.ToArray(), apps, sql, reloadCache, bulk, sleep);
+
+                TimeSpan took = DateTime.Now.Subtract(started);
+
+                string duration = "started: " + started.ToString() + "; took: " + took.ToString();
+
+                if (emails != null && emails.Length > 0)
+                {
+                    var errors = (Dictionary<string, Dictionary<string, object>>)((Dictionary<string, object>)result)["errors"];
+                    var successes = (Dictionary<string, Dictionary<string, object>>)((Dictionary<string, object>)result)["apps"];
+                    
+                    if (errors.Count == 0)
+                    {
+                        Send(emails, "Billing Stat, " + duration + ", " + successes.Count + " Apps Without Errors", "");
+                    }
+                    else
+                    {
+                        Send(emails, "Billing Stat, " + duration + ", " + successes.Count + " Apps With " + errors.Count + " Errors", Durados.Web.Mvc.UI.Json.JsonSerializer.Serialize(errors));
+                    }
+                }
+
+                return Ok(result);
             }
             catch (Exception exception)
             {
+                if (emails != null && emails.Length > 0)
+                {
+                    SendError(emails, exception);
+                }
                 throw new BackAndApiUnexpectedResponseException(exception, this);
 
             }
         }
+        private void Send(string[] emails, string subject, string message)
+        {
+            string host = System.Convert.ToString(System.Configuration.ConfigurationManager.AppSettings["host"]);
+            int port = System.Convert.ToInt32(System.Configuration.ConfigurationManager.AppSettings["port"]);
+            string username = System.Convert.ToString(System.Configuration.ConfigurationManager.AppSettings["username"]);
+            string password = System.Convert.ToString(System.Configuration.ConfigurationManager.AppSettings["password"]);
+            string from = System.Convert.ToString(System.Configuration.ConfigurationManager.AppSettings["fromAlert"]);
 
-
+            Durados.Cms.DataAccess.Email.Send(host, Maps.Instance.DuradosMap.Database.UseSmtpDefaultCredentials, port, username, password, false, emails, null, null, subject, message, from, null, null, false, null, Maps.Instance.DuradosMap.Database.Logger, true);
+        }
+        private void SendError(string[] emails, Exception exception)
+        {
+            Send(emails, "Billing Stat Error", exception.Message);
+        }
     }
 }

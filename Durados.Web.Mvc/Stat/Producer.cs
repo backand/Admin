@@ -14,11 +14,10 @@ namespace Durados.Web.Mvc.Stat
 {
     public class Producer
     {
-        public object Produce(DateTime date, MeasurementType? measurementType = null, string[] apps = null, string sql = null, bool? persist = false, int bulk = 100, int sleep = 1000)
+        public object Produce(DateTime date, MeasurementType[] measurementTypes = null, string[] apps = null, string sql = null, bool? persist = false, int bulk = 100, int sleep = 1000)
         {
             apps = GetApps(apps, sql);
-            MeasurementType[] measurementTypes = GetMeasurementTypes(measurementType);
-            return Produce(date, measurementTypes, apps, persist.Value, bulk, sleep);
+            return Produce(date, GetMeasurementTypes(measurementTypes), apps, persist.Value, bulk, sleep);
 
         }
 
@@ -27,61 +26,82 @@ namespace Durados.Web.Mvc.Stat
             throw new NotImplementedException();
         }
 
-        private MeasurementType[] GetMeasurementTypes(MeasurementType? measurementType)
+        private MeasurementType[] GetMeasurementTypes(MeasurementType[] measurementTypes)
         {
-            if (measurementType.HasValue)
-                return new MeasurementType[1] { measurementType.Value };
+            if (measurementTypes == null || measurementTypes.Length == 0)
+                return (MeasurementType[])Enum.GetValues(typeof(MeasurementType)).Cast<MeasurementType>();
 
-            return (MeasurementType[])Enum.GetValues(typeof(MeasurementType)).Cast<MeasurementType>();
+            return measurementTypes;
         }
 
         private object Produce(DateTime date, MeasurementType[] measurementTypes, string[] apps, bool persist, int bulk, int sleep)
         {
+            Dictionary<string, object> result = new Dictionary<string, object>();
             Dictionary<string, Dictionary<string, object>> appsMeasurements = new Dictionary<string, Dictionary<string, object>>();
+            Dictionary<string, Dictionary<string, object>> appsWithErrors = new Dictionary<string, Dictionary<string, object>>();
 
-            using (SqlConnection connection = new SqlConnection(Maps.ReportConnectionString))
+            int counter = 0;
+            foreach (string appName in apps)
             {
-                connection.Open();
-                SqlTransaction transaction = connection.BeginTransaction(IsolationLevel.ReadCommitted);
-
-                using (SqlCommand command = new SqlCommand())
+                if (!appsMeasurements.ContainsKey(appName))
                 {
-                    command.Connection = connection;
-                    command.Transaction = transaction;
+                    App app = new App(appName);
+                    counter++;
+                    appsMeasurements.Add(appName, new Dictionary<string, object>());
 
-                    int counter = 0;
-                    foreach (string appName in apps)
+                    var appRow = app.GetAppRow();
+                    if (appRow.durados_SqlConnectionRowByFK_durados_App_durados_SqlConnection_System == null)
                     {
-                        if (!appsMeasurements.ContainsKey(appName))
+                        if (!appsWithErrors.ContainsKey(appName))
                         {
-                            App app = new App(appName);
-                            counter++;
-                            appsMeasurements.Add(appName, new Dictionary<string, object>());
+                            appsWithErrors.Add(appName, new Dictionary<string, object>());
+                        }
+                        appsWithErrors[appName].Add(MeasurementType.TeamSize.ToString(), "Missing system connection");
+                            
+                        continue;
+                    }
 
-                            foreach (MeasurementType measurementType in measurementTypes)
+                    foreach (MeasurementType measurementType in measurementTypes)
+                    {
+                        try
+                        {
+                            using (SqlConnection connection = new SqlConnection(Maps.ReportConnectionString))
                             {
-                                try
+                                connection.Open();
+
+                                using (SqlCommand command = new SqlCommand())
                                 {
+                                    command.Connection = connection;
                                     object measurementValue = ProduceMeasurement(date, measurementType, app, persist, command);
                                     appsMeasurements[appName].Add(measurementType.ToString(), measurementValue);
                                 }
-                                catch (Exception exception)
-                                {
-                                    appsMeasurements[appName].Add(measurementType.ToString(), exception.Message);
-                                    Maps.Instance.DuradosMap.Logger.Log("stat", appName, measurementType.ToString(), exception, 1, appName);
-                                }
-                            }
-
-                            if (counter % bulk == 0)
-                            {
-                                System.Threading.Thread.Sleep(sleep);
                             }
                         }
+                        catch (Exception exception)
+                        {
+                            if (!appsWithErrors.ContainsKey(appName))
+                            {
+                                appsWithErrors.Add(appName, new Dictionary<string, object>());
+                            }
+                            appsMeasurements[appName].Add(measurementType.ToString(), exception.Message);
+                            appsWithErrors[appName].Add(measurementType.ToString(), exception.Message);
+                            Maps.Instance.DuradosMap.Logger.Log("stat", appName, measurementType.ToString(), exception, 1, appName);
+                        }
                     }
-                    transaction.Commit();
+
+                    if (counter % bulk == 0)
+                    {
+                        System.Threading.Thread.Sleep(sleep);
+                    }
+                }
+                else
+                {
+
                 }
             }
-            return appsMeasurements;
+            result.Add("apps", appsMeasurements);
+            result.Add("errors", appsWithErrors);
+            return result;
         }
 
         private string[] GetApps(string[] apps, string sql)

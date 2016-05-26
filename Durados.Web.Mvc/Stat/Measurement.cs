@@ -24,7 +24,7 @@ namespace Durados.Web.Mvc.Stat
         {
             if (appRow.durados_SqlConnectionRowByFK_durados_App_durados_SqlConnection_System == null)
             {
-                return null;
+                throw new DuradosException("Missing system connection");
             }
             SqlPersistency persistency = new SqlPersistency();
             System.Data.SqlClient.SqlConnectionStringBuilder builder = new System.Data.SqlClient.SqlConnectionStringBuilder();
@@ -42,8 +42,9 @@ namespace Durados.Web.Mvc.Stat
         {
             if (appRow.durados_SqlConnectionRowByFK_durados_App_durados_SqlConnection == null)
             {
-                return null;
+                throw new DuradosException("Missing app connection");
             }
+            
             
             SqlPersistency persistency = new SqlPersistency();
             System.Data.SqlClient.SqlConnectionStringBuilder builder = new System.Data.SqlClient.SqlConnectionStringBuilder();
@@ -96,7 +97,9 @@ namespace Durados.Web.Mvc.Stat
         protected virtual IDbCommand GetSystemCommand(MapDataSet.durados_AppRow appRow)
         {
             if (appRow.durados_SqlConnectionRowByFK_durados_App_durados_SqlConnection_System == null)
-                return null;
+            {
+                throw new DuradosException("Missing system connection");
+            }
 
             int systemSqlProduct = appRow.durados_SqlConnectionRowByFK_durados_App_durados_SqlConnection_System.SqlProductId;
 
@@ -107,7 +110,9 @@ namespace Durados.Web.Mvc.Stat
         protected virtual IDbCommand GetCommand(MapDataSet.durados_AppRow appRow)
         {
             if (appRow.durados_SqlConnectionRowByFK_durados_App_durados_SqlConnection == null)
-                return null;
+            {
+                throw new DuradosException("Missing app connection");
+            }
 
 
             int sqlProduct = appRow.durados_SqlConnectionRowByFK_durados_App_durados_SqlConnection.SqlProductId;
@@ -181,7 +186,9 @@ namespace Durados.Web.Mvc.Stat
         {
             var appRow = App.GetAppRow();
             if (appRow.durados_SqlConnectionRowByFK_durados_App_durados_SqlConnection_System == null)
-                return;
+            {
+                throw new DuradosException("Missing system connection");
+            }
 
             int sqlConnId = appRow.durados_SqlConnectionRowByFK_durados_App_durados_SqlConnection_System.Id;
 
@@ -221,22 +228,21 @@ namespace Durados.Web.Mvc.Stat
 
         public virtual object Get(DateTime date)
         {
-
-            var appRow = GetAppRow();
-            int systemSqlProduct = appRow.durados_SqlConnectionRowByFK_durados_App_durados_SqlConnection_System.SqlProductId;
             object value = null;
 
+            var appRow = GetAppRow();
+
+            if (appRow.durados_SqlConnectionRowByFK_durados_App_durados_SqlConnection_System == null)
+            {
+                throw new DuradosException("Missing system connection");
+            }
+            int systemSqlProduct = appRow.durados_SqlConnectionRowByFK_durados_App_durados_SqlConnection_System.SqlProductId;
+            
             using (IDbConnection connection = GetSystemConnection(appRow))
             {
-                if (connection == null)
-                    return -1;
-
                 connection.Open();
                 using (IDbCommand command = GetSystemCommand(appRow))
                 {
-                    if (command == null)
-                        return -1;
-
                     command.Connection = connection;
                     command.CommandText = GetSql((SqlProduct)systemSqlProduct);
                     value = command.ExecuteScalar();
