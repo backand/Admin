@@ -140,8 +140,15 @@ namespace BackAnd.Web.Api.Controllers.Billing
                 {
                     try
                     {
-                        date = (DateTime)values["date"];
-                        date = date.Date;
+                        string dateString = values["date"].ToString();
+
+                        string[] dateParts = dateString.Split('-');
+
+                        int year = System.Convert.ToInt32(dateParts[0]);
+                        int month = System.Convert.ToInt32(dateParts[1]);
+                        int day = System.Convert.ToInt32(dateParts[2]);
+
+                        date = new DateTime(year, month, day);
                     }
                     catch (Exception exception)
                     {
