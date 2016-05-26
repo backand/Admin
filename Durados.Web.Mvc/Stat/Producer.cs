@@ -50,6 +50,16 @@ namespace Durados.Web.Mvc.Stat
                     appsMeasurements.Add(appName, new Dictionary<string, object>());
 
                     var appRow = app.GetAppRow();
+                    if (appRow == null)
+                    {
+                        if (!appsWithErrors.ContainsKey(appName))
+                        {
+                            appsWithErrors.Add(appName, new Dictionary<string, object>());
+                        }
+                        appsWithErrors[appName].Add(MeasurementType.TeamSize.ToString(), "Missing app");
+
+                        continue;
+                    }
                     if (appRow.durados_SqlConnectionRowByFK_durados_App_durados_SqlConnection_System == null)
                     {
                         if (!appsWithErrors.ContainsKey(appName))
