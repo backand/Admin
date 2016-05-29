@@ -1042,10 +1042,10 @@ namespace BackAnd.Web.Api.Controllers
                 Map.Logger.Log("viewData", "bulk", "", null, 2, "more than 1000 requests");
                 return ResponseMessage(Request.CreateResponse(HttpStatusCode.NotAcceptable, "bulk is limited to 1000 requests at a time"));
             }
-            IEnumerable<string> headers = Request.Headers.GetValues("Authorization");
-            string authorization = headers.FirstOrDefault();
-            headers = Request.Headers.GetValues("AppName");
-            string appName = headers.FirstOrDefault();
+            //IEnumerable<string> headers = Request.Headers.GetValues("Authorization");
+            //string authorization = headers.FirstOrDefault();
+            //headers = Request.Headers.GetValues("AppName");
+            //string appName = headers.FirstOrDefault();
             //var responses = new bulk().Run(requests, authorization, appName);
             var responses = new Bulk().Run(requests, Map, DataHandler);
             return Ok(responses);
