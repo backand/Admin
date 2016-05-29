@@ -296,6 +296,7 @@
       <DependentUpon>Settings.settings</DependentUpon>
     </Compile>
     <Compile Include="Services\AccountService.cs" />
+    <Compile Include="Services\EmailProviders.cs" />
     <Compile Include="SiteInfo.cs" />
     <Compile Include="SocialLogin\ExternalLoginData.cs" />
     <Compile Include="SocialLogin\Facebook\FacebookException.cs" />
