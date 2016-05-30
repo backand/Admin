@@ -115,6 +115,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Analytics.cs" />
     <Compile Include="ApprovalProcess.cs" />
     <Compile Include="console.cs" />
     <Compile Include="Cookie.cs" />
