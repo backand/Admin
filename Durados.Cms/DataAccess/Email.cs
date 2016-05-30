@@ -26,6 +26,8 @@ namespace Durados.Cms.DataAccess
                     System.Net.NetworkCredential cred = new System.Net.NetworkCredential(username, password);
                     smtpClient.Credentials = cred;
                 }
+                else
+                    smtpClient.UseDefaultCredentials = true;
 
                 smtpClient.Port = port;
 

@@ -2128,18 +2128,16 @@ namespace BackAnd.Web.Api.Controllers
                 bool sendError = Convert.ToBoolean(System.Configuration.ConfigurationManager.AppSettings["sendError"]) && logType == 1;
                 if (sendError)
                 {
-                    string host = Convert.ToString(System.Configuration.ConfigurationManager.AppSettings["host"]);
-                    int port = Convert.ToInt32(System.Configuration.ConfigurationManager.AppSettings["port"]);
-                    string username = Convert.ToString(System.Configuration.ConfigurationManager.AppSettings["username"]);
-                    string password = Convert.ToString(System.Configuration.ConfigurationManager.AppSettings["password"]);
+                    Durados.Cms.Services.EmailProvider provider = new Durados.Cms.Services.EmailProvider();
+                    Durados.Cms.Services.SMTPServiceDetails smtp =provider.GetSMTPServiceDetails(provider.GetSMTPProvider());
                     string applicationName = string.Empty;
                     try
                     {
                         applicationName = System.Web.HttpContext.Current.Items[Durados.Database.AppName].ToString();
                     }
                     catch { }
-                    string from = Convert.ToString(System.Configuration.ConfigurationManager.AppSettings["fromError"]);
-                    string defaultTo = Convert.ToString(System.Configuration.ConfigurationManager.AppSettings["toError"]);
+                   
+                    string defaultTo = smtp.to;
                     string[] to = !string.IsNullOrEmpty(map.Database.AdminEmail) ? map.Database.AdminEmail.Split(';') : null;
                     string[] cc = new string[1] { defaultTo };
                     if (to == null || to.Length == 0)
@@ -2156,7 +2154,7 @@ namespace BackAnd.Web.Api.Controllers
                         message += "\n\r\n\r\n\rMore info:\n\r" + moreInfo;
                     }
 
-                    Durados.Cms.DataAccess.Email.Send(host, false, port, username, password, false, to, cc, null, applicationName + " error", "url: " + apiController.Request.RequestUri.ToString() + ", error: " + message, from, null, null, DontSend, logger);
+                    Durados.Cms.DataAccess.Email.Send(smtp.host, smtp.useDefaultCredentials, smtp.port, smtp.username, smtp.password, false, to, cc, null, applicationName + " error", "url: " + apiController.Request.RequestUri.ToString() + ", error: " + message, smtp.from, null, null, DontSend, logger);
                 }
             }
             catch (Exception ex)
@@ -2164,6 +2162,8 @@ namespace BackAnd.Web.Api.Controllers
                 logger.Log(controller, action, exception.Source, ex, 1, "Error sending email when logging an exception");
             }
         }
+
+       
 
         public bool DontSend
         {
@@ -2246,4 +2246,6 @@ namespace BackAnd.Web.Api.Controllers
         
         
     }
+
+   
 }
