@@ -303,12 +303,17 @@ namespace Durados.Web.Mvc.Infrastructure
             return ret;
         }
 
-        public static string PostWebRequest(string url, string postData, string header = "", string Accept = "", Dictionary<string, string> headers = null, int? timeout = null)
+        public static string PostWebRequest(string url, string postData, string header = "", string Accept = "", Dictionary<string, string> headers = null, int? timeout = null, string contentType = null)
         {
 
             System.Net.WebRequest webRequest = System.Net.WebRequest.Create(url);
             webRequest.Method = "POST";
             webRequest.ContentType = "application/x-www-form-urlencoded";
+            if (!string.IsNullOrEmpty(contentType))
+            {
+                webRequest.ContentType = contentType;
+            
+            }
             if (Accept != "")
                 ((HttpWebRequest)webRequest).Accept = Accept;
             if (header != "")

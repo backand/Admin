@@ -211,6 +211,15 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Analytics\CoolaReportDataAccess.cs" />
+    <Compile Include="Analytics\EmbeddedReports.cs" />
+    <Compile Include="Analytics\EmbeddedReportsConfig.cs" />
+    <Compile Include="Analytics\LastPeriod.cs" />
+    <Compile Include="Analytics\Report.cs" />
+    <Compile Include="Analytics\ReportConfig.cs" />
+    <Compile Include="Analytics\ReportDataAccess.cs" />
+    <Compile Include="Analytics\ReportDataType.cs" />
+    <Compile Include="Analytics\ReportParameters.cs" />
     <Compile Include="Azure\CacheFactory.cs" />
     <Compile Include="Azure\ILargeObjectCachingStamp.cs" />
     <Compile Include="Azure\DuradosStorage.cs" />

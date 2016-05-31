@@ -23,6 +23,7 @@ using System.Diagnostics;
 using Durados.Data;
 using Durados.SmartRun;
 using Durados.Web.Mvc.Farm;
+using Durados.Web.Mvc.Analytics;
 
 namespace Durados.Web.Mvc
 {
@@ -433,6 +434,27 @@ namespace Durados.Web.Mvc
 
             DevUsers = System.Configuration.ConfigurationManager.AppSettings["DevUsers"].Split(',');
 
+            string embeddedReportsApiToken = System.Configuration.ConfigurationManager.AppSettings["embeddedReportsApiToken"];
+            if (string.IsNullOrEmpty(embeddedReportsApiToken))
+            {
+                throw new DuradosException("Missing embeddedReportsApiToken key in web config");
+            }
+            string embeddedReportsUrlStep1 = System.Configuration.ConfigurationManager.AppSettings["embeddedReportsUrlStep1"];
+            if (string.IsNullOrEmpty(embeddedReportsUrlStep1))
+            {
+                throw new DuradosException("Missing embeddedReportsUrlStep1 key in web config");
+            }
+            string embeddedReportsUrlStep2 = System.Configuration.ConfigurationManager.AppSettings["embeddedReportsUrlStep2"];
+            if (string.IsNullOrEmpty(embeddedReportsUrlStep2))
+            {
+                throw new DuradosException("Missing embeddedReportsUrlStep2 key in web config");
+            }
+            string embeddedReportAppPropertyName = System.Configuration.ConfigurationManager.AppSettings["embeddedReportAppPropertyName"];
+            if (string.IsNullOrEmpty(embeddedReportAppPropertyName))
+            {
+                throw new DuradosException("Missing embeddedReportAppPropertyName key in web config");
+            }
+            embeddedReportsConfig = new EmbeddedReportsConfig(embeddedReportsApiToken, embeddedReportsUrlStep1, embeddedReportsUrlStep2, embeddedReportAppPropertyName);
         }
 
         public static string GetConfigPath(string filename)
@@ -2143,6 +2165,12 @@ namespace Durados.Web.Mvc
             if (username == null)
                 username = Instance.DuradosMap.Database.GetCurrentUsername();
             return DevUsers.Contains(username);
+        }
+
+        private static EmbeddedReportsConfig embeddedReportsConfig;
+        public static Analytics.EmbeddedReportsConfig GetEmbeddedReportsConfig()
+        {
+            return embeddedReportsConfig;
         }
     }
 }
