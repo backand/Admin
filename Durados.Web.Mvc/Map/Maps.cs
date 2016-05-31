@@ -24,6 +24,7 @@ using Durados.Data;
 using Durados.SmartRun;
 using Durados.Web.Mvc.Farm;
 using Durados.Web.Mvc.Analytics;
+using Durados.Web.Mvc.Stat.Measurements.S3;
 
 namespace Durados.Web.Mvc
 {
@@ -455,6 +456,28 @@ namespace Durados.Web.Mvc
                 throw new DuradosException("Missing embeddedReportAppPropertyName key in web config");
             }
             embeddedReportsConfig = new EmbeddedReportsConfig(embeddedReportsApiToken, embeddedReportsUrlStep1, embeddedReportsUrlStep2, embeddedReportAppPropertyName);
+
+            string awsAccessKeyId = System.Configuration.ConfigurationManager.AppSettings["awsAccessKeyId"];
+            if (string.IsNullOrEmpty(awsAccessKeyId))
+            {
+                throw new DuradosException("Missing awsAccessKeyId key in web config");
+            }
+            string awsSecretAccessKey = System.Configuration.ConfigurationManager.AppSettings["awsSecretAccessKey"];
+            if (string.IsNullOrEmpty(awsSecretAccessKey))
+            {
+                throw new DuradosException("Missing awsSecretAccessKey key in web config");
+            }
+            awsCredentials = new AwsCredentials() { AccessKeyID = awsAccessKeyId, SecretAccessKey = awsSecretAccessKey };
+
+        }
+
+        private static AwsCredentials awsCredentials;
+        public static AwsCredentials AwsCredentials
+        {
+            get
+            {
+                return awsCredentials;
+            }
         }
 
         public static string GetConfigPath(string filename)

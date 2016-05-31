@@ -14,6 +14,9 @@ namespace Durados.Web.Mvc.Stat
         XmlSize,
         DbSize,
         TotalRows,
-        MaxTableTotalRows
+        MaxTableTotalRows,
+        S3HostingSize,
+        S3FilesSize,
+        S3NodeJsSize,
     }
 }

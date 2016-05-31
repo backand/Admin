@@ -137,7 +137,7 @@ namespace BackAnd.Web.Api.Controllers
         private string GetId(Dictionary<string, object> request)
         {
             string url = (string)request["url"];
-            return url.Split(new[] { "objects/" }, StringSplitOptions.None)[0].Split('/')[1];
+            return new Uri(url).Segments.LastOrDefault();
         }
 
         private string GetMethod(Dictionary<string, object> request)

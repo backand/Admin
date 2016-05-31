@@ -1,6 +1,7 @@
 ﻿using Durados.DataAccess;
 using Durados.Web.Mvc.Stat.Measurements;
 using Durados.Web.Mvc.Stat.Measurements.Development;
+using Durados.Web.Mvc.Stat.Measurements.S3;
 using Durados.Web.Mvc.Stat.Measurements.Sys;
 using System;
 using System.Collections.Generic;
@@ -186,6 +187,15 @@ namespace Durados.Web.Mvc.Stat
                     break;
                 case MeasurementType.MaxTableTotalRows:
                     measurement = new MaxTableTotalRows(app, measurementType);
+                    break;
+                case MeasurementType.S3FilesSize:
+                    measurement = new FilesS3Measurement(app, measurementType);
+                    break;
+                case MeasurementType.S3HostingSize:
+                    measurement = new HostingS3Measurement(app, measurementType);
+                    break;
+                case MeasurementType.S3NodeJsSize:
+                    measurement = new NodeJsS3Measurement(app, measurementType);
                     break;
 
 

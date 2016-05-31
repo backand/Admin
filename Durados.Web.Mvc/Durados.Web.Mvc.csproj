@@ -332,6 +332,11 @@
     <Compile Include="Stat\Measurements\Development\MaxTableTotalRows.cs" />
     <Compile Include="Stat\Measurements\Development\TotalRows.cs" />
     <Compile Include="Stat\Measurements\Development\XmlSize.cs" />
+    <Compile Include="Stat\Measurements\S3\AwsCredentials.cs" />
+    <Compile Include="Stat\Measurements\S3\NodeJsS3Measurement.cs" />
+    <Compile Include="Stat\Measurements\S3\FilesS3Measurement.cs" />
+    <Compile Include="Stat\Measurements\S3\S3Measurement.cs" />
+    <Compile Include="Stat\Measurements\S3\HostingS3Measurement.cs" />
     <Compile Include="Stat\Measurements\Sys\AnonymousUsers.cs" />
     <Compile Include="Stat\Measurement.cs" />
     <Compile Include="Stat\Measurements\Sys\SysMeasurement.cs" />
