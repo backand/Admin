@@ -354,7 +354,7 @@ namespace Durados.Workflow
             userProfile.Add("app", view.Database.GetCurrentAppName());
             userProfile.Add("userId", view.Database.GetCurrentUserId());
             userProfile.Add("token", System.Web.HttpContext.Current.Request.Headers["Authorization"] ?? view.Database.GetAuthorization());
-            userProfile.Add("request", new Dictionary<string, object>() { { "userIP", GetUserIP() }, { "method", System.Web.HttpContext.Current.Request.HttpMethod }, { "headers", GetHeaders(System.Web.HttpContext.Current.Request.Headers) } });
+            userProfile.Add("request", GetRequest());
 
             var call = new Jint.Engine(cfg => cfg.AllowClr(typeof(Backand.XMLHttpRequest).Assembly));
 
@@ -487,6 +487,32 @@ namespace Durados.Workflow
                 else
                     values[ReturnedValueKey] = r;
             }
+        }
+
+        private static Dictionary<string, object> GetRequest()
+        {
+            Dictionary<string, object> req =  new Dictionary<string, object>() { { "userIP", GetUserIP() }, { "method", System.Web.HttpContext.Current.Request.HttpMethod }, { "headers", GetHeaders(System.Web.HttpContext.Current.Request.Headers) } };
+
+            req.Add("body", GetRequestBody());
+            
+            return req;
+        }
+
+        public static object GetRequestBody()
+        {
+            object body = null;
+            if (System.Web.HttpContext.Current.Items.Contains("body"))
+            {
+                string s = (string)System.Web.HttpContext.Current.Items["body"];
+                string json = System.Web.HttpUtility.UrlDecode(s);
+
+                try
+                {
+                    body = Newtonsoft.Json.JsonConvert.DeserializeObject(json);
+                }
+                catch { }
+            }
+            return body;
         }
 
         private static object DateConversion(View view, object val, Field[] fields)

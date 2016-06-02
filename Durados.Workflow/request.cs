@@ -13,6 +13,15 @@ namespace Backand
             }
         }
 
+        public object body
+        {
+            get
+            {
+                return Durados.Workflow.JavaScript.GetRequestBody();
+            }
+        }
+
+
         public Dictionary<string, object> headers
         {
             get
