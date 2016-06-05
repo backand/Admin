@@ -151,6 +151,10 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\Duradus.Web.Mvc.App\deployment\PayPal.dll</HintPath>
     </Reference>
+    <Reference Include="RestSharp, Version=104.4.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\RestSharp.104.4.0\lib\net4\RestSharp.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="StackExchange.Redis, Version=1.0.316.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\StackExchange.Redis.1.0.488\lib\net45\StackExchange.Redis.dll</HintPath>
@@ -430,6 +434,12 @@
     <Compile Include="UI\Json\View.cs" />
     <Compile Include="UI\ParentFieldViewer.cs" />
     <Compile Include="UI\ViewViewer.cs" />
+    <Compile Include="Webhook\Webhook.cs" />
+    <Compile Include="Webhook\WebhookErrorHandling.cs" />
+    <Compile Include="Webhook\WebhookParameters.cs" />
+    <Compile Include="Webhook\WebhookRequestException.cs" />
+    <Compile Include="Webhook\WebhookResponseException.cs" />
+    <Compile Include="Webhook\WebhookType.cs" />
     <Compile Include="Workflow\WebService.cs" />
     <Compile Include="Workflow\HistoryNotifier.cs" />
     <Compile Include="Workflow\Notifier.cs" />

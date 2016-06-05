@@ -25,6 +25,10 @@ using Durados.SmartRun;
 using Durados.Web.Mvc.Farm;
 using Durados.Web.Mvc.Analytics;
 using Durados.Web.Mvc.Stat.Measurements.S3;
+using Durados.Web.Mvc.Webhook;
+using System.Collections.Specialized;
+using System.Configuration;
+using System.Web.Script.Serialization;
 
 namespace Durados.Web.Mvc
 {
@@ -469,6 +473,7 @@ namespace Durados.Web.Mvc
             }
             awsCredentials = new AwsCredentials() { AccessKeyID = awsAccessKeyId, SecretAccessKey = awsSecretAccessKey };
 
+            GetWebhookParameters(Webhook.WebhookType.AppCreated);
         }
 
         private static AwsCredentials awsCredentials;
@@ -555,7 +560,7 @@ namespace Durados.Web.Mvc
         public static string AppLockedMessage { get; private set; }
         public static string ExcludedEmailDomains { get; private set; }
         public static string ReportConnectionString { get; private set; }
-        
+
         public static TimeSpan AzureCacheUpdateInterval { get; private set; }
 
         public static string ConfigPath { get; private set; }
@@ -2194,6 +2199,82 @@ namespace Durados.Web.Mvc
         public static Analytics.EmbeddedReportsConfig GetEmbeddedReportsConfig()
         {
             return embeddedReportsConfig;
+        }
+
+        private static string GetTextFileContent(string fileName)
+        {
+            string fileContent = null;
+            if (File.Exists(fileName))
+            {
+                fileContent = File.ReadAllText(fileName);
+            }
+            else
+            {
+                throw new System.IO.FileNotFoundException("The file was not found", fileName);
+            }
+            return fileContent;
+        }
+
+        private static Dictionary<string, object> webhookJson = null;
+        private static Dictionary<string, object> GetJsonFromFile(string fileName)
+        {
+            fileName = Path.GetDirectoryName(AppDomain.CurrentDomain.BaseDirectory) + @"\deployment\" + fileName;
+            if (webhookJson == null)
+            {
+                string json = GetTextFileContent(fileName);
+                JavaScriptSerializer jss = new JavaScriptSerializer();
+                webhookJson = (Dictionary<string, object>)jss.Deserialize<dynamic>(json);
+            }
+            return webhookJson;
+        }
+
+        private static string WebhooksParametersFileName = "webhooks.json";
+        internal static WebhookParameters GetWebhookParameters(Webhook.WebhookType webhookType)
+        {
+            Dictionary<string, object> json = GetJsonFromFile(WebhooksParametersFileName);
+            if (!json.ContainsKey(webhookType.ToString()))
+            {
+                return null;
+            }
+
+            json = (Dictionary<string, object>)json[webhookType.ToString()];
+            WebhookParameters webhookParameters = new WebhookParameters();
+            if (json.ContainsKey("Method"))
+            {
+                webhookParameters.Method = json["Method"].ToString();
+            }
+            if (json.ContainsKey("Url"))
+            {
+                webhookParameters.Url = json["Url"].ToString();
+            }
+            if (json.ContainsKey("Body"))
+            {
+                webhookParameters.Body = json["Body"].ToString();
+            }
+            if (json.ContainsKey("ErrorHandling"))
+            {
+                Dictionary<string, object> errorHandlingDic = (Dictionary<string, object>)json["ErrorHandling"];
+                WebhookErrorHandling errorHandling = new WebhookErrorHandling();
+                if (errorHandlingDic.ContainsKey("Cancel"))
+                {
+                    errorHandling.Cancel = (bool)errorHandlingDic["Cancel"];
+                }
+                if (errorHandlingDic.ContainsKey("Message"))
+                {
+                    errorHandling.Message = (string)errorHandlingDic["Message"];
+                }
+                webhookParameters.ErrorHandling = errorHandling;
+            }
+            if (json.ContainsKey("QueryStringParameters"))
+            {
+                webhookParameters.QueryStringParameters = (Dictionary<string, object>)json["QueryStringParameters"];
+            }
+            if (json.ContainsKey("Headers"))
+            {
+                webhookParameters.Headers = (Dictionary<string, object>)json["Headers"];
+            }
+
+            return webhookParameters;
         }
     }
 }

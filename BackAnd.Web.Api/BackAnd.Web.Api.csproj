@@ -280,6 +280,7 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="packages.config" />
+    <Content Include="deployment\webhooks.json" />
     <None Include="Properties\PublishProfiles\api.pubxml" />
     <None Include="Properties\PublishProfiles\BackandApi.pubxml" />
     <None Include="Web.BackandApi.config">

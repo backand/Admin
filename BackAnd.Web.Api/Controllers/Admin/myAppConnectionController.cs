@@ -15,6 +15,8 @@ using Durados.Web.Mvc;
 using System.Net.Http.Headers;
 using Durados.Web.Mvc.Controllers.Api;
 using System.Text.RegularExpressions;
+using BackAnd.Web.Api.Controllers.Admin;
+using Durados.Web.Mvc.Webhook;
 /*
  HTTP Verb	|Entire Collection (e.g. /customers)	                                                        |Specific Item (e.g. /customers/{id})
 -----------------------------------------------------------------------------------------------------------------------------------------------
@@ -1082,12 +1084,13 @@ namespace BackAnd.Web.Api.Controllers
                 bool sendError = Convert.ToBoolean(System.Configuration.ConfigurationManager.AppSettings["sendError"]) && logType == 1;
                 if (sendError)
                 {
-                    Durados.Cms.Services.EmailProvider provider = new Durados.Cms.Services.EmailProvider();
-                    Durados.Cms.Services.SMTPServiceDetails smtp = provider.GetSMTPServiceDetails(provider.GetSMTPProvider());
-                  
+                    string host = Convert.ToString(System.Configuration.ConfigurationManager.AppSettings["host"]);
+                    int port = Convert.ToInt32(System.Configuration.ConfigurationManager.AppSettings["port"]);
+                    string username = Convert.ToString(System.Configuration.ConfigurationManager.AppSettings["username"]);
+                    string password = Convert.ToString(System.Configuration.ConfigurationManager.AppSettings["password"]);
                     string applicationName = System.Web.HttpContext.Current.Request.Url.Host;
-                    
-                    string defaultTo = smtp.to;
+                    string from = Convert.ToString(System.Configuration.ConfigurationManager.AppSettings["fromError"]);
+                    string defaultTo = Convert.ToString(System.Configuration.ConfigurationManager.AppSettings["toError"]);
                     string[] to = !string.IsNullOrEmpty(Map.Database.AdminEmail) ? Map.Database.AdminEmail.Split(';') : null;
                     string[] cc = new string[1] { defaultTo };
                     if (to == null || to.Length == 0)
@@ -1104,7 +1107,7 @@ namespace BackAnd.Web.Api.Controllers
                         message += "\n\r\n\r\n\rMore info:\n\r" + moreInfo;
                     }
 
-                    Durados.Cms.DataAccess.Email.Send(smtp.host, smtp.useDefaultCredentials, smtp.port, smtp.username, smtp.password, false, to, cc, null, applicationName + " error", message, smtp.from, null, null, DontSend, logger);
+                    Durados.Cms.DataAccess.Email.Send(host, false, port, username, password, false, to, cc, null, applicationName + " error", message, from, null, null, DontSend, logger);
                 }
             }
             catch (Exception ex)
@@ -1866,6 +1869,19 @@ namespace BackAnd.Web.Api.Controllers
                     ProcessDatabase(appId.Value, id);
                     string message = "App " + id + " id: " + appId.Value + " connected";
                     Maps.Instance.DuradosMap.Logger.Log(GetControllerNameForLog(ControllerContext), GetActionName(), this.Request.Method.Method, message, HttpStatusCode.OK.ToString(), 3, null, DateTime.Now);
+
+                    if (Maps.Instance.DuradosMap.Database.GetUserID(username) != Maps.PoolCreator)
+                    {
+                        Webhook webhook = new Webhook();
+                        try
+                        {
+                            webhook.Send(WebhookType.AppCreated, GetBody(name, username));
+                        }
+                        catch (Exception exception)
+                        {
+                            webhook.HandleException(WebhookType.AppCreated, exception);
+                        }
+                    }
                     return Ok();
                 }
                 else
@@ -1882,6 +1898,14 @@ namespace BackAnd.Web.Api.Controllers
             }
         }
 
+        private object GetBody(string name, string username)
+        {
+            string firstName = Maps.Instance.DuradosMap.Database.GetUserFirstName();
+            string lastName = Maps.Instance.DuradosMap.Database.GetUserLastName();
+            return new { app = new { name = name }, user = new { username = username, firstName = firstName, lastName = lastName } };
+        }
+
+        
         private bool IsSampleApp(Dictionary<string, object> values)
         {
             if (values.ContainsKey("sampleApp"))
