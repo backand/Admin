@@ -2435,6 +2435,9 @@ namespace Durados.DataAccess
             ParentField parentField = null;
             ParentField fkField = null;
             View parentView = field.GetOtherParentView(out parentField, out fkField);
+            if (parentView == null)
+                return new Dictionary<string, Dictionary<string, string>>(); ;
+
             string whereStatement = GetWhereStatement(field, dataView);
 
             string selectStatement = "select distinct " + GetSelectStatement(parentView, true) + " from " + sqlTextBuilder.EscapeDbObject(parentView.DataTable.TableName) + sqlTextBuilder.WithNolock + " INNER JOIN " + sqlTextBuilder.EscapeDbObject(childrenView.DataTable.TableName) + sqlTextBuilder.WithNolock + " on " + GetJoin(parentField) + " where " + GetWhereStatement(field, dataView);
