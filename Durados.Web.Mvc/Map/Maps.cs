@@ -473,7 +473,7 @@ namespace Durados.Web.Mvc
             }
             awsCredentials = new AwsCredentials() { AccessKeyID = awsAccessKeyId, SecretAccessKey = awsSecretAccessKey };
 
-            WebhooksParametersFileName = System.Configuration.ConfigurationManager.AppSettings["webhooksParametersFileName"] ?? @"\deployment\webhooks.json";
+            WebhooksParametersFileName = System.Configuration.ConfigurationManager.AppSettings["webhooksParametersFileName"];
 
             GetWebhookParameters(Webhook.WebhookType.AppCreated);
         }
@@ -2230,9 +2230,12 @@ namespace Durados.Web.Mvc
             return webhookJson;
         }
 
-        private static string WebhooksParametersFileName = @"\deployment\webhooks.json";
+        private static string WebhooksParametersFileName = null;
         internal static WebhookParameters GetWebhookParameters(Webhook.WebhookType webhookType)
         {
+            if (string.IsNullOrEmpty(WebhooksParametersFileName))
+                return null;
+
             Dictionary<string, object> json = GetJsonFromFile(WebhooksParametersFileName);
             if (!json.ContainsKey(webhookType.ToString()))
             {
