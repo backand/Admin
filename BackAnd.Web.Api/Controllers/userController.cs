@@ -38,10 +38,6 @@ namespace BackAnd.Web.Api.Controllers
 
                 if (username == null)
                 {
-                    if (map == Maps.Instance.DuradosMap)
-                    {
-                        return ResponseMessage(Request.CreateResponse(HttpStatusCode.Unauthorized, Messages.ActionIsUnauthorized));
-                    }
                     username = Map.Database.GetCurrentUsername();
                 }
 
