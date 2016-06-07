@@ -1869,6 +1869,11 @@ namespace BackAnd.Web.Api.Controllers
                     string message = "App " + id + " id: " + appId.Value + " connected";
                     Maps.Instance.DuradosMap.Logger.Log(GetControllerNameForLog(ControllerContext), GetActionName(), this.Request.Method.Method, message, HttpStatusCode.OK.ToString(), 3, null, DateTime.Now);
 
+                    if (string.IsNullOrEmpty(username))
+                    {
+                        username = Maps.Instance.DuradosMap.Database.GetCurrentUsername();
+                    }
+
                     if (Maps.Instance.DuradosMap.Database.GetUserID(username) != Maps.PoolCreator)
                     {
                         Webhook webhook = new Webhook();
