@@ -210,9 +210,9 @@ namespace BackAnd.Web.Api.Providers
 
             string eq = "=";
             string amp = "&";
-
-            string originalForm = System.Web.HttpContext.Current.Request.Form.ToString();
-
+            
+            string originalForm = System.Web.HttpContext.Current.Request.Unvalidated.Form.ToString();
+           
             string tempFrom = originalForm;
             foreach (string key in System.Web.HttpContext.Current.Request.Form.Keys)
             {
