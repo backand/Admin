@@ -16,6 +16,10 @@ namespace Durados.Web.Mvc.Webhook
         }
         public void Send(WebhookType webhookType, object body = null, string method = null, Dictionary<string, object> queryStringParameters = null, Dictionary<string, string> headers = null)
         {
+            Send(webhookType.ToString(), body, method, queryStringParameters, headers);
+        }
+        public void Send(string webhookType, object body = null, string method = null, Dictionary<string, object> queryStringParameters = null, Dictionary<string, string> headers = null)
+        {
             WebhookParameters parameters = Maps.GetWebhookParameters(webhookType);
             if (parameters == null)
                 return;
@@ -65,8 +69,11 @@ namespace Durados.Web.Mvc.Webhook
             }
 
         }
-
         public void HandleException(WebhookType webhookType, Exception exception)
+        {
+            HandleException(webhookType.ToString(), exception);
+        }
+        public void HandleException(string webhookType, Exception exception)
         {
             Maps.Instance.DuradosMap.Logger.Log(GetType().Name, new StackFrame(0).GetMethod().Name, webhookType.ToString(), exception, 1, null);
             WebhookParameters parameters = Maps.GetWebhookParameters(webhookType);

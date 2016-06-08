@@ -4203,7 +4203,8 @@ namespace Durados.DataAccess
                             transaction.Commit();
                             if (!identicalSystemConnection)
                             {
-                                sysTransaction.Commit();
+                                if (sysTransaction != null && sysCommand.Connection.State == ConnectionState.Open)
+                                    sysTransaction.Commit();
                             }
                         }
                         catch
@@ -9911,7 +9912,8 @@ namespace Durados.DataAccess
                     {
                         try
                         {
-                            sysTransaction.Commit();
+                            if (sysTransaction != null)
+                                sysTransaction.Commit();
                         }
                         catch { }
                     }

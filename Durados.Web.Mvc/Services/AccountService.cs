@@ -943,7 +943,7 @@ namespace Durados.Web.Mvc.UI.Helpers
 
             Map map = GetMap(appName);
 
-            return Maps.Instance.AppExists(appName, map.Database.GetUserID(username)).HasValue;
+            return Maps.Instance.AppExists(appName, map.Database.GetUserID(username), true).HasValue;
         }
 
         protected virtual bool IsInvited(string username, string appName)

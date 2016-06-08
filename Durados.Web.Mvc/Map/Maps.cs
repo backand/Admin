@@ -475,7 +475,7 @@ namespace Durados.Web.Mvc
 
             WebhooksParametersFileName = System.Configuration.ConfigurationManager.AppSettings["webhooksParametersFileName"];
 
-            GetWebhookParameters(Webhook.WebhookType.AppCreated);
+            GetWebhookParameters("AppCreated");
         }
 
         private static AwsCredentials awsCredentials;
@@ -1851,12 +1851,12 @@ namespace Durados.Web.Mvc
         }
 
 
-        public int? AppExists(string appName, int? userId = null)
+        public int? AppExists(string appName, int? userId = null, bool ignoreDevUser = false)
         {
             SqlAccess sql = new SqlAccess();
             string sSqlCommand = "";
 
-            if (!userId.HasValue || IsDevUser())
+            if (!userId.HasValue || (IsDevUser() && !ignoreDevUser))
             {
                 sSqlCommand = "select Id from durados_App with(nolock) where Name = N'" + appName + "'";
             }
@@ -2217,27 +2217,49 @@ namespace Durados.Web.Mvc
             return fileContent;
         }
 
-        private static Dictionary<string, object> webhookJson = null;
-        private static Dictionary<string, object> GetJsonFromFile(string fileName)
+        private static string webhookJsonString = null;
+        //private static Dictionary<string, object> webhookJson = null;
+        //private static Dictionary<string, object> GetJsonFromFile(string fileName)
+        //{
+        //    fileName = Path.GetDirectoryName(AppDomain.CurrentDomain.BaseDirectory) +  fileName;
+        //    if (webhookJson == null)
+        //    {
+        //        string json = GetTextFileContent(fileName);
+        //        JavaScriptSerializer jss = new JavaScriptSerializer();
+        //        webhookJson = (Dictionary<string, object>)jss.Deserialize<dynamic>(json);
+        //    }
+        //    return webhookJson;
+        //}
+
+        private static Dictionary<string, object> GetJsonFromString(string json)
         {
-            fileName = Path.GetDirectoryName(AppDomain.CurrentDomain.BaseDirectory) +  fileName;
-            if (webhookJson == null)
-            {
-                string json = GetTextFileContent(fileName);
-                JavaScriptSerializer jss = new JavaScriptSerializer();
-                webhookJson = (Dictionary<string, object>)jss.Deserialize<dynamic>(json);
-            }
+            JavaScriptSerializer jss = new JavaScriptSerializer();
+            var  webhookJson = (Dictionary<string, object>)jss.Deserialize<dynamic>(json);
             return webhookJson;
         }
 
+        private static string GetStringFromFile(string fileName)
+        {
+            fileName = Path.GetDirectoryName(AppDomain.CurrentDomain.BaseDirectory) + fileName;
+            if (webhookJsonString == null)
+            {
+                return GetTextFileContent(fileName);
+            }
+            return webhookJsonString;
+        }
+
         private static string WebhooksParametersFileName = null;
-        internal static WebhookParameters GetWebhookParameters(Webhook.WebhookType webhookType)
+        internal static WebhookParameters GetWebhookParameters(string webhookType)
         {
             if (string.IsNullOrEmpty(WebhooksParametersFileName))
                 return null;
 
-            Dictionary<string, object> json = GetJsonFromFile(WebhooksParametersFileName);
-            if (!json.ContainsKey(webhookType.ToString()))
+            string jsonString = GetStringFromFile(WebhooksParametersFileName);
+
+            jsonString = ReplaceAppName(jsonString);
+
+            Dictionary<string, object> json = GetJsonFromString(WebhooksParametersFileName);
+            if (!json.ContainsKey(webhookType))
             {
                 return null;
             }
@@ -2280,6 +2302,17 @@ namespace Durados.Web.Mvc
             }
 
             return webhookParameters;
+        }
+
+        private static string AppNamePlaceHolder = "{{AppName}}";
+        private static string ReplaceAppName(string jsonString)
+        {
+            if (!jsonString.Contains(AppNamePlaceHolder))
+            {
+                return jsonString;
+            }
+            string appName = instance.GetAppName();
+            return jsonString.Replace(AppNamePlaceHolder, appName);
         }
     }
 }

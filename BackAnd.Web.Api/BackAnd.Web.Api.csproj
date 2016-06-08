@@ -238,6 +238,7 @@
     <Compile Include="Controllers\bannerController.cs" />
     <Compile Include="Controllers\apiController.cs" />
     <Compile Include="Controllers\Billing\analyticsController.cs" />
+    <Compile Include="Controllers\Billing\webhookController.cs" />
     <Compile Include="Controllers\Billing\statController.cs" />
     <Compile Include="Controllers\Billing\paymentStatusController.cs" />
     <Compile Include="Controllers\Bulk.cs" />
