@@ -2240,7 +2240,7 @@ namespace Durados.Web.Mvc
 
         private static string GetStringFromFile(string fileName)
         {
-            fileName = Path.GetDirectoryName(AppDomain.CurrentDomain.BaseDirectory) + fileName;
+            fileName = Path.GetDirectoryName(AppDomain.CurrentDomain.BaseDirectory) + @"\" + fileName;
             if (webhookJsonString == null)
             {
                 return GetTextFileContent(fileName);
@@ -2256,9 +2256,9 @@ namespace Durados.Web.Mvc
 
             string jsonString = GetStringFromFile(WebhooksParametersFileName);
 
-            jsonString = ReplaceAppName(jsonString);
+            jsonString = ReplaceParameters(jsonString);
 
-            Dictionary<string, object> json = GetJsonFromString(WebhooksParametersFileName);
+            Dictionary<string, object> json = GetJsonFromString(jsonString);
             if (!json.ContainsKey(webhookType))
             {
                 return null;
@@ -2305,6 +2305,36 @@ namespace Durados.Web.Mvc
         }
 
         private static string AppNamePlaceHolder = "{{AppName}}";
+        private static string UsernamePlaceHolder = "{{Username}}";
+        private static string CreatorPlaceHolder = "{{Creator}}";
+
+        private static string ReplaceParameters(string jsonString)
+        {
+            return ReplaceCreator(ReplaceUsername(ReplaceAppName(jsonString)));
+        }
+
+        private static string ReplaceCreator(string jsonString)
+        {
+            if (!jsonString.Contains(CreatorPlaceHolder))
+            {
+                return jsonString;
+            }
+
+            Map map = instance.GetMap();
+            string creator = map.Database.GetCreatorUsername(Convert.ToInt32(map.Id));
+            return jsonString.Replace(CreatorPlaceHolder, creator, false);
+        }
+
+        private static string ReplaceUsername(string jsonString)
+        {
+            if (!jsonString.Contains(UsernamePlaceHolder))
+            {
+                return jsonString;
+            }
+            string username = instance.GetMap().Database.GetCurrentUsername();
+            return jsonString.Replace(UsernamePlaceHolder, username, false);
+        }
+        
         private static string ReplaceAppName(string jsonString)
         {
             if (!jsonString.Contains(AppNamePlaceHolder))
@@ -2312,7 +2342,7 @@ namespace Durados.Web.Mvc
                 return jsonString;
             }
             string appName = instance.GetAppName();
-            return jsonString.Replace(AppNamePlaceHolder, appName);
+            return jsonString.Replace(AppNamePlaceHolder, appName, false);
         }
     }
 }

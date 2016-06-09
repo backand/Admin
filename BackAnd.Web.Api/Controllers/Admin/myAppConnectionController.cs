@@ -1874,7 +1874,7 @@ namespace BackAnd.Web.Api.Controllers
                         username = Maps.Instance.DuradosMap.Database.GetCurrentUsername();
                     }
 
-                    if (Maps.Instance.DuradosMap.Database.GetUserID(username) != Maps.PoolCreator)
+                    if (Maps.Instance.DuradosMap.Database.GetUsernameById(Maps.PoolCreator.ToString()) != username)
                     {
                         Webhook webhook = new Webhook();
                         try

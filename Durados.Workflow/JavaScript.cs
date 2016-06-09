@@ -498,17 +498,21 @@ namespace Durados.Workflow
             return req;
         }
 
+        static Jint.Engine call2 = new Jint.Engine(cfg => cfg.AllowClr(typeof(Backand.XMLHttpRequest).Assembly));
+        static Jint.Native.Json.JsonParser parser2 = new Jint.Native.Json.JsonParser(call2);
+            
         public static object GetRequestBody()
         {
             object body = null;
             if (System.Web.HttpContext.Current.Items.Contains("body"))
             {
                 string s = (string)System.Web.HttpContext.Current.Items["body"];
-                string json = System.Web.HttpUtility.UrlDecode(s);
+                //string json = System.Web.HttpUtility.UrlDecode(s);
 
                 try
                 {
-                    body = Newtonsoft.Json.JsonConvert.DeserializeObject(json);
+                    body = parser2.Parse(s);
+                    
                 }
                 catch { }
             }

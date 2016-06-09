@@ -50,9 +50,7 @@ namespace BackAnd.Web.Api.Controllers.Billing
             {
                 Webhook webhook = new Webhook();
 
-                webhook.Send(webhookName);
-                
-                return Ok();
+                return Ok(webhook.Send(webhookName));
             }
             catch (Exception exception)
             {

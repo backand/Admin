@@ -14,15 +14,15 @@ namespace Durados.Web.Mvc.Webhook
         {
             
         }
-        public void Send(WebhookType webhookType, object body = null, string method = null, Dictionary<string, object> queryStringParameters = null, Dictionary<string, string> headers = null)
+        public object Send(WebhookType webhookType, object body = null, string method = null, Dictionary<string, object> queryStringParameters = null, Dictionary<string, string> headers = null)
         {
-            Send(webhookType.ToString(), body, method, queryStringParameters, headers);
+            return Send(webhookType.ToString(), body, method, queryStringParameters, headers);
         }
-        public void Send(string webhookType, object body = null, string method = null, Dictionary<string, object> queryStringParameters = null, Dictionary<string, string> headers = null)
+        public object Send(string webhookType, object body = null, string method = null, Dictionary<string, object> queryStringParameters = null, Dictionary<string, string> headers = null)
         {
             WebhookParameters parameters = Maps.GetWebhookParameters(webhookType);
             if (parameters == null)
-                return;
+                return new { };
             if (method == null)
                 method = parameters.Method;
             RestClient client = new RestClient(parameters.Url);
@@ -32,7 +32,7 @@ namespace Durados.Web.Mvc.Webhook
             if (body != null)
             {
                 request.RequestFormat = DataFormat.Json;
-                request.AddBody(parameters.Body);
+                request.AddBody(body);
             }
             if (queryStringParameters != null)
             {
@@ -67,7 +67,7 @@ namespace Durados.Web.Mvc.Webhook
             {
                 throw new WebhookRequestException(response.ErrorMessage ?? response.Content, response.ErrorException);
             }
-
+            return response.Content;
         }
         public void HandleException(WebhookType webhookType, Exception exception)
         {
