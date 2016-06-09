@@ -34,7 +34,7 @@ namespace Durados.Web.Mvc.Stat.Measurements.Development
                     break;
 
                 default:
-                    sql = "SELECT row_size_mb = CAST(SUM(CASE WHEN type_desc = 'ROWS' THEN size END) * 8. * 1024 AS DECIMAL(8,2)) FROM sys.master_files WITH(NOWAIT) WHERE database_id = DB_ID() GROUP BY database_id";
+                    sql = "SELECT row_size_mb = CAST(SUM(CASE WHEN type_desc = 'ROWS' THEN size END) * 8. * 1024 AS bigint) FROM sys.master_files WITH(NOWAIT) WHERE database_id = DB_ID() GROUP BY database_id";
                     break;
             }
 
