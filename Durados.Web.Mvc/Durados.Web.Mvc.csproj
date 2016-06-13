@@ -436,6 +436,7 @@
     <Compile Include="UI\ViewViewer.cs" />
     <Compile Include="Webhook\Webhook.cs" />
     <Compile Include="Webhook\WebhookErrorHandling.cs" />
+    <Compile Include="Webhook\WebhookNotFoundException.cs" />
     <Compile Include="Webhook\WebhookParameters.cs" />
     <Compile Include="Webhook\WebhookRequestException.cs" />
     <Compile Include="Webhook\WebhookResponseException.cs" />

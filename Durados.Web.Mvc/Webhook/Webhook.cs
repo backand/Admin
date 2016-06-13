@@ -23,7 +23,7 @@ namespace Durados.Web.Mvc.Webhook
         {
             WebhookParameters parameters = Maps.GetWebhookParameters(webhookType);
             if (parameters == null)
-                return new { };
+                throw new WebhookNotFoundException(webhookType);
             if (method == null)
                 method = parameters.Method;
             RestClient client = new RestClient(parameters.Url);

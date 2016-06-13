@@ -52,6 +52,10 @@ namespace BackAnd.Web.Api.Controllers.Billing
 
                 return Ok(webhook.Send(webhookName));
             }
+            catch (WebhookNotFoundException exception)
+            {
+                return ResponseMessage(Request.CreateResponse(HttpStatusCode.NotFound, exception.Message));
+            }
             catch (Exception exception)
             {
                 throw new BackAndApiUnexpectedResponseException(exception, this);
