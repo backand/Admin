@@ -475,7 +475,7 @@ namespace Durados.Web.Mvc
 
             WebhooksParametersFileName = System.Configuration.ConfigurationManager.AppSettings["webhooksParametersFileName"];
 
-            GetWebhookParameters("AppCreated");
+            //GetWebhookParameters("AppCreated");
         }
 
         private static AwsCredentials awsCredentials;
@@ -2276,7 +2276,7 @@ namespace Durados.Web.Mvc
             }
             if (json.ContainsKey("Body"))
             {
-                webhookParameters.Body = json["Body"].ToString();
+                webhookParameters.Body = json["Body"];
             }
             if (json.ContainsKey("ErrorHandling"))
             {
@@ -2304,9 +2304,9 @@ namespace Durados.Web.Mvc
             return webhookParameters;
         }
 
-        private static string AppNamePlaceHolder = "{{AppName}}";
-        private static string UsernamePlaceHolder = "{{Username}}";
-        private static string CreatorPlaceHolder = "{{Creator}}";
+        private static string AppNamePlaceHolder = "$AppName$";
+        private static string UsernamePlaceHolder = "$Username$";
+        private static string CreatorPlaceHolder = "$Creator$";
 
         private static string ReplaceParameters(string jsonString)
         {
@@ -2321,7 +2321,7 @@ namespace Durados.Web.Mvc
             }
 
             Map map = instance.GetMap();
-            string creator = map.Database.GetCreatorUsername(Convert.ToInt32(map.Id));
+            string creator = Instance.DuradosMap.Database.GetCreatorUsername(Convert.ToInt32(map.Id));
             return jsonString.Replace(CreatorPlaceHolder, creator, false);
         }
 

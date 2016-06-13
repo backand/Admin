@@ -5,6 +5,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Web.Script.Serialization;
 
 namespace Durados.Web.Mvc.Webhook
 {
@@ -67,7 +68,16 @@ namespace Durados.Web.Mvc.Webhook
             {
                 throw new WebhookRequestException(response.ErrorMessage ?? response.Content, response.ErrorException);
             }
-            return response.Content;
+            try
+            {
+                JavaScriptSerializer jss = new JavaScriptSerializer();
+                var webhookJsonResponse = (Dictionary<string, object>)jss.Deserialize<dynamic>(response.Content);
+                return webhookJsonResponse;
+            }
+            catch
+            {
+                return response.Content;
+            }
         }
         public void HandleException(WebhookType webhookType, Exception exception)
         {
