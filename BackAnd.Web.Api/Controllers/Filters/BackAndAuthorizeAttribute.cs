@@ -218,12 +218,22 @@ namespace BackAnd.Web.Api.Controllers.Filters
             string username = null;
             string appName = null;
 
-            BasicAuthenticationIdentity basicAuthenticationIdentity = GetBasicAuthenticationIdentity(actionContext);
-            if (!IsBasicAuthorized(basicAuthenticationIdentity, out username, out appName))
+            try
+            {
+                BasicAuthenticationIdentity basicAuthenticationIdentity = GetBasicAuthenticationIdentity(actionContext);
+                if (!IsBasicAuthorized(basicAuthenticationIdentity, out username, out appName))
+                {
+                    actionContext.Response = actionContext.Request.CreateErrorResponse(
+                            HttpStatusCode.Unauthorized,
+                            new BasicAuthorizationException());
+                    return true;
+                }
+            }
+            catch (Exception exception)
             {
                 actionContext.Response = actionContext.Request.CreateErrorResponse(
-                        HttpStatusCode.Unauthorized,
-                        new BasicAuthorizationException());
+                            HttpStatusCode.InternalServerError,
+                            exception);
                 return true;
             }
 
