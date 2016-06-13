@@ -233,7 +233,7 @@ namespace BackAnd.Web.Api.Controllers.Filters
             {
                 actionContext.Response = actionContext.Request.CreateErrorResponse(
                             HttpStatusCode.InternalServerError,
-                            exception);
+                            exception.Message);
                 return true;
             }
 
