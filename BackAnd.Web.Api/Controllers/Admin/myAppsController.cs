@@ -17,6 +17,7 @@ using Durados.Web.Mvc.Controllers.Api;
 using System.Text.RegularExpressions;
 using Durados.Web.Mvc.Farm;
 using Durados.Data;
+using Durados.Web.Mvc.Webhook;
 /*
  HTTP Verb	|Entire Collection (e.g. /customers)	                                                        |Specific Item (e.g. /customers/{id})
 -----------------------------------------------------------------------------------------------------------------------------------------------
@@ -758,6 +759,20 @@ namespace BackAnd.Web.Api.Controllers
 
                 string sql = "delete durados_App where name = '" + id + "'";
                 (new SqlAccess()).ExecuteNonQuery(Maps.Instance.DuradosMap.connectionString, sql);
+
+                try
+                {
+                    Webhook webhook = new Webhook();
+                    try
+                    {
+                        webhook.Send(WebhookType.AppDeleted, GetBody(id, Maps.Instance.DuradosMap.Database.GetCurrentUsername()));
+                    }
+                    catch (Exception exception)
+                    {
+                        webhook.HandleException(WebhookType.AppDeleted, exception);
+                    }
+                }
+                catch { }
 
                 Maps.Instance.DuradosMap.Logger.Log("myApps", "delete", "", null, 1, "The app " + id + " was deleted");
                 Maps.Instance.Restart(id);

@@ -1902,14 +1902,6 @@ namespace BackAnd.Web.Api.Controllers
             }
         }
 
-        private object GetBody(string name, string username)
-        {
-            string firstName = Maps.Instance.DuradosMap.Database.GetUserFirstName();
-            string lastName = Maps.Instance.DuradosMap.Database.GetUserLastName();
-            return new { app = new { name = name }, user = new { username = username, firstName = firstName, lastName = lastName } };
-        }
-
-        
         private bool IsSampleApp(Dictionary<string, object> values)
         {
             if (values.ContainsKey("sampleApp"))

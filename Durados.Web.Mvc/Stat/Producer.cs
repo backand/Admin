@@ -29,6 +29,16 @@ namespace Durados.Web.Mvc.Stat
 
         private MeasurementType[] GetMeasurementTypes(MeasurementType[] measurementTypes)
         {
+            MeasurementType[] measurementTypes2 = GetMeasurementTypes2(measurementTypes);
+            HashSet<MeasurementType> h = measurementTypes2.ToHashSet<MeasurementType>();
+            if (h.Contains(MeasurementType.XmlSize) && !h.Contains(MeasurementType.Factor))
+            {
+                h.Add(MeasurementType.Factor);
+            }
+            return h.ToArray();
+        }
+        private MeasurementType[] GetMeasurementTypes2(MeasurementType[] measurementTypes)
+        {
             if (measurementTypes == null || measurementTypes.Length == 0)
                 return (MeasurementType[])Enum.GetValues(typeof(MeasurementType)).Cast<MeasurementType>();
 
@@ -181,6 +191,9 @@ namespace Durados.Web.Mvc.Stat
                     break;
                 case MeasurementType.XmlSize:
                     measurement = new XmlSize(app, measurementType);
+                    break;
+                case MeasurementType.Factor:
+                    measurement = new Factor(app, measurementType);
                     break;
                 case MeasurementType.TotalRows:
                     measurement = new TotalRows(app, measurementType);

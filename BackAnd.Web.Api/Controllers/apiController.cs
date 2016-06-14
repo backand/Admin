@@ -2064,7 +2064,12 @@ namespace BackAnd.Web.Api.Controllers
                 catch { }
         }
 
-
+        protected object GetBody(string name, string username)
+        {
+            string firstName = Maps.Instance.DuradosMap.Database.GetUserFirstName();
+            string lastName = Maps.Instance.DuradosMap.Database.GetUserLastName();
+            return new { app = new { name = name }, user = new { username = username, firstName = firstName, lastName = lastName } };
+        }
         
     }
 

@@ -29,7 +29,7 @@ namespace Durados.Web.Mvc.Stat.Measurements.Development
             return value;
         }
 
-        public static long GetSpaceUsed(string id)
+        protected long GetSpaceUsed(string id)
         {
             string containerName = Maps.DuradosAppPrefix.Replace("_", "").Replace(".", "").ToLower() + id.ToString();
 

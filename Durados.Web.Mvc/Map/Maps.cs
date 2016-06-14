@@ -2243,7 +2243,7 @@ namespace Durados.Web.Mvc
             fileName = Path.GetDirectoryName(AppDomain.CurrentDomain.BaseDirectory) + @"\" + fileName;
             if (webhookJsonString == null)
             {
-                return GetTextFileContent(fileName);
+                webhookJsonString = GetTextFileContent(fileName);
             }
             return webhookJsonString;
         }

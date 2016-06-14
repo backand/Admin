@@ -335,6 +335,7 @@
     <Compile Include="Stat\Measurements\Development\TablesCount.cs" />
     <Compile Include="Stat\Measurements\Development\MaxTableTotalRows.cs" />
     <Compile Include="Stat\Measurements\Development\TotalRows.cs" />
+    <Compile Include="Stat\Measurements\Development\Factor.cs" />
     <Compile Include="Stat\Measurements\Development\XmlSize.cs" />
     <Compile Include="Stat\Measurements\S3\AwsCredentials.cs" />
     <Compile Include="Stat\Measurements\S3\NodeJsS3Measurement.cs" />

@@ -18,5 +18,6 @@ namespace Durados.Web.Mvc.Stat
         S3HostingSize,
         S3FilesSize,
         S3NodeJsSize,
+        Factor,
     }
 }

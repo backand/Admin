@@ -8,6 +8,7 @@ namespace Durados.Web.Mvc.Webhook
 {
     public enum WebhookType
     {
-        AppCreated
+        AppCreated,
+        AppDeleted
     }
 }
