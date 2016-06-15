@@ -1109,7 +1109,14 @@ namespace Durados.Web.Mvc
                 return this.map;
             }
 
-            return GetMap(GetAppName());
+            Map m = GetMap(GetAppName());
+
+            if (System.Web.HttpContext.Current != null)
+            {
+                System.Web.HttpContext.Current.Items[Database.AppId] = m.Id;
+            }
+
+            return m;
         }
 
         string prevAppName = null;

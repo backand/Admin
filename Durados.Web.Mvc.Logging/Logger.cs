@@ -465,6 +465,7 @@ namespace Durados.Web.Mvc.Logging
             }
             catch { }
             appName = GetAppName();
+            string appId = GetAppId();
 
             string username = Username;
 
@@ -484,7 +485,8 @@ namespace Durados.Web.Mvc.Logging
             coll.Add("Refferer", refferer);
             coll.Add("Agent", clientAgent);
             coll.Add("Languages", clientLanguages == null ? null : string.Join(",", clientLanguages));
-
+            coll.Add("AppId", appId);
+            
             bool excludeFromLog = GetExcludeFromLogEvents(applicationName, controller, action, method, message, trace, logType, freeText, time, clientInfo, null, requestTime);
 
             if (excludeFromLog)
@@ -512,6 +514,21 @@ namespace Durados.Web.Mvc.Logging
                     WriteToEventLog(controller, action, method, message, trace, logType, freeText);
                 }
             }
+        }
+
+        private string GetAppId()
+        {
+            string appId = string.Empty;
+            if (System.Web.HttpContext.Current == null)
+                return appId;
+            try
+            {
+                //appId = System.Web.HttpContext.Current == null || System.Web.HttpContext.Current.Items[Database.AppId] == null ? appId: int.TryParse(System.Web.HttpContext.Current.Items[Database.AppId].ToString(),out appId)?appId:appId;
+                if (System.Web.HttpContext.Current.Items.Contains(Database.AppId))
+                    appId = System.Web.HttpContext.Current.Items[Database.AppId].ToString();
+            }
+            catch { }
+            return appId;
         }
 
         public bool GetExcludeFromLogEvents(string applicationName, string controller, string action, string method, string message, string trace, int logType, string freeText, DateTime time, string clientInfo, Guid? guid, int? requestTime)

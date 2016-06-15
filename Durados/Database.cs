@@ -42,6 +42,7 @@ namespace Durados
         public static readonly string backand_appNotInCache = "backand_appNotInCache";
         public static readonly string backand_appGuidNotMatch = "backand_appGuidNotMatch";
         public static readonly string AppName = "appname";
+        public static readonly string AppId = "appid";
         public static readonly string CurAppName = "curappname";
         public static readonly string AppGuid = "appguid";
         public static readonly string Username = "username";
