@@ -105,13 +105,13 @@ namespace Durados.Web.Mvc.Infrastructure
 
                     case 3: //northwind
                         if (manager == null)
-                            Maps.Instance.DuradosMap.Logger.Log("ProductMaintenance", null, "RemoveApp", null, 2, string.Format("Could not drop main db from app {0}, the database server was not found, the app type is {1}", app.Name, app.AppType.ToString()));
+                            Maps.Instance.DuradosMap.Logger.Log("ProductMaintenance", null, "RemoveApp", null, 1, string.Format("Could not drop main db from app {0}, the database server was not found, the app type is {1}", app.Name, app.AppType.ToString()));
                         else
                             manager.DropDB(app.Server, app.Catalog);
                         goto case 1;
                     case 1:// console
                         if (sysManager == null)
-                            Maps.Instance.DuradosMap.Logger.Log("ProductMaintenance", null, "RemoveApp", null, 2, string.Format("Could not drop system db from app {0}, the database server was not found the app type is {1}", app.Name, app.AppType.ToString()));
+                            Maps.Instance.DuradosMap.Logger.Log("ProductMaintenance", null, "RemoveApp", null, 1, string.Format("Could not drop system db from app {0}, the database server was not found the app type is {1}", app.Name, app.AppType.ToString()));
                         else
                         {
                             sysManager.DropDB(app.SystemServer, app.SystemCatalog);
@@ -137,10 +137,10 @@ namespace Durados.Web.Mvc.Infrastructure
                 Maps.Instance.DuradosMap.Logger.Log("ProductMaintenance", null, "RemoveApp", exception, 1, app.Name);
             }
             DeleteConfiguration(configFileName);
-            Maps.Instance.DuradosMap.Logger.Log("ProductMaintenance", "RemoveApp", "RemoveApp", null, 3, "configuration files " + configFileName + " was remove from storage");
+            Maps.Instance.DuradosMap.Logger.Log("ProductMaintenance", "RemoveApp", "RemoveApp", null, 1, "configuration files " + configFileName + " was remove from storage");
             UpdateDeletedApp(app.AppId);
             success = true;
-            Maps.Instance.DuradosMap.Logger.Log("ProductMaintenance", "RemoveApp", "RemoveApp", null, 3, "App name: " + app.Name + " Number: " + app.AppId + " was completly removed");
+            Maps.Instance.DuradosMap.Logger.Log("ProductMaintenance", "RemoveApp", "RemoveApp", null, 1, "App name: " + app.Name + " Number: " + app.AppId + " was marked deleted");
             return success;
 
             // Maps.Instance.RemoveMap(app.Name);
