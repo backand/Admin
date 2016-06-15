@@ -22,11 +22,7 @@ namespace Durados.Web.Mvc.Stat.Measurements.Development
         public override object Get(DateTime date)
         {
             long? xmlSize = GetXmlSizeFromDb(date);
-            if (xmlSize.HasValue)
-            {
-                return xmlSize.Value;
-            }
-            else
+            if (!xmlSize.HasValue)
             {
                 xmlSize = (long)base.Get(date);
             }

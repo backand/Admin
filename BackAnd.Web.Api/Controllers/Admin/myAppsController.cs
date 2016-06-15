@@ -748,9 +748,10 @@ namespace BackAnd.Web.Api.Controllers
                 productMaintenece.RemoveApp(id);
 
                 }
-                catch
+                catch(Exception exception)
                 {
-
+                    Maps.Instance.DuradosMap.Logger.Log("myApps", "delete", id, exception, 1, "The app " + id + " has productMaintenece errors");
+               
                 }
 
                 //url = GetDeleteAppUrl(id);
