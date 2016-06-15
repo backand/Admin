@@ -6,6 +6,7 @@ using Durados.Web.Mvc.Stat.Measurements.Sys;
 using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Data.Common;
 using System.Data.SqlClient;
 using System.Linq;
 using System.Text;
@@ -50,6 +51,7 @@ namespace Durados.Web.Mvc.Stat
             Dictionary<string, object> result = new Dictionary<string, object>();
             Dictionary<string, Dictionary<string, object>> appsMeasurements = new Dictionary<string, Dictionary<string, object>>();
             Dictionary<string, Dictionary<string, object>> appsWithErrors = new Dictionary<string, Dictionary<string, object>>();
+            Dictionary<string, Dictionary<string, object>> appsWithWornings = new Dictionary<string, Dictionary<string, object>>();
 
             int counter = 0;
             foreach (string appName in apps)
@@ -98,6 +100,16 @@ namespace Durados.Web.Mvc.Stat
                                 }
                             }
                         }
+                        catch (DbException exception)
+                        {
+                            if (!appsWithWornings.ContainsKey(appName))
+                            {
+                                appsWithWornings.Add(appName, new Dictionary<string, object>());
+                            }
+                            appsMeasurements[appName].Add(measurementType.ToString(), exception.Message);
+                            appsWithWornings[appName].Add(measurementType.ToString(), exception.Message);
+                            Maps.Instance.DuradosMap.Logger.Log("stat", appName, measurementType.ToString(), exception, 1, appName);
+                        }
                         catch (Exception exception)
                         {
                             if (!appsWithErrors.ContainsKey(appName))
@@ -122,6 +134,7 @@ namespace Durados.Web.Mvc.Stat
             }
             result.Add("apps", appsMeasurements);
             result.Add("errors", appsWithErrors);
+            result.Add("warnings", appsWithWornings);
             return result;
         }
 

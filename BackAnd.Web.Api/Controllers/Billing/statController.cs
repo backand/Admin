@@ -25,6 +25,7 @@ using Backand;
 using Durados.Web.Mvc.Stat;
 using System.IO;
 using System.Threading;
+using System.Text;
 /*
  HTTP Verb	|Entire Collection (e.g. /customers)	                                                        |Specific Item (e.g. /customers/{id})
 -----------------------------------------------------------------------------------------------------------------------------------------------
@@ -239,12 +240,13 @@ namespace BackAnd.Web.Api.Controllers.Billing
 
                 TimeSpan took = DateTime.Now.Subtract(started);
 
-                string duration = "started: " + started.ToString() + "; took: " + took.ToString();
+                string duration = "date: " + date.ToShortDateString() + "; took: " + took.ToString();
 
                 if (emails != null && emails.Length > 0)
                 {
                     var errors = (Dictionary<string, Dictionary<string, object>>)((Dictionary<string, object>)result)["errors"];
                     var successes = (Dictionary<string, Dictionary<string, object>>)((Dictionary<string, object>)result)["apps"];
+                    var warnings = (Dictionary<string, Dictionary<string, object>>)((Dictionary<string, object>)result)["warnings"];
                     
                     if (errors.Count == 0)
                     {
@@ -252,7 +254,7 @@ namespace BackAnd.Web.Api.Controllers.Billing
                     }
                     else
                     {
-                        Send(emails, "Billing Stat, " + duration + ", " + successes.Count + " Apps With " + errors.Count + " Errors", Durados.Web.Mvc.UI.Json.JsonSerializer.Serialize(errors));
+                        Send(emails, "Billing Stat, " + duration + ", " + successes.Count + " Apps With " + errors.Count + " Errors", GetMessage(errors, warnings));
                     }
                 }
 
@@ -268,6 +270,56 @@ namespace BackAnd.Web.Api.Controllers.Billing
 
             }
         }
+
+        private string GetMessage(Dictionary<string, Dictionary<string, object>> errors, Dictionary<string, Dictionary<string, object>> warnings)
+        {
+            StringBuilder sb = new StringBuilder();
+            if (errors.Count > 0)
+            {
+                sb.AppendLine(GetMessageSection(errors, "errors"));
+                sb.AppendLine();
+            }
+            if (warnings.Count > 0)
+            {
+                sb.AppendLine(GetMessageSection(warnings, "warnings"));
+            }
+            return sb.ToString();
+        }
+        private string GetMessageSection(Dictionary<string, Dictionary<string, object>> sections, string sectionName)
+        {
+            StringBuilder sb = new StringBuilder();
+
+            sb.AppendFormat("The following {0} occured:", sectionName);
+            sb.AppendLine();
+            foreach (string key in sections.Keys)
+            {
+                Dictionary<string, object> appIssues = (Dictionary<string, object>)sections[key];
+                
+                sb.Append(key);
+                sb.AppendLine(": ");
+                sb.AppendLine(GetAppIssues(appIssues));
+            }
+
+            return sb.ToString();
+        }
+
+        private string GetAppIssues(Dictionary<string, object> appIssues)
+        {
+            StringBuilder sb = new StringBuilder();
+
+            foreach (string key in appIssues.Keys)
+            {
+                sb.Append("\t");
+                sb.Append(key);
+                sb.Append(" - ");
+                sb.Append(appIssues[key]);
+                sb.AppendLine(",");
+            }
+
+
+            return sb.ToString();
+        }
+
         private void Send(string[] emails, string subject, string message)
         {
             string host = System.Convert.ToString(System.Configuration.ConfigurationManager.AppSettings["host"]);
