@@ -2307,6 +2307,14 @@ namespace Durados.Web.Mvc
             {
                 webhookParameters.Headers = (Dictionary<string, object>)json["Headers"];
             }
+            if (json.ContainsKey("Async"))
+            {
+                webhookParameters.Async = (bool)json["Async"];
+            }
+            if (json.ContainsKey("LimitApps"))
+            {
+                webhookParameters.LimitApps = (string)json["LimitApps"];
+            }
 
             return webhookParameters;
         }

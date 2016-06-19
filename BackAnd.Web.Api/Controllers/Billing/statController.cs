@@ -296,8 +296,8 @@ namespace BackAnd.Web.Api.Controllers.Billing
                 Dictionary<string, object> appIssues = (Dictionary<string, object>)sections[key];
                 
                 sb.Append(key);
-                sb.AppendLine(": ");
-                sb.AppendLine(GetAppIssues(appIssues));
+                sb.AppendLine(": <br>");
+                sb.AppendLine(GetAppIssues(appIssues) + "<br>");
             }
 
             return sb.ToString();
@@ -309,11 +309,11 @@ namespace BackAnd.Web.Api.Controllers.Billing
 
             foreach (string key in appIssues.Keys)
             {
-                sb.Append("\t");
+                sb.Append("&npsp;&npsp;&npsp;&npsp;&npsp;");
                 sb.Append(key);
                 sb.Append(" - ");
                 sb.Append(appIssues[key]);
-                sb.AppendLine(",");
+                sb.AppendLine(",<br>");
             }
 
 

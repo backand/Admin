@@ -19,5 +19,9 @@ namespace Durados.Web.Mvc.Webhook
         public Dictionary<string, object> Headers { get; set; }
 
         public WebhookErrorHandling ErrorHandling { get; set; }
+
+        public bool Async { get; set; }
+
+        public string LimitApps { get; set; }
     }
 }
