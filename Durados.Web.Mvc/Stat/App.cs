@@ -30,8 +30,9 @@ namespace Durados.Web.Mvc.Stat
             View appView = GetAppView();
             Field idField = appView.Fields["Id"];
 
-            int? id = Maps.Instance.AppExists(AppName, null);
-
+            int? id = GetAppId();
+            
+            
             if (!id.HasValue)
             {
                 Durados.Diagnostics.EventViewer.WriteEvent("Could not find app for: " + AppName);
@@ -63,6 +64,22 @@ namespace Durados.Web.Mvc.Stat
 
             return appRow;
 
+        }
+
+        private int? GetAppId()
+        {
+            int? id = null;
+            int appId ;
+            
+            bool result = int.TryParse(AppName,out appId);
+            
+            if (result)
+                 id = Maps.Instance.AppExists(appId);
+            
+            if(!id.HasValue)
+                id=  Maps.Instance.AppExists(AppName, null);
+            
+            return id;
         }
     }
 }
