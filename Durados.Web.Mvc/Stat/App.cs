@@ -11,10 +11,11 @@ namespace Durados.Web.Mvc.Stat
     public class App
     {
         public string AppName { get; private set; }
-        public int AppId { get; private set; }
+        public int? AppId { get; private set; }
         public App(string appName)
         {
             AppName = appName;
+            AppId = Maps.Instance.AppExists(AppName, null);
         }
 
         public App(int appId)
@@ -37,13 +38,8 @@ namespace Durados.Web.Mvc.Stat
             Field idField = appView.Fields["Id"];
 
 
-            int? id = null;
-            if (AppId > 0)
-                id = AppId;
-            else
-                id = Maps.Instance.AppExists(AppName, null);
-            
-            if (!id.HasValue)
+           
+            if (!AppId.HasValue)
             {
                 Durados.Diagnostics.EventViewer.WriteEvent(string.Format("Could not find app for appname: {0} or AppId: {1}" ,AppName,AppId ));
                 return null;
@@ -51,15 +47,15 @@ namespace Durados.Web.Mvc.Stat
 
             try
             {
-                appRow = (MapDataSet.durados_AppRow)appView.GetDataRow(idField, id.Value.ToString(), false);
+                appRow = (MapDataSet.durados_AppRow)appView.GetDataRow(idField, AppId.Value.ToString(), false);
             }
             catch (Exception exception)
             {
-                Durados.Diagnostics.EventViewer.WriteEvent("failed to GetDataRow for id: " + id.Value, exception);
+                Durados.Diagnostics.EventViewer.WriteEvent("failed to GetDataRow for id: " + AppId.Value, exception);
                 try
                 {
                     ((DuradosMap)Maps.Instance.DuradosMap).AddSslAndAahKeyColumn();
-                    appRow = (MapDataSet.durados_AppRow)appView.GetDataRow(idField, id.Value.ToString(), false);
+                    appRow = (MapDataSet.durados_AppRow)appView.GetDataRow(idField, AppId.Value.ToString(), false);
                 }
                 catch (Exception exception2)
                 {
@@ -77,20 +73,6 @@ namespace Durados.Web.Mvc.Stat
 
         }
 
-        private int? GetAppId()
-        {
-            int? id = null;
-            int appId ;
-            
-            bool result = int.TryParse(AppName,out appId);
-            
-            if (result)
-                 id = Maps.Instance.AppExists(appId);
-            
-            if(!id.HasValue)
-                id=  Maps.Instance.AppExists(AppName, null);
-            
-            return id;
-        }
+    
     }
 }
