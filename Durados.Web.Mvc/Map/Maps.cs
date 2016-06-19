@@ -1629,8 +1629,7 @@ namespace Durados.Web.Mvc
             map.PaymentStatus = appRow.PaymentStatus;
             map.AnonymousToken = appRow.AnonymousToken;
             map.SignUpToken = appRow.SignUpToken;
-            map.CreatedDate = appRow.CreatedDate;
-
+            
             int themeId = 0;
             string themeName = "";
             string themePath = "";
