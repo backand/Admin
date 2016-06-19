@@ -1120,6 +1120,7 @@ namespace Durados.Web.Mvc
         }
 
         string prevAppName = null;
+
         public string GetAppName()
         {
             try
@@ -1628,6 +1629,7 @@ namespace Durados.Web.Mvc
             map.PaymentStatus = appRow.PaymentStatus;
             map.AnonymousToken = appRow.AnonymousToken;
             map.SignUpToken = appRow.SignUpToken;
+            map.CreatedDate = appRow.CreatedDate;
 
             int themeId = 0;
             string themeName = "";
@@ -2320,12 +2322,13 @@ namespace Durados.Web.Mvc
         }
 
         private static string AppNamePlaceHolder = "$AppName$";
+        private static string AppIdPlaceHolder = "$AppId$";
         private static string UsernamePlaceHolder = "$Username$";
         private static string CreatorPlaceHolder = "$Creator$";
 
         private static string ReplaceParameters(string jsonString)
         {
-            return ReplaceCreator(ReplaceUsername(ReplaceAppName(jsonString)));
+            return ReplaceCreator(ReplaceUsername(ReplaceAppName(ReplaceAppId(jsonString))));
         }
 
         private static string ReplaceCreator(string jsonString)
@@ -2358,6 +2361,17 @@ namespace Durados.Web.Mvc
             }
             string appName = instance.GetAppName();
             return jsonString.Replace(AppNamePlaceHolder, appName, false);
+        }
+
+        private static string ReplaceAppId(string jsonString)
+        {
+            if (!jsonString.Contains(AppIdPlaceHolder))
+            {
+                return jsonString;
+            }
+            Map map = instance.GetMap();
+            string appId = map.Id;
+            return jsonString.Replace(AppIdPlaceHolder, appId, false);
         }
     }
 }

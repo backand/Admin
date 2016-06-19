@@ -2068,7 +2068,8 @@ namespace BackAnd.Web.Api.Controllers
         {
             string firstName = Maps.Instance.DuradosMap.Database.GetUserFirstName();
             string lastName = Maps.Instance.DuradosMap.Database.GetUserLastName();
-            return new { app = new { name = name }, user = new { username = username, firstName = firstName, lastName = lastName } };
+            int? appId = Maps.Instance.AppExists(name);
+            return new { app = new { name = name, id = appId.ToString() }, user = new { username = username, firstName = firstName, lastName = lastName } };
         }
         
     }
