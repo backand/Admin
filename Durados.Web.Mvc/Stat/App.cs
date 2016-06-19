@@ -10,10 +10,21 @@ namespace Durados.Web.Mvc.Stat
 {
     public class App
     {
-        public string AppName { get; private set; }
+        //private string appName;
+        public string AppName{get; private set;}
+       
+        public int? AppId { get; private set; }
         public App(string appName)
         {
             AppName = appName;
+            AppId = Maps.Instance.AppExists(AppName, null);
+        }
+
+        public App(int appId)
+        {
+            AppId = appId;
+            if (appRow == null)
+                appRow = GetAppRow();
         }
 
         private View GetAppView()
@@ -30,25 +41,25 @@ namespace Durados.Web.Mvc.Stat
             View appView = GetAppView();
             Field idField = appView.Fields["Id"];
 
-            int? id = Maps.Instance.AppExists(AppName, null);
 
-            if (!id.HasValue)
+           
+            if (!AppId.HasValue)
             {
-                Durados.Diagnostics.EventViewer.WriteEvent("Could not find app for: " + AppName);
+                Durados.Diagnostics.EventViewer.WriteEvent(string.Format("Could not find app for appname: {0} or AppId: {1}" ,AppName,AppId ));
                 return null;
             }
 
             try
             {
-                appRow = (MapDataSet.durados_AppRow)appView.GetDataRow(idField, id.Value.ToString(), false);
+                appRow = (MapDataSet.durados_AppRow)appView.GetDataRow(idField, AppId.Value.ToString(), false);
             }
             catch (Exception exception)
             {
-                Durados.Diagnostics.EventViewer.WriteEvent("failed to GetDataRow for id: " + id.Value, exception);
+                Durados.Diagnostics.EventViewer.WriteEvent("failed to GetDataRow for id: " + AppId.Value, exception);
                 try
                 {
                     ((DuradosMap)Maps.Instance.DuradosMap).AddSslAndAahKeyColumn();
-                    appRow = (MapDataSet.durados_AppRow)appView.GetDataRow(idField, id.Value.ToString(), false);
+                    appRow = (MapDataSet.durados_AppRow)appView.GetDataRow(idField, AppId.Value.ToString(), false);
                 }
                 catch (Exception exception2)
                 {
@@ -60,9 +71,12 @@ namespace Durados.Web.Mvc.Stat
             {
                 return null;
             }
-
+            
+            AppName = appRow.Name;
             return appRow;
 
         }
+
+    
     }
 }
