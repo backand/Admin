@@ -10,7 +10,9 @@ namespace Durados.Web.Mvc.Stat
 {
     public class App
     {
-        public string AppName { get; private set; }
+        //private string appName;
+        public string AppName{get; private set;}
+       
         public int? AppId { get; private set; }
         public App(string appName)
         {
@@ -21,6 +23,8 @@ namespace Durados.Web.Mvc.Stat
         public App(int appId)
         {
             AppId = appId;
+            if (appRow == null)
+                appRow = GetAppRow();
         }
 
         private View GetAppView()
