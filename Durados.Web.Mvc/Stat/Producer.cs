@@ -54,36 +54,37 @@ namespace Durados.Web.Mvc.Stat
             Dictionary<string, Dictionary<string, object>> appsWithWornings = new Dictionary<string, Dictionary<string, object>>();
 
             int counter = 0;
-            foreach (string appName in apps)
+            foreach (string appItem in apps)
             {
-                if (!appsMeasurements.ContainsKey(appName))
+                if (!appsMeasurements.ContainsKey(appItem))
                 {
-                    App app = new App(appName);
+                    App app = GetApp(appItem);
                     counter++;
-                    appsMeasurements.Add(appName, new Dictionary<string, object>());
+                    appsMeasurements.Add(appItem, new Dictionary<string, object>());
 
                     var appRow = app.GetAppRow();
                     if (appRow == null)
                     {
-                        if (!appsWithErrors.ContainsKey(appName))
+                        if (!appsWithErrors.ContainsKey(appItem))
                         {
-                            appsWithErrors.Add(appName, new Dictionary<string, object>());
+                            appsWithErrors.Add(appItem, new Dictionary<string, object>());
                         }
-                        appsWithErrors[appName].Add(MeasurementType.TeamSize.ToString(), "Missing app");
+                        appsWithErrors[appItem].Add("MissingApp", true);
 
                         continue;
                     }
                     if (appRow.durados_SqlConnectionRowByFK_durados_App_durados_SqlConnection_System == null)
                     {
-                        if (!appsWithErrors.ContainsKey(appName))
+                        if (!appsWithErrors.ContainsKey(appItem))
                         {
-                            appsWithErrors.Add(appName, new Dictionary<string, object>());
+                            appsWithErrors.Add(appItem, new Dictionary<string, object>());
                         }
-                        appsWithErrors[appName].Add(MeasurementType.TeamSize.ToString(), "Missing system connection");
-                            
+                        appsWithErrors[appItem].Add("MissingSystemConnection",true);
+                        
                         continue;
                     }
 
+                    appsMeasurements[appItem].Add("AppName", app.AppName);
                     foreach (MeasurementType measurementType in measurementTypes)
                     {
                         try
@@ -96,29 +97,29 @@ namespace Durados.Web.Mvc.Stat
                                 {
                                     command.Connection = connection;
                                     object measurementValue = ProduceMeasurement(date, measurementType, app, persist, command);
-                                    appsMeasurements[appName].Add(measurementType.ToString(), measurementValue);
+                                    appsMeasurements[appItem].Add(measurementType.ToString(), measurementValue);
                                 }
                             }
                         }
                         catch (DbException exception)
                         {
-                            if (!appsWithWornings.ContainsKey(appName))
+                            if (!appsWithWornings.ContainsKey(appItem))
                             {
-                                appsWithWornings.Add(appName, new Dictionary<string, object>());
+                                appsWithWornings.Add(appItem, new Dictionary<string, object>());
                             }
-                            appsMeasurements[appName].Add(measurementType.ToString(), exception.Message);
-                            appsWithWornings[appName].Add(measurementType.ToString(), exception.Message);
-                            Maps.Instance.DuradosMap.Logger.Log("stat", appName, measurementType.ToString(), exception, 1, appName);
+                            appsMeasurements[appItem].Add(measurementType.ToString(), exception.Message);
+                            appsWithWornings[appItem].Add(measurementType.ToString(), exception.Message);
+                            Maps.Instance.DuradosMap.Logger.Log("stat", appItem, measurementType.ToString(), exception, 1, appItem);
                         }
                         catch (Exception exception)
                         {
-                            if (!appsWithErrors.ContainsKey(appName))
+                            if (!appsWithErrors.ContainsKey(appItem))
                             {
-                                appsWithErrors.Add(appName, new Dictionary<string, object>());
+                                appsWithErrors.Add(appItem, new Dictionary<string, object>());
                             }
-                            appsMeasurements[appName].Add(measurementType.ToString(), exception.Message);
-                            appsWithErrors[appName].Add(measurementType.ToString(), exception.Message);
-                            Maps.Instance.DuradosMap.Logger.Log("stat", appName, measurementType.ToString(), exception, 1, appName);
+                            appsMeasurements[appItem].Add(measurementType.ToString(), exception.Message);
+                            appsWithErrors[appItem].Add(measurementType.ToString(), exception.Message);
+                            Maps.Instance.DuradosMap.Logger.Log("stat", appItem, measurementType.ToString(), exception, 1, appItem);
                         }
                     }
 
@@ -136,6 +137,28 @@ namespace Durados.Web.Mvc.Stat
             result.Add("errors", appsWithErrors);
             result.Add("warnings", appsWithWornings);
             return result;
+        }
+
+        private static App GetApp(string appItem)
+        {
+           
+            int appId;
+
+            bool result = int.TryParse(appItem, out appId);
+
+            if (result)
+            {  
+                return new App(appId);
+            }
+            else
+            {
+                return new App(appItem);
+            }
+            
+           
+            
+          
+           
         }
 
         private string[] GetApps(string[] apps, string sql)
