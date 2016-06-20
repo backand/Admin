@@ -2327,7 +2327,17 @@ namespace Durados.Web.Mvc
 
         private static string ReplaceParameters(string jsonString)
         {
-            return ReplaceCreator(ReplaceUsername(ReplaceAppName(ReplaceAppId(jsonString))));
+            return ReplaceQueryString(ReplaceCreator(ReplaceUsername(ReplaceAppName(ReplaceAppId(jsonString)))));
+        }
+
+        private static string ReplaceQueryString(string jsonString)
+        {
+            foreach (string key in System.Web.HttpContext.Current.Request.QueryString.AllKeys)
+            {
+                jsonString = jsonString.Replace("$" + key + "$", System.Web.HttpContext.Current.Request.QueryString[key], false);
+            }
+
+            return jsonString;
         }
 
         private static string ReplaceCreator(string jsonString)
