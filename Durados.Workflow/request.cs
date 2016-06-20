@@ -5,6 +5,13 @@ namespace Backand
 {
     public class request
     {
+        public string id
+        {
+            get
+            {
+                return ((Guid)(Durados.Workflow.JavaScript.GetCacheInCurrentRequest(Durados.Workflow.JavaScript.GuidKey) ?? Guid.NewGuid())).ToString(); 
+            }
+        }
         public string method 
         {
             get

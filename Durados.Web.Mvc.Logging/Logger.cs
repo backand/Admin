@@ -486,6 +486,11 @@ namespace Durados.Web.Mvc.Logging
             coll.Add("Agent", clientAgent);
             coll.Add("Languages", clientLanguages == null ? null : string.Join(",", clientLanguages));
             coll.Add("AppId", appId);
+            if (method == Durados.Database.LogMessage)
+            {
+                coll.Add(Durados.Database.LogMessage, freeText);
+            
+            }
             
             bool excludeFromLog = GetExcludeFromLogEvents(applicationName, controller, action, method, message, trace, logType, freeText, time, clientInfo, null, requestTime);
 
@@ -524,7 +529,7 @@ namespace Durados.Web.Mvc.Logging
             try
             {
                 //appId = System.Web.HttpContext.Current == null || System.Web.HttpContext.Current.Items[Database.AppId] == null ? appId: int.TryParse(System.Web.HttpContext.Current.Items[Database.AppId].ToString(),out appId)?appId:appId;
-                if (System.Web.HttpContext.Current.Items.Contains(Database.AppId))
+                if (System.Web.HttpContext.Current.Items.Contains(Database.AppId) && System.Web.HttpContext.Current.Items[Database.AppId] != null)
                     appId = System.Web.HttpContext.Current.Items[Database.AppId].ToString();
             }
             catch { }

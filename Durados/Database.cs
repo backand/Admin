@@ -55,6 +55,7 @@ namespace Durados
         public static readonly string CustomTokenAttrKey = "CustomTokenAttr";
         public static readonly string AutoGuidPkType = "char(36)";
 
+        public static readonly string LogMessage = "LogMessage";
 
         public virtual Guid Guid
         {
@@ -1147,6 +1148,11 @@ namespace Durados
         public virtual string GetCurrentAppName()
         {
             return string.Empty;
+        }
+
+        public virtual Database GetMainDatabase()
+        {
+            return null;
         }
 
         public virtual object GetCurrentUserId()
