@@ -489,7 +489,10 @@ namespace Durados.Web.Mvc.Logging
             if (method == Durados.Database.LogMessage)
             {
                 coll.Add(Durados.Database.LogMessage, freeText);
-            
+            }
+            else
+            {
+                coll.Add(Durados.Database.LogMessage, string.Empty);
             }
             
             bool excludeFromLog = GetExcludeFromLogEvents(applicationName, controller, action, method, message, trace, logType, freeText, time, clientInfo, null, requestTime);
