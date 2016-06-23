@@ -309,7 +309,7 @@ namespace BackAnd.Web.Api.Controllers.Billing
 
             foreach (string key in appIssues.Keys)
             {
-                sb.Append("&npsp;&npsp;&npsp;&npsp;&npsp;");
+                sb.Append("&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;");
                 sb.Append(key);
                 sb.Append(" - ");
                 sb.Append(appIssues[key]);
