@@ -79,7 +79,7 @@ namespace Durados.Workflow
         {
             try
             {
-                if (System.Web.HttpContext.Current.Items.Contains(key))
+                if (System.Web.HttpContext.Current != null && System.Web.HttpContext.Current.Items.Contains(key))
                     return System.Web.HttpContext.Current.Items[key];
             }
             catch { }
@@ -121,7 +121,7 @@ namespace Durados.Workflow
 
         public static bool IsCrud(System.Net.WebRequest request)
         {
-            if (System.Web.HttpContext.Current.Request.Headers["Authorization"] == null)
+            if (System.Web.HttpContext.Current == null || System.Web.HttpContext.Current.Request.Headers["Authorization"] == null)
                 return false;
             HashSet<string> methods = new HashSet<string>() { "POST", "PUT", "DELETE" };
             string route = "/objects/";

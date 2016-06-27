@@ -107,7 +107,7 @@ var console = new Backand.console(); var socket = new Backand.socket(); var file
         return (typeof s == 'string' || s instanceof String) || (Object.prototype.toString.call(s) == '[object String]');
     }
     var exports = function (parameters) {
-        var method = "GET";
+        var method = "GET"; var async = (parameters && parameters.async) ? true : false;
         if (parameters && parameters.method) method = parameters.method;
         var url = null;
         if (parameters && parameters.url) url = parameters.url;
@@ -119,7 +119,7 @@ var console = new Backand.console(); var socket = new Backand.socket(); var file
         if (parameters && parameters.data) data = parameters.data;
 
         var params = null;
-        if (parameters && parameters.params) params = parameters.params;
+        if (parameters && parameters.params) params = parameters.params; 
 
         if (params) {
             var prefix = url.indexOf('?') === -1 ? '?' : '&';
@@ -135,7 +135,7 @@ var console = new Backand.console(); var socket = new Backand.socket(); var file
             }
             url = url + qs;
         }
-        return xhr(method, url, data ? (isString(data) ? data : JSON.stringify(data)) : null, false, headers);
+        return xhr(method, url, data ? (isString(data) ? data : JSON.stringify(data)) : null, async, headers);
     };
 
     exports['get'] = function (url, headers) {
