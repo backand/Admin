@@ -214,7 +214,13 @@ namespace Backand
                 {
                     Thread.CurrentThread.IsBackground = true;
                     /* run your code here */
-                    request.BeginGetResponse(null, null);
+                    var asyncRequest = WebRequest.Create(request.RequestUri);
+                    asyncRequest.Method = request.Method;
+                    asyncRequest.ContentType = request.ContentType;
+                    foreach (var header in request.Headers.AllKeys)
+                        if (!(header.ToLower() == "content-type" || header.ToLower() == "accept"))
+                            asyncRequest.Headers.Add(header, request.Headers[header]);
+                    asyncRequest.BeginGetResponse(null, null);
                 
                 }).Start();
                 return;
