@@ -499,29 +499,28 @@ namespace Durados.Web.Mvc.Logging
 
             if (excludeFromLog)
                 return;
-           
 
-            if (guid != null)
+
+            if (guid != null && method != Durados.Database.LogMessage)
             {
                 WriteToJavaScriptDebugLogger(controller, action, method, message, trace, logType, freeText, time, guid, log, applicationName, username);
             }
-            else
+            
+            try
             {
-                try
-                {
-                    guid = GetRequestGuid();
-                }
-                catch { }
-                try
-                {
-                    WriteLogAsync(controller, action, method, message, trace, logType, freeText, time, guid, log, applicationName, appName, username, clientIP, clientInfo, writeLogTypeToSpecificAppLog, writeLogTypeToGeneralLog, requestTime, coll);
-                }
-                catch (Exception logException)
-                {
-                    WriteToEventLog(logException.Message, EventLogEntryType.FailureAudit, 1);
-                    WriteToEventLog(controller, action, method, message, trace, logType, freeText);
-                }
+                guid = GetRequestGuid();
             }
+            catch { }
+            try
+            {
+                WriteLogAsync(controller, action, method, message, trace, logType, freeText, time, guid, log, applicationName, appName, username, clientIP, clientInfo, writeLogTypeToSpecificAppLog, writeLogTypeToGeneralLog, requestTime, coll);
+            }
+            catch (Exception logException)
+            {
+                WriteToEventLog(logException.Message, EventLogEntryType.FailureAudit, 1);
+                WriteToEventLog(controller, action, method, message, trace, logType, freeText);
+            }
+            
         }
 
         private string GetAppId()
