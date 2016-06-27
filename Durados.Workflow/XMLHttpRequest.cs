@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Backand
@@ -209,8 +210,13 @@ namespace Backand
 
             if (Async)
             {
-                request.BeginGetResponse(null, null);
-
+                new Thread(() =>
+                {
+                    Thread.CurrentThread.IsBackground = true;
+                    /* run your code here */
+                    request.BeginGetResponse(null, null);
+                
+                }).Start();
                 return;
             }
 
