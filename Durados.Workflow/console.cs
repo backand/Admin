@@ -125,6 +125,7 @@ namespace Backand
         {
             Guid requestGuid = (Guid)(Durados.Workflow.JavaScript.GetCacheInCurrentRequest(Durados.Workflow.JavaScript.GuidKey) ?? Guid.NewGuid());
             Durados.Database database = Durados.Workflow.Engine.GetCurrentDatabase();
+            if (database == null) return;
             database.Logger.Log("", "", Durados.Database.LogMessage, "", "", logType, message, DateTime.Now, requestGuid);
 
             if (!IsDebug())
