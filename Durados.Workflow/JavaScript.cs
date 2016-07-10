@@ -354,7 +354,8 @@ namespace Durados.Workflow
             userProfile.Add("app", view.Database.GetCurrentAppName());
             userProfile.Add("userId", view.Database.GetCurrentUserId());
             userProfile.Add("token", System.Web.HttpContext.Current.Request.Headers["Authorization"] ?? view.Database.GetAuthorization());
-            userProfile.Add("request", GetRequest());
+            if (!clientParameters.ContainsKey("filedata"))
+                userProfile.Add("request", GetRequest());
 
             var call = new Jint.Engine(cfg => cfg.AllowClr(typeof(Backand.XMLHttpRequest).Assembly));
 
