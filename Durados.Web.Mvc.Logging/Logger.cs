@@ -489,6 +489,11 @@ namespace Durados.Web.Mvc.Logging
             if (method == Durados.Database.LogMessage)
             {
                 coll.Add(Durados.Database.LogMessage, freeText);
+                Task.Factory.StartNew(() =>
+                {
+                    WriteToLogstash(controller, action, method, message, trace, logType, freeText, time, guid, log, applicationName,
+                        appName, username, clientIP, clientInfo, requestTime, coll);
+                });
             }
             else
             {
