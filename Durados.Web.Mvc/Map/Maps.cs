@@ -1833,9 +1833,9 @@ namespace Durados.Web.Mvc
             }
         }
 
-        public int PaymentStatus(string appName)
+        public int PaymentStatus(string appName, bool ignoreCache = false)
         {
-            if (AppInCach(appName))
+            if (!ignoreCache && AppInCach(appName))
                 return GetMap(appName).PaymentStatus;
 
             try

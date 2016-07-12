@@ -194,10 +194,17 @@ namespace BackAnd.Web.Api.Controllers.Filters
 
         private bool IsAdminLocked(string appName, string appNameFromToken)
         {
-            if (appNameFromToken != Maps.DuradosAppName)
+            if (appNameFromToken != Maps.DuradosAppName || System.Web.HttpContext.Current.Request.Url.Segments.Contains("general/"))
                 return false;
 
-            return Maps.Instance.PaymentStatus(appName) == 1;
+            if (Maps.Instance.PaymentStatus(appName) == 1)
+            {
+                return Maps.Instance.PaymentStatus(appName, true) == 1;
+            }
+            else
+            {
+                return false;
+            }
         }
 
         public class BasicAuthenticationIdentity
