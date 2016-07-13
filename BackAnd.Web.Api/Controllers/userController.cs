@@ -33,7 +33,7 @@ namespace BackAnd.Web.Api.Controllers
             {
                 if (Maps.Instance.DuradosMap.Database.GetUserRole() != "Developer" && username != null)
                 {
-                    return ResponseMessage(Request.CreateResponse(HttpStatusCode.Unauthorized, Messages.ActionIsUnauthorized));
+                    return ResponseMessage(Request.CreateResponse(HttpStatusCode.Unauthorized, new { Messsage = Messages.ActionIsUnauthorized }));
                 }
 
                 if (username == null)
