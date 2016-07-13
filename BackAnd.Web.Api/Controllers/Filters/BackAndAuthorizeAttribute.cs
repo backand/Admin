@@ -118,7 +118,7 @@ namespace BackAnd.Web.Api.Controllers.Filters
                         return;
                     }
 
-                    if (new Durados.Web.Mvc.UI.Helpers.DuradosAuthorizationHelper().IsAppLocked(appname) || IsAdminLocked(appname, appNameFromToken))
+                    if (new Durados.Web.Mvc.UI.Helpers.DuradosAuthorizationHelper().IsAppLocked(appname) || IsAdminLocked(appname, appNameFromToken, username))
                     {
                         actionContext.Response = actionContext.Request.CreateErrorResponse(
                     HttpStatusCode.Unauthorized,
@@ -192,8 +192,11 @@ namespace BackAnd.Web.Api.Controllers.Filters
             }
         }
 
-        private bool IsAdminLocked(string appName, string appNameFromToken)
+        private bool IsAdminLocked(string appName, string appNameFromToken, string username)
         {
+            if (Maps.IsDevUser(username))
+                return false;
+
             if (appNameFromToken != Maps.DuradosAppName || System.Web.HttpContext.Current.Request.Url.Segments.Contains("general/"))
                 return false;
 
