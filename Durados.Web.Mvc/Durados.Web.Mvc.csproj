@@ -297,6 +297,7 @@
     <Compile Include="Map\MapSimpleCache.cs" />
     <Compile Include="Map\NoMorePortsAvailableException.cs" />
     <Compile Include="Map\OnBoardingStatus.cs" />
+    <Compile Include="Map\PaymentStatus.cs" />
     <Compile Include="Map\PendingPool.cs" />
     <Compile Include="Map\PluginCache.cs" />
     <Compile Include="Map\PortManager.cs" />

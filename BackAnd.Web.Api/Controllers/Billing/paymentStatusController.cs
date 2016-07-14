@@ -40,6 +40,25 @@ namespace BackAnd.Web.Api.Controllers.Billing
     {
 
         [Route("~/1/billing/payment/status/{appName}")]
+        [HttpGet]
+        public IHttpActionResult Get(string appName)
+        {
+            try
+            {
+                if (!Maps.IsDevUser())
+                {
+                    return ResponseMessage(Request.CreateResponse(HttpStatusCode.Unauthorized, Messages.ActionIsUnauthorized));
+                }
+                return Ok( new { PaymentStatus = (int)Maps.Instance.GetMap(appName).PaymentStatus });
+            }
+            catch (Exception exception)
+            {
+                throw new BackAndApiUnexpectedResponseException(exception, this);
+
+            }
+        }
+
+        [Route("~/1/billing/payment/status/{appName}")]
         [HttpPut]
         public IHttpActionResult Put(string appName)
         {
@@ -71,24 +90,27 @@ namespace BackAnd.Web.Api.Controllers.Billing
                 string pk = id.Value.ToString();
 
                 Durados.Web.Mvc.View appsView = (Durados.Web.Mvc.View)Maps.Instance.DuradosMap.Database.Views["durados_App"];
+                int PaymentStatus = System.Convert.ToInt32(values["PaymentStatus"]);
+                    
+                appsView.Edit(new Dictionary<string, object>() { { "PaymentStatus", PaymentStatus } }, pk, view_BeforeEdit, view_BeforeEditInDatabase, view_AfterEditBeforeCommit, view_AfterEditAfterCommit);
 
-                string sql = string.Empty;
-                if (values.ContainsKey("PaymentStatus"))
-                {
-                    string PaymentStatus = values["PaymentStatus"].ToString();
-                    sql = "update [durados_App] set [PaymentStatus] = " + PaymentStatus + " where [durados_App].[Id] = " + pk + ";";
+                //string sql = string.Empty;
+                //if (values.ContainsKey("PaymentStatus"))
+                //{
+                //    string PaymentStatus = values["PaymentStatus"].ToString();
+                //    sql = "update [durados_App] set [PaymentStatus] = " + PaymentStatus + " where [durados_App].[Id] = " + pk + ";";
                
-                }
-                if (values.ContainsKey("PaymentLocked"))
-                {
-                    string PaymentLocked = values["PaymentLocked"].ToString();
-                    sql += "update [durados_App] set [PaymentLocked] = " + PaymentLocked + " where [durados_App].[Id] = " + pk + ";";
+                //}
+                //if (values.ContainsKey("PaymentLocked"))
+                //{
+                //    string PaymentLocked = values["PaymentLocked"].ToString();
+                //    sql += "update [durados_App] set [PaymentLocked] = " + PaymentLocked + " where [durados_App].[Id] = " + pk + ";";
 
-                }
+                //}
                 
-                SqlAccess sa = new SqlAccess();
+                //SqlAccess sa = new SqlAccess();
                 
-                sa.ExecuteNonQuery(Maps.Instance.DuradosMap.Database.ConnectionString, sql);
+                //sa.ExecuteNonQuery(Maps.Instance.DuradosMap.Database.ConnectionString, sql);
 
                 Reload(appName);
 
@@ -101,15 +123,20 @@ namespace BackAnd.Web.Api.Controllers.Billing
             }
         }
 
+        protected override void BeforeEdit(EditEventArgs e)
+        {
+            if (e.View.Name == "durados_App")
+            {
+                e.IgnorePermanentFilter = true;
+                e.History = new History();
+                e.UserId = System.Convert.ToInt32(Maps.Instance.DuradosMap.Database.GetUserID());
+            }
+            base.BeforeEdit(e);
+        }
+
         private void Reload(string appName)
         {
-            RestHelper.Refresh(appName);
-            try
-            {
-                new Sync().Initiate(Maps.Instance.GetMap(appName));
-                new Sync().Initiate(Maps.Instance.GetMap(appName));
-            }
-            catch { }
+            RefreshConfigCache(Maps.Instance.GetMap(appName));
         }
     }
 }

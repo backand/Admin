@@ -2882,11 +2882,11 @@ namespace Durados.Web.Mvc.UI.Helpers
             item.Add("stat", stat);
             if (item.ContainsKey("PaymentStatus"))
             {
-                item["PaymentStatus"] = map.PaymentStatus;
+                item["PaymentStatus"] = (int)map.PaymentStatus;
             }
             else
             {
-                item.Add("PaymentStatus", map.PaymentStatus);
+                item.Add("PaymentStatus", (int)map.PaymentStatus);
             }
         }
 

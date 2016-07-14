@@ -4625,7 +4625,7 @@ namespace Durados.Web.Mvc
 
         public bool PaymentLocked { get; set; }
 
-        public int PaymentStatus { get; set; }
+        public Billing.PaymentStatus PaymentStatus { get; set; }
 
     }
 }

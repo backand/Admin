@@ -5167,7 +5167,11 @@ namespace Durados.DataAccess
 
 
                 string sql = "update " + sqlTextBuilder.EscapeDbObject("{0}") + " set {2} where {1}";
-                sql = string.Format(sql, tableName, GetWhereStatement(view, tableName, true), updateSetColumns);
+
+                bool usePermanentFilter = true;
+                if (editEventArgs.IgnorePermanentFilter)
+                    usePermanentFilter = false;
+                sql = string.Format(sql, tableName, GetWhereStatement(view, tableName, usePermanentFilter), updateSetColumns);
 
                 if (editEventArgs.Cancel)
                 {

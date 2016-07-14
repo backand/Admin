@@ -29,7 +29,6 @@ namespace BackAnd.Web.Api.Controllers.Filters
         }
         public override void OnAuthorization(System.Web.Http.Controllers.HttpActionContext actionContext)
         {
-
             if (IsBasicAuthorized(actionContext))
             {
                 ((apiController)actionContext.ControllerContext.Controller).Init();
@@ -118,7 +117,7 @@ namespace BackAnd.Web.Api.Controllers.Filters
                         return;
                     }
 
-                    if (new Durados.Web.Mvc.UI.Helpers.DuradosAuthorizationHelper().IsAppLocked(appname) || IsAdminLocked(appname, appNameFromToken, username))
+                    if (!Maps.IsDevUser(username) && (new Durados.Web.Mvc.UI.Helpers.DuradosAuthorizationHelper().IsAppLocked(appname) || IsAdminLocked(appname, appNameFromToken, username)))
                     {
                         actionContext.Response = actionContext.Request.CreateErrorResponse(
                     HttpStatusCode.Unauthorized,
@@ -194,20 +193,11 @@ namespace BackAnd.Web.Api.Controllers.Filters
 
         private bool IsAdminLocked(string appName, string appNameFromToken, string username)
         {
-            if (Maps.IsDevUser(username))
-                return false;
-
             if (appNameFromToken != Maps.DuradosAppName || System.Web.HttpContext.Current.Request.Url.Segments.Contains("general/"))
                 return false;
 
-            if (Maps.Instance.PaymentStatus(appName) == 1)
-            {
-                return Maps.Instance.PaymentStatus(appName, true) == 1;
-            }
-            else
-            {
-                return false;
-            }
+            return Maps.Instance.PaymentStatus(appName) == Durados.Web.Mvc.Billing.PaymentStatus.Locked;
+            
         }
 
         public class BasicAuthenticationIdentity
@@ -244,6 +234,14 @@ namespace BackAnd.Web.Api.Controllers.Filters
                 actionContext.Response = actionContext.Request.CreateErrorResponse(
                             HttpStatusCode.InternalServerError,
                             exception.Message);
+                return true;
+            }
+
+            if (!Durados.Web.Mvc.Maps.IsDevUser(username) && new Durados.Web.Mvc.UI.Helpers.DuradosAuthorizationHelper().IsAppLocked(appName))
+            {
+                actionContext.Response = actionContext.Request.CreateErrorResponse(
+                    HttpStatusCode.Unauthorized,
+                    string.Format(Durados.Web.Mvc.UI.Helpers.UserValidationErrorMessages.AppLocked, appName));
                 return true;
             }
 
@@ -364,6 +362,14 @@ namespace BackAnd.Web.Api.Controllers.Filters
                 return false;
             if (!IsAllowAnonymousAccess(appName))
                 return false;
+
+            if (new Durados.Web.Mvc.UI.Helpers.DuradosAuthorizationHelper().IsAppLocked(appName))
+            {
+                actionContext.Response = actionContext.Request.CreateErrorResponse(
+                    HttpStatusCode.Unauthorized,
+                    string.Format(Durados.Web.Mvc.UI.Helpers.UserValidationErrorMessages.AppLocked, appName));
+                return true;
+            }
 
             string username = Durados.Database.GuestUsername;
 

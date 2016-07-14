@@ -1626,7 +1626,7 @@ namespace Durados.Web.Mvc
             map.Guid = appRow.Guid;
             map.CreatorId = appRow.Creator;
             map.PaymentLocked = appRow.PaymentLocked;
-            map.PaymentStatus = appRow.PaymentStatus;
+            map.PaymentStatus = (Billing.PaymentStatus)Enum.ToObject(typeof(Billing.PaymentStatus), appRow.PaymentStatus);
             map.AnonymousToken = appRow.AnonymousToken;
             map.SignUpToken = appRow.SignUpToken;
             
@@ -1810,51 +1810,34 @@ namespace Durados.Web.Mvc
 
         public bool AppLocked(string appName)
         {
-            if (AppInCach(appName))
-                return GetMap(appName).PaymentLocked;
-
-            try
-            {
-                SqlAccess sql = new SqlAccess();
-                string sSqlCommand = "";
-
-                sSqlCommand = "select PaymentLocked from durados_App with(nolock) where Name = N'" + appName + "'";
-
-                object scalar = sql.ExecuteScalar(duradosMap.connectionString, sSqlCommand);
-
-                if (scalar.Equals(string.Empty) || scalar == null || scalar == DBNull.Value)
-                    return false;
-                else
-                    return Convert.ToBoolean(scalar);
-            }
-            catch
-            {
-                return false;
-            }
+            return PaymentStatus(appName) == Billing.PaymentStatus.Suspended;
         }
 
-        public int PaymentStatus(string appName, bool ignoreCache = false)
+        public Billing.PaymentStatus PaymentStatus(string appName)
         {
-            if (!ignoreCache && AppInCach(appName))
-                return GetMap(appName).PaymentStatus;
-
+            if (AppInCach(appName))
+            {
+                Billing.PaymentStatus paymentStatus = GetMap(appName).PaymentStatus;
+                if (paymentStatus == Billing.PaymentStatus.Active)
+                {
+                    return Billing.PaymentStatus.Active;
+                }
+            }
             try
             {
                 SqlAccess sql = new SqlAccess();
-                string sSqlCommand = "";
-
-                sSqlCommand = "select PaymentStatus from durados_App with(nolock) where Name = N'" + appName + "'";
+                string sSqlCommand = "select PaymentStatus from durados_App with(nolock) where Name = N'" + appName + "'";
 
                 object scalar = sql.ExecuteScalar(duradosMap.connectionString, sSqlCommand);
 
                 if (scalar.Equals(string.Empty) || scalar == null || scalar == DBNull.Value)
-                    return 0;
+                    return Billing.PaymentStatus.Active;
                 else
-                    return Convert.ToInt32(scalar);
+                    return (Billing.PaymentStatus)Enum.ToObject(typeof(Billing.PaymentStatus), Convert.ToInt32(scalar));
             }
             catch
             {
-                return 0;
+                return Billing.PaymentStatus.Active;
             }
         }
 

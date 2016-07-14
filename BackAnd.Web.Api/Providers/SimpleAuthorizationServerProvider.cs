@@ -306,12 +306,6 @@ namespace BackAnd.Web.Api.Providers
                 return;
             }
 
-            if (IsAppLocked(appname))
-            {
-                context.SetError(UserValidationErrorMessages.InvalidGrant, string.Format(UserValidationErrorMessages.AppLocked, appname));
-                return;
-            }
-
             System.Collections.Specialized.NameValueCollection form = GetFixedForm();
 
             string username = context.UserName;
@@ -331,7 +325,11 @@ namespace BackAnd.Web.Api.Providers
             catch { }
 
 
-
+            if (!Durados.Web.Mvc.Maps.IsDevUser(username) && IsAppLocked(appname))
+            {
+                context.SetError(UserValidationErrorMessages.InvalidGrant, string.Format(UserValidationErrorMessages.AppLocked, appname));
+                return;
+            }
 
 
             if (!System.Web.HttpContext.Current.Items.Contains(Database.AppName))
