@@ -23,7 +23,10 @@ namespace BackAnd.Web.Api.Controllers.Filters
             base.OnActionExecuted(actionExecutedContext);
             try
             {
-                HandleHooks(actionExecutedContext);
+                if (!Maps.Instance.GetMap().IsMainMap)
+                {
+                    HandleHooks(actionExecutedContext);
+                }
             }
             catch { }
         }

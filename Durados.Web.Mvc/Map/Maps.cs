@@ -2363,6 +2363,8 @@ namespace Durados.Web.Mvc
             }
             Map map = instance.GetMap();
             string appId = map.Id;
+            if (string.IsNullOrEmpty(appId))
+                return jsonString;
             return jsonString.Replace(AppIdPlaceHolder, appId, false);
         }
     }
