@@ -117,7 +117,7 @@ namespace BackAnd.Web.Api.Controllers.Filters
                         return;
                     }
 
-                    if (!Maps.IsDevUser(username) && (new Durados.Web.Mvc.UI.Helpers.DuradosAuthorizationHelper().IsAppLocked(appname) || IsAdminLocked(appname, appNameFromToken, username)))
+                    if (!(Maps.IsDevUser(username) || System.Web.HttpContext.Current.Request.Url.Segments.Contains("general/")) && (new Durados.Web.Mvc.UI.Helpers.DuradosAuthorizationHelper().IsAppLocked(appname) || IsAdminLocked(appname, appNameFromToken, username)))
                     {
                         actionContext.Response = actionContext.Request.CreateErrorResponse(
                     HttpStatusCode.Unauthorized,
@@ -193,7 +193,7 @@ namespace BackAnd.Web.Api.Controllers.Filters
 
         private bool IsAdminLocked(string appName, string appNameFromToken, string username)
         {
-            if (appNameFromToken != Maps.DuradosAppName || System.Web.HttpContext.Current.Request.Url.Segments.Contains("general/"))
+            if (appNameFromToken != Maps.DuradosAppName)
                 return false;
 
             return Maps.Instance.PaymentStatus(appName) == Durados.Web.Mvc.Billing.PaymentStatus.Locked;
