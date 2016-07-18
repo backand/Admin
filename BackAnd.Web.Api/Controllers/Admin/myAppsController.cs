@@ -758,9 +758,6 @@ namespace BackAnd.Web.Api.Controllers
                 //string response = Durados.Web.Mvc.Infrastructure.Http.GetWebRequest(url,string.Empty,string.Empty, 100000);
                 //Dictionary<string, object> ret = Durados.Web.Mvc.UI.Json.JsonSerializer.Deserialize(response);
 
-                string sql = "delete durados_App where name = '" + id + "'";
-                (new SqlAccess()).ExecuteNonQuery(Maps.Instance.DuradosMap.connectionString, sql);
-
                 try
                 {
                     Webhook webhook = new Webhook();
@@ -774,6 +771,10 @@ namespace BackAnd.Web.Api.Controllers
                     }
                 }
                 catch { }
+
+                string sql = "delete durados_App where name = '" + id + "'";
+                (new SqlAccess()).ExecuteNonQuery(Maps.Instance.DuradosMap.connectionString, sql);
+
 
                 Maps.Instance.DuradosMap.Logger.Log("myApps", "delete", "", null, 1, "The app " + id + " was deleted");
                 Maps.Instance.Restart(id);

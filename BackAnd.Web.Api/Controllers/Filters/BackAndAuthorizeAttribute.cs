@@ -307,7 +307,18 @@ namespace BackAnd.Web.Api.Controllers.Filters
             username = map.Database.GetUsernameByGuid(basicAuthenticationIdentity.UserGuid);
 
             if (string.IsNullOrEmpty(username))
-                return false;
+            {
+                username = Maps.Instance.DuradosMap.Database.GetUsernameByGuid(basicAuthenticationIdentity.UserGuid);
+                if (string.IsNullOrEmpty(username))
+                {
+                    return false;
+                }
+                if (map.Database.GetUserRow(username) == null)
+                {
+                    return false;
+                }
+            }
+                
 
             return true;
         }
