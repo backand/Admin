@@ -11,7 +11,7 @@
     <%=Html.Hidden("a", Durados.Web.Mvc.Infrastructure.General.GetRootPath(), new { id = "GetRootPath" })%>
     <%=Html.Hidden("a", Durados.Web.Mvc.UI.Json.JsonSerializer.Serialize(new Durados.Web.Mvc.UI.Json.Translator(Map.Database)), new { id = "translator" })%>
     <script type="text/javascript">
-        document.domain = '<%=Durados.Web.Mvc.Maps.Domain %>';
+        document.domain = '<%=Durados.Web.Mvc.Maps.Host %>';
     </script>
     
     <script  type="text/javascript">

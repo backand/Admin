@@ -7,7 +7,7 @@
 </asp:Content>
 <asp:Content ID="Content2" ContentPlaceHolderID="head" runat="server">
     <script type="text/javascript">
-        document.domain = '<%=Durados.Web.Mvc.Maps.Domain %>';
+        document.domain = '<%=Durados.Web.Mvc.Maps.Host %>';
     </script>
     <%=((Durados.Web.Mvc.View)Database.Views[Model.ViewName]).GetScripts()%>
     <%

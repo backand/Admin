@@ -39,7 +39,7 @@
     <script type="text/javascript" src="//sslstatic.wix.com/services/js-sdk/1.17.0/js/Wix.js"></script>
 <%} %>
 <script type="text/javascript">
-    document.domain = '<%=Durados.Web.Mvc.Maps.Domain %>';
+    document.domain = '<%=Durados.Web.Mvc.Maps.Host %>';
 </script>
     
 <script type="text/javascript">

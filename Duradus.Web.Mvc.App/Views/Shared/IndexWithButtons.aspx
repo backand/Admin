@@ -92,7 +92,7 @@
 
     </style>
     <script type="text/javascript">
-        document.domain = '<%=Durados.Web.Mvc.Maps.Domain %>';
+        document.domain = '<%=Durados.Web.Mvc.Maps.Host %>';
     </script>
     <script src='<%=ResolveUrl("~/Scripts/jquery.min.js")%>' type="text/javascript"></script>
     <script type="text/javascript">
