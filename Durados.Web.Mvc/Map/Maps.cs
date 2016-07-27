@@ -475,6 +475,39 @@ namespace Durados.Web.Mvc
 
             WebhooksParametersFileName = System.Configuration.ConfigurationManager.AppSettings["webhooksParametersFileName"];
 
+            cqlConfig = new CqlConfig();
+            cqlConfig.ApiUrl = System.Configuration.ConfigurationManager.AppSettings["CqlApiUrl"];
+            if (string.IsNullOrEmpty(cqlConfig.ApiUrl))
+            {
+                throw new DuradosException("Missing CqlApiUrl key in web config");
+            }
+
+            cqlConfig.AuthorizationHeader = System.Configuration.ConfigurationManager.AppSettings["CqlAuthorizationHeader"];
+            if (string.IsNullOrEmpty(cqlConfig.AuthorizationHeader))
+            {
+                throw new DuradosException("Missing CqlAuthorizationHeader key in web config");
+            }
+
+            cqlConfig.Cqls = new Dictionary<string, string>();
+            string cqlsJson = System.Configuration.ConfigurationManager.AppSettings["Cqls"];
+            if (string.IsNullOrEmpty(cqlsJson))
+            {
+                throw new DuradosException("Missing Cqls key in web config");
+            }
+            Dictionary<string, object>[] cqls = Durados.Web.Mvc.Controllers.Api.JsonConverter.DeserializeArray(cqlsJson);
+
+            foreach (Dictionary<string, object> cql in cqls)
+            {
+                if (!cql.ContainsKey("name"))
+                {
+                    throw new DuradosException("Cql does not contains name in web config");
+                }
+                if (!cql.ContainsKey("cql"))
+                {
+                    throw new DuradosException("Cql does not contains cql in web config");
+                }
+                cqlConfig.Cqls.Add(cql["name"].ToString(), cql["cql"].ToString());
+            }
             //GetWebhookParameters("AppCreated");
         }
 
@@ -635,7 +668,7 @@ namespace Durados.Web.Mvc
         private Map duradosMap = null;
         System.Data.SqlClient.SqlConnectionStringBuilder builder = new System.Data.SqlClient.SqlConnectionStringBuilder();
 
-
+        private static CqlConfig cqlConfig;
         public static string GetAdminButtonText()
         {
             return adminButtonText;
@@ -698,7 +731,13 @@ namespace Durados.Web.Mvc
             return demoDatabaseName + PandingDatabaseSuffix + next;
         }
 
-
+        public static CqlConfig CqlConfig
+        {
+            get
+            {
+                return cqlConfig;
+            }
+        }
 
         public virtual IPersistency GetNewPersistency()
         {
@@ -2367,5 +2406,6 @@ namespace Durados.Web.Mvc
                 return jsonString;
             return jsonString.Replace(AppIdPlaceHolder, appId, false);
         }
+       
     }
 }

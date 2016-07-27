@@ -216,6 +216,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Analytics\CoolaReportDataAccess.cs" />
+    <Compile Include="Analytics\Cql.cs" />
+    <Compile Include="Analytics\CqlConfig.cs" />
+    <Compile Include="Analytics\CqlException.cs" />
     <Compile Include="Analytics\EmbeddedReports.cs" />
     <Compile Include="Analytics\EmbeddedReportsConfig.cs" />
     <Compile Include="Analytics\LastPeriod.cs" />
