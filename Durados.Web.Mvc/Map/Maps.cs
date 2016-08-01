@@ -488,28 +488,32 @@ namespace Durados.Web.Mvc
                 throw new DuradosException("Missing CqlAuthorizationHeader key in web config");
             }
 
-            cqlConfig.Cqls = new Dictionary<string, string>();
-            string cqlsJson = System.Configuration.ConfigurationManager.AppSettings["Cqls"];
-            if (string.IsNullOrEmpty(cqlsJson))
+            string cqlsFileName = System.Configuration.ConfigurationManager.AppSettings["CqlsFileName"];
+            if (string.IsNullOrEmpty(cqlsFileName))
             {
-                throw new DuradosException("Missing Cqls key in web config");
+                throw new DuradosException("Missing CqlsFileName key in web config");
             }
-            Dictionary<string, object>[] cqls = Durados.Web.Mvc.Controllers.Api.JsonConverter.DeserializeArray(cqlsJson);
-
-            foreach (Dictionary<string, object> cql in cqls)
-            {
-                if (!cql.ContainsKey("name"))
-                {
-                    throw new DuradosException("Cql does not contains name in web config");
-                }
-                if (!cql.ContainsKey("cql"))
-                {
-                    throw new DuradosException("Cql does not contains cql in web config");
-                }
-                cqlConfig.Cqls.Add(cql["name"].ToString(), cql["cql"].ToString());
-            }
+            cqlConfig.Cqls = GetCqls(cqlsFileName);
             //GetWebhookParameters("AppCreated");
         }
+
+        private static Dictionary<string, string> GetCqls(string cqlsFileName)
+        {
+            Dictionary<string, string> dic =  new Dictionary<string, string>();
+            string jsonString = GetStringFromFile(cqlsFileName);
+
+
+            Dictionary<string, object> cqls = Durados.Web.Mvc.Controllers.Api.JsonConverter.Deserialize(jsonString);
+
+            foreach (string name in cqls.Keys)
+            {
+                dic.Add(name, cqls[name].ToString());
+            }
+
+            return dic;
+        }
+
+
 
         private static AwsCredentials awsCredentials;
         public static AwsCredentials AwsCredentials
