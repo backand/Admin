@@ -493,11 +493,13 @@ namespace Durados.Web.Mvc.UI.Helpers
             values.Add("apiPath".AsToken(), siteWithoutQueryString);
             values.Add("appName".AsToken(), appName);
             values.Add("firstName".AsToken(), row.IsNull("FirstName") ? username : row["FirstName"].ToString());
-
-            foreach (string key in parameters.Keys)
-                if (!values.ContainsKey(key))
-                    values.Add(key.AsToken(), parameters[key]);
-
+            
+            if (parameters != null && parameters.Count > 0)
+            {
+                foreach (string key in parameters.Keys)
+                    if (!values.ContainsKey(key))
+                        values.Add(key.AsToken(), parameters[key]);
+            }
 
             wfe.PerformActions(this.controller, view, Durados.TriggerDataAction.OnDemand, values, id, row, map.Database.ConnectionString, Convert.ToInt32(id), row["Role"].ToString(), null, null, "newUserVerification");
 
