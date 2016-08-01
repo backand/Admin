@@ -11,6 +11,7 @@ namespace Durados.Web.Mvc.Analytics
 {
     public class Cql
     {
+        public const string AnalyticsLog = "AnalyticsLog";
         public Cql()
         {
 
@@ -111,7 +112,9 @@ namespace Durados.Web.Mvc.Analytics
 
         private string GetFilter(string filter)
         {
-            return "1=1";
+            if (string.IsNullOrEmpty(filter))
+                return "1=1";
+            return "(" + filter + ")";
         }
 
         private Dictionary<string, object> GetInner(string name, int page, int pageSize, string filter, string sort)
@@ -146,6 +149,7 @@ namespace Durados.Web.Mvc.Analytics
         {
             return Maps.CqlConfig;
         }
+
     }
 
 }

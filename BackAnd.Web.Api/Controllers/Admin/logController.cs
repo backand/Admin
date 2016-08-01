@@ -43,20 +43,16 @@ namespace BackAnd.Web.Api.Controllers
     [BackAnd.Web.Api.Controllers.Filters.BackAndAuthorize("Admin,Developer")]
     public class logController : apiController
     {
-        [Route("~/1/log")]
+        [Route("~/1/log/{name}")]
         [HttpGet]
-        public IHttpActionResult Get(int? pageNumber = null, int? pageSize = null, string filter = null, string sort = null)
+        public IHttpActionResult Get(string name, int? pageNumber = null, int? pageSize = null, string filter = null, string sort = null)
         {
-            if (!Maps.IsDevUser())
-            {
-                return ResponseMessage(Request.CreateResponse(HttpStatusCode.Unauthorized, Messages.ActionIsUnauthorized));
-            }
             try
             {
                 if (WriteToExternalLog())
                 {
                     Cql cql = new Cql();
-                    return Ok(cql.Get("log", pageNumber ?? 1, pageSize ?? 1000, filter, sort));
+                    return Ok(cql.Get(name, pageNumber ?? 1, pageSize ?? 1000, filter, sort));
                 }
                 else
                 {
@@ -73,5 +69,7 @@ namespace BackAnd.Web.Api.Controllers
         {
             return System.Convert.ToBoolean(System.Configuration.ConfigurationManager.AppSettings["writeToLogStash"] ?? "true");
         }
+
+        
     }
 }
