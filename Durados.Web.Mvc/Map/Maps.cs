@@ -500,7 +500,7 @@ namespace Durados.Web.Mvc
         private static Dictionary<string, string> GetCqls(string cqlsFileName)
         {
             Dictionary<string, string> dic =  new Dictionary<string, string>();
-            string jsonString = GetStringFromFile(cqlsFileName);
+            string jsonString = GetStringFromFile(cqlsFileName, ref cqlsJsonString);
 
 
             Dictionary<string, object> cqls = Durados.Web.Mvc.Controllers.Api.JsonConverter.Deserialize(jsonString);
@@ -2252,6 +2252,7 @@ namespace Durados.Web.Mvc
         }
 
         private static string webhookJsonString = null;
+        private static string cqlsJsonString = null;
         //private static Dictionary<string, object> webhookJson = null;
         //private static Dictionary<string, object> GetJsonFromFile(string fileName)
         //{
@@ -2272,14 +2273,14 @@ namespace Durados.Web.Mvc
             return webhookJson;
         }
 
-        private static string GetStringFromFile(string fileName)
+        private static string GetStringFromFile(string fileName, ref string jsonString)
         {
             fileName = Path.GetDirectoryName(AppDomain.CurrentDomain.BaseDirectory) + @"\" + fileName;
-            if (webhookJsonString == null)
+            if (jsonString == null)
             {
-                webhookJsonString = GetTextFileContent(fileName);
+                jsonString = GetTextFileContent(fileName);
             }
-            return webhookJsonString;
+            return jsonString;
         }
 
         private static string WebhooksParametersFileName = null;
@@ -2288,7 +2289,7 @@ namespace Durados.Web.Mvc
             if (string.IsNullOrEmpty(WebhooksParametersFileName))
                 return null;
 
-            string jsonString = GetStringFromFile(WebhooksParametersFileName);
+            string jsonString = GetStringFromFile(WebhooksParametersFileName, ref webhookJsonString);
 
             jsonString = ReplaceParameters(jsonString);
 
