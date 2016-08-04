@@ -19,14 +19,45 @@ namespace Durados.Web.Mvc.Analytics
 
         public object Get(string name, int page, int pageSize, string filter, string sort)
         {
-            return GetBackandResponse(GetInner(name, page, pageSize, GetFilter(filter), GetSort(sort)));
+            try
+            {
+                return GetBackandResponse(GetInner(name, page, pageSize, GetFilter(filter), GetSort(sort)));
+            }
+            catch (CqlException exception)
+            {
+                if (TryGetWithoutFilter(name, sort))
+                {
+                    throw new CqlException("The filter '" + filter + "' failed with the following error: " + exception.Message, exception);
+                }
+                throw exception;
+            }
+        }
+
+        private bool TryGetWithoutFilter(string name, string sort)
+        {
+            try
+            {
+                GetBackandResponse(GetInner(name, 1, 1, GetFilter(null), GetSort(sort)));
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
         }
 
         private object GetBackandResponse(Dictionary<string, object> cqlResponse)
         {
             if (!cqlResponse.ContainsKey("table"))
             {
-                throw new CqlException("Cql response is missing the table property");
+                if (cqlResponse.ContainsKey("errors"))
+                {
+                    throw new CqlException(GetErrorMessage(cqlResponse));
+                }
+                else
+                {
+                    throw new CqlException("Unexpected CQL failure");
+                }
             }
 
             Dictionary<string, object> response = new Dictionary<string, object>();
@@ -56,6 +87,22 @@ namespace Durados.Web.Mvc.Analytics
             response.Add("data", list.ToArray());
 
             return response;
+        }
+
+        private string GetErrorMessage(Dictionary<string, object> cqlResponse)
+        {
+            List<string> messages = new List<string>();
+
+            foreach (Dictionary<string, object> errorMessage in (object[])cqlResponse["errors"])
+            {
+                if (errorMessage.ContainsKey("detailed_message"))
+                {
+                    messages.Add(errorMessage["detailed_message"].ToString());
+                }
+            }
+
+
+            return string.Join(",", messages);
         }
 
         private object ConvertToBackand(object o)
