@@ -500,7 +500,7 @@ namespace Durados.Web.Mvc
         private static Dictionary<string, string> GetCqls(string cqlsFileName)
         {
             Dictionary<string, string> dic =  new Dictionary<string, string>();
-            string jsonString = GetStringFromFile(cqlsFileName, ref cqlsJsonString);
+            string jsonString = GetStringFromFile(cqlsFileName, ref cqlsJsonString).Replace("\\", "\\\\");
 
 
             Dictionary<string, object> cqls = Durados.Web.Mvc.Controllers.Api.JsonConverter.Deserialize(jsonString);
