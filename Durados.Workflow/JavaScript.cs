@@ -353,7 +353,7 @@ namespace Durados.Workflow
             userProfile.Add("role", currentUserRole);
             userProfile.Add("app", view.Database.GetCurrentAppName());
             userProfile.Add("userId", view.Database.GetCurrentUserId());
-            userProfile.Add("token", System.Web.HttpContext.Current.Request.Headers["Authorization"] ?? view.Database.GetAuthorization());
+            userProfile.Add("token", GetUserProfileAuthToken(view));
             if (!clientParameters.ContainsKey("filedata"))
                 userProfile.Add("request", GetRequest());
 
@@ -488,6 +488,14 @@ namespace Durados.Workflow
                 else
                     values[ReturnedValueKey] = r;
             }
+        }
+
+        private static string GetUserProfileAuthToken(View view)
+        {
+            if (view.Database.GetCurrentUserId() == null)
+                return view.Database.GetAuthorization();
+            else
+                return System.Web.HttpContext.Current.Request.Headers["Authorization"] ?? view.Database.GetAuthorization();
         }
 
         private static Dictionary<string, object> GetRequest()
