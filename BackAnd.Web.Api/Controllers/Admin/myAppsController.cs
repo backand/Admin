@@ -484,7 +484,8 @@ namespace BackAnd.Web.Api.Controllers
 
                 if (values.ContainsKey("Name") && values["Name"].ToString() != appName)
                 {
-                    return ResponseMessage(Request.CreateResponse(HttpStatusCode.Conflict, "The app Name cannot be changed."));
+                    if (!Maps.IsDevUser())
+                        return ResponseMessage(Request.CreateResponse(HttpStatusCode.Conflict, "The app Name cannot be changed."));
 
                     newAppName = GetCleanName(values["Name"].ToString());
                     if (string.IsNullOrEmpty(newAppName))
