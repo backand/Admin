@@ -372,6 +372,8 @@ namespace Durados.Web.Mvc
         public override string GetPermanentFilter()
         {
             string permanentFilter = base.GetPermanentFilter();
+            if (string.IsNullOrEmpty(permanentFilter))
+                return permanentFilter;
             if (permanentFilter.Contains(Database.UserPlaceHolder) || permanentFilter.ToLower().Contains(Database.UserPlaceHolder.ToLower()))
                 permanentFilter = permanentFilter.Replace(Database.UserPlaceHolder, Database.GetUserID() ?? Database.NullInt, false);
             if (System.Web.HttpContext.Current.User != null && System.Web.HttpContext.Current.User.Identity != null && !string.IsNullOrEmpty(System.Web.HttpContext.Current.User.Identity.Name) && (permanentFilter.Contains(Database.UsernamePlaceHolder) || permanentFilter.ToLower().Contains(Database.UsernamePlaceHolder.ToLower())))
@@ -418,9 +420,25 @@ namespace Durados.Web.Mvc
                 return permanentFilter;
 
             string parameters = System.Web.HttpContext.Current.Request.QueryString["parameters"];
-
-            //Dictionary<string, object> rulesParameters = RestHelper.Deserialize(this, System.Web.HttpContext.Current.Server.UrlDecode(parameters));
-            Dictionary<string, object> values = Durados.Web.Mvc.UI.Json.JsonSerializer.Deserialize(parameters);
+            Dictionary<string, object> values = new Dictionary<string,object>();
+            try
+            {
+                //Dictionary<string, object> rulesParameters = RestHelper.Deserialize(this, System.Web.HttpContext.Current.Server.UrlDecode(parameters));
+                values = Durados.Web.Mvc.UI.Json.JsonSerializer.Deserialize(parameters);
+            }
+            catch(Exception ex)
+            {
+                string text;
+                try
+                {
+                     text = Map.Database.Decrypt(parameters);
+                }
+                catch(Exception e)
+                {
+                    throw ex;
+                }
+                values = Durados.Web.Mvc.UI.Json.JsonSerializer.Deserialize(text);
+            }
 
             foreach (string key in values.Keys)
             {
@@ -676,6 +694,12 @@ namespace Durados.Web.Mvc
                             values.Add("defaultValue", field.DefaultValue);
                         }
                     }
+
+                    if (types.ContainsKey(field.JsonName))
+                    {
+                        throw new DuplicateFieldException(field.JsonName,field.View.Name);
+                    }
+
                     types.Add(field.JsonName, values);
                 }
             }
@@ -804,8 +828,15 @@ namespace Durados.Web.Mvc
                     {
                         try
                         {
-
-                            socket.emitAll(JsonName + "." + eventName, string.Format("{{\"id\":\"{0}\", \"objectName\":\"{1}\", \"event\":\"{2}\"}}", pk, JsonName, eventName), appName);
+                            string data = string.Format("{{\"id\":\"{0}\", \"objectName\":\"{1}\", \"event\":\"{2}\"}}", pk, JsonName, eventName);
+                            if (Database.IsConfig)
+                            {
+                                socket.emitRole(JsonName + "." + eventName, data, "Admin", appName);
+                            }
+                            else
+                            {
+                                socket.emitAll(JsonName + "." + eventName, data, appName);
+                            }
 
                         }
                         catch (Exception exception)

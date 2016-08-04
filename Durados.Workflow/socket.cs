@@ -53,6 +53,16 @@ namespace Backand
             return EmitPrivate(eventName, data, null, "Role", role);
         }
 
+        public virtual object emitRole(string eventName, object data, string role, string appName)
+        {
+            if (string.IsNullOrEmpty(role))
+            {
+                return new { status = 502, message = "if emitRole is called, you must specify a role as parameter " };
+            }
+
+            return EmitPrivate(eventName, data, appName, "Role", role);
+        }
+
         /// <summary>
         /// send message to specific users
         /// </summary>

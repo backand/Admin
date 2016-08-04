@@ -329,6 +329,11 @@ namespace BackAnd.Web.Api.Controllers
 
                 return Ok(backandToObjectResult);
             }
+            catch (DuplicateFieldException exception)
+            {
+                return ResponseMessage(Request.CreateResponse(HttpStatusCode.Conflict, exception.Message));
+
+            }
             catch (WebException exception)
             {
                 return ResponseMessage(Request.CreateResponse((HttpStatusCode)(int)exception.Status, exception.Message));

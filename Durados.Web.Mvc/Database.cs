@@ -508,6 +508,11 @@ namespace Durados.Web.Mvc
             }
         }
 
+        public Durados.View GetDevUserView()
+        {
+            return Maps.Instance.DuradosMap.Database.Views[UserViewName];
+            
+        }
 
         public override Durados.View GetUserView()
         {
@@ -622,10 +627,29 @@ namespace Durados.Web.Mvc
                 return null;
             }
             DataRow userRow = userView.GetDataRow(usernameField, username, false);
+            if (userRow == null)
+                userRow = GetDevUserRow(username);
 
             SetValueFromRequestCache(key, userRow);
 
             return userRow;
+        }
+
+        public virtual DataRow GetDevUserRow(string username)
+        {
+            if (!IsDevUser(username))
+                return null;
+            View userView = (View)GetDevUserView();
+            Field usernameField = userView.Fields[UsernameFieldName];
+            DataRow userRow = userView.GetDataRow(usernameField, username, false);
+
+            
+            return userRow;
+        }
+
+        private bool IsDevUser(string username)
+        {
+            return Maps.IsDevUser(username);
         }
 
         public virtual DataRow GetUserRow(int userId)
@@ -1377,6 +1401,21 @@ namespace Durados.Web.Mvc
 
             return list;
         }
+        public string Decrypt(string token)
+        {
+            string text = null;
+            Map duradosMap = Maps.Instance.DuradosMap;
+            try
+            {
+                text = Durados.Security.CipherUtility.Decrypt<System.Security.Cryptography.AesManaged>(token, duradosMap.Database.DefaultMasterKeyPassword, duradosMap.Database.Salt);
+            }
+            catch
+            {
+                text = Durados.Security.CipherUtility.Decrypt<System.Security.Cryptography.AesManaged>(System.Web.HttpContext.Current.Server.UrlDecode(token), duradosMap.Database.DefaultMasterKeyPassword, duradosMap.Database.Salt);
+            }
+            return text;
+        }
+
     }
 
 

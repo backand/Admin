@@ -409,6 +409,8 @@ namespace Durados.Web.Mvc
             
             System.Net.ServicePointManager.SecurityProtocol = System.Net.SecurityProtocolType.Ssl3 | System.Net.SecurityProtocolType.Tls | System.Net.SecurityProtocolType.Tls11 | System.Net.SecurityProtocolType.Tls12;
 
+            DevUsers = System.Configuration.ConfigurationManager.AppSettings["DevUsers"].Split(',');
+
         }
 
         public static string GetConfigPath(string filename)
@@ -477,6 +479,7 @@ namespace Durados.Web.Mvc
         public static string S3Bucket { get; private set; }
         public static string S3FilesBucket { get; private set; }
         public static string SendWelcomeEmail { get; private set; }
+        public static string[] DevUsers { get; private set; }
 
         public static string ParseConverterMasterKey { get; private set; }
         public static string ParseConverterAdminKey { get; private set; }
@@ -1537,6 +1540,7 @@ namespace Durados.Web.Mvc
             map.Url = GetAppUrl(appName);
             map.SiteInfo.LogoHref = map.Url;
             map.Guid = appRow.Guid;
+            map.CreatorId = appRow.Creator;
             map.AnonymousToken = appRow.AnonymousToken;
             map.SignUpToken = appRow.SignUpToken;
 
@@ -1702,6 +1706,12 @@ namespace Durados.Web.Mvc
             SqlAccess sql = new SqlAccess();
             string sSqlCommand = "";
 
+            Guid parsedGuid;
+            if (!Guid.TryParse(guid, out parsedGuid))
+            {
+                throw new ArgumentException("Illegal token");
+            }
+
             sSqlCommand = "select [name] from durados_App with(nolock) where [Guid] = '" + guid + "'";
 
             object scalar = sql.ExecuteScalar(duradosMap.connectionString, sSqlCommand);
@@ -1717,7 +1727,7 @@ namespace Durados.Web.Mvc
             SqlAccess sql = new SqlAccess();
             string sSqlCommand = "";
 
-            if (!userId.HasValue)
+            if (!userId.HasValue || IsDevUser())
             {
                 sSqlCommand = "select Id from durados_App with(nolock) where Name = N'" + appName + "'";
             }
@@ -2064,6 +2074,13 @@ namespace Durados.Web.Mvc
                 }
                 catch { }
             }
+        }
+
+        public static bool IsDevUser(string username = null)
+        {
+            if (username == null)
+                username = Instance.DuradosMap.Database.GetCurrentUsername();
+            return DevUsers.Contains(username);
         }
     }
 }

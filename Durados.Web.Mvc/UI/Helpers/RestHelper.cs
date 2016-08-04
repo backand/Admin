@@ -2990,7 +2990,10 @@ namespace Durados.Web.Mvc.UI.Helpers
 
             foreach (View view in map.Database.Views.Values.Where(v => !v.SystemView && !v.IsCloned).OrderBy(v => v.JsonName))
             {
-                dataSecurity.Add(view.JsonName, view.Precedent);
+                if (!dataSecurity.ContainsKey(view.JsonName))
+                {
+                    dataSecurity.Add(view.JsonName, view.Precedent);
+                }
             }
 
             return dataSecurity;
@@ -4693,6 +4696,7 @@ namespace Durados.Web.Mvc.UI.Helpers
             try
             {
                 wfe.PerformActions(this, view, Durados.TriggerDataAction.OnDemand, values, null, null, map.Database.ConnectionString, Convert.ToInt32(map.Database.GetUserID()), map.Database.GetUserRole(), null, null, Durados.Database.CustomValidationActionName);
+
             }
             catch (Exception exception)
             {
@@ -4756,11 +4760,70 @@ namespace Durados.Web.Mvc.UI.Helpers
                 }
 
             }
+
+            if (values.ContainsKey("Username"))
+            {
+                username = values["Username"].ToString();
+            }
+            if (values.ContainsKey("username"))
+            {
+                username = values["username"].ToString();
+            }
+
+            if (System.Web.HttpContext.Current != null && System.Web.HttpContext.Current.Items.Contains(Database.Username) && System.Web.HttpContext.Current.Items[Database.Username] != username)
+            {
+                System.Web.HttpContext.Current.Items[Database.Username] = username;
+            }
+
+            string firstName = null;
+            if (values.ContainsKey("FirstName"))
+            {
+                firstName = values["FirstName"].ToString();
+            }
+            if (values.ContainsKey("firstName"))
+            {
+                firstName = values["firstName"].ToString();
+            }
+
+            string lastName = null;
+            if (values.ContainsKey("LastName"))
+            {
+                lastName = values["LastName"].ToString();
+            }
+            if (values.ContainsKey("lastName"))
+            {
+                lastName = values["lastName"].ToString();
+            }
+
+            string role = null;
+            if (values.ContainsKey("Role"))
+            {
+                role = values["Role"].ToString();
+            }
+            if (values.ContainsKey("UserRole_Parent"))
+            {
+                role = values["UserRole_Parent"].ToString();
+            }
+
+            if (values.ContainsKey("password"))
+            {
+                password = values["password"].ToString();
+            }
+            if (values.ContainsKey("Password"))
+            {
+                password = values["Password"].ToString();
+            }
+
             if (!IsUserExist(username))
             {
                 try
                 {
-                    AddUser(username);
+                    View roleView = Map.Database.GetRoleView();
+                    if (!string.IsNullOrEmpty(role) && roleView.GetDataRow(role) == null)
+                    {
+                        roleView.Create(new Dictionary<string, object>() { { "Name", role }, { "Description", role } });
+                    }
+                    AddUser(username, password, firstName, lastName, role);
                 }
                 catch (Exception exception)
                 {
@@ -4804,14 +4867,15 @@ namespace Durados.Web.Mvc.UI.Helpers
         }
 
 
-        private void AddUser(string username)
+        private void AddUser(string username, string password = null, string firstName = null, string lastName = null, string role = null)
         {
             AccountService account = new AccountService(this);
 
             Map map = Maps.Instance.GetMap();
-
-            string password = GeneratePassword(4, 4, 4);
-            Durados.Web.Mvc.UI.Helpers.AccountService.SignUpResults signUpResults = account.SignUp(map.AppName, username.Split('@').FirstOrDefault(), string.Empty, username, null, true, password, password, false, null, null, null, null, null, null, null, null, null);
+            string password2 = password;
+            if (string.IsNullOrEmpty(password) || password.Length < 6)
+                password2 = GeneratePassword(4, 4, 4);
+            Durados.Web.Mvc.UI.Helpers.AccountService.SignUpResults signUpResults = account.SignUp(map.AppName, firstName ?? username.Split('@').FirstOrDefault(), lastName ?? string.Empty, username, role, true, password2, password2, false, null, null, null, null, null, null, null, null, null);
 
         }
 

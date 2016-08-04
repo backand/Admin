@@ -40,8 +40,9 @@ namespace BackAnd.Web.Api.Controllers
     {
 
         [Route("~/1/hosting/folder")]
+        [Route("~/1/nodejs/folder")]
         [HttpGet]
-        public IHttpActionResult smartListFolder(string path = null)
+        public IHttpActionResult smartListFolder(string path = null, string objectName = null, string actionName = null)
         {
             try
             {
@@ -54,8 +55,18 @@ namespace BackAnd.Web.Api.Controllers
                 Dictionary<string, object> data = new Dictionary<string, object>();
                 string appName = Map.AppName;
 
-                data.Add("bucket", Maps.S3Bucket);
-                data.Add("folder", appName);
+                string bucket = Maps.S3Bucket;
+                string folder = appName;
+                if (Request.GetRouteData().Route.RouteTemplate == "1/nodejs/folder")
+                {
+                    bucket = Maps.NodeJSBucket;
+                    if (string.IsNullOrEmpty(path))
+                        folder = appName + "/" + objectName + "/" + actionName;
+                
+                }
+
+                data.Add("bucket", bucket);
+                data.Add("folder", folder);
                 data.Add("pathInFolder", path);
 
 
@@ -114,6 +125,74 @@ namespace BackAnd.Web.Api.Controllers
             }
         }
 
+        [Route("~/1/syncInfo")]
+        [HttpPost]
+        public IHttpActionResult syncInfo()
+        {
+            try
+            {
+                string dir = Map.AppName;
+                
+                Dictionary<string, string> buckets = new Dictionary<string, string>() { { "hosting", Maps.S3Bucket }, { "nodejs", Maps.NodeJSBucket } };
+
+                Dictionary<string, object> services = new Dictionary<string, object>();
+
+                foreach (string key in buckets.Keys)
+                {
+                    string bucket = buckets[key];
+                    Dictionary<string, object> credentials = GetInfo(dir, bucket);
+                    Dictionary<string, object> adjustedCredentials = AdjustCredentials(credentials);
+
+                    services.Add(key, adjustedCredentials);
+                }
+
+                return Ok(services);
+            }
+            catch (Exception exception)
+            {
+                return Ok(new { valid = "never", warnings = new string[1] { exception.Message } });
+
+            }
+        }
+
+        private Dictionary<string, object> AdjustCredentials(Dictionary<string, object> dic)
+        {
+            Dictionary<string, object> lowerDic = LowerKeys(dic);
+            ((Dictionary<string, object>)lowerDic["credentials"]).Remove("expiration");
+            return lowerDic;
+        }
+
+        private Dictionary<string, object> LowerKeys(Dictionary<string, object> dic)
+        {
+            Dictionary<string, object> lowerDic = new Dictionary<string, object>();
+
+            foreach (string key in dic.Keys)
+            {
+                string lower = key.Substring(0, 1).ToLower() + key.Substring(1);
+                object value = dic[key];
+                if (value is Dictionary<string, object>)
+                {
+                    lowerDic.Add(lower, LowerKeys((Dictionary<string, object>)value));
+                }
+                else
+                {
+                    lowerDic.Add(lower, value);
+                }
+            }
+
+            return lowerDic;
+        }
+
+        private Dictionary<string, object> GetInfo(string dir, string bucket)
+        {
+            JavaScriptSerializer jss = new JavaScriptSerializer();
+            var data = new Dictionary<string, object>() { { "bucket", bucket }, { "dir", dir } };
+            string json = jss.Serialize(data);
+            Dictionary<string, object> credentials = bucketCredentials(json);
+            credentials.Add("Info", new Dictionary<string, object>() { { "Bucket", bucket }, { "Dir", dir } });
+            return credentials;
+        }
+
 
         protected virtual Dictionary<string, object> bucketCredentials(string json)
         {
@@ -153,10 +232,31 @@ namespace BackAnd.Web.Api.Controllers
             }
 
             return result;
+        }
 
+        [Route("~/1/template/{service}")]
+        [HttpGet]
+        public IHttpActionResult template(string service)
+        {
+            try
+            {
+                Dictionary<string, object> response = new Dictionary<string, object>();
+                switch (service)
+                {
+                    case "nodejs":
+                        response.Add("url", "http://s3.amazonaws.com/templates.backand.net/action/nodejs/1.0/template.zip");
+                        break;
 
+                    default:
+                        throw new DuradosException("There is no tempalte for this service " + service);
+                }
+                return Ok(response);
+            }
+            catch (Exception exception)
+            {
+                return Ok(new { valid = "never", warnings = new string[1] { exception.Message } });
 
-
+            }
         }
     }
 }
