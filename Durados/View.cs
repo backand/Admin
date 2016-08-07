@@ -2056,6 +2056,8 @@ namespace Durados
         public IDbCommand Command { get; set; }
         public IDbCommand SysCommand { get; set; }
 
+        public bool IgnorePermanentFilter { get; set; }
+
         public DataActionEventArgs(View view, Dictionary<string, object> values, string pk, IDbCommand command, IDbCommand sysCommand)
             : base()
         {
@@ -2064,6 +2066,7 @@ namespace Durados
             this.pk = pk;
             Command = command;
             SysCommand = sysCommand;
+            IgnorePermanentFilter = false;  
         }
 
         public View View

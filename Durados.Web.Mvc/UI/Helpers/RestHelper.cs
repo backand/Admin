@@ -2880,6 +2880,14 @@ namespace Durados.Web.Mvc.UI.Helpers
             }
             stat = map.Stat.Stat;
             item.Add("stat", stat);
+            if (item.ContainsKey("PaymentStatus"))
+            {
+                item["PaymentStatus"] = (int)map.PaymentStatus;
+            }
+            else
+            {
+                item.Add("PaymentStatus", (int)map.PaymentStatus);
+            }
         }
 
         public class StatAndTime
@@ -2961,7 +2969,25 @@ namespace Durados.Web.Mvc.UI.Helpers
             Dictionary<string, object> authorizationSecurity = GetAuthorizationSecurity(appName);
             Dictionary<string, object> dataSecurity = GetDataSecurity(appName);
 
-            return new Dictionary<string, object>() { { "last24hours", last24 }, { "diffLastDaytoYesterday", diff24 }, { "last30days", last30 }, { "diffLast30DaysToPrev", diff30 }, { "sizeInMb", size }, { "totalRows", totalRows }, { "authorizationSecurity", authorizationSecurity }, { "dataSecurity", dataSecurity } };
+            Dictionary<string, object> stat = new Dictionary<string, object>() { { "last24hours", last24 }, { "diffLastDaytoYesterday", diff24 }, { "last30days", last30 }, { "diffLast30DaysToPrev", diff30 }, { "sizeInMb", size }, { "totalRows", totalRows }, { "authorizationSecurity", authorizationSecurity }, { "dataSecurity", dataSecurity } };
+
+            //try
+            //{
+            //    Mvc.Stat.Producer producer = new Mvc.Stat.Producer();
+
+            //    Dictionary<string, Dictionary<string, object>> appsMeasurements = (Dictionary<string, Dictionary<string, object>>)producer.Produce(DateTime.Today, null, new string[1] { appName }, null, true);
+
+            //    Dictionary<string, object> measurements = appsMeasurements[appName];
+            //    foreach (string measurement in measurements.Keys)
+            //    {
+            //        stat.Add(measurement, measurements[measurement]);
+            //    }
+            //}
+            //catch (Exception exception)
+            //{
+            //    Maps.Instance.DuradosMap.Logger.Log("producer", "Produce", appName, exception, 1, appName);
+            //}
+            return stat;
         }
 
         private Dictionary<string, object> GetDataSecurity(string appName)
@@ -3040,7 +3066,7 @@ namespace Durados.Web.Mvc.UI.Helpers
             return null;
         }
 
-        private string GetTotalRowsSql(SqlProduct sqlProduct)
+        public static string GetTotalRowsSql(SqlProduct sqlProduct)
         {
             string sql = null;
 
@@ -3110,7 +3136,7 @@ namespace Durados.Web.Mvc.UI.Helpers
             return sqlAccess;
         }
 
-        private string GetSql(SqlProduct sqlProduct)
+        public static string GetSql(SqlProduct sqlProduct)
         {
             string sql = null;
 
@@ -4252,7 +4278,13 @@ namespace Durados.Web.Mvc.UI.Helpers
         public static readonly string InvalidGrant = "invalid_grant";
         public static readonly string AppNameNotSupplied = "The app name was not supplied.";
         public static readonly string AppNameNotExists = "The app {0} does not exist.";
-
+        public static string AppLocked
+        {
+            get
+            {
+                return Maps.AppLockedMessage;
+            }
+        }
         public static readonly string MissingUserIdOrAppId = "Missing userId or appId.";
         public static readonly string WrongUserIdOrAppId = "Wrong userId or appId.";
         public static readonly string EnableKeysAccess = "Enable keys access.";
@@ -4581,6 +4613,11 @@ namespace Durados.Web.Mvc.UI.Helpers
                 return true;
             else
                 return Durados.Web.Mvc.Maps.Instance.AppExists(appname).HasValue;
+        }
+
+        public bool IsAppLocked(string appname)
+        {
+            return Durados.Web.Mvc.Maps.Instance.AppLocked(appname);
         }
 
         public bool IsValid(string username, string password, out UserValidationError userValidationError, out string customError, out bool hasCustomValidation, out bool customValid)

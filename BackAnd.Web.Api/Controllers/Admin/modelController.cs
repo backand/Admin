@@ -57,7 +57,8 @@ namespace BackAnd.Web.Api.Controllers
                         ArrayList arrayList = (ArrayList)transformResult[Alter];
                         for (int i = 0; i< arrayList.Count; i++)
                         {
-                            arrayList[i] = AdjustSql(arrayList[i].ToString());
+                            if (arrayList[i] != null)
+                                arrayList[i] = AdjustSql(arrayList[i].ToString());
                         }
                     }
                 }

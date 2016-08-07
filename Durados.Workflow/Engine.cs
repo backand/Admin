@@ -177,7 +177,7 @@ namespace Durados.Workflow
 
         public static Database GetCurrentDatabase()
         {
-            if (System.Web.HttpContext.Current.Items[Database.AppName] != null)
+            if (System.Web.HttpContext.Current != null && System.Web.HttpContext.Current.Items[Database.AppName] != null)
             {
                 string appName = System.Web.HttpContext.Current.Items[Database.AppName].ToString();
 

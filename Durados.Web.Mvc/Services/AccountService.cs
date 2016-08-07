@@ -381,7 +381,7 @@ namespace Durados.Web.Mvc.UI.Helpers
                 {
                     if (IsSignupEmailVerification(appName, isSignupEmailVerification))
                     {
-                        SendVerificationEmail(username, appName, firstName, lastName);
+                        SendVerificationEmail(username, appName, firstName, lastName,parameters);
                         signUpResults.Status = SignUpStatus.PengingVerification;
                         return signUpResults;
                     }
@@ -467,7 +467,7 @@ namespace Durados.Web.Mvc.UI.Helpers
             return new Durados.Web.Mvc.Workflow.Engine();
         }
 
-        private void SendVerificationEmail(string username, string appName, string firstName, string lastName)
+        private void SendVerificationEmail(string username, string appName, string firstName, string lastName, Dictionary<string,object> parameters)
         {
             string encrypted = GetVerificationParametersToken(appName, username);
             string token = System.Web.HttpContext.Current.Server.UrlEncode(encrypted);
@@ -493,7 +493,13 @@ namespace Durados.Web.Mvc.UI.Helpers
             values.Add("apiPath".AsToken(), siteWithoutQueryString);
             values.Add("appName".AsToken(), appName);
             values.Add("firstName".AsToken(), row.IsNull("FirstName") ? username : row["FirstName"].ToString());
-
+            
+            if (parameters != null && parameters.Count > 0)
+            {
+                foreach (string key in parameters.Keys)
+                    if (!values.ContainsKey(key))
+                        values.Add(key.AsToken(), parameters[key]);
+            }
 
             wfe.PerformActions(this.controller, view, Durados.TriggerDataAction.OnDemand, values, id, row, map.Database.ConnectionString, Convert.ToInt32(id), row["Role"].ToString(), null, null, "newUserVerification");
 
@@ -939,7 +945,7 @@ namespace Durados.Web.Mvc.UI.Helpers
 
             Map map = GetMap(appName);
 
-            return Maps.Instance.AppExists(appName, map.Database.GetUserID(username)).HasValue;
+            return Maps.Instance.AppExists(appName, map.Database.GetUserID(username), true).HasValue;
         }
 
         protected virtual bool IsInvited(string username, string appName)

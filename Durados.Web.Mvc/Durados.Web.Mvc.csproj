@@ -154,6 +154,10 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\Duradus.Web.Mvc.App\deployment\PayPal.dll</HintPath>
     </Reference>
+    <Reference Include="RestSharp, Version=104.4.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\RestSharp.104.4.0\lib\net4\RestSharp.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="StackExchange.Redis, Version=1.0.316.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\StackExchange.Redis.1.0.488\lib\net45\StackExchange.Redis.dll</HintPath>
@@ -216,6 +220,18 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Analytics\CoolaReportDataAccess.cs" />
+    <Compile Include="Analytics\Cql.cs" />
+    <Compile Include="Analytics\CqlConfig.cs" />
+    <Compile Include="Analytics\CqlException.cs" />
+    <Compile Include="Analytics\EmbeddedReports.cs" />
+    <Compile Include="Analytics\EmbeddedReportsConfig.cs" />
+    <Compile Include="Analytics\LastPeriod.cs" />
+    <Compile Include="Analytics\Report.cs" />
+    <Compile Include="Analytics\ReportConfig.cs" />
+    <Compile Include="Analytics\ReportDataAccess.cs" />
+    <Compile Include="Analytics\ReportDataType.cs" />
+    <Compile Include="Analytics\ReportParameters.cs" />
     <Compile Include="Azure\CacheFactory.cs" />
     <Compile Include="Azure\ILargeObjectCachingStamp.cs" />
     <Compile Include="Azure\DuradosStorage.cs" />
@@ -289,6 +305,7 @@
     <Compile Include="Map\MapSimpleCache.cs" />
     <Compile Include="Map\NoMorePortsAvailableException.cs" />
     <Compile Include="Map\OnBoardingStatus.cs" />
+    <Compile Include="Map\PaymentStatus.cs" />
     <Compile Include="Map\PendingPool.cs" />
     <Compile Include="Map\PluginCache.cs" />
     <Compile Include="Map\PortManager.cs" />
@@ -301,6 +318,7 @@
       <DependentUpon>Settings.settings</DependentUpon>
     </Compile>
     <Compile Include="Services\AccountService.cs" />
+    <Compile Include="Services\EmailProviders.cs" />
     <Compile Include="SiteInfo.cs" />
     <Compile Include="SocialLogin\ExternalLoginData.cs" />
     <Compile Include="SocialLogin\Facebook\FacebookException.cs" />
@@ -320,6 +338,26 @@
     <Compile Include="SocialLogin\Twitter\TwitterException.cs" />
     <Compile Include="SocialLogin\Twitter\TwitterProfile.cs" />
     <Compile Include="SocialLogin\Twitter\TwitterSocial.cs" />
+    <Compile Include="Stat\App.cs" />
+    <Compile Include="Stat\Measurements\Development\DbSize.cs" />
+    <Compile Include="Stat\Measurements\Development\DevMeasurement.cs" />
+    <Compile Include="Stat\Measurements\Development\TablesCount.cs" />
+    <Compile Include="Stat\Measurements\Development\MaxTableTotalRows.cs" />
+    <Compile Include="Stat\Measurements\Development\TotalRows.cs" />
+    <Compile Include="Stat\Measurements\Development\Factor.cs" />
+    <Compile Include="Stat\Measurements\Development\XmlSize.cs" />
+    <Compile Include="Stat\Measurements\S3\AwsCredentials.cs" />
+    <Compile Include="Stat\Measurements\S3\NodeJsS3Measurement.cs" />
+    <Compile Include="Stat\Measurements\S3\FilesS3Measurement.cs" />
+    <Compile Include="Stat\Measurements\S3\S3Measurement.cs" />
+    <Compile Include="Stat\Measurements\S3\HostingS3Measurement.cs" />
+    <Compile Include="Stat\Measurements\Sys\AnonymousUsers.cs" />
+    <Compile Include="Stat\Measurement.cs" />
+    <Compile Include="Stat\Measurements\Sys\SysMeasurement.cs" />
+    <Compile Include="Stat\MeasurementType.cs" />
+    <Compile Include="Stat\Producer.cs" />
+    <Compile Include="Stat\Measurements\Sys\RegisteredUsers.cs" />
+    <Compile Include="Stat\Measurements\Sys\TeamSize.cs" />
     <Compile Include="UI\Charting\BasicChartBuilder.cs" />
     <Compile Include="UI\CheckList.cs" />
     <Compile Include="UI\ClientParams.cs" />
@@ -406,6 +444,13 @@
     <Compile Include="UI\Json\View.cs" />
     <Compile Include="UI\ParentFieldViewer.cs" />
     <Compile Include="UI\ViewViewer.cs" />
+    <Compile Include="Webhook\Webhook.cs" />
+    <Compile Include="Webhook\WebhookErrorHandling.cs" />
+    <Compile Include="Webhook\WebhookNotFoundException.cs" />
+    <Compile Include="Webhook\WebhookParameters.cs" />
+    <Compile Include="Webhook\WebhookRequestException.cs" />
+    <Compile Include="Webhook\WebhookResponseException.cs" />
+    <Compile Include="Webhook\WebhookType.cs" />
     <Compile Include="Workflow\WebService.cs" />
     <Compile Include="Workflow\HistoryNotifier.cs" />
     <Compile Include="Workflow\Notifier.cs" />

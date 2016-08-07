@@ -89,7 +89,7 @@ namespace Durados.DataAccess
 
         protected override string GetPointFieldStatement(Field field)
         {
-            return string.Format("CONCAT(X(`{0}`.`{1}`), \", \", Y(`{0}`.`{1}`))  as `{1}`", field.View.DataTable.TableName, field.GetColumnsNames()[0]);
+            return new MySqlTextBuilder().GetPointFieldStatement(field.View.DataTable.TableName, field.GetColumnsNames()[0]);
             //return string.Format("AsText(`{0}`.`{1}`) as `{1}`", field.View.DataTable.TableName, field.GetColumnsNames()[0]);
         }
        
@@ -361,6 +361,12 @@ namespace Durados.DataAccess
         {
             return " () values () ";
         }
+
+        public override string GetPointFieldStatement(string tableName, string fieldName)
+        {
+            return string.Format("CONCAT(X(`{0}`.`{1}`), \", \", Y(`{0}`.`{1}`))  as `{1}`", tableName, fieldName);
+           
+        }
     }
 
     public class MySqlSchema : SqlSchema
@@ -406,7 +412,17 @@ namespace Durados.DataAccess
 
         public override string GetTableRowsCount(string tableName)
         {
-            return "SELECT TABLE_ROWS as rows FROM information_schema.tables WHERE TABLE_NAME = '" + tableName + "'";
+            return "SELECT TABLE_ROWS as rows FROM information_schema.tables WHERE table_schema = DATABASE() and TABLE_NAME = '" + tableName + "'";
+        }
+
+        public override string GetTotalRowsCount()
+        {
+            return "SELECT SUM(TABLE_ROWS) as rows FROM information_schema.tables WHERE table_schema = DATABASE()";
+        }
+
+        public override string GetMaxTableRowsCount()
+        {
+            return "SELECT MAX(TABLE_ROWS) as rows FROM information_schema.tables WHERE table_schema = DATABASE()";
         }
 
         public override string GetPrimaryIndexName(string tableName)
@@ -428,6 +444,12 @@ namespace Durados.DataAccess
         {
             return "select table_name as Name, table_schema as `Schema`, table_type as EntityType from information_schema.tables where table_schema = DATABASE() and table_type = 'BASE TABLE'";
         }
+
+        public override string CountTablesSelectStatement()
+        {
+            return "select Count(*) from information_schema.tables where table_schema = DATABASE() and table_type = 'BASE TABLE'";
+        }
+
         public override string GetTableNamesSelectStatementWithFilter()
         {
             return "select table_name as Name, table_schema as `Schema`, table_type as EntityType from information_schema.tables where table_schema = DATABASE() and table_type = 'BASE TABLE' AND table_name  like N'%[filter]%'" ;

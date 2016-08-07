@@ -124,6 +124,17 @@ namespace BackAnd.Web.Api.Controllers
                                  values.Add(key, jsonPostDict[key]);
                          }
                      }
+                     if (!string.IsNullOrEmpty(jsonPost))
+                     {
+                         if (System.Web.HttpContext.Current.Items.Contains("body"))
+                         {
+                             System.Web.HttpContext.Current.Items["body"] = jsonPost;
+                         }
+                         else
+                         {
+                             System.Web.HttpContext.Current.Items.Add("body", jsonPost);
+                         }
+                     }
                  }
                  catch (Exception exception)
                  {

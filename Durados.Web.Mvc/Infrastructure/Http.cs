@@ -324,7 +324,42 @@ namespace Durados.Web.Mvc.Infrastructure
             return ret;
         }
 
-        public static string PostWebRequest(string url, string postData, string header = "", string Accept = "")
+        public static string PostWebRequest(string url, string postData, string header = "", string Accept = "", Dictionary<string, string> headers = null, int? timeout = null, string contentType = null)
+        {
+
+            System.Net.WebRequest webRequest = System.Net.WebRequest.Create(url);
+            webRequest.Method = "POST";
+            webRequest.ContentType = "application/x-www-form-urlencoded";
+            if (!string.IsNullOrEmpty(contentType))
+            {
+                webRequest.ContentType = contentType;
+            
+            }
+            if (Accept != "")
+                ((HttpWebRequest)webRequest).Accept = Accept;
+            if (header != "")
+                webRequest.Headers.Add(header);
+            if (headers != null)
+            {
+                foreach (string key in headers.Keys)
+                {
+                    webRequest.Headers.Add(key, headers[key]);
+                }
+
+            }
+            Stream reqStream = webRequest.GetRequestStream();
+            byte[] postArray = Encoding.ASCII.GetBytes(postData);
+            reqStream.Write(postArray, 0, postArray.Length);
+            if (timeout.HasValue)
+                webRequest.Timeout = timeout.Value;
+            reqStream.Close();
+            StreamReader sr = new StreamReader(webRequest.GetResponse().GetResponseStream());
+            string result = sr.ReadToEnd();
+
+            return result;
+        }
+
+        public static void PostWebRequest2(string url, string postData, string header = "", string Accept = "", Dictionary<string, string> headers = null, int? timeout = null)
         {
 
             System.Net.WebRequest webRequest = System.Net.WebRequest.Create(url);
@@ -334,14 +369,25 @@ namespace Durados.Web.Mvc.Infrastructure
                 ((HttpWebRequest)webRequest).Accept = Accept;
             if (header != "")
                 webRequest.Headers.Add(header);
+            if (headers != null)
+            {
+                foreach (string key in headers.Keys)
+                {
+                    webRequest.Headers.Add(key, headers[key]);
+                }
+
+            }
             Stream reqStream = webRequest.GetRequestStream();
             byte[] postArray = Encoding.ASCII.GetBytes(postData);
             reqStream.Write(postArray, 0, postArray.Length);
+            if (timeout.HasValue)
+                webRequest.Timeout = timeout.Value;
             reqStream.Close();
-            StreamReader sr = new StreamReader(webRequest.GetResponse().GetResponseStream());
-            string result = sr.ReadToEnd();
-
-            return result;
+            try
+            {
+                webRequest.GetResponse();
+            }
+            catch { }
         }
         
         public static string GetWebRequest(string url, string header = "", string UserAgent = "", int? timeout = null)

@@ -368,6 +368,11 @@ namespace Durados.DataAccess
             return "select TABLE_NAME Name, OWNER as Schema, 'TABLE' as EntityType  from SYS.ALL_TABLES where OWNER = (select sys_context( 'userenv', 'current_schema' ) from dual)";
         }
 
+        public override string CountTablesSelectStatement()
+        {
+            return "select Count(*) from SYS.ALL_TABLES where OWNER = (select sys_context( 'userenv', 'current_schema' ) from dual)";
+        }
+
         public override System.Data.IDbCommand GetCommand()
         {
             return new DuradosCommand(SqlProduct.Oracle);

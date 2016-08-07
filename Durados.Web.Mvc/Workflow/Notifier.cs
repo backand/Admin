@@ -355,7 +355,11 @@ namespace Durados.Web.Mvc.Workflow
                 }
             
             }
-
+            else
+            {
+                content = content.Replace(values, controller.GetTableViewer(), view);
+                
+            }
             return content;
         }
 

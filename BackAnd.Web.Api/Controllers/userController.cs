@@ -27,13 +27,18 @@ namespace BackAnd.Web.Api.Controllers
         [HttpDelete]
         [BackAnd.Web.Api.Controllers.Filters.BackAndAuthorize]
         [Route("backand")]
-        public IHttpActionResult Delete(string username)
+        public IHttpActionResult Delete(string username = null)
         {
             try
             {
-                if (Maps.Instance.DuradosMap.Database.GetUserRole() != "Developer")
+                if (Maps.Instance.DuradosMap.Database.GetUserRole() != "Developer" && username != null)
                 {
-                    return ResponseMessage(Request.CreateResponse(HttpStatusCode.Unauthorized, Messages.ActionIsUnauthorized));
+                    return ResponseMessage(Request.CreateResponse(HttpStatusCode.Unauthorized, new { Messsage = Messages.ActionIsUnauthorized }));
+                }
+
+                if (username == null)
+                {
+                    username = Map.Database.GetCurrentUsername();
                 }
 
                 AccountService account = new AccountService(this);

@@ -67,4 +67,6 @@
     string InsertWithoutColumns();
 
     string FromDual();
+
+    string GetPointFieldStatement(string tableName, string columnName);
 }

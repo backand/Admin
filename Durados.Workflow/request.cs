@@ -5,6 +5,13 @@ namespace Backand
 {
     public class request
     {
+        public string id
+        {
+            get
+            {
+                return ((Guid)(Durados.Workflow.JavaScript.GetCacheInCurrentRequest(Durados.Workflow.JavaScript.GuidKey) ?? Guid.NewGuid())).ToString(); 
+            }
+        }
         public string method 
         {
             get
@@ -12,6 +19,15 @@ namespace Backand
                 return System.Web.HttpContext.Current.Request.HttpMethod;
             }
         }
+
+        public object body
+        {
+            get
+            {
+                return Durados.Workflow.JavaScript.GetRequestBody();
+            }
+        }
+
 
         public Dictionary<string, object> headers
         {

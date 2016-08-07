@@ -99,7 +99,7 @@ namespace BackAnd.Web.Api.Controllers
             return request.RequestUri.ParseQueryString()[name];
         }
 
-        protected virtual string Post(string name, string json, IDbCommand command, IDbCommand sysCommand, bool? deep = null, bool? returnObject = null, string parameters = null)
+        public virtual string Post(string name, string json, IDbCommand command, IDbCommand sysCommand, bool? deep = null, bool? returnObject = null, string parameters = null)
         {
             Dictionary<string, object>[] values = null;
             try
@@ -170,7 +170,7 @@ namespace BackAnd.Web.Api.Controllers
             }
         }
 
-        protected virtual string Put(string name, string id, string json, IDbCommand command, IDbCommand sysCommand, bool? deep = null, bool? returnObject = null, string parameters = null, bool? overwrite = null)
+        public virtual string Put(string name, string id, string json, IDbCommand command, IDbCommand sysCommand, bool? deep = null, bool? returnObject = null, string parameters = null, bool? overwrite = null)
         {
             try
             {
@@ -233,7 +233,7 @@ namespace BackAnd.Web.Api.Controllers
             }
         }
 
-        protected virtual string Delete(string name, string id, IDbCommand command, IDbCommand sysCommand, bool? deep = null, string parameters = null)
+        public virtual string Delete(string name, string id, IDbCommand command, IDbCommand sysCommand, bool? deep = null, string parameters = null)
         {
             try
             {
@@ -342,8 +342,8 @@ namespace BackAnd.Web.Api.Controllers
             
             if (this is viewDataController)
                 DataHandler = new DataHandler((viewDataController)this);
-            //else if (this is userController)
-            //    DataHandler = new DataHandler((userController)this);
+            else if (this is userController)
+                DataHandler = new DataHandler(new viewDataController());
             //Init();
 
         }
@@ -2064,7 +2064,13 @@ namespace BackAnd.Web.Api.Controllers
                 catch { }
         }
 
-
+        protected object GetBody(string name, string username)
+        {
+            string firstName = Maps.Instance.DuradosMap.Database.GetUserFirstName();
+            string lastName = Maps.Instance.DuradosMap.Database.GetUserLastName();
+            int? appId = Maps.Instance.AppExists(name);
+            return new { app = new { name = name, id = appId.ToString() }, user = new { username = username, firstName = firstName, lastName = lastName } };
+        }
         
     }
 
@@ -2128,18 +2134,16 @@ namespace BackAnd.Web.Api.Controllers
                 bool sendError = Convert.ToBoolean(System.Configuration.ConfigurationManager.AppSettings["sendError"]) && logType == 1;
                 if (sendError)
                 {
-                    string host = Convert.ToString(System.Configuration.ConfigurationManager.AppSettings["host"]);
-                    int port = Convert.ToInt32(System.Configuration.ConfigurationManager.AppSettings["port"]);
-                    string username = Convert.ToString(System.Configuration.ConfigurationManager.AppSettings["username"]);
-                    string password = Convert.ToString(System.Configuration.ConfigurationManager.AppSettings["password"]);
+                    Durados.Cms.Services.EmailProvider provider = new Durados.Cms.Services.EmailProvider();
+                    Durados.Cms.Services.SMTPServiceDetails smtp =provider.GetSMTPServiceDetails(provider.GetSMTPProvider());
                     string applicationName = string.Empty;
                     try
                     {
                         applicationName = System.Web.HttpContext.Current.Items[Durados.Database.AppName].ToString();
                     }
                     catch { }
-                    string from = Convert.ToString(System.Configuration.ConfigurationManager.AppSettings["fromError"]);
-                    string defaultTo = Convert.ToString(System.Configuration.ConfigurationManager.AppSettings["toError"]);
+                   
+                    string defaultTo = smtp.to;
                     string[] to = !string.IsNullOrEmpty(map.Database.AdminEmail) ? map.Database.AdminEmail.Split(';') : null;
                     string[] cc = new string[1] { defaultTo };
                     if (to == null || to.Length == 0)
@@ -2156,7 +2160,7 @@ namespace BackAnd.Web.Api.Controllers
                         message += "\n\r\n\r\n\rMore info:\n\r" + moreInfo;
                     }
 
-                    Durados.Cms.DataAccess.Email.Send(host, false, port, username, password, false, to, cc, null, applicationName + " error", "url: " + apiController.Request.RequestUri.ToString() + ", error: " + message, from, null, null, DontSend, logger);
+                    Durados.Cms.DataAccess.Email.Send(smtp.host, smtp.useDefaultCredentials, smtp.port, smtp.username, smtp.password, false, to, cc, null, applicationName + " error", "url: " + apiController.Request.RequestUri.ToString() + ", error: " + message, smtp.from, null, null, DontSend, logger);
                 }
             }
             catch (Exception ex)
@@ -2164,6 +2168,8 @@ namespace BackAnd.Web.Api.Controllers
                 logger.Log(controller, action, exception.Source, ex, 1, "Error sending email when logging an exception");
             }
         }
+
+       
 
         public bool DontSend
         {
@@ -2246,4 +2252,6 @@ namespace BackAnd.Web.Api.Controllers
         
         
     }
+
+   
 }

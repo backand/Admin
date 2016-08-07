@@ -23,6 +23,12 @@ using System.Diagnostics;
 using Durados.Data;
 using Durados.SmartRun;
 using Durados.Web.Mvc.Farm;
+using Durados.Web.Mvc.Analytics;
+using Durados.Web.Mvc.Stat.Measurements.S3;
+using Durados.Web.Mvc.Webhook;
+using System.Collections.Specialized;
+using System.Configuration;
+using System.Web.Script.Serialization;
 
 namespace Durados.Web.Mvc
 {
@@ -59,7 +65,7 @@ namespace Durados.Web.Mvc
             CloudBlobContainer container = GetContainer(containerName);
 
             List<string> versions = (new Durados.Web.Mvc.Azure.BlobBackup()).GetVersions(container);
-            
+
             return versions.ToArray();
         }
 
@@ -92,7 +98,7 @@ namespace Durados.Web.Mvc
                 (new Durados.Web.Mvc.Azure.BlobBackup()).CopyBack(container, version, containerName);
             }
         }
-            public Dictionary<string, Stream> GetAllConfigs(string id, string version)
+        public Dictionary<string, Stream> GetAllConfigs(string id, string version)
         {
 
             string containerName = Maps.DuradosAppPrefix.Replace("_", "").Replace(".", "").ToLower() + id;
@@ -398,6 +404,13 @@ namespace Durados.Web.Mvc
                 throw new DuradosException("Missing ParseConverterObjectName key in web config");
             }
 
+            AppLockedMessage = System.Configuration.ConfigurationManager.AppSettings["AppLockedMessage"];
+
+            if (string.IsNullOrEmpty(AppLockedMessage))
+            {
+                throw new DuradosException("Missing AppLockedMessage key in web config");
+            }
+
             NodeJSBucket = System.Configuration.ConfigurationManager.AppSettings["NodeJSBucket"];
 
             if (string.IsNullOrEmpty(NodeJSBucket))
@@ -405,12 +418,110 @@ namespace Durados.Web.Mvc
                 throw new DuradosException("Missing NodeJSBucket key in web config");
             }
 
+
+            ExcludedEmailDomains = System.Configuration.ConfigurationManager.AppSettings["ExcludedEmailDomains"];
+
+            if (string.IsNullOrEmpty(ExcludedEmailDomains))
+            {
+                throw new DuradosException("Missing ExcludedEmailDomains key in web config");
+            }
+
+            ReportConnectionString = System.Web.Configuration.WebConfigurationManager.ConnectionStrings["reportConnectionString"].ConnectionString;
+
+            if (string.IsNullOrEmpty(ReportConnectionString))
+            {
+                throw new DuradosException("Missing reportConnectionString key in web config");
+            }
+
             SendWelcomeEmail = System.Configuration.ConfigurationManager.AppSettings["SendWelcomeEmail"] ?? "true";
-            
+
             System.Net.ServicePointManager.SecurityProtocol = System.Net.SecurityProtocolType.Ssl3 | System.Net.SecurityProtocolType.Tls | System.Net.SecurityProtocolType.Tls11 | System.Net.SecurityProtocolType.Tls12;
 
             DevUsers = System.Configuration.ConfigurationManager.AppSettings["DevUsers"].Split(',');
 
+            string embeddedReportsApiToken = System.Configuration.ConfigurationManager.AppSettings["embeddedReportsApiToken"];
+            if (string.IsNullOrEmpty(embeddedReportsApiToken))
+            {
+                throw new DuradosException("Missing embeddedReportsApiToken key in web config");
+            }
+            string embeddedReportsUrlStep1 = System.Configuration.ConfigurationManager.AppSettings["embeddedReportsUrlStep1"];
+            if (string.IsNullOrEmpty(embeddedReportsUrlStep1))
+            {
+                throw new DuradosException("Missing embeddedReportsUrlStep1 key in web config");
+            }
+            string embeddedReportsUrlStep2 = System.Configuration.ConfigurationManager.AppSettings["embeddedReportsUrlStep2"];
+            if (string.IsNullOrEmpty(embeddedReportsUrlStep2))
+            {
+                throw new DuradosException("Missing embeddedReportsUrlStep2 key in web config");
+            }
+            string embeddedReportAppPropertyName = System.Configuration.ConfigurationManager.AppSettings["embeddedReportAppPropertyName"];
+            if (string.IsNullOrEmpty(embeddedReportAppPropertyName))
+            {
+                throw new DuradosException("Missing embeddedReportAppPropertyName key in web config");
+            }
+            embeddedReportsConfig = new EmbeddedReportsConfig(embeddedReportsApiToken, embeddedReportsUrlStep1, embeddedReportsUrlStep2, embeddedReportAppPropertyName);
+
+            string awsAccessKeyId = System.Configuration.ConfigurationManager.AppSettings["awsAccessKeyId"];
+            if (string.IsNullOrEmpty(awsAccessKeyId))
+            {
+                throw new DuradosException("Missing awsAccessKeyId key in web config");
+            }
+            string awsSecretAccessKey = System.Configuration.ConfigurationManager.AppSettings["awsSecretAccessKey"];
+            if (string.IsNullOrEmpty(awsSecretAccessKey))
+            {
+                throw new DuradosException("Missing awsSecretAccessKey key in web config");
+            }
+            awsCredentials = new AwsCredentials() { AccessKeyID = awsAccessKeyId, SecretAccessKey = awsSecretAccessKey };
+
+            WebhooksParametersFileName = System.Configuration.ConfigurationManager.AppSettings["webhooksParametersFileName"];
+
+            cqlConfig = new CqlConfig();
+            cqlConfig.ApiUrl = System.Configuration.ConfigurationManager.AppSettings["CqlApiUrl"];
+            if (string.IsNullOrEmpty(cqlConfig.ApiUrl))
+            {
+                throw new DuradosException("Missing CqlApiUrl key in web config");
+            }
+
+            cqlConfig.AuthorizationHeader = System.Configuration.ConfigurationManager.AppSettings["CqlAuthorizationHeader"];
+            if (string.IsNullOrEmpty(cqlConfig.AuthorizationHeader))
+            {
+                throw new DuradosException("Missing CqlAuthorizationHeader key in web config");
+            }
+
+            string cqlsFileName = System.Configuration.ConfigurationManager.AppSettings["CqlsFileName"];
+            if (string.IsNullOrEmpty(cqlsFileName))
+            {
+                throw new DuradosException("Missing CqlsFileName key in web config");
+            }
+            cqlConfig.Cqls = GetCqls(cqlsFileName);
+            //GetWebhookParameters("AppCreated");
+        }
+
+        private static Dictionary<string, string> GetCqls(string cqlsFileName)
+        {
+            Dictionary<string, string> dic =  new Dictionary<string, string>();
+            string jsonString = GetStringFromFile(cqlsFileName, ref cqlsJsonString).Replace("\\", "\\\\");
+
+
+            Dictionary<string, object> cqls = Durados.Web.Mvc.Controllers.Api.JsonConverter.Deserialize(jsonString);
+
+            foreach (string name in cqls.Keys)
+            {
+                dic.Add(name, cqls[name].ToString());
+            }
+
+            return dic;
+        }
+
+
+
+        private static AwsCredentials awsCredentials;
+        public static AwsCredentials AwsCredentials
+        {
+            get
+            {
+                return awsCredentials;
+            }
         }
 
         public static string GetConfigPath(string filename)
@@ -485,8 +596,10 @@ namespace Durados.Web.Mvc
         public static string ParseConverterAdminKey { get; private set; }
         public static string ParseConverterObjectName { get; private set; }
         public static string NodeJSBucket { get; private set; }
-       
-        
+        public static string AppLockedMessage { get; private set; }
+        public static string ExcludedEmailDomains { get; private set; }
+        public static string ReportConnectionString { get; private set; }
+
         public static TimeSpan AzureCacheUpdateInterval { get; private set; }
 
         public static string ConfigPath { get; private set; }
@@ -559,7 +672,7 @@ namespace Durados.Web.Mvc
         private Map duradosMap = null;
         System.Data.SqlClient.SqlConnectionStringBuilder builder = new System.Data.SqlClient.SqlConnectionStringBuilder();
 
-
+        private static CqlConfig cqlConfig;
         public static string GetAdminButtonText()
         {
             return adminButtonText;
@@ -622,7 +735,13 @@ namespace Durados.Web.Mvc
             return demoDatabaseName + PandingDatabaseSuffix + next;
         }
 
-
+        public static CqlConfig CqlConfig
+        {
+            get
+            {
+                return cqlConfig;
+            }
+        }
 
         public virtual IPersistency GetNewPersistency()
         {
@@ -1033,10 +1152,18 @@ namespace Durados.Web.Mvc
                 return this.map;
             }
 
-            return GetMap(GetAppName());
+            Map m = GetMap(GetAppName());
+
+            if (System.Web.HttpContext.Current != null)
+            {
+                System.Web.HttpContext.Current.Items[Database.AppId] = m.Id;
+            }
+
+            return m;
         }
 
         string prevAppName = null;
+
         public string GetAppName()
         {
             try
@@ -1427,7 +1554,7 @@ namespace Durados.Web.Mvc
             {
                 return null;
             }
-            
+
             //Durados.Diagnostics.EventViewer.WriteEvent("appRow found for: " + appName + " id: " + id, System.Diagnostics.EventLogEntryType.SuccessAudit, 500);
 
             Map map = new Map();
@@ -1541,9 +1668,11 @@ namespace Durados.Web.Mvc
             map.SiteInfo.LogoHref = map.Url;
             map.Guid = appRow.Guid;
             map.CreatorId = appRow.Creator;
+            map.PaymentLocked = appRow.PaymentLocked;
+            map.PaymentStatus = (Billing.PaymentStatus)Enum.ToObject(typeof(Billing.PaymentStatus), appRow.PaymentStatus);
             map.AnonymousToken = appRow.AnonymousToken;
             map.SignUpToken = appRow.SignUpToken;
-
+            
             int themeId = 0;
             string themeName = "";
             string themePath = "";
@@ -1722,12 +1851,46 @@ namespace Durados.Web.Mvc
                 return scalar.ToString();
         }
 
-        public int? AppExists(string appName, int? userId = null)
+        public bool AppLocked(string appName)
+        {
+            return PaymentStatus(appName) == Billing.PaymentStatus.Suspended;
+        }
+
+        public Billing.PaymentStatus PaymentStatus(string appName)
+        {
+            if (AppInCach(appName))
+            {
+                Billing.PaymentStatus paymentStatus = GetMap(appName).PaymentStatus;
+                if (paymentStatus == Billing.PaymentStatus.Active)
+                {
+                    return Billing.PaymentStatus.Active;
+                }
+            }
+            try
+            {
+                SqlAccess sql = new SqlAccess();
+                string sSqlCommand = "select PaymentStatus from durados_App with(nolock) where Name = N'" + appName + "'";
+
+                object scalar = sql.ExecuteScalar(duradosMap.connectionString, sSqlCommand);
+
+                if (scalar.Equals(string.Empty) || scalar == null || scalar == DBNull.Value)
+                    return Billing.PaymentStatus.Active;
+                else
+                    return (Billing.PaymentStatus)Enum.ToObject(typeof(Billing.PaymentStatus), Convert.ToInt32(scalar));
+            }
+            catch
+            {
+                return Billing.PaymentStatus.Active;
+            }
+        }
+
+
+        public int? AppExists(string appName, int? userId = null, bool ignoreDevUser = false)
         {
             SqlAccess sql = new SqlAccess();
             string sSqlCommand = "";
 
-            if (!userId.HasValue || IsDevUser())
+            if (!userId.HasValue || (IsDevUser() && !ignoreDevUser))
             {
                 sSqlCommand = "select Id from durados_App with(nolock) where Name = N'" + appName + "'";
             }
@@ -2082,5 +2245,187 @@ namespace Durados.Web.Mvc
                 username = Instance.DuradosMap.Database.GetCurrentUsername();
             return DevUsers.Contains(username);
         }
+
+        private static EmbeddedReportsConfig embeddedReportsConfig;
+        public static Analytics.EmbeddedReportsConfig GetEmbeddedReportsConfig()
+        {
+            return embeddedReportsConfig;
+        }
+
+        private static string GetTextFileContent(string fileName)
+        {
+            string fileContent = null;
+            if (File.Exists(fileName))
+            {
+                fileContent = File.ReadAllText(fileName);
+            }
+            else
+            {
+                throw new System.IO.FileNotFoundException("The file was not found", fileName);
+            }
+            return fileContent;
+        }
+
+        private static string webhookJsonString = null;
+        private static string cqlsJsonString = null;
+        //private static Dictionary<string, object> webhookJson = null;
+        //private static Dictionary<string, object> GetJsonFromFile(string fileName)
+        //{
+        //    fileName = Path.GetDirectoryName(AppDomain.CurrentDomain.BaseDirectory) +  fileName;
+        //    if (webhookJson == null)
+        //    {
+        //        string json = GetTextFileContent(fileName);
+        //        JavaScriptSerializer jss = new JavaScriptSerializer();
+        //        webhookJson = (Dictionary<string, object>)jss.Deserialize<dynamic>(json);
+        //    }
+        //    return webhookJson;
+        //}
+
+        private static Dictionary<string, object> GetJsonFromString(string json)
+        {
+            JavaScriptSerializer jss = new JavaScriptSerializer();
+            var  webhookJson = (Dictionary<string, object>)jss.Deserialize<dynamic>(json);
+            return webhookJson;
+        }
+
+        private static string GetStringFromFile(string fileName, ref string jsonString)
+        {
+            fileName = Path.GetDirectoryName(AppDomain.CurrentDomain.BaseDirectory) + @"\" + fileName;
+            if (jsonString == null)
+            {
+                jsonString = GetTextFileContent(fileName);
+            }
+            return jsonString;
+        }
+
+        private static string WebhooksParametersFileName = null;
+        internal static WebhookParameters GetWebhookParameters(string webhookType)
+        {
+            if (string.IsNullOrEmpty(WebhooksParametersFileName))
+                return null;
+
+            string jsonString = GetStringFromFile(WebhooksParametersFileName, ref webhookJsonString);
+
+            jsonString = ReplaceParameters(jsonString);
+
+            Dictionary<string, object> json = GetJsonFromString(jsonString);
+            if (!json.ContainsKey(webhookType))
+            {
+                return null;
+            }
+
+            json = (Dictionary<string, object>)json[webhookType.ToString()];
+            WebhookParameters webhookParameters = new WebhookParameters();
+            if (json.ContainsKey("Method"))
+            {
+                webhookParameters.Method = json["Method"].ToString();
+            }
+            if (json.ContainsKey("Url"))
+            {
+                webhookParameters.Url = json["Url"].ToString();
+            }
+            if (json.ContainsKey("Body"))
+            {
+                webhookParameters.Body = json["Body"];
+            }
+            if (json.ContainsKey("ErrorHandling"))
+            {
+                Dictionary<string, object> errorHandlingDic = (Dictionary<string, object>)json["ErrorHandling"];
+                WebhookErrorHandling errorHandling = new WebhookErrorHandling();
+                if (errorHandlingDic.ContainsKey("Cancel"))
+                {
+                    errorHandling.Cancel = (bool)errorHandlingDic["Cancel"];
+                }
+                if (errorHandlingDic.ContainsKey("Message"))
+                {
+                    errorHandling.Message = (string)errorHandlingDic["Message"];
+                }
+                webhookParameters.ErrorHandling = errorHandling;
+            }
+            if (json.ContainsKey("QueryStringParameters"))
+            {
+                webhookParameters.QueryStringParameters = (Dictionary<string, object>)json["QueryStringParameters"];
+            }
+            if (json.ContainsKey("Headers"))
+            {
+                webhookParameters.Headers = (Dictionary<string, object>)json["Headers"];
+            }
+            if (json.ContainsKey("Async"))
+            {
+                webhookParameters.Async = (bool)json["Async"];
+            }
+            if (json.ContainsKey("LimitApps"))
+            {
+                webhookParameters.LimitApps = (string)json["LimitApps"];
+            }
+
+            return webhookParameters;
+        }
+
+        private static string AppNamePlaceHolder = "$AppName$";
+        private static string AppIdPlaceHolder = "$AppId$";
+        private static string UsernamePlaceHolder = "$Username$";
+        private static string CreatorPlaceHolder = "$Creator$";
+
+        private static string ReplaceParameters(string jsonString)
+        {
+            return ReplaceQueryString(ReplaceCreator(ReplaceUsername(ReplaceAppName(ReplaceAppId(jsonString)))));
+        }
+
+        private static string ReplaceQueryString(string jsonString)
+        {
+            foreach (string key in System.Web.HttpContext.Current.Request.QueryString.AllKeys)
+            {
+                jsonString = jsonString.Replace("$" + key + "$", System.Web.HttpContext.Current.Request.QueryString[key], false);
+            }
+
+            return jsonString;
+        }
+
+        private static string ReplaceCreator(string jsonString)
+        {
+            if (!jsonString.Contains(CreatorPlaceHolder))
+            {
+                return jsonString;
+            }
+
+            Map map = instance.GetMap();
+            string creator = Instance.DuradosMap.Database.GetCreatorUsername(Convert.ToInt32(map.Id));
+            return jsonString.Replace(CreatorPlaceHolder, creator, false);
+        }
+
+        private static string ReplaceUsername(string jsonString)
+        {
+            if (!jsonString.Contains(UsernamePlaceHolder))
+            {
+                return jsonString;
+            }
+            string username = instance.GetMap().Database.GetCurrentUsername();
+            return jsonString.Replace(UsernamePlaceHolder, username, false);
+        }
+        
+        private static string ReplaceAppName(string jsonString)
+        {
+            if (!jsonString.Contains(AppNamePlaceHolder))
+            {
+                return jsonString;
+            }
+            string appName = instance.GetAppName();
+            return jsonString.Replace(AppNamePlaceHolder, appName, false);
+        }
+
+        private static string ReplaceAppId(string jsonString)
+        {
+            if (!jsonString.Contains(AppIdPlaceHolder))
+            {
+                return jsonString;
+            }
+            Map map = instance.GetMap();
+            string appId = map.Id;
+            if (string.IsNullOrEmpty(appId))
+                return jsonString;
+            return jsonString.Replace(AppIdPlaceHolder, appId, false);
+        }
+       
     }
 }

@@ -17,6 +17,7 @@ using Durados.Web.Mvc.Controllers.Api;
 using System.Text.RegularExpressions;
 using Durados.Web.Mvc.Farm;
 using Durados.Data;
+using Durados.Web.Mvc.Webhook;
 /*
  HTTP Verb	|Entire Collection (e.g. /customers)	                                                        |Specific Item (e.g. /customers/{id})
 -----------------------------------------------------------------------------------------------------------------------------------------------
@@ -221,8 +222,7 @@ namespace BackAnd.Web.Api.Controllers
                 }
                 catch { }
                 item.Add("debugMode", debugMode);
-
-                
+                                
                 if (deep.HasValue && deep.Value && item["DatabaseStatus"].Equals(1))
                 {
                     bool reset = false;
@@ -276,6 +276,7 @@ namespace BackAnd.Web.Api.Controllers
 
             }
         }
+
 
         private void HandleInitiationFailure(string id)
         {
@@ -483,6 +484,8 @@ namespace BackAnd.Web.Api.Controllers
 
                 if (values.ContainsKey("Name") && values["Name"].ToString() != appName)
                 {
+                    return ResponseMessage(Request.CreateResponse(HttpStatusCode.Conflict, "The app Name cannot be changed."));
+
                     newAppName = GetCleanName(values["Name"].ToString());
                     if (string.IsNullOrEmpty(newAppName))
                         return ResponseMessage(Request.CreateResponse(HttpStatusCode.Conflict, "The app Name cannot be empty"));
@@ -745,17 +748,33 @@ namespace BackAnd.Web.Api.Controllers
                 productMaintenece.RemoveApp(id);
 
                 }
-                catch
+                catch(Exception exception)
                 {
-
+                    Maps.Instance.DuradosMap.Logger.Log("myApps", "delete", id, exception, 1, "The app " + id + " has productMaintenece errors");
+               
                 }
 
                 //url = GetDeleteAppUrl(id);
                 //string response = Durados.Web.Mvc.Infrastructure.Http.GetWebRequest(url,string.Empty,string.Empty, 100000);
                 //Dictionary<string, object> ret = Durados.Web.Mvc.UI.Json.JsonSerializer.Deserialize(response);
 
+                try
+                {
+                    Webhook webhook = new Webhook();
+                    try
+                    {
+                        webhook.Send(WebhookType.AppDeleted, GetBody(id, Maps.Instance.DuradosMap.Database.GetCurrentUsername()));
+                    }
+                    catch (Exception exception)
+                    {
+                        webhook.HandleException(WebhookType.AppDeleted, exception);
+                    }
+                }
+                catch { }
+
                 string sql = "delete durados_App where name = '" + id + "'";
                 (new SqlAccess()).ExecuteNonQuery(Maps.Instance.DuradosMap.connectionString, sql);
+
 
                 Maps.Instance.DuradosMap.Logger.Log("myApps", "delete", "", null, 1, "The app " + id + " was deleted");
                 Maps.Instance.Restart(id);

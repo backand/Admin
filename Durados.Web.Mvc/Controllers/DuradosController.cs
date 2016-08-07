@@ -8274,7 +8274,39 @@ namespace Durados.Web.Mvc.Controllers
             else
                 return Json(new { success = true });
         }
+        public JsonResult RunAction(string url)
+        {
+            string masterGuid = Map.Guid == null? null : Map.Guid.ToString();
+            string userGuid = Map.Database.GetUserGuid();
+
+            var client = new  RestSharp.RestClient(Maps.ApiUrls[0]);
+            client.Authenticator = new  RestSharp.HttpBasicAuthenticator(masterGuid, userGuid);
+
+            var request = new RestSharp.RestRequest();
+            request.Resource = url;
+            try
+            {
+                var response = client.Execute(request);
+                //System.Web.Script.Serialization.JavaScriptSerializer jss = new System.Web.Script.Serialization.JavaScriptSerializer();
+                //var actionResponse = (Dictionary<string, object>)jss.Deserialize<dynamic>(response.Content);
+                return Json(new { status = true, response = response.Content });
+
+            }
+            catch(Exception ex)
+            {
+                string username = GetUsername();
+                Map.Logger.Log(GetControllerNameForLog(this.ControllerContext), this.ControllerContext.RouteData.Values["action"].ToString(),null,ex,3, "username=" + username.Replace("'", "\""),DateTime.Now);
+                return Json(new { status = false, response = ex.Message });
+
+            }
+            
+            
+            
+        }
     }
+
+
+    
     public static class NameValueCollectionExtention
     {
         public static System.Web.Routing.RouteValueDictionary ToRouteValues(this System.Collections.Specialized.NameValueCollection col, Object obj)

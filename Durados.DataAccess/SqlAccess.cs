@@ -2362,6 +2362,11 @@ namespace Durados.DataAccess
                     sb.Append(GetCalculatedFieldStatement(view.Fields[column.ColumnName], null));
                     sb.Append(",");
                 }
+                else if(view.Fields.ContainsKey(column.ColumnName) && view.Fields[column.ColumnName].IsPoint)
+                {
+                    sb.Append(sqlTextBuilder.GetPointFieldStatement(table.TableName,column.ColumnName));
+                    sb.Append(",");
+                }
                 else
                 {
                     if (excludeLongText && ntext)
@@ -2430,6 +2435,9 @@ namespace Durados.DataAccess
             ParentField parentField = null;
             ParentField fkField = null;
             View parentView = field.GetOtherParentView(out parentField, out fkField);
+            if (parentView == null)
+                return new Dictionary<string, Dictionary<string, string>>(); ;
+
             string whereStatement = GetWhereStatement(field, dataView);
 
             string selectStatement = "select distinct " + GetSelectStatement(parentView, true) + " from " + sqlTextBuilder.EscapeDbObject(parentView.DataTable.TableName) + sqlTextBuilder.WithNolock + " INNER JOIN " + sqlTextBuilder.EscapeDbObject(childrenView.DataTable.TableName) + sqlTextBuilder.WithNolock + " on " + GetJoin(parentField) + " where " + GetWhereStatement(field, dataView);
@@ -4195,7 +4203,8 @@ namespace Durados.DataAccess
                             transaction.Commit();
                             if (!identicalSystemConnection)
                             {
-                                sysTransaction.Commit();
+                                if (sysTransaction != null && sysCommand.Connection.State == ConnectionState.Open)
+                                    sysTransaction.Commit();
                             }
                         }
                         catch
@@ -5158,7 +5167,11 @@ namespace Durados.DataAccess
 
 
                 string sql = "update " + sqlTextBuilder.EscapeDbObject("{0}") + " set {2} where {1}";
-                sql = string.Format(sql, tableName, GetWhereStatement(view, tableName, true), updateSetColumns);
+
+                bool usePermanentFilter = true;
+                if (editEventArgs.IgnorePermanentFilter)
+                    usePermanentFilter = false;
+                sql = string.Format(sql, tableName, GetWhereStatement(view, tableName, usePermanentFilter), updateSetColumns);
 
                 if (editEventArgs.Cancel)
                 {
@@ -9903,7 +9916,8 @@ namespace Durados.DataAccess
                     {
                         try
                         {
-                            sysTransaction.Commit();
+                            if (sysTransaction != null)
+                                sysTransaction.Commit();
                         }
                         catch { }
                     }
@@ -10403,6 +10417,16 @@ public class SqlSchema : ISchema
         return "SELECT rows FROM sys.sysindexes  AS s1 WHERE (rows > 0) AND (indid IN (SELECT MIN(indid) AS Expr1 FROM sys.sysindexes AS s2 WHERE (s1.id = id))) AND (id = OBJECT_ID('" + tableName + "'))";
     }
 
+    public virtual string GetTotalRowsCount()
+    {
+        return "SELECT sum(rows) FROM sys.sysindexes  AS s1 WHERE (rows > 0) AND (indid IN (SELECT MIN(indid) AS Expr1 FROM sys.sysindexes AS s2 WHERE (s1.id = id)))";
+    }
+
+    public virtual string GetMaxTableRowsCount()
+    {
+        return "SELECT max(rows) FROM sys.sysindexes  AS s1 WHERE (rows > 0) AND (indid IN (SELECT MIN(indid) AS Expr1 FROM sys.sysindexes AS s2 WHERE (s1.id = id)))";
+
+    }
 
     public virtual string GetPrimaryKeyColumns(string tableName)
     {
@@ -10432,6 +10456,11 @@ public class SqlSchema : ISchema
     public virtual string GetTableNamesSelectStatement()
     {
         return "select Name from sys.Tables";
+    }
+
+    public virtual string CountTablesSelectStatement()
+    {
+        return "select Count(*) from sys.Tables";
     }
 
     public virtual string GetTableNamesSelectStatementWithFilter()
@@ -12107,4 +12136,8 @@ public class SqlTextBuilder : ISqlTextBuilder
         return " default values ";
     }
 
+    public virtual string GetPointFieldStatement(string tableName, string columnName)
+    {
+        return string.Empty;
+    }
 }

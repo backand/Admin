@@ -443,9 +443,9 @@ namespace Durados.Web.Mvc.Logging
              Log log = new Log();
 
             bool writeTolog = (logType == 500 || logType == 501);
-            bool writeLogTypeToSpecificAppLog = !(LogType < logType) || writeTolog;
-            bool writeLogTypeToGeneralLog = !(logStashLogType < logType) || writeTolog;
-            if (!writeLogTypeToGeneralLog && !writeLogTypeToSpecificAppLog )
+            bool writeLogTypeToSpecificAppLog = !(LogType < logType); //|| writeTolog;
+            bool writeLogTypeToGeneralLog = !(logStashLogType < logType);// || writeTolog;
+            if (!writeLogTypeToGeneralLog && !writeLogTypeToSpecificAppLog && !writeTolog)
                 return;
 
             //if (LogFailed)
@@ -465,6 +465,7 @@ namespace Durados.Web.Mvc.Logging
             }
             catch { }
             appName = GetAppName();
+            string appId = GetAppId();
 
             string username = Username;
 
@@ -484,34 +485,62 @@ namespace Durados.Web.Mvc.Logging
             coll.Add("Refferer", refferer);
             coll.Add("Agent", clientAgent);
             coll.Add("Languages", clientLanguages == null ? null : string.Join(",", clientLanguages));
-
+            coll.Add("AppId", appId);
+            if (method == Durados.Database.LogMessage)
+            {
+                coll.Add(Durados.Database.LogMessage, freeText);
+                Task.Factory.StartNew(() =>
+                {
+                    WriteToLogstash(controller, action, method, message, trace, logType, freeText, time, guid, log, applicationName,
+                        appName, username, clientIP, clientInfo, requestTime, coll);
+                });
+            }
+            else
+            {
+                coll.Add(Durados.Database.LogMessage, string.Empty);
+            }
+            
             bool excludeFromLog = GetExcludeFromLogEvents(applicationName, controller, action, method, message, trace, logType, freeText, time, clientInfo, null, requestTime);
 
             if (excludeFromLog)
                 return;
-           
 
-            if (guid != null)
+
+            if (guid != null && method != Durados.Database.LogMessage)
             {
                 WriteToJavaScriptDebugLogger(controller, action, method, message, trace, logType, freeText, time, guid, log, applicationName, username);
             }
-            else
+            
+            try
             {
-                try
-                {
-                    guid = GetRequestGuid();
-                }
-                catch { }
-                try
-                {
-                    WriteLogAsync(controller, action, method, message, trace, logType, freeText, time, guid, log, applicationName, appName, username, clientIP, clientInfo, writeLogTypeToSpecificAppLog, writeLogTypeToGeneralLog, requestTime, coll);
-                }
-                catch (Exception logException)
-                {
-                    WriteToEventLog(logException.Message, EventLogEntryType.FailureAudit, 1);
-                    WriteToEventLog(controller, action, method, message, trace, logType, freeText);
-                }
+                guid = GetRequestGuid();
             }
+            catch { }
+            try
+            {
+                WriteLogAsync(controller, action, method, message, trace, logType, freeText, time, guid, log, applicationName, appName, username, clientIP, clientInfo, writeLogTypeToSpecificAppLog, writeLogTypeToGeneralLog, requestTime, coll);
+            }
+            catch (Exception logException)
+            {
+                WriteToEventLog(logException.Message, EventLogEntryType.FailureAudit, 1);
+                WriteToEventLog(controller, action, method, message, trace, logType, freeText);
+            }
+            
+        }
+
+        private string GetAppId()
+        {
+            string appId = string.Empty;
+            if (System.Web.HttpContext.Current == null)
+                return appId;
+            try
+            {
+                //appId = System.Web.HttpContext.Current == null || System.Web.HttpContext.Current.Items[Database.AppId] == null ? appId: int.TryParse(System.Web.HttpContext.Current.Items[Database.AppId].ToString(),out appId)?appId:appId;
+                if (System.Web.HttpContext.Current.Items.Contains(Database.AppId) && System.Web.HttpContext.Current.Items[Database.AppId] != null)
+                    appId = System.Web.HttpContext.Current.Items[Database.AppId].ToString();
+            }
+            catch { }
+            return appId;
         }
 
         public bool GetExcludeFromLogEvents(string applicationName, string controller, string action, string method, string message, string trace, int logType, string freeText, DateTime time, string clientInfo, Guid? guid, int? requestTime)

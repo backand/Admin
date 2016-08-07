@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Backand
@@ -20,8 +21,12 @@ namespace Backand
 
         public int status { get; private set; }
         public string responseText { get; private set; }
+
+        private bool Async = false;
         public void open(string type, string url, bool async)
         {
+            Async = async;
+
             if (url.Contains("objects/action") && System.Web.HttpContext.Current.Request.RawUrl.Contains("$$debug$$") && !url.Contains("url.Contains"))
             {
                 if (url.Contains("&parameters="))
@@ -79,7 +84,10 @@ namespace Backand
             {
                 Durados.Database database = Durados.Workflow.Engine.GetCurrentDatabase();
 
-                database.Logger.Log(request.RequestUri.AbsoluteUri, request.Method, "Durados.Workflow", exception == null ? string.Empty : exception.Message, exception == null ? string.Empty : exception.StackTrace, logType, freeText, DateTime.Now);
+                if (database != null)
+                {
+                    database.Logger.Log(request.RequestUri.AbsoluteUri, request.Method, "Durados.Workflow", exception == null ? string.Empty : exception.Message, exception == null ? string.Empty : exception.StackTrace, logType, freeText, DateTime.Now);
+                }
             }
             catch { }
         }
@@ -127,6 +135,14 @@ namespace Backand
                         if (request.Headers["AppName"] == null && request.Headers["appName"] == null && request.Headers["appname"] == null)
                         {
                             request.Headers.Add("AppName", appName);
+                        }
+                    }
+                    if (request.Headers["Authorization"] == null && request.Headers["authorization"] == null)
+                    {
+                        Durados.Database database = Durados.Workflow.Engine.GetCurrentDatabase();
+                        if (database != null)
+                        {
+                            request.Headers.Add("Authorization", database.GetAuthorization());
                         }
                     }
                 }
@@ -192,7 +208,23 @@ namespace Backand
 
             HttpWebResponse response = null;
 
-            
+            if (Async)
+            {
+                new Thread(() =>
+                {
+                    Thread.CurrentThread.IsBackground = true;
+                    /* run your code here */
+                    var asyncRequest = WebRequest.Create(request.RequestUri);
+                    asyncRequest.Method = request.Method;
+                    asyncRequest.ContentType = request.ContentType;
+                    foreach (var header in request.Headers.AllKeys)
+                        if (!(header.ToLower() == "content-type" || header.ToLower() == "accept"))
+                            asyncRequest.Headers.Add(header, request.Headers[header]);
+                    asyncRequest.BeginGetResponse(null, null);
+                
+                }).Start();
+                return;
+            }
 
             try
             {

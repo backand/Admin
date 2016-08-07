@@ -1300,6 +1300,11 @@ namespace Durados.Web.Mvc
 
             return System.Web.HttpContext.Current.Items[Database.AppName].ToString();
         }
+
+        public override Durados.Database GetMainDatabase()
+        {
+            return Maps.Instance.DuradosMap.Database;
+        }
         public override bool IsAllow(Durados.Services.ISecurable securable)
         {
             return !UI.Helpers.SecurityHelper.IsDenied(null, securable.AllowSelectRoles);// || UI.Helpers.SecurityHelper.IsConfigViewForViewOwner(securable);
@@ -1416,7 +1421,9 @@ namespace Durados.Web.Mvc
             return text;
         }
 
+        public override string GetAuthorization()
+        {
+            return Map.GetAuthorization();
+        }
     }
-
-
 }

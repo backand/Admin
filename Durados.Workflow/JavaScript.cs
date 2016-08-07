@@ -79,7 +79,7 @@ namespace Durados.Workflow
         {
             try
             {
-                if (System.Web.HttpContext.Current.Items.Contains(key))
+                if (System.Web.HttpContext.Current != null && System.Web.HttpContext.Current.Items.Contains(key))
                     return System.Web.HttpContext.Current.Items[key];
             }
             catch { }
@@ -121,6 +121,8 @@ namespace Durados.Workflow
 
         public static bool IsCrud(System.Net.WebRequest request)
         {
+            if (System.Web.HttpContext.Current == null || System.Web.HttpContext.Current.Request.Headers["Authorization"] == null)
+                return false;
             HashSet<string> methods = new HashSet<string>() { "POST", "PUT", "DELETE" };
             string route = "/objects/";
 
@@ -351,8 +353,9 @@ namespace Durados.Workflow
             userProfile.Add("role", currentUserRole);
             userProfile.Add("app", view.Database.GetCurrentAppName());
             userProfile.Add("userId", view.Database.GetCurrentUserId());
-            userProfile.Add("token", System.Web.HttpContext.Current.Request.Headers["Authorization"] ?? "anonymous-" + (System.Web.HttpContext.Current.Request.Headers["AnonymousToken"] ?? view.Database.GetAnonymousToken().ToString()));
-            userProfile.Add("request", new Dictionary<string, object>() { { "userIP", GetUserIP() }, { "method", System.Web.HttpContext.Current.Request.HttpMethod }, { "headers", GetHeaders(System.Web.HttpContext.Current.Request.Headers) } });
+            userProfile.Add("token", System.Web.HttpContext.Current.Request.Headers["Authorization"] ?? view.Database.GetAuthorization());
+            if (!clientParameters.ContainsKey("filedata"))
+                userProfile.Add("request", GetRequest());
 
             var call = new Jint.Engine(cfg => cfg.AllowClr(typeof(Backand.XMLHttpRequest).Assembly));
 
@@ -485,6 +488,36 @@ namespace Durados.Workflow
                 else
                     values[ReturnedValueKey] = r;
             }
+        }
+
+        private static Dictionary<string, object> GetRequest()
+        {
+            Dictionary<string, object> req =  new Dictionary<string, object>() { { "userIP", GetUserIP() }, { "method", System.Web.HttpContext.Current.Request.HttpMethod }, { "headers", GetHeaders(System.Web.HttpContext.Current.Request.Headers) } };
+
+            req.Add("body", GetRequestBody());
+            
+            return req;
+        }
+
+        static Jint.Engine call2 = new Jint.Engine(cfg => cfg.AllowClr(typeof(Backand.XMLHttpRequest).Assembly));
+        static Jint.Native.Json.JsonParser parser2 = new Jint.Native.Json.JsonParser(call2);
+            
+        public static object GetRequestBody()
+        {
+            object body = null;
+            if (System.Web.HttpContext.Current.Items.Contains("body"))
+            {
+                string s = (string)System.Web.HttpContext.Current.Items["body"];
+                //string json = System.Web.HttpUtility.UrlDecode(s);
+
+                try
+                {
+                    body = parser2.Parse(s);
+                    
+                }
+                catch { }
+            }
+            return body;
         }
 
         private static object DateConversion(View view, object val, Field[] fields)
