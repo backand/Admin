@@ -8287,16 +8287,16 @@ namespace Durados.Web.Mvc.Controllers
             try
             {
                 var response = client.Execute(request);
-                //System.Web.Script.Serialization.JavaScriptSerializer jss = new System.Web.Script.Serialization.JavaScriptSerializer();
-                //var actionResponse = (Dictionary<string, object>)jss.Deserialize<dynamic>(response.Content);
-                return Json(new { status = true, response = response.Content });
+                if(response.ErrorException != null)
+                    return Json(new { success = false, error = response.ErrorMessage, exception = response.ErrorException, response = response.Content });
+                return Json(new { success = true, response = response.Content });
 
             }
             catch(Exception ex)
             {
                 string username = GetUsername();
                 Map.Logger.Log(GetControllerNameForLog(this.ControllerContext), this.ControllerContext.RouteData.Values["action"].ToString(),null,ex,3, "username=" + username.Replace("'", "\""),DateTime.Now);
-                return Json(new { status = false, response = ex.Message });
+                return Json(new { success = false, error = ex.Message  });
 
             }
             

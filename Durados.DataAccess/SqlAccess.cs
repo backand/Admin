@@ -7330,62 +7330,25 @@ namespace Durados.DataAccess
             {
                 return;
             }
+            if (view.DataTable.PrimaryKey.Length != 1)
+                throw new DuradosException("Not supported for multi columns primary key " + tableName);
 
-            using (SqlConnection connection = new SqlConnection(view.ConnectionString))
+            string pkColumnName = view.DataTable.PrimaryKey[0].ColumnName;
+            tableName = GetTableName(view);
+            string sql = GetNewSqlSchema().GetChangeOrdinalStatement(view, tableName, pkColumnName);
+            using (IDbConnection connection = GetNewConnection(view.ConnectionString))
             {
                 try
                 {
-                    tableName = GetTableName(view);
+                    
 
                     connection.Open();
-                    SqlCommand command = new SqlCommand();
-                    command.Connection = connection;
-
-                    StringBuilder sqlBuilder = new StringBuilder();
-
-
-                    //sql = "update [{0}] set [{1}]={2} where {3}";
-                    //sql = string.Format(sql, tableName, view.OrdinalColumnName, -Convert.ToInt64(dOrder), GetWhereStatement(view, tableName));
-                    if (view.DataTable.PrimaryKey.Length != 1)
-                        throw new DuradosException("Not supported for multi columns primary key " + tableName);
-
-                    string pkColumnName = view.DataTable.PrimaryKey[0].ColumnName;
-
-                    //Variables and validations from here
-                    sqlBuilder.Append("DECLARE @returnValue int select @returnValue = 0 ");
-                    sqlBuilder.Append("DECLARE @PKFromOrdinal INT DECLARE @PKToOrdinal INT DECLARE @Direction nvarchar(4) ");
-                    //If o_pk not exist or d_pk not exist- return error
-                    sqlBuilder.Append("if exists (select [{2}] from [{0}] where [{2}]=@PKFrom) and exists (select [{2}] from [{0}] where [{2}]=@PKTo) begin ");
-                    sqlBuilder.Append("select @PKFromOrdinal=[{1}] from [{0}] where [{2}]=@PKFrom ");
-                    sqlBuilder.Append("select @PKToOrdinal=[{1}] from [{0}] where [{2}]=@PKTo ");
-                    //If o_pk ordinal is null or d_pk ordinal is null- do nothing but return success
-                    sqlBuilder.Append("if @PKFromOrdinal is null or @PKToOrdinal is null or @PKFromOrdinal=@PKToOrdinal begin select @returnValue =1 end else begin ");
-                    sqlBuilder.Append("select @Direction=case when @PKFromOrdinal<@PKToOrdinal then 'down' else 'up' end ");
-
-                    //Update all records which in range
-                    sqlBuilder.Append("BEGIN TRAN T1 ");
-                    sqlBuilder.Append(";with RecordsToChange([{2}], [{1}], RowNumber) ");
-                    sqlBuilder.Append("as (select [{2}], [{1}], ROW_NUMBER() OVER (order by [{1}]) as RowNumber from [{0}] ");
-                    sqlBuilder.Append("where @Direction='down' and [{1}]>=@PKFromOrdinal and [{1}]<=@PKToOrdinal ");
-                    sqlBuilder.Append("or @Direction='up' and [{1}]>=@PKToOrdinal and [{1}]<=@PKFromOrdinal) ");
-                    sqlBuilder.Append("Update [{0}] set [{0}].[{1}]=RecordsToChange2.[{1}] from [{0}] ");
-                    sqlBuilder.Append("inner join RecordsToChange RecordsToChange1 on RecordsToChange1.[{2}]=[{0}].[{2}] ");
-                    sqlBuilder.Append("inner join RecordsToChange RecordsToChange2 on  ");
-                    sqlBuilder.Append("@Direction='down' and RecordsToChange1.RowNumber=RecordsToChange2.RowNumber+1 ");
-                    sqlBuilder.Append("or @Direction='up' and RecordsToChange1.RowNumber=RecordsToChange2.RowNumber-1 ");
-
-                    //Update moved record
-                    sqlBuilder.Append("update [{0}] set [{0}].[{1}]=@PKToOrdinal where [{2}]=@PKFrom ");
-                    sqlBuilder.Append("COMMIT TRAN T1 select @returnValue =1 ");
-                    sqlBuilder.Append("end end select @returnValue");
-
-                    string sql = string.Format(sqlBuilder.ToString(), tableName, view.OrdinalColumnName, pkColumnName);
-                    command.CommandText = sql;
-
+                    IDbCommand command = GetNewCommand(sql, connection);
+                  
                     //Add command parameters
-                    command.Parameters.AddWithValue("@PKFrom", Convert.ToInt32(o_pk));
-                    command.Parameters.AddWithValue("@PKTo", Convert.ToInt32(d_pk));
-
+                    command.Parameters.Add(GetNewParameter(command,"@PKFrom", Convert.ToInt32(o_pk)));
+                    command.Parameters.Add(GetNewParameter(command,"@PKTo", Convert.ToInt32(d_pk)));
+                   
                     object returnedValue = command.ExecuteScalar();
 
                     if (Convert.ToInt32(returnedValue) != 1)
@@ -7398,6 +7361,40 @@ namespace Durados.DataAccess
                     throw new DuradosException("Failed to change order in table " + tableName, ex);
                 }
             }
+        }
+
+        protected virtual string GetChangeOrdinalStatement(View view, string tableName, IDbCommand command, StringBuilder sqlBuilder, string pkColumnName)
+        {
+            //Variables and validations from here
+            sqlBuilder.Append("DECLARE @returnValue int select @returnValue = 0 ");
+            sqlBuilder.Append("DECLARE @PKFromOrdinal INT DECLARE @PKToOrdinal INT DECLARE @Direction nvarchar(4) ");
+            //If o_pk not exist or d_pk not exist- return error
+            sqlBuilder.Append("if exists (select [{2}] from [{0}] where [{2}]=@PKFrom) and exists (select [{2}] from [{0}] where [{2}]=@PKTo) begin ");
+            sqlBuilder.Append("select @PKFromOrdinal=[{1}] from [{0}] where [{2}]=@PKFrom ");
+            sqlBuilder.Append("select @PKToOrdinal=[{1}] from [{0}] where [{2}]=@PKTo ");
+            //If o_pk ordinal is null or d_pk ordinal is null- do nothing but return success
+            sqlBuilder.Append("if @PKFromOrdinal is null or @PKToOrdinal is null or @PKFromOrdinal=@PKToOrdinal begin select @returnValue =1 end else begin ");
+            sqlBuilder.Append("select @Direction=case when @PKFromOrdinal<@PKToOrdinal then 'down' else 'up' end ");
+
+            //Update all records which in range
+            sqlBuilder.Append("BEGIN TRAN T1 ");
+            sqlBuilder.Append(";with RecordsToChange([{2}], [{1}], RowNumber) ");
+            sqlBuilder.Append("as (select [{2}], [{1}], ROW_NUMBER() OVER (order by [{1}]) as RowNumber from [{0}] ");
+            sqlBuilder.Append("where @Direction='down' and [{1}]>=@PKFromOrdinal and [{1}]<=@PKToOrdinal ");
+            sqlBuilder.Append("or @Direction='up' and [{1}]>=@PKToOrdinal and [{1}]<=@PKFromOrdinal) ");
+            sqlBuilder.Append("Update [{0}] set [{0}].[{1}]=RecordsToChange2.[{1}] from [{0}] ");
+            sqlBuilder.Append("inner join RecordsToChange RecordsToChange1 on RecordsToChange1.[{2}]=[{0}].[{2}] ");
+            sqlBuilder.Append("inner join RecordsToChange RecordsToChange2 on  ");
+            sqlBuilder.Append("@Direction='down' and RecordsToChange1.RowNumber=RecordsToChange2.RowNumber+1 ");
+            sqlBuilder.Append("or @Direction='up' and RecordsToChange1.RowNumber=RecordsToChange2.RowNumber-1 ");
+
+            //Update moved record
+            sqlBuilder.Append("update [{0}] set [{0}].[{1}]=@PKToOrdinal where [{2}]=@PKFrom ");
+            sqlBuilder.Append("COMMIT TRAN T1 select @returnValue =1 ");
+            sqlBuilder.Append("end end select @returnValue");
+
+            return string.Format(sqlBuilder.ToString(), tableName, view.OrdinalColumnName, pkColumnName);
+            
         }
 
         public virtual void Switch(View view, string o_pk, string d_pk, int userID)
@@ -11652,6 +11649,41 @@ public class SqlSchema : ISchema
     {
         return new SqlParameter(name, value);
     }
+    public virtual string GetChangeOrdinalStatement(View view, string tableName,   string pkColumnName)
+    {
+        StringBuilder sqlBuilder = new StringBuilder();
+        //Variables and validations from here
+        sqlBuilder.Append("DECLARE @returnValue int select @returnValue = 0 ");
+        sqlBuilder.Append("DECLARE @PKFromOrdinal INT DECLARE @PKToOrdinal INT DECLARE @Direction nvarchar(4) ");
+        //If o_pk not exist or d_pk not exist- return error
+        sqlBuilder.Append("if exists (select [{2}] from [{0}] where [{2}]=@PKFrom) and exists (select [{2}] from [{0}] where [{2}]=@PKTo) begin ");
+        sqlBuilder.Append("select @PKFromOrdinal=[{1}] from [{0}] where [{2}]=@PKFrom ");
+        sqlBuilder.Append("select @PKToOrdinal=[{1}] from [{0}] where [{2}]=@PKTo ");
+        //If o_pk ordinal is null or d_pk ordinal is null- do nothing but return success
+        sqlBuilder.Append("if @PKFromOrdinal is null or @PKToOrdinal is null or @PKFromOrdinal=@PKToOrdinal begin select @returnValue =1 end else begin ");
+        sqlBuilder.Append("select @Direction=case when @PKFromOrdinal<@PKToOrdinal then 'down' else 'up' end ");
+
+        //Update all records which in range
+        sqlBuilder.Append("BEGIN TRAN T1 ");
+        sqlBuilder.Append(";with RecordsToChange([{2}], [{1}], RowNumber) ");
+        sqlBuilder.Append("as (select [{2}], [{1}], ROW_NUMBER() OVER (order by [{1}]) as RowNumber from [{0}] ");
+        sqlBuilder.Append("where @Direction='down' and [{1}]>=@PKFromOrdinal and [{1}]<=@PKToOrdinal ");
+        sqlBuilder.Append("or @Direction='up' and [{1}]>=@PKToOrdinal and [{1}]<=@PKFromOrdinal) ");
+        sqlBuilder.Append("Update [{0}] set [{0}].[{1}]=RecordsToChange2.[{1}] from [{0}] ");
+        sqlBuilder.Append("inner join RecordsToChange RecordsToChange1 on RecordsToChange1.[{2}]=[{0}].[{2}] ");
+        sqlBuilder.Append("inner join RecordsToChange RecordsToChange2 on  ");
+        sqlBuilder.Append("@Direction='down' and RecordsToChange1.RowNumber=RecordsToChange2.RowNumber+1 ");
+        sqlBuilder.Append("or @Direction='up' and RecordsToChange1.RowNumber=RecordsToChange2.RowNumber-1 ");
+
+        //Update moved record
+        sqlBuilder.Append("update [{0}] set [{0}].[{1}]=@PKToOrdinal where [{2}]=@PKFrom ");
+        sqlBuilder.Append("COMMIT TRAN T1 select @returnValue =1 ");
+        sqlBuilder.Append("end end select @returnValue");
+
+        return string.Format(sqlBuilder.ToString(), tableName, view.OrdinalColumnName, pkColumnName);
+
+    }
+
 }
 
 public class DuradosCommand : System.Data.IDbCommand

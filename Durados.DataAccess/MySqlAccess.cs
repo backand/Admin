@@ -759,6 +759,53 @@ namespace Durados.DataAccess
         {
             return new MySqlParameter(name, value);
         }
+        public  override string GetChangeOrdinalStatement(View view, string tableName, string pkColumnName)
+        {
+            string sql = @"DROP TEMPORARY TABLE IF EXISTS   $RecordsToChange2 ;
+                DROP TEMPORARY TABLE IF EXISTS  $RecordsToChange;
+	              -- DECLARE @returnValue int 
+	            SET @returnValue = 1 ;
+                SET @PKFromOrdinal = null ;-- INT 
+	            SET @PKToOrdinal = null ; -- INT 
+	            SET @Direction = null ;-- nvarchar(4)
+    
+                SET @doChange = false;
+   
+                SELECT @doChange:=true FROM (SELECT 1) T WHERE EXISTS (SELECT `{2}` FROM `{0}` WHERE `{2}`=@PKFrom) AND EXISTS (SELECT `{2}` FROM `{0}` WHERE `{2}`=@PKTo );
+    
+                SELECT @PKFromOrdinal:=`{1}` FROM `{0}` WHERE `{2}`=@PKFrom ;
+	            SELECT @PKToOrdinal:=`{1}` FROM `{0}` WHERE `{2}`=@PKTo ;
+    
+                SELECT @returnValue:=0 , @doChange=false FROM (SELECT 1) T WHERE  @PKFromOrdinal IS NULL OR @PKToOrdinal IS NULL OR @PKFromOrdinal=@PKToOrdinal;
+    
+                SELECT @Direction:=(CASE WHEN @PKFromOrdinal<@PKToOrdinal THEN 'down' ELSE 'up' END )FROM (SELECT 1) T WHERE @doChange=true;
+  
+	            START TRANSACTION  ;
+		            SELECT @returnValue;
+                    CREATE TEMPORARY TABLE $RecordsToChange
+        
+                    SELECT `{2}`, `{1}`, RowNumber FROM 
+			            (SELECT `{2}`, `{1}`,   @row_num := @row_num+1 AS RowNumber
+                        FROM `{0}` ,
+                         (SELECT @row_num := 1) x
+				            WHERE @doChange=true AND  (@Direction='down' and `{1}`>=@PKFromOrdinal and `{1}`<=@PKToOrdinal 
+				            OR @Direction='up' and `{1}`>=@PKToOrdinal and `{1}`<=@PKFromOrdinal)  ORDER BY `{1}`) AS T;
+        
+                    CREATE TEMPORARY TABLE $RecordsToChange2
+                    SELECT `{2}`, `{1}`, RowNumber FROM  $RecordsToChange;
+     
+                    UPDATE `{0}` INNER JOIN $RecordsToChange $RecordsToChange1 on $RecordsToChange1.`{2}`=`{0}`.`{2}` 
+		            INNER JOIN $RecordsToChange2 on @Direction='down' and $RecordsToChange1.RowNumber=$RecordsToChange2.RowNumber+1 
+		            OR @Direction='up' and $RecordsToChange1.RowNumber=$RecordsToChange2.RowNumber-1  SET `{0}`.`{1}`=$RecordsToChange2.`{1}` 
+                    WHERE @doChange=true;
+        
+		            -- Update moved record
+		            UPDATE `{0}` SET `{0}`.`{1}`=@PKToOrdinal WHERE `{2}`=@PKFrom  AND  @doChange=true;
+		            COMMIT ;
+        
+                    SELECT @returnValue";
+            return string.Format(sql, tableName, view.OrdinalColumnName, pkColumnName);
+        }
       
     }
 
