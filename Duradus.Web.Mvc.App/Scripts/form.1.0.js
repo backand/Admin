@@ -3582,10 +3582,10 @@ EditDialog.GetButtons = function (pk, guid, hideClose, allowEdit) {
         }
     }
 
-    //    if (allowEdit && views[guid].ShowUpDown) {
-    //        buttons['->'] = function() { EditDialog.Next(pk, guid); }
-    //        buttons['<-'] = function() { EditDialog.Prev(pk, guid); }
-    //    }
+       if (allowEdit && views[guid].ShowUpDown) {
+           buttons['->'] = function() { EditDialog.Next(pk, guid); }
+           buttons['<-'] = function() { EditDialog.Prev(pk, guid); }
+       }
 
     if (allowEdit && isAdmin(guid) && !d_autoCommit) {
         buttons[translator.saveAndCommit] = function () {
@@ -3790,22 +3790,26 @@ EditDialog.Open2 = function (pk, guid, hideClose, callback) {
     dialog.dialog('open');
 
     //1 sec
-    //    if (!allowEdit.disabled && views[guid].ShowUpDown) {
-    //        dialog.parent().find('.ui-dialog-buttonpane button').each(function() {
-    //            if ($(this).text() == '->') {
-    //                $(this).attr('title', 'Next');
-    //                $(this).attr('alt', 'Next');
-    //            }
-    //            else if ($(this).text() == '<-') {
-    //                $(this).attr('title', 'Previous');
-    //                $(this).attr('alt', 'Previous');
-    //            }
-    //        });
-    //    }
+		if(typeof(allowedit) != "undefined"){
+		   if (!allowedit.disabled && views[guid].showupdown) {
+			   dialog.parent().find('.ui-dialog-buttonpane button').each(function() {
+				   if ($(this).text() == '->') {
+					   $(this).attr('title', 'next');
+					   $(this).attr('alt', 'next');
+				   }
+				   else if ($(this).text() == '<-') {
+					   $(this).attr('title', 'previous');
+					   $(this).attr('alt', 'previous');
+				   }
+			   });
+		   }
+		}
 
-    //    if (!EditDialog.AllowEdit(guid, pk)) {
-    //        EditDialog.DisableDialog(editPrefix, guid, jsonView);
-    //    }
+		if(typeof(editdialog) != "undefined"){
+		   if (!editdialog.allowedit(guid, pk)) {
+			   editdialog.disabledialog(editprefix, guid, jsonview);
+		   }
+		}
 
     if (views[guid].ViewName == "Field") {
         var displayFormatElms = dialog.find("select[name='DisplayFormat']");

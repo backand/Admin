@@ -1,4 +1,10 @@
-﻿/* Base styles
+﻿* {
+  box-sizing: border-box;
+}
+
+@import 'https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,700';
+
+/* Base styles
 ----------------------------------*/
 /*html, body {height: 100%;}
 body, dl, dt, dd, ul, ol, li, h1, h2, h3, h4, h5, h6, pre, code, form, fieldset, legend, input, textarea, p, blockquote, table, tbody, th, td {margin: 0;padding: 0;border-collapse:collapse;font-weight: inherit;border: none;font-family:Arial, Helvetica, sans-serif;}
@@ -76,7 +82,7 @@ body {overflow:hidden;}
 /* Menu
 ----------------------------------*/
 .menu-container {margin-right: auto;margin-left: auto;padding-top: 0px;padding-bottom: 0px;}
-.navigation-bar {height:39px;background-image: url(Images/menubg.jpg);background-repeat: repeat-x;background-position: center center;line-height:39px;font-family:Arial, Helvetica, sans-serif;padding-left:70px;position: relative;}
+.navigation-bar {height:39px;background-image: url(Images/menubg.jpg);background-repeat: repeat-x;background-position: center center;line-height:39px;font-family:'Source Sans Pro', Arial, Helvetica, sans-serif;padding-left:70px;position: relative;}
 .navigation-left {float:left;margin-left: 50px;}
 .sf-menu, .sf-menu *{padding:0;font-size: 13px;color: #c4f434;text-align: left;line-height: 39px;text-shadow: 1px 1px 0px #000000;margin: 0px;}
 .sf-menu ul{position:absolute;top:-999em;-moz-border-radius:0px 0px 10px 10px;-webkit-border-radius:0px 0px 10px 10px;border-radius:0px 0px 10px 10px;visibility:hidden;}
@@ -95,7 +101,7 @@ ul.sf-menu li li:hover ul, ul.sf-menu li li.sfHover ul{left:10em; /* match ul wi
 .sf-menu li li a span{white-space: nowrap}
 .sf-menu li li:hover {background-color:#666666;transition-duration:0.2s;-webkit-transition-duration:0.2s;-moz-transition-duration:0.2s;}
 .sf-sub-indicator {position:absolute;display:block;right:0em;top:1.05em; /* IE6 only */width:10px;height:10px;text-indent:-999em;overflow:hidden;background-image: url(Images/arrow.png);background-repeat: no-repeat;background-position: right center;}
-.navigation-right {float:right;padding-right:15px;font-size:11px;color: #fff;line-height:39px;font-family:Arial, Helvetica, sans-serif;background: url(Images/corner-r.jpg) no-repeat right top;}
+.navigation-right {float:right;padding-right:15px;font-size:11px;color: #fff;line-height:39px;font-family:'Source Sans Pro', Arial, Helvetica, sans-serif;background: url(Images/corner-r.jpg) no-repeat right top;}
 .navigation-right a {color: #fff;text-decoration:none;display: inline-block;margin-right: 5px;margin-left: 5px;}
 .navigation-right a:hover {text-decoration:underline;}
 
@@ -242,24 +248,24 @@ th.thAll, td.thAll{ padding-left: 0px !important; }
 
 th.NotSortable
 {
-    color: #FFF !Important;
-    font: Arial 14px !Important;
-    font-weight: 100 !Important;
+    color: #FFF ;
+    font: Arial 14px ;
+    font-weight: 100 ;
 }
 
 th A.Sortable, th SPAN.sortable
 {
-    color: #FFF !Important;
-    font: Arial 14px !Important;
-    font-weight: 100 !Important;
+    color: #FFF ;
+    font: Arial 14px ;
+    font-weight: 100 ;
 }
 
 .filterOn
 {
-    color: #39A218 !Important;
-    /*color: #FFF !Important;*/
-    font: Arial 14px !Important;
-    font-weight: bold !Important;
+    color: #39A218 ;
+    /*color: #FFF ;*/
+    font: Arial 14px ;
+    font-weight: bold ;
 }
 
 
@@ -271,14 +277,14 @@ th A.Sortable, th SPAN.sortable
 
 .disabledCell
 {
-    color: #A0918C !Important;
-    font: Arial 13px !Important;
+    color: #A0918C ;
+    font: Arial 13px ;
 }
 
 .enabledCell
 {
-    color: #494949 !Important;
-    font: Arial 13px !Important;
+    color: #494949 ;
+    font: Arial 13px ;
 }
 
 
@@ -308,7 +314,7 @@ a.sort_command{color:#ff8605; text-decoration:underline}
 /*  WIXWIX html.dark-bg, body.dark-bg, iframe.dark-bg, #AppFilterTreeDiv.dark-bg {background: rgb(90, 90, 90) !important;}*/
 .loading {position:absolute; left:50%; top:50%; text-align: center; margin-left:-60px; z-index: 20000000;}
 #progress .loading {position:absolute; left:50%; top:35%; text-align: center; margin-left:-30px; z-index: 20000000;}
-.loading>div {color: White; margin-bottom: 5px; text-shadow: 2px 2px 1px black; font-family: Arial, Helvetica, sans-serif; font-size: 13px;}
+.loading>div {color: White; margin-bottom: 5px; text-shadow: 2px 2px 1px black; font-family: 'Source Sans Pro', Arial, Helvetica, sans-serif; font-size: 13px;}
 
 /*------------------Dashboard Style ---------------------*/
 .gridboard{}
@@ -370,7 +376,7 @@ background-image: none;
 background-repeat: repeat-x;
 background-position: center center;
 line-height: 39px;
-font-family: Arial, Helvetica, sans-serif;
+font-family: 'Source Sans Pro', Arial, Helvetica, sans-serif;
 padding-left: 70px;
 position: relative;
 margin-left: 400px;
@@ -524,3 +530,218 @@ padding-left: 0;
 
 
 #topRight .sf-menu li.sfHover ul#userPreview li:hover {  background-color: rgba(243, 184, 88, 1);}
+
+#topMenu {
+	background:#393a3d;
+	padding:15px;
+	color:white;
+}
+
+#topMenu #adminButtons a{
+	color:white;
+	font-size:16px;
+}
+a.durados-logo {
+	background:url(images/gray/logo.png) no-repeat;
+	width:103px;
+	height:24px;
+	top:15px;
+
+}
+#topRight {
+	margin-top:-4px;
+}
+
+#topRight  .sf-menu a{
+	color:#d7d7d7;
+	padding:5px 15px; 
+
+}
+.body.template table.listview, table.gridview, table.gridviewhead, table.detailstable {
+	font-family: "Source Sans Pro", arial, sans-serif;
+}
+
+#topRight .sf-menu a.sf-with-ul {
+padding-right:30px;
+}
+
+#topRight li:not(:first-child) a {
+	border-left:1px solid #6a6a6a;
+}
+#topRight  .sf-sub-indicator {
+	top:16px;
+	right:18px;
+}
+.main-content {
+	padding-left:260px;
+	background:#f6f6f6;
+	overflow:hidden;
+}
+.main-content:after {
+	content : "";
+	clear:both;
+	width:100%;
+	float:left;
+	display:block;
+}
+#sideMenu {
+	position:absolute;
+	left:0;
+	top:131px;
+	bottom:0px;
+
+	background:url(images/menu-bg.jpg) no-repeat;
+
+
+background: #485563; /* fallback for old browsers */
+background: -webkit-linear-gradient(to left, #485563 , #29323c); /* Chrome 10-25, Safari 5.1-6 */
+background: linear-gradient(to left, #485563 , #29323c); /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
+        
+	background-size:100%;
+}
+
+#mainMenu {
+	border:0;
+	border-bottom:1px solid #ddd;
+	box-shadow:0px 5px 15px rgba(0,0,0,0.1);
+}
+/* sidebar */
+
+#sideMenu ul {
+	background:none;
+
+	width:100%;
+
+}
+
+#sideMenu li {
+	background:none;
+	height:auto;
+	line-height:1;
+	border-bottom:1px solid rgba(255,255,255,0.4);
+}
+#sideMenu li a {
+	color:white !important;
+	padding:20px;
+	padding-left:20px;
+	text-transform: capitalize;
+}
+#sideMenu li.selected3 {
+	border:none;
+
+	background-color:  rgba(0, 0, 0, 0.23);
+
+}
+#sideMenu li:first-child a:first-child {
+	text-transform: uppercase;
+	font-weight:bold;
+	font-size:15px;
+	padding-right:40px;
+	width:100%;
+}
+#sideMenu li .collapse {
+	background-color: none;
+	position: absolute;
+	top:19px;
+	right:10px;
+}
+#sideMenu li:first-child div+div {
+	display:none;
+}
+
+
+#mainAppDiv {
+	margin:20px;
+	padding:20px;
+	padding-top:0;
+	background:white;
+	box-shadow: 0px 1px 5px 0px rgba(0, 0, 0, 0.08);
+	border-radius: 5px;
+}
+
+
+div.table-menu {
+	background:none;
+	    margin-top: 0;
+    padding-top: 10px;
+    padding-bottom: 10px;
+	
+}
+table.gridview {
+	border:1px solid #ddd;
+}
+table.gridview thead {
+	background:#eaeefd;
+
+}
+table.gridview td {
+	    background: none;
+	    	    padding: 7px 10px !important;
+
+
+}
+table.gridview th {
+	    padding: 10px 10px !important;
+    background: none;
+   
+}
+.gridview th .thdiv, .gridviewhead th .thdiv {
+	padding:0;
+}
+table.gridview tr:hover {
+	background:#eaeefd;
+}
+table.gridview th {
+	color: #1c2b36;
+	 
+    font-weight: bold;
+    text-transform: uppercase;
+    font-size: 14px;
+}
+body.template th a:link, body.template th a:visited, body.template th a:hover{
+	color: #1c2b36;
+}
+
+
+tr.data-row.d_alt_row {
+    background-color: #f9f9f9 !important;
+    border-bottom: 1px #d7d7d7 !important;
+
+}
+ .enabledCell  {
+ 	font-weight: normal;
+ 	color:#1c2b36;
+ 	font-size:15px;
+
+ }
+ .logo-title-container {
+ float:left;
+ display:block;
+ }
+#mainMenu .logo-container  {
+	float:left;
+	display:inline;
+}
+
+#mainMenu .logo-container a {
+	padding:5px;
+}
+#mainMenu .logo-container img {
+	vertical-align: middle;
+}
+ #mainMenu img {
+ 	margin:0;
+ }
+
+ #mainMenu > div.logo-title-container > div.title-container {
+ 	width:auto;
+ 	max-width:auto;
+ }
+
+ #mainMenu .title-container * {
+ 	font-family:'Source Sans Pro', Arial, Helvetica, sans-serif;
+ 	font-size:30px;
+ 	font-weight:bold;
+ 	color:black;
+ 	margin-top:10px;
+ }
