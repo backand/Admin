@@ -56,7 +56,11 @@ namespace Durados.Web.Mvc.UI.Helpers
             {
                 string tableName = string.IsNullOrEmpty(view.EditableTableName) ? view.Name : view.EditableTableName;
                 if (chart.SQL.Contains(tableName))
-                    return new System.Data.SqlClient.SqlConnection(Map.Database.SystemConnectionString);
+                {
+                    return GetConnection(Map.Database.SystemSqlProduct, Map.Database.SystemConnectionString);
+                   
+                }
+                    
             }
             return GetConnection(Map.Database.SqlProduct, Map.Database.ConnectionString);
         }
