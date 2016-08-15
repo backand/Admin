@@ -481,11 +481,23 @@ namespace Durados.Web.Mvc.Logging
             var clientAgent = GetClientAgent();
             var clientLanguages = GetClientLanguages();
 
+            var entityType = GetEntityType();
+            var objectName = GetObjectName();
+            var queryName = GetQueryName();
+            var actionName = GetActionName();
+
             NameValueCollection coll = new NameValueCollection();
             coll.Add("Refferer", refferer);
             coll.Add("Agent", clientAgent);
             coll.Add("Languages", clientLanguages == null ? null : string.Join(",", clientLanguages));
             coll.Add("AppId", appId);
+
+            coll.Add("EntityType", entityType);
+            coll.Add("ObjectName", objectName);
+            coll.Add("QueryName", queryName);
+            coll.Add("ActionName", actionName);
+            
+            
             if (method == Durados.Database.LogMessage)
             {
                 coll.Add(Durados.Database.LogMessage, freeText);
@@ -526,6 +538,44 @@ namespace Durados.Web.Mvc.Logging
                 WriteToEventLog(controller, action, method, message, trace, logType, freeText);
             }
             
+        }
+
+        private string GetActionName()
+        {
+            return GetRequestItem(Database.ActionName);
+        }
+
+        private string GetQueryName()
+        {
+            return GetRequestItem(Database.QueryName);
+        }
+
+        private string GetObjectName()
+        {
+            return GetRequestItem(Database.ObjectName);
+        }
+
+        private string GetEntityType()
+        {
+            return GetRequestItem(Database.EntityType);
+        }
+
+        private string GetRequestItem(string key)
+        {
+            try
+            {
+                if (System.Web.HttpContext.Current == null)
+                    return null;
+
+                if (System.Web.HttpContext.Current.Items.Contains(key) && System.Web.HttpContext.Current.Items[key] != null)
+                    return System.Web.HttpContext.Current.Items[key].ToString();
+                else
+                    return null;
+            }
+            catch
+            {
+                return null;
+            }
         }
 
         private string GetAppId()

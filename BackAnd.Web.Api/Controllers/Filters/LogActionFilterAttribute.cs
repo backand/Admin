@@ -16,7 +16,6 @@ namespace BackAnd.Web.Api.Controllers.Filters
 {
     public class LogActionFilterAttribute : ActionFilterAttribute  
     {
-        
         public override void OnActionExecuted(HttpActionExecutedContext actionExecutedContext)
         {
             Log(actionExecutedContext.ActionContext, actionExecutedContext.Exception);
@@ -104,12 +103,64 @@ namespace BackAnd.Web.Api.Controllers.Filters
                     reqMilli = Convert.ToInt32(DateTime.Now.Subtract(apiController.started.Value).TotalMilliseconds);
                 }
 
+                UpdateRequestInfo(actionContext);
                 map.Logger.Log(apiController.GetControllerNameForLog(apiController.ControllerContext), verb, appName + ": " + exceptionSource, exception , logType, actionContext.Request.RequestUri.ToString(), DateTime.Now, reqMilli);
             }
             catch (Exception e)
             {
                 Durados.Diagnostics.EventViewer.WriteEvent(e);
             }
+        }
+
+        private void UpdateRequestInfo(System.Web.Http.Controllers.HttpActionContext actionContext)
+        {
+            try
+            {
+                const string ObjectRoute = "controller";
+                const string NAME = "name";
+                const string OBJECT = "Object";
+                const string QUERY = "Query";
+                const string ACTION = "Action";
+                const string ObjectController = "viewData";
+                const string QueryRoute = "1/query/data/{name}";
+                const string ActionRoute = "1/objects/action/{viewName}/{id}";
+                const string ViewName = "viewName";
+                
+                if (actionContext.RequestContext.RouteData.Values.ContainsKey(ObjectRoute))
+                {
+                    string controller = actionContext.RequestContext.RouteData.Values[ObjectRoute].ToString();
+                    if (controller == ObjectController)
+                    {
+                        if (actionContext.RequestContext.RouteData.Values.ContainsKey(NAME))
+                        {
+                            string objectName = actionContext.RequestContext.RouteData.Values[NAME].ToString();
+                            System.Web.HttpContext.Current.Items[Database.EntityType] = OBJECT;
+                            System.Web.HttpContext.Current.Items[Database.ObjectName] = objectName;
+                        }
+                    }
+                }
+                else if (actionContext.RequestContext.RouteData.Route.RouteTemplate == QueryRoute)
+                {
+                    if (actionContext.RequestContext.RouteData.Values.ContainsKey(NAME))
+                    {
+                        string queryName = actionContext.RequestContext.RouteData.Values[NAME].ToString();
+                        System.Web.HttpContext.Current.Items[Database.EntityType] = QUERY;
+                        System.Web.HttpContext.Current.Items[Database.QueryName] = queryName;
+                    }
+                }
+                else if (actionContext.RequestContext.RouteData.Route.RouteTemplate == ActionRoute)
+                {
+                    if (actionContext.ActionArguments.ContainsKey(NAME) && actionContext.ActionArguments.ContainsKey(ViewName))
+                    {
+                        string actionName = actionContext.ActionArguments[NAME].ToString();
+                        string objectName = actionContext.ActionArguments[ViewName].ToString();
+                        System.Web.HttpContext.Current.Items[Database.EntityType] = ACTION;
+                        System.Web.HttpContext.Current.Items[Database.ActionName] = actionName;
+                        System.Web.HttpContext.Current.Items[Database.ObjectName] = objectName;
+                    }
+                }
+            }
+            catch { }
         }
     }
 }

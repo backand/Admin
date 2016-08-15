@@ -56,6 +56,11 @@ namespace Durados
         public static readonly string AutoGuidPkType = "char(36)";
 
         public static readonly string LogMessage = "LogMessage";
+        public static readonly string EntityType = "EntityType";
+        public static readonly string ObjectName = "ObjectName";
+        public static readonly string QueryName = "QueryName";
+        public static readonly string ActionName = "ActionName";
+        
 
         public virtual Guid Guid
         {

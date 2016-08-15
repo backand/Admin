@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.Specialized;
 
 namespace Backand
 {
@@ -17,6 +18,19 @@ namespace Backand
             get
             {
                 return System.Web.HttpContext.Current.Request.HttpMethod;
+            }
+        }
+
+        public Dictionary<string, object> query
+        {
+            get
+            {
+                Dictionary<string, object> dictData = new Dictionary<string, object>();
+                foreach (string key in System.Web.HttpContext.Current.Request.QueryString)
+                {
+                    dictData.Add(key, System.Web.HttpContext.Current.Request.QueryString.Get(key));
+                }
+                return dictData;
             }
         }
 
