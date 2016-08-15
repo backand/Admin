@@ -528,6 +528,11 @@ namespace Durados.Workflow
             return body;
         }
 
+        public static object GetJintObject(object o)
+        {
+            return parser2.Parse(Newtonsoft.Json.JsonConvert.SerializeObject(o));
+        }
+
         private static object DateConversion(View view, object val, Field[] fields)
         {
             if (fields[0].DataType == DataType.DateTime)

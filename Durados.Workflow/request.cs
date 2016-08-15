@@ -21,7 +21,7 @@ namespace Backand
             }
         }
 
-        public Dictionary<string, object> query
+        public object query
         {
             get
             {
@@ -30,7 +30,7 @@ namespace Backand
                 {
                     dictData.Add(key, System.Web.HttpContext.Current.Request.QueryString.Get(key));
                 }
-                return dictData;
+                return Durados.Workflow.JavaScript.GetJintObject(dictData);
             }
         }
 
