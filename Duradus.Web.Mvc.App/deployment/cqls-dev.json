@@ -1,0 +1,3 @@
+{
+	"log": "select Guid,regexp_replace (customer_FreeText,'https//api.backand.com','') as Request,Username,ClientIP,event_time_ts as Time,Refferer, RequestTime as Duration,Action as Method,LogType,ExceptionMessage ,Trace from cooladata where date_range(between 2015-01-01 and 2060-01-01 ) and regexp_replace (customer_FreeText,'https//api.backand.com','') <> '/1/app/sync' and not regexp_match (Username, '@backand.com') and regexp_match (customer_FreeText, 'https//api.backand.com') and event_name = '{0}' and ({1}) order by {2} limit {3}"
+}

@@ -770,6 +770,7 @@
     <Content Include="Content\ui.dropdownchecklist.themeroller.css" />
     <Content Include="Content\ui.dropdownchecklist.themeroller.min.css" />
     <Content Include="Default.aspx" />
+    <Content Include="deployment\ChilkatDotNet45.dll" />
     <Content Include="deployment\Durados.Version.exe" />
     <Content Include="deployment\FSharp.Core.dll" />
     <Content Include="deployment\FSharp.Core.xml" />
@@ -855,6 +856,7 @@
     <Content Include="apps\assets\fonts\bootstrap\glyphicons-halflings-regular.eot" />
     <Content Include="apps\assets\fonts\bootstrap\glyphicons-halflings-regular.ttf" />
     <Content Include="apps\assets\fonts\bootstrap\glyphicons-halflings-regular.woff" />
+    <Content Include="deployment\cqls-dev.json" />
     <None Include="Properties\PublishProfiles\Admin.pubxml" />
     <None Include="ws\about.html.old" />
     <Content Include="ws\about.html" />
