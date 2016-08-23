@@ -759,7 +759,7 @@ namespace Durados.DataAccess
         {
             return new MySqlParameter(name, value);
         }
-        protected virtual string GetChangeOrdinalStatement(View view, string tableName, string pkColumnName)
+        public override string GetChangeOrdinalStatement(View view, string tableName, string pkColumnName)
         {
             string sql = @"DROP TEMPORARY TABLE IF EXISTS   $RecordsToChange2 ;
                 DROP TEMPORARY TABLE IF EXISTS  $RecordsToChange;
