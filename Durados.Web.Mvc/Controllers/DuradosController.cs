@@ -19,6 +19,7 @@ using System.Web.Mvc;
 
 namespace Durados.Web.Mvc.Controllers
 {
+  
     [NoCache]
     [Durados.Web.Mvc.Controllers.Attributes.DynamicAuthorizeAttribute()]
     public class DuradosController : BaseController
