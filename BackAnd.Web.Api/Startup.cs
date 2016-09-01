@@ -167,6 +167,7 @@ namespace BackAnd.Web.Api
         }
 
         private const string key = "authorization";
+        private const string BEARER = "bearer";
 
         public override Task RequestToken(OAuthRequestTokenContext context)
         {
@@ -176,7 +177,22 @@ namespace BackAnd.Web.Api
                 {
                     var queryString = HttpUtility.ParseQueryString(context.Request.QueryString.Value);
                     var token = queryString[key];
-                    context.Token = token;
+                    if (token != null)
+                    {
+                        if (token.Contains(BEARER))
+                        {
+                            token = token.Replace(BEARER, "").Trim();
+                        }
+                        context.Token = token;
+                    }
+                    else
+                    {
+                        string anonymousToken = queryString[Durados.Database.AnonymousToken];
+                        if (anonymousToken != null)
+                        {
+                            context.Request.Headers.Add(Durados.Database.AnonymousToken, new string[1] { anonymousToken });
+                        }
+                    }
                 }
             }
 

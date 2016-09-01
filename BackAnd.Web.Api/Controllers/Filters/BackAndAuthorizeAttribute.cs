@@ -324,18 +324,21 @@ namespace BackAnd.Web.Api.Controllers.Filters
         }
 
         const string BASIC = "basic";
+        const string AUTHORIZATION = "Authorization";
+        
             
         private bool IsBasicAuthentication(System.Web.Http.Controllers.HttpActionContext actionContext)
         {
-            string key = "basic";
-            return (actionContext.Request.Headers.Authorization != null && actionContext.Request.Headers.Authorization.Scheme.ToLower() == BASIC) || System.Web.HttpContext.Current.Request.QueryString[BASIC] != null;
+            return (actionContext.Request.Headers.Authorization != null && actionContext.Request.Headers.Authorization.Scheme.ToLower() == BASIC) || System.Web.HttpContext.Current.Request.QueryString[BASIC] != null ||
+                (System.Web.HttpContext.Current.Request.QueryString[AUTHORIZATION] != null &&
+                System.Web.HttpContext.Current.Request.QueryString[AUTHORIZATION].ToLower().Contains(BASIC));
         }
 
         private BasicAuthenticationIdentity GetBasicAuthenticationIdentity(System.Web.Http.Controllers.HttpActionContext actionContext)
         {
             string authHeaderValue = null;
             var authRequest = actionContext.Request.Headers.Authorization;
-            if (authRequest != null && !String.IsNullOrEmpty(authRequest.Scheme) && authRequest.Scheme.ToLower() == "basic")
+            if (authRequest != null && !String.IsNullOrEmpty(authRequest.Scheme) && authRequest.Scheme.ToLower() == BASIC)
                 authHeaderValue = authRequest.Parameter;
             if (string.IsNullOrEmpty(authHeaderValue))
                 return GetBasicAuthenticationIdentityFromQueryString();
@@ -349,6 +352,15 @@ namespace BackAnd.Web.Api.Controllers.Filters
             if (System.Web.HttpContext.Current.Request.QueryString[BASIC] != null)
             {
                 var credentials = System.Web.HttpContext.Current.Request.QueryString[BASIC].Split(':');
+                return credentials.Length < 2 ? null : new BasicAuthenticationIdentity(credentials[0], credentials[1]);
+            }
+            else if (System.Web.HttpContext.Current.Request.QueryString[AUTHORIZATION] != null &&
+                System.Web.HttpContext.Current.Request.QueryString[AUTHORIZATION].ToLower().Contains(BASIC))
+            {
+                var credentials1 = System.Web.HttpContext.Current.Request.QueryString[AUTHORIZATION].Split(' ');
+                if (credentials1.Length != 2)
+                    return null;
+                var credentials = credentials1[1].Split(':');
                 return credentials.Length < 2 ? null : new BasicAuthenticationIdentity(credentials[0], credentials[1]);
             }
             return null;
