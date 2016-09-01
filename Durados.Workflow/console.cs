@@ -92,9 +92,20 @@ namespace Backand
             {
                 messageString = (string)message;
             }
+            else if (message is Jint.Native.Error.ErrorInstance)
+            {
+                messageString = message.ToString();
+            }
             else
             {
-                messageString = Newtonsoft.Json.JsonConvert.SerializeObject(message);
+                try
+                {
+                    messageString = Newtonsoft.Json.JsonConvert.SerializeObject(message);
+                }
+                catch
+                {
+                    messageString = message.ToString();
+                }
             }
             
             object[] list = new object[8] { o1, o2, o3, o4, o5, o6, o7, o8 };
