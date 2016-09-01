@@ -48,25 +48,45 @@ namespace Durados.Web.Mvc.UI.Helpers
             return accountMembershipService.AuthenticateUser(username, password);
         }
 
-        public string GetEmailBySocialId(string provider, string socialId)
+        public string GetEmailBySocialId(string provider, string socialId, int appId)
         {
             View view = GetUserSocialView();
 
 
-            int rowCount = -1;
-            DataView dataView = view.FillPage(1, 1, new Dictionary<string, object>() { { "Provider", provider }, { "SocialId", socialId } }, null, null, out rowCount, null, null);
+            //int rowCount = -1;
+            //DataView dataView = view.FillPage(1, 1, new Dictionary<string, object>() { { "Provider", provider }, { "SocialId", socialId } }, null, null, out rowCount, null, null);
 
-            if (dataView.Count == 0)
+            SqlAccess sa = new SqlAccess();
+
+            string sql = "select UserId from durados_UserSocial where Provider = @Provider and SocialId = @SocialId and AppId = @AppId";
+
+            object scalar = sa.ExecuteScalar(view.ConnectionString, sql, new Dictionary<string, object>() { { "Provider", provider }, { "SocialId", socialId }, { "AppId", appId } });
+
+            if (scalar == null)
+            {
+                sql = "select UserId from durados_UserSocial where Provider = @Provider and SocialId = @SocialId and AppId is null";
+
+                scalar = sa.ExecuteScalar(view.ConnectionString, sql, new Dictionary<string, object>() { { "Provider", provider }, { "SocialId", socialId } });
+            }
+
+            if (scalar == null || scalar.Equals(string.Empty))
             {
                 return null;
             }
 
-            if (dataView.Count > 1)
-            {
-                throw new DuradosException("More than one found!");
-            }
+            string userId = scalar.ToString();
 
-            string userId = dataView[0]["UserId"].ToString();
+            //if (dataView.Count == 0)
+            //{
+            //    return null;
+            //}
+
+            //if (dataView.Count > 1)
+            //{
+            //    throw new DuradosException("More than one found!");
+            //}
+
+            //string userId = dataView[0]["UserId"].ToString();
             return GetDuradosMap().Database.GetUsernameById(userId);
         }
 
@@ -81,12 +101,12 @@ namespace Durados.Web.Mvc.UI.Helpers
             return view;
         }
 
-        public void SetEmailBySocialId(string provider, string socialId, string email)
+        public void SetEmailBySocialId(string provider, string socialId, string email, int appId)
         {
             View view = GetUserSocialView();
             int userId = GetDuradosMap().Database.GetUserID(email);
             view.Create(new Dictionary<string, object>() { { "Provider", provider }, { view.GetFieldByColumnNames("UserId").Name, userId },
-                { "SocialId", socialId } });
+                { "SocialId", socialId }, { view.GetFieldByColumnNames("AppId").Name, appId }});
         }
 
         private static MembershipProvider _provider = System.Web.Security.Membership.Provider;

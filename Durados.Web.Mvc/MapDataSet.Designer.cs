@@ -80,6 +80,8 @@ namespace Durados.Web.Mvc {
         
         private global::System.Data.DataRelation relationv_durados_User_durados_UserSocial;
         
+        private global::System.Data.DataRelation relationdurados_App_durados_UserSocial;
+        
         private global::System.Data.SchemaSerializationMode _schemaSerializationMode = global::System.Data.SchemaSerializationMode.IncludeSchema;
         
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
@@ -506,6 +508,7 @@ namespace Durados.Web.Mvc {
             this.relationFK_durados_App_durados_Theme = this.Relations["FK_durados_App_durados_Theme"];
             this.relationFK_durados_AppStat_durados_App = this.Relations["FK_durados_AppStat_durados_App"];
             this.relationv_durados_User_durados_UserSocial = this.Relations["v_durados_User_durados_UserSocial"];
+            this.relationdurados_App_durados_UserSocial = this.Relations["durados_App_durados_UserSocial"];
         }
         
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
@@ -604,6 +607,10 @@ namespace Durados.Web.Mvc {
                         this.tablev_durados_User.IDColumn}, new global::System.Data.DataColumn[] {
                         this.tabledurados_UserSocial.UserIdColumn}, false);
             this.Relations.Add(this.relationv_durados_User_durados_UserSocial);
+            this.relationdurados_App_durados_UserSocial = new global::System.Data.DataRelation("durados_App_durados_UserSocial", new global::System.Data.DataColumn[] {
+                        this.tabledurados_App.IdColumn}, new global::System.Data.DataColumn[] {
+                        this.tabledurados_UserSocial.AppIdColumn}, false);
+            this.Relations.Add(this.relationdurados_App_durados_UserSocial);
         }
         
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
@@ -5313,6 +5320,8 @@ namespace Durados.Web.Mvc {
             
             private global::System.Data.DataColumn columnSocialId;
             
+            private global::System.Data.DataColumn columnAppId;
+            
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
             public durados_UserSocialDataTable() {
@@ -5380,6 +5389,14 @@ namespace Durados.Web.Mvc {
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
+            public global::System.Data.DataColumn AppIdColumn {
+                get {
+                    return this.columnAppId;
+                }
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
             [global::System.ComponentModel.Browsable(false)]
             public int Count {
                 get {
@@ -5415,15 +5432,19 @@ namespace Durados.Web.Mvc {
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
-            public durados_UserSocialRow Adddurados_UserSocialRow(v_durados_UserRow parentv_durados_UserRowByv_durados_User_durados_UserSocial, string Provider, string SocialId) {
+            public durados_UserSocialRow Adddurados_UserSocialRow(v_durados_UserRow parentv_durados_UserRowByv_durados_User_durados_UserSocial, string Provider, string SocialId, durados_AppRow parentdurados_AppRowBydurados_App_durados_UserSocial) {
                 durados_UserSocialRow rowdurados_UserSocialRow = ((durados_UserSocialRow)(this.NewRow()));
                 object[] columnValuesArray = new object[] {
                         null,
                         null,
                         Provider,
-                        SocialId};
+                        SocialId,
+                        null};
                 if ((parentv_durados_UserRowByv_durados_User_durados_UserSocial != null)) {
                     columnValuesArray[1] = parentv_durados_UserRowByv_durados_User_durados_UserSocial[0];
+                }
+                if ((parentdurados_AppRowBydurados_App_durados_UserSocial != null)) {
+                    columnValuesArray[4] = parentdurados_AppRowBydurados_App_durados_UserSocial[0];
                 }
                 rowdurados_UserSocialRow.ItemArray = columnValuesArray;
                 this.Rows.Add(rowdurados_UserSocialRow);
@@ -5458,6 +5479,7 @@ namespace Durados.Web.Mvc {
                 this.columnUserId = base.Columns["UserId"];
                 this.columnProvider = base.Columns["Provider"];
                 this.columnSocialId = base.Columns["SocialId"];
+                this.columnAppId = base.Columns["AppId"];
             }
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
@@ -5471,6 +5493,8 @@ namespace Durados.Web.Mvc {
                 base.Columns.Add(this.columnProvider);
                 this.columnSocialId = new global::System.Data.DataColumn("SocialId", typeof(string), null, global::System.Data.MappingType.Element);
                 base.Columns.Add(this.columnSocialId);
+                this.columnAppId = new global::System.Data.DataColumn("AppId", typeof(int), null, global::System.Data.MappingType.Element);
+                base.Columns.Add(this.columnAppId);
                 this.Constraints.Add(new global::System.Data.UniqueConstraint("Constraint1", new global::System.Data.DataColumn[] {
                                 this.columnid}, true));
                 this.columnid.AutoIncrement = true;
@@ -6687,6 +6711,17 @@ namespace Durados.Web.Mvc {
                 }
                 else {
                     return ((durados_AppStatRow[])(base.GetChildRows(this.Table.ChildRelations["FK_durados_AppStat_durados_App"])));
+                }
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
+            public durados_UserSocialRow[] Getdurados_UserSocialRows() {
+                if ((this.Table.ChildRelations["durados_App_durados_UserSocial"] == null)) {
+                    return new durados_UserSocialRow[0];
+                }
+                else {
+                    return ((durados_UserSocialRow[])(base.GetChildRows(this.Table.ChildRelations["durados_App_durados_UserSocial"])));
                 }
             }
         }
@@ -8913,6 +8948,22 @@ namespace Durados.Web.Mvc {
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
+            public int AppId {
+                get {
+                    try {
+                        return ((int)(this[this.tabledurados_UserSocial.AppIdColumn]));
+                    }
+                    catch (global::System.InvalidCastException e) {
+                        throw new global::System.Data.StrongTypingException("The value for column \'AppId\' in table \'durados_UserSocial\' is DBNull.", e);
+                    }
+                }
+                set {
+                    this[this.tabledurados_UserSocial.AppIdColumn] = value;
+                }
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
             public v_durados_UserRow v_durados_UserRow {
                 get {
                     return ((v_durados_UserRow)(this.GetParentRow(this.Table.ParentRelations["v_durados_User_durados_UserSocial"])));
@@ -8920,6 +8971,29 @@ namespace Durados.Web.Mvc {
                 set {
                     this.SetParentRow(value, this.Table.ParentRelations["v_durados_User_durados_UserSocial"]);
                 }
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
+            public durados_AppRow durados_AppRow {
+                get {
+                    return ((durados_AppRow)(this.GetParentRow(this.Table.ParentRelations["durados_App_durados_UserSocial"])));
+                }
+                set {
+                    this.SetParentRow(value, this.Table.ParentRelations["durados_App_durados_UserSocial"]);
+                }
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
+            public bool IsAppIdNull() {
+                return this.IsNull(this.tabledurados_UserSocial.AppIdColumn);
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
+            public void SetAppIdNull() {
+                this[this.tabledurados_UserSocial.AppIdColumn] = global::System.Convert.DBNull;
             }
         }
         

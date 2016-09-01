@@ -211,7 +211,9 @@ namespace Durados.Web.Mvc.SocialLogin
             string GraphApiEndpoint = "https://graph.facebook.com/me?fields=id,email,name";
             string graphAddress = GraphApiEndpoint + "&access_token=" + Uri.EscapeDataString(accessToken);
 
-            return Durados.Web.Mvc.Infrastructure.Http.GetWebRequest(graphAddress);
+            string response = Durados.Web.Mvc.Infrastructure.Http.GetWebRequest(graphAddress);
+
+            return response;
         }
     }
 }

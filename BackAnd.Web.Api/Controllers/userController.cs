@@ -773,7 +773,8 @@ namespace BackAnd.Web.Api.Controllers
                 SocialProfile profile = social.Authenticate(userLoginData);
 
                 // link
-                new AccountService(null).SetEmailBySocialId(provider, profile.id, username);
+                int appId = Convert.ToInt32(Maps.Instance.GetMap(profile.appName).Id);
+                new AccountService(null).SetEmailBySocialId(provider, profile.id, username, appId);
 
                 if (profile == null)
                 {
@@ -1197,7 +1198,7 @@ namespace BackAnd.Web.Api.Controllers
 
             if (profile.email == null)
             {
-                throw new SocialException("cna't signup without email. NO_EMAIL_SOCIAL");
+                throw new SocialException("can't signup without email. NO_EMAIL_SOCIAL");
             }
 
             if (canLoginWithProfile)
@@ -1267,20 +1268,23 @@ namespace BackAnd.Web.Api.Controllers
                 view_BeforeEdit, view_BeforeEditInDatabase,
                 view_AfterEditBeforeCommit, view_AfterEditAfterCommit);
 
-            var currentData = accountService.GetEmailBySocialId(profile.Provider, profile.id);
+            int appId = Convert.ToInt32(Maps.Instance.GetMap(profile.appName).Id);
+
+            var currentData = accountService.GetEmailBySocialId(profile.Provider, profile.id, appId);
 
             if (string.IsNullOrEmpty(currentData))
             {
-                accountService.SetEmailBySocialId(profile.Provider, profile.id, profile.email);
+                accountService.SetEmailBySocialId(profile.Provider, profile.id, profile.email, appId);
             }
 
         }
 
         public virtual void SocialSigninInner(SocialProfile profile)
         {
+            int appId = Convert.ToInt32(Maps.Instance.GetMap(profile.appName).Id);
             var accountService = new AccountService(null);
             var emailFromService = accountService
-                                    .GetEmailBySocialId(profile.Provider, profile.id);
+                                    .GetEmailBySocialId(profile.Provider, profile.id, appId);
 
             profile.email = emailFromService ?? profile.email;
 
@@ -1325,7 +1329,7 @@ namespace BackAnd.Web.Api.Controllers
                 // user that already exist in backand, and signup before we add external provider link 
                 if (emailFromService == null && profile.email != null)
                 {
-                    accountService.SetEmailBySocialId(profile.Provider, profile.id, profile.email);
+                    accountService.SetEmailBySocialId(profile.Provider, profile.id, profile.email, appId);
                 }
             }
             else

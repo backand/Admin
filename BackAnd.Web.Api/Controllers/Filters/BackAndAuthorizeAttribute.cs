@@ -323,9 +323,12 @@ namespace BackAnd.Web.Api.Controllers.Filters
             return true;
         }
 
+        const string BASIC = "basic";
+            
         private bool IsBasicAuthentication(System.Web.Http.Controllers.HttpActionContext actionContext)
         {
-            return actionContext.Request.Headers.Authorization != null && actionContext.Request.Headers.Authorization.Scheme.ToLower() == "basic";
+            string key = "basic";
+            return (actionContext.Request.Headers.Authorization != null && actionContext.Request.Headers.Authorization.Scheme.ToLower() == BASIC) || System.Web.HttpContext.Current.Request.QueryString[BASIC] != null;
         }
 
         private BasicAuthenticationIdentity GetBasicAuthenticationIdentity(System.Web.Http.Controllers.HttpActionContext actionContext)
@@ -335,10 +338,20 @@ namespace BackAnd.Web.Api.Controllers.Filters
             if (authRequest != null && !String.IsNullOrEmpty(authRequest.Scheme) && authRequest.Scheme.ToLower() == "basic")
                 authHeaderValue = authRequest.Parameter;
             if (string.IsNullOrEmpty(authHeaderValue))
-                return null;
+                return GetBasicAuthenticationIdentityFromQueryString();
             authHeaderValue = System.Text.Encoding.Default.GetString(Convert.FromBase64String(authHeaderValue));
             var credentials = authHeaderValue.Split(':');
             return credentials.Length < 2 ? null : new BasicAuthenticationIdentity(credentials[0], credentials[1]);
+        }
+
+        private BasicAuthenticationIdentity GetBasicAuthenticationIdentityFromQueryString()
+        {
+            if (System.Web.HttpContext.Current.Request.QueryString[BASIC] != null)
+            {
+                var credentials = System.Web.HttpContext.Current.Request.QueryString[BASIC].Split(':');
+                return credentials.Length < 2 ? null : new BasicAuthenticationIdentity(credentials[0], credentials[1]);
+            }
+            return null;
         }
 
         private bool IsAppReady()

@@ -9999,7 +9999,17 @@ namespace Durados.DataAccess
                     if (field.FieldType != FieldType.Children)
                     {
                         // handle parents?
-                        values.Add(field.Name, deepObject[key]);
+                        if (field.FieldType == FieldType.Parent && deepObject[key] is Dictionary<string, object>)
+                        {
+                            string pk = GetPkFromMetadata((Dictionary<string, object>)deepObject[key]);
+                            if (pk == null)
+                                pk = GetPkFromObject(view, (Dictionary<string, object>)deepObject[key]);
+                            values.Add(field.Name, pk);
+                        }
+                        else
+                        {
+                            values.Add(field.Name, deepObject[key]);
+                        }
                     }
                 }
                 else
@@ -10154,7 +10164,7 @@ namespace Durados.DataAccess
 
         protected virtual int Update(View view, Dictionary<string, object> deepObject, string pk, bool deep, IDbCommand command, IDbCommand sysCommand, BeforeEditEventHandler beforeEditCallback, BeforeEditInDatabaseEventHandler beforeEditInDatabaseCallback, AfterEditEventHandler afterEditBeforeCommitCallback, AfterEditEventHandler afterEditAfterCommitCallback, BeforeCreateEventHandler beforeCreateCallback = null, BeforeCreateInDatabaseEventHandler beforeCreateInDatabaseCallback = null, AfterCreateEventHandler afterCreateBeforeCommitCallback = null, AfterCreateEventHandler afterCreateAfterCommitCallback = null, bool overwrite = false, BeforeDeleteEventHandler beforeDeleteCallback = null, AfterDeleteEventHandler afterDeleteBeforeCommitCallback = null, AfterDeleteEventHandler afterDeleteAfterCommitCallback = null)
         {
-            if (deep && GetPk(deepObject) == null)
+            if (deep && GetPkFromMetadata(deepObject) == null)
             {
                 throw new NotOriginalObjectException();
             }
@@ -10192,7 +10202,7 @@ namespace Durados.DataAccess
 
                                 foreach (Dictionary<string, object> child in children)
                                 {
-                                    string childPk = GetPk(child);
+                                    string childPk = GetPkFromMetadata(child);
                                     if (childPk == null)
                                     {
                                         ParentField parentField = childrenField.GetEquivalentParentField();
@@ -10276,7 +10286,7 @@ namespace Durados.DataAccess
         {
             foreach (var child in children)
             {
-                string childPk = GetPk((Dictionary<string, object>)child);
+                string childPk = GetPkFromMetadata((Dictionary<string, object>)child);
                 if (childPk != null)
                 {
                     if (keys.ContainsKey(childPk))
@@ -10287,7 +10297,7 @@ namespace Durados.DataAccess
             }
         }
 
-        private string GetPk(Dictionary<string, object> o)
+        private string GetPkFromMetadata(Dictionary<string, object> o)
         {
             if (!o.ContainsKey(Database.__metadata))
             {
@@ -10309,6 +10319,23 @@ namespace Durados.DataAccess
             {
                 throw new DuradosException("Failed to get object id", exception);
             }
+        }
+
+        private string GetPkFromObject(View view, Dictionary<string, object> o)
+        {
+            List<object> pk = new List<object>();
+            foreach (DataColumn column in view.DataTable.PrimaryKey)
+            {
+                Field field = view.GetFieldByColumnNames(column.ColumnName);
+                if (field == null)
+                    return null;
+                if (!o.ContainsKey(field.Name))
+                    return null;
+
+                pk.Add(o[field.Name]);
+            }
+
+            return string.Join(",", pk.ToArray());
         }
 
         public int Delete(View view, string pk, bool deep, BeforeDeleteEventHandler beforeDeleteCallback, AfterDeleteEventHandler afterDeleteBeforeCommitCallback, AfterDeleteEventHandler afterDeleteAfterCommitCallback, IDbCommand command = null, IDbCommand sysCommand = null, Dictionary<string, object> values = null)

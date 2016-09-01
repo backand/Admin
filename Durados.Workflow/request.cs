@@ -43,11 +43,11 @@ namespace Backand
         }
 
 
-        public Dictionary<string, object> headers
+        public object headers
         {
             get
             {
-                return Durados.Workflow.JavaScript.GetHeaders(System.Web.HttpContext.Current.Request.Headers);
+                return Durados.Workflow.JavaScript.GetJintObject(Durados.Workflow.JavaScript.GetHeaders(System.Web.HttpContext.Current.Request.Headers));
             }
         }
     }
