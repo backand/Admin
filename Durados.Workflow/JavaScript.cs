@@ -121,7 +121,7 @@ namespace Durados.Workflow
 
         public static bool IsCrud(System.Net.WebRequest request)
         {
-            if (System.Web.HttpContext.Current == null || System.Web.HttpContext.Current.Request.Headers["Authorization"] == null)
+            if (System.Web.HttpContext.Current == null || System.Web.HttpContext.Current.Request.Headers["Authorization"] == null || (System.Web.HttpContext.Current.Request.Url.PathAndQuery.ToLower().Contains("1/user/signup")))
                 return false;
             HashSet<string> methods = new HashSet<string>() { "POST", "PUT", "DELETE" };
             string route = "/objects/";
@@ -492,7 +492,7 @@ namespace Durados.Workflow
 
         private static string GetUserProfileAuthToken(View view)
         {
-            if (view.Database.GetCurrentUserId() == null)
+            if (System.Web.HttpContext.Current.Request.Url.PathAndQuery.ToLower().Contains("1/user/signup"))
                 return view.Database.GetAuthorization();
             else
                 return System.Web.HttpContext.Current.Request.Headers["Authorization"] ?? view.Database.GetAuthorization();
