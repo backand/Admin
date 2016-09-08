@@ -495,6 +495,26 @@ namespace Durados.Web.Mvc
             }
             cqlConfig.Cqls = GetCqls(cqlsFileName);
             //GetWebhookParameters("AppCreated");
+
+
+            CronDeveloperAuth = System.Configuration.ConfigurationManager.AppSettings["cronDeveloperAuth"];
+            if (string.IsNullOrEmpty(CronDeveloperAuth))
+            {
+                throw new DuradosException("Missing cronDeveloperAuth key in web config");
+            }
+
+            LambdaArn = System.Configuration.ConfigurationManager.AppSettings["lambdaArn"];
+            if (string.IsNullOrEmpty(LambdaArn))
+            {
+                throw new DuradosException("Missing lambdaArn key in web config");
+            }
+
+            CronPrefix = System.Configuration.ConfigurationManager.AppSettings["cronPrefix"];
+            if (string.IsNullOrEmpty(CronPrefix))
+            {
+                throw new DuradosException("Missing CronPrefix key in web config");
+            }
+
         }
 
         private static Dictionary<string, string> GetCqls(string cqlsFileName)
@@ -593,6 +613,11 @@ namespace Durados.Web.Mvc
         public static string[] DevUsers { get; private set; }
 
         public static string ParseConverterMasterKey { get; private set; }
+        public static string CronDeveloperAuth { get; private set; }
+        public static string LambdaArn { get; private set; }
+        public static string CronPrefix { get; private set; }
+
+        
         public static string ParseConverterAdminKey { get; private set; }
         public static string ParseConverterObjectName { get; private set; }
         public static string NodeJSBucket { get; private set; }

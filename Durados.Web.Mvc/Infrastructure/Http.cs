@@ -368,8 +368,8 @@ namespace Durados.Web.Mvc.Infrastructure
             }
             catch { }
         }
-        
-        public static string GetWebRequest(string url, string header = "", string UserAgent = "", int? timeout = null)
+
+        public static string GetWebRequest(string url, string header = "", string UserAgent = "", int? timeout = null, Dictionary<string, string> headers = null)
         {
 
             WebRequest request = WebRequest.Create(url);
@@ -379,6 +379,15 @@ namespace Durados.Web.Mvc.Infrastructure
             request.Method = "GET";
             if (header != "")
                 request.Headers.Add(header);
+            if (headers != null)
+            {
+                foreach (string key in headers.Keys)
+                {
+                    request.Headers.Add(key, headers[key]);
+                }
+
+            }
+            
             if (UserAgent != "")
                 ((HttpWebRequest)request).UserAgent = UserAgent;
             using (WebResponse response = request.GetResponse())

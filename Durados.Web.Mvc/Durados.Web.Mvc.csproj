@@ -359,8 +359,10 @@
     <Compile Include="UI\ColumnsExcluder.cs" />
     <Compile Include="UI\FieldValue.cs" />
     <Compile Include="UI\Gantt.cs" />
+    <Compile Include="UI\Helpers\ActionNotFoundException.cs" />
     <Compile Include="UI\Helpers\AppFactory.cs" />
     <Compile Include="Farm\FarmCaching.cs" />
+    <Compile Include="UI\Helpers\CronAuthorizationWasNotSuppliedException.cs" />
     <Compile Include="UI\Helpers\FtpHelper.cs" />
     <Compile Include="UI\Helpers\AmazonS3Helper.cs" />
     <Compile Include="UI\Helpers\AzureHelper.cs" />
@@ -373,6 +375,8 @@
     <Compile Include="UI\Helpers\CryptorHelper.cs" />
     <Compile Include="UI\Helpers\ERDHelper.cs" />
     <Compile Include="Farm\IFarmCaching.cs" />
+    <Compile Include="UI\Helpers\InvalidCronHeadersJsonException.cs" />
+    <Compile Include="UI\Helpers\InvalidHttpMethodException.cs" />
     <Compile Include="UI\Helpers\MailingServiceHelper.cs" />
     <Compile Include="UI\Helpers\MenuHelper.cs" />
     <Compile Include="UI\Helpers\NewDatabaseParametersFactory.cs" />
@@ -381,6 +385,7 @@
     </Compile>
     <Compile Include="UI\Helpers\PlugInHelper.cs" />
     <Compile Include="UI\Helpers\PreviewHelper.cs" />
+    <Compile Include="UI\Helpers\QueryNotFoundException.cs" />
     <Compile Include="UI\Helpers\RestHelper.cs" />
     <Compile Include="UI\Helpers\XMLConfigHelper.cs" />
     <Compile Include="UI\HistoryTableViewer.cs" />

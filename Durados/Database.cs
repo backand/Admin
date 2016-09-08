@@ -470,8 +470,22 @@ namespace Durados
             }
         }
 
-        [Durados.Config.Attributes.ChildrenProperty(TableName = "Cron", Type = typeof(Cron), DictionaryKeyColumnName = "Name")]
-        public Dictionary<string, Cron> Crons { get; private set; }
+        private Dictionary<int, Cron> crons;
+        [Durados.Config.Attributes.ChildrenProperty(TableName = "Cron", Type = typeof(Cron), DictionaryKeyColumnName = "ID")]
+        public Dictionary<int, Cron> Crons
+        {
+            get
+            {
+                foreach (Cron cron in crons.Values)
+                    cron.Database = this;
+                //}
+                //isPagesInitialized = true;
+                return crons;
+
+
+            }
+            private set { crons = value; }
+        }
 
         [Durados.Config.Attributes.ParentProperty(TableName = "MyCharts")]
         public MyCharts MyCharts { get; set; }
@@ -582,7 +596,7 @@ namespace Durados
 
             SpecialMenus = new Dictionary<string, SpecialMenu>();
 
-            Crons = new Dictionary<string, Cron>();
+            Crons = new Dictionary<int, Durados.Cron>();
             Dashboards = new Dictionary<int, Durados.MyCharts>();
             Queries = new Dictionary<int, Durados.Query>();
             //Globals = new Dictionary<int, Durados.NameValue>();

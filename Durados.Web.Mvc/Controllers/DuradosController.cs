@@ -7407,40 +7407,40 @@ namespace Durados.Web.Mvc.Controllers
             }
         }
 
-        public virtual void AsyncCron(int appId, int cycle)
-        {
-            CycleEnum cycleEnum = (CycleEnum)cycle;
-            Map Map = Maps.Instance.GetMap(CronHelper.GetAppName(appId));
-            Map.Logger.Log("AsyncCron", "Send", "start", null, 10, "");
-            IEnumerable<Cron> crons = Map.Database.Crons.Where(cron => cycleEnum.Equals(((Cron)cron.Value).Cycle)).Select(c => c.Value);
-            foreach (Cron cron in crons)
-            {
-                Cron(cron.Name);
-            }
-        }
+        //public virtual void AsyncCron(int appId, int cycle)
+        //{
+        //    CycleEnum cycleEnum = (CycleEnum)cycle;
+        //    Map Map = Maps.Instance.GetMap(CronHelper.GetAppName(appId));
+        //    Map.Logger.Log("AsyncCron", "Send", "start", null, 10, "");
+        //    IEnumerable<Cron> crons = Map.Database.Crons.Where(cron => cycleEnum.Equals(((Cron)cron.Value).Cycle)).Select(c => c.Value);
+        //    foreach (Cron cron in crons)
+        //    {
+        //        Cron(cron.Name);
+        //    }
+        //}
 
-        public virtual void Cron(string cronName)
-        {
-            if (!Map.Database.Crons.ContainsKey(cronName))
-                return;
-            Cron cron = Map.Database.Crons[cronName];
+        //public virtual void Cron(string cronName)
+        //{
+        //    if (!Map.Database.Crons.ContainsKey(cronName))
+        //        return;
+        //    Cron cron = Map.Database.Crons[cronName];
 
-            SqlAccess sqlAccess = new SqlAccess();
+        //    SqlAccess sqlAccess = new SqlAccess();
 
-            Dictionary<string, object> parameters = new Dictionary<string, object>();
-            parameters.Add("CronName", cron.Name);
-            DataTable table = sqlAccess.ExecuteTable(Map.Database.ConnectionString, cron.ProcedureName, parameters, CommandType.StoredProcedure);
+        //    Dictionary<string, object> parameters = new Dictionary<string, object>();
+        //    parameters.Add("CronName", cron.Name);
+        //    DataTable table = sqlAccess.ExecuteTable(Map.Database.ConnectionString, cron.ProcedureName, parameters, CommandType.StoredProcedure);
 
-            string userId = Map.Database.GetUserID();
-            string template = GetTemplate(cron);
-            if (!string.IsNullOrEmpty(userId))
-            {
-                foreach (DataRow row in table.Rows)
-                {
-                    SendCron(cron, row, Convert.ToInt32(userId), template);
-                }
-            }
-        }
+        //    string userId = Map.Database.GetUserID();
+        //    string template = GetTemplate(cron);
+        //    if (!string.IsNullOrEmpty(userId))
+        //    {
+        //        foreach (DataRow row in table.Rows)
+        //        {
+        //            SendCron(cron, row, Convert.ToInt32(userId), template);
+        //        }
+        //    }
+        //}
 
 
         #endregion

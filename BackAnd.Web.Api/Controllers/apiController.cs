@@ -2222,6 +2222,7 @@ namespace BackAnd.Web.Api.Controllers
         public static readonly string WorkspaceNameMissing = "The workspace name is missing";
         public static readonly string WorkspaceWithNameAlreadyExists = "A Workspace with the name {0} already exists.";
         public static readonly string QueryWithNameAlreadyExists = "A Query with the name {0} already exists.";
+        public static readonly string CronWithNameAlreadyExists = "A Cron with the name {0} already exists.";
         public static readonly string UploadWithNameAlreadyExists = "An Upload with the name {0} already exists.";
         public static readonly string ChangeAdminWorkspaceNameNotAllowed = "Changing Admin worksapces name is not allowed.";
         public static readonly string WorkspaceLimit = "You have reached workspaces limit";
