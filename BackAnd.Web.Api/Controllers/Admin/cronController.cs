@@ -245,17 +245,59 @@ namespace BackAnd.Web.Api.Controllers
 
         const string NAME = "Name";
         const string DATABASE = "Crons_Parent";
+        const string EntityId = "EntityId";
+        const string CRON_TYPE = "CronType";
+
         protected override IHttpActionResult ValidateInputForPost(Durados.Web.Mvc.View view, Dictionary<string, object> values)
         {
             if (values.ContainsKey(NAME))
             {
                 string name = values[NAME].ToString();
-                if (Map.Database.Crons.Values.Where(q => q.Name == name).FirstOrDefault() != null)
+                if (Map.Database.Crons.Values.Where(c => c.Name == name).FirstOrDefault() != null)
                 {
                     return ResponseMessage(Request.CreateResponse(HttpStatusCode.Conflict, string.Format(Messages.CronWithNameAlreadyExists, name)));
 
                 }
             }
+
+            if (!values.ContainsKey(CRON_TYPE))
+            {
+                return ResponseMessage(Request.CreateResponse(HttpStatusCode.NotAcceptable, "Missing CronType"));
+
+            }
+
+            string cronType = values[CRON_TYPE].ToString();
+
+            if (cronType != CronType.External.ToString() && !values.ContainsKey(EntityId))
+            {
+                return ResponseMessage(Request.CreateResponse(HttpStatusCode.NotAcceptable, "Missing EntityId"));
+            }
+
+            int entityId = -1;
+            if (!int.TryParse(values[EntityId].ToString(), out entityId))
+            {
+                return ResponseMessage(Request.CreateResponse(HttpStatusCode.NotAcceptable, "EntityId must be a number"));
+            }
+
+            if (cronType == CronType.Query.ToString())
+            {
+                if (Map.Database.Queries.Values.Where(q => q.ID == entityId).FirstOrDefault() == null)
+                {
+                    return ResponseMessage(Request.CreateResponse(HttpStatusCode.NotFound, "Query not found for id " + entityId));
+                }
+            }
+
+            if (cronType == CronType.Action.ToString())
+            {
+                ConfigAccess configAccess = new ConfigAccess();
+                DataRow row = configAccess.GetRow("Rule", "ID", entityId.ToString(), map.GetConfigDatabase().ConnectionString);
+
+                if (row == null)
+                {
+                    return ResponseMessage(Request.CreateResponse(HttpStatusCode.NotFound, "Action not found for id " + entityId));
+                }
+            }
+
 
             if (values.ContainsKey(DATABASE))
             {
@@ -274,7 +316,7 @@ namespace BackAnd.Web.Api.Controllers
             if (values.ContainsKey(NAME))
             {
                 string name = values[NAME].ToString();
-                if (Map.Database.Crons.Values.Where(q => q.Name == name && q.ID.ToString() != id).FirstOrDefault() != null)
+                if (Map.Database.Crons.Values.Where(c => c.Name == name && c.ID.ToString() != id).FirstOrDefault() != null)
                 {
                     return ResponseMessage(Request.CreateResponse(HttpStatusCode.Conflict, string.Format(Messages.CronWithNameAlreadyExists, name)));
 

@@ -1199,7 +1199,7 @@ namespace Durados.DataAccess
             //SaveConfigDataset(filename);
 
             if (afterEditAfterCommitCallback != null)
-                afterEditAfterCommitCallback(this, new EditEventArgs(view, null, pk, null, null));
+                afterEditAfterCommitCallback(this, new EditEventArgs(view, values, pk, null, null));
 
             try
             {
