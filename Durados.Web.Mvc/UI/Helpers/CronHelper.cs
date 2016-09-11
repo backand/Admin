@@ -116,7 +116,8 @@ namespace Durados.Web.Mvc.UI.Helpers
         private static void SetAuthorization(CronRequestInfo requestInfo)
         {
             const string AUTHORIZATION = "AUTHORIZATION";
-            
+            const string AppId = "AppId";
+           
             if (requestInfo.url.ToUpper().Contains(AUTHORIZATION) || (requestInfo.headers != null && requestInfo.headers.Keys.Where(k=>k.ToUpper() == AUTHORIZATION).FirstOrDefault() != null))
                 return;
 
@@ -131,6 +132,8 @@ namespace Durados.Web.Mvc.UI.Helpers
                 if (requestInfo.headers == null)
                     requestInfo.headers = new Dictionary<string, object>();
                 requestInfo.headers.Add("authorization", System.Web.HttpContext.Current.Request.Headers[AUTHORIZATION]);
+                if (System.Web.HttpContext.Current.Request.Headers[AppId] != null)
+                    requestInfo.headers.Add("AppId", System.Web.HttpContext.Current.Request.Headers[AppId]);
                 return;
             }
 
@@ -233,7 +236,6 @@ namespace Durados.Web.Mvc.UI.Helpers
         }
 
         private static string BaseUrl = System.Configuration.ConfigurationManager.AppSettings["nodeHost"] ?? "http://127.0.0.1:9000";
-        private static string CronDeveloperAuth = Maps.CronDeveloperAuth;
         private static string LambdaArn = Maps.LambdaArn;
         private static string CronPrefix = Maps.CronPrefix;
         public static void putCron(Cron cron)
@@ -250,23 +252,21 @@ namespace Durados.Web.Mvc.UI.Helpers
             return GetNamePrefix() + cron.ID;
         }
 
-        private static string GetNamePrefix()
+        private static string GetNamePrefix(string appId = null)
         {
-            return CronPrefix + "-" + Maps.Instance.GetMap().Id + "-";
+            return CronPrefix + "-" + (appId ?? Maps.Instance.GetMap().Id) + "-";
         }
 
         private static Dictionary<string, object> GetInput(Cron cron)
         {
-            //System.Web.Script.Serialization.JavaScriptSerializer jss = new System.Web.Script.Serialization.JavaScriptSerializer();
+            const string CronId = "cronId";
+            const string AppId = "appId";
+            
             Dictionary<string, object> input = new Dictionary<string, object>();
-            Dictionary<string, object> options = new Dictionary<string, object>();
-
-            //input.Add("protocol", System.Web.HttpContext.Current.Request.Url.Scheme.ToLower());
-            options.Add("hostname", System.Web.HttpContext.Current.Request.Url.Host.ToLower());
-            options.Add("path", "/1/cron/run/" + cron.ID + "/async?authorization=basic%20" + Maps.Instance.GetMap().Guid.ToString() + ":" + Maps.Instance.DuradosMap.Database.GetGuidByUsername(CronDeveloperAuth));
-            options.Add("method", "GET");
-            input.Add("options", options);
-            //return jss.Serialize(input);
+            
+            input.Add(CronId, cron.ID);
+            input.Add(AppId, Maps.Instance.GetMap().Id);
+            
             return input;
         }
 
@@ -352,10 +352,11 @@ namespace Durados.Web.Mvc.UI.Helpers
 
         }
 
+        const string RULES = "Rules";
+        const string NAME = "Name";
+              
         public static Dictionary<string, Dictionary<string, object>> getCron(Cron cron = null)
         {
-            const string RULES = "Rules";
-            const string NAME = "Name";
             
             string prefix = cron == null ? GetNamePrefix() : GetName(cron);
             Dictionary<string, object> crons = getCron(prefix);
@@ -424,5 +425,21 @@ namespace Durados.Web.Mvc.UI.Helpers
             return response;
         }
 
+
+        public static void DeleteAllCrons(string appId)
+        {
+            Dictionary<string, object> crons = getCron(GetNamePrefix(appId));
+            if (!crons.ContainsKey(RULES))
+            {
+                return;
+            }
+             ArrayList cronsArray = (ArrayList)crons[RULES];
+
+             foreach (Dictionary<string, object> cron in cronsArray)
+             {
+                 string name = cron[NAME].ToString();
+                 deleteCron(name);
+             }
+        }
     }
 }

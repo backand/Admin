@@ -42,7 +42,7 @@ namespace BackAnd.Web.Api.Controllers
 
         [Route("~/1/cron/run/{id}")]
         [HttpGet]
-        public IHttpActionResult run(int id)
+        public IHttpActionResult run(int id, bool test = false)
         {
             try
             {
@@ -84,12 +84,25 @@ namespace BackAnd.Web.Api.Controllers
                     return ResponseMessage(Request.CreateResponse(HttpStatusCode.InternalServerError, request.responseText));
                 }
 
-                    
-                string response = request.responseText;
-                Maps.Instance.DuradosMap.Logger.Log("cron", "run", "success", null, 3, response.Length > 4000 ? response.Substring(0, 4000) : response);
-                
-                
-                return Ok(response);
+
+                Maps.Instance.DuradosMap.Logger.Log("cron", "run", "success", null, 3, request.responseText.Length > 4000 ? request.responseText.Substring(0, 4000) : request.responseText);
+
+                object response = request.responseText;
+
+                try
+                {
+                    response = jss.Deserialize<object>(request.responseText);
+                }
+                catch { }
+
+                if (test)
+                {
+                    return Ok(new { request = cronInfo, response = response });
+                }
+                else
+                {
+                    return Ok(response);
+                }
             }
             catch (ActionNotFoundException exception)
             {
@@ -103,6 +116,14 @@ namespace BackAnd.Web.Api.Controllers
             {
                 throw new BackAndApiUnexpectedResponseException(exception, this);
             }
+        }
+
+        
+        [Route("~/1/cron/run/{id}/test")]
+        [HttpGet]
+        public IHttpActionResult runTest(int id)
+        {
+            return run(id, true);
         }
 
         private CronRequestInfo GetRequestInfo(Cron cron)
@@ -166,6 +187,9 @@ namespace BackAnd.Web.Api.Controllers
             const string STATE = "State";
             const string ENABLED = "ENABLED";
             const string ACTIVE = "active";
+
+            if (!(content is IDictionary<string, object>))
+                return base.Ok<T>(content);
 
             IDictionary<string, object> response = (dynamic)content;
             Dictionary<string, Dictionary<string, object>> crons = null;

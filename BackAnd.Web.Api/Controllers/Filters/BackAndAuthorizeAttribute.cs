@@ -318,7 +318,24 @@ namespace BackAnd.Web.Api.Controllers.Filters
                     return false;
                 }
             }
-                
+
+            const string AppId = "appId";
+            if (Durados.Web.Mvc.Maps.IsDevUser(username) && System.Web.HttpContext.Current.Request.Headers[AppId] != null)
+            {
+                int id = -1;
+                if (int.TryParse(System.Web.HttpContext.Current.Request.Headers[AppId], out id))
+                {
+                    appName = Maps.Instance.GetAppNameById(id);
+                    if (appName == null)
+                    {
+                        throw new Durados.DuradosException("App not found with id " + id);
+                    }
+                }
+                else
+                {
+                    throw new Durados.DuradosException("AppId must be a number instead of " + System.Web.HttpContext.Current.Request.Headers[AppId]);
+                }
+            }
 
             return true;
         }

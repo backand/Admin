@@ -497,12 +497,6 @@ namespace Durados.Web.Mvc
             //GetWebhookParameters("AppCreated");
 
 
-            CronDeveloperAuth = System.Configuration.ConfigurationManager.AppSettings["cronDeveloperAuth"];
-            if (string.IsNullOrEmpty(CronDeveloperAuth))
-            {
-                throw new DuradosException("Missing cronDeveloperAuth key in web config");
-            }
-
             LambdaArn = System.Configuration.ConfigurationManager.AppSettings["lambdaArn"];
             if (string.IsNullOrEmpty(LambdaArn))
             {
@@ -613,7 +607,6 @@ namespace Durados.Web.Mvc
         public static string[] DevUsers { get; private set; }
 
         public static string ParseConverterMasterKey { get; private set; }
-        public static string CronDeveloperAuth { get; private set; }
         public static string LambdaArn { get; private set; }
         public static string CronPrefix { get; private set; }
 
@@ -2247,6 +2240,19 @@ namespace Durados.Web.Mvc
                 return OnBoardingStatus.NotStarted;
             else
                 return (OnBoardingStatus)Convert.ToInt32(scalar);
+        }
+
+        public string GetAppNameById(int appId)
+        {
+            string sql = "select Name from dbo.durados_App with (NOLOCK) where id = " + appId;
+            Durados.DataAccess.SqlAccess sqlAccess = new Durados.DataAccess.SqlAccess();
+
+            object scalar = sqlAccess.ExecuteScalar(DuradosMap.connectionString, sql);
+
+            if (scalar.Equals(string.Empty) || scalar == null || scalar == DBNull.Value)
+                return null;
+            else
+                return Convert.ToString(scalar);
         }
 
         public static bool IsDevUser(string username = null)

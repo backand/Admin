@@ -273,7 +273,7 @@ namespace Backand
                     }
                     status = (int)((System.Net.HttpWebResponse)(we.Response)).StatusCode;
                 }
-                if (we.Response.Headers.AllKeys.Contains("error"))
+                if (we.Response != null && we.Response.Headers.AllKeys.Contains("error"))
                 {
                     if (!string.IsNullOrEmpty(responseText))
                     {

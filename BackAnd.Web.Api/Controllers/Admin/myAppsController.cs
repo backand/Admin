@@ -761,6 +761,16 @@ namespace BackAnd.Web.Api.Controllers
 
                 try
                 {
+                    CronHelper.DeleteAllCrons(Maps.Instance.AppExists(id).Value.ToString());
+                }
+                catch (Exception exception)
+                {
+                    Maps.Instance.DuradosMap.Logger.Log("myApps", "delete", id, exception, 1, "Failed to delete all app crons");
+                }
+
+
+                try
+                {
                     Webhook webhook = new Webhook();
                     try
                     {
