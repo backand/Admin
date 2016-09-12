@@ -1315,6 +1315,8 @@ namespace Durados.Web.Mvc.Controllers
 
         protected virtual History GetNewHistory()
         {
+            if (MySqlAccess.IsMySqlConnectionString(Map.Database.SystemConnectionString))
+                return new MySqlHistory();
             return new History();
         }
 
