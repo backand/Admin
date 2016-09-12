@@ -27,7 +27,7 @@ namespace Durados.Web.Mvc.SocialLogin
             }
         }
 
-        public override string GetAuthUrl(string appName, string returnAddress, string parameters, string activity, string email)
+        public override string GetAuthUrl(string appName, string returnAddress, string parameters, string activity, string email, bool signupIfNotSignedIn)
         {
             var keys = GetSocialKeys(appName);
             string clientId = keys.ClientId;
@@ -38,7 +38,8 @@ namespace Durados.Web.Mvc.SocialLogin
                 returnAddress = System.Web.HttpContext.Current.Server.UrlEncode(returnAddress),
                 activity = activity,
                 parameters = parameters ?? string.Empty,
-                email = email
+                email = email,
+                signupIfNotSignedIn = signupIfNotSignedIn
             };
 
             var jss = new JavaScriptSerializer();
@@ -129,6 +130,17 @@ namespace Durados.Web.Mvc.SocialLogin
                     throw new FacebookException("Could not find the activity");
                 }
                 string activity = stateObject["activity"].ToString();
+                bool signupIfNotSignedIn = false;
+                if (stateObject.ContainsKey("signupIfNotSignedIn"))
+                {
+                    try
+                    {
+                        signupIfNotSignedIn = System.Convert.ToBoolean(stateObject["signupIfNotSignedIn"]);
+                    }
+                    catch { }
+                }
+                
+                
                 if (!stateObject.ContainsKey("parameters"))
                 {
                     throw new FacebookException("Could not find the parameters");
@@ -143,7 +155,7 @@ namespace Durados.Web.Mvc.SocialLogin
                     email = stateObject["email"].ToString();
                 }
 
-                return FetchProfileByCode(code, appName, returnAddress, activity, parameters, null, email);
+                return FetchProfileByCode(code, appName, returnAddress, activity, parameters, null, email, signupIfNotSignedIn);
 
 
                 //HttpResponseMessage graphResponse = await _httpClient.GetAsync(graphAddress, HttpCompletionOption.ResponseContentRead);
@@ -166,7 +178,7 @@ namespace Durados.Web.Mvc.SocialLogin
 
         }
 
-        protected override SocialProfile FetchProfileByCode(string code, string appName, string returnAddress, string activity, string parameters, string redirectUrl, string email)
+        protected override SocialProfile FetchProfileByCode(string code, string appName, string returnAddress, string activity, string parameters, string redirectUrl, string email, bool signupIfNotSignedIn)
         {
             var socialKeys = GetSocialKeys(appName);
             string clientId = socialKeys.ClientId;
@@ -188,7 +200,7 @@ namespace Durados.Web.Mvc.SocialLogin
             string accessToken = validateResponse["access_token"].ToString();
             string expires = validateResponse["expires"].ToString();
 
-            SocialProfile profile = GetProfile(appName, accessToken, returnAddress, activity, parameters, email);
+            SocialProfile profile = GetProfile(appName, accessToken, returnAddress, activity, parameters, email, signupIfNotSignedIn);
 
             // don't email more socialLogin V2
             //if (string.IsNullOrEmpty(profile.email))

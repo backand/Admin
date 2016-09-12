@@ -32,7 +32,7 @@ namespace Durados.Web.Mvc.SocialLogin
         }
 
 
-        public override string GetAuthUrl(string appName, string returnAddress, string parameters, string activity, string email)
+        public override string GetAuthUrl(string appName, string returnAddress, string parameters, string activity, string email, bool signupIfNotSignedIn)
         {
             var socialKeys = GetSocialKeys(appName);
             string clientId = socialKeys.ClientId;
@@ -46,7 +46,7 @@ namespace Durados.Web.Mvc.SocialLogin
             {
 
                 // set cookie
-                AddCookie(new TwitterRequestUserData { Activity = activity, Email = email, AppName = appName, ReturnAddress = returnAddress, Token = requestToken });
+                AddCookie(new TwitterRequestUserData { Activity = activity, Email = email, AppName = appName, ReturnAddress = returnAddress, Token = requestToken, signupIfNotSignedIn = signupIfNotSignedIn });
                 string twitterAuthenticationEndpoint = AuthenticationEndpoint + requestToken.Token;
                 return twitterAuthenticationEndpoint;
             }
@@ -249,7 +249,7 @@ namespace Durados.Web.Mvc.SocialLogin
                 }
 
 
-                return new TwitterProfile(dataFromCookie.Email, twitterId, dataFromCookie.ReturnAddress, dataFromCookie.Activity, dataFromCookie.AppName, null);
+                return new TwitterProfile(dataFromCookie.Email, twitterId, dataFromCookie.ReturnAddress, dataFromCookie.Activity, dataFromCookie.AppName, null, dataFromCookie.signupIfNotSignedIn);
                 //return FetchProfileByCode(code, appName, returnAddress, activity, parameters, null);
 
             }
@@ -261,7 +261,7 @@ namespace Durados.Web.Mvc.SocialLogin
         }
 
         protected override SocialProfile FetchProfileByCode(string code, string appName, string returnUrl, string activity,
-            string parameters, string redirectUrl, string email)
+            string parameters, string redirectUrl, string email, bool signupIfNotSignedIn)
         {
             //build the URL to send to Google
             string urlAccessToken = "http://twitter.com/oauth/authenticate?oauth_token=";
@@ -283,7 +283,7 @@ namespace Durados.Web.Mvc.SocialLogin
 
             string accessToken = validateResponse["access_token"].ToString();
 
-            var googleProfile = GetProfile(appName, accessToken, redirectUri, activity, parameters, email);
+            var googleProfile = GetProfile(appName, accessToken, redirectUri, activity, parameters, email, signupIfNotSignedIn);
 
             return googleProfile;
         }
@@ -370,5 +370,7 @@ namespace Durados.Web.Mvc.SocialLogin
         public string Email { get; set; }
 
         public RequestToken Token { get; set; }
+
+        public bool signupIfNotSignedIn { get; set; }
     }
 }

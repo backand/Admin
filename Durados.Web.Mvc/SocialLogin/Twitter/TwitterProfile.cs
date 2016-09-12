@@ -11,9 +11,9 @@ namespace Durados.Web.Mvc.SocialLogin.Google
 
         }
 
-        public TwitterProfile(string email, string id, string returnUrl, string activity, string appName, string parameters) :
+        public TwitterProfile(string email, string id, string returnUrl, string activity, string appName, string parameters, bool signupIfNotSignedIn) :
             base(string.IsNullOrEmpty(email) ? "" : email.Split('@').FirstOrDefault() // if email exist, first name can be the prefix part of email address
-                , "", email, id, appName, returnUrl, activity, parameters)
+                , "", email, id, appName, returnUrl, activity, parameters, signupIfNotSignedIn)
         {
 
         }

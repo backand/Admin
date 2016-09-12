@@ -6,7 +6,7 @@ namespace Durados.Web.Mvc.UI.Helpers
 {
     public abstract class AbstractSocialProvider
     {
-        public abstract string GetAuthUrl(string appName, string returnAddress, string parameters, string activity, string email);
+        public abstract string GetAuthUrl(string appName, string returnAddress, string parameters, string activity, string email, bool signupIfNotSignedIn);
 
         public abstract SocialProfile Authenticate();
 
@@ -17,7 +17,7 @@ namespace Durados.Web.Mvc.UI.Helpers
             get;
         }
 
-        protected abstract SocialProfile FetchProfileByCode(string code, string appName, string returnUrl, string activity, string parameters, string redirectUrl, string email);
+        protected abstract SocialProfile FetchProfileByCode(string code, string appName, string returnUrl, string activity, string parameters, string redirectUrl, string email, bool signupIfNotSignedIn);
 
         protected abstract string ConfigPrefix { get; }
 
@@ -25,30 +25,30 @@ namespace Durados.Web.Mvc.UI.Helpers
 
         public SocialProfile Authenticate(string appName, string code, string returnUri)
         {
-            return FetchProfileByCode(code, appName, "dummy", returnUri, string.Empty, null, null);
+            return FetchProfileByCode(code, appName, "dummy", returnUri, string.Empty, null, null, false);
         }
 
         public SocialProfile Authenticate(SopcialLoginUserData data)
         {
-            return FetchProfileByCode(data.code, data.appName, "dummy", string.Empty, string.Empty, data.redirectUri, null);
+            return FetchProfileByCode(data.code, data.appName, "dummy", string.Empty, string.Empty, data.redirectUri, null, false);
         }
 
         public SocialProfile GetProfile(string appName, string accessToken)
         {
-            return GetProfileUnsafe(appName, accessToken, "dummy", "signin", string.Empty, null);
+            return GetProfileUnsafe(appName, accessToken, "dummy", "signin", string.Empty, null, false);
         }
 
 
         public SocialProfile GetProfile(string appName, string accessToken, string email)
         {
-            return GetProfileUnsafe(appName, accessToken, "dummy", "signin", string.Empty, email);
+            return GetProfileUnsafe(appName, accessToken, "dummy", "signin", string.Empty, email, false);
         }
 
-        protected SocialProfile GetProfile(string appName, string accessToken, string returnAddress, string activity, string parameters, string email)
+        protected SocialProfile GetProfile(string appName, string accessToken, string returnAddress, string activity, string parameters, string email, bool signupIfNotSignedIn)
         {
             try
             {
-                return GetProfileUnsafe(appName, accessToken, returnAddress, activity, parameters, email);
+                return GetProfileUnsafe(appName, accessToken, returnAddress, activity, parameters, email, signupIfNotSignedIn);
             }
             catch (Exception ex)
             {
@@ -96,7 +96,7 @@ namespace Durados.Web.Mvc.UI.Helpers
             return defaultKeys;
         }
 
-        protected SocialProfile GetProfileUnsafe(string appName, string accessToken, string returnAddress, string activity, string parameters, string email)
+        protected SocialProfile GetProfileUnsafe(string appName, string accessToken, string returnAddress, string activity, string parameters, string email, bool signupIfNotSignedIn)
         {
             //get the Google user profile using the access token
 
@@ -111,6 +111,7 @@ namespace Durados.Web.Mvc.UI.Helpers
             profile.Add("appName", appName);
             profile.Add("returnAddress", returnAddress);
             profile.Add("activity", activity);
+            profile.Add("signupIfNotSignedIn", signupIfNotSignedIn);
             profile.Add("parameters", parameters);
 
             if (!string.IsNullOrEmpty(email))

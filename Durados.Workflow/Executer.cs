@@ -59,10 +59,10 @@ namespace Durados.Workflow
 
                         Dictionary<string, object> valuesCopy = new Dictionary<string, object>();
 
-                        //foreach (string key in values.Keys)
-                        //{
-                        //    valuesCopy.Add(key, values[key]);
-                        //}
+                        foreach (string key in values.Keys)
+                        {
+                            valuesCopy.Add(key, values[key]);
+                        }
 
                         //foreach (Field field in view.Fields.Values)
                         //{
@@ -74,11 +74,11 @@ namespace Durados.Workflow
                         //}
                         try
                         {
-                            EscapeApostrophe(values);
+                            EscapeApostrophe(valuesCopy);
                         }
                         catch { }
-                        spCommand.CommandText = ReplaceAllTokens(view, values, prevRow, pk, currentUsetId, currentUserRole, expression);
-                        spCommand.CommandText = spCommand.CommandText.Replace(Engine.AsToken(values), ((Durados.Workflow.INotifier)controller).GetTableViewer(), view);
+                        spCommand.CommandText = ReplaceAllTokens(view, valuesCopy, prevRow, pk, currentUsetId, currentUserRole, expression);
+                        spCommand.CommandText = spCommand.CommandText.Replace(Engine.AsToken(valuesCopy), ((Durados.Workflow.INotifier)controller).GetTableViewer(), view);
                 
                         string[] filter = ((IExecuter)controller).GetFilterFieldValue(view);
 

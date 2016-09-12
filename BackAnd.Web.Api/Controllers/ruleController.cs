@@ -54,16 +54,13 @@ namespace BackAnd.Web.Api.Controllers
                  {
                      return Request.CreateResponse(HttpStatusCode.NotFound, string.Format(Messages.ViewNameNotFound, viewName));
                  }
-                 //if (!IsAllow(view))
-                 //{
-                 //    return Request.CreateResponse(HttpStatusCode.Forbidden, Messages.ActionIsUnauthorized);
-                 //}
 
-                 //if (string.IsNullOrEmpty(id))
-                 //{
-                 //    return Request.CreateResponse(HttpStatusCode.NotFound, Messages.IdIsMissing);
-                 //}
+                 if (!IsAllow(view))
+                 {
+                     return Request.CreateResponse(HttpStatusCode.Forbidden, Messages.ActionIsUnauthorized);
+                 }
 
+                
                  System.Data.DataRow row = null;
 
                  if (!string.IsNullOrEmpty(id))

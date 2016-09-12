@@ -26,7 +26,7 @@ namespace Durados.Web.Mvc.SocialLogin
             }
         }
 
-        public override string GetAuthUrl(string appName, string returnAddress, string parameters, string activity, string email)
+        public override string GetAuthUrl(string appName, string returnAddress, string parameters, string activity, string email, bool signupIfNotSignedIn)
         {
             var socialKeys = GetSocialKeys(appName);
             string clientId = socialKeys.ClientId;
@@ -34,7 +34,7 @@ namespace Durados.Web.Mvc.SocialLogin
             string scope = "https://www.googleapis.com/auth/userinfo.email+https://www.googleapis.com/auth/userinfo.profile";
 
             //var state = Durados.Web.Mvc.UI.Json.JsonSerializer.Serialize(new Dictionary<string, object>() { { "appName", appName }, { "returnAddress", System.Web.HttpContext.Current.Server.UrlEncode(returnAddress) } });
-            var state = new { appName = appName, returnAddress = System.Web.HttpContext.Current.Server.UrlEncode(returnAddress), activity = activity, parameters = parameters ?? string.Empty, email = email };
+            var state = new { appName = appName, returnAddress = System.Web.HttpContext.Current.Server.UrlEncode(returnAddress), activity = activity, parameters = parameters ?? string.Empty, email = email, signupIfNotSignedIn = signupIfNotSignedIn };
             var jss = new JavaScriptSerializer();
 
             string url = string.Format("https://accounts.google.com/o/oauth2/auth?scope={0}&client_id={1}&redirect_uri={2}&response_type=code&access_type=offline&state={3}", scope, clientId, redirectUri, jss.Serialize(state));
@@ -80,6 +80,15 @@ namespace Durados.Web.Mvc.SocialLogin
                 {
                     throw new GoogleException("Could not find the parameters");
                 }
+                bool signupIfNotSignedIn = false;
+                if (stateObject.ContainsKey("signupIfNotSignedIn"))
+                {
+                    try
+                    {
+                        signupIfNotSignedIn = System.Convert.ToBoolean(stateObject["signupIfNotSignedIn"]);
+                    }
+                    catch { }
+                }
                 string parameters = stateObject["parameters"].ToString();
 
                 string email = null;
@@ -89,7 +98,7 @@ namespace Durados.Web.Mvc.SocialLogin
                     email = stateObject["email"].ToString();
                 }
 
-                return FetchProfileByCode(code, appName, returnAddress, activity, parameters, null, email);
+                return FetchProfileByCode(code, appName, returnAddress, activity, parameters, null, email, signupIfNotSignedIn);
 
             }
             catch (Exception exception)
@@ -99,7 +108,7 @@ namespace Durados.Web.Mvc.SocialLogin
 
         }
 
-        protected override SocialProfile FetchProfileByCode(string code, string appName, string returnUrl, string activity, string parameters, string redirectUrl, string email)
+        protected override SocialProfile FetchProfileByCode(string code, string appName, string returnUrl, string activity, string parameters, string redirectUrl, string email, bool signupIfNotSignedIn)
         {
             //build the URL to send to Google
             string urlAccessToken = "https://accounts.google.com/o/oauth2/token";
@@ -121,7 +130,7 @@ namespace Durados.Web.Mvc.SocialLogin
 
             string accessToken = validateResponse["access_token"].ToString();
 
-            var googleProfile = GetProfile(appName, accessToken, returnUrl, activity, parameters, email);
+            var googleProfile = GetProfile(appName, accessToken, returnUrl, activity, parameters, email, signupIfNotSignedIn);
 
             return googleProfile;
         }

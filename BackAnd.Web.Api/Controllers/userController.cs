@@ -624,7 +624,7 @@ namespace BackAnd.Web.Api.Controllers
         [AllowAnonymous]
         [Route("socialSignin")]
         [HttpGet]
-        public async Task<IHttpActionResult> socialSignin(string provider, string appName, string returnAddress = null, string code = null)
+        public async Task<IHttpActionResult> socialSignin(string provider, string appName, string returnAddress = null, string code = null, bool signupIfNotSignedIn = false)
         {
 
             AbstractSocialProvider social = SocialProviderFactory.GetSocialProvider(provider);
@@ -638,7 +638,7 @@ namespace BackAnd.Web.Api.Controllers
             try
             {
                 // return Redirect("http://wwww.backand.aaaaaaaaa?message={'hello' : 'world'}");
-                return Redirect(social.GetAuthUrl(appName, returnAddress ?? GetCurrentAddress(), null, "signin", null));
+                return Redirect(social.GetAuthUrl(appName, returnAddress ?? GetCurrentAddress(), null, "signin", null, signupIfNotSignedIn));
             }
             catch (Exception exception)
             {
@@ -661,7 +661,7 @@ namespace BackAnd.Web.Api.Controllers
             try
             {
                 AbstractSocialProvider social = SocialProviderFactory.GetSocialProvider(provider);
-                return Redirect(social.GetAuthUrl(appName, returnAddress ?? GetCurrentAddress(), parameters, "signup", email));
+                return Redirect(social.GetAuthUrl(appName, returnAddress ?? GetCurrentAddress(), parameters, "signup", email, false));
             }
             catch (Exception exception)
             {
@@ -699,7 +699,7 @@ namespace BackAnd.Web.Api.Controllers
         [AllowAnonymous]
         [Route("{provider}/token")]
         [HttpGet]
-        public async Task<IHttpActionResult> socialToken(string provider, string appName, string accessToken)
+        public async Task<IHttpActionResult> socialToken(string provider, string appName, string accessToken, bool signupIfNotSignedIn = false)
         {
             try
             {
@@ -714,7 +714,22 @@ namespace BackAnd.Web.Api.Controllers
 
                 returnAddress = profile.returnAddress;
 
-                SocialSigninInner(profile);
+                try
+                {
+                    SocialSigninInner(profile);
+                }
+                catch (UserNotSignedUpSocialException userNotSignedUpSocialException)
+                {
+                    if (signupIfNotSignedIn)
+                    {
+                        SocialSignupInner(profile);
+                        SocialSigninInner(profile);
+                    }
+                    else
+                    {
+                        return BadRequest(userNotSignedUpSocialException.Message);
+                    }
+                }
 
                 string email = profile.email;
 
@@ -929,7 +944,23 @@ namespace BackAnd.Web.Api.Controllers
 
                 if (profile.activity == "signin")
                 {
-                    SocialSigninInner(profile);
+                    try
+                    {
+                        SocialSigninInner(profile);
+                    }
+                    catch (UserNotSignedUpSocialException userNotSignedUpSocialException)
+                    {
+                        if (!profile.signupIfNotSignedIn)
+                        {
+                            return BadRequest(userNotSignedUpSocialException.Message);
+                        }
+                        else
+                        {
+                            SocialSignupInner(profile);
+                            SocialSigninInner(profile);
+                        }
+
+                    }
                 }
                 else if (profile.activity == "signup")
                 {
@@ -1308,11 +1339,11 @@ namespace BackAnd.Web.Api.Controllers
                 }
                 else
                 {
-                    userRow = Maps.Instance.GetMap(profile.appName).Database.GetUserRow(profile.email);
+                    userRow = Maps.Instance.GetMap(profile.appName).Database.GetUserRow(profile.email, true);
 
                     if (userRow == null)
                     {
-                        throw new SocialException("The user is not signed up to " + profile.appName);
+                        throw new UserNotSignedUpSocialException(profile.appName);
                     }
 
                     if (!userRow.IsNull("IsApproved"))

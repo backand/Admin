@@ -256,6 +256,7 @@
     <Compile Include="Controllers\Filters\TokenAuthorizeAttribute .cs" />
     <Compile Include="Controllers\Filters\LogActionFilterAttribute.cs" />
     <Compile Include="Controllers\Filters\LogExceptionFilterAttribute .cs" />
+    <Compile Include="Controllers\UserNotSignedUpSocialException.cs" />
     <Compile Include="IHasMap.cs" />
     <Compile Include="Controllers\uploadConfigController.cs" />
     <Compile Include="Controllers\queryDataController.cs" />

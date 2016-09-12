@@ -21,7 +21,7 @@ namespace Durados.Web.Mvc.SocialLogin
             get { return "github"; }
         }
 
-        public override string GetAuthUrl(string appName, string returnAddress, string parameters, string activity, string email)
+        public override string GetAuthUrl(string appName, string returnAddress, string parameters, string activity, string email, bool signupIfNotSignedIn)
         {
             var socialKeys = GetSocialKeys(appName);
             string clientId = socialKeys.ClientId;
@@ -35,7 +35,8 @@ namespace Durados.Web.Mvc.SocialLogin
                 returnAddress = System.Web.HttpContext.Current.Server.UrlEncode(returnAddress),
                 activity = activity,
                 parameters = parameters ?? string.Empty,
-                email = email
+                email = email,
+                signupIfNotSignedIn = signupIfNotSignedIn
             };
 
             var jss = new JavaScriptSerializer();
@@ -85,6 +86,15 @@ namespace Durados.Web.Mvc.SocialLogin
                 string activity = stateObject["activity"].ToString();
                 string parameters = stateObject["parameters"].ToString();
 
+                bool signupIfNotSignedIn = false;
+                if (stateObject.ContainsKey("signupIfNotSignedIn"))
+                {
+                    try
+                    {
+                        signupIfNotSignedIn = System.Convert.ToBoolean(stateObject["signupIfNotSignedIn"]);
+                    }
+                    catch { }
+                }
 
                 string email = null;
 
@@ -93,7 +103,7 @@ namespace Durados.Web.Mvc.SocialLogin
                     email = stateObject["email"].ToString();
                 }
 
-                return FetchProfileByCode(code, appName, returnAddress, activity, parameters, null, email);
+                return FetchProfileByCode(code, appName, returnAddress, activity, parameters, null, email, signupIfNotSignedIn);
 
             }
             catch (Exception exception)
@@ -103,7 +113,7 @@ namespace Durados.Web.Mvc.SocialLogin
 
         }
 
-        protected override SocialProfile FetchProfileByCode(string code, string appName, string returnAddress, string activity, string parameters, string redirectUrl, string email)
+        protected override SocialProfile FetchProfileByCode(string code, string appName, string returnAddress, string activity, string parameters, string redirectUrl, string email, bool signupIfNotSignedIn)
         {
 
             string urlAccessToken = "https://github.com/login/oauth/access_token";
@@ -121,7 +131,7 @@ namespace Durados.Web.Mvc.SocialLogin
             Dictionary<string, object> accessObject = Durados.Web.Mvc.UI.Json.JsonSerializer.Deserialize(response);
             string accessToken = accessObject["access_token"].ToString();
 
-            return GetProfile(appName, accessToken, returnAddress, activity, parameters, email);
+            return GetProfile(appName, accessToken, returnAddress, activity, parameters, email, signupIfNotSignedIn);
         }
 
         protected override SocialApplicationKeys GetSocialKeysFromDatabase(Map map)
