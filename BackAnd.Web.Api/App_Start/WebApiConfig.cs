@@ -320,6 +320,9 @@ namespace BackAnd.Web.Api
             config.Formatters.Add(new TextPlainFormatter());
             config.MessageHandlers.Add(new MethodOverrideHandler());
 
+            config.Formatters.JsonFormatter.SupportedMediaTypes.Add(new MediaTypeHeaderValue("text/html"));
+
+
             config.Services.Replace(typeof(IHostBufferPolicySelector), new NoBufferPolicySelector());
 
  
