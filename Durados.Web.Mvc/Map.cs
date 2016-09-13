@@ -1371,8 +1371,10 @@ namespace Durados.Web.Mvc
          String.Concat(Enumerable.Repeat(indentSpaces, indent + 1)) + "method: \"POST\",\n" +
          String.Concat(Enumerable.Repeat(indentSpaces, indent + 1)) + "url:CONSTS.apiUrl + \"/1/objects/" + objectName + "\",\n" +
          String.Concat(Enumerable.Repeat(indentSpaces, indent + 1)) + "params: " + (parameters ?? "{}") + ",\n" +
-         String.Concat(Enumerable.Repeat(indentSpaces, indent + 1)) + "data: " + data + ",\n" +
-         String.Concat(Enumerable.Repeat(indentSpaces, indent + 1)) + "headers: {\"Authorization\": userProfile.token}\n" +
+         //String.Concat(Enumerable.Repeat(indentSpaces, indent + 1)) + "data: " + data + ",\n" +
+         //String.Concat(Enumerable.Repeat(indentSpaces, indent + 1)) + "headers: {\"Authorization\": userProfile.token}\n" +
+         //String.Concat(Enumerable.Repeat(indentSpaces, indent)) + "});";
+         String.Concat(Enumerable.Repeat(indentSpaces, indent + 1)) + "data: " + data + "\n" +
          String.Concat(Enumerable.Repeat(indentSpaces, indent)) + "});";
         }
 
@@ -1387,8 +1389,10 @@ namespace Durados.Web.Mvc
         String.Concat(Enumerable.Repeat(indentSpaces, indent + 1)) + "method: \"PUT\",\n" +
         String.Concat(Enumerable.Repeat(indentSpaces, indent + 1)) + "url:CONSTS.apiUrl + \"/1/objects/" + objectName + "/" + id + "\",\n" +
         String.Concat(Enumerable.Repeat(indentSpaces, indent + 1)) + "params: " + (parameters ?? "{}") + ",\n" +
-        String.Concat(Enumerable.Repeat(indentSpaces, indent + 1)) + "data: " + data + ",\n" +
-        String.Concat(Enumerable.Repeat(indentSpaces, indent + 1)) + "headers: {\"Authorization\": userProfile.token}\n" +
+        //String.Concat(Enumerable.Repeat(indentSpaces, indent + 1)) + "data: " + data + ",\n" +
+        //String.Concat(Enumerable.Repeat(indentSpaces, indent + 1)) + "headers: {\"Authorization\": userProfile.token}\n" +
+        //String.Concat(Enumerable.Repeat(indentSpaces, indent)) + "});";
+        String.Concat(Enumerable.Repeat(indentSpaces, indent + 1)) + "data: " + data + "\n" +
         String.Concat(Enumerable.Repeat(indentSpaces, indent)) + "});";
             return code;
         }
@@ -1403,8 +1407,10 @@ namespace Durados.Web.Mvc
             string code = String.Concat(Enumerable.Repeat(indentSpaces, indent)) + "var " + varName + " = $http({\n" +
         String.Concat(Enumerable.Repeat(indentSpaces, indent + 1)) + "method: \"DELETE\",\n" +
         String.Concat(Enumerable.Repeat(indentSpaces, indent + 1)) + "url:CONSTS.apiUrl + \"/1/objects/" + objectName + "/" + id + "\",\n" +
-        String.Concat(Enumerable.Repeat(indentSpaces, indent + 1)) + "params: " + (parameters ?? "{}") + ",\n" +
-        String.Concat(Enumerable.Repeat(indentSpaces, indent + 1)) + "headers: {\"Authorization\": userProfile.token}\n" +
+        //String.Concat(Enumerable.Repeat(indentSpaces, indent + 1)) + "params: " + (parameters ?? "{}") + ",\n" +
+        //String.Concat(Enumerable.Repeat(indentSpaces, indent + 1)) + "headers: {\"Authorization\": userProfile.token}\n" +
+        //String.Concat(Enumerable.Repeat(indentSpaces, indent)) + "});";
+        String.Concat(Enumerable.Repeat(indentSpaces, indent + 1)) + "params: " + (parameters ?? "{}") + "\n" +
         String.Concat(Enumerable.Repeat(indentSpaces, indent)) + "});";
             return code;
         }
@@ -1441,11 +1447,11 @@ namespace Durados.Web.Mvc
                 "   parameters.firstName = userInput.FirstName;\n" +
                 "   parameters.lastName = userInput.LastName;\n" +
                 "   try{\n" +
-            GetPostCode("response", USERS, "{parameters: {\"sync\": true}}", "parameters", 1) + "\n" +
-                "}\n" +
-                "catch(err) {\n" +
+            GetPostCode("response", USERS, "{parameters: {\"sync\": true}}", "parameters", 2) + "\n" +
+                "   }\n" +
+                "   catch(err) {\n" +
                 "   // register user even if there is an error or no users object \n" +
-                "}";
+                "   }";
 
             ISqlTextBuilder sqlTextBuilder = GetSqlTextBuilder();
             ConfigAccess configAccess = new DataAccess.ConfigAccess();
