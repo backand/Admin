@@ -5281,7 +5281,7 @@ namespace Durados.DataAccess
                 }
                 if (view.Database.Logger != null)
                 {
-                    view.Database.Logger.Log(view.Name, "wf after commit start", "Edit", "DataAccess", "", 3, view.Database.Logger.NowWithMilliseconds(), DateTime.Now);
+                    view.Database.Logger.Log(view.Name, "wf after commit start", "Edit", "DataAccess", "", 10, view.Database.Logger.NowWithMilliseconds(), DateTime.Now);
                 }
 
                 editEventArgs = new EditEventArgs(view, values, pk, command, sysCommand);
@@ -5295,7 +5295,7 @@ namespace Durados.DataAccess
 
                 if (view.Database.Logger != null)
                 {
-                    view.Database.Logger.Log(view.Name, "wf after commit end", "Edit", "DataAccess", "", 3, view.Database.Logger.NowWithMilliseconds(), DateTime.Now);
+                    view.Database.Logger.Log(view.Name, "wf after commit end", "Edit", "DataAccess", "", 10, view.Database.Logger.NowWithMilliseconds(), DateTime.Now);
 
                     view.Database.Logger.Log(view.Name, "End", "Edit", "DataAccess", "", 10, view.Database.Logger.NowWithMilliseconds(), DateTime.Now);
                 }
