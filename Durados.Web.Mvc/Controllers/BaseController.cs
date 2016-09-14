@@ -57,7 +57,7 @@ namespace Durados.Web.Mvc.Controllers
                 logger.Log(controller, action, filterContext.Exception.Source, filterContext.Exception, logType, null);
             }
             catch { }
-            //logger.WriteToEventLog("Message: " + filterContext.Exception.Message + "; Trace: " + filterContext.Exception.StackTrace, System.Diagnostics.EventLogEntryType.Error, logType);
+            logger.WriteToEventLog("Message: " + filterContext.Exception.Message + "; Trace: " + filterContext.Exception.StackTrace, System.Diagnostics.EventLogEntryType.Error, logType);
 
             if (log == null)
             {

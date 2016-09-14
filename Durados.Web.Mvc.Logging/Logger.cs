@@ -798,7 +798,7 @@ namespace Durados.Web.Mvc.Logging
 
             EventLogEntryType eventLogEntryType = logType < 4 ? EventLogEntryType.Warning : EventLogEntryType.Information;
 
-            WriteToEventLog(sEvent, eventLogEntryType, logType);
+            //WriteToEventLog(sEvent, eventLogEntryType, logType);
 
         }
 
@@ -1037,7 +1037,7 @@ namespace Durados.Web.Mvc.Logging
                 }
                 else
                 {
-                    WriteToEventLog(message, EventLogEntryType.Warning, 3);
+                    //WriteToEventLog(message, EventLogEntryType.Warning, 3);
                 }
             }
             catch (Exception e)
