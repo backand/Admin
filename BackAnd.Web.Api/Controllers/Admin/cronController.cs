@@ -145,7 +145,14 @@ namespace BackAnd.Web.Api.Controllers
                 {
                     Thread.CurrentThread.IsBackground = true;
                     /* run your code here */
-                    Durados.Web.Mvc.Infrastructure.Http.GetWebRequest(url, string.Empty, string.Empty, null, headers);
+                    try
+                    {
+                        Durados.Web.Mvc.Infrastructure.Http.GetWebRequest(url, string.Empty, string.Empty, null, headers);
+                    }
+                    catch (Exception exception)
+                    {
+                        Map.Logger.Log("cron", "runAsync", "GetWebRequest", exception, 1, url);
+                    }
                 }).Start();
 
 
