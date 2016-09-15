@@ -278,7 +278,7 @@ namespace Durados.Web.Mvc.UI.Helpers
             Dictionary<string, object> data = new Dictionary<string, object>();
 
             data.Add("name", name);
-            data.Add("schedule", schedule);
+            data.Add("schedule", HandleSchedule(schedule));
             data.Add("lambdaArn", LambdaArn);
             data.Add("input", input);
             if (active.HasValue)
@@ -316,6 +316,12 @@ namespace Durados.Web.Mvc.UI.Helpers
                 throw new Durados.DuradosException("Could not parse putCron response", exception);
             }
 
+        }
+
+        private static object HandleSchedule(string schedule)
+        {
+            CronScheduler.Scheduler scheduler = new CronScheduler.AwsScheduler();
+            return scheduler.Standardize(schedule);
         }
 
         public static void deleteCron(Cron cron)
