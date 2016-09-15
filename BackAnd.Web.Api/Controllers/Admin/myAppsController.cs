@@ -775,6 +775,7 @@ namespace BackAnd.Web.Api.Controllers
                     try
                     {
                         webhook.Send(WebhookType.AppDeleted, GetBody(id, Maps.Instance.DuradosMap.Database.GetCurrentUsername()));
+                        Maps.Instance.DuradosMap.Logger.Log("webhook", "AppDeleted", this.Request.Method.Method, null, 3, null, DateTime.Now);
                     }
                     catch (Exception exception)
                     {

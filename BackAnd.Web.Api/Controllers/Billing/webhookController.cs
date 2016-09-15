@@ -54,10 +54,12 @@ namespace BackAnd.Web.Api.Controllers.Billing
             }
             catch (WebhookNotFoundException exception)
             {
+                Maps.Instance.DuradosMap.Logger.Log("webhook", webhookName, this.Request.Method.Method, exception, 1, null, DateTime.Now);
                 return ResponseMessage(Request.CreateResponse(HttpStatusCode.NotFound, exception.Message));
             }
             catch (Exception exception)
             {
+                Maps.Instance.DuradosMap.Logger.Log("webhook", webhookName, this.Request.Method.Method, exception, 1, null, DateTime.Now);
                 throw new BackAndApiUnexpectedResponseException(exception, this);
             }
         }

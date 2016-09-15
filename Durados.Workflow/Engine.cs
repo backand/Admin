@@ -155,9 +155,17 @@ namespace Durados.Workflow
             if (exceptions.Count > 0)
             {
                 Backand.Logger.Log(exceptions[0].Message + "\n" + exceptions[0].StackTrace, 501);
-                throw new WorkflowEngineException(exceptions.ToArray(), failedRules.ToArray());
+                if (IsDebug())
+                    throw new WorkflowEngineException(exceptions.ToArray(), failedRules.ToArray());
+                else
+                    throw exceptions[0];
             }
 
+        }
+
+        private bool IsDebug()
+        {
+            return System.Web.HttpContext.Current.Request.QueryString["$$debug$$"] == "true";
         }
 
         private static void SetCurrentDatabase(View view)

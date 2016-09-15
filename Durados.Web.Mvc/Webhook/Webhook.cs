@@ -134,7 +134,7 @@ namespace Durados.Web.Mvc.Webhook
         }
         public void HandleException(string webhookType, Exception exception)
         {
-            Maps.Instance.DuradosMap.Logger.Log(GetType().Name, new StackFrame(0).GetMethod().Name, webhookType.ToString(), exception, 1, null);
+            Maps.Instance.DuradosMap.Logger.Log("webhook", new StackFrame(0).GetMethod().Name, webhookType.ToString(), exception, 1, null);
             WebhookParameters parameters = Maps.GetWebhookParameters(webhookType);
             if (parameters == null || parameters.ErrorHandling == null)
                 return;

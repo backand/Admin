@@ -1880,6 +1880,7 @@ namespace BackAnd.Web.Api.Controllers
                         try
                         {
                             webhook.Send(WebhookType.AppCreated, GetBody(name, username));
+                            Maps.Instance.DuradosMap.Logger.Log("webhook", "AppCreated", this.Request.Method.Method, null, 3, null, DateTime.Now);
                         }
                         catch (Exception exception)
                         {

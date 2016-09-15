@@ -298,7 +298,12 @@ namespace Durados.Web.Mvc.UI.Helpers
 
             if (request.status != 200)
             {
-                throw new Durados.DuradosException("Server return status " + request.status + ", " + request.responseText);
+                string message = request.responseText;
+                if (request.responseText.Contains("Parameter ScheduleExpression is not valid"))
+                {
+                    message = "The schedule expression '" + schedule + "' is not valid";
+                }
+                throw new Durados.DuradosException(message);
             }
 
             Dictionary<string, object> response = null;

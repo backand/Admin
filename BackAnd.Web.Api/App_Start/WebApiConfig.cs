@@ -317,11 +317,16 @@ namespace BackAnd.Web.Api
             /*var jsonFormatter = config.Formatters.OfType<JsonMediaTypeFormatter>().First();
             jsonFormatter.SerializerSettings.ContractResolver = new CamelCasePropertyNamesContractResolver();
             */
+
+            config.Formatters.Clear();
+
             config.Formatters.Add(new TextPlainFormatter());
             config.MessageHandlers.Add(new MethodOverrideHandler());
-
-            config.Formatters.JsonFormatter.SupportedMediaTypes.Add(new MediaTypeHeaderValue("text/html"));
-
+            config.Formatters.Add(new JsonMediaTypeFormatter());
+            
+            //config.Formatters.JsonFormatter.SupportedMediaTypes.Add(new MediaTypeHeaderValue("text/html"));
+            //config.Formatters.JsonFormatter.SupportedMediaTypes.Add(new MediaTypeHeaderValue("application/json"));
+            //config.Formatters.JsonFormatter.SupportedMediaTypes.Add(new JsonMediaTypeFormatter());
 
             config.Services.Replace(typeof(IHostBufferPolicySelector), new NoBufferPolicySelector());
 
