@@ -389,6 +389,10 @@
     <Compile Include="UI\Helpers\PreviewHelper.cs" />
     <Compile Include="UI\Helpers\QueryNotFoundException.cs" />
     <Compile Include="UI\Helpers\RestHelper.cs" />
+    <Compile Include="UI\Helpers\Search\FieldNameConfigFieldSearcher.cs" />
+    <Compile Include="UI\Helpers\Search\Searcher.cs" />
+    <Compile Include="UI\Helpers\Search\ConfigFieldSearcher.cs" />
+    <Compile Include="UI\Helpers\Search\SnippetConfigFieldSearcher.cs" />
     <Compile Include="UI\Helpers\XMLConfigHelper.cs" />
     <Compile Include="UI\HistoryTableViewer.cs" />
     <Compile Include="UI\DataActionFields.cs" />

@@ -1397,6 +1397,11 @@ namespace Durados
         public FilterValueType ValueType { get; set; }
 
     }
-    
 
+    public enum EntityType
+    {
+        Object,
+        Action,
+        Query,
+    }
 }

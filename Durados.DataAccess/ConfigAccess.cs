@@ -507,6 +507,22 @@ namespace Durados.DataAccess
             return dataView[0].Row;
         }
 
+        public DataView GetRows(string viewName, string filterFieldName, string filterValue, string filename)
+        {
+            return GetRows(viewName, filterFieldName + " = '" + filterValue + "'", filename);
+        }
+
+        public DataView GetRows(string viewName, string whereStatement, string filename)
+        {
+            DataSet ds;
+            ds = GetDataSet(filename);
+            
+            DataView dataView = new DataView(ds.Tables[viewName]);
+            dataView.RowFilter = whereStatement;
+            
+            return dataView;
+        }
+
         public DataRow GetViewRow(string viewName, string filename)
         {
             DataSet ds;
