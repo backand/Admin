@@ -11,5 +11,10 @@ namespace Durados.Web.Mvc.UI.Helpers.Search
         {
             return "Fields";
         }
+
+        protected override string GetName(System.Data.DataRowView row, string q)
+        {
+            return row.Row.GetParentRow(GetIdFilterFieldName())["Name"].ToString();
+        }
     }
 }

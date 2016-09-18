@@ -43,11 +43,11 @@ namespace BackAnd.Web.Api.Controllers
 
         [Route("~/1/admin/search")]
         [HttpGet]
-        public IHttpActionResult Get(string q, string entityType = null, int? id = null, int snippetLength = ConfigFieldSearcher.SNIPPET_LENGTH)
+        public IHttpActionResult Get(string q, string entityType = null, int? id = null, int snippetLength = ConfigFieldSearcher.SNIPPET_LENGTH, bool spaceAsWildcard = true, string highlightTag = "<b>", int tabChars = 4)
         {
             try
             {
-                return Ok(new Searcher().Search(q, entityType, id, snippetLength));
+                return Ok(new Searcher().Search(q, entityType, id, snippetLength, spaceAsWildcard, highlightTag, tabChars));
 
             }
             catch (Exception exception)

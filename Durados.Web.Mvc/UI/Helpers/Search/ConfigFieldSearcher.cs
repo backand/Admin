@@ -16,7 +16,7 @@ namespace Durados.Web.Mvc.UI.Helpers.Search
 
         public string FieldName { get; set; }
 
-        public object Search(ConfigAccess config, string q, int? id, int snippetLength)
+        public object Search(ConfigAccess config, string q, int? id, int snippetLength, string highlightTag, int tabChars)
         {
             string whereStatement = GetWhereStatement(q, id);
 
@@ -25,18 +25,23 @@ namespace Durados.Web.Mvc.UI.Helpers.Search
             if (dataView.Count == 0)
                 return null;
 
-            return GetResults(dataView, q, snippetLength);
+            return GetResults(dataView, q, snippetLength, highlightTag, tabChars);
         }
 
-        protected virtual object GetResults(DataView dataView, string q, int snippetLength)
+        protected virtual object GetResults(DataView dataView, string q, int snippetLength, string highlightTag, int tabChars)
         {
             List<object> list = new List<object>();
             foreach (System.Data.DataRowView row in dataView)
             {
-                list.Add(new { id = GetId(row), snippet = GetSnippet(row, q, snippetLength) });
+                list.Add(new { id = GetId(row), name = GetName(row, q), snippets = GetSnippets(row, q, snippetLength, highlightTag, tabChars) });
             }
 
             return list.ToArray();
+        }
+
+        protected virtual string GetName(System.Data.DataRowView row, string q)
+        {
+            return row["Name"].ToString();
         }
 
         protected virtual object GetId(System.Data.DataRowView row)
@@ -44,7 +49,7 @@ namespace Durados.Web.Mvc.UI.Helpers.Search
             return row[GetIdFilterFieldName()];
         }
 
-        protected virtual object GetSnippet(System.Data.DataRowView row, string q, int snippetLength)
+        protected virtual object GetSnippets(System.Data.DataRowView row, string q, int snippetLength, string highlightTag, int tabChars)
         {
             return row[FieldName];
         }

@@ -10,13 +10,16 @@ namespace Durados.Web.Mvc.UI.Helpers.Search
 {
     public class Searcher
     {
-        public object Search(string q, string entityType, int? id, int snippetLength)
+        public object Search(string q, string entityType, int? id, int snippetLength, bool spaceAsWildcard, string highlightTag, int tabChars)
         {
-            q = q.Replace(" ", "%");
+            if (spaceAsWildcard)
+            {
+                q = q.Replace(" ", "%");
+            }
 
             if (string.IsNullOrEmpty(entityType))
             {
-                return Search(q, (EntityType?)null, id, snippetLength);
+                return Search(q, (EntityType?)null, id, snippetLength, highlightTag, tabChars);
             }
 
             EntityType entity;
@@ -26,18 +29,18 @@ namespace Durados.Web.Mvc.UI.Helpers.Search
                 throw new DuradosException("entityType is not valid");
             }
 
-            return Search(q, entity, id, snippetLength);
+            return Search(q, entity, id, snippetLength, highlightTag, tabChars);
         }
 
         ConfigAccess config = new ConfigAccess();
 
-        public object Search(string q, EntityType? entityType, int? id, int snippetLength)
+        public object Search(string q, EntityType? entityType, int? id, int snippetLength, string highlightTag, int tabChars)
         {
             Dictionary<string, object> results = new Dictionary<string, object>();
 
             foreach (EntityType entityType2 in GetEntityTypes(entityType))
             {
-                object entityResults = SearchEntity(q, entityType2, id, snippetLength);
+                object entityResults = SearchEntity(q, entityType2, id, snippetLength, highlightTag, tabChars);
                 if (entityResults != null)
                 {
                     results.Add(entityType2.ToString(), entityResults);
@@ -60,7 +63,7 @@ namespace Durados.Web.Mvc.UI.Helpers.Search
 
         }
 
-        private object SearchEntity(string q, EntityType entityType, int? id, int snippetLength)
+        private object SearchEntity(string q, EntityType entityType, int? id, int snippetLength, string highlightTag, int tabChars)
         {
             ConfigFieldSearcher[] configFieldSearchers = GetViewAndFieldName(entityType);
 
@@ -68,7 +71,7 @@ namespace Durados.Web.Mvc.UI.Helpers.Search
 
             foreach (ConfigFieldSearcher configFieldSearcher in configFieldSearchers)
             {
-                object entityResults = configFieldSearcher.Search(config, q, id, snippetLength);
+                object entityResults = configFieldSearcher.Search(config, q, id, snippetLength, highlightTag, tabChars);
                 if (entityResults != null)
                 {
                     results.Add(configFieldSearcher.Name, entityResults);
