@@ -15,6 +15,10 @@
 <html xmlns="http://www.w3.org/1999/xhtml" <%=Durados.Web.Mvc.Maps.Instance.GetMap().Database.Localizer.Direction=="RTL" ? " dir='rtl'":"" %>
 <%=style %>>
 <head>
+    <%if (Durados.Web.Infrastructure.General.IsMobile()){ %>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" />
+    <%} %>
     <style>
         .overlay > div:first-child
         {
