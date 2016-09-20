@@ -1,9 +1,18 @@
 ﻿<%@ Page Language="C#" Inherits="System.Web.Mvc.ViewPage" %>
 
 <%
-    string url = ViewData["url"].ToString();
-    string backUrl = (ViewData["backUrl"] ?? string.Empty).ToString();
+    string url = (ViewData["url"] ?? string.Empty).ToString();
 
+    string viewName = string.Empty;
+    if(!string.IsNullOrEmpty(url))
+    {
+        string baseUrl = (url.Split('?').Length > 1) ? url.Split('?')[0] : url;
+        viewName = (baseUrl.Split('/').Length > 1) ? baseUrl.Split('/').LastOrDefault() : string.Empty;
+        viewName = (viewName == "Field" || string.IsNullOrEmpty(viewName)) ? "Columns" : viewName;
+        
+    }
+    string backUrl = (ViewData["backUrl"] ?? string.Empty).ToString();
+    bool isMobile = Durados.Web.Infrastructure.General.IsMobile()?true:false;
     string style = string.Empty;
     // WIXWIX
     //if (backUrl.Contains("Admin/Item/View"))
@@ -16,9 +25,10 @@
 <%=style %>>
 <head>
     <%if (Durados.Web.Infrastructure.General.IsMobile()){ %>
-    <meta http-equiv="content-type" content="text/html; charset=utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" />
+        <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" />
     <%} %>
+ 
     <style>
         .overlay > div:first-child
         {
@@ -97,6 +107,8 @@
     </style>
     <script type="text/javascript">
         document.domain = '<%=Durados.Web.Mvc.Maps.Host %>';
+        var backUrl = '<%=backUrl%>';
+        var isMobile = '<%=(isMobile)%>' =='True'?true:false;
     </script>
     <script src='<%=ResolveUrl("~/Scripts/jquery.min.js")%>' type="text/javascript"></script>
     <script type="text/javascript">
@@ -135,16 +147,15 @@
             $('iframe').show();
             $('iframe[name=viewProp]', scope).show();
             $(window).resize();
-            
             if ($.browser.mozilla) {
                 setTimeout(function () {
                     var iframe1 = $(getDocumentScope()).find('#d_viewProp');
-                    iframe1.height(iframe1.height()+1);
+                    iframe1.height(iframe1.height() + 1);
                 },
                 1000);
             }
-           // alert($('iframe').$('iframe').contents().html());
-            
+            // alert($('iframe').$('iframe').contents().html());
+
         }
 
         $(document).ready(function () {
@@ -173,11 +184,14 @@
                     menuOff = '?menu=off';
                 }
                 if (parent) {
-                    parent.location = parent.location.href.split('?')[0] + menuOff;
+                    if(isMobile)
+                        parent.location = backUrl;
+                    else
+                        parent.location = parent.location.href.split('?')[0] + menuOff;
                 }
             });
 
-            
+
         });
 
         var toResize;
@@ -200,7 +214,7 @@
 <% if (Durados.Web.Mvc.Maps.Instance.GetMap().Database.GetUserRole() != "View Owner")
    { %>
     <div id="columns-titlebar" class="page-settings-header">
-    <span>Columns</span>
+    <span><%=viewName %></span>
     <a href="#" class="columns-done" title="Close">
         <span class="pages-close">close</span>
     </a>
