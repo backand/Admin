@@ -181,7 +181,7 @@ namespace BackAnd.Web.Api.Controllers
         }
         private string GetUrl()
         {
-            return this.Request.RequestUri.AbsoluteUri.Replace("/async", string.Empty);
+            return System.Web.HttpContext.Current.Request.Url.OriginalString.Replace("/async", string.Empty);
         }
 
         protected override string GetConfigViewName()
