@@ -85,7 +85,7 @@ namespace BackAnd.Web.Api.Controllers
                 }
 
 
-                Maps.Instance.DuradosMap.Logger.Log("cron", "run", "success", null, 3, request.responseText.Length > 4000 ? request.responseText.Substring(0, 4000) : request.responseText);
+                Maps.Instance.DuradosMap.Logger.Log("cron", "run", "success app " + Map.AppName, null, 3, request.responseText.Length > 4000 ? request.responseText.Substring(0, 4000) : request.responseText);
 
                 object response = request.responseText;
 
@@ -147,11 +147,13 @@ namespace BackAnd.Web.Api.Controllers
                     /* run your code here */
                     try
                     {
-                        Durados.Web.Mvc.Infrastructure.Http.GetWebRequest(url, string.Empty, string.Empty, null, headers);
+                        string response = Durados.Web.Mvc.Infrastructure.Http.GetWebRequest(url, string.Empty, string.Empty, null, headers);
+                        Maps.Instance.DuradosMap.Logger.Log("cron", "run async", "success app " + Map.AppName, null, 3, response.Length > 4000 ? response.Substring(0, 4000) : response);
+
                     }
                     catch (Exception exception)
                     {
-                        Map.Logger.Log("cron", "runAsync", "GetWebRequest", exception, 1, url);
+                        Maps.Instance.DuradosMap.Logger.Log("cron", "runAsync", "GetWebRequest", exception, 1, url);
                     }
                 }).Start();
 
@@ -168,7 +170,14 @@ namespace BackAnd.Web.Api.Controllers
         {
             if (this.Request.Headers.Authorization == null)
                 return null;
-            return new Dictionary<string, string>() { { "Authorization", this.Request.Headers.Authorization.ToString() } };
+            Dictionary<string, string> headers = new Dictionary<string, string>() { { "Authorization", this.Request.Headers.Authorization.ToString() } };
+
+            if (System.Web.HttpContext.Current.Request.Headers["AppId"] != null)
+            {
+                headers.Add("AppId", System.Web.HttpContext.Current.Request.Headers["AppId"]);
+            }
+
+            return headers;
         }
         private string GetUrl()
         {
