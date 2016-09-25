@@ -94,7 +94,7 @@ namespace BackAnd.Web.Api.Controllers.Billing
 
         private string GetUrl()
         {
-            return this.Request.RequestUri.OriginalString.TrimEnd("/async".ToCharArray());
+            return System.Web.HttpContext.Current.Request.Url.OriginalString.TrimEnd("/async".ToCharArray());
         }
 
         private string[] GetEmails()

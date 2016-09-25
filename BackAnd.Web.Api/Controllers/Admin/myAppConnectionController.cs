@@ -1960,7 +1960,7 @@ namespace BackAnd.Web.Api.Controllers
 
         private void ValidateSchema(object schema, string appName)
         {
-            string url = this.Request.RequestUri.OriginalString.Split(new string[1] { "admin" }, StringSplitOptions.RemoveEmptyEntries)[0] + "1/model/validate";
+            string url = System.Web.HttpContext.Current.Request.Url.OriginalString.Split(new string[1] { "admin" }, StringSplitOptions.RemoveEmptyEntries)[0] + "1/model/validate";
             Dictionary<string, string> headers = GetHeaders(appName);
             headers.Remove("AppName");
 
@@ -2186,7 +2186,7 @@ namespace BackAnd.Web.Api.Controllers
 
         private string GetUrlToConnect(string appName)
         {
-            return this.Request.RequestUri.OriginalString.Split(new string[1] { "admin" }, StringSplitOptions.RemoveEmptyEntries)[0] + "admin/myAppConnection/status/" + appName;
+            return System.Web.HttpContext.Current.Request.Url.OriginalString.Split(new string[1] { "admin" }, StringSplitOptions.RemoveEmptyEntries)[0] + "admin/myAppConnection/status/" + appName;
         }
 
         private void CallHttpRequestToCreateTheSchema(string appName, string json)
