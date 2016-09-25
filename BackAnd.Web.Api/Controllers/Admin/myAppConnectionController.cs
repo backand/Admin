@@ -2208,7 +2208,7 @@ namespace BackAnd.Web.Api.Controllers
             }
             catch (Exception exception)
             {
-                Map.Logger.Log(GetControllerNameForLog(this.ControllerContext), "CallHttpRequestToCreateTheSchema", exception.Source, exception, 1, null);
+                Map.Logger.Log(GetControllerNameForLog(this.ControllerContext), "CallHttpRequestToCreateTheSchema", exception.Source, exception, 1, url);
 
             }
         }
