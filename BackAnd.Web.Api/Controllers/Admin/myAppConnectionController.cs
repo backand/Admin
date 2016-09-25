@@ -2225,7 +2225,7 @@ namespace BackAnd.Web.Api.Controllers
 
         private string GetUrl()
         {
-            return this.Request.RequestUri.OriginalString.Split(new string[1] { "admin" }, StringSplitOptions.RemoveEmptyEntries)[0] + "1/model?firstTime=true";//"1/table/config/template";
+            return System.Web.HttpContext.Current.Request.Url.OriginalString.Split(new string[1] { "admin" }, StringSplitOptions.RemoveEmptyEntries)[0] + "1/model?firstTime=true";//"1/table/config/template";
         }
 
 
