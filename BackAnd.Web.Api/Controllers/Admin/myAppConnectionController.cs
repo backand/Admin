@@ -1960,7 +1960,7 @@ namespace BackAnd.Web.Api.Controllers
 
         private void ValidateSchema(object schema, string appName)
         {
-            string url = System.Web.HttpContext.Current.Request.Url.OriginalString.Split(new string[1] { "admin" }, StringSplitOptions.RemoveEmptyEntries)[0] + "1/model/validate";
+            string url = this.Request.RequestUri.OriginalString.Replace("http://", Maps.Debug ? "http://" : "https://").Split(new string[1] { "admin" }, StringSplitOptions.RemoveEmptyEntries)[0] + "1/model/validate";
             Dictionary<string, string> headers = GetHeaders(appName);
             headers.Remove("AppName");
 
@@ -2186,7 +2186,7 @@ namespace BackAnd.Web.Api.Controllers
 
         private string GetUrlToConnect(string appName)
         {
-            return System.Web.HttpContext.Current.Request.Url.OriginalString.Split(new string[1] { "admin" }, StringSplitOptions.RemoveEmptyEntries)[0] + "admin/myAppConnection/status/" + appName;
+            return this.Request.RequestUri.OriginalString.Replace("http://", Maps.Debug ? "http://" : "https://").Split(new string[1] { "admin" }, StringSplitOptions.RemoveEmptyEntries)[0] + "admin/myAppConnection/status/" + appName;
         }
 
         private void CallHttpRequestToCreateTheSchema(string appName, string json)
@@ -2225,7 +2225,7 @@ namespace BackAnd.Web.Api.Controllers
 
         private string GetUrl()
         {
-            return System.Web.HttpContext.Current.Request.Url.OriginalString.Split(new string[1] { "admin" }, StringSplitOptions.RemoveEmptyEntries)[0] + "1/model?firstTime=true";//"1/table/config/template";
+            return this.Request.RequestUri.OriginalString.Replace("http://", Maps.Debug ? "http://" : "https://").Split(new string[1] { "admin" }, StringSplitOptions.RemoveEmptyEntries)[0] + "1/model?firstTime=true";//"1/table/config/template";
         }
 
 
