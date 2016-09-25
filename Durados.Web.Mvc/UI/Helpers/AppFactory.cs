@@ -106,7 +106,7 @@ namespace Durados.Web.Mvc.UI.Helpers
             return GetConnection(product, connectionStringCache);           
         }
 
-        private string GetExternalAvailableInstanceConnectionString(SqlProduct product,out string server,out int port)
+        public string GetExternalAvailableInstanceConnectionString(SqlProduct product,out string server,out int port)
         {
             
             string catalog =null;

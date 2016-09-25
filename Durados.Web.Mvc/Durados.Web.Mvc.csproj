@@ -362,6 +362,8 @@
     <Compile Include="UI\Helpers\ActionNotFoundException.cs" />
     <Compile Include="UI\Helpers\AppFactory.cs" />
     <Compile Include="Farm\FarmCaching.cs" />
+    <Compile Include="UI\Helpers\Cloning\Cloner.cs" />
+    <Compile Include="UI\Helpers\Cloning\CopyOptions.cs" />
     <Compile Include="UI\Helpers\CronAuthorizationWasNotSuppliedException.cs" />
     <Compile Include="UI\Helpers\CronScheduler\AwsScheduler.cs" />
     <Compile Include="UI\Helpers\CronScheduler\Scheduler.cs" />

@@ -2969,24 +2969,11 @@ namespace Durados.Web.Mvc.UI.Helpers
             Dictionary<string, object> authorizationSecurity = GetAuthorizationSecurity(appName);
             Dictionary<string, object> dataSecurity = GetDataSecurity(appName);
 
-            Dictionary<string, object> stat = new Dictionary<string, object>() { { "last24hours", last24 }, { "diffLastDaytoYesterday", diff24 }, { "last30days", last30 }, { "diffLast30DaysToPrev", diff30 }, { "sizeInMb", size }, { "totalRows", totalRows }, { "authorizationSecurity", authorizationSecurity }, { "dataSecurity", dataSecurity } };
+            Dictionary<string, object> stat = new Dictionary<string, object>() { 
+            { "last24hours", last24 }, { "diffLastDaytoYesterday", diff24 }, { "last30days", last30 }, { "diffLast30DaysToPrev", diff30 }, 
+            { "sizeInMb", size }, { "totalRows", totalRows }, { "authorizationSecurity", authorizationSecurity }, { "dataSecurity", dataSecurity } };
 
-            //try
-            //{
-            //    Mvc.Stat.Producer producer = new Mvc.Stat.Producer();
-
-            //    Dictionary<string, Dictionary<string, object>> appsMeasurements = (Dictionary<string, Dictionary<string, object>>)producer.Produce(DateTime.Today, null, new string[1] { appName }, null, true);
-
-            //    Dictionary<string, object> measurements = appsMeasurements[appName];
-            //    foreach (string measurement in measurements.Keys)
-            //    {
-            //        stat.Add(measurement, measurements[measurement]);
-            //    }
-            //}
-            //catch (Exception exception)
-            //{
-            //    Maps.Instance.DuradosMap.Logger.Log("producer", "Produce", appName, exception, 1, appName);
-            //}
+            
             return stat;
         }
 
@@ -5390,10 +5377,10 @@ namespace Durados.Web.Mvc.UI.Helpers
 
     public class AppsPool
     {
-        public bool? Pop(string appName, string title, string username, out int? appId, string template)
+        public bool? Pop(string appName, string title, string username, out int? appId, string template, int? templateId)
         {
             int creator = GetCreator(username);
-            return Pop(appName, title, username, creator, out appId, template);
+            return Pop(appName, title, username, creator, out appId, template, templateId);
         }
 
         private int GetCreator(string username)
@@ -5401,7 +5388,7 @@ namespace Durados.Web.Mvc.UI.Helpers
             return Maps.Instance.DuradosMap.Database.GetUserID(username);
         }
 
-        public bool? Pop(string appName, string title, string username, int creator, out int? appId, string template)
+        public bool? Pop(string appName, string title, string username, int creator, out int? appId, string template, int? templateId)
         {
             Map mainMap = null;
             appId = null;
@@ -5422,7 +5409,7 @@ namespace Durados.Web.Mvc.UI.Helpers
                     return false;
                 }
 
-                appId = FindAndUpdateAppInMain(appName, title, creator, mainMap.connectionString);
+                appId = FindAndUpdateAppInMain(appName, title, creator, mainMap.connectionString, templateId);
                 if (!appId.HasValue)
                 {
                     mainMap.Logger.Log("AppsPool", "Pop", "", string.Format("Could not find app in pool for user id {0} where pool creator is {1}", creator, poolCreator), "", 2, string.Empty, DateTime.Now);
@@ -5499,9 +5486,9 @@ namespace Durados.Web.Mvc.UI.Helpers
             userView.Edit(new Dictionary<string, object>() { { "Username", username }, { "Email", username }, { "FirstName", firstName }, { "LastName", lastName } }, pk, null, null, null, null);
         }
 
-        private int? FindAndUpdateAppInMain(string appName, string title, int creator, string connectionString)
+        private int? FindAndUpdateAppInMain(string appName, string title, int creator, string connectionString, int? templateId)
         {
-            return FindAndUpdateAppInMain(appName, title, creator, GetPoolCreator(), connectionString);
+            return FindAndUpdateAppInMain(appName, title, creator, GetPoolCreator(), connectionString, templateId);
         }
 
         private int GetPoolCreator()
@@ -5514,12 +5501,12 @@ namespace Durados.Web.Mvc.UI.Helpers
             return Maps.PoolShouldBeUsed;
         }
 
-        private int? FindAndUpdateAppInMain(string appName, string title, int creator, int poolCreator, string connectionString)
+        private int? FindAndUpdateAppInMain(string appName, string title, int creator, int poolCreator, string connectionString, int? templateId)
         {
             string sql =
                 "begin tran getFromPool " +
                 "declare @appId int " +
-                "select top(1) @appId = id from durados_App with(UPDLOCK) where creator = @poolCreator and DatabaseStatus = 1 order by id asc; " +
+                "select top(1) @appId = id from durados_App with(UPDLOCK) where TemplateId " + (templateId.HasValue ? " = " + templateId.Value : " is null ").ToString() + " and creator = @poolCreator and DatabaseStatus = 1 order by id asc; " +
                 "delete from durados_App where [Name] = @Name; " +
                 "update durados_App " +
                 "set creator = @creator, " +

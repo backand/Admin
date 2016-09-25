@@ -435,7 +435,7 @@
                 <xs:element name="OrderForEdit" msdata:Caption="" type="xs:int" minOccurs="0" />
                 <xs:element name="Sortable" msdata:Caption="" type="xs:boolean" minOccurs="0" />
                 <xs:element name="UpdateParentInGrid" msdata:Caption="" type="xs:boolean" minOccurs="0" />
-                <xs:element name="DefaultValue" msdata:DataType="System.Object, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" msdata:Caption="" type="xs:anyType" minOccurs="0" />
+                <xs:element name="DefaultValue" msdata:Caption="" type="xs:anyType" minOccurs="0" />
                 <xs:element name="GridEditable" msdata:Caption="" type="xs:boolean" minOccurs="0" />
                 <xs:element name="Seperator" msdata:Caption="" type="xs:boolean" minOccurs="0" />
                 <xs:element name="SeperatorTitle" msdata:Caption="" type="xs:string" minOccurs="0" />
@@ -1006,7 +1006,7 @@
     <FirstViewName>durados_App</FirstViewName>
     <True>Yes</True>
     <False>No</False>
-    <ConfigVersion>1.0.406</ConfigVersion>
+    <ConfigVersion>1.0.407</ConfigVersion>
     <SecureLevel>RegisteredUsers</SecureLevel>
     <DefaultLevelOfDept>3</DefaultLevelOfDept>
     <SelectionLimit>2000</SelectionLimit>

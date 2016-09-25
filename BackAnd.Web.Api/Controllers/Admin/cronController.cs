@@ -41,11 +41,17 @@ namespace BackAnd.Web.Api.Controllers
     {
 
         [Route("~/1/cron/run/{id}")]
+        [Route("~/1/jobs/run/{id}")]
         [HttpGet]
-        public IHttpActionResult run(int id, bool test = false)
+        public IHttpActionResult run(int id, bool test = false, bool async = true)
         {
             try
             {
+                if (async && !test)
+                {
+                    return runAsync(id);
+                }
+
                 if (!Map.Database.Crons.ContainsKey(id))
                 {
                     return ResponseMessage(Request.CreateResponse(HttpStatusCode.NotFound, "The Cron " + id + " does not exist"));
@@ -119,6 +125,7 @@ namespace BackAnd.Web.Api.Controllers
         }
 
         
+        [Route("~/1/jobs/run/{id}/test")]
         [Route("~/1/cron/run/{id}/test")]
         [HttpGet]
         public IHttpActionResult runTest(int id)
@@ -131,6 +138,7 @@ namespace BackAnd.Web.Api.Controllers
             return CronHelper.GetRequestInfo(cron);
         }
 
+        [Route("~/1/jobs/run/{id}/async")]
         [Route("~/1/cron/run/{id}/async")]
         [HttpGet]
         public IHttpActionResult runAsync(int id)
@@ -181,7 +189,18 @@ namespace BackAnd.Web.Api.Controllers
         }
         private string GetUrl()
         {
-            return System.Web.HttpContext.Current.Request.Url.OriginalString.Replace("/async", string.Empty);
+            string url = System.Web.HttpContext.Current.Request.Url.OriginalString.Replace("/async", string.Empty);
+
+            if (url.Contains('?'))
+            {
+                url += "&async=false";
+            }
+            else
+            {
+                url += "?async=false";
+            }
+
+            return url;
         }
 
         protected override string GetConfigViewName()
@@ -266,6 +285,12 @@ namespace BackAnd.Web.Api.Controllers
 
         protected override IHttpActionResult ValidateInputForPost(Durados.Web.Mvc.View view, Dictionary<string, object> values)
         {
+            if (IsOverTheLimit(view))
+            {
+                return ResponseMessage(Request.CreateResponse(HttpStatusCode.PreconditionFailed, "You have exceeded the limit of maximum crons allowed"));
+            }
+
+
             if (values.ContainsKey(NAME))
             {
                 string name = values[NAME].ToString();
@@ -278,7 +303,7 @@ namespace BackAnd.Web.Api.Controllers
 
             if (!values.ContainsKey(CRON_TYPE))
             {
-                return ResponseMessage(Request.CreateResponse(HttpStatusCode.NotAcceptable, "Missing CronType"));
+                return ResponseMessage(Request.CreateResponse(HttpStatusCode.PreconditionFailed, "Missing CronType"));
 
             }
 
@@ -286,13 +311,13 @@ namespace BackAnd.Web.Api.Controllers
 
             if (cronType != CronType.External.ToString() && !values.ContainsKey(EntityId))
             {
-                return ResponseMessage(Request.CreateResponse(HttpStatusCode.NotAcceptable, "Missing EntityId"));
+                return ResponseMessage(Request.CreateResponse(HttpStatusCode.PreconditionFailed, "Missing EntityId"));
             }
 
             int entityId = -1;
             if (!int.TryParse(values[EntityId].ToString(), out entityId))
             {
-                return ResponseMessage(Request.CreateResponse(HttpStatusCode.NotAcceptable, "EntityId must be a number"));
+                return ResponseMessage(Request.CreateResponse(HttpStatusCode.PreconditionFailed, "EntityId must be a number"));
             }
 
             if (cronType == CronType.Query.ToString())
@@ -325,6 +350,15 @@ namespace BackAnd.Web.Api.Controllers
             }
 
             return null;
+        }
+
+        private bool IsOverTheLimit(Durados.Web.Mvc.View view)
+        {
+            int count = view.GetRowCount();
+
+            int limit = Map.GetLimit(Limits.Cron);
+
+            return count > limit;
         }
 
         protected override IHttpActionResult ValidateInputForUpdate(string id, Durados.Web.Mvc.View view, Dictionary<string, object> values)

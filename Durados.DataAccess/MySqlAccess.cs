@@ -252,6 +252,43 @@ namespace Durados.DataAccess
                 }
             }
         }
+
+        public override void CopyDatabase(string adminConnectionString, string sourceConnectionString, string targetConnectionString)
+        {
+            MySqlConnection conn = new MySqlConnection(sourceConnectionString);
+            string sourceDatabaseName = conn.Database;
+            conn = new MySqlConnection(targetConnectionString);
+            string targetDatabaseName = conn.Database;
+
+            MySqlConnectionStringBuilder connBuilder = new MySqlConnectionStringBuilder(adminConnectionString);
+            string username = connBuilder.UserID;
+            string password = connBuilder.Password;
+
+            CopyDatabase(adminConnectionString, sourceDatabaseName, username, password, targetDatabaseName);
+        }
+
+
+        public void CopyDatabase(string adminConnectionString, string sourceDatabaseName, string username, string password, string targetDatabaseName)
+        {
+            MySqlConnection conn = new MySqlConnection(adminConnectionString);
+            MySqlCommand cmd;
+            string s0;
+
+            try
+            {
+                conn.Open();
+                s0 = "mysqldump <sourcedb> -u <USERNAME> -p<PASS> | mysql <targetdb> -u <USERNAME> -p<PASS>".Replace("<sourcedb>", sourceDatabaseName).Replace("<targetdb>", targetDatabaseName).Replace("<USERNAME>", username).Replace("<PASS>", password);
+                //s0 = "mysqldump -h localhost -u <USERNAME> -p<PASS> <sourcedb> | mysql -h localhost -u <USERNAME> -p<PASS> <targetdb>".Replace("<sourcedb>", sourceDatabaseName).Replace("<targetdb>", targetDatabaseName).Replace("<USERNAME>", username).Replace("<PASS>", password);
+                cmd = new MySqlCommand(s0, conn);
+                cmd.ExecuteNonQuery();
+                conn.Close();
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.ToString());
+                throw new DuradosException("Failed to copy MySQL database " + sourceDatabaseName + " to " + targetDatabaseName);
+            } 
+        }
     }
 
 

@@ -227,6 +227,9 @@
     <Compile Include="Controllers\accountController.cs" />
     <Compile Include="Controllers\Admin\actionTemplateController.cs" />
     <Compile Include="Controllers\Admin\cronController.cs" />
+    <Compile Include="Controllers\Admin\limitsController.cs">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="Controllers\Admin\ParseMigrationController.cs" />
     <Compile Include="Controllers\Admin\FarmController.cs" />
     <Compile Include="Controllers\Admin\debugModeController.cs" />

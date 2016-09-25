@@ -26,7 +26,7 @@ DELETE	    |404 (Not Found), unless you want to delete the whole collection—no
 
 namespace BackAnd.Web.Api.Controllers
 {
-    [RoutePrefix("1/query/data")]
+    [RoutePrefix("1")]
     [BackAnd.Web.Api.Controllers.Filters.BackAndAuthorize]
     public class queryDataController : apiController
     {
@@ -36,7 +36,8 @@ namespace BackAnd.Web.Api.Controllers
             return query.IsAllow();
         }
 
-        [Route("{name}")]
+        [Route("queries/data/{name}")]
+        [Route("query/data/{name}")]
         [HttpGet]
         [HttpPost]
         public IHttpActionResult Get(string name, int? pageNumber = null, int? pageSize = null, bool dataSeries = false, string parameters = null)

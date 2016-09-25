@@ -161,6 +161,11 @@ namespace Durados.DataAccess
 
         const char comma = ',';
 
+        public virtual void CopyDatabase(string adminConnectionString, string sourceConnectionString, string targetConnectionString)
+        {
+
+        }
+
         public string CopyAzureDatabase(string server, string catalog, string username, string password, string source)
         {
             SqlConnectionStringBuilder csb = new SqlConnectionStringBuilder();

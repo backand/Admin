@@ -4633,5 +4633,61 @@ namespace Durados.Web.Mvc
 
         public Billing.PaymentStatus PaymentStatus { get; set; }
 
+
+        public int GetLimit(Limits limit)
+        {
+            try
+            {
+                if (limits.ContainsKey(limit))
+                {
+                    return limits[limit];
+                }
+                else
+                {
+                    return Maps.GetLimit(limit);
+                }
+            }
+            catch (Exception exception)
+            {
+                Maps.Instance.DuradosMap.Logger.Log("Map", "GetLimit", "GetLimit", exception, 1, "Failed to get app limit");
+                throw new DuradosException("Failed to get limit " + limit, exception);
+            }
+        }
+
+        Dictionary<Limits, int> limits = new Dictionary<Limits, int>();
+        public void LoadLimits()
+        {
+            try
+            {
+                SqlAccess sqlAccess = new SqlAccess();
+                DataTable table = sqlAccess.ExecuteTable(Maps.Instance.DuradosMap.connectionString, "select Name, Limit from durados_AppLimits where AppId = " + Id, null, CommandType.Text);
+                foreach (DataRow row in table.Rows)
+                {
+                    string limitName = row["Name"].ToString();
+                    Limits limit;
+                    if (Enum.TryParse<Limits>(limitName, out limit))
+                    {
+                        int value = (int)row["Limit"];
+                        if (limits.ContainsKey(limit))
+                        {
+                            limits[limit] = value;
+                        }
+                        else
+                        {
+                            limits.Add(limit, value);
+                        }
+                    }
+                }
+            }
+            catch (Exception exception)
+            {
+                Maps.Instance.DuradosMap.Logger.Log("Map", "LoadLimits", "LoadLimits", exception, 1, "Failed to load app limit");
+            }
+        }
+    }
+
+    public enum Limits
+    {
+        Cron
     }
 }

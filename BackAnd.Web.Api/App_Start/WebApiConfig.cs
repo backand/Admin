@@ -265,13 +265,8 @@ namespace BackAnd.Web.Api
               name: "myAppConnectionPassword",
               routeTemplate: "admin/myAppConnection/getPassword/{id}",
               defaults: new { controller = "myAppConnection", action = "getPassword", id = RouteParameter.Optional }
-          );
-			config.Routes.MapHttpRoute(
-               name: "rdsCreateDbCallback",
-               routeTemplate: "admin/myAppConnection/rdsResponse",
-               defaults: new { controller = "myAppConnection", action ="rdsResponse" }
            );
-
+			
             config.Routes.MapHttpRoute(
               name: "myAppConnectionTest",
               routeTemplate: "admin/myAppConnectionTest",

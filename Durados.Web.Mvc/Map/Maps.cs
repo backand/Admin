@@ -509,6 +509,7 @@ namespace Durados.Web.Mvc
                 throw new DuradosException("Missing CronPrefix key in web config");
             }
 
+            limits.Add(Limits.Cron, Convert.ToInt32(System.Configuration.ConfigurationManager.AppSettings["cronLimit"]));
         }
 
         private static Dictionary<string, string> GetCqls(string cqlsFileName)
@@ -1690,7 +1691,8 @@ namespace Durados.Web.Mvc
             map.PaymentStatus = (Billing.PaymentStatus)Enum.ToObject(typeof(Billing.PaymentStatus), appRow.PaymentStatus);
             map.AnonymousToken = appRow.AnonymousToken;
             map.SignUpToken = appRow.SignUpToken;
-            
+            map.LoadLimits();
+
             int themeId = 0;
             string themeName = "";
             string themePath = "";
@@ -2442,6 +2444,13 @@ namespace Durados.Web.Mvc
                 return jsonString;
             return jsonString.Replace(AppIdPlaceHolder, appId, false);
         }
-       
+
+
+        private static Dictionary<Limits, int> limits = new Dictionary<Limits, int>();
+        
+        internal static int GetLimit(Limits limit)
+        {
+            return limits[limit];
+        }
     }
 }
