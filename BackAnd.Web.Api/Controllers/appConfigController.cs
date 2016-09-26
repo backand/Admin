@@ -78,10 +78,19 @@ namespace BackAnd.Web.Api.Controllers
                 {
                     response = Request.CreateResponse(System.Net.HttpStatusCode.OK, "App was not in cache", new TextPlainFormatter());
                     response.Content.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue("application/x-javascript");
+                    if (!string.IsNullOrEmpty(appname) && appname != Maps.DuradosAppName)
+                    {
+                        FarmCachingSingeltone.Instance.ClearMachinesCache(appname);
+                    }
                     return response;
                 }
 
                 RestHelper.Refresh(appname);
+
+                if (!string.IsNullOrEmpty(appname) && appname != Maps.DuradosAppName)
+                {
+                    FarmCachingSingeltone.Instance.ClearMachinesCache(appname);
+                }
 
                 response = Request.CreateResponse(System.Net.HttpStatusCode.OK, "App refreshed", new TextPlainFormatter());
                 response.Content.Headers.ContentType = new MediaTypeHeaderValue("application/x-javascript");
