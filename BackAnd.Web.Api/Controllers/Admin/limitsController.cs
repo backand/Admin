@@ -139,17 +139,16 @@ namespace BackAnd.Web.Api.Controllers
 
                     sa.ExecuteNonQuery(Maps.Instance.DuradosMap.connectionString, sql);
                 }
-                
+
+                Reload(appName);
+
                 return Ok();
             }
             catch (Exception exception)
             {
                 throw new BackAndApiUnexpectedResponseException(exception, this);
             }
-            finally
-            {
-                Reload(appName);
-            }
+            
         }
 
         private void Reload(string appName)

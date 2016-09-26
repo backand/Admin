@@ -364,7 +364,7 @@ namespace BackAnd.Web.Api.Controllers
 
             int limit = Map.GetLimit(Limits.Cron);
 
-            return count > limit;
+            return count >= limit;
         }
 
         protected override IHttpActionResult ValidateInputForUpdate(string id, Durados.Web.Mvc.View view, Dictionary<string, object> values)
