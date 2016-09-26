@@ -50,16 +50,30 @@ namespace BackAnd.Web.Api.Controllers
             {
                 Limits limits;
 
-                if (!Enum.TryParse<Limits>(activity, out limits))
+                if (!Enum.TryParse<Limits>(activity, true, out limits))
                 {
                     return ResponseMessage(Request.CreateResponse(HttpStatusCode.NotFound, "activity not found"));
                 }
-                return Ok(new Dictionary<string, object>() { { activity, Map.GetLimit(limits) } });
+                return Ok(new Dictionary<string, object>() { { "limit", Map.GetLimit(limits) }, { "count", GetCurrentCount(limits) } });
             }
             catch (Exception exception)
             {
                 throw new BackAndApiUnexpectedResponseException(exception, this);
             }
+        }
+
+        private int? GetCurrentCount(Limits limit)
+        {
+            if (limit == Limits.Cron)
+            {
+                int count;
+
+                Map.GetConfigDatabase().Views["Cron"].FillPage(1, 100000, null, null, null, out count, null, null);
+
+                return count;
+            }
+
+            return null;
         }
 
         [Route("~/1/admin/limits")]
@@ -72,7 +86,7 @@ namespace BackAnd.Web.Api.Controllers
 
                 foreach (Limits limits in Enum.GetValues(typeof(Limits)))
                 {
-                    result.Add(limits.ToString(), Map.GetLimit(limits));
+                    result.Add(limits.ToString().LowerFirstChar(), new Dictionary<string, object>() { { "limit", Map.GetLimit(limits) }, { "count", GetCurrentCount(limits) } });
                 }
 
                 return Ok(result);
@@ -119,7 +133,7 @@ namespace BackAnd.Web.Api.Controllers
                 {
                     Limits limits;
 
-                    if (!Enum.TryParse<Limits>(key, out limits))
+                    if (!Enum.TryParse<Limits>(key, true, out limits))
                     {
                         return ResponseMessage(Request.CreateResponse(HttpStatusCode.NotFound, key + " limit not found"));
                     }
