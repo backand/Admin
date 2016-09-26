@@ -208,7 +208,9 @@ namespace BackAnd.Web.Api.Controllers
             return "Cron";
         }
 
+        [Route("~/1/jobs")]
         [Route("~/1/cron")]
+        
         [HttpGet]
         public new IHttpActionResult Get(bool? withSelectOptions = null, int? pageNumber = null, int? pageSize = null, string filter = null, string sort = null, string search = null)
         {
@@ -263,6 +265,7 @@ namespace BackAnd.Web.Api.Controllers
             return base.Ok<T>(content);
         }
 
+        [Route("~/1/jobs/{id}")]
         [Route("~/1/cron/{id}")]
         [HttpGet]
         public new IHttpActionResult Get(string id)
@@ -270,6 +273,7 @@ namespace BackAnd.Web.Api.Controllers
             return GetItem(id, true);
         }
 
+        [Route("~/1/jobs")]
         [Route("~/1/cron")]
         [HttpPost]
         [BackAnd.Web.Api.Controllers.Filters.ConfigBackupFilter]
@@ -354,7 +358,9 @@ namespace BackAnd.Web.Api.Controllers
 
         private bool IsOverTheLimit(Durados.Web.Mvc.View view)
         {
-            int count = view.GetRowCount();
+            int count;
+
+            view.FillPage(1, 100000, null, null, null, out count, null, null);
 
             int limit = Map.GetLimit(Limits.Cron);
 
@@ -410,6 +416,7 @@ namespace BackAnd.Web.Api.Controllers
             CronHelper.putCron(cron);
         }
 
+        [Route("~/1/jobs/{id}")]
         [Route("~/1/cron/{id}")]
         [HttpPut]
         [BackAnd.Web.Api.Controllers.Filters.ConfigBackupFilter]
@@ -425,6 +432,7 @@ namespace BackAnd.Web.Api.Controllers
 
         }
 
+        [Route("~/1/jobs/{id}")]
         [Route("~/1/cron/{id}")]
         [HttpDelete]
         [BackAnd.Web.Api.Controllers.Filters.ConfigBackupFilter]
