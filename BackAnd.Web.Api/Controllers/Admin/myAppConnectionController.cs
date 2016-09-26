@@ -1958,19 +1958,7 @@ namespace BackAnd.Web.Api.Controllers
             return false;
         }
 
-        private void ValidateSchema(object schema, string appName)
-        {
-            string url = this.Request.RequestUri.OriginalString.Replace("http://", Maps.Debug ? "http://" : "https://").Split(new string[1] { "admin" }, StringSplitOptions.RemoveEmptyEntries)[0] + "1/model/validate";
-            Dictionary<string, string> headers = GetHeaders(appName);
-            headers.Remove("AppName");
-
-            string json = "{newSchema: " + new JavaScriptSerializer().Serialize(schema) + ", severity: 0}";
-
-            string response = Durados.Web.Mvc.Infrastructure.Http.WebRequestingJson(url, json, headers);
-            Dictionary<string, object> ret = Durados.Web.Mvc.UI.Json.JsonSerializer.Deserialize(response);
-
-        }
-
+        
         private static bool IsNewDatabase(string template)
         {
             int templateId;
@@ -2186,7 +2174,7 @@ namespace BackAnd.Web.Api.Controllers
 
         private string GetUrlToConnect(string appName)
         {
-            return this.Request.RequestUri.OriginalString.Replace("http://", Maps.Debug ? "http://" : "https://").Split(new string[1] { "admin" }, StringSplitOptions.RemoveEmptyEntries)[0] + "admin/myAppConnection/status/" + appName;
+            return Maps.LocalAddress + "/admin/myAppConnection/status/" + appName;
         }
 
         private void CallHttpRequestToCreateTheSchema(string appName, string json)
@@ -2225,7 +2213,7 @@ namespace BackAnd.Web.Api.Controllers
 
         private string GetUrl()
         {
-            return this.Request.RequestUri.OriginalString.Replace("http://", Maps.Debug ? "http://" : "https://").Split(new string[1] { "admin" }, StringSplitOptions.RemoveEmptyEntries)[0] + "1/model?firstTime=true";//"1/table/config/template";
+            return Maps.LocalAddress + "/1/model?firstTime=true";
         }
 
 

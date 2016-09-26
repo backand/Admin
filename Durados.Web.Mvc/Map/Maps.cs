@@ -510,6 +510,8 @@ namespace Durados.Web.Mvc
             }
 
             limits.Add(Limits.Cron, Convert.ToInt32(System.Configuration.ConfigurationManager.AppSettings["cronLimit"]));
+
+            LocalAddress = System.Configuration.ConfigurationManager.AppSettings["localAddress"] ?? "http://localhost:8080";
         }
 
         private static Dictionary<string, string> GetCqls(string cqlsFileName)
@@ -2452,5 +2454,7 @@ namespace Durados.Web.Mvc
         {
             return limits[limit];
         }
+
+        public static string LocalAddress { get; set; }
     }
 }
