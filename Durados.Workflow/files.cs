@@ -45,10 +45,18 @@ namespace Backand
             jss.MaxJsonLength = int.MaxValue;
             request.send(jss.Serialize(data));
 
+            
             if (request.status != 200)
             {
+                if (Logger != null)
+                    Logger.Log("files", "upload", fileName, "Server return status " + request.status, request.responseText, 1, "upload " + fileName, DateTime.Now);
+
                 throw new Durados.DuradosException("Server return status " + request.status + ", " + request.responseText);
             }
+
+            if (Logger != null)
+                Logger.Log("files", "upload", fileName, null, 3, "upload " + fileName);
+
 
             Dictionary<string, object> response = null;
             try
@@ -92,6 +100,16 @@ namespace Backand
             if (request.status != 200)
             {
                 throw new Durados.DuradosException("Server return status " + request.status + ", " + request.responseText);
+            }
+        }
+
+        private Durados.Diagnostics.ILogger Logger
+        {
+            get
+            {
+                if (System.Web.HttpContext.Current == null)
+                    return null;
+                return (Durados.Diagnostics.ILogger)System.Web.HttpContext.Current.Items[Durados.Database.MainLogger];
             }
         }
     }

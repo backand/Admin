@@ -105,8 +105,55 @@ namespace Durados.Web.Mvc.UI.Helpers
         {
             View view = GetUserSocialView();
             int userId = GetDuradosMap().Database.GetUserID(email);
-            view.Create(new Dictionary<string, object>() { { "Provider", provider }, { view.GetFieldByColumnNames("UserId").Name, userId },
-                { "SocialId", socialId }, { view.GetFieldByColumnNames("AppId").Name, appId }});
+            try
+            {
+                Dictionary<string, object> values = new Dictionary<string, object>() { { "Provider", provider }, { view.GetFieldByColumnNames("UserId").Name, userId },
+                { "SocialId", socialId }, { view.GetFieldByColumnNames("AppId").Name, appId }};
+                view.Create(values);
+            }
+            catch (Exception exception)
+            {
+                if (IsProviderSocialAndAppAlreadyExists(exception))
+                {
+                    UpdateSocialByProviderUserAndApp(provider, socialId, userId, appId);
+                }
+                else
+                {
+                    throw new DuradosException("Failed to Set email by social id", exception);
+                }
+            }
+        }
+
+        private bool IsProviderSocialAndAppAlreadyExists(Exception exception)
+        {
+            return exception.Message.Contains("IX_durados_UserSocial_UserId_Provider");
+        }
+
+        private void UpdateSocialByProviderUserAndApp(string provider, string socialId, int userId, int appId)
+        {
+            string pk = GetUserSocialId(provider, userId, appId);
+            UpdateUserSocialEmailById(pk, socialId);
+        }
+
+        private void UpdateUserSocialEmailById(string pk, string socialId)
+        {
+            GetUserSocialView().Edit(new Dictionary<string, object>() { { "SocialId", socialId } }, pk, null, null, null, null);
+        }
+
+        private string GetUserSocialId(string provider, int userId, int appId)
+        {
+            View view = GetUserSocialView();
+            Dictionary<string, object> values = new Dictionary<string, object>() {{ view.GetFieldByColumnNames("UserId").Name, userId },
+                 { "Provider", provider },  { view.GetFieldByColumnNames("AppId").Name, appId }};
+            int count;
+            DataView dataView = view.FillPage(1, 2, values, null, null, out count, null, null);
+
+            if (count != 1)
+            {
+                return null;
+            }
+
+            return view.GetPkValue(dataView[0].Row);
         }
 
         private static MembershipProvider _provider = System.Web.Security.Membership.Provider;

@@ -60,8 +60,9 @@ namespace Durados
         public static readonly string ObjectName = "ObjectName";
         public static readonly string QueryName = "QueryName";
         public static readonly string ActionName = "ActionName";
-        
 
+        public static readonly string MainLogger = "MainLogger";
+        
         public virtual Guid Guid
         {
             get

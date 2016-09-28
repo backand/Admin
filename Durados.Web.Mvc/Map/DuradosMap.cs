@@ -66,7 +66,7 @@ namespace Durados.Web.Mvc
             {
                 dataView = appsView.FillPage(1, 10000, values, null, null, out rowCount, null, null);
             }
-            catch (Exception exception)
+            catch (Exception)
             {
                 AddSslAndAahKeyColumn();
                 dataView = appsView.FillPage(1, 10000, values, null, null, out rowCount, null, null);

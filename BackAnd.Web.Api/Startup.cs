@@ -171,6 +171,7 @@ namespace BackAnd.Web.Api
 
         public override Task RequestToken(OAuthRequestTokenContext context)
         {
+            SetMainLoggerInRequest();
             if (!context.Request.Headers.ContainsKey(AuthHeader))
             {
                 if (context.Request.QueryString.HasValue)
@@ -197,6 +198,15 @@ namespace BackAnd.Web.Api
             }
 
             return Task.FromResult<object>(null);
+        }
+
+        private void SetMainLoggerInRequest()
+        {
+            try
+            {
+                System.Web.HttpContext.Current.Items[Durados.Database.MainLogger] = Durados.Web.Mvc.Maps.Instance.DuradosMap.Logger;
+            }
+            catch { }
         }
     }
 }

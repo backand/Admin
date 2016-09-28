@@ -95,7 +95,7 @@ namespace Backand
         public void send(string data)
         {
             Log(3, "Started");
-
+            
             try
             {
                 if (Durados.Workflow.JavaScript.IsCrud(request))
@@ -255,8 +255,9 @@ namespace Backand
                     }
                 }
                 response.Close();//Close HttpWebResponse
-
-                Log(3, "Ended with status " + status);
+                Log(3, request.RequestUri.OriginalString);
+            
+                //Log(3, "Ended with status " + status);
 
             }
             catch (WebException we)
@@ -281,13 +282,15 @@ namespace Backand
                     }
                     responseText += we.Response.Headers["error"];
                 }
-                Log(1, "Ended with status " + status, we);
-
+                //Log(1, "Ended with status " + status, we);
+                Log(1, request.RequestUri.OriginalString, we);
+            
             }
             catch (Exception ex) 
             {
-                Log(1, "Ended with status " + status, ex);
-
+                //Log(1, "Ended with status " + status, ex);
+                Log(1, request.RequestUri.OriginalString, ex);
+ 
                 throw new Exception(ex.Message); 
             }
             finally

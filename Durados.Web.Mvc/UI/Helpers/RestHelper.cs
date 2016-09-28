@@ -1886,8 +1886,11 @@ namespace Durados.Web.Mvc.UI.Helpers
             string username = row["Username"].ToString();
 
             System.Web.Security.MembershipUser existingUser = System.Web.Security.Membership.Provider.GetUser(username, false);
-
-            bool readyToSignin = existingUser != null;
+            
+            Durados.Web.Mvc.Controllers.AccountMembershipService accountMembershipService = new Durados.Web.Mvc.Controllers.AccountMembershipService();
+            bool valid = accountMembershipService.ValidateUser(username);
+            
+            bool readyToSignin = existingUser != null && valid;
 
             dictionary.Add("readyToSignin", readyToSignin);
         }

@@ -131,15 +131,29 @@ namespace Backand
                 // sehd data to server
                 xmlHttpRequest.send(serializer.Serialize(newData));
 
+                if (Logger != null)
+                    Logger.Log("socket", "emit", eventName, null, 3, "emit " + mode + " " + eventName);
+
                 // send response to user
                 return new { status = xmlHttpRequest.status, message = xmlHttpRequest.responseText };
             }
             catch (Exception exception)
             {
+                if (Logger != null)
+                    Logger.Log("socket", "emit", eventName, exception, 1, "emit " + mode + " " + eventName);
                 return new { status = 502, message = exception.Message };
             }
         }
 
+        private Durados.Diagnostics.ILogger Logger
+        {
+            get
+            {
+                if (System.Web.HttpContext.Current == null)
+                    return null;
+                return (Durados.Diagnostics.ILogger)System.Web.HttpContext.Current.Items[Durados.Database.MainLogger];
+            }
+        }
         
     }
 
