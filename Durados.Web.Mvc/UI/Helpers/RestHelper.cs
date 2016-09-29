@@ -1593,7 +1593,7 @@ namespace Durados.Web.Mvc.UI.Helpers
        };
         HashSet<string> fieldExcludeFieldsFromJson = new HashSet<string>() {
             "AdvancedFilter", "AutoIncrement","AutoIncrementSequanceName","DefaultFilter","Dashboard","Preview","GraphicProperties",
-            "Formula","InlineSearch","Name","MultiFilter","Precedent","Width",
+            "Formula","InlineSearch","Name","MultiFilter","Width",
             "ChildrenHtmlControlType","DenyCreateRoles","DenyEditRoles","DenySelectRoles"
        };
 
