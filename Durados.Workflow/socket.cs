@@ -132,7 +132,7 @@ namespace Backand
                 xmlHttpRequest.send(serializer.Serialize(newData));
 
                 if (Logger != null)
-                    Logger.Log("socket", "emit", eventName, null, 3, "emit " + mode + " " + eventName);
+                    Logger.Log("socket", "emit", eventName, null, 3, "emit " + mode + " " + eventName, DateTime.Now, 0);
 
                 // send response to user
                 return new { status = xmlHttpRequest.status, message = xmlHttpRequest.responseText };
@@ -140,7 +140,7 @@ namespace Backand
             catch (Exception exception)
             {
                 if (Logger != null)
-                    Logger.Log("socket", "emit", eventName, exception, 1, "emit " + mode + " " + eventName);
+                    Logger.Log("socket", "emit", eventName, exception, 1, "emit " + mode + " " + eventName, DateTime.Now, 0);
                 return new { status = 502, message = exception.Message };
             }
         }

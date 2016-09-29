@@ -78,7 +78,7 @@ namespace Backand
             send(null);
         }
 
-        private void Log(int logType, string freeText, Exception exception = null)
+        private void Log(int logType, string freeText, Exception exception = null, int? requestTiem = null)
         {
             try
             {
@@ -86,7 +86,7 @@ namespace Backand
 
                 if (database != null)
                 {
-                    database.Logger.Log(request.RequestUri.AbsoluteUri, request.Method, "Durados.Workflow", exception == null ? string.Empty : exception.Message, exception == null ? string.Empty : exception.StackTrace, logType, freeText, DateTime.Now);
+                    database.Logger.Log(request.RequestUri.AbsoluteUri, request.Method, "Durados.Workflow", exception == null ? string.Empty : exception.Message, exception == null ? string.Empty : exception.StackTrace, logType, freeText, DateTime.Now, requestTiem);
                 }
             }
             catch { }
@@ -255,7 +255,7 @@ namespace Backand
                     }
                 }
                 response.Close();//Close HttpWebResponse
-                Log(3, request.RequestUri.OriginalString);
+                Log(3, request.RequestUri.OriginalString, null, 0);
             
                 //Log(3, "Ended with status " + status);
 

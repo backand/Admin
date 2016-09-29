@@ -49,13 +49,13 @@ namespace Backand
             if (request.status != 200)
             {
                 if (Logger != null)
-                    Logger.Log("files", "upload", fileName, "Server return status " + request.status, request.responseText, 1, "upload " + fileName, DateTime.Now);
+                    Logger.Log("files", "upload", fileName, "Server return status " + request.status, request.responseText, 1, "upload " + fileName, DateTime.Now, 0);
 
                 throw new Durados.DuradosException("Server return status " + request.status + ", " + request.responseText);
             }
 
             if (Logger != null)
-                Logger.Log("files", "upload", fileName, null, 3, "upload " + fileName);
+                Logger.Log("files", "upload", fileName, null, 3, "upload " + fileName, DateTime.Now, 0);
 
 
             Dictionary<string, object> response = null;
