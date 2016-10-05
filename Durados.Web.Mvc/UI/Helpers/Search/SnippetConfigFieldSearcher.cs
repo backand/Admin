@@ -10,7 +10,7 @@ namespace Durados.Web.Mvc.UI.Helpers.Search
     {
         protected override object GetSnippets(System.Data.DataRowView row, string q, int snippetLength, string highlightTag, int tabChars)
         {
-            string snippet = base.GetSnippets(row, q, snippetLength, highlightTag, tabChars).ToString();
+            string snippet = base.GetSnippet(row, q, snippetLength, highlightTag, tabChars).ToString();
             
             Line[] lines = GetLines(snippet);
 

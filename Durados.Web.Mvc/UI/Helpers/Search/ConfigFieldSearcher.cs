@@ -33,7 +33,7 @@ namespace Durados.Web.Mvc.UI.Helpers.Search
             List<object> list = new List<object>();
             foreach (System.Data.DataRowView row in dataView)
             {
-                list.Add(new { id = GetId(row), name = GetName(row, q), snippets = GetSnippets(row, q, snippetLength, highlightTag, tabChars) });
+                list.Add(new { id = GetId(row), name = GetName(row, q), foundAt = Name, snippets = GetSnippets(row, q, snippetLength, highlightTag, tabChars) });
             }
 
             return list.ToArray();
@@ -49,9 +49,14 @@ namespace Durados.Web.Mvc.UI.Helpers.Search
             return row[GetIdFilterFieldName()];
         }
 
-        protected virtual object GetSnippets(System.Data.DataRowView row, string q, int snippetLength, string highlightTag, int tabChars)
+        protected virtual object GetSnippet(System.Data.DataRowView row, string q, int snippetLength, string highlightTag, int tabChars)
         {
             return row[FieldName];
+        }
+
+        protected virtual object GetSnippets(System.Data.DataRowView row, string q, int snippetLength, string highlightTag, int tabChars)
+        {
+            return new Dictionary<string, object>() { { "snippet", GetSnippet(row, q, snippetLength, highlightTag, tabChars) } };
         }
 
         

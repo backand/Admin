@@ -67,14 +67,16 @@ namespace Durados.Web.Mvc.UI.Helpers.Search
         {
             ConfigFieldSearcher[] configFieldSearchers = GetViewAndFieldName(entityType);
 
-            Dictionary<string, object> results = new Dictionary<string, object>();
+            //Dictionary<string, object> results = new Dictionary<string, object>();
+
+            List<object> results = new List<object>();
 
             foreach (ConfigFieldSearcher configFieldSearcher in configFieldSearchers)
             {
                 object entityResults = configFieldSearcher.Search(config, q, id, snippetLength, highlightTag, tabChars);
                 if (entityResults != null)
                 {
-                    results.Add(configFieldSearcher.Name, entityResults);
+                    results.AddRange((IEnumerable<object>)entityResults);
                 }
             }
 
@@ -82,7 +84,7 @@ namespace Durados.Web.Mvc.UI.Helpers.Search
             {
                 return null;
             }
-            return results;
+            return results.ToArray();
         }
 
         private ConfigFieldSearcher[] GetViewAndFieldName(EntityType entityType)
