@@ -15,6 +15,7 @@ namespace Durados.Web.Mvc.UI.Helpers.Search
         public string ViewName { get; set; }
 
         public string FieldName { get; set; }
+        public EntityType EntityType { get; set; }
 
         public object Search(ConfigAccess config, string q, int? id, int snippetLength, string highlightTag, int tabChars)
         {
@@ -33,10 +34,33 @@ namespace Durados.Web.Mvc.UI.Helpers.Search
             List<object> list = new List<object>();
             foreach (System.Data.DataRowView row in dataView)
             {
-                list.Add(new { id = GetId(row), name = GetName(row, q), foundAt = Name, snippets = GetSnippets(row, q, snippetLength, highlightTag, tabChars) });
+                var result = GetResult(row, q, snippetLength, highlightTag, tabChars);
+                list.Add(result);
             }
 
             return list.ToArray();
+        }
+
+        protected virtual object GetResult(System.Data.DataRowView row, string q, int snippetLength, string highlightTag, int tabChars)
+        {
+            object id = GetId(row);
+            if (EntityType == Durados.EntityType.Action)
+            {
+                return new { id = id, name = GetName(row, q), objectId = GetObjectId((int)id), foundAt = Name, snippets = GetSnippets(row, q, snippetLength, highlightTag, tabChars) };
+            }
+            else
+            {
+                return new { id = id, name = GetName(row, q), foundAt = Name, snippets = GetSnippets(row, q, snippetLength, highlightTag, tabChars) };
+            }
+        }
+
+        private object GetObjectId(int actionId)
+        {
+            var ruleAndAction = CronHelper.GetRuleAndAction(actionId);
+
+            View view = (View)ruleAndAction["view"];
+
+            return view.ID;
         }
 
         protected virtual string GetName(System.Data.DataRowView row, string q)

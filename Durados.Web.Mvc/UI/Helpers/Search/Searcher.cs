@@ -92,13 +92,13 @@ namespace Durados.Web.Mvc.UI.Helpers.Search
             switch (entityType)
             {
                 case EntityType.Action:
-                    return new ConfigFieldSearcher[2] { new ConfigFieldSearcher() { Name = "actionName", ViewName = "Rule", FieldName = "Name" }, new SnippetConfigFieldSearcher() { Name = "actionCode", ViewName = "Rule", FieldName = "Code" } };
+                    return new ConfigFieldSearcher[2] { new ConfigFieldSearcher() { Name = "actionName", ViewName = "Rule", FieldName = "Name", EntityType = entityType }, new SnippetConfigFieldSearcher() { Name = "actionCode", ViewName = "Rule", FieldName = "Code", EntityType = entityType } };
 
                 case EntityType.Object:
-                    return new ConfigFieldSearcher[2] { new ConfigFieldSearcher() { Name = "objectName", ViewName = "View", FieldName = "Name" }, new FieldNameConfigFieldSearcher() { Name = "fieldName", ViewName = "Field", FieldName = "Name" } };
+                    return new ConfigFieldSearcher[2] { new ConfigFieldSearcher() { Name = "objectName", ViewName = "View", FieldName = "Name", EntityType = entityType }, new FieldNameConfigFieldSearcher() { Name = "fieldName", ViewName = "Field", FieldName = "Name", EntityType = entityType } };
 
                 case EntityType.Query:
-                    return new ConfigFieldSearcher[2] { new ConfigFieldSearcher() { Name = "queryName", ViewName = "Query", FieldName = "Name" }, new SnippetConfigFieldSearcher() { Name = "querySql", ViewName = "Query", FieldName = "SQL" } };
+                    return new ConfigFieldSearcher[2] { new ConfigFieldSearcher() { Name = "queryName", ViewName = "Query", FieldName = "Name", EntityType = entityType }, new SnippetConfigFieldSearcher() { Name = "querySql", ViewName = "Query", FieldName = "SQL", EntityType = entityType } };
 
                 default:
                     return null;

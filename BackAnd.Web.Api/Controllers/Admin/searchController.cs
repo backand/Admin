@@ -47,6 +47,10 @@ namespace BackAnd.Web.Api.Controllers
         {
             try
             {
+                if (map is DuradosMap)
+                {
+                    return ResponseMessage(Request.CreateResponse(HttpStatusCode.NotFound, "Please provide AppName in the header"));
+                }
                 return Ok(new Searcher().Search(q, entityType, id, snippetLength, spaceAsWildcard, highlightTag, tabChars));
 
             }

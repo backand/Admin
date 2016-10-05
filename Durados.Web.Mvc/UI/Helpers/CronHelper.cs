@@ -179,7 +179,7 @@ namespace Durados.Web.Mvc.UI.Helpers
             return System.Web.HttpContext.Current.Request.Url.Scheme + "://" + System.Web.HttpContext.Current.Request.Url.Host + ":" + System.Web.HttpContext.Current.Request.Url.Port;
         }
 
-        private static Dictionary<string, object> GetRuleAndAction(int actionId)
+        public static Dictionary<string, object> GetRuleAndAction(int actionId)
         {
             Map map = Maps.Instance.GetMap();
 
