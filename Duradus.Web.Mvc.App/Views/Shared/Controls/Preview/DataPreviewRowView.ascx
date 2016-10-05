@@ -29,7 +29,7 @@
     <!------------------Div title for one dataRow-------------------->
     <div class="boardtitle portlet-header" guid='<%=guid %>' onclick="Multi.BoardClicked(event, this, '<%=guid %>', true)"
         <%=unselectable %> d_pk='<%=pkValue %>'>
-        <%= displayValue%> 
+        <%= HttpUtility.HtmlDecode(displayValue)%> 
     </div>
     <!------------------Fields content for one dataRow-------------------->
     <table class="portlet-content">

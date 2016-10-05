@@ -11925,6 +11925,8 @@ function closePageSettings(div) {
     $(window).resize();
     pageSettingsDialogOpen = false;
     pageWasOpen = false;
+    $('#mainAppDiv').removeClass("adminMenuOpen");
+    div.removeClass("adminMenuOpen");
 }
 
 var prevMenuName = '';
@@ -11938,6 +11940,9 @@ function pageSettings(page) {
         $('#mainAppDiv').css('margin-left', 500);
         $(window).resize();
         pageSettingsDialogOpen = true;
+        $('#mainAppDiv').addClass("adminMenuOpen");
+        div.addClass("adminMenuOpen");
+
     }
 
     if (pageSettingsDialog) {

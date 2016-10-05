@@ -27,7 +27,7 @@
         
         %>
        
-        <li style="margin-right: 5px;">
+        <li style="margin-right: 5px;display:none">
              <a target="angularbknd" href="<%=(!string.IsNullOrEmpty(userPreviewUrl))?userPreviewUrl:"javascript:void(0);"%>">
        
             <div class="preview-notice" style="display: none;"></div>

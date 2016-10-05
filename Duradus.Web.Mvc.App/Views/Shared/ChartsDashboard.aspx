@@ -4,7 +4,7 @@
 
 <asp:Content ID="Content1" ContentPlaceHolderID="MainContent" runat="server">
     <script type="text/javascript">
-        document.domain = '<%=Durados.Web.Mvc.Maps.Domain %>';
+        document.domain = '<%=Durados.Web.Mvc.Maps.Host %>';
     </script>
     
     <script type="text/javascript">

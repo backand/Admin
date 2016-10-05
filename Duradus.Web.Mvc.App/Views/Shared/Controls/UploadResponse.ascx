@@ -8,7 +8,7 @@
 
 <head id="Head1" runat="server">
     <script type="text/javascript">
-        document.domain = '<%=Durados.Web.Mvc.Maps.Domain %>';
+        document.domain = '<%=Durados.Web.Mvc.Maps.Host %>';
         //alert(document.domain);
     </script>
 </head>

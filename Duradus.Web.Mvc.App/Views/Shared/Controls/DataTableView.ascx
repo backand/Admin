@@ -208,6 +208,7 @@ if (view.SortingType == Durados.SortingType.Group)
                          if (tableViewer.IsVisible(field, excludedColumn,guid))
                          {
                              string colStyle = "style=\"" + tableViewer.GetCellWidthStyle(field, cv, false, "header") + tableViewer.GetCellAlignmentStyle(field, cv, false, "data") + "\""; 
+                             
                             string headerTitle =  tableViewer.GetDisplayName(field, null, guid);
                             string dataTypeClass = field.DataType.ToString() + "FieldType";
                             

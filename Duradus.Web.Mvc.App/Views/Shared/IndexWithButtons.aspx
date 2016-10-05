@@ -1,7 +1,7 @@
 ﻿<%@ Page Language="C#" Inherits="System.Web.Mvc.ViewPage" %>
 
 <%
-    string url = ViewData["url"].ToString();
+    string url = (ViewData["url"] ?? string.Empty).ToString();
     string backUrl = (ViewData["backUrl"] ?? string.Empty).ToString();
 
     string style = string.Empty;
@@ -93,9 +93,13 @@
     </style>
     <script type="text/javascript">
         document.domain = '<%=Durados.Web.Mvc.Maps.Host %>';
+        var backUrl = '<%=backUrl%>';
     </script>
     <script src='<%=ResolveUrl("~/Scripts/jquery.min.js")%>' type="text/javascript"></script>
     <script type="text/javascript">
+        function navigateBack() {
+            window.location.href = backUrl;
+        }
         function getDocumentScope() {
             var scope = document;
             if (window.parent) {
@@ -164,12 +168,14 @@
             // WIXWIX $('body').css('background-color', 'rgb(90, 90, 90)');
 
             $('.columns-done').click(function () {
+                debugger;
                 var menuOff = '';
                 if (parent.location.href.indexOf('menu=off') != -1) {
                     menuOff = '?menu=off';
                 }
                 if (parent) {
-                    parent.location = parent.location.href.split('?')[0] + menuOff;
+                    //parent.location = parent.location.href.split('?')[0] + menuOff;
+                    parent.location = backUrl;
                 }
             });
 
@@ -198,7 +204,7 @@
     <div id="columns-titlebar" class="page-settings-header">
     <span>Columns</span>
     <a href="#" class="columns-done" title="Close">
-        <span class="pages-close">close</span>
+        <span onclick="navigateBack();" class="pages-close">close</span>
     </a>
     <%} %>
 </div><center>
