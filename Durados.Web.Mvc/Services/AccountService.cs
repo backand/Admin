@@ -1423,7 +1423,7 @@ namespace Durados.Web.Mvc.UI.Helpers
 
         }
 
-        private bool UserBelongToMoreThanOneApp(string username, string appName)
+        public bool UserBelongToMoreThanOneApp(string username, string appName)
         {
             int id = Maps.Instance.DuradosMap.Database.GetUserID(username);
 

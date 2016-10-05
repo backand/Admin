@@ -803,9 +803,9 @@ namespace BackAnd.Web.Api.Controllers
             }
         }
 
-        protected bool IsAdmin()
+        protected bool IsAdmin(string username = null)
         {
-            string role = Map.Database.GetUserRole();
+            string role = Map.Database.GetUserRole(username);
             return role == "Admin" || role == "Developer";
         }
 

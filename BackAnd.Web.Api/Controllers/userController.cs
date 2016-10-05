@@ -385,19 +385,35 @@ namespace BackAnd.Web.Api.Controllers
 
                 if (!values.ContainsKey("username"))
                 {
-                    return ResponseMessage(Request.CreateResponse(HttpStatusCode.NotAcceptable, "The username is missing"));
+                    return ResponseMessage(Request.CreateResponse(HttpStatusCode.PreconditionFailed, "The username is missing"));
 
                 }
 
                 if (!values.ContainsKey("password"))
                 {
-                    return ResponseMessage(Request.CreateResponse(HttpStatusCode.NotAcceptable, "The password is missing"));
+                    return ResponseMessage(Request.CreateResponse(HttpStatusCode.PreconditionFailed, "The password is missing"));
 
                 }
                 string username = values["username"].ToString();
                 string password = values["password"].ToString();
 
+                if (IsAdmin(username))
+                {
+                    return ResponseMessage(Request.CreateResponse(HttpStatusCode.PreconditionFailed, "You cannot change other admins password."));
+                }
+
+                if (map is DuradosMap)
+                {
+                    return ResponseMessage(Request.CreateResponse(HttpStatusCode.NotFound, "Please provide AppName in the header"));
+                }
+
                 AccountService account = new AccountService(this);
+
+                if (account.UserBelongToMoreThanOneApp(username, Map.AppName))
+                {
+                    return ResponseMessage(Request.CreateResponse(HttpStatusCode.PreconditionFailed, "You cannot change the password to a user that belongs to additional Backand apps, other than yours. In this case, user must reset password using your app UI."));
+                }
+
                 account.ChangePassword(username, password);
 
 
