@@ -3355,8 +3355,8 @@ namespace Durados.DataAccess.AutoGeneration.Dynamic
             //command.Connection.Open();
             //command.Transaction = connection.BeginTransaction();
 
-            IDbConnection sysConnection = new System.Data.SqlClient.SqlConnection(database.SysDbConnectionString);
-            IDbCommand sysCommand = new System.Data.SqlClient.SqlCommand();
+            IDbConnection sysConnection = sqlSchema.GetConnection(database.SysDbConnectionString); 
+            IDbCommand sysCommand = sqlSchema.GetCommand();
 
             try
             {

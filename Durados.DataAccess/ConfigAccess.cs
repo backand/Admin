@@ -1758,8 +1758,8 @@ namespace Durados.DataAccess
 
             connectionString = view.Database.SysDbConnectionString;
             IDbCommand command;
-
-            command = GetNewCommand(string.Empty, GetNewConnection(connectionString));
+            SqlProduct sysSqlProduct = view.Database.SystemSqlProduct;
+            command = GetNewCommand(string.Empty, GetNewConnection(sysSqlProduct, connectionString), sysSqlProduct);
         
             command.Connection.Open();
 
@@ -1950,7 +1950,7 @@ namespace Durados.DataAccess
 
         private void SaveHistory(View view, DataRow prevRow, Dictionary<string, object> values, string pk, int userID, IDbCommand command)
         {
-            History history = new History();
+            History history = DataAccess.History.GetHistory(view.Database.SystemSqlProduct); //new History();
 
             OldNewValue[] oldNewValues = null;
             int? id = history.SaveEdit(command, view, prevRow, values, pk, userID, out oldNewValues, view.Database.SwVersion, view.GetWorkspaceName());

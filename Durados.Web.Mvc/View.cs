@@ -408,7 +408,8 @@ namespace Durados.Web.Mvc
         {
             foreach (string key in System.Web.HttpContext.Current.Request.QueryString.Keys)
             {
-                permanentFilter = permanentFilter.Replace(key.AsToken(), System.Web.HttpContext.Current.Request.QueryString[key], false);
+                if(!string.IsNullOrEmpty(key))
+                    permanentFilter = permanentFilter.Replace(key.AsToken(), System.Web.HttpContext.Current.Request.QueryString[key], false);
             }
 
             return permanentFilter;

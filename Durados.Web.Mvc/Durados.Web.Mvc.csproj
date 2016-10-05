@@ -264,6 +264,7 @@
     <Compile Include="Controllers\MultiTenancy\PlugIn\HerokuPlugInController.cs" />
     <Compile Include="Controllers\MultiTenancy\PlugIn\PlugInController.cs" />
     <Compile Include="Controllers\MultiTenancy\PlugIn\WixPlugInController.cs" />
+    <Compile Include="Controllers\SystemController.cs" />
     <Compile Include="Controllers\UtilsController.cs" />
     <Compile Include="Controllers\CrmController.cs" />
     <Compile Include="Controllers\ImageOrganizerController.cs" />

@@ -40,6 +40,13 @@
             
       <div class="refer-bar">
       <a href="#" class="mobile-menu-icon" onclick="<%=onclick %>" >&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</a><%=workspaceName %>
+    <%if(string.IsNullOrEmpty(Map.Database.GetCurrentUsername() ) || Map.Database.GetCurrentUsername() == Durados.Database.GuestUsername) {%>
+                 <nav id="topRight">
+				<% Html.RenderPartial("~/Views/Shared/Controls/LogOnUserControl.ascx", null); %>
+				
+			</nav>
+       
+    <%} %>
       <div class="mobileMenuContent" style="display:none;">
         <% Html.RenderPartial("~/Views/Shared/Controls/MobileMenu.ascx"); %>
         </div>

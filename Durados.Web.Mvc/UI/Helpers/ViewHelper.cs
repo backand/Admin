@@ -1314,7 +1314,7 @@ namespace Durados.Web.Mvc.UI.Helpers
         {
             string dashboardId = Map.CreateDashboard("My Charts");
             Dictionary<string, object> values = new Dictionary<string, object>();
-            string sql = "SELECT top(10) substring(Controller,1,10) as Controller, COUNT(*) as [Count]  FROM [Durados_Log]  where logtype<=3 group by Controller Order By [Count] desc ";
+            string sql = GetdefualtChartSelectStatement();
             values.Add("Name", "Activity");
             values.Add("SubTitle", "Example");
             values.Add("SQL", sql);
@@ -1337,6 +1337,16 @@ namespace Durados.Web.Mvc.UI.Helpers
             Map.AddNewChartToDashboard(dashboardId, 4, 2, null, false);
 
             return dashboardId;
+        }
+
+        private static string GetdefualtChartSelectStatement()
+        {
+            string sql = string.Empty;
+            if(Map.Database.SystemSqlProduct == SqlProduct.SqlServer)
+                sql = "SELECT top(10) substring(Controller,1,10) as Controller, COUNT(*) as [Count]  FROM [Durados_Log]  where logtype<=3 group by Controller Order By [Count] desc ";
+            else if (Map.Database.SystemSqlProduct == SqlProduct.MySql)
+                sql = "SELECT  SUBSTRING(Controller,1,10) as Controller, COUNT(*) as `Count`  FROM `Durados_Log`  WHERE logtype<=3 GROUP BY Controller ORDER BY `Count` DESC LIMIT 10";
+            return sql;
         }
 
         private static void SetHomeMenu(Durados.Database configDatabase, Database database)
