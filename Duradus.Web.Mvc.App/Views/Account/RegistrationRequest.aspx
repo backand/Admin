@@ -130,7 +130,7 @@ Registration
                    <%= content%>
             </div>
 
-             <div class="username">
+            <%-- <div class="username">
                     <label for="username"><%=Map.Database.Localizer.Translate("Username")%>&nbsp;</label>
                     <%= Html.TextBox("username", string.Empty, new { id = "fullname", type = "email", placeholder="Full Name"})%>
                 </div>
@@ -149,7 +149,7 @@ Registration
                     <%= Html.Password("password", string.Empty, new { id="reset_password", type = "password", placeholder="Re-type Password" })%>
                 </div>
                 <div class="signup_button" id="btn_signup" style=""><span name="submit" class="inner"><%=Map.Database.Localizer.Translate("Sign Up")%></span></div>
-         
+         --%>
 
         </form>
 </asp:Content>
