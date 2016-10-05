@@ -1260,6 +1260,11 @@ namespace Durados
 
             return restType;
         }
+
+        public virtual bool IsAllow(DataAction dataAction)
+        {
+            return true;
+        }
     }
 
     public enum ColumnFieldType

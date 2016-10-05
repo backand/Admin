@@ -6571,7 +6571,7 @@ namespace Durados.DataAccess
             //foreach (Field field in view.Fields.Values.Where(f=>f.IsExcluded(dataAction)==false))
             HashSet<string> columnNames = new HashSet<string>();
 
-            foreach (Field field in view.Fields.Values.Where(f => f.IsExcluded(dataAction) == false && f.IsDerivationEditable(values)))
+            foreach (Field field in view.Fields.Values.Where(f => f.IsExcluded(dataAction) == false && f.IsAllow(dataAction) && f.IsDerivationEditable(values)))
             {
                 string columnName = null;
                 if (values.ContainsKey(field.Name))
@@ -7212,7 +7212,7 @@ namespace Durados.DataAccess
         {
             List<string> updateSetColumns = new List<string>();
             //foreach (Field field in view.Fields.Values.Where(f => f.IsExcluded(DataAction.Edit) == false))
-            foreach (Field field in view.Fields.Values.Where(f => f.IsExcluded(DataAction.Edit) == false && f.IsDerivationEditable(values) && !f.IsFromOtherView()))
+            foreach (Field field in view.Fields.Values.Where(f => f.IsExcluded(DataAction.Edit) == false && f.IsAllow(DataAction.Edit) && f.IsDerivationEditable(values) && !f.IsFromOtherView()))
             {
                 if (values.ContainsKey(field.Name))
                 {

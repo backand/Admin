@@ -369,7 +369,10 @@ namespace Durados.Web.Mvc
            
         }
 
-       
+        public override bool IsAllow(DataAction dataAction)
+        {
+            return !FieldExtentions.IsDisable(this, dataAction, null);
+        }
       
     }
 

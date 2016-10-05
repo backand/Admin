@@ -2211,7 +2211,7 @@ namespace BackAnd.Web.Api.Controllers
         public static readonly string MissingObjectToUpdate = "The object to update is missing.";
         public static readonly string FieldNameNotFound = "The field \"{0}\" was not found.";
         public static readonly string TheFieldMustBeTextual = "The field must be textual.";
-        public static readonly string ItemWithIdNotFound = "An item with id \"{0}\" was not found or filtered by predefined filter in the object \"{1}\".";
+        public static readonly string ItemWithIdNotFound = "An item with id \"{0}\" was either not found, not allowed to the current role or filtered out by a predefined filter in the object \"{1}\".";
         public static readonly string ItemWithNoFieldsToUpdate = "An item with id \"{0}\" has no fields to update in the object \"{1}\".";
         public static readonly string AppNotFound = "The app \"{0}\" was not found.";
         public static readonly string ChartWithIdNotFound = "An chart with id \"{0}\" was not found.";

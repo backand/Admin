@@ -129,6 +129,10 @@ namespace Durados.Web.Mvc
         [Durados.Config.Attributes.ColumnProperty(Description = "Limit the values count that will be displayed in the grid. Default is 0 witch means no limit.")]
         public int CheckListInTableLimit { get; set; }
 
+        public override bool IsAllow(DataAction dataAction)
+        {
+            return FieldHelper.IsVisibleForRow(this, dataAction);
+        }
     }
 
     public enum ChildrenHtmlControlType

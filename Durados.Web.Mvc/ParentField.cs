@@ -158,6 +158,11 @@ namespace Durados.Web.Mvc
                 GraphicProperties = value;
             }
         }
+
+        public override bool IsAllow(DataAction dataAction)
+        {
+            return FieldHelper.IsVisibleForRow(this, dataAction);
+        }
     }
 
     public enum ParentHtmlControlType
