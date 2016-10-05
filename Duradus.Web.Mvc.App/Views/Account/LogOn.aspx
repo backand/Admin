@@ -19,6 +19,8 @@ Sign In
 
 <asp:Content ID="Content2" ContentPlaceHolderID="MainContent" runat="server">
 
+
+
 <% 
     string returnUrl = Request.QueryString["returnUrl"];
     string parameters = string.Empty;
@@ -41,12 +43,16 @@ Sign In
         urlReferrer = Request.UrlReferrer.ToString();
         
 %>
+    
+     <div class="dragonicon"></div>
+     <div class="bchandimage">
+
     <div class="signInHeader">
-        <%=Map.Database.Localizer.Translate("sign in")%>
+        <%=Map.Database.Localizer.Translate("Sign in to")%>
     </div>
     
     <div class="errors">
-        <font style="color:Red;"><%= Html.ValidationSummary(Map.Database.Localizer.Translate("Login was unsuccessful. Please correct the errors and try again."))%></font>
+        <font style="color:Red;"><%= Html.ValidationSummary(Map.Database.Localizer.Translate("Username and password don’t match"))%></font>
     </div>
 
            <%--<form id="loginform" action="<%=Url.Action("LogOn", "Account") + "?" + parameters %>" method="post">--%>
@@ -54,11 +60,11 @@ Sign In
                 <% = Html.Hidden("returnUrl", Request.QueryString["returnUrl"]) %>
                 <div class="username">
                     <label for="username"><%=Map.Database.Localizer.Translate("Username")%>&nbsp;</label>
-                    <%= Html.TextBox("username", string.Empty, new { id = "username", type = "email" })%>
+                    <%= Html.TextBox("username", string.Empty, new { id = "username", type = "email", placeholder="Username"})%>
                 </div>
                 <div class="password">
                     <label for="password"><%=Map.Database.Localizer.Translate("Password")%>&nbsp;</label>
-                    <%= Html.Password("password", string.Empty, new { id="Logon_password", type = "password" })%>
+                    <%= Html.Password("password", string.Empty, new { id="Logon_password", type = "password", placeholder="Password" })%>
                 </div>
                 <% if (Map.Database.LogOnUrlAuthToken != null && Map.Database.LogOnUrlAuthToken.Length > 0 )  %>
                     <%{ %>
@@ -76,10 +82,10 @@ Sign In
                         
                 <div class="remember">
                     <label class="remember">&nbsp;</label>
-                    <%= Html.CheckBox("rememberMe") %> <label class="rememberMe" for="rememberMe"><%=Map.Database.Localizer.Translate("Remember me")%>?</label>
+                    <%= Html.CheckBox("rememberMe") %> <label class="rememberMe" for="rememberMe"><%=Map.Database.Localizer.Translate("Remember Me")%>?</label>
                 
 
-                    <div class="btn-green" id="btn_login" style=""><span name="submit" class="inner"><%=Map.Database.Localizer.Translate("Sign In")%></span></div>
+                    <div class="btn-green" id="btn_login" style=""><span name="submit" class="inner"><%=Map.Database.Localizer.Translate("Log In")%></span></div>
                     <br />
                    <%-- <div class="btn-green" id="signin-goolge" style="width:200px;"><span  class="inner">log on with Google</span></div>
                     <br />
@@ -89,6 +95,8 @@ Sign In
                 <div><%= Server.HtmlDecode(Html.GetHtml("login")) %></div>
 
             </form>
+            </div>
+
 
 <script type="text/javascript">
     var submitElement = $('[name="submit"]');

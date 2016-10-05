@@ -11266,9 +11266,12 @@ function pagesManager(width, url) {
 
 
             if (document.location.href.indexOf('/Admin/Pages') > -1) {
+                $('body').addClass("page-page");
                 if (queryString('p') == 'on') {
                     openAddPageDialog();
                 }
+                else
+                    $('body').removeClass("page-page");
             }
         }
     });
@@ -11439,10 +11442,10 @@ function selectPage2(page, url, isView, text, data) {
     }
 
     var iframe = $('#mainAppFrame');
-
+  
     var c = url.indexOf('?') > -1 ? '&' : '?';
     iframe.attr('src', url + c + 'menu=off');
-
+    
     /*
     showProgress();
     $.ajax({
@@ -12246,6 +12249,9 @@ function viewProperties(guid, vfloat, width, url, viewDisplayName) {
 function viewDivResize(viewDiv, mainDiv, frame) {
     viewDiv.height(($(window).height() - mainDiv.offset().top - 16));
     frame.height((viewDiv.height() - 8));
+    $('.main-content').addClass("admin-open");
+    $('body').addClass("page-settings");
+    $('#AppFilterTreeDiv').addClass("admin-open");
 }
 
 function closeViewProperties() {
@@ -12266,6 +12272,9 @@ function closeViewProperties() {
 
     $(window).resize();
 
+    $('.main-content').removeClass("admin-open");
+    $('#AppFilterTreeDiv').removeClass("admin-open");
+    $('body').removeClass("page-settings");
     //    reloadPage();
 }
 
@@ -13676,6 +13685,9 @@ $(document).ready(function () {
         $('body').addClass('webkit');
     }
 
+    if (inIframe()) {
+        $('.main-content').addClass('in-iframe');
+    }
     logTitle.initiate();
 
     //Checkboxs	

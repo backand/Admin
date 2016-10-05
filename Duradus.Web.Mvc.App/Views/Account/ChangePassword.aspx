@@ -6,6 +6,8 @@ Change Password
 </asp:Content>
 <asp:Content ContentPlaceHolderID="MainContent" runat="server">
 
+<div class="changedragonimg"></div>
+
 <div class="signInHeader">
     <%=Map.Database.Localizer.Translate("Change Password")%>
 </div>
@@ -31,7 +33,7 @@ Change Password
           { %>
         <div class="password">
             <label for="currentPassword"><%= Map.Database.Localizer.Translate("Current password")%></label>
-            <%= Html.Password("currentPassword", string.Empty, new { id = "currentPassword", type = "password" })%>
+            <%= Html.Password("currentPassword", string.Empty, new { id = "currentPassword", type = "password" , placeholder="Current Password" })%>
             <font style="color: Red;">
                 <%= Html.ValidationMessage("currentPassword")%>
                 <%= Html.ValidationMessage("newPassword")%>
@@ -44,13 +46,13 @@ Change Password
         <%} %>
         <div class="password">
             <label for="newPassword"><%= Map.Database.Localizer.Translate("New password")%>:</label>
-            <%= Html.Password("newPassword", string.Empty, new { id = "newPassword", type = "password" })%>
+            <%= Html.Password("newPassword", string.Empty, new { id = "newPassword", type = "password" , placeholder="Password" })%>
         </div>
         <div class="password">
             <label for="confirmPassword"><%= Map.Database.Localizer.Translate("Confirm new password")%>:</label>
-            <%= Html.Password("confirmPassword", string.Empty, new { id = "Change_confirmPassword", type = "password" })%>
+            <%= Html.Password("confirmPassword", string.Empty, new { id = "Change_confirmPassword", type = "password" , placeholder="Password" })%>
         </div>
-        <div class="btn-green" id="btn_changepassword"><span name="submit" class="inner"><%=Map.Database.Localizer.Translate("Change Password")%></span></div>
+        <div class="btn-green" id="btn_changepassword"><span name="submit" class="inner"><%=Map.Database.Localizer.Translate("Reset Password")%></span></div>
         <input style="display: none;" id="submit" type="submit" value="" />
     </form>
 

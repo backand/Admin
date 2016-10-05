@@ -287,6 +287,7 @@
     <Content Include="Config\Sql\Users.sql" />
     <Content Include="Config\Sql\WorkFlowGraph.sql" />
     <Content Include="Content\anythingslider.css" />
+    <Content Include="Content\fonts\backandadmin.svg" />
     <Content Include="Content\Images\back_favicon.ico" />
     <Content Include="Content\bootstrap.min.css" />
     <Content Include="Content\ddsmoothmenu-v.css" />
@@ -855,6 +856,10 @@
     <Content Include="apps\assets\fonts\bootstrap\glyphicons-halflings-regular.eot" />
     <Content Include="apps\assets\fonts\bootstrap\glyphicons-halflings-regular.ttf" />
     <Content Include="apps\assets\fonts\bootstrap\glyphicons-halflings-regular.woff" />
+    <Content Include="Content\fonts\backandadmin.eot" />
+    <Content Include="Content\fonts\backandadmin.ttf" />
+    <Content Include="Content\fonts\backandadmin.woff" />
+    <Content Include="deployment\Registration page content" />
     <None Include="Properties\PublishProfiles\Admin.pubxml" />
     <None Include="ws\about.html.old" />
     <Content Include="ws\about.html" />
@@ -1937,10 +1942,10 @@
           <AutoAssignPort>True</AutoAssignPort>
           <DevelopmentServerPort>1333</DevelopmentServerPort>
           <DevelopmentServerVPath>/</DevelopmentServerVPath>
-          <IISUrl>http://localhost:4008</IISUrl>
+          <IISUrl>http://localhost:4010</IISUrl>
           <NTLMAuthentication>False</NTLMAuthentication>
           <UseCustomServer>False</UseCustomServer>
-          <CustomServerUrl>http://localhost:4009</CustomServerUrl>
+          <CustomServerUrl>http://localhost:4010</CustomServerUrl>
           <SaveServerSettingsInUserFile>False</SaveServerSettingsInUserFile>
         </WebProjectProperties>
       </FlavorProperties>

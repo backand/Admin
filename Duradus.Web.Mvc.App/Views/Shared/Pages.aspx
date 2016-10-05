@@ -28,8 +28,10 @@
             iframe.height(pagesDiv.height());
             iframe.css('border','none');
             iframe.css('position','relative');
+            $('body').addClass("page-pages");
+           
             $('.pages-manager-wrapper').height(pagesDiv.height() - $('.pages-manager-wrapper').position().top);
-            
+          
         });
     </script>
 
