@@ -345,45 +345,16 @@ div.boardtitle > span{position: absolute;top: 4px;right: 4px;}
 
 .overlay > div:first-child { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: #000; filter: alpha(opacity=60); -moz-opacity: 0.6; -khtml-opacity: 0.6; opacity: 0.6; z-index: 10000000;}
 
-
-#topRight {
-	position: 	absolute;
-	top:0;
-	right:0;
-	margin:0;
-}
-#topRight li {
-	height:60px;
-}
 #topRight .sf-menu, #topRight .sf-menu * 
 {
-    font-size:11px;color:#d7d7d7;
+    font-size:11px;color:White;
 }
 #topRight .sf-menu a {padding-right: 0;}
 #topRight .sf-menu a.sf-with-ul {padding-right: 10px;}
 #topRight .sf-menu select {color: black; text-shadow: none;}
 #topRight .sf-menu select option {color: black; text-shadow: none;}
 
-#topRight .sf-menu ul  {
-	top:60px;
-}
-#topRight .sf-menu ul li {
-	height:40px;
-	border-top:#757575 1px solid;
-}
-#topRight .sf-menu ul li a {
-	height:40px;
-	padding:5px;
-	color:white;
-	font-weight:normal;
-	background:#393a3d;
-}
-
-#topRight .sf-menu ul li a:hover {
-	color:white;
-	background:#666666;
-}
-
+/*****/
 
 div.table-menu {margin-top:0;}
 /*#mainAppFrame{margin-top:-1px;}*/
@@ -395,7 +366,7 @@ div.table-menu {margin-top:0;}
 
 #topRight  a {line-height: 30px; padding: 0 0 0 4px;}
 
-#topRight  .sf-sub-indicator {top:25px; right:12px;}
+#topRight  .sf-sub-indicator {top: 0.8em;}
 
 #topRight   ul {top: 30px;}
 
@@ -426,6 +397,17 @@ padding-left: 0;
 				color: #f26522;
 				font-weight: bold;
 			}
+			
+.sf-menu li:hover ul, .sf-menu li.sfHover ul{background-color:rgb(241, 241, 241);border-top:1px solid rgb(204,204,204); -webkit-border-radius: 0; border-radius: 0;}
+.sf-menu li:hover ul li, .sf-menu li.sfHover ul li {background-color:rgb(241, 241, 241);border:1px solid rgb(204,204,204); border-top:none; }
+.sf-menu li.sfHover a span{color:White;}
+.sf-menu li.sfHover ul li:hover, .sf-menu li.sfHover ul li:hover {background-color:rgba(243, 101, 35, 1)}
+#topRight .sf-menu li ul li:hover, #topRight .sf-menu li.sfHover ul li:hover  {background-color:rgba(243, 101, 35, 1)}
+#topRight .sf-menu li ul li, #topRight .sf-menu li.sfHover ul li  {background-color:rgba(243, 184, 88, 1); border:none; border-top:1px solid white;}
+#topRight .sf-menu li li:hover a, .sf-menu li li a:hover {color:White;}
+#topRight .sf-menu li ul li:first-child, #topRight .sf-menu li.sfHover ul li:first-child  {border:none; }
+#topRight .sf-menu li:hover ul, #topRight .sf-menu li.sfHover ul{border:none;}
+
 
 
 
@@ -434,7 +416,6 @@ padding-left: 0;
 #mainAppDiv{position:relative; overflow:hidden;border-left: 1px solid rgb(204, 204, 204);}
 
 #sideMenu ul {padding:0;}
-
 
 
 
@@ -553,8 +534,6 @@ padding-left: 0;
 #topMenu {
 	background:#393a3d;
 	padding:15px;
-	border-bottom:0;
-	height:60px;
 	color:white;
 }
 
@@ -570,13 +549,12 @@ a.durados-logo {
 
 }
 #topRight {
-	
+	margin-top:-4px;
 }
 
 #topRight  .sf-menu a{
 	color:#d7d7d7;
-	padding:15px; 
-	height:60px;
+	padding:5px 15px; 
 
 }
 .body.template table.listview, table.gridview, table.gridviewhead, table.detailstable {
@@ -589,6 +567,10 @@ padding-right:30px;
 
 #topRight li:not(:first-child) a {
 	border-left:1px solid #6a6a6a;
+}
+#topRight  .sf-sub-indicator {
+	top:16px;
+	right:18px;
 }
 .main-content {
 	padding-left:260px;
@@ -717,9 +699,7 @@ table.gridview th {
     font-size: 14px;
 }
 body.template th a:link, body.template th a:visited, body.template th a:hover{
-	color: white;
-	font-weight:normal;
-	text-transform: uppercase;
+	color: #1c2b36;
 }
 
 
@@ -765,280 +745,3 @@ tr.data-row.d_alt_row {
  	color:black;
  	margin-top:10px;
  }
-.gridview th, .gridviewhead th, tr.gridviewhead td.ScrollPlace {
-	background:white;
-}
-
-#mainAppDiv .gridview th, 
-#mainAppDiv  .gridviewhead th, 
-#mainAppDiv  tr.gridviewhead td.ScrollPlace {
-vertical-align: middle;
-font-weight:normal;
-padding:10px;
-background:#29323c;
-
-}
-
-
-.navigation-left {
-	float:right;
-	margin-right: 40px;
-
-}
-.workspaceMenu {
-	padding-top:0;
-}
-ul#mainmenu {
-	height:70px;
-}
-.sf-menu li {
-
-}
-.sf-sub-indicator {
-	right:10px;
-	top:28px;
-}
-.sf-menu li a {
-	font-weight:bold;
-	color:black;
-	display:block;
-	padding-top:13px;
-	padding-left:40px;
-	padding-right:40px;
-	transition:300ms;
-}
-.sf-menu li a:hover {
-	font-weight:bold;
-	color:black;
-	background:#428bcd;
-	color:white;
-	height:60px;
-
-}
-.GridFilterDiv {height:auto;}
-
-tr.rowfilter td {
-	background:#ddd;
-	padding:7px;
-	text-shadow:none;
-}
-.filterOff {
-	text-shadow:none;
-	color:black;
-	text-transform: uppercase;
-
-}
-.editForm {
-	width:100%;
-}
-.editForm td {
-	vertical-align:middle;
-	 padding:5px;
-	 width:25%;
-	 font-weight:bold;
-	 color:black;
-
-}
-.editForm.tableCol2 td{
-	width:25%;
-}
-.editForm.tableCol2 td.rowViewLable {
-	width:15%;
-}
-.editForm.tableCol2 td.rowViewCell {
-	width:35%;
-
-}
-.editForm.tableCol2 td.rowViewCell[colspan=3] {
-	width:85%;
-}
-.fileClearImg {
-    cursor: pointer;
-    border: 1px #eee solid;
-    margin: 10px;
-    padding: 5px;
-    /* height: 30px; */
-    vertical-align: middle;
-    /* width: 30px; */
-}
-.fileClearImg:hover {
-border:1px solid black;
-	}
-.gbutton {
-    height: auto;
-    text-shadow: none;
-    background: #428bcd !important;
-    color: white;
-    border-radius: 5px;
-    padding: 7px 15px;
-    margin-right: 10px;
-    display: inline-block;
-    width: auto;
-}
-td.rowViewCell input, td.rowViewCell textarea{
-	border:1px solid #ddd;
-	padding:10px;
-	max-width:100%;
-}
-
-.ui-dialog-buttonpane  {
-	background:#f5f5f5;
-	border-top:1px solid rgba(208, 206, 206, 73);
-
-}
-
-.ui-dialog-buttonpane .ui-widget-content, 
-.ui-dialog-buttonpane .ui-state-default, 
-.ui-dialog-buttonpane .ui-widget-header .ui-state-default {
-	border-radius: 5px;
-	background:  #5cb85c;
-	transition:300ms;
-
-	border:none;
-	padding: 7px 20px;
-	color:white;
-	font-size:14px;
-	font-weight:bold;
-	box-shadow:0px 5px 0px 0px #218521;
-}
-.ui-dialog-buttonpane button:hover {
-	background:  #5cb85c !important;
-	box-shadow:0px 7px 0px 0px #218521 ;
-	transform:translateY(-2px);
-} 
-.ui-tabs-nav {
-	border-bottom: 1px solid #ddd;
-	background:none;
-}
-.ui-tabs .ui-tabs-nav li {
-	border:none;
-	background:none;
-}
-.ui-tabs .ui-tabs-nav li a {
-	color:  #1c2b36;
-	font-size: 14px;
-	text-transform: uppercase;
-	padding-bottom:5px;
-	padding-left:15px;
-	display:block;
-	border:none;
-	background:none;
-	padding-right:15px;
-	font-weight: 700;
-}
-.ui-tabs-nav li a:hover, 
-.ui-tabs-nav li.ui-tabs-selected a {
-	box-shadow: 0px 2px 0px 0px #428bcd;
-}
-.ui-widget-header {
-background:none;
-padding:10px;
-border-bottom:1px solid #ddd;
-font-size:25px;
-font-weight:bold;
-color:black;
-}
-
-
-.ui-dialog .ui-dialog-titlebar-max {
-	right:70px;
-	transition:300ms;
-}
-.ui-dialog .ui-dialog-titlebar-close {
-	right:30px;
-	transition:300ms;
-}
-
-.ui-state-hover, 
-.ui-widget-content .ui-state-hover, 
-.ui-widget-header .ui-state-hover, 
-.ui-state-focus, .ui-widget-content .ui-state-focus, 
-.ui-widget-header .ui-state-focus {
-	background: none;
-	color:black;
-	border:none;
-	
-
-}
-
-
-#topRight a  {
-	color:#428bcd;
-}
-
-#adminButtons li#settings,
-#adminButtons li#pages,
-#adminButtons li#columns {
-	width:auto;
-}
-#adminButtons {
-	width:auto;
-}
-.workspace {
-	background:#6a6a6a;
-}
-iframe .main-content {
-	padding-left:0;
-}
-
-
-body.template table.listview td, table.gridview td, table.detailstable td, table.gridviewhead td {
-	border-bottom:0;
-}
-
-
-#userPreview {
-	width:370px !important;
-	border:none !important;
-	height:auto !important;
-	background:#393a3d  !important;
-	
-
-}
-#topRight #userPreview li:hover {
-	background:#757575;
-}
-#topRight #userPreview li {
-	height:60px;
-	color:#d7d7d7;
-	line-height: auto;
-	padding:10px 5px;
-	display:block;
-
-}
-#topRight #userPreview li:first-child {
-	border-top:none;
-}
-
-
-#mainMenu .navigation-left li a {
-	height:70px;
-}
-#mainMenu .navigation-left ul ul {
-		top:70px;
-		background:white;
-		border-radius: 0;
-		border:1px solid #ddd;
-		right:0;
-}
-
-#mainMenu .navigation-left ul  ul li {
-		background:none;
-		display:block;
-
-}
-#mainMenu .navigation-left ul  ul li a {
-	height:40px;
-	display:block;
-	padding:12px;
-	font-weight:normal;
-	line-height:1;
-}
-
-#mainMenu .navigation-left .sf-sub-indicator {
-	right:15px;
-}
-
-#footer {
-	display:none;
-}

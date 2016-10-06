@@ -6,9 +6,9 @@
     Reset Password
 </asp:Content>
 <asp:Content ID="Content3" ContentPlaceHolderID="MainContent" runat="server">
-
+<div class="bgdragonimage"></div>
     <div class="signInHeader">
-        <%=Map.Database.Localizer.Translate("reset your password")%>
+        <%=Map.Database.Localizer.Translate("Reset  Password")%>
     </div>
 
     <div class="error" style="border: none;text-align: left;margin-left: 60px;display: none;margin-top: 15px;">
@@ -23,9 +23,9 @@
     <form onsubmit="return false;" action="<%=Url.Action("PasswordReset", controller, new {appName=Request.QueryString["appName"], id=Request.QueryString["id"]})%>" method="post">
         <div class="pwResetForm">
             <div class="instructions"><%=Map.Database.Localizer.Translate("To reset your password, enter your Back& username")%></div>
-            <div class="username">
-                <label for="username"><%=Map.Database.Localizer.Translate("Username")%>&nbsp;</label>
-                <%= Html.TextBox("username", ViewData["username"], new { id = "username", type = "email" })%>
+            <div class="resetpassworduser">
+               
+                <%= Html.TextBox("username", ViewData["username"], new { id = "username", type = "email", placeholder="Username" })%>
             </div>
             <div class="btn-green" id="btn_reset"><span name="submit" class="inner"><%=Map.Database.Localizer.Translate("Reset Password")%></span></div>
             <input type="submit" id="submit" style="display:none;" />
