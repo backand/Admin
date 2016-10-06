@@ -161,7 +161,7 @@ namespace Durados.Web.Mvc
 
         public override bool IsAllow(DataAction dataAction)
         {
-            return FieldHelper.IsVisibleForRow(this, dataAction);
+            return !Durados.Web.Mvc.UI.FieldExtentions.IsDisable(this, dataAction, null);
         }
     }
 

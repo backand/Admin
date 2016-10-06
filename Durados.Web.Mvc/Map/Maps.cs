@@ -2144,7 +2144,8 @@ namespace Durados.Web.Mvc
             return GetSqlProduct(GetCurrentAppName());
         }
 
-        private static Dictionary<string, SqlProduct> appsSqlProducts = new Dictionary<string, SqlProduct>();
+        //private static Dictionary<string, SqlProduct> appsSqlProducts = new Dictionary<string, SqlProduct>();
+        private static Durados.Data.ICache<SqlProduct> appsSqlProducts = CacheFactory.CreateCache<SqlProduct>("SqlProduct");
 
         public static void RemoveSqlProduct(string appName)
         {

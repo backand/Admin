@@ -640,7 +640,7 @@ namespace BackAnd.Web.Api.Controllers
         [AllowAnonymous]
         [Route("socialSignin")]
         [HttpGet]
-        public async Task<IHttpActionResult> socialSignin(string provider, string appName, string returnAddress = null, string code = null, bool signupIfNotSignedIn = false)
+        public async Task<IHttpActionResult> socialSignin(string provider, string appName, string returnAddress = null, string code = null, string email = null, bool signupIfNotSignedIn = false)
         {
 
             AbstractSocialProvider social = SocialProviderFactory.GetSocialProvider(provider);
@@ -654,7 +654,7 @@ namespace BackAnd.Web.Api.Controllers
             try
             {
                 // return Redirect("http://wwww.backand.aaaaaaaaa?message={'hello' : 'world'}");
-                return Redirect(social.GetAuthUrl(appName, returnAddress ?? GetCurrentAddress(), null, "signin", null, signupIfNotSignedIn));
+                return Redirect(social.GetAuthUrl(appName, returnAddress ?? GetCurrentAddress(), null, "signin", email, signupIfNotSignedIn));
             }
             catch (Exception exception)
             {

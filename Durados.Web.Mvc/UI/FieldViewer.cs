@@ -551,6 +551,9 @@ namespace Durados.Web.Mvc.UI
 
         public static bool IsDisable(this Field field, DataAction dataAction, string guid)
         {
+            if (field.View.SystemView)
+                return false;
+
             switch (dataAction)
             {
                 case DataAction.Create:
