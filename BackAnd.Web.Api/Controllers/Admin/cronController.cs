@@ -57,9 +57,9 @@ namespace BackAnd.Web.Api.Controllers
                     return ResponseMessage(Request.CreateResponse(HttpStatusCode.NotFound, "The Cron " + id + " does not exist"));
                 }
                 Cron cron = Map.Database.Crons[id];
-                
 
-                CronRequestInfo cronInfo = GetRequestInfo(cron);
+
+                CronRequestInfo cronInfo = GetRequestInfo(cron, test);
                 
 
                 XMLHttpRequest request = new XMLHttpRequest();
@@ -103,7 +103,7 @@ namespace BackAnd.Web.Api.Controllers
 
                 if (test)
                 {
-                    return Ok(new { request = cronInfo, response = response });
+                    return Ok(new { request = GetTestRequest(cronInfo), response = response });
                 }
                 else
                 {
@@ -133,9 +133,14 @@ namespace BackAnd.Web.Api.Controllers
             return run(id, true);
         }
 
-        private CronRequestInfo GetRequestInfo(Cron cron)
+        private CronRequestInfo GetRequestInfo(Cron cron, bool test)
         {
-            return CronHelper.GetRequestInfo(cron);
+            return CronHelper.GetRequestInfo(cron, test);
+        }
+
+        private object GetTestRequest(CronRequestInfo requestInfo)
+        {
+            return CronHelper.GetTestRequest(requestInfo);
         }
 
         [Route("~/1/jobs/run/{id}/async")]

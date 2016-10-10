@@ -21,6 +21,7 @@ using MySql.Data.MySqlClient;
 using Durados;
 using System.Collections;
 using System.Data;
+using BackAnd.Web.Api.Controllers.Admin;
 /*
  HTTP Verb	|Entire Collection (e.g. /customers)	                                                        |Specific Item (e.g. /customers/{id})
 -----------------------------------------------------------------------------------------------------------------------------------------------
@@ -57,8 +58,10 @@ namespace BackAnd.Web.Api.Controllers
                         ArrayList arrayList = (ArrayList)transformResult[Alter];
                         for (int i = 0; i< arrayList.Count; i++)
                         {
+                            string sql = arrayList[i].ToString();
+                            ValidateSql(sql);
                             if (arrayList[i] != null)
-                                arrayList[i] = AdjustSql(arrayList[i].ToString());
+                                arrayList[i] = AdjustSql(sql);
                         }
                     }
                 }
@@ -78,6 +81,100 @@ namespace BackAnd.Web.Api.Controllers
                 throw new BackAndApiUnexpectedResponseException(exception, this);
 
             }
+        }
+
+        private void ValidateSql(string sql)
+        {
+            Fk fk = GetFk(sql);
+            if (fk == null)
+                return;
+
+            ValidateVia(fk);
+        }
+
+        private void ValidateVia(Fk fk)
+        {
+            if (!Map.Database.Views.ContainsKey(fk.ParentTable))
+                return;
+
+            Durados.View parentView = Map.Database.Views[fk.ParentTable];
+
+            if (!Map.Database.Views.ContainsKey(fk.ChildTable))
+                return;
+
+            Durados.View childView = Map.Database.Views[fk.ChildTable];
+
+            if (parentView.DataTable.Columns.Contains(fk.ParentColumn) || parentView.Fields.ContainsKey(fk.ParentColumn))
+            {
+                throw new NewFkException(fk.ParentTable, fk.ParentColumn);
+            }
+
+            if (childView.DataTable.Columns.Contains(fk.ChildColumn) || childView.Fields.ContainsKey(fk.ChildColumn))
+            {
+                throw new NewFkException(fk.ChildTable, fk.ChildColumn);
+            }
+        }
+
+
+
+        private Fk GetFk(string sql)
+        {
+            const string Constraint = "constraint";
+            const string Foreign = "foreign";
+            const string Key = "key";
+            const char Space = ' ';
+            const char SqlArgBoundery = '`';
+            const char _ = '_';
+            const char LeftBracket = '(';
+            const char RightBracket = ')';
+            const string Table = "table";
+            const string References = "references";
+            
+
+            if (!(sql.Contains(Constraint) && sql.Contains(Foreign)))
+                return null;
+
+            string[] words = sql.Split(Space);
+
+            Fk fk = new Fk();
+
+            for (int i = 0; i < words.Length - 1; i++)
+            {
+                string word = words[i];
+                string nextWord = words[i + 1];
+
+                if (word.Equals(Table))
+                {
+                    fk.ChildTable = nextWord.Trim(SqlArgBoundery);
+                }
+
+                if (word.Equals(Constraint))
+                {
+                    fk.ParentColumn = nextWord.Split(_).Last();
+                }
+
+                if (word.Equals(Key))
+                {
+                    fk.ChildColumn = nextWord.Trim(LeftBracket).Trim(RightBracket).Trim(SqlArgBoundery);
+                }
+
+                if (word.Equals(References))
+                {
+                    fk.ParentTable = nextWord.Trim(SqlArgBoundery);
+                }
+            }
+
+            return fk;
+        }
+
+
+
+        public class Fk
+        {
+            public string ParentTable { get; set; }
+            public string ParentColumn { get; set; }
+            public string ChildTable { get; set; }
+            public string ChildColumn { get; set; }
         }
 
         private string AdjustSql(string sql)

@@ -88,7 +88,7 @@ namespace Durados.Web.Mvc.UI.Helpers
         const string POST = "POST";
 
 
-        public static CronRequestInfo GetRequestInfo(Cron cron)
+        public static CronRequestInfo GetRequestInfo(Cron cron, bool test)
         {
 
             CronRequestInfo requestInfo = new CronRequestInfo();
@@ -108,12 +108,12 @@ namespace Durados.Web.Mvc.UI.Helpers
 
             requestInfo.headers = GetHeaders(cron.Headers);
 
-            SetAuthorization(requestInfo);
+            SetAuthorization(requestInfo, test);
 
             return requestInfo;
         }
 
-        private static void SetAuthorization(CronRequestInfo requestInfo)
+        private static void SetAuthorization(CronRequestInfo requestInfo, bool test)
         {
             const string AUTHORIZATION = "AUTHORIZATION";
             const string AppId = "AppId";
@@ -127,13 +127,25 @@ namespace Durados.Web.Mvc.UI.Helpers
                 return;
             }
 
-            if (System.Web.HttpContext.Current.Request.Headers[AUTHORIZATION] != null)
+            if (requestInfo.headers == null)
+                requestInfo.headers = new Dictionary<string, object>();
+            
+            if (test)
             {
-                if (requestInfo.headers == null)
-                    requestInfo.headers = new Dictionary<string, object>();
-                requestInfo.headers.Add("authorization", System.Web.HttpContext.Current.Request.Headers[AUTHORIZATION]);
+                string appId = Maps.Instance.GetMap().Id;
+                if (!requestInfo.headers.ContainsKey("authorization"))
+                    requestInfo.headers.Add("authorization", Maps.CronAuthorizationHeader);
+                if (!requestInfo.headers.ContainsKey(AppId))
+                    requestInfo.headers.Add(AppId, appId);
+                return;
+            }
+            else if (System.Web.HttpContext.Current.Request.Headers[AUTHORIZATION] != null)
+            {
+                if (!requestInfo.headers.ContainsKey("authorization"))
+                    requestInfo.headers.Add("authorization", System.Web.HttpContext.Current.Request.Headers[AUTHORIZATION]);
                 if (System.Web.HttpContext.Current.Request.Headers[AppId] != null)
-                    requestInfo.headers.Add("AppId", System.Web.HttpContext.Current.Request.Headers[AppId]);
+                    if (!requestInfo.headers.ContainsKey(AppId))
+                        requestInfo.headers.Add(AppId, System.Web.HttpContext.Current.Request.Headers[AppId]);
                 return;
             }
 
@@ -451,6 +463,25 @@ namespace Durados.Web.Mvc.UI.Helpers
                  string name = cron[NAME].ToString();
                  deleteCron(name);
              }
+        }
+
+        public static object GetTestRequest(CronRequestInfo requestInfo)
+        {
+            Dictionary<string, object> dic = new Dictionary<string, object>();
+
+            if (requestInfo.data != null)
+            {
+                dic.Add("data", requestInfo.data);
+            }
+            if (requestInfo.url != null)
+            {
+                dic.Add("url", requestInfo.url);
+            }
+            if (requestInfo.method != null)
+            {
+                dic.Add("method", requestInfo.method);
+            }
+            return dic;
         }
     }
 }

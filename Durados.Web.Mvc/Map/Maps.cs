@@ -509,6 +509,12 @@ namespace Durados.Web.Mvc
                 throw new DuradosException("Missing CronPrefix key in web config");
             }
 
+            CronAuthorizationHeader = System.Configuration.ConfigurationManager.AppSettings["cronAuthorizationHeader"];
+            if (string.IsNullOrEmpty(CronAuthorizationHeader))
+            {
+                throw new DuradosException("Missing CronAuthorizationHeader key in web config");
+            }
+
             limits.Add(Limits.Cron, Convert.ToInt32(System.Configuration.ConfigurationManager.AppSettings["cronLimit"]));
 
             LocalAddress = System.Configuration.ConfigurationManager.AppSettings["localAddress"] ?? "http://localhost:8080";
@@ -612,7 +618,8 @@ namespace Durados.Web.Mvc
         public static string ParseConverterMasterKey { get; private set; }
         public static string LambdaArn { get; private set; }
         public static string CronPrefix { get; private set; }
-
+        public static string CronAuthorizationHeader { get; private set; }
+        
         
         public static string ParseConverterAdminKey { get; private set; }
         public static string ParseConverterObjectName { get; private set; }

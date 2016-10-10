@@ -9991,7 +9991,7 @@ namespace Durados.DataAccess
             return field;
         }
 
-        protected virtual Dictionary<string, object> GetValues(View view, Dictionary<string, object> deepObject)
+        protected virtual Dictionary<string, object> GetValues(View view, Dictionary<string, object> deepObject, bool createParent = false, IDbCommand command = null, IDbCommand sysCommand = null, BeforeCreateEventHandler beforeCreateCallback = null, BeforeCreateInDatabaseEventHandler beforeCreateInDatabaseCallback = null, AfterCreateEventHandler afterCreateBeforeCommitCallback = null, AfterCreateEventHandler afterCreateAfterCommitCallback = null)
         {
             Dictionary<string, object> values = new Dictionary<string, object>();
 
@@ -10006,9 +10006,14 @@ namespace Durados.DataAccess
                         // handle parents?
                         if (field.FieldType == FieldType.Parent && deepObject[key] is Dictionary<string, object>)
                         {
-                            string pk = GetPkFromMetadata((Dictionary<string, object>)deepObject[key]);
+                            var parentValues = (Dictionary<string, object>)deepObject[key];
+                            string pk = GetPkFromMetadata(parentValues);
                             if (pk == null)
-                                pk = GetPkFromObject(view, (Dictionary<string, object>)deepObject[key]);
+                                pk = GetPkFromObject(view, parentValues);
+                            if (pk == null && createParent)
+                            {
+                                pk = CreateParentObject((ParentField)field, parentValues, command, sysCommand, beforeCreateCallback, beforeCreateInDatabaseCallback, afterCreateBeforeCommitCallback, afterCreateAfterCommitCallback);
+                            }
                             values.Add(field.Name, pk);
                         }
                         else
@@ -10026,9 +10031,14 @@ namespace Durados.DataAccess
             return values;
         }
 
+        private string CreateParentObject(ParentField parentField, Dictionary<string, object> parentValues, IDbCommand command, IDbCommand sysCommand, BeforeCreateEventHandler beforeCreateCallback, BeforeCreateInDatabaseEventHandler beforeCreateInDatabaseCallback, AfterCreateEventHandler afterCreateBeforeCommitCallback, AfterCreateEventHandler afterCreateAfterCommitCallback)
+        {
+            return Create(parentField.ParentView, parentValues, true, beforeCreateCallback, beforeCreateInDatabaseCallback, afterCreateBeforeCommitCallback, afterCreateAfterCommitCallback);
+        }
+
         protected virtual string Create(View view, Dictionary<string, object> deepObject, bool deep, IDbCommand command, IDbCommand sysCommand, BeforeCreateEventHandler beforeCreateCallback, BeforeCreateInDatabaseEventHandler beforeCreateInDatabaseCallback, AfterCreateEventHandler afterCreateBeforeCommitCallback, AfterCreateEventHandler afterCreateAfterCommitCallback)
         {
-            Dictionary<string, object> values = GetValues(view, deepObject);
+            Dictionary<string, object> values = GetValues(view, deepObject, true, command, sysCommand, beforeCreateCallback, beforeCreateInDatabaseCallback, afterCreateBeforeCommitCallback, afterCreateAfterCommitCallback);
 
             int? id = null;
 
