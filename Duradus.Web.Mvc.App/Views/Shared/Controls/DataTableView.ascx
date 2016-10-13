@@ -230,8 +230,15 @@ if (view.SortingType == Durados.SortingType.Group)
                                  string sortId = "sort_" + guid + i.ToString();
                                    
                                   %>
-                                    <th <%=contextMenuAttr %> class="<%=dataTypeClass%>" SortColumn='<%=field.Name%>'><div <%=colStyle %> class="thdiv"><a id='<%=sortId %>' href="#" class="Sortable col-header" SortColumn='<%=field.Name%>' onclick="FilterForm.Sort('<%=sortId%>', '<%=guid %>')" title='<%=description %>'><%=headerTitle%></a><%= (ViewData["SortColumn"] != null && ViewData["SortColumn"].ToString() == field.Name) ? "<div class='sortIcon-con'><img alt='' title='" + ViewData["direction"].ToString() + "ending' src='" + Durados.Web.Mvc.Infrastructure.General.GetRootPath() + "Content/Images/icon_sort_" + ViewData["direction"].ToString() + ".GIF' class='sortIcon grid' /></div>" : ""%></div><%= displayAdminContextMenu && !view.SystemView ? "<span class=\"desc-icon\"></span>" : string.Empty%> </th>
-                                <%}
+                                    <th <%=contextMenuAttr %> class="<%=dataTypeClass%>" SortColumn='<%=field.Name%>'><div <%=colStyle %> class="thdiv"><a id='<%=sortId %>' href="#" class="Sortable col-header" SortColumn='<%=field.Name%>' onclick="FilterForm.Sort('<%=sortId%>', '<%=guid %>')" title='<%=description %>'><%=headerTitle%></a> 
+                                        <%if(!string.IsNullOrEmpty(description) && String.Compare(description,headerTitle,true)>0){ %>
+                                        <i class="icon-info_outline" title="<%=description %>"></i>
+                                        <%} %>
+                                        <%= (ViewData["SortColumn"] != null && ViewData["SortColumn"].ToString() == field.Name) ? "<div class='sortIcon-con'><img alt='' title='" + ViewData["direction"].ToString() + "ending' src='" + Durados.Web.Mvc.Infrastructure.General.GetRootPath() + "Content/Images/icon_sort_" + ViewData["direction"].ToString() + ".GIF' class='sortIcon grid' /></div>" : ""%></div>
+                                        <%= displayAdminContextMenu && !view.SystemView ? "<span class=\"desc-icon\"></span>" : string.Empty%> 
+                                       
+                                    </th>
+                            <%}
                              else
                              { %>
                                 <th <%=contextMenuAttr %>  class="NotSortable <%=dataTypeClass%>" SortColumn='<%=field.Name%>'><div  <%=colStyle %> class="thdiv">

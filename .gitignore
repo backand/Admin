@@ -160,3 +160,7 @@ $RECYCLE.BIN/
 .DS_Store
 
 packages
+/Duradus.Web.Mvc.App/Web.config
+/Duradus.Web.Mvc.App/Web.qa.config
+*.config
+/Duradus.Web.Mvc.App/Web - Copy.config

@@ -309,6 +309,24 @@
             catch(e){}
         });
     </script>
+
+     <script type="text/javascript">
+        $(document).ready(function () {
+           
+           $('#sideMenu ul li  div a span.collapse').click(function(){
+                 $('.main-content').removeClass('left_paddd');   
+           });
+           $(' #sideMenu2').click(function(){
+                 $('.main-content').addClass('left_paddd');   
+           });
+           if ($("#sideMenu").css('display') == 'block') {
+   // ...
+   $('.main-content').addClass('left_paddd'); 
+}
+
+            });
+    </script>
+
     <asp:ContentPlaceHolder ID="head" runat="server"></asp:ContentPlaceHolder>
     <%--<script language='javascript' async='true' type='text/javascript' src='https://d3b3ehuo35wzeh.cloudfront.net/users/8098/walkme_8098_https.js'></script>--%>
 </head>
@@ -676,7 +694,7 @@
         <div class="loading">
             <div>
                     <%=Map.Database.Localizer.Translate("Please wait...")%></div>
-            <img src='<%= Durados.Web.Mvc.Infrastructure.General.GetRootPath() + "Content/Images/wait.gif"%>' alt='loading...' />
+            <img src='<%= Durados.Web.Mvc.Infrastructure.General.GetRootPath() + "Content/Images/loading .gif"%>' alt='loading...' />
         </div>
     </div>
         <%  Html.RenderPartial("~/Views/Shared/Controls/AdvancedFilter.ascx", Durados.Web.Mvc.UI.Json.AdvancedFilterType.NumericFilter.ToString()); %>
@@ -716,6 +734,8 @@
             document.addEventListener("DOMContentLoaded", function () {
                 Boomerang.init({ app: 'bustrack', addon: 'yontest' }); //hard coded
             });
+
+
          
         </script>
         <%}%>
