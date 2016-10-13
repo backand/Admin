@@ -30,6 +30,7 @@
     <div class="boardtitle portlet-header" guid='<%=guid %>' onclick="Multi.BoardClicked(event, this, '<%=guid %>', true)"
         <%=unselectable %> d_pk='<%=pkValue %>'>
         <%= displayValue%> 
+        <i class="icon-info_outline"></i>
     </div>
     <!------------------Fields content for one dataRow-------------------->
     <table class="portlet-content">

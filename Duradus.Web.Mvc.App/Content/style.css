@@ -1,10 +1,10 @@
 @font-face {
   font-family: 'backandadmin';
-  src:  url('fonts/backandadmin.eot?j8sdsq');
-  src:  url('fonts/backandadmin.eot?j8sdsq#iefix') format('embedded-opentype'),
-    url('fonts/backandadmin.ttf?j8sdsq') format('truetype'),
-    url('fonts/backandadmin.woff?j8sdsq') format('woff'),
-    url('fonts/backandadmin.svg?j8sdsq#backandadmin') format('svg');
+  src:  url('fonts/backandadmin.eot?k4cnv9');
+  src:  url('fonts/backandadmin.eot?k4cnv9#iefix') format('embedded-opentype'),
+    url('fonts/backandadmin.ttf?k4cnv9') format('truetype'),
+    url('fonts/backandadmin.woff?k4cnv9') format('woff'),
+    url('fonts/backandadmin.svg?k4cnv9#backandadmin') format('svg');
   font-weight: normal;
   font-style: normal;
 }
@@ -24,6 +24,9 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
+.icon-info_outline:before {
+  content: "\e921";
+}
 .icon-icons_page-duplicate:before {
   content: "\e920";
 }

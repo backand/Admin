@@ -7458,27 +7458,35 @@ var copyPaste;
 function initTooltip(elm) {
 
     var title = elm.attr('title');
+    //var title = elm.attr('tooltip');
     if (title == '')
         return;
     if (title.indexOf('|') == -1) {
+        //elm.attr('tooltip', '|' + title)
         elm.attr('title', '|' + title)
     }
     elm.cluetip({
         splitTitle: '|',
         clickThrough: true,
-        cluetipClass: 'jtip',
+        cluetipClass: 'default',
+        activation: 'click',
+        cursor: '',
         arrows: true,
         dropShadow: false,
         hoverIntent: false,
         sticky: title.indexOf('href') != -1,
         mouseOutClose: true,
         closePosition: 'title',
+        //closePosition: 'tooltip',
         closeText: '<img src="/content/images/cross.png" alt="close" />'
     });
 }
 
 function initTooltips() {
-    $('#rowtabletitleSpan').each(function () {
+    //$('#rowtabletitleSpan').each(function () {
+    //    initTooltip($(this));
+    //});
+    $('i.icon-info_outline').each(function () {
         initTooltip($(this));
     });
     Durados.Preview.init();
