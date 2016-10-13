@@ -696,6 +696,8 @@
     <Content Include="Content\spectrum.css" />
     <Content Include="Content\SpryValidation.css" />
     <Content Include="Content\SpryValidation.min.css" />
+    <Content Include="Content\style.css" />
+    <Content Include="Content\styles.css" />
     <Content Include="Content\Stylesheet.css" />
     <Content Include="Content\Stylesheet.min.css" />
     <Content Include="Content\StylesheetRtl.css" />
@@ -860,6 +862,8 @@
     <Content Include="Content\fonts\backandadmin.ttf" />
     <Content Include="Content\fonts\backandadmin.woff" />
     <Content Include="deployment\Registration page content" />
+    <Content Include="Content\styles.scss" />
+    <Content Include="Content\selection.json" />
     <None Include="Properties\PublishProfiles\Admin.pubxml" />
     <None Include="ws\about.html.old" />
     <Content Include="ws\about.html" />
@@ -1940,13 +1944,13 @@
     <VisualStudio>
       <FlavorProperties GUID="{349c5851-65df-11da-9384-00065b846f21}">
         <WebProjectProperties>
-          <UseIIS>False</UseIIS>
+          <UseIIS>True</UseIIS>
           <AutoAssignPort>True</AutoAssignPort>
           <DevelopmentServerPort>1333</DevelopmentServerPort>
           <DevelopmentServerVPath>/</DevelopmentServerVPath>
           <IISUrl>http://localhost:4009</IISUrl>
           <NTLMAuthentication>False</NTLMAuthentication>
-          <UseCustomServer>True</UseCustomServer>
+          <UseCustomServer>False</UseCustomServer>
           <CustomServerUrl>http://localhost:4009</CustomServerUrl>
           <SaveServerSettingsInUserFile>False</SaveServerSettingsInUserFile>
         </WebProjectProperties>

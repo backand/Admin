@@ -852,6 +852,7 @@ namespace Durados.Web.Mvc.Config
             //viewView.OrdinalColumnName = "DisplayName";
             viewView.Fields["ID"].HideInTable = true;
             viewView.Fields["ID"].DisplayName = "Id";
+            viewView.Fields["ID"].Preview = false;
             viewView.Fields["Controller"].DenyEditRoles = "User";
             viewView.Fields["Controller"].HideInTable = true;
             viewView.Fields["Controller"].DisplayName = "Controller";
@@ -1060,6 +1061,7 @@ namespace Durados.Web.Mvc.Config
             //viewView.Fields["Order"].HideInEdit = true;
             viewView.Fields["Order"].HideInCreate = true;
             viewView.Fields["Order"].DisplayName = "order";
+            viewView.Fields["Order"].Preview = false;
             //configView.Fields["DisplayColumn"].HideInTable = true;
             ColumnField displayColumnField = (ColumnField)viewView.Fields["DisplayColumn"];
             displayColumnField.DisplayName = "Column Display in Title";
@@ -1490,8 +1492,9 @@ namespace Durados.Web.Mvc.Config
                 viewView.Fields["ApplySkinToAllViews"].DisplayName = "Apply the skin to all the views";
                 viewView.Fields["ApplySkinToAllViews"].OrderForCreate = 200;
                 viewView.Fields["ApplySkinToAllViews"].OrderForEdit = 200;
+
                 //viewView.Fields["ApplyColorDesignToAllViews"].Seperator = true;
-                //viewView.Fields["ApplyColorDesignToAllViews"].IsAdminPreview = true;
+                viewView.Fields["ApplyColorDesignToAllViews"].Preview = false;
             }
             if (viewView.Fields.ContainsKey("CustomThemePath"))
             {
@@ -1528,6 +1531,7 @@ namespace Durados.Web.Mvc.Config
                 viewView.Fields["Skin"].DisplayName = "Admin Skin";
                 viewView.Fields["Skin"].DisplayFormat = DisplayFormat.Slider;
                 viewView.Fields["Skin"].IsAdminPreview = true;
+                viewView.Fields["Skin"].Preview = false;
             }
             if (viewView.Fields.ContainsKey("Theme"))
             {
@@ -1538,6 +1542,7 @@ namespace Durados.Web.Mvc.Config
                 viewView.Fields["Theme"].DisplayName = "User Preview Theme";
                 viewView.Fields["Theme"].DisplayFormat = DisplayFormat.Slider;
                 viewView.Fields["Theme"].IsAdminPreview = false;
+                viewView.Fields["Theme"].Preview = false;
             }
             if (viewView.Fields.ContainsKey("RowHeight"))
             {
@@ -1806,6 +1811,7 @@ namespace Durados.Web.Mvc.Config
 
             if (viewView.Fields.ContainsKey("NosqlPermanentFilter"))
             {
+                viewView.Fields["NosqlPermanentFilter"].Preview = false;
                 viewView.Fields["NosqlPermanentFilter"].Seperator = true;
                 viewView.Fields["NosqlPermanentFilter"].ColSpanInDialog = 2;
                 viewView.Fields["NosqlPermanentFilter"].GraphicProperties = "wtextareashort";
@@ -1815,6 +1821,7 @@ namespace Durados.Web.Mvc.Config
                 viewView.Fields["NosqlPermanentFilter"].DisplayName = "Nosql Permanent Filter";
                 (viewView.Fields["NosqlPermanentFilter"] as ColumnField).CssClass += " field-dic";
                 (viewView.Fields["NosqlPermanentFilter"] as ColumnField).DictionaryType = DictionaryType.PlaceHolders;
+
                 //(viewView.Fields["PermanentFilter"] as ColumnField).DictionaryViewFieldName = "Name";
                 
             }
