@@ -645,6 +645,7 @@ namespace BackAnd.Web.Api.Controllers
 
             AbstractSocialProvider social = SocialProviderFactory.GetSocialProvider(provider);
 
+            string authUrl = null;
             if (code != null)
             {
                 SocialProfile profile = social.Authenticate(appName, code, returnAddress);
@@ -654,11 +655,12 @@ namespace BackAnd.Web.Api.Controllers
             try
             {
                 // return Redirect("http://wwww.backand.aaaaaaaaa?message={'hello' : 'world'}");
-                return Redirect(social.GetAuthUrl(appName, returnAddress ?? GetCurrentAddress(), null, "signin", email, signupIfNotSignedIn));
+                authUrl = social.GetAuthUrl(appName, returnAddress ?? GetCurrentAddress(), null, "signin", email, signupIfNotSignedIn);
+                return Redirect(authUrl);
             }
             catch (Exception exception)
             {
-                Map.Logger.Log("user", "socialSignin", exception.Source, exception, 1, null);
+                Map.Logger.Log("user", "socialSignin", exception.Source, exception, 1, authUrl);
                 return BadRequest(exception.Message);
             }
 
