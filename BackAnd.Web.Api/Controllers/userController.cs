@@ -946,6 +946,11 @@ namespace BackAnd.Web.Api.Controllers
         [HttpGet]
         public async Task<IHttpActionResult> auth(string provider)
         {
+            return authInner(provider);
+        }
+
+        private IHttpActionResult authInner(string provider)
+        {
             string returnAddress = null;
             try
             {

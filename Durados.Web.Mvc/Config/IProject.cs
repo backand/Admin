@@ -3377,6 +3377,35 @@ namespace Durados.Web.Mvc.Config
                 EnableFacebook.HideInTable = true;
             }
 
+            if (databaseView.Fields.ContainsKey("AdfsClientId"))
+            {
+                ColumnField FacebookClientId = (ColumnField)databaseView.Fields["AdfsClientId"];
+                FacebookClientId.Order = 600;
+                FacebookClientId.Category = rolesCategory;
+                FacebookClientId.HideInTable = true;
+            }
+            if (databaseView.Fields.ContainsKey("AdfsResource"))
+            {
+                ColumnField FacebookClientSecret = (ColumnField)databaseView.Fields["AdfsResource"];
+                FacebookClientSecret.Order = 600;
+                FacebookClientSecret.Category = rolesCategory;
+                FacebookClientSecret.HideInTable = true;
+            }
+            if (databaseView.Fields.ContainsKey("AdfsHost"))
+            {
+                ColumnField FacebookClientSecret = (ColumnField)databaseView.Fields["AdfsHost"];
+                FacebookClientSecret.Order = 600;
+                FacebookClientSecret.Category = rolesCategory;
+                FacebookClientSecret.HideInTable = true;
+            }
+            if (databaseView.Fields.ContainsKey("EnableAdfs"))
+            {
+                ColumnField EnableFacebook = (ColumnField)databaseView.Fields["EnableAdfs"];
+                EnableFacebook.Order = 600;
+                EnableFacebook.Category = rolesCategory;
+                EnableFacebook.HideInTable = true;
+            }
+
             if (databaseView.Fields.ContainsKey("TwitterClientId"))
             {
                 ColumnField TwitterClientId = (ColumnField)databaseView.Fields["TwitterClientId"];

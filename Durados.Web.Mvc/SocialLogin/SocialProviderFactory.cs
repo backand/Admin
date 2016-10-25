@@ -21,7 +21,9 @@ namespace Durados.Web.Mvc.SocialLogin
                     return new FacebookSocialProvider();
                 case "twitter":
                     return new TwitterSocialProvider();
-
+                case "adfs":
+                    return new AdfsSocialProvider();
+                
                 default:
                     return null;
             }

@@ -441,11 +441,13 @@ namespace Durados.Web.Mvc
                 values = Durados.Web.Mvc.UI.Json.JsonSerializer.Deserialize(text);
             }
 
-            foreach (string key in values.Keys)
+            if (values != null)
             {
-                permanentFilter = permanentFilter.Replace(key.AsToken(), values[key].ToString(), false);
+                foreach (string key in values.Keys)
+                {
+                    permanentFilter = permanentFilter.Replace(key.AsToken(), values[key].ToString(), false);
+                }
             }
-
 
             return permanentFilter;
         }

@@ -237,12 +237,25 @@ namespace Durados.Web.Mvc
         [Durados.Config.Attributes.ColumnProperty()]
         public bool EnableTwitter { get; set; }
 
+        [Durados.Config.Attributes.ColumnProperty()]
+        public bool EnableAdfs { get; set; }
+
 
         [Durados.Config.Attributes.ColumnProperty()]
         public string FacebookClientId { get; set; }
 
         [Durados.Config.Attributes.ColumnProperty()]
         public string FacebookClientSecret { get; set; }
+
+        [Durados.Config.Attributes.ColumnProperty()]
+        public string AdfsClientId { get; set; }
+
+        [Durados.Config.Attributes.ColumnProperty()]
+        public string AdfsResource { get; set; }
+
+        [Durados.Config.Attributes.ColumnProperty()]
+        public string AdfsHost { get; set; }
+
         [Durados.Config.Attributes.ColumnProperty()]
         public bool EnableFacebook { get; set; }
 
@@ -269,6 +282,10 @@ namespace Durados.Web.Mvc
             if (EnableTwitter)
             {
                 providers.Add("twitter");
+            }
+            if (EnableAdfs)
+            {
+                providers.Add("adfs");
             }
 
             return providers;
