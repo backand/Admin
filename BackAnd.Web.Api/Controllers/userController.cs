@@ -668,6 +668,8 @@ namespace BackAnd.Web.Api.Controllers
 
         private string GetCurrentAddress()
         {
+            if (System.Web.HttpContext.Current.Request.UrlReferrer == null)
+                return string.Empty;
             return System.Web.HttpContext.Current.Request.UrlReferrer.AbsoluteUri;
         }
 
