@@ -599,5 +599,10 @@ namespace System
         {
             return text.Replace("'", "''");
         }
+
+        public static string FromBase64String(this string base64)
+        {
+            return System.Text.Encoding.UTF8.GetString(System.Convert.FromBase64String(base64.PadRight(base64.Length + (4 - base64.Length % 4) % 4, '=')));
+        }
     }
 }

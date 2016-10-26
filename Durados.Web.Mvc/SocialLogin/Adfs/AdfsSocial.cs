@@ -198,7 +198,7 @@ namespace Durados.Web.Mvc.SocialLogin
             }
             string base64 = array[1];
 
-            string jwt = System.Text.Encoding.UTF8.GetString(System.Convert.FromBase64String(base64.PadRight(base64.Length + (4 - base64.Length % 4) % 4, '=')));
+            string jwt = base64.FromBase64String();
 
             
             return jwt;
