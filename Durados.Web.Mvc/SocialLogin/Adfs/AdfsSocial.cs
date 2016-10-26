@@ -191,19 +191,14 @@ namespace Durados.Web.Mvc.SocialLogin
 
         protected override string FetchProfileFromService(string accessToken)
         {
-            if (System.Web.HttpContext.Current.Request.QueryString["appName"] == null)
-            {
-                throw new AdfsException("Could not find the app name");
-            }
-
             var array = accessToken.Split('.');
             if (array.Length != 3)
             {
                 throw new AdfsException("adfs access token does not contain the jwt part.");
             }
-            string base64 = array[1] + "==";
+            string base64 = array[1];
 
-            string jwt = System.Text.Encoding.UTF8.GetString(System.Convert.FromBase64String(base64));
+            string jwt = System.Text.Encoding.UTF8.GetString(System.Convert.FromBase64String(base64.PadRight(base64.Length + (4 - base64.Length % 4) % 4, '=')));
 
             
             return jwt;
