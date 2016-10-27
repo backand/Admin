@@ -518,6 +518,8 @@ namespace Durados.Web.Mvc
             limits.Add(Limits.Cron, Convert.ToInt32(System.Configuration.ConfigurationManager.AppSettings["cronLimit"]));
 
             LocalAddress = System.Configuration.ConfigurationManager.AppSettings["localAddress"] ?? "http://localhost:8080";
+
+            SocialRedirectHost = System.Configuration.ConfigurationManager.AppSettings["socialRedirectHost"];
         }
 
         private static Dictionary<string, string> GetCqls(string cqlsFileName)
@@ -2464,5 +2466,8 @@ namespace Durados.Web.Mvc
         }
 
         public static string LocalAddress { get; set; }
+        public static string SocialRedirectHost { get; set; }
+
+        
     }
 }

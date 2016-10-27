@@ -58,7 +58,8 @@ namespace Durados.Web.Mvc.UI.Helpers
 
         protected virtual string GetRedirectUrl()
         {
-            return System.Web.HttpContext.Current.Request.Url.Scheme + "://" + System.Web.HttpContext.Current.Request.Url.Authority + "/1/user/" + ProviderName + "/auth";
+            return (Maps.SocialRedirectHost ?? Maps.LocalAddress) + "/1/user/" + ProviderName + "/auth";
+            //return System.Web.HttpContext.Current.Request.Url.Scheme + "://" + System.Web.HttpContext.Current.Request.Url.Authority + "/1/user/" + ProviderName + "/auth";
         }
 
         protected SocialApplicationKeys GetSocialKeys(string appName)

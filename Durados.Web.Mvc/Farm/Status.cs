@@ -24,7 +24,22 @@ namespace Durados.Web.Mvc.Farm
 
         public void Set(string appName)
         {
-            database.StringSet(appName, subscriberID);
+            try
+            {
+                database.StringSet(appName, subscriberID);
+            }
+            catch (RedisServerException exception)
+            {
+                if (!Maps.Debug)
+                    throw exception;
+            }
+            catch (TimeoutException)
+            {
+                // Wait... then try again
+                System.Threading.Thread.Sleep(100);
+
+                database.StringSet(appName, subscriberID);
+            }
         }
 
         public bool Contains(string appName)

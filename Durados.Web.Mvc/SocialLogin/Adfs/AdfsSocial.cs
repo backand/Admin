@@ -40,7 +40,7 @@ namespace Durados.Web.Mvc.SocialLogin
         {
             AdfsApplicationKeys keys = (AdfsApplicationKeys)GetSocialKeys(appName);
             string clientId = keys.ClientId;
-            string host = keys.Host;
+            string oauth2EndPoint = keys.Host;
             string resource = keys.Resource;
             Dictionary<string, object> state = new Dictionary<string, object>()
             { 
@@ -58,7 +58,7 @@ namespace Durados.Web.Mvc.SocialLogin
             //var jss = new JavaScriptSerializer();
 
             string authorizationEndpoint =
-               host + "/adfs/oauth2/authorize" +
+               oauth2EndPoint + "/authorize" +
                     "?response_type=code" +
                     "&client_id=" + Uri.EscapeDataString(clientId) +
                     "&redirect_uri=" + Uri.EscapeDataString(redirectUri) + // + "?state=" + jss.Serialize(state)) +
@@ -163,8 +163,8 @@ namespace Durados.Web.Mvc.SocialLogin
 
             AdfsApplicationKeys keys = (AdfsApplicationKeys)GetSocialKeys(appName);
             string clientId = keys.ClientId;
-            string host = keys.Host;
-            string urlAccessToken = host + "/adfs/oauth2/token";
+            string oauth2EndPoint = keys.Host;
+            string urlAccessToken = oauth2EndPoint + "/token";
 
             string redirectUri = GetRedirectUrl(appName);
             
@@ -198,9 +198,10 @@ namespace Durados.Web.Mvc.SocialLogin
             }
             string base64 = array[1];
 
+            string jwt = null;
             try
             {
-                string jwt = base64.FromBase64String();
+                jwt = base64.FromBase64String();
             }
             catch (Exception exception)
             {

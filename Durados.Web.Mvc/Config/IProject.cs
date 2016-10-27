@@ -3379,24 +3379,25 @@ namespace Durados.Web.Mvc.Config
 
             if (databaseView.Fields.ContainsKey("AdfsClientId"))
             {
-                ColumnField FacebookClientId = (ColumnField)databaseView.Fields["AdfsClientId"];
-                FacebookClientId.Order = 600;
-                FacebookClientId.Category = rolesCategory;
-                FacebookClientId.HideInTable = true;
+                ColumnField AdfsClientId = (ColumnField)databaseView.Fields["AdfsClientId"];
+                AdfsClientId.Order = 600;
+                AdfsClientId.Category = rolesCategory;
+                AdfsClientId.HideInTable = true;
             }
             if (databaseView.Fields.ContainsKey("AdfsResource"))
             {
-                ColumnField FacebookClientSecret = (ColumnField)databaseView.Fields["AdfsResource"];
-                FacebookClientSecret.Order = 600;
-                FacebookClientSecret.Category = rolesCategory;
-                FacebookClientSecret.HideInTable = true;
+                ColumnField AdfsResource = (ColumnField)databaseView.Fields["AdfsResource"];
+                AdfsResource.Order = 600;
+                AdfsResource.Category = rolesCategory;
+                AdfsResource.HideInTable = true;
             }
             if (databaseView.Fields.ContainsKey("AdfsHost"))
             {
-                ColumnField FacebookClientSecret = (ColumnField)databaseView.Fields["AdfsHost"];
-                FacebookClientSecret.Order = 600;
-                FacebookClientSecret.Category = rolesCategory;
-                FacebookClientSecret.HideInTable = true;
+                ColumnField AdfsHost = (ColumnField)databaseView.Fields["AdfsHost"];
+                AdfsHost.Order = 600;
+                AdfsHost.Category = rolesCategory;
+                AdfsHost.HideInTable = true;
+                AdfsHost.DisplayName = "oauth2EndPoint";
             }
             if (databaseView.Fields.ContainsKey("EnableAdfs"))
             {
