@@ -1390,7 +1390,7 @@ namespace BackAnd.Web.Api.Controllers
             }
             else
             {
-                throw new SocialException("Email and appname must be valid");
+                throw new SocialException("Email, appname and returnAddress must be valid");
             }
         }
     }

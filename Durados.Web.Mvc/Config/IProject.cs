@@ -3400,10 +3400,10 @@ namespace Durados.Web.Mvc.Config
             }
             if (databaseView.Fields.ContainsKey("EnableAdfs"))
             {
-                ColumnField EnableFacebook = (ColumnField)databaseView.Fields["EnableAdfs"];
-                EnableFacebook.Order = 600;
-                EnableFacebook.Category = rolesCategory;
-                EnableFacebook.HideInTable = true;
+                ColumnField EnableAdfs = (ColumnField)databaseView.Fields["EnableAdfs"];
+                EnableAdfs.Order = 600;
+                EnableAdfs.Category = rolesCategory;
+                EnableAdfs.HideInTable = true;
             }
 
             if (databaseView.Fields.ContainsKey("TwitterClientId"))

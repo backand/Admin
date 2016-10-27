@@ -198,8 +198,14 @@ namespace Durados.Web.Mvc.SocialLogin
             }
             string base64 = array[1];
 
-            string jwt = base64.FromBase64String();
-
+            try
+            {
+                string jwt = base64.FromBase64String();
+            }
+            catch (Exception exception)
+            {
+                throw new AdfsException("Fail to convert from base64: " + base64, exception);
+            }
             
             return jwt;
         }

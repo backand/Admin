@@ -600,9 +600,16 @@ namespace System
             return text.Replace("'", "''");
         }
 
-        public static string FromBase64String(this string base64)
+        public static string FromBase64String(this string base64, string encodingName = null)
         {
-            return System.Text.Encoding.UTF8.GetString(System.Convert.FromBase64String(base64.PadRight(base64.Length + (4 - base64.Length % 4) % 4, '=')));
+            const int MOD = 4;
+            const char EQ = '=';
+
+            Encoding encoding = Encoding.UTF8;
+            if (encodingName != null)
+                encoding = System.Text.Encoding.GetEncoding(encodingName);
+
+            return encoding.GetString(System.Convert.FromBase64String(base64.PadRight(base64.Length + (MOD - base64.Length % MOD) % MOD, EQ)));
         }
     }
 }

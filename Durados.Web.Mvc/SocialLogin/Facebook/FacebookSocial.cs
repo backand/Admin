@@ -49,6 +49,10 @@ namespace Durados.Web.Mvc.SocialLogin
 
             // comma separated
             string scope = "email";
+            //if (!IsDefault())
+            //{
+
+            //}
 
             string authorizationEndpoint =
                 "https://www.facebook.com/dialog/oauth" +
