@@ -4509,6 +4509,12 @@ namespace Durados.Web.Mvc
         {
             string token = Guid.ToString() + ":" + GetCreatorGuid();
             return "Basic " + Backand.Convert.btoa(token);
+        }
+
+        public string GetCurrentUserBasicAuthorization()
+        {
+            string token = Guid.ToString() + ":" + Database.GetUserGuid();
+            return "Basic " + Backand.Convert.btoa(token);
         } 
 
         public bool AsyncOperationRuning { get; set; }

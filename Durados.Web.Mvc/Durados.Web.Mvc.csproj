@@ -367,6 +367,7 @@
     <Compile Include="UI\Gantt.cs" />
     <Compile Include="UI\Helpers\AppFactory.cs" />
     <Compile Include="Farm\FarmCaching.cs" />
+    <Compile Include="UI\Helpers\CrudUtil.cs" />
     <Compile Include="UI\Helpers\FtpHelper.cs" />
     <Compile Include="UI\Helpers\AmazonS3Helper.cs" />
     <Compile Include="UI\Helpers\AzureHelper.cs" />
