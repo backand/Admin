@@ -11,13 +11,16 @@ namespace Durados.Web.Mvc.SocialLogin
     {
         protected override SocialProfile GetNewProfile(Dictionary<string, object> dictionary)
         {
-            if (!dictionary.ContainsKey("upn"))
+            if (!(dictionary.ContainsKey("upn") || dictionary.ContainsKey("email")))
             {
-                throw new AdfsException("adfs/oauth2/authorize response must contain upn");
+                throw new AdfsException("adfs/oauth2/authorize response must contain upn or email");
             }
             if (!dictionary.ContainsKey("id"))
             {
-                dictionary.Add("id", dictionary["upn"]);
+                if (dictionary.ContainsKey("upn"))
+                    dictionary.Add("id", dictionary["upn"]);
+                else
+                    dictionary.Add("id", dictionary["email"]);
             }
             
             return new AdfsProfile(dictionary);
@@ -62,7 +65,7 @@ namespace Durados.Web.Mvc.SocialLogin
                     "?response_type=code" +
                     "&client_id=" + Uri.EscapeDataString(clientId) +
                     "&redirect_uri=" + Uri.EscapeDataString(redirectUri) + // + "?state=" + jss.Serialize(state)) +
-                    "&resource=" + Uri.EscapeDataString(resource) +
+                    (string.IsNullOrEmpty(resource) ? string.Empty : ("&resource=" + Uri.EscapeDataString(resource))) +
                     "&state=" + Uri.EscapeDataString(qsState);
 
             return authorizationEndpoint;
@@ -106,8 +109,11 @@ namespace Durados.Web.Mvc.SocialLogin
         public override SocialProfile Authenticate()
         {
             //get the code from Google and request from access token
-            string code = System.Web.HttpContext.Current.Request.QueryString["code"];
-            string error = System.Web.HttpContext.Current.Request.QueryString["error"];
+
+            var qs = System.Web.HttpContext.Current.Request.QueryString;
+
+            string code = qs["code"];
+            string error = qs["error"];
 
             if (code == null || error != null)
             {
@@ -116,30 +122,9 @@ namespace Durados.Web.Mvc.SocialLogin
             try
             {
 
-                if (System.Web.HttpContext.Current.Request.QueryString["appName"] == null)
-                {
-                    throw new AdfsException("Could not find the app name");
-                }
-                string appName = System.Web.HttpContext.Current.Request.QueryString["appName"].ToString();
-                if (System.Web.HttpContext.Current.Request.QueryString["returnAddress"] == null)
-                {
-                    throw new AdfsException("Could not find the return address");
-                }
-                string returnAddress = System.Web.HttpContext.Current.Request.QueryString["returnAddress"];
-                if (System.Web.HttpContext.Current.Request.QueryString["activity"] == null)
-                {
-                    throw new AdfsException("Could not find the activity");
-                }
-                string activity = System.Web.HttpContext.Current.Request.QueryString["activity"];
-                if (System.Web.HttpContext.Current.Request.QueryString["parameters"] == null)
-                {
-                    throw new AdfsException("Could not find the parameters");
-                }
-                string parameters = System.Web.HttpContext.Current.Request.QueryString["parameters"];
-                bool signupIfNotSignedIn = true;
-                string email = null;
+                RedirectState redirectState = GetRedirectState();
 
-                return FetchProfileByCode(code, appName, returnAddress, activity, parameters, null, email, signupIfNotSignedIn);
+                return FetchProfileByCode(code, redirectState.AppName, redirectState.ReturnAddress, redirectState.Activity, redirectState.Parameters, null, redirectState.Email, redirectState.SignupIfNotSignedIn);
 
 
                
@@ -151,6 +136,104 @@ namespace Durados.Web.Mvc.SocialLogin
 
 
 
+        }
+
+        private RedirectState GetRedirectState()
+        {
+            var qs = System.Web.HttpContext.Current.Request.QueryString;
+            if (qs["appName"] == null)
+            {
+                return GetRedirectStateFromState();
+            }
+            else
+            {
+                return GetRedirectStateDirect();
+            }
+        }
+        private RedirectState GetRedirectStateDirect()
+        {
+            RedirectState redirectState = new SocialLogin.RedirectState();
+            var qs = System.Web.HttpContext.Current.Request.QueryString;
+            if (qs["appName"] == null)
+            {
+                throw new AdfsException("Could not find the app name");
+            }
+            redirectState.AppName = qs["appName"].ToString();
+            if (qs["returnAddress"] == null)
+            {
+                throw new AdfsException("Could not find the return address");
+            }
+            redirectState.ReturnAddress = qs["returnAddress"];
+            if (qs["activity"] == null)
+            {
+                throw new AdfsException("Could not find the activity");
+            }
+            redirectState.Activity = qs["activity"];
+            if (qs["parameters"] == null)
+            {
+                throw new AdfsException("Could not find the parameters");
+            }
+            redirectState.Parameters = qs["parameters"];
+            redirectState.SignupIfNotSignedIn = true;
+            redirectState.Email = null;
+
+            return redirectState;
+        }
+        private RedirectState GetRedirectStateFromState()
+        {
+            var qs = System.Web.HttpContext.Current.Request.QueryString;
+            RedirectState redirectState = new SocialLogin.RedirectState();
+
+            if (qs["state"] == null)
+            {
+                throw new AdfsException("Could not find the state");
+            }
+
+            string[] state = qs["state"].Split('&');
+
+            foreach (string keyValue in state)
+            {
+                string[] keyValueArray = keyValue.Split('=');
+
+                if (keyValueArray.Length == 2)
+                {
+                    string key = keyValueArray[0];
+                    string value = keyValueArray[1];
+
+                    
+                    if (key == "appName")
+                    {
+                        redirectState.AppName = value;
+                    }
+
+                    if (key == "returnAddress")
+                    {
+                        redirectState.ReturnAddress = System.Web.HttpContext.Current.Server.UrlDecode(value);
+                    }
+
+                    if (key == "activity")
+                    {
+                        redirectState.Activity = value;
+                    }
+
+                    if (key == "parameters")
+                    {
+                        redirectState.Parameters = value;
+                    }
+                    
+                }
+            }
+
+            if (redirectState.AppName == null)
+            {
+                throw new AdfsException("Could not find the app name");
+            }
+            
+            
+            redirectState.SignupIfNotSignedIn = true;
+            redirectState.Email = null;
+
+            return redirectState;
         }
 
         private string GetRedirectUrl(string appName)
@@ -165,12 +248,33 @@ namespace Durados.Web.Mvc.SocialLogin
             string clientId = keys.ClientId;
             string oauth2EndPoint = keys.Host;
             string urlAccessToken = oauth2EndPoint + "/token";
-
+            
             string redirectUri = GetRedirectUrl(appName);
             
             string accessTokenData = string.Format("grant_type=authorization_code&code={0}&client_id={1}&redirect_uri={2}", code, clientId, redirectUri);
-            string response = Durados.Web.Mvc.Infrastructure.Http.PostWebRequest(urlAccessToken, accessTokenData);
 
+            if (string.IsNullOrEmpty(keys.Resource))
+            {
+                accessTokenData = string.Format("grant_type=authorization_code&code={0}&client_id={1}&redirect_uri={2}&resource=https://graph.windows.net/", code, clientId, redirectUri);
+            }
+
+
+            string response = null;
+
+            try
+            {
+                response = Durados.Web.Mvc.Infrastructure.Http.PostWebRequest(urlAccessToken, accessTokenData);
+            }
+            catch (System.Net.WebException exception)
+            {
+                try
+                {
+                    string errorDescription = new System.IO.StreamReader((exception).Response.GetResponseStream()).ReadToEnd();
+                    throw new AdfsException(errorDescription);
+                }
+                catch { }
+                throw exception;
+            }
             //get the access token from the return JSON
             //JavaScriptSerializer jsonSerializer = new JavaScriptSerializer();
             //AuthResponse validateResponse = (AuthResponse)jsonSerializer.Deserialize<AuthResponse>(response);

@@ -330,6 +330,7 @@
     <Compile Include="SocialLogin\Google\GoogleProfile.cs" />
     <Compile Include="SocialLogin\Google\GoogleSocial.cs" />
     <Compile Include="SocialLogin\Profile.cs" />
+    <Compile Include="SocialLogin\RedirectState.cs" />
     <Compile Include="SocialLogin\Social.cs" />
     <Compile Include="SocialLogin\SocialApplicationKeys.cs" />
     <Compile Include="SocialLogin\SocialException.cs" />
