@@ -22,8 +22,13 @@ namespace Durados.Web.Mvc.SocialLogin
                 else
                     dictionary.Add("id", dictionary["email"]);
             }
-            
-            return new AdfsProfile(dictionary);
+
+            return GetNewSocialProfile(dictionary);
+        }
+
+        protected virtual SocialProfile GetNewSocialProfile(Dictionary<string, object> dictionary)
+        {
+            return new AdfsProfile(dictionary); 
         }
 
         protected override string ProviderName
@@ -39,7 +44,7 @@ namespace Durados.Web.Mvc.SocialLogin
             }
         }
 
-        public override string GetAuthUrl(string appName, string returnAddress, string parameters, string activity, string email, bool signupIfNotSignedIn)
+        public override string GetAuthUrl(string appName, string returnAddress, string parameters, string activity, string email, bool signupIfNotSignedIn, bool useHashRouting)
         {
             AdfsApplicationKeys keys = (AdfsApplicationKeys)GetSocialKeys(appName);
             string clientId = keys.ClientId;
@@ -53,7 +58,8 @@ namespace Durados.Web.Mvc.SocialLogin
                 { "activity", activity },
                 { "parameters", parameters ?? string.Empty },
                 { "email", email ?? string.Empty },
-                {"signupIfNotSignedIn", true}
+                {"signupIfNotSignedIn", true},
+                {"useHashRouting", useHashRouting}
             };
             string redirectUri = GetRedirectUrl(appName);
 
@@ -124,7 +130,7 @@ namespace Durados.Web.Mvc.SocialLogin
 
                 RedirectState redirectState = GetRedirectState();
 
-                return FetchProfileByCode(code, redirectState.AppName, redirectState.ReturnAddress, redirectState.Activity, redirectState.Parameters, null, redirectState.Email, redirectState.SignupIfNotSignedIn);
+                return FetchProfileByCode(code, redirectState.AppName, redirectState.ReturnAddress, redirectState.Activity, redirectState.Parameters, null, redirectState.Email, redirectState.SignupIfNotSignedIn, redirectState.UseHashRouting);
 
 
                
@@ -174,6 +180,11 @@ namespace Durados.Web.Mvc.SocialLogin
                 throw new AdfsException("Could not find the parameters");
             }
             redirectState.Parameters = qs["parameters"];
+            redirectState.UseHashRouting = true;
+            if (qs["useHashRouting"].ToLower() == "false")
+            {
+                redirectState.UseHashRouting = false;
+            }
             redirectState.SignupIfNotSignedIn = true;
             redirectState.Email = null;
 
@@ -191,11 +202,13 @@ namespace Durados.Web.Mvc.SocialLogin
 
             string[] state = qs["state"].Split('&');
 
+            redirectState.UseHashRouting = true;
+
             foreach (string keyValue in state)
             {
                 string[] keyValueArray = keyValue.Split('=');
 
-                if (keyValueArray.Length == 2)
+                 if (keyValueArray.Length == 2)
                 {
                     string key = keyValueArray[0];
                     string value = keyValueArray[1];
@@ -209,6 +222,10 @@ namespace Durados.Web.Mvc.SocialLogin
                     if (key == "returnAddress")
                     {
                         redirectState.ReturnAddress = System.Web.HttpContext.Current.Server.UrlDecode(value);
+                    }
+                    if (key == "useHashRouting" && value.ToLower() == "false")
+                    {
+                        redirectState.UseHashRouting = false;
                     }
 
                     if (key == "activity")
@@ -241,7 +258,7 @@ namespace Durados.Web.Mvc.SocialLogin
             return GetRedirectUrl();// +"/" + appName;
         }
 
-        protected override SocialProfile FetchProfileByCode(string code, string appName, string returnUrl, string activity, string parameters, string redirectUrl, string email, bool signupIfNotSignedIn)
+        protected override SocialProfile FetchProfileByCode(string code, string appName, string returnUrl, string activity, string parameters, string redirectUrl, string email, bool signupIfNotSignedIn, bool useHashRouting)
         {
 
             AdfsApplicationKeys keys = (AdfsApplicationKeys)GetSocialKeys(appName);
@@ -250,14 +267,8 @@ namespace Durados.Web.Mvc.SocialLogin
             string urlAccessToken = oauth2EndPoint + "/token";
             
             string redirectUri = GetRedirectUrl(appName);
-            
-            string accessTokenData = string.Format("grant_type=authorization_code&code={0}&client_id={1}&redirect_uri={2}", code, clientId, redirectUri);
 
-            if (string.IsNullOrEmpty(keys.Resource))
-            {
-                accessTokenData = string.Format("grant_type=authorization_code&code={0}&client_id={1}&redirect_uri={2}&resource=https://graph.windows.net/", code, clientId, redirectUri);
-            }
-
+            string accessTokenData = GetAccessTokenData(code, clientId, redirectUri, keys.Resource);
 
             string response = null;
 
@@ -283,9 +294,15 @@ namespace Durados.Web.Mvc.SocialLogin
 
             string accessToken = validateResponse["access_token"].ToString();
 
-            var profile = GetProfile(appName, accessToken, returnUrl, activity, parameters, email, signupIfNotSignedIn);
+            var profile = GetProfile(appName, accessToken, returnUrl, activity, parameters, email, signupIfNotSignedIn, useHashRouting);
 
             return profile;
+        }
+
+        protected virtual string GetAccessTokenData(string code, string clientId, string redirectUri, string resource)
+        {
+            string accessTokenData = string.Format("grant_type=authorization_code&code={0}&client_id={1}&redirect_uri={2}", code, clientId, redirectUri);
+            return accessTokenData;
         }
 
         protected override SocialApplicationKeys GetSocialKeysFromDatabase(Map map)

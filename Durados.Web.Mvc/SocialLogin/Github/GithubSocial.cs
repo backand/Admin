@@ -21,7 +21,7 @@ namespace Durados.Web.Mvc.SocialLogin
             get { return "github"; }
         }
 
-        public override string GetAuthUrl(string appName, string returnAddress, string parameters, string activity, string email, bool signupIfNotSignedIn)
+        public override string GetAuthUrl(string appName, string returnAddress, string parameters, string activity, string email, bool signupIfNotSignedIn, bool useHashRouting)
         {
             var socialKeys = GetSocialKeys(appName);
             string clientId = socialKeys.ClientId;
@@ -95,7 +95,15 @@ namespace Durados.Web.Mvc.SocialLogin
                     }
                     catch { }
                 }
-
+                bool useHashRouting = false;
+                if (stateObject.ContainsKey("useHashRouting"))
+                {
+                    try
+                    {
+                        useHashRouting = System.Convert.ToBoolean(stateObject["useHashRouting"]);
+                    }
+                    catch { }
+                }
                 string email = null;
 
                 if (stateObject.ContainsKey("email") && stateObject["email"] != null && !string.IsNullOrEmpty(stateObject["email"].ToString()))
@@ -103,7 +111,7 @@ namespace Durados.Web.Mvc.SocialLogin
                     email = stateObject["email"].ToString();
                 }
 
-                return FetchProfileByCode(code, appName, returnAddress, activity, parameters, null, email, signupIfNotSignedIn);
+                return FetchProfileByCode(code, appName, returnAddress, activity, parameters, null, email, signupIfNotSignedIn, useHashRouting);
 
             }
             catch (Exception exception)
@@ -113,7 +121,7 @@ namespace Durados.Web.Mvc.SocialLogin
 
         }
 
-        protected override SocialProfile FetchProfileByCode(string code, string appName, string returnAddress, string activity, string parameters, string redirectUrl, string email, bool signupIfNotSignedIn)
+        protected override SocialProfile FetchProfileByCode(string code, string appName, string returnAddress, string activity, string parameters, string redirectUrl, string email, bool signupIfNotSignedIn, bool useHashRouting)
         {
 
             string urlAccessToken = "https://github.com/login/oauth/access_token";
@@ -131,7 +139,7 @@ namespace Durados.Web.Mvc.SocialLogin
             Dictionary<string, object> accessObject = Durados.Web.Mvc.UI.Json.JsonSerializer.Deserialize(response);
             string accessToken = accessObject["access_token"].ToString();
 
-            return GetProfile(appName, accessToken, returnAddress, activity, parameters, email, signupIfNotSignedIn);
+            return GetProfile(appName, accessToken, returnAddress, activity, parameters, email, signupIfNotSignedIn, useHashRouting);
         }
 
         protected override SocialApplicationKeys GetSocialKeysFromDatabase(Map map)

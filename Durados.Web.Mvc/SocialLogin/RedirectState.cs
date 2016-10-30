@@ -13,6 +13,7 @@ namespace Durados.Web.Mvc.SocialLogin
         public string Activity { get; set; }
         public string Parameters { get; set; }
         public bool SignupIfNotSignedIn { get; set; }
+        public bool UseHashRouting { get; set; }
         public string Email { get; set; }
 
     }

@@ -319,6 +319,8 @@
     <Compile Include="SocialLogin\Adfs\AdfsException.cs" />
     <Compile Include="SocialLogin\Adfs\AdfsProfile.cs" />
     <Compile Include="SocialLogin\Adfs\AdfsSocial.cs" />
+    <Compile Include="SocialLogin\AzureAd\AzureAdProfile.cs" />
+    <Compile Include="SocialLogin\AzureAd\AzureAdSocial.cs" />
     <Compile Include="SocialLogin\ExternalLoginData.cs" />
     <Compile Include="SocialLogin\Facebook\FacebookException.cs" />
     <Compile Include="SocialLogin\Facebook\FacebookProfile.cs" />

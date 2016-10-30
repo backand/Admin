@@ -640,7 +640,7 @@ namespace BackAnd.Web.Api.Controllers
         [AllowAnonymous]
         [Route("socialSignin")]
         [HttpGet]
-        public async Task<IHttpActionResult> socialSignin(string provider, string appName, string returnAddress = null, string code = null, string email = null, bool signupIfNotSignedIn = false)
+        public async Task<IHttpActionResult> socialSignin(string provider, string appName, string returnAddress = null, string code = null, string email = null, bool signupIfNotSignedIn = false, bool useHashRouting = true)
         {
 
             AbstractSocialProvider social = SocialProviderFactory.GetSocialProvider(provider);
@@ -655,7 +655,7 @@ namespace BackAnd.Web.Api.Controllers
             try
             {
                 // return Redirect("http://wwww.backand.aaaaaaaaa?message={'hello' : 'world'}");
-                authUrl = social.GetAuthUrl(appName, returnAddress ?? GetCurrentAddress(), null, "signin", email, signupIfNotSignedIn);
+                authUrl = social.GetAuthUrl(appName, returnAddress ?? GetCurrentAddress(), null, "signin", email, signupIfNotSignedIn, useHashRouting);
                 return Redirect(authUrl);
             }
             catch (Exception exception)
@@ -676,12 +676,12 @@ namespace BackAnd.Web.Api.Controllers
         [AllowAnonymous]
         [Route("socialSignup")]
         [HttpGet]
-        public async Task<IHttpActionResult> socialSignup(string provider, string appName, string returnAddress = null, string parameters = null, string email = null)
+        public async Task<IHttpActionResult> socialSignup(string provider, string appName, string returnAddress = null, string parameters = null, string email = null, bool useHashRouting = true)
         {
             try
             {
                 AbstractSocialProvider social = SocialProviderFactory.GetSocialProvider(provider);
-                return Redirect(social.GetAuthUrl(appName, returnAddress ?? GetCurrentAddress(), parameters, "signup", email, false));
+                return Redirect(social.GetAuthUrl(appName, returnAddress ?? GetCurrentAddress(), parameters, "signup", email, false, useHashRouting));
             }
             catch (Exception exception)
             {
@@ -1001,7 +1001,7 @@ namespace BackAnd.Web.Api.Controllers
 
                 // return token
 
-                string url = GetSuccessUrl(returnAddress, AccessToken, profile.appName, profile.email);
+                string url = GetSuccessUrl(returnAddress, AccessToken, profile.appName, profile.email, profile.useHashRouting);
                 return Redirect(url);
 
             }
@@ -1176,13 +1176,13 @@ namespace BackAnd.Web.Api.Controllers
             }
         }
 
-        private string GetSuccessUrl(string url, string accessToken, string appName, string email)
+        private string GetSuccessUrl(string url, string accessToken, string appName, string email, bool useHashRouting)
         {
             string role, userId;
             int expiration;
             GetNeededParamsForToken(appName, email, out role, out userId, out expiration);
 
-            if (!url.Contains("#/"))
+            if (!url.Contains("#/") && useHashRouting)
                 url += "#/";
             if (url.Contains('?')) // already have query string
             {

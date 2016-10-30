@@ -26,7 +26,7 @@ namespace Durados.Web.Mvc.SocialLogin
             }
         }
 
-        public override string GetAuthUrl(string appName, string returnAddress, string parameters, string activity, string email, bool signupIfNotSignedIn)
+        public override string GetAuthUrl(string appName, string returnAddress, string parameters, string activity, string email, bool signupIfNotSignedIn, bool useHashRouting)
         {
             var socialKeys = GetSocialKeys(appName);
             string clientId = socialKeys.ClientId;
@@ -89,6 +89,16 @@ namespace Durados.Web.Mvc.SocialLogin
                     }
                     catch { }
                 }
+                bool useHashRouting = true;
+                if (stateObject.ContainsKey("useHashRouting"))
+                {
+                    try
+                    {
+                        useHashRouting = System.Convert.ToBoolean(stateObject["useHashRouting"]);
+                    }
+                    catch { }
+                }
+
                 string parameters = stateObject["parameters"].ToString();
 
                 string email = null;
@@ -98,7 +108,7 @@ namespace Durados.Web.Mvc.SocialLogin
                     email = stateObject["email"].ToString();
                 }
 
-                return FetchProfileByCode(code, appName, returnAddress, activity, parameters, null, email, signupIfNotSignedIn);
+                return FetchProfileByCode(code, appName, returnAddress, activity, parameters, null, email, signupIfNotSignedIn, useHashRouting);
 
             }
             catch (Exception exception)
@@ -108,7 +118,7 @@ namespace Durados.Web.Mvc.SocialLogin
 
         }
 
-        protected override SocialProfile FetchProfileByCode(string code, string appName, string returnUrl, string activity, string parameters, string redirectUrl, string email, bool signupIfNotSignedIn)
+        protected override SocialProfile FetchProfileByCode(string code, string appName, string returnUrl, string activity, string parameters, string redirectUrl, string email, bool signupIfNotSignedIn, bool useHashRouting)
         {
             //build the URL to send to Google
             string urlAccessToken = "https://accounts.google.com/o/oauth2/token";
@@ -130,7 +140,7 @@ namespace Durados.Web.Mvc.SocialLogin
 
             string accessToken = validateResponse["access_token"].ToString();
 
-            var googleProfile = GetProfile(appName, accessToken, returnUrl, activity, parameters, email, signupIfNotSignedIn);
+            var googleProfile = GetProfile(appName, accessToken, returnUrl, activity, parameters, email, signupIfNotSignedIn, useHashRouting);
 
             return googleProfile;
         }

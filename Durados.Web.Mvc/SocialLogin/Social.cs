@@ -6,7 +6,7 @@ namespace Durados.Web.Mvc.UI.Helpers
 {
     public abstract class AbstractSocialProvider
     {
-        public abstract string GetAuthUrl(string appName, string returnAddress, string parameters, string activity, string email, bool signupIfNotSignedIn);
+        public abstract string GetAuthUrl(string appName, string returnAddress, string parameters, string activity, string email, bool signupIfNotSignedIn, bool useHashRouting);
 
         public abstract SocialProfile Authenticate();
 
@@ -17,7 +17,7 @@ namespace Durados.Web.Mvc.UI.Helpers
             get;
         }
 
-        protected abstract SocialProfile FetchProfileByCode(string code, string appName, string returnUrl, string activity, string parameters, string redirectUrl, string email, bool signupIfNotSignedIn);
+        protected abstract SocialProfile FetchProfileByCode(string code, string appName, string returnUrl, string activity, string parameters, string redirectUrl, string email, bool signupIfNotSignedIn, bool useHashRouting);
 
         protected abstract string ConfigPrefix { get; }
 
@@ -25,30 +25,30 @@ namespace Durados.Web.Mvc.UI.Helpers
 
         public SocialProfile Authenticate(string appName, string code, string returnUri)
         {
-            return FetchProfileByCode(code, appName, "dummy", returnUri, string.Empty, null, null, false);
+            return FetchProfileByCode(code, appName, "dummy", returnUri, string.Empty, null, null, false, true);
         }
 
         public SocialProfile Authenticate(SopcialLoginUserData data)
         {
-            return FetchProfileByCode(data.code, data.appName, "dummy", string.Empty, string.Empty, data.redirectUri, null, false);
+            return FetchProfileByCode(data.code, data.appName, "dummy", string.Empty, string.Empty, data.redirectUri, null, false, true);
         }
 
         public SocialProfile GetProfile(string appName, string accessToken)
         {
-            return GetProfileUnsafe(appName, accessToken, "dummy", "signin", string.Empty, null, false);
+            return GetProfileUnsafe(appName, accessToken, "dummy", "signin", string.Empty, null, false, true);
         }
 
 
         public SocialProfile GetProfile(string appName, string accessToken, string email)
         {
-            return GetProfileUnsafe(appName, accessToken, "dummy", "signin", string.Empty, email, false);
+            return GetProfileUnsafe(appName, accessToken, "dummy", "signin", string.Empty, email, false, true);
         }
 
-        protected SocialProfile GetProfile(string appName, string accessToken, string returnAddress, string activity, string parameters, string email, bool signupIfNotSignedIn)
+        protected SocialProfile GetProfile(string appName, string accessToken, string returnAddress, string activity, string parameters, string email, bool signupIfNotSignedIn, bool useHashRouting)
         {
             try
             {
-                return GetProfileUnsafe(appName, accessToken, returnAddress, activity, parameters, email, signupIfNotSignedIn);
+                return GetProfileUnsafe(appName, accessToken, returnAddress, activity, parameters, email, signupIfNotSignedIn, useHashRouting);
             }
             catch (Exception ex)
             {
@@ -97,7 +97,7 @@ namespace Durados.Web.Mvc.UI.Helpers
             return defaultKeys;
         }
 
-        protected SocialProfile GetProfileUnsafe(string appName, string accessToken, string returnAddress, string activity, string parameters, string email, bool signupIfNotSignedIn)
+        protected SocialProfile GetProfileUnsafe(string appName, string accessToken, string returnAddress, string activity, string parameters, string email, bool signupIfNotSignedIn, bool useHashRouting)
         {
             //get the Google user profile using the access token
 
@@ -113,6 +113,7 @@ namespace Durados.Web.Mvc.UI.Helpers
             profile.Add("returnAddress", returnAddress);
             profile.Add("activity", activity);
             profile.Add("signupIfNotSignedIn", signupIfNotSignedIn);
+            profile.Add("useHashRouting", useHashRouting);
             profile.Add("parameters", parameters);
 
             if (!string.IsNullOrEmpty(email))

@@ -29,11 +29,16 @@ namespace Durados.Web.Mvc.SocialLogin
             {
                 this.signupIfNotSignedIn = System.Convert.ToBoolean(dictionary["signupIfNotSignedIn"]);
             }
+            this.useHashRouting = true;
+            if (dictionary.ContainsKey("useHashRouting"))
+            {
+                this.useHashRouting = System.Convert.ToBoolean(dictionary["useHashRouting"]);
+            }
             this.parameters = dictionary["parameters"].ToString();
         }
 
         public SocialProfile(string firstName, string lastName, string email, string id,
-            string appName, string returnAddress, string activity, string parameters, bool signupIfNotSignedIn)
+            string appName, string returnAddress, string activity, string parameters, bool signupIfNotSignedIn, bool useHashRouting)
         {
             this.firstName = firstName;
             this.lastName = lastName;
@@ -43,6 +48,7 @@ namespace Durados.Web.Mvc.SocialLogin
             this.returnAddress = returnAddress;
             this.activity = activity;
             this.signupIfNotSignedIn = signupIfNotSignedIn;
+            this.useHashRouting = useHashRouting;
             this.parameters = parameters;
         }
 
@@ -80,6 +86,8 @@ namespace Durados.Web.Mvc.SocialLogin
         public string activity;
         
         public bool signupIfNotSignedIn;
+        
+        public bool useHashRouting;
 
         public string parameters;
 

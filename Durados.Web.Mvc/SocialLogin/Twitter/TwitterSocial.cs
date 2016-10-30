@@ -32,7 +32,7 @@ namespace Durados.Web.Mvc.SocialLogin
         }
 
 
-        public override string GetAuthUrl(string appName, string returnAddress, string parameters, string activity, string email, bool signupIfNotSignedIn)
+        public override string GetAuthUrl(string appName, string returnAddress, string parameters, string activity, string email, bool signupIfNotSignedIn, bool useHashRouting)
         {
             var socialKeys = GetSocialKeys(appName);
             string clientId = socialKeys.ClientId;
@@ -249,7 +249,7 @@ namespace Durados.Web.Mvc.SocialLogin
                 }
 
 
-                return new TwitterProfile(dataFromCookie.Email, twitterId, dataFromCookie.ReturnAddress, dataFromCookie.Activity, dataFromCookie.AppName, null, dataFromCookie.signupIfNotSignedIn);
+                return new TwitterProfile(dataFromCookie.Email, twitterId, dataFromCookie.ReturnAddress, dataFromCookie.Activity, dataFromCookie.AppName, null, dataFromCookie.signupIfNotSignedIn, true);
                 //return FetchProfileByCode(code, appName, returnAddress, activity, parameters, null);
 
             }
@@ -261,7 +261,7 @@ namespace Durados.Web.Mvc.SocialLogin
         }
 
         protected override SocialProfile FetchProfileByCode(string code, string appName, string returnUrl, string activity,
-            string parameters, string redirectUrl, string email, bool signupIfNotSignedIn)
+            string parameters, string redirectUrl, string email, bool signupIfNotSignedIn, bool useHashRouting)
         {
             //build the URL to send to Google
             string urlAccessToken = "http://twitter.com/oauth/authenticate?oauth_token=";
@@ -283,7 +283,7 @@ namespace Durados.Web.Mvc.SocialLogin
 
             string accessToken = validateResponse["access_token"].ToString();
 
-            var googleProfile = GetProfile(appName, accessToken, redirectUri, activity, parameters, email, signupIfNotSignedIn);
+            var googleProfile = GetProfile(appName, accessToken, redirectUri, activity, parameters, email, signupIfNotSignedIn, useHashRouting);
 
             return googleProfile;
         }

@@ -173,6 +173,7 @@ namespace Durados.Web.Mvc
             EnableFacebook = true;
             EnableTwitter = true;
             EnableAdfs = true;
+            EnableAzureAd = true;
             EnableSecretKeyAccess = true;
             TokenExpiration = 86400;
             UseRefreshToken = false;
@@ -240,6 +241,7 @@ namespace Durados.Web.Mvc
 
         [Durados.Config.Attributes.ColumnProperty()]
         public bool EnableAdfs { get; set; }
+        public bool EnableAzureAd { get; set; }
 
 
         [Durados.Config.Attributes.ColumnProperty()]
@@ -256,6 +258,16 @@ namespace Durados.Web.Mvc
 
         [Durados.Config.Attributes.ColumnProperty()]
         public string AdfsHost { get; set; }
+
+        [Durados.Config.Attributes.ColumnProperty()]
+        public string AzureAdClientId { get; set; }
+
+        [Durados.Config.Attributes.ColumnProperty()]
+        public string AzureAdResource { get; set; }
+
+        [Durados.Config.Attributes.ColumnProperty()]
+        public string AzureAdHost { get; set; }
+
 
         [Durados.Config.Attributes.ColumnProperty()]
         public bool EnableFacebook { get; set; }
@@ -287,6 +299,10 @@ namespace Durados.Web.Mvc
             if (EnableAdfs)
             {
                 providers.Add("adfs");
+            }
+            if (EnableAzureAd)
+            {
+                providers.Add("azuread");
             }
 
             return providers;

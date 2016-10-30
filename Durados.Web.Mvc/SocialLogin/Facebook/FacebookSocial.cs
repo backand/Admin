@@ -27,7 +27,7 @@ namespace Durados.Web.Mvc.SocialLogin
             }
         }
 
-        public override string GetAuthUrl(string appName, string returnAddress, string parameters, string activity, string email, bool signupIfNotSignedIn)
+        public override string GetAuthUrl(string appName, string returnAddress, string parameters, string activity, string email, bool signupIfNotSignedIn, bool useHashRouting)
         {
             var keys = GetSocialKeys(appName);
             string clientId = keys.ClientId;
@@ -143,6 +143,16 @@ namespace Durados.Web.Mvc.SocialLogin
                     }
                     catch { }
                 }
+
+                bool useHashRouting = true;
+                if (stateObject.ContainsKey("useHashRouting"))
+                {
+                    try
+                    {
+                        useHashRouting = System.Convert.ToBoolean(stateObject["useHashRouting"]);
+                    }
+                    catch { }
+                }
                 
                 
                 if (!stateObject.ContainsKey("parameters"))
@@ -159,7 +169,7 @@ namespace Durados.Web.Mvc.SocialLogin
                     email = stateObject["email"].ToString();
                 }
 
-                return FetchProfileByCode(code, appName, returnAddress, activity, parameters, null, email, signupIfNotSignedIn);
+                return FetchProfileByCode(code, appName, returnAddress, activity, parameters, null, email, signupIfNotSignedIn, useHashRouting);
 
 
                 //HttpResponseMessage graphResponse = await _httpClient.GetAsync(graphAddress, HttpCompletionOption.ResponseContentRead);
@@ -182,7 +192,7 @@ namespace Durados.Web.Mvc.SocialLogin
 
         }
 
-        protected override SocialProfile FetchProfileByCode(string code, string appName, string returnAddress, string activity, string parameters, string redirectUrl, string email, bool signupIfNotSignedIn)
+        protected override SocialProfile FetchProfileByCode(string code, string appName, string returnAddress, string activity, string parameters, string redirectUrl, string email, bool signupIfNotSignedIn, bool useHashRouting)
         {
             var socialKeys = GetSocialKeys(appName);
             string clientId = socialKeys.ClientId;
@@ -204,7 +214,7 @@ namespace Durados.Web.Mvc.SocialLogin
             string accessToken = validateResponse["access_token"].ToString();
             string expires = validateResponse["expires"].ToString();
 
-            SocialProfile profile = GetProfile(appName, accessToken, returnAddress, activity, parameters, email, signupIfNotSignedIn);
+            SocialProfile profile = GetProfile(appName, accessToken, returnAddress, activity, parameters, email, signupIfNotSignedIn, useHashRouting);
 
             // don't email more socialLogin V2
             //if (string.IsNullOrEmpty(profile.email))

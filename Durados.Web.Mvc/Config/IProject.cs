@@ -3397,7 +3397,7 @@ namespace Durados.Web.Mvc.Config
                 AdfsHost.Order = 600;
                 AdfsHost.Category = rolesCategory;
                 AdfsHost.HideInTable = true;
-                AdfsHost.DisplayName = "oauth2EndPoint";
+                AdfsHost.DisplayName = "adfsOauth2EndPoint";
             }
             if (databaseView.Fields.ContainsKey("EnableAdfs"))
             {
@@ -3405,6 +3405,36 @@ namespace Durados.Web.Mvc.Config
                 EnableAdfs.Order = 600;
                 EnableAdfs.Category = rolesCategory;
                 EnableAdfs.HideInTable = true;
+            }
+
+            if (databaseView.Fields.ContainsKey("AzureAdClientId"))
+            {
+                ColumnField AzureAdClientId = (ColumnField)databaseView.Fields["AzureAdClientId"];
+                AzureAdClientId.Order = 600;
+                AzureAdClientId.Category = rolesCategory;
+                AzureAdClientId.HideInTable = true;
+            }
+            if (databaseView.Fields.ContainsKey("AzureAdResource"))
+            {
+                ColumnField AzureAdResource = (ColumnField)databaseView.Fields["AzureAdResource"];
+                AzureAdResource.Order = 600;
+                AzureAdResource.Category = rolesCategory;
+                AzureAdResource.HideInTable = true;
+            }
+            if (databaseView.Fields.ContainsKey("AzureAdHost"))
+            {
+                ColumnField AzureAdHost = (ColumnField)databaseView.Fields["AzureAdHost"];
+                AzureAdHost.Order = 600;
+                AzureAdHost.Category = rolesCategory;
+                AzureAdHost.HideInTable = true;
+                AzureAdHost.DisplayName = "azureAdOauth2EndPoint";
+            }
+            if (databaseView.Fields.ContainsKey("EnableAzureAd"))
+            {
+                ColumnField EnableAzureAd = (ColumnField)databaseView.Fields["EnableAzureAd"];
+                EnableAzureAd.Order = 600;
+                EnableAzureAd.Category = rolesCategory;
+                EnableAzureAd.HideInTable = true;
             }
 
             if (databaseView.Fields.ContainsKey("TwitterClientId"))
