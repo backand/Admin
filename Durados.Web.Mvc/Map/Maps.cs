@@ -1390,8 +1390,9 @@ namespace Durados.Web.Mvc
                         map = CreateMap(appName, out newStructure);
                     }
                 }
-                catch (Exception)
+                catch (Exception exception)
                 {
+                    Maps.Instance.duradosMap.Logger.Log("Map", "GetMap", "RemoveConfig", exception, 1, "App name:" + Maps.GetCurrentAppName()  );
                     throw new AppNotReadyException(appName);
                 }
 
@@ -1672,7 +1673,12 @@ namespace Durados.Web.Mvc
                 map.SiteInfo.Product = string.Empty;
             else
                 map.SiteInfo.Product = appRow.Title;
-            map.SiteInfo.Logo = appRow.Image;
+
+            try
+            {
+                map.SiteInfo.Logo = appRow.Image;
+            }
+            catch { }
 
 
             map.UsingSsh = !appRow.durados_SqlConnectionRowByFK_durados_App_durados_SqlConnection.IsSshUsesNull() && appRow.durados_SqlConnectionRowByFK_durados_App_durados_SqlConnection.SshUses;
