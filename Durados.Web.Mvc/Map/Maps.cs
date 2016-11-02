@@ -1392,7 +1392,8 @@ namespace Durados.Web.Mvc
                 }
                 catch (Exception exception)
                 {
-                    Maps.Instance.duradosMap.Logger.Log("Map", "GetMap", "RemoveConfig", exception, 1, "App name:" + Maps.GetCurrentAppName()  );
+                    
+                    Maps.Instance.duradosMap.Logger.Log("Map", "GetMap", "", exception, 1, (exception.InnerException == null?"App name:" + Maps.GetCurrentAppName(): exception.InnerException.Message);
                     throw new AppNotReadyException(appName);
                 }
 
