@@ -283,7 +283,7 @@ namespace Durados.Web.Mvc.SocialLogin
 
             string accessToken = validateResponse["access_token"].ToString();
 
-            var googleProfile = GetProfile(appName, accessToken, redirectUri, activity, parameters, email, signupIfNotSignedIn, useHashRouting);
+            var googleProfile = GetProfile(appName, accessToken, null, redirectUri, activity, parameters, email, signupIfNotSignedIn, useHashRouting);
 
             return googleProfile;
         }

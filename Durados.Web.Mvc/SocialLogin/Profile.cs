@@ -22,8 +22,10 @@ namespace Durados.Web.Mvc.SocialLogin
             this.email = dictionary.ContainsKey("email") ? dictionary["email"].ToString() : emailInner;
             this.id = dictionary["id"].ToString();
             this.appName = dictionary["appName"].ToString();
-            this.returnAddress = dictionary["returnAddress"].ToString();
-            this.activity = dictionary["activity"].ToString();
+            if (dictionary["returnAddress"] != null)
+                this.returnAddress = dictionary["returnAddress"].ToString();
+            if (dictionary["activity"] != null)
+                this.activity = dictionary["activity"].ToString();
             this.signupIfNotSignedIn = false;
             if (dictionary.ContainsKey("signupIfNotSignedIn"))
             {
@@ -34,7 +36,8 @@ namespace Durados.Web.Mvc.SocialLogin
             {
                 this.useHashRouting = System.Convert.ToBoolean(dictionary["useHashRouting"]);
             }
-            this.parameters = dictionary["parameters"].ToString();
+            if (dictionary["parameters"] != null)
+                this.parameters = dictionary["parameters"].ToString();
         }
 
         public SocialProfile(string firstName, string lastName, string email, string id,

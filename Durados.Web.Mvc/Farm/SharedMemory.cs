@@ -84,5 +84,26 @@ namespace Durados.Web.Mvc.Farm
         {
             return database.KeyExists(GetKey(appName, key));
         }
+
+
+        public void Delete(string key)
+        {
+            database.KeyDelete(key);
+        }
+
+        public void Set(string key, string value, int milliseconds)
+        {
+            database.StringSet(key, value, new TimeSpan(0, 0, 0, 0, milliseconds));
+        }
+
+        public string Get(string key)
+        {
+            return database.StringGet(key);
+        }
+
+        public bool Contains(string key)
+        {
+            return database.KeyExists(key);
+        }
     }
 }

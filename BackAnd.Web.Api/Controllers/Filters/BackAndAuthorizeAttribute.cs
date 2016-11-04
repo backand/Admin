@@ -111,7 +111,7 @@ namespace BackAnd.Web.Api.Controllers.Filters
                     //{
                     //    throw new Durados.DuradosException("App is not ready yet");
                     //}
-                    if (!accountMembershipService.ValidateUser(username) || !accountMembershipService.IsApproved(username))
+                    if (!accountMembershipService.ValidateUser(username) || !accountMembershipService.IsApproved(username) || Revoked(appname, actionContext.Request.Headers.Authorization.Parameter))
                     {
                         HandleUnauthorized(actionContext, appname, username);
                         return;
@@ -189,6 +189,15 @@ namespace BackAnd.Web.Api.Controllers.Filters
                 HandleUnauthorized(actionContext, null, null);
                 return;
             }
+        }
+
+        private bool Revoked(string appname, string token)
+        {
+            if (Maps.Instance.GetMap(appname).Database.EnableTokenRevokation)
+            {
+                return Durados.Web.Mvc.Farm.SharedMemorySingeltone.Instance.Contains(token);
+            }
+            return false;
         }
 
         private bool IsAdminLocked(string appName, string appNameFromToken, string username)

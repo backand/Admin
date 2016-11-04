@@ -637,6 +637,29 @@ namespace BackAnd.Web.Api.Controllers
 
         }
 
+        [Route("signout")]
+        [HttpGet]
+        public IHttpActionResult signout()
+        {
+            try
+            {
+                if (!map.Database.EnableTokenRevokation)
+                {
+                    return ResponseMessage(Request.CreateResponse(HttpStatusCode.BadRequest, "To signout please set EnableTokenRevokation to true"));
+
+                }
+                string token = Request.Headers.Authorization.Parameter;
+                int day = 1000 * 60 * 60 * 24;
+                Durados.Web.Mvc.Farm.SharedMemorySingeltone.Instance.Set(token, "true", day);
+                return Ok();
+            }
+            catch (Exception exception)
+            {
+                throw new BackAndApiUnexpectedResponseException(exception, this);
+
+            }
+        }
+
         [AllowAnonymous]
         [Route("socialSignin")]
         [HttpGet]
@@ -998,6 +1021,13 @@ namespace BackAnd.Web.Api.Controllers
 
                 // create token
                 string AccessToken = SecurityHelper.GetTmpUserGuidFromGuid(AccountService.GetUserGuid(profile.email));//CreateToken(identity);
+
+                if (Maps.Instance.GetMap(profile.appName).Database.UseRefreshToken && (provider == SocialProviders.AzureAd.ToString().ToLower() || provider == SocialProviders.Adfs.ToString().ToLower()))
+                {
+                    int tenMinutes = 1000 * 60 * 10;
+                    Durados.Web.Mvc.Farm.SharedMemorySingeltone.Instance.Set(AccessToken, profile.additionalValues["refreshToken"].ToString(), tenMinutes);
+
+                }
 
                 // return token
 

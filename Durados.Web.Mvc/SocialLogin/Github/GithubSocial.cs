@@ -139,7 +139,7 @@ namespace Durados.Web.Mvc.SocialLogin
             Dictionary<string, object> accessObject = Durados.Web.Mvc.UI.Json.JsonSerializer.Deserialize(response);
             string accessToken = accessObject["access_token"].ToString();
 
-            return GetProfile(appName, accessToken, returnAddress, activity, parameters, email, signupIfNotSignedIn, useHashRouting);
+            return GetProfile(appName, accessToken, null, returnAddress, activity, parameters, email, signupIfNotSignedIn, useHashRouting);
         }
 
         protected override SocialApplicationKeys GetSocialKeysFromDatabase(Map map)

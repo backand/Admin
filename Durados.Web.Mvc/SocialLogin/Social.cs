@@ -19,6 +19,11 @@ namespace Durados.Web.Mvc.UI.Helpers
 
         protected abstract SocialProfile FetchProfileByCode(string code, string appName, string returnUrl, string activity, string parameters, string redirectUrl, string email, bool signupIfNotSignedIn, bool useHashRouting);
 
+        public virtual SocialProfile FetchProfileByRefreshToken(string refreshToken, string appName)
+        {
+            return null;
+        }
+        
         protected abstract string ConfigPrefix { get; }
 
         protected abstract SocialApplicationKeys GetSocialKeysFromDatabase(Map map);
@@ -35,20 +40,20 @@ namespace Durados.Web.Mvc.UI.Helpers
 
         public SocialProfile GetProfile(string appName, string accessToken)
         {
-            return GetProfileUnsafe(appName, accessToken, "dummy", "signin", string.Empty, null, false, true);
+            return GetProfileUnsafe(appName, accessToken, null, "dummy", "signin", string.Empty, null, false, true);
         }
 
 
         public SocialProfile GetProfile(string appName, string accessToken, string email)
         {
-            return GetProfileUnsafe(appName, accessToken, "dummy", "signin", string.Empty, email, false, true);
+            return GetProfileUnsafe(appName, accessToken, null, "dummy", "signin", string.Empty, email, false, true);
         }
 
-        protected SocialProfile GetProfile(string appName, string accessToken, string returnAddress, string activity, string parameters, string email, bool signupIfNotSignedIn, bool useHashRouting)
+        protected SocialProfile GetProfile(string appName, string accessToken, string refreshToken, string returnAddress, string activity, string parameters, string email, bool signupIfNotSignedIn, bool useHashRouting)
         {
             try
             {
-                return GetProfileUnsafe(appName, accessToken, returnAddress, activity, parameters, email, signupIfNotSignedIn, useHashRouting);
+                return GetProfileUnsafe(appName, accessToken, refreshToken, returnAddress, activity, parameters, email, signupIfNotSignedIn, useHashRouting);
             }
             catch (Exception ex)
             {
@@ -97,7 +102,7 @@ namespace Durados.Web.Mvc.UI.Helpers
             return defaultKeys;
         }
 
-        protected SocialProfile GetProfileUnsafe(string appName, string accessToken, string returnAddress, string activity, string parameters, string email, bool signupIfNotSignedIn, bool useHashRouting)
+        protected SocialProfile GetProfileUnsafe(string appName, string accessToken, string refreshToken, string returnAddress, string activity, string parameters, string email, bool signupIfNotSignedIn, bool useHashRouting)
         {
             //get the Google user profile using the access token
 
@@ -115,6 +120,7 @@ namespace Durados.Web.Mvc.UI.Helpers
             profile.Add("signupIfNotSignedIn", signupIfNotSignedIn);
             profile.Add("useHashRouting", useHashRouting);
             profile.Add("parameters", parameters);
+            profile.Add("refreshToken", refreshToken);
 
             if (!string.IsNullOrEmpty(email))
             {
@@ -132,5 +138,15 @@ namespace Durados.Web.Mvc.UI.Helpers
         protected abstract string FetchProfileFromService(string accessToken);
 
         public Dictionary<string, object> MockReturnFromService { get; set; }
+    }
+
+    public enum SocialProviders
+    {
+        Google,
+        Facebook,
+        Github,
+        Twitter,
+        Adfs,
+        AzureAd
     }
 }

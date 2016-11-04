@@ -177,8 +177,11 @@ namespace Durados.Web.Mvc
             EnableSecretKeyAccess = true;
             TokenExpiration = 86400;
             UseRefreshToken = false;
+            EnableTokenRevokation = false;
 
         }
+
+
 
         public override bool IsMain()
         {
@@ -205,6 +208,10 @@ namespace Durados.Web.Mvc
         {
             return new Durados.Web.Mvc.View(dataTable, this);
         }
+
+        [Durados.Config.Attributes.ColumnProperty()]
+        public bool EnableTokenRevokation { get; set; }
+
 
         [Durados.Config.Attributes.ColumnProperty()]
         public int TokenExpiration { get; set; }
@@ -241,6 +248,7 @@ namespace Durados.Web.Mvc
 
         [Durados.Config.Attributes.ColumnProperty()]
         public bool EnableAdfs { get; set; }
+        [Durados.Config.Attributes.ColumnProperty()]
         public bool EnableAzureAd { get; set; }
 
 

@@ -258,6 +258,48 @@ namespace Durados.Web.Mvc.SocialLogin
             return GetRedirectUrl();// +"/" + appName;
         }
 
+        public override SocialProfile FetchProfileByRefreshToken(string refreshToken, string appName)
+        {
+
+            AdfsApplicationKeys keys = (AdfsApplicationKeys)GetSocialKeys(appName);
+            string clientId = keys.ClientId;
+            string oauth2EndPoint = keys.Host;
+            string urlAccessToken = oauth2EndPoint + "/token";
+
+            string redirectUri = GetRedirectUrl(appName);
+
+            string accessTokenData = GetRefreshTokenData(refreshToken, clientId, redirectUri, keys.Resource);
+
+            string response = null;
+
+            try
+            {
+                response = Durados.Web.Mvc.Infrastructure.Http.PostWebRequest(urlAccessToken, accessTokenData);
+            }
+            catch (System.Net.WebException exception)
+            {
+                try
+                {
+                    string errorDescription = new System.IO.StreamReader((exception).Response.GetResponseStream()).ReadToEnd();
+                    throw new AdfsException(errorDescription);
+                }
+                catch { }
+                throw exception;
+            }
+            //get the access token from the return JSON
+            //JavaScriptSerializer jsonSerializer = new JavaScriptSerializer();
+            //AuthResponse validateResponse = (AuthResponse)jsonSerializer.Deserialize<AuthResponse>(response);
+
+            Dictionary<string, object> validateResponse = Durados.Web.Mvc.UI.Json.JsonSerializer.Deserialize(response);
+
+            string newRefreshToken = validateResponse["refresh_token"].ToString();
+            string accessToken = validateResponse["access_token"].ToString();
+
+            var profile = GetProfile(appName, accessToken, newRefreshToken, null, null, null, null, false, false);
+
+            return profile;
+        }
+
         protected override SocialProfile FetchProfileByCode(string code, string appName, string returnUrl, string activity, string parameters, string redirectUrl, string email, bool signupIfNotSignedIn, bool useHashRouting)
         {
 
@@ -293,8 +335,9 @@ namespace Durados.Web.Mvc.SocialLogin
             Dictionary<string, object> validateResponse = Durados.Web.Mvc.UI.Json.JsonSerializer.Deserialize(response);
 
             string accessToken = validateResponse["access_token"].ToString();
+            string refreshToken = validateResponse["refresh_token"].ToString();
 
-            var profile = GetProfile(appName, accessToken, returnUrl, activity, parameters, email, signupIfNotSignedIn, useHashRouting);
+            var profile = GetProfile(appName, accessToken, refreshToken, returnUrl, activity, parameters, email, signupIfNotSignedIn, useHashRouting);
 
             return profile;
         }
@@ -302,6 +345,12 @@ namespace Durados.Web.Mvc.SocialLogin
         protected virtual string GetAccessTokenData(string code, string clientId, string redirectUri, string resource)
         {
             string accessTokenData = string.Format("grant_type=authorization_code&code={0}&client_id={1}&redirect_uri={2}", code, clientId, redirectUri);
+            return accessTokenData;
+        }
+
+        protected virtual string GetRefreshTokenData(string refreshToken, string clientId, string redirectUri, string resource)
+        {
+            string accessTokenData = string.Format("grant_type=refresh_token&refresh_token={0}&client_id={1}&redirect_uri={2}", refreshToken, clientId, redirectUri);
             return accessTokenData;
         }
 

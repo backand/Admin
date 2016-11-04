@@ -17,6 +17,15 @@ namespace Durados.Data
         bool Contains(string appName, SharedMemoryKey key);
 
         void ListRightPush(string key, string value);
+
+
+        void Delete(string key);
+
+        void Set(string key, string value, int milliseconds);
+
+        string Get(string key);
+
+        bool Contains(string key);
     }
 
 

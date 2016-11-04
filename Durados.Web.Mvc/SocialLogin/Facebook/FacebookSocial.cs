@@ -214,7 +214,7 @@ namespace Durados.Web.Mvc.SocialLogin
             string accessToken = validateResponse["access_token"].ToString();
             string expires = validateResponse["expires"].ToString();
 
-            SocialProfile profile = GetProfile(appName, accessToken, returnAddress, activity, parameters, email, signupIfNotSignedIn, useHashRouting);
+            SocialProfile profile = GetProfile(appName, accessToken, null, returnAddress, activity, parameters, email, signupIfNotSignedIn, useHashRouting);
 
             // don't email more socialLogin V2
             //if (string.IsNullOrEmpty(profile.email))

@@ -1,4 +1,5 @@
 ﻿using Durados.DataAccess;
+using Durados.Web.Mvc.SocialLogin;
 using Microsoft.WindowsAzure;
 using Microsoft.WindowsAzure.StorageClient;
 using System;
@@ -5069,6 +5070,107 @@ namespace Durados.Web.Mvc.UI.Helpers
         }
     }
 
+    public class ExternalAuthRefreshToken
+    {
+        public static bool IsExternalAuth(Map map, out string refreshToken)
+        {
+            refreshToken = null;
+            if (map.Database.UseRefreshToken)
+            {
+                string refreshTokenAfterValidate = GetRefreshTokenAfterValidate();
+                if (refreshTokenAfterValidate != null)
+                {
+                    refreshToken = refreshTokenAfterValidate;
+                    return true;
+                }
+
+                AbstractSocialProvider social = null;
+                if (IsSocial(map, SocialProviders.AzureAd))
+                {
+                    social = SocialProviderFactory.GetSocialProvider(SocialProviders.AzureAd.ToString().ToLower());
+
+                }
+                else if (IsSocial(map, SocialProviders.Adfs))
+                {
+                    social = SocialProviderFactory.GetSocialProvider(SocialProviders.Adfs.ToString().ToLower());
+
+                }
+                else
+                {
+                    return false;
+                }
+
+                string currentRefreshToken = GetCurrentRefreshToken();
+                if (currentRefreshToken != null)
+                {
+                    SocialProfile profile = social.FetchProfileByRefreshToken(currentRefreshToken, map.AppName);
+                    refreshToken = profile.additionalValues["refreshToken"].ToString();
+                }
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+
+        private static string GetRefreshTokenAfterValidate()
+        {
+            return System.Web.HttpContext.Current.Items["refreshToken"] == null ? null : System.Web.HttpContext.Current.Items["refreshToken"].ToString();
+        }
+
+        private static void SetRefreshTokenAfterValidate(string refreshToken)
+        {
+            System.Web.HttpContext.Current.Items["refreshToken"] = refreshToken;
+        }
+
+        public static bool IsExternalAuth(Map map, string refreshToken, out bool valid)
+        {
+            AbstractSocialProvider social = null;
+            valid = false;
+            if (IsSocial(map, SocialProviders.AzureAd))
+            {
+                social = SocialProviderFactory.GetSocialProvider(SocialProviders.AzureAd.ToString().ToLower());
+
+            }
+            else if (IsSocial(map, SocialProviders.Adfs))
+            {
+                social = SocialProviderFactory.GetSocialProvider(SocialProviders.Adfs.ToString().ToLower());
+
+            }
+            else
+            {
+                return false;
+            }
+            SocialProfile profile = social.FetchProfileByRefreshToken(refreshToken, map.AppName);
+            string newRefreshToken = profile.additionalValues["refreshToken"].ToString();
+            SetRefreshTokenAfterValidate(newRefreshToken);
+            if (newRefreshToken != null)
+            {
+                valid = true;
+            }
+
+            return true;
+        }
+
+        private static string GetCurrentRefreshToken()
+        {
+            string oneTimeToken = GetOneTimeToken();
+            return Durados.Web.Mvc.Farm.SharedMemorySingeltone.Instance.Get(oneTimeToken);
+        }
+
+        private static string GetOneTimeToken()
+        {
+            return System.Web.HttpContext.Current.Request.Form["accessToken"];
+        }
+
+        private static bool IsSocial(Map map, SocialProviders provider)
+        {
+            return map.Database.AzureAdClientId != null && provider.Equals(SocialProviders.AzureAd) ||
+                map.Database.AdfsClientId != null && provider.Equals(SocialProviders.Adfs);
+        }
+    }
+
     public class RefreshToken
     {
         static SqlAccess sql = new SqlAccess();
@@ -5083,11 +5185,19 @@ namespace Durados.Web.Mvc.UI.Helpers
 
         public static string Get(string appName, string username)
         {
+            string refreshToken = null;
             Map map = GetMap(appName);
+            if (ExternalAuthRefreshToken.IsExternalAuth(map, out refreshToken))
+            {
+                return refreshToken;
+            }
             string appGuid = map.Guid.ToString();
             string userGuid = map.Database.GetGuidByUsername(username);
-            return System.Web.Helpers.Crypto.HashPassword(appGuid + userGuid);
+            refreshToken = System.Web.Helpers.Crypto.HashPassword(appGuid + userGuid);
+            return refreshToken; 
         }
+
+        
 
         private static Map GetMap(string appName)
         {
@@ -5117,6 +5227,12 @@ namespace Durados.Web.Mvc.UI.Helpers
                 if (!map.Database.UseRefreshToken && !map.Equals(Maps.Instance.DuradosMap))
                     return false;
 
+                bool valid;
+                if (ExternalAuthRefreshToken.IsExternalAuth(map, refreshToken, out valid))
+                {
+                    return valid;
+                }
+            
                 string appGuid = map.Guid.ToString();
                 string userGuid = map.Database.GetGuidByUsername(username);
                 if (System.Web.Helpers.Crypto.VerifyHashedPassword(refreshToken, appGuid + userGuid))

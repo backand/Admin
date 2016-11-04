@@ -140,7 +140,7 @@ namespace Durados.Web.Mvc.SocialLogin
 
             string accessToken = validateResponse["access_token"].ToString();
 
-            var googleProfile = GetProfile(appName, accessToken, returnUrl, activity, parameters, email, signupIfNotSignedIn, useHashRouting);
+            var googleProfile = GetProfile(appName, accessToken, null, returnUrl, activity, parameters, email, signupIfNotSignedIn, useHashRouting);
 
             return googleProfile;
         }

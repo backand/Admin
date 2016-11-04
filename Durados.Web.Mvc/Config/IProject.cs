@@ -3407,6 +3407,14 @@ namespace Durados.Web.Mvc.Config
                 EnableAdfs.HideInTable = true;
             }
 
+            if (databaseView.Fields.ContainsKey("EnableTokenRevokation"))
+            {
+                ColumnField EnableTokenRevokation = (ColumnField)databaseView.Fields["EnableTokenRevokation"];
+                EnableTokenRevokation.Order = 600;
+                EnableTokenRevokation.Category = rolesCategory;
+                EnableTokenRevokation.HideInTable = true;
+            }
+
             if (databaseView.Fields.ContainsKey("AzureAdClientId"))
             {
                 ColumnField AzureAdClientId = (ColumnField)databaseView.Fields["AzureAdClientId"];

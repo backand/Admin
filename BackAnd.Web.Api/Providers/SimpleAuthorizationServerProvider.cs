@@ -58,6 +58,7 @@ namespace BackAnd.Web.Api.Providers
                     catch { }
                     context.AdditionalResponseParameters.Add("regId", backandUserId);
                     context.AdditionalResponseParameters.Add("userId", userId);
+                    
                 }
                 catch { }
 
