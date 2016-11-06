@@ -344,7 +344,7 @@ namespace Durados.Web.Mvc.Logging
                 {
                     return "Guest";
                 }
-                else if (System.Web.HttpContext.Current.Items.Contains(Database.Username))
+                else if (System.Web.HttpContext.Current.Items.Contains(Database.Username) && System.Web.HttpContext.Current.Items[Database.Username] != null)
                 {
                     return System.Web.HttpContext.Current.Items[Database.Username].ToString();
                 }

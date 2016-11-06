@@ -278,8 +278,17 @@ namespace BackAnd.Web.Api.Providers
                 ValidateByOneTimeAccessToken(context);
                 return;
             }
-            else if (System.Web.HttpContext.Current.Request.Form["username"] != null && System.Web.HttpContext.Current.Request.Form["refreshToken"] != null)
+            else if (System.Web.HttpContext.Current.Request.Form["refreshToken"] != null)
             {
+                if (System.Web.HttpContext.Current.Request.Form["username"] == null)
+                {
+                    throw new DuradosException("username is missing.");
+                }
+
+                if (System.Web.HttpContext.Current.Request.Form[Database.AppName] == null)
+                {
+                    throw new DuradosException(Database.AppName + " is missing.");
+                }
 
                 if (!System.Web.HttpContext.Current.Items.Contains(Database.AppName))
                     System.Web.HttpContext.Current.Items.Add(Database.AppName, System.Web.HttpContext.Current.Request.Form[Database.AppName]);
@@ -445,6 +454,12 @@ namespace BackAnd.Web.Api.Providers
                 }
             }
             catch (AppNotFoundException exception)
+            {
+                context.SetError(exception.Message, exception.Message);
+                Durados.Web.Mvc.Maps.Instance.DuradosMap.Logger.Log("refresh token", appName, username, exception, 2, string.Empty);
+                return;
+            }
+            catch (RefereshTokenException exception)
             {
                 context.SetError(exception.Message, exception.Message);
                 Durados.Web.Mvc.Maps.Instance.DuradosMap.Logger.Log("refresh token", appName, username, exception, 2, string.Empty);

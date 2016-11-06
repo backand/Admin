@@ -5143,6 +5143,19 @@ namespace Durados.Web.Mvc.UI.Helpers
                 return false;
             }
             SocialProfile profile = social.FetchProfileByRefreshToken(refreshToken, map.AppName);
+            if (!CompareRequestWithToken(profile.email))
+            {
+                throw new RefereshTokenException("The user in the token is different then the request.");
+            }
+            if (!UserBelongToApp(profile.email, map))
+            {
+                throw new RefereshTokenException("The user does not belong to the app.");
+            }
+            if (!IsApprovedUser(profile.email, map))
+            {
+                throw new RefereshTokenException("The user is not approved.");
+            }
+            
             string newRefreshToken = profile.additionalValues["refreshToken"].ToString();
             SetRefreshTokenAfterValidate(newRefreshToken);
             if (newRefreshToken != null)
@@ -5151,6 +5164,23 @@ namespace Durados.Web.Mvc.UI.Helpers
             }
 
             return true;
+        }
+        static Durados.Web.Mvc.Controllers.AccountMembershipService accountMembershipService = new Durados.Web.Mvc.Controllers.AccountMembershipService();
+            
+
+        private static bool IsApprovedUser(string email, Map map)
+        {
+            return accountMembershipService.IsApproved(email);
+        }
+
+        private static bool UserBelongToApp(string email, Map map)
+        {
+            return accountMembershipService.ValidateUser(email);
+        }
+
+        private static bool CompareRequestWithToken(string email)
+        {
+            return System.Web.HttpContext.Current.Request.Form["username"].Equals(email);
         }
 
         private static string GetCurrentRefreshToken()
@@ -5168,6 +5198,15 @@ namespace Durados.Web.Mvc.UI.Helpers
         {
             return map.Database.AzureAdClientId != null && provider.Equals(SocialProviders.AzureAd) ||
                 map.Database.AdfsClientId != null && provider.Equals(SocialProviders.Adfs);
+        }
+    }
+
+    public class RefereshTokenException : DuradosException
+    {
+        public RefereshTokenException(string message)
+            : base(message)
+        {
+
         }
     }
 
