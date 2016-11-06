@@ -47,13 +47,8 @@ namespace Durados.Web.Mvc.SocialLogin
             // OAuth2 10.12 CSRF
             //GenerateCorrelationId(properties);
 
-            // comma separated
-            string scope = "email";
-            //if (!IsDefault())
-            //{
-
-            //}
-
+            string scope = GetScope(appName);
+           
             string authorizationEndpoint =
                 "https://www.facebook.com/dialog/oauth" +
                     "?response_type=code" +
@@ -63,6 +58,13 @@ namespace Durados.Web.Mvc.SocialLogin
                     "&state=" + Uri.EscapeDataString(jss.Serialize(state));
 
             return authorizationEndpoint;
+        }
+
+        private string GetScope(string appName)
+        {
+            Map map = Maps.Instance.GetMap(appName);
+            return map.Database.FacebookScope ?? "email";
+            
         }
 
         private Dictionary<string, object> GetFacebookKeys(string appName)

@@ -639,13 +639,15 @@ namespace BackAnd.Web.Api.Controllers
 
         [Route("signout")]
         [HttpGet]
+        [HttpPost]
+        [BackAnd.Web.Api.Controllers.Filters.BackAndAuthorize]
         public IHttpActionResult signout()
         {
             try
             {
                 if (!map.Database.EnableTokenRevokation)
                 {
-                    return ResponseMessage(Request.CreateResponse(HttpStatusCode.BadRequest, "To signout please set EnableTokenRevokation to true"));
+                    return ResponseMessage(Request.CreateResponse(HttpStatusCode.BadRequest, "Please set Enable Signout to true"));
 
                 }
                 string token = Request.Headers.Authorization.Parameter;

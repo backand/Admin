@@ -178,7 +178,7 @@ namespace Durados.Web.Mvc
             TokenExpiration = 86400;
             UseRefreshToken = false;
             EnableTokenRevokation = false;
-
+            FacebookScope = "email";
         }
 
 
@@ -257,6 +257,9 @@ namespace Durados.Web.Mvc
 
         [Durados.Config.Attributes.ColumnProperty()]
         public string FacebookClientSecret { get; set; }
+
+        [Durados.Config.Attributes.ColumnProperty()]
+        public string FacebookScope { get; set; }
 
         [Durados.Config.Attributes.ColumnProperty()]
         public string AdfsClientId { get; set; }
