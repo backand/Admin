@@ -138,6 +138,8 @@ namespace Durados.Web.Mvc.UI.Helpers
         protected abstract string FetchProfileFromService(string accessToken);
 
         public Dictionary<string, object> MockReturnFromService { get; set; }
+
+        public abstract string GetLogOutRedirectUrl(string appName, string redirectUri = null);
     }
 
     public enum SocialProviders

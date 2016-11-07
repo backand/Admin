@@ -3376,6 +3376,13 @@ namespace Durados.Web.Mvc.Config
                 EnableFacebook.Category = rolesCategory;
                 EnableFacebook.HideInTable = true;
             }
+            if (databaseView.Fields.ContainsKey("FacebookScope"))
+            {
+                ColumnField FacebookScope = (ColumnField)databaseView.Fields["FacebookScope"];
+                FacebookScope.Order = 600;
+                FacebookScope.Category = rolesCategory;
+                FacebookScope.HideInTable = true;
+            }
 
             if (databaseView.Fields.ContainsKey("AdfsClientId"))
             {

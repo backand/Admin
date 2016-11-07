@@ -650,16 +650,46 @@ namespace BackAnd.Web.Api.Controllers
                     return ResponseMessage(Request.CreateResponse(HttpStatusCode.BadRequest, "Please set Enable Signout to true"));
 
                 }
-                string token = Request.Headers.Authorization.Parameter;
-                int day = 1000 * 60 * 60 * 24;
-                Durados.Web.Mvc.Farm.SharedMemorySingeltone.Instance.Set(token, "true", day);
+                revokeToken();
+
                 return Ok();
+            }
+            catch (Exception exception)
+            {
+                throw new BackAndApiUnexpectedResponseException(exception, this);
+            }
+        }
+
+        [Route("socialSignout")]
+        [HttpGet]
+        [HttpPost]
+        [BackAnd.Web.Api.Controllers.Filters.BackAndAuthorize]
+        public IHttpActionResult socialSignout(string provider, string returnAddress = null)
+        {
+            try
+            {
+                if (!map.Database.EnableTokenRevokation)
+                {
+                    return ResponseMessage(Request.CreateResponse(HttpStatusCode.BadRequest, "Please set Enable Signout to true"));
+
+                }
+                revokeToken();
+
+                AbstractSocialProvider social = SocialProviderFactory.GetSocialProvider(provider);
+                return Redirect(social.GetLogOutRedirectUrl(Maps.Instance.GetMap().AppName, returnAddress));
             }
             catch (Exception exception)
             {
                 throw new BackAndApiUnexpectedResponseException(exception, this);
 
             }
+        }
+
+        private void revokeToken()
+        {
+            string token = Request.Headers.Authorization.Parameter;
+            int day = 1000 * 60 * 60 * 24;
+            Durados.Web.Mvc.Farm.SharedMemorySingeltone.Instance.Set(token, "true", day);
         }
 
         [AllowAnonymous]

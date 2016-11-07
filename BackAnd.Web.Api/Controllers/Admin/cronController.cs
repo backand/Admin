@@ -243,14 +243,26 @@ namespace BackAnd.Web.Api.Controllers
                 foreach (Dictionary<string, object> item in (IEnumerable)response[DATA])
                 {
                     bool active = false;
-                    if (crons.ContainsKey(item[ID].ToString()))
+                    string id = null;
+                    if (item.ContainsKey(ID))
                     {
-                        active = ((Dictionary<string, object>)crons[item[ID].ToString()])[STATE].ToString() == ENABLED;
+                        id = item[ID].ToString();
                     }
-                    if (item.ContainsKey(ACTIVE))
-                        item[ACTIVE] = active;
-                    else
-                        item.Add(ACTIVE, active);
+                    else if (item.ContainsKey("id"))
+                    {
+                        id = item["id"].ToString();
+                    }
+                    if (id != null)
+                    {
+                        if (crons.ContainsKey(id))
+                        {
+                            active = ((Dictionary<string, object>)crons[id])[STATE].ToString() == ENABLED;
+                        }
+                        if (item.ContainsKey(ACTIVE))
+                            item[ACTIVE] = active;
+                        else
+                            item.Add(ACTIVE, active);
+                    }
                 }
             }
             else if (response.ContainsKey(ID))

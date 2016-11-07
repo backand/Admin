@@ -380,5 +380,20 @@ namespace Durados.Web.Mvc.SocialLogin
             
             return jwt;
         }
+
+        public override string GetLogOutRedirectUrl(string appName, string redirectUri = null)
+        {
+            AdfsApplicationKeys keys = (AdfsApplicationKeys)GetSocialKeys(appName);
+            string clientId = keys.ClientId;
+            string oauth2EndPoint = keys.Host;
+            
+            string url = oauth2EndPoint + "/logout";
+            if (string.IsNullOrEmpty(redirectUri))
+            {
+                url += "?post_logout_redirect_uri=" + redirectUri;
+            }
+
+            return url;
+        }
     }
 }

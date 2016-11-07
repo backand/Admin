@@ -335,7 +335,10 @@ namespace Durados.Web.Mvc.SocialLogin
             }
         }
 
-
+        public override string GetLogOutRedirectUrl(string appName, string redirectUri = null)
+        {
+            throw new NotImplementedException();
+        }
 
     }
 

@@ -35,7 +35,11 @@ namespace BackAnd.Web.Api
                     // consider storing only the hash of the handle
                     string username = map.Database.GetCurrentUsername();
 
-                    context.SetToken(Durados.Web.Mvc.UI.Helpers.RefreshToken.Get(map.Equals(Durados.Web.Mvc.Maps.Instance.DuradosMap) ? Durados.Web.Mvc.Maps.DuradosAppName : map.AppName, username));
+                    string refreshToken = Durados.Web.Mvc.UI.Helpers.RefreshToken.Get(map.Equals(Durados.Web.Mvc.Maps.Instance.DuradosMap) ? Durados.Web.Mvc.Maps.DuradosAppName : map.AppName, username);
+                    if (refreshToken != null)
+                    {
+                        context.SetToken(refreshToken);
+                    }
                 }
             }
             catch { }
