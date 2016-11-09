@@ -516,6 +516,7 @@ namespace Durados.Web.Mvc
             }
 
             limits.Add(Limits.Cron, Convert.ToInt32(System.Configuration.ConfigurationManager.AppSettings["cronLimit"]));
+            limits.Add(Limits.ActionParametersKbSize, Convert.ToInt32(System.Configuration.ConfigurationManager.AppSettings["actionParametersKbSizeLimit"]));
 
             LocalAddress = System.Configuration.ConfigurationManager.AppSettings["localAddress"] ?? "http://localhost:8080";
 

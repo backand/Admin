@@ -4686,8 +4686,5 @@ namespace Durados.Web.Mvc
         }
     }
 
-    public enum Limits
-    {
-        Cron
-    }
+    
 }

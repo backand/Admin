@@ -121,6 +121,7 @@
     <Compile Include="Cookie.cs" />
     <Compile Include="JsActionArguments.cs" />
     <Compile Include="NodeJS.cs" />
+    <Compile Include="OverTheActionParametersSizeLimitException.cs" />
     <Compile Include="ParseAuth.cs" />
     <Compile Include="JavaScript.cs" />
     <Compile Include="files.cs" />

@@ -18,7 +18,7 @@ namespace Durados.Workflow
         #region consts
 
         public static readonly string ReturnedValueKey = "$$ReturnedValueKey$$";
-        
+        const string FILEDATA = "filedata";
         #endregion
 
         private static string xhr = null;
@@ -354,8 +354,13 @@ namespace Durados.Workflow
             userProfile.Add("app", view.Database.GetCurrentAppName());
             userProfile.Add("userId", view.Database.GetCurrentUserId());
             userProfile.Add("token", GetUserProfileAuthToken(view));
-            if (!clientParameters.ContainsKey("filedata"))
-                userProfile.Add("request", GetRequest());
+
+            
+            if (!clientParameters.ContainsKey(FILEDATA))
+            {
+            HandleParametersSizeLimit(view.Database.GetLimit(Limits.ActionParametersKbSize), clientParameters);
+    userProfile.Add("request", GetRequest());
+            }
 
             var call = new Jint.Engine(cfg => cfg.AllowClr(typeof(Backand.XMLHttpRequest).Assembly));
 
@@ -387,14 +392,17 @@ namespace Durados.Workflow
             //var Config2 = parser.Parse(theJavaScriptSerializer.Serialize(Config));
             var userInput = parser.Parse(Newtonsoft.Json.JsonConvert.SerializeObject(newRow));
             Object clientParametersToSend = null;
-            if (!clientParameters.ContainsKey("filedata"))
+
+            
+
+            if (!clientParameters.ContainsKey(FILEDATA))
             {
                 clientParametersToSend = parser.Parse(Newtonsoft.Json.JsonConvert.SerializeObject(clientParameters));
             }
             else
             {
-                System.Web.HttpContext.Current.Items["file_stream"] = clientParameters["filedata"];
-                clientParameters["filedata"] = "file_stream";
+                System.Web.HttpContext.Current.Items["file_stream"] = clientParameters[FILEDATA];
+                clientParameters[FILEDATA] = "file_stream";
                 clientParametersToSend = clientParameters;
             }
             var dbRow = parser.Parse(Newtonsoft.Json.JsonConvert.SerializeObject(oldRow));
@@ -488,6 +496,45 @@ namespace Durados.Workflow
                 else
                     values[ReturnedValueKey] = r;
             }
+        }
+
+        private void HandleParametersSizeLimit(object limit, Dictionary<string, object> clientParameters)
+        {
+            int sizeLimit = Convert.ToInt32(limit);
+            int parametersSize = GetSize();
+            if (parametersSize > sizeLimit)
+            {
+                throw new OverTheActionParametersSizeLimitException(sizeLimit, parametersSize);
+            }
+        }
+
+        private int GetSize()
+        {
+
+            string s = (string)System.Web.HttpContext.Current.Items["body"];
+            if (s == null)
+                return 0;
+            int size = System.Text.ASCIIEncoding.Unicode.GetByteCount(s);
+
+            return size / 1000;
+        }
+
+        private int GetSize(Dictionary<string, object> clientParameters)
+        {
+            int size = 0;
+            foreach (string key in clientParameters.Keys)
+            {
+                if (key != FILEDATA)
+                {
+                    object parameter = clientParameters[key];
+                    if (parameter is string)
+                    {
+                        size += System.Text.ASCIIEncoding.Unicode.GetByteCount((string)parameter);
+                    }
+                }
+            }
+
+            return size / 1000;
         }
 
         private static string GetUserProfileAuthToken(View view)

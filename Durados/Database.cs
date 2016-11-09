@@ -1244,6 +1244,11 @@ namespace Durados
         {
             return null;
         }
+
+        public virtual object GetLimit(Limits limit)
+        {
+            throw new NotImplementedException();
+        }
     }
 
     public class IlegalDateFormatException : DuradosException
@@ -1404,5 +1409,11 @@ namespace Durados
         Object,
         Action,
         Query,
+    }
+
+    public enum Limits
+    {
+        Cron,
+        ActionParametersKbSize
     }
 }

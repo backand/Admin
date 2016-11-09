@@ -1470,5 +1470,10 @@ namespace Durados.Web.Mvc
         {
             return Map.GetAuthorization();
         }
+
+        public override object GetLimit(Limits limit)
+        {
+            return Map.GetLimit(limit);
+        }
     }
 }
