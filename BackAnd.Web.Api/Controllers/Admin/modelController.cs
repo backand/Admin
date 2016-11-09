@@ -47,7 +47,24 @@ namespace BackAnd.Web.Api.Controllers
             {
                 string json = System.Web.HttpContext.Current.Server.UrlDecode(Request.Content.ReadAsStringAsync().Result);
 
-                Dictionary<string, object> transformResult = Transform(json, false);
+                JavaScriptSerializer jss = new JavaScriptSerializer();
+
+                var data = jss.Deserialize<Dictionary<string, object>>(json);
+
+                const string OldSchema = "oldSchema";
+                
+                if (!data.ContainsKey(OldSchema))
+                {
+                    return ResponseMessage(Request.CreateResponse(HttpStatusCode.BadRequest, "Missing oldSchema property."));
+                }
+
+                if (!IsOldModelEqualsToCurrent((ArrayList)data[OldSchema], GetBackandToObject()))
+                {
+                    return ResponseMessage(Request.CreateResponse(HttpStatusCode.Conflict, "The model has changed. Please reload the page and make your changes again."));
+
+                }
+
+                Dictionary<string, object> transformResult = Transform(jss, json, data, false);
 
                 const string Alter = "alter";
 
@@ -82,6 +99,13 @@ namespace BackAnd.Web.Api.Controllers
 
             }
         }
+
+        private bool IsOldModelEqualsToCurrent(ArrayList oldModel, ArrayList newModel)
+        {
+            return new ModelComparer().IsEquals(oldModel, newModel);
+        }
+
+        
 
         private void ValidateSql(string sql)
         {
@@ -489,7 +513,30 @@ namespace BackAnd.Web.Api.Controllers
 
         private Dictionary<string, object> Sync()
         {
-            return (new Sync()).AddNewViewsAndSyncAll(Map);
+            Dictionary<string, object> response = (new Sync()).AddNewViewsAndSyncAll(Map);
+
+            EmitMessage("ModelChanged", new {changedBy = Map.Database.GetCurrentUsername()});
+
+            return response;
+        }
+
+        private void EmitMessage(string eventName, object data)
+        {
+            Backand.socket socket = new Backand.socket();
+            string appName = (System.Web.HttpContext.Current.Items[Durados.Database.AppName] ?? string.Empty).ToString();
+               System.Threading.ThreadPool.QueueUserWorkItem(delegate
+                {
+                    try
+                    {
+                            socket.emitRole(eventName, data, "Admin", appName);
+                        
+                    }
+                    catch (Exception exception)
+                    {
+                        Database.Logger.Log("model", "socket", "emit", exception, 1, eventName);
+                    }
+                });
+            
         }
        
 

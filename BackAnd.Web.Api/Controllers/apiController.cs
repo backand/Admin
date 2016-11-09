@@ -472,15 +472,13 @@ namespace BackAnd.Web.Api.Controllers
             }
         }
 
-        protected virtual Dictionary<string, object> Transform(string json, bool getOldSchema = true)
+        protected virtual Dictionary<string, object> Transform(JavaScriptSerializer jss, string json, Dictionary<string, object> data, bool getOldSchema = true)
         {
+
             string getNodeUrl = GetNodeUrl() + "/transform";
 
             bulk bulk = new Durados.Web.Mvc.UI.Helpers.bulk();
 
-            JavaScriptSerializer jss = new JavaScriptSerializer();
-
-            var data = jss.Deserialize<Dictionary<string, object>>(json);
 
             if (!data.ContainsKey("oldSchema"))
             {
@@ -522,7 +520,16 @@ namespace BackAnd.Web.Api.Controllers
 
             return result;
 
+        }
 
+        protected virtual Dictionary<string, object> Transform(string json, bool getOldSchema = true)
+        {
+            JavaScriptSerializer jss = new JavaScriptSerializer();
+
+            var data = jss.Deserialize<Dictionary<string, object>>(json);
+
+            
+            return Transform(jss, json, data, getOldSchema);
 
         }
 

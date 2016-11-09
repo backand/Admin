@@ -390,6 +390,7 @@
     <Compile Include="UI\Helpers\InvalidHttpMethodException.cs" />
     <Compile Include="UI\Helpers\MailingServiceHelper.cs" />
     <Compile Include="UI\Helpers\MenuHelper.cs" />
+    <Compile Include="UI\Helpers\ModelComparer.cs" />
     <Compile Include="UI\Helpers\NewDatabaseParametersFactory.cs" />
     <Compile Include="UI\Helpers\OnlinePayments.cs">
       <SubType>Code</SubType>
