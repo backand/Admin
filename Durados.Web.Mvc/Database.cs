@@ -774,6 +774,19 @@ namespace Durados.Web.Mvc
             return userRow[UserGuidFieldName].ToString();
         }
 
+        public virtual string GetUserFullName2(string username)
+        {
+            if (System.Web.HttpContext.Current == null)
+            {
+                return GetUserFullName(username);
+            }
+            if (!System.Web.HttpContext.Current.Items.Contains(Database.FullName))
+            {
+                System.Web.HttpContext.Current.Items.Add(Database.FullName, GetUserFullName(username));
+            }
+            return System.Web.HttpContext.Current.Items[Database.FullName].ToString();
+        }
+
         public virtual string GetUserFullName(string username)
         {
             string fullNameFieldName = "FullName";
@@ -983,6 +996,19 @@ namespace Durados.Web.Mvc
             string sessionKey = Map.AppName + "-" + currentUser + suffix;
 
             return sessionKey;
+        }
+
+        public virtual string GetUserRole2(string username)
+        {
+            if (System.Web.HttpContext.Current == null)
+            {
+                return GetUserRole(username);
+            }
+            if (!System.Web.HttpContext.Current.Items.Contains(Database.UserRole))
+            {
+                System.Web.HttpContext.Current.Items.Add(Database.UserRole, GetUserRole(username));
+            }
+            return System.Web.HttpContext.Current.Items[Database.UserRole].ToString();
         }
 
         public virtual string GetUserRole(string username)

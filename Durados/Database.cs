@@ -46,6 +46,8 @@ namespace Durados
         public static readonly string CurAppName = "curappname";
         public static readonly string AppGuid = "appguid";
         public static readonly string Username = "username";
+        public static readonly string UserRole = "role";
+        public static readonly string FullName = "fullName";
         public static readonly string CurrentUserId = "CurrentUserId";
 
         public static readonly string RequestId = "requestId";

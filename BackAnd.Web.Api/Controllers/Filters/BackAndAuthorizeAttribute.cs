@@ -63,6 +63,10 @@ namespace BackAnd.Web.Api.Controllers.Filters
 
                 var appnameObj = principal.Claims.Where(c => c.Type == Database.AppName).Single();
 
+                var userroleObj = principal.Claims.Where(c => c.Type == Database.UserRole).SingleOrDefault();
+                var fullNameObj = principal.Claims.Where(c => c.Type == Database.FullName).SingleOrDefault();
+
+
                 if (usernameObj == null)
                 {
                     HandleUnauthorized(actionContext, null, null);
@@ -73,6 +77,20 @@ namespace BackAnd.Web.Api.Controllers.Filters
                 {
                     HandleUnauthorized(actionContext, null, null);
                     return;
+                }
+
+                if (userroleObj != null)
+                {
+                    if (!System.Web.HttpContext.Current.Items.Contains(Database.UserRole))
+                        System.Web.HttpContext.Current.Items.Add(Database.UserRole, userroleObj.Value);
+
+                }
+
+                if (fullNameObj != null)
+                {
+                    if (!System.Web.HttpContext.Current.Items.Contains(Database.FullName))
+                        System.Web.HttpContext.Current.Items.Add(Database.FullName, fullNameObj.Value);
+
                 }
 
                 string username = usernameObj.Value;

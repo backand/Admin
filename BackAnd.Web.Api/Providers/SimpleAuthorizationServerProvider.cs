@@ -41,7 +41,7 @@ namespace BackAnd.Web.Api.Providers
                     context.Properties.IssuedUtc = currentUtc;
                     context.Properties.ExpiresUtc = currentUtc.Add(System.TimeSpan.FromSeconds(expiration));
 
-                    string role = map.Database.GetUserRole(username);
+                    string role = map.Database.GetUserRole2(username);
                     int backandUserId = map.Database.GetUserID(username);
                     object userId = map.Database.GetCurrentUserId();
 
@@ -52,7 +52,7 @@ namespace BackAnd.Web.Api.Providers
                         context.AdditionalResponseParameters.Add("firstName", firstName);
                         string lastName = map.Database.GetUserLastName();
                         context.AdditionalResponseParameters.Add("lastName", lastName);
-                        string fullName = map.Database.GetUserFullName(username).ToString();
+                        string fullName = map.Database.GetUserFullName2(username).ToString();
                         context.AdditionalResponseParameters.Add("fullName", fullName);
                     }
                     catch { }
@@ -429,6 +429,8 @@ namespace BackAnd.Web.Api.Providers
             var identity = new ClaimsIdentity(context.Options.AuthenticationType);
             identity.AddClaim(new Claim(Database.Username, username));
             identity.AddClaim(new Claim(Database.AppName, appname));
+            identity.AddClaim(new Claim(Database.FullName, map.Database.GetUserFullName2(username)));
+            identity.AddClaim(new Claim(Database.UserRole, map.Database.GetUserRole2(username)));
             // create metadata to pass on to refresh token provider
             //var props = new Microsoft.Owin.Security.AuthenticationProperties(new Dictionary<string, string>
             //{

@@ -19,6 +19,11 @@ namespace Durados.Web.Mvc
             {
                 try
                 {
+                    if (Maps.Instance.IsApi())
+                    {
+                        return System.Web.HttpContext.Current.Items[name];
+                    }
+                    
                     if (System.Web.HttpContext.Current.Session == null)
                     {
                         if (System.Web.HttpContext.Current.Items[name] == null && System.Web.HttpContext.Current.Items[Database.RequestId] != null)
@@ -42,6 +47,11 @@ namespace Durados.Web.Mvc
             {
                 try
                 {
+                    if (Maps.Instance.IsApi())
+                    {
+                        System.Web.HttpContext.Current.Items[name] = value;
+                        return;
+                    }
                     if (System.Web.HttpContext.Current.Session == null)
                     {
                         System.Web.HttpContext.Current.Items[name] = value;
@@ -59,6 +69,7 @@ namespace Durados.Web.Mvc
                 catch { }
             }
         }
+
     }
     public class MySqlPersistentSession:PersistentSession
     {

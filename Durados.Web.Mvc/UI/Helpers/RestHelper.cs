@@ -781,9 +781,10 @@ namespace Durados.Web.Mvc.UI.Helpers
         {
             Dictionary<string, object> user = new Dictionary<string, object>();
 
-            user.Add("username", database.GetCurrentUsername());
-            user.Add("fullName", database.GetUserFullName());
-            user.Add("role", database.GetUserRole());
+            string username = database.GetCurrentUsername();
+            user.Add("username", username);
+            user.Add("fullName", database.GetUserFullName2(username));
+            user.Add("role", database.GetUserRole2(username));
             user.Add("appName", database.Map.AppName);
 
             return user;
@@ -2905,68 +2906,68 @@ namespace Durados.Web.Mvc.UI.Helpers
 
         private object GetStat(string appName)
         {
-            string sysConnectionString = GetSystemConnectionString(appName);
+            //string sysConnectionString = GetSystemConnectionString(appName);
 
-            if (string.IsNullOrEmpty(sysConnectionString))
-                return null;
+            //if (string.IsNullOrEmpty(sysConnectionString))
+            //    return null;
 
-            object scalar = GetLast24Hours(sysConnectionString);
-            int? last24 = null;
-            if (scalar != null) last24 = Convert.ToInt32(scalar);
+            //object scalar = GetLast24Hours(sysConnectionString);
+            //int? last24 = null;
+            //if (scalar != null) last24 = Convert.ToInt32(scalar);
 
-            scalar = GetLast48Hours(sysConnectionString);
-            int? last48 = null;
-            if (scalar != null) last48 = Convert.ToInt32(scalar);
+            //scalar = GetLast48Hours(sysConnectionString);
+            //int? last48 = null;
+            //if (scalar != null) last48 = Convert.ToInt32(scalar);
 
-            int? diff24 = null;
-            if (last24.HasValue && last48.HasValue)
-            {
-                int today = last24.Value;
-                int yesterday = last48.Value - today;
+            //int? diff24 = null;
+            //if (last24.HasValue && last48.HasValue)
+            //{
+            //    int today = last24.Value;
+            //    int yesterday = last48.Value - today;
 
-                if (today == yesterday)
-                {
-                    diff24 = 0;
-                }
-                else if (yesterday == 0)
-                {
-                    diff24 = null;
-                }
-                else
-                {
-                    diff24 = (100 * (today - yesterday)) / yesterday;
-                }
-            }
+            //    if (today == yesterday)
+            //    {
+            //        diff24 = 0;
+            //    }
+            //    else if (yesterday == 0)
+            //    {
+            //        diff24 = null;
+            //    }
+            //    else
+            //    {
+            //        diff24 = (100 * (today - yesterday)) / yesterday;
+            //    }
+            //}
 
-            scalar = GetLast30Days(sysConnectionString);
-            int? last30 = null;
-            if (scalar != null) last30 = Convert.ToInt32(scalar);
+            //scalar = GetLast30Days(sysConnectionString);
+            //int? last30 = null;
+            //if (scalar != null) last30 = Convert.ToInt32(scalar);
 
-            scalar = GetLast60Days(sysConnectionString);
-            int? last60 = null;
-            if (scalar != null) last60 = Convert.ToInt32(scalar);
+            //scalar = GetLast60Days(sysConnectionString);
+            //int? last60 = null;
+            //if (scalar != null) last60 = Convert.ToInt32(scalar);
 
-            int? diff30 = null;
-            if (last30.HasValue && last60.HasValue)
-            {
-                int thisMonth = last30.Value;
-                int prevMonth = last60.Value - thisMonth;
+            //int? diff30 = null;
+            //if (last30.HasValue && last60.HasValue)
+            //{
+            //    int thisMonth = last30.Value;
+            //    int prevMonth = last60.Value - thisMonth;
 
-                if (thisMonth == prevMonth)
-                {
-                    diff30 = 0;
-                }
-                else if (prevMonth == 0)
-                {
-                    diff30 = null;
-                }
-                else
-                {
-                    diff30 = (100 * (thisMonth - prevMonth)) / prevMonth;
-                }
-            }
+            //    if (thisMonth == prevMonth)
+            //    {
+            //        diff30 = 0;
+            //    }
+            //    else if (prevMonth == 0)
+            //    {
+            //        diff30 = null;
+            //    }
+            //    else
+            //    {
+            //        diff30 = (100 * (thisMonth - prevMonth)) / prevMonth;
+            //    }
+            //}
 
-            int? size = GetSize(appName, GetConnectionString(appName));
+            //int? size = GetSize(appName, GetConnectionString(appName));
 
             Dictionary<string, object> totalRows = GetTotalRows(appName);
 
@@ -2974,8 +2975,8 @@ namespace Durados.Web.Mvc.UI.Helpers
             Dictionary<string, object> dataSecurity = GetDataSecurity(appName);
 
             Dictionary<string, object> stat = new Dictionary<string, object>() { 
-            { "last24hours", last24 }, { "diffLastDaytoYesterday", diff24 }, { "last30days", last30 }, { "diffLast30DaysToPrev", diff30 }, 
-            { "sizeInMb", size }, { "totalRows", totalRows }, { "authorizationSecurity", authorizationSecurity }, { "dataSecurity", dataSecurity } };
+            //{ "last24hours", last24 }, { "diffLastDaytoYesterday", diff24 }, { "last30days", last30 }, { "diffLast30DaysToPrev", diff30 }, { "sizeInMb", size }, 
+            { "totalRows", totalRows }, { "authorizationSecurity", authorizationSecurity }, { "dataSecurity", dataSecurity } };
 
             
             return stat;
