@@ -129,7 +129,7 @@ namespace BackAnd.Web.Api.Controllers.Filters
                     //{
                     //    throw new Durados.DuradosException("App is not ready yet");
                     //}
-                    if (!accountMembershipService.ValidateUser(username) || !accountMembershipService.IsApproved(username) || Revoked(appname, actionContext.Request.Headers.Authorization.Parameter))
+                    if (!accountMembershipService.ValidateUser(username) || !accountMembershipService.IsApproved(username) || Revoked(appname, GetAuthToken(actionContext)))
                     {
                         HandleUnauthorized(actionContext, appname, username);
                         return;
@@ -209,8 +209,32 @@ namespace BackAnd.Web.Api.Controllers.Filters
             }
         }
 
+        private static string GetAuthToken(System.Web.Http.Controllers.HttpActionContext actionContext)
+        {
+            if (actionContext.Request.Headers != null && actionContext.Request.Headers.Authorization != null && actionContext.Request.Headers.Authorization.Parameter != null)
+                return actionContext.Request.Headers.Authorization.Parameter;
+            else if (System.Web.HttpContext.Current != null && System.Web.HttpContext.Current.Request.Headers["authorization"] != null)
+            {
+                string[] authToken = System.Web.HttpContext.Current.Request.Headers["authorization"].ToString().Split(' ');
+                if (authToken.Length == 2)
+                    return authToken[1];
+            }
+            else if (System.Web.HttpContext.Current != null && System.Web.HttpContext.Current.Request.QueryString["authorization"] != null)
+            {
+                string[] authToken = System.Web.HttpContext.Current.Request.QueryString["authorization"].ToString().Split(' ');
+                if (authToken.Length == 2)
+                    return authToken[1];
+            }
+
+            return null;
+        }
+
         private bool Revoked(string appname, string token)
         {
+            if (string.IsNullOrEmpty(token))
+            {
+                return false;
+            }
             Map map = Maps.Instance.GetMap(appname);
             if (map != null && map.Database.EnableTokenRevokation)
             {
