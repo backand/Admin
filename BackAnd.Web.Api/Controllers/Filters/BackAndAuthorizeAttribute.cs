@@ -211,7 +211,8 @@ namespace BackAnd.Web.Api.Controllers.Filters
 
         private bool Revoked(string appname, string token)
         {
-            if (Maps.Instance.GetMap(appname).Database.EnableTokenRevokation)
+            Map map = Maps.Instance.GetMap(appname);
+            if (map != null && map.Database.EnableTokenRevokation)
             {
                 return Durados.Web.Mvc.Farm.SharedMemorySingeltone.Instance.Contains(token);
             }

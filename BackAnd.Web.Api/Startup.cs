@@ -171,31 +171,39 @@ namespace BackAnd.Web.Api
 
         public override Task RequestToken(OAuthRequestTokenContext context)
         {
-            SetMainLoggerInRequest();
-            if (!context.Request.Headers.ContainsKey(AuthHeader))
+            try
             {
-                if (context.Request.QueryString.HasValue)
+                SetMainLoggerInRequest();
+                if (!context.Request.Headers.ContainsKey(AuthHeader))
                 {
-                    var queryString = HttpUtility.ParseQueryString(context.Request.QueryString.Value);
-                    var token = queryString[key];
-                    if (token != null)
+                    if (context.Request.QueryString.HasValue)
                     {
-                        if (token.Contains(BEARER))
+                        var queryString = HttpUtility.ParseQueryString(context.Request.QueryString.Value);
+                        var token = queryString[key];
+                        if (token != null)
                         {
-                            token = token.Replace(BEARER, "").Trim();
+                            if (token.Contains(BEARER))
+                            {
+                                token = token.Replace(BEARER, "").Trim();
+                            }
+                            context.Token = token;
+                            context.Request.Headers.Add(key, new string[1] { queryString[key] });
                         }
-                        context.Token = token;
-                        context.Request.Headers.Add(key, new string[1] { queryString[key] });
-                    }
-                    else
-                    {
-                        string anonymousToken = queryString[Durados.Database.AnonymousToken];
-                        if (anonymousToken != null)
+                        else
                         {
-                            context.Request.Headers.Add(Durados.Database.AnonymousToken, new string[1] { anonymousToken });
+                            string anonymousToken = queryString[Durados.Database.AnonymousToken];
+                            if (anonymousToken != null)
+                            {
+                                context.Request.Headers.Add(Durados.Database.AnonymousToken, new string[1] { anonymousToken });
+                            }
                         }
                     }
                 }
+            }
+            catch (Exception exception)
+            {
+                Durados.Web.Mvc.Maps.Instance.DuradosMap.Logger.Log("Startup", "RequestToken", "", exception, 1, null);
+                throw exception;
             }
 
             return Task.FromResult<object>(null);
