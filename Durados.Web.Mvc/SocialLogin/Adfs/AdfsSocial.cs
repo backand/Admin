@@ -388,7 +388,7 @@ namespace Durados.Web.Mvc.SocialLogin
             string oauth2EndPoint = keys.Host;
             
             string url = oauth2EndPoint + "/logout";
-            if (string.IsNullOrEmpty(redirectUri))
+            if (!string.IsNullOrEmpty(redirectUri))
             {
                 url += "?post_logout_redirect_uri=" + redirectUri;
             }

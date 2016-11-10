@@ -90,7 +90,7 @@ namespace Durados.Web.Mvc
         {
             int dataSourceTypeId = appRow.DataSourceTypeId;
             bool usesSsh = !appRow.durados_SqlConnectionRowByFK_durados_App_durados_SqlConnection.IsSshUsesNull() && appRow.durados_SqlConnectionRowByFK_durados_App_durados_SqlConnection.SshUses;
-            return GetConnection(appRow.durados_SqlConnectionRowByFK_durados_App_durados_SqlConnection, dataSourceTypeId, (System.Data.SqlClient.SqlConnectionStringBuilder)builder, usesSsh ? "server=localhost;database={1};User Id={2};password={3};Allow User Variables=True;CharSet=utf8;" : "server={0};database={1};User Id={2};password={3}") + ";port=" + localPort.ToString() + ";convert zero datetime=True;default command timeout=90;Connection Timeout=60;Allow User Variables=True;CharSet=utf8;";
+            return GetConnection(appRow.durados_SqlConnectionRowByFK_durados_App_durados_SqlConnection, dataSourceTypeId, (System.Data.SqlClient.SqlConnectionStringBuilder)builder, usesSsh ? "server=localhost;database={1};User Id={2};password={3};Allow User Variables=True;CharSet=utf8;UseProcedureBodies=true;" : "server={0};database={1};User Id={2};password={3}") + ";port=" + localPort.ToString() + ";convert zero datetime=True;default command timeout=90;Connection Timeout=60;Allow User Variables=True;CharSet=utf8;UseProcedureBodies=true;";
         }
 
         public object GetPostgreConnection(MapDataSet.durados_AppRow appRow, object builder, int localPort)

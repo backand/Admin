@@ -1,5 +1,7 @@
 using BackAnd.Web.Api.Controllers.Filters;
+using Durados.Data;
 using Durados.Web.Mvc;
+using Durados.Web.Mvc.Farm;
 using Durados.Web.Mvc.SocialLogin;
 using Durados.Web.Mvc.UI.Helpers;
 //﻿using Backand.Web.Api;
@@ -272,6 +274,16 @@ namespace BackAnd.Web.Api.Controllers
                 }
                 string appName = System.Web.HttpContext.Current.Items[Durados.Web.Mvc.Database.AppName].ToString();
                 AccountService account = new AccountService(this);
+
+                try
+                {
+                    if (SharedMemorySingeltone.Instance.Contains(appName, SharedMemoryKey.DebugMode))
+                    {
+                        System.Web.HttpContext.Current.Items[Durados.Workflow.JavaScript.Debug] = true;
+                    }
+
+                }
+                catch { }
 
                 try
                 {
@@ -1016,6 +1028,16 @@ namespace BackAnd.Web.Api.Controllers
                 AbstractSocialProvider social = SocialProviderFactory.GetSocialProvider(provider);
                 SocialProfile profile = social.Authenticate();
                 returnAddress = profile.returnAddress;
+
+                try
+                {
+                    if (SharedMemorySingeltone.Instance.Contains(profile.appName, SharedMemoryKey.DebugMode))
+                    {
+                        System.Web.HttpContext.Current.Items[Durados.Workflow.JavaScript.Debug] = true;
+                    }
+
+                }
+                catch { }
 
                 if (profile.activity != "signin" && profile.activity != "signup")
                 {

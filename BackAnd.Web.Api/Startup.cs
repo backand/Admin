@@ -185,6 +185,7 @@ namespace BackAnd.Web.Api
                             token = token.Replace(BEARER, "").Trim();
                         }
                         context.Token = token;
+                        context.Request.Headers.Add(key, new string[1] { queryString[key] });
                     }
                     else
                     {
