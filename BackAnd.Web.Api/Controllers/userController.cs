@@ -1334,6 +1334,7 @@ namespace BackAnd.Web.Api.Controllers
             if (!System.Web.HttpContext.Current.Items.Contains(Durados.Database.RequestId))
                 System.Web.HttpContext.Current.Items.Add(Durados.Database.RequestId, Guid.NewGuid().ToString());
 
+            NewRelic.Api.Agent.NewRelic.AddCustomParameter(Durados.Database.RequestId, System.Web.HttpContext.Current.Items[Durados.Database.RequestId].ToString());
             var canLoginWithProfile = GetCanLoginWithProfile(profile);
 
             if (profile.email == null)
