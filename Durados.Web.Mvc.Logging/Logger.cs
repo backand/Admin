@@ -736,7 +736,8 @@ namespace Durados.Web.Mvc.Logging
                 return null;
             if (System.Web.HttpContext.Current.Items["requestId"] == null)
                 return null;
-            return Guid.Parse((string)System.Web.HttpContext.Current.Items["requestId"]);
+            Guid? requesrId = Guid.Parse((string)System.Web.HttpContext.Current.Items["requestId"]);
+            return requesrId;
         }
 
         private string GetClientIP()

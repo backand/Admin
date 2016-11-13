@@ -1,0 +1,83 @@
+{
+	"requests": "select Guid,Request,Type,ObjectName,QueryName,ActionName,Username,ClientIP,Time,Refferer, Duration,Method,LogMessage,ExceptionMessage,Trace 
+from
+(
+
+select Guid,Request,
+
+if (regexp_match (AdjustedRequest, '/1/query/data'), 
+	'query', 
+	if (regexp_match (AdjustedRequest, '(/1/objects|/1/table/data|/1/view/data)'), 
+		if (regexp_match (AdjustedRequest, '/action/'), 
+			'action', 
+			'object'
+		   ), 
+		null
+	   )
+   ) as Type,
+
+if (regexp_match(AdjustedRequest,'(objects\\/action\\/[a-zA-z0-9\\_]*\\?)'), 
+	regexp_replace ( regexp_extract(AdjustedRequest,'(objects\\/action\\/[a-zA-z0-9\\_]*\\?)'), 
+		'(objects\\/action\\/|\\?$)', 
+		''
+	),
+    if (regexp_match(AdjustedRequest,'(objects\\/action\\/.*\\/[a-zA-z0-9\\_]*\\?)'), 
+		regexp_replace ( 
+		  regexp_extract(AdjustedRequest,'(objects\\/action\\/.*\\/[a-zA-z0-9\\_]*\\?)'), 
+			  '(objects\\/action\\/|\\/.*\\?$)',
+			  ''
+		  ),
+		  if (regexp_match(AdjustedRequest,'(objects\\/[a-zA-z0-9\\_]*\\?)'), 
+			  regexp_replace ( regexp_extract(AdjustedRequest,'(objects\\/[a-zA-z0-9\\_]*\\?)'), 
+				  '(objects\\/|\\?$)', 
+				  ''
+			 ), 
+			 if (regexp_match(AdjustedRequest,'(objects\\/.*\\/[a-zA-z0-9\\_]*\\?)'), 
+				 regexp_replace ( regexp_extract(AdjustedRequest,'(objects\\/.*\\/[a-zA-z0-9\\_]*\\?)'), 
+					 '(objects\\/|\\/.*\\?$)', 
+					 ''),
+				 null
+				)
+		  )
+	  )
+   )
+ as ObjectName,
+
+if (regexp_match(AdjustedRequest,'(query\\/data\\/[a-zA-z0-9\\_\\-]*\\?)'), 
+				 regexp_replace ( 
+				   regexp_extract(AdjustedRequest,'(query\\/data\\/[a-zA-z0-9\\_\\-]*\\?)'), '(query\\/data\\/|\\?$)', ''), null) as QueryName,
+
+if (regexp_match(AdjustedRequest,'(objects\\/action\\/[a-zA-z0-9\\_]*\\?)'), 
+				 regexp_replace ( regexp_extract(AdjustedRequest,'(\\?name\\=.*[\\&]?)'), '(\\?name=|\\&.*)', ''),
+   if (regexp_match(AdjustedRequest,'(objects\\/action\\/.*\\/[a-zA-z0-9\\_]*\\?)'), 
+				 regexp_replace ( regexp_extract(AdjustedRequest,'(\\?name\\=.*[\\&]?)'), '(\\?name=|\\&.*)', ''),null)
+   )
+	  
+ as ActionName,
+
+Username,ClientIP,Time,Refferer, Duration,Method,LogMessage,LogType,ExceptionMessage ,Trace 
+
+from
+(
+select Guid,regexp_replace (customer_FreeText,'https//api.backand.com','') as Request,
+
+regexp_replace(regexp_replace(
+	if (regexp_match (customer_FreeText, '\\?'), 
+	customer_FreeText, 
+	concat(customer_FreeText,'?')
+), '\\/\\?', '?'),'https//api.backand.com','') as AdjustedRequest,
+   
+   
+Username,ClientIP,event_time_ts as Time,Refferer, RequestTime as Duration,Action as Method, LogMessage,LogType,ExceptionMessage ,Trace 
+
+from cooladata
+where date_range(between 2015-01-01 and 2060-01-01 )
+and event_name = '{0}'  
+and regexp_replace (customer_FreeText,'https//api.backand.com','') <> '/1/app/sync'
+and not regexp_match (Username, '@backand.com')
+and regexp_match (customer_FreeText, 'https//api.backand.com')
+  )
+)
+where Type <> 'N/A'
+and ({1}) order by {2} limit {3}"
+}

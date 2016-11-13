@@ -99,6 +99,10 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\Duradus.Web.Mvc.App\deployment\MySql.Web.dll</HintPath>
     </Reference>
+    <Reference Include="NewRelic.Api.Agent, Version=6.3.123.0, Culture=neutral, PublicKeyToken=06552fced0b33d87, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\NewRelic.Agent.Api.6.3.123.0\lib\NewRelic.Api.Agent.dll</HintPath>
+    </Reference>
     <Reference Include="Newtonsoft.Json, Version=7.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\Newtonsoft.Json.7.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
@@ -290,6 +294,7 @@
   <ItemGroup>
     <Content Include="packages.config" />
     <Content Include="deployment\webhooks.json" />
+    <Content Include="deployment\cqls-qa.json" />
     <None Include="Properties\PublishProfiles\api.pubxml" />
     <None Include="Properties\PublishProfiles\BackandApi.pubxml" />
     <None Include="Web.BackandApi.config">
@@ -363,7 +368,7 @@
           <AutoAssignPort>True</AutoAssignPort>
           <DevelopmentServerPort>5943</DevelopmentServerPort>
           <DevelopmentServerVPath>/</DevelopmentServerVPath>
-          <IISUrl>http://localhost:4110</IISUrl>
+          <IISUrl>http://localhost:5943</IISUrl>
           <OverrideIISAppRootUrl>True</OverrideIISAppRootUrl>
           <IISAppRootUrl>http://localhost:5943</IISAppRootUrl>
           <NTLMAuthentication>False</NTLMAuthentication>
