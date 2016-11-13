@@ -429,8 +429,6 @@ namespace BackAnd.Web.Api.Providers
             var identity = new ClaimsIdentity(context.Options.AuthenticationType);
             identity.AddClaim(new Claim(Database.Username, username));
             identity.AddClaim(new Claim(Database.AppName, appname));
-            identity.AddClaim(new Claim(Database.FullName, map.Database.GetUserFullName2(username)));
-            identity.AddClaim(new Claim(Database.UserRole, map.Database.GetUserRole2(username)));
             // create metadata to pass on to refresh token provider
             //var props = new Microsoft.Owin.Security.AuthenticationProperties(new Dictionary<string, string>
             //{
