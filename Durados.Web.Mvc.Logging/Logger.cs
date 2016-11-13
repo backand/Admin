@@ -621,17 +621,64 @@ namespace Durados.Web.Mvc.Logging
 
         private void WriteToJavaScriptDebugLogger(string controller, string action, string method, string message, string trace, int logType, string freeText, DateTime time, Guid? guid, Log log, string applicationName, string username)
         {
+            LogInsert(controller, action, method, message, trace, logType, freeText, time, guid, log, applicationName, username);
+        }
+
+        private void LogInsert(string controller, string action, string method, string message, string trace, int logType, string freeText, DateTime time, Guid? guid, Log log, string applicationName, string username)
+        {
+            if (!guid.HasValue)
+            {
+                guid = Guid.NewGuid();
+            }
             using (IDbConnection sqlConnection = GetConnection(connectionString))
             {
                 using (IDbCommand command = GetCommand(sqlConnection, "Durados_LogInsert"))
                 {
-                    command.CommandType = CommandType.StoredProcedure;
+                    if (command is MySql.Data.MySqlClient.MySqlCommand)
+                    {
+                        command.CommandText = "INSERT INTO `Durados_Log` " +
+        "(" +
+		"`ApplicationName`, " +
+		"`Username`, " +
+		"`MachineName`, " +
+		"`Time`, " +
+		"`Controller`, " +
+		"`Action`, " +
+		"`MethodName`, " +
+		"`LogType`, " +
+		"`ExceptionMessage`, " +
+		"`Trace`, " +
+		"`FreeText`, " +
+		"`Guid`) " +
+		"VALUES " +
+		"	(@ApplicationName " +
+        "	,@Username " +
+        "	,@MachineName " +
+        "	,@Time " +
+        "	,@Controller " +
+        "	,@Action " +
+        "	,@MethodName " +
+        "	,@LogType " +
+        "	,@ExceptionMessage " +
+        "	,@Trace " +
+        "	,@FreeText " +
+        "	,@Guid);";
+                        sqlConnection.Open();
 
-                    sqlConnection.Open();
+                        SetCommandParametrs(command, applicationName, username, controller, action, method, message, trace, logType, freeText, time, log, guid);
 
-                    SetCommandParametrs(command, applicationName, username, controller, action, method, message, trace, logType, freeText, time, log, guid);
+                        command.ExecuteNonQuery();
+                    }
+                    else
+                    {
+                        command.CommandType = CommandType.StoredProcedure;
 
-                    command.ExecuteNonQuery();
+                        sqlConnection.Open();
+
+                        SetCommandParametrs(command, applicationName, username, controller, action, method, message, trace, logType, freeText, time, log, guid);
+
+                        command.ExecuteNonQuery();
+                    }
                 }
             }
         }
@@ -669,19 +716,21 @@ namespace Durados.Web.Mvc.Logging
         {
             try
             {
-                using (IDbConnection sqlConnection = GetConnection(connectionString))
-                {
-                    using (IDbCommand command = GetCommand(sqlConnection, "Durados_LogInsert"))
-                    {
-                        command.CommandType = CommandType.StoredProcedure;
+                //using (IDbConnection sqlConnection = GetConnection(connectionString))
+                //{
+                //    using (IDbCommand command = GetCommand(sqlConnection, "Durados_LogInsert"))
+                //    {
+                //        command.CommandType = CommandType.StoredProcedure;
 
-                        sqlConnection.Open();
+                //        sqlConnection.Open();
 
-                        SetCommandParametrs(command, applicationName, username, controller, action, method, message, trace, logType, freeText, time, log, guid);
+                //        SetCommandParametrs(command, applicationName, username, controller, action, method, message, trace, logType, freeText, time, log, guid);
 
-                        command.ExecuteNonQuery();
-                    }
-                }
+                //        command.ExecuteNonQuery();
+                //    }
+                //}
+                LogInsert(controller, action, method, message, trace, logType, freeText, time, guid, log, applicationName, username);
+
             }
             catch (InvalidOperationException)
             {
@@ -709,19 +758,21 @@ namespace Durados.Web.Mvc.Logging
         {
             try
             {
-                using (IDbConnection sqlConnection = GetConnection(reportConnectionString))
-                {
-                    using (IDbCommand command = GetCommand(sqlConnection, "Durados_LogInsert"))
-                    {
-                        command.CommandType = CommandType.StoredProcedure;
+                //using (IDbConnection sqlConnection = GetConnection(reportConnectionString))
+                //{
+                //    using (IDbCommand command = GetCommand(sqlConnection, "Durados_LogInsert"))
+                //    {
+                //        command.CommandType = CommandType.StoredProcedure;
 
-                        sqlConnection.Open();
+                //        sqlConnection.Open();
 
-                        SetCommandParametrs(command, applicationName, username, controller, action, method, message, trace, logType, freeText, time, log, appName, clientIP, clientInfo, guid);
+                //        SetCommandParametrs(command, applicationName, username, controller, action, method, message, trace, logType, freeText, time, log, appName, clientIP, clientInfo, guid);
 
-                        command.ExecuteNonQuery();
-                    }
-                }
+                //        command.ExecuteNonQuery();
+                //    }
+                //}
+                LogInsert(controller, action, method, message, trace, logType, freeText, time, guid, log, applicationName, username);
+
             }
             catch (Exception logException)
             {
@@ -836,17 +887,19 @@ namespace Durados.Web.Mvc.Logging
             try
             {
                 string applicationName = System.Web.HttpContext.Current.Request.Headers["Host"];
-                using (IDbConnection cnn = GetConnection(connectionString))
-                {
-                    cnn.Open();
-                    using (IDbCommand command = GetCommand("Durados_LogInsert", connectionString))
-                    {
-                        command.CommandType = CommandType.StoredProcedure;
-                        SetCommandParametrs(command, applicationName, Username, controller, action, method, message, trace, logType, freeText, time, log);
-                        command.ExecuteNonQuery();
-                    }
-                    cnn.Close();
-                }
+                //using (IDbConnection cnn = GetConnection(connectionString))
+                //{
+                //    cnn.Open();
+                //    using (IDbCommand command = GetCommand("Durados_LogInsert", connectionString))
+                //    {
+                //        command.CommandType = CommandType.StoredProcedure;
+                //        SetCommandParametrs(command, applicationName, Username, controller, action, method, message, trace, logType, freeText, time, log);
+                //        command.ExecuteNonQuery();
+                //    }
+                //    cnn.Close();
+                //}
+                LogInsert(controller, action, method, message, trace, logType, freeText, time, null, log, applicationName, Username);
+
             }
             catch (Exception logException)
             {
