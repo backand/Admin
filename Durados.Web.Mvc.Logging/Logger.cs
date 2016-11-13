@@ -624,6 +624,8 @@ namespace Durados.Web.Mvc.Logging
             LogInsert(controller, action, method, message, trace, logType, freeText, time, guid, log, applicationName, username);
         }
 
+
+
         private void LogInsert(string controller, string action, string method, string message, string trace, int logType, string freeText, DateTime time, Guid? guid, Log log, string applicationName, string username)
         {
             if (!guid.HasValue)
