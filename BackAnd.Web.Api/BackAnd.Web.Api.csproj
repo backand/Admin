@@ -294,7 +294,6 @@
   <ItemGroup>
     <Content Include="packages.config" />
     <Content Include="deployment\webhooks.json" />
-    <Content Include="deployment\cqls-qa.json" />
     <None Include="Properties\PublishProfiles\api.pubxml" />
     <None Include="Properties\PublishProfiles\BackandApi.pubxml" />
     <None Include="Web.BackandApi.config">
