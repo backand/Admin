@@ -58,7 +58,8 @@ namespace Durados.Web.Mvc.Logging
         name
         ,email
         ,ipAddress
-        , provider
+        , provider,
+        signed_up_at
         
     }
 }

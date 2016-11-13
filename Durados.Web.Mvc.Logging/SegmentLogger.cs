@@ -71,7 +71,8 @@ namespace Durados.Web.Mvc.Logging
 
                     Analytics.Client.Identify(userId, new Traits() {
                         { ExternalAnalyticsTraitsKey.email.ToString(), userId },
-                        { ExternalAnalyticsTraitsKey.name.ToString(), name }
+                        { ExternalAnalyticsTraitsKey.name.ToString(), name },
+                        { ExternalAnalyticsTraitsKey.signed_up_at.ToString(), DateTime.Now }
                         }, new Options().SetContext(new Context() {
                         { "ip", origIp }}).SetTimestamp(timestamp));
 
