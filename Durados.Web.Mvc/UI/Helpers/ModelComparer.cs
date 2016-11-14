@@ -75,7 +75,17 @@ namespace Durados.Web.Mvc.UI.Helpers
                 {
                     return false;
                 }
-                if (!oldField[key].Equals(newField[key]))
+                if (key == "defaultValue")
+                {
+                    if (newField[key] is decimal)
+                    {
+                        if (!Convert.ToDecimal(oldField[key]).Equals(newField[key]))
+                        {
+                            return false;
+                        }
+                    }
+                }
+                else if (!oldField[key].Equals(newField[key]))
                 {
                     return false;
                 }
