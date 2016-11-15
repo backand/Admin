@@ -81,9 +81,6 @@
     <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Jint">
-      <HintPath>..\Duradus.Web.Mvc.App\deployment\Jint.dll</HintPath>
-    </Reference>
     <Reference Include="MySql.Data">
       <HintPath>..\Duradus.Web.Mvc.App\deployment\MySql.Data.dll</HintPath>
     </Reference>
@@ -150,6 +147,10 @@
     <ProjectReference Include="..\Durados\Durados.csproj">
       <Project>{04183BAC-B3DA-46EC-BE81-D635768F98F4}</Project>
       <Name>Durados</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Jint\Jint.csproj">
+      <Project>{f8a2d895-d745-4e90-937b-fa914d6740d7}</Project>
+      <Name>Jint</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

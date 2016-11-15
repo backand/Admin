@@ -92,8 +92,10 @@ namespace Durados.Workflow
             return System.Convert.ToBoolean(Durados.Workflow.JavaScript.GetCacheInCurrentRequest(Durados.Workflow.JavaScript.Debug) ?? false);
         }
 
-        private string HandleLineCodes(string message)
+        private string HandleLineCodes(string message, string objectName, string actionName)
         {
+            message += "\n\t at " + objectName + " - " + actionName;
+            
             string[] segments = message.Split(new string[] { ":" }, StringSplitOptions.None);
             
             foreach(string segment in segments)
@@ -113,7 +115,7 @@ namespace Durados.Workflow
                     }
                 }
             }
-
+                
             return message;
 
             // "The follwoing action: "aaa" failed to perform: Failed to load the javascript code: Line 166: Unexpected token }"
@@ -427,7 +429,7 @@ namespace Durados.Workflow
             catch (Exception exception)
             {
                 Backand.Logger.Log(exception.Message, 501);
-                throw new DuradosException("Failed to load the javascript code: " + HandleLineCodes(exception.Message), exception); 
+                throw new DuradosException("Syntax error: " + HandleLineCodes(exception.Message, view.Name, actionName), exception); 
             }
             object r = null;
             try
@@ -439,11 +441,12 @@ namespace Durados.Workflow
             catch (Exception exception)
             {
                 string message = (exception.InnerException == null) ? exception.Message : exception.InnerException.Message;
+                message = HandleLineCodes(message, view.Name, actionName);
                 Exception e = new DuradosException(message, exception);
-                Backand.Logger.Log("417 " + e.Message, 501);
+                Backand.Logger.Log(e.Message, 501);
                 if (IsDebug())
                 {
-                    values[ReturnedValueKey] = "417 " + message;
+                    values[ReturnedValueKey] = message;
                     return;
                 }
                 else

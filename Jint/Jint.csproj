@@ -1,0 +1,512 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{F8A2D895-D745-4E90-937B-FA914D6740D7}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>Jint</RootNamespace>
+    <AssemblyName>Jint</AssemblyName>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup>
+    <StartupObject />
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Web" />
+    <Reference Include="System.Web.Extensions" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="DeclarationBindingType.cs" />
+    <Compile Include="Engine.cs" />
+    <Compile Include="EvalCodeScope.cs" />
+    <Compile Include="Native\Argument\ArgumentsObject.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Native\Array\ArrayConstructor.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Native\Array\ArrayInstance.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Native\Array\ArrayPrototype.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Native\Boolean\BooleanConstructor.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Native\Boolean\BooleanInstance.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Native\Boolean\BooleanPrototype.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Native\Date\DateConstructor.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Native\Date\DateInstance.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Native\Date\DatePrototype.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Native\Error\ErrorConstructor.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Native\Error\ErrorInstance.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Native\Error\ErrorPrototype.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Native\Function\BindFunctionInstance.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Native\Function\EvalFunctionInstance.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Native\Function\FunctionConstructor.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Native\Function\FunctionInstance.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Native\Function\FunctionPrototype.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Native\Function\FunctionShim.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Native\Function\ScriptFunctionInstance.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Native\Function\ThrowTypeError.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Native\Global\GlobalObject.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Native\ICallable.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Native\IConstructor.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Native\IPrimitiveInstance.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Native\Json\JsonInstance.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Native\Json\JsonParser.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Native\Json\JsonSerializer.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Native\JsValue.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Native\Math\MathInstance.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Native\Null.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Native\Number\Dtoa\CachePowers.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Native\Number\Dtoa\DiyFp.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Native\Number\Dtoa\DoubleHelper.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Native\Number\Dtoa\FastDtoa.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Native\Number\Dtoa\FastDtoaBuilder.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Native\Number\Dtoa\NumberExtensions.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Native\Number\NumberConstructor.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Native\Number\NumberInstance.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Native\Number\NumberPrototype.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Native\Object\ObjectConstructor.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Native\Object\ObjectInstance.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Native\Object\ObjectPrototype.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Native\RegExp\RegExpConstructor.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Native\RegExp\RegExpInstance.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Native\RegExp\RegExpPrototype.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Native\String\StringConstructor.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Native\String\StringInstance.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Native\String\StringPrototype.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Native\Undefined.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Options.cs" />
+    <Compile Include="Parser\Ast\ArrayExpression.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Parser\Ast\AssignmentExpression.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Parser\Ast\BinaryExpression.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Parser\Ast\BlockStatement.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Parser\Ast\BreakStatement.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Parser\Ast\CallExpression.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Parser\Ast\CatchClause.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Parser\Ast\ConditionalExpression.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Parser\Ast\ContinueStatement.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Parser\Ast\DebuggerStatement.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Parser\Ast\DoWhileStatement.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Parser\Ast\EmptyStatement.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Parser\Ast\Expression.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Parser\Ast\ExpressionStatement.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Parser\Ast\ForInStatement.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Parser\Ast\ForStatement.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Parser\Ast\FunctionDeclaration.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Parser\Ast\FunctionExpression.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Parser\Ast\Identifier.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Parser\Ast\IfStatement.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Parser\Ast\IPropertyKeyExpression.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Parser\Ast\LabeledStatement.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Parser\Ast\Literal.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Parser\Ast\LogicalExpression.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Parser\Ast\MemberExpression.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Parser\Ast\NewExpression.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Parser\Ast\ObjectExpression.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Parser\Ast\Program.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Parser\Ast\Property.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Parser\Ast\RegExpLiteral.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Parser\Ast\ReturnStatement.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Parser\Ast\SequenceExpression.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Parser\Ast\Statement.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Parser\Ast\SwitchCase.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Parser\Ast\SwitchStatement.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Parser\Ast\SyntaxNode.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Parser\Ast\SyntaxNodes.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Parser\Ast\ThisExpression.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Parser\Ast\ThrowStatement.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Parser\Ast\TryStatement.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Parser\Ast\UnaryExpression.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Parser\Ast\UpdateExpression.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Parser\Ast\VariableDeclaration.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Parser\Ast\VariableDeclarator.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Parser\Ast\WhileStatement.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Parser\Ast\WithStatement.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Parser\Comment.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Parser\IFunctionDeclaration.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Parser\IFunctionScope.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Parser\IVariableScope.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Parser\JavascriptParser.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Parser\Loc.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Parser\Messages.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Parser\ParserException.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Parser\ParserExtensions.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Parser\ParserOptions.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Parser\Position.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Parser\State.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Parser\Token.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Runtime\Arguments.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Runtime\CallStack\CallStackElement.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Runtime\CallStack\CallStackElementComparer.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Runtime\CallStack\JintCallStack.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Runtime\Completion.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Runtime\Debug\DebugInfo.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Runtime\Debug\DebugValue.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Runtime\Debug\ExpressionEvaluation.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Runtime\Debug\StatementEvaluation.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Runtime\Descriptors\PropertyDescriptor.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Runtime\Descriptors\Specialized\ClrAccessDescriptor.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Runtime\Descriptors\Specialized\FieldInfoDescriptor.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Runtime\Descriptors\Specialized\IndexDescriptor.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Runtime\Descriptors\Specialized\PropertyInfoDescriptor.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Runtime\Environments\Binding.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Runtime\Environments\DeclarativeEnvironmentRecord.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Runtime\Environments\EnvironmentRecord.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Runtime\Environments\ExecutionContext.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Runtime\Environments\LexicalEnvironment.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Runtime\Environments\ObjectEnvironmentRecord.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Runtime\ExpressionIntepreter.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Runtime\Interop\ClrFunctionInstance.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Runtime\Interop\DefaultTypeConverter.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Runtime\Interop\DelegateWrapper.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Runtime\Interop\GetterFunctionInstance.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Runtime\Interop\IObjectConverter.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Runtime\Interop\IObjectWrapper.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Runtime\Interop\ITypeConverter.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Runtime\Interop\MethodInfoFunctionInstance.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Runtime\Interop\NamespaceReference.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Runtime\Interop\ObjectWrapper.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Runtime\Interop\SetterFunctionInstance.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Runtime\Interop\TypeReference.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Runtime\Interop\TypeReferencePrototype.cs" />
+    <Compile Include="Runtime\JavaScriptException.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Runtime\RecursionDepthOverflowException.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Runtime\References\Reference.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Runtime\StatementInterpreter.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Runtime\StatementsCountOverflowException.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Runtime\TypeConverter.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="StrictModeScope.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="App.config" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>
