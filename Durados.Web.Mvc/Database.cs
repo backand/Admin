@@ -1501,5 +1501,14 @@ namespace Durados.Web.Mvc
         {
             return Map.GetLimit(limit);
         }
+
+        public override bool EnableDecryption
+        {
+            get
+            {
+                return System.Web.HttpContext.Current != null && System.Web.HttpContext.Current.Items[Database.EnableDecryptionKey] != null && System.Web.HttpContext.Current.Items[Database.EnableDecryptionKey].Equals(true);
+            }
+        }
+        
     }
 }

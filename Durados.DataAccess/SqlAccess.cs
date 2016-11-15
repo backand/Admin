@@ -2971,6 +2971,9 @@ namespace Durados.DataAccess
         private string GetOpenCertificatesStatement(Durados.View view)
         {
             string s = string.Empty;
+            if (!view.Database.EnableDecryption)
+                return s;
+
             string sql = "OPEN SYMMETRIC KEY {0} DECRYPTION BY CERTIFICATE {1} ";
             HashSet<string> keys = new HashSet<string>();
 

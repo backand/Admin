@@ -64,6 +64,7 @@ namespace Durados
         public static readonly string ActionName = "ActionName";
 
         public static readonly string MainLogger = "MainLogger";
+        public static readonly string EnableDecryptionKey = "EnableDecryption";
         
         public virtual Guid Guid
         {
@@ -1250,6 +1251,14 @@ namespace Durados
         public virtual object GetLimit(Limits limit)
         {
             throw new NotImplementedException();
+        }
+
+        public virtual bool EnableDecryption
+        {
+            get
+            {
+                return true;
+            }
         }
     }
 

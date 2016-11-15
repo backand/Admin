@@ -2726,7 +2726,7 @@ namespace BackAnd.Web.Api.Controllers
             return Ok(new { status = Maps.Instance.GetOnBoardingStatus(appId.Value.ToString()).ToString() });
         }
 
-        
+
 
 
 
@@ -2736,6 +2736,8 @@ namespace BackAnd.Web.Api.Controllers
         {
             try
             {
+                System.Web.HttpContext.Current.Items[Durados.Database.EnableDecryptionKey] = true;
+                
                 View view = GetView(AppViewName);
                 if (view == null)
                 {

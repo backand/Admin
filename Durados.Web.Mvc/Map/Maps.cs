@@ -1550,6 +1550,7 @@ namespace Durados.Web.Mvc
         private Map CreateMap(string appName, out bool newStructure)
         {
             //Durados.Diagnostics.EventViewer.WriteEvent("Start CreateMap for: " + appName);
+            System.Web.HttpContext.Current.Items[Durados.Database.EnableDecryptionKey] = true;
 
             newStructure = false;
             View appView = GetAppView();
