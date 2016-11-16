@@ -359,22 +359,21 @@ namespace Durados.Workflow
             userProfile.Add("userId", view.Database.GetCurrentUserId());
             userProfile.Add("token", GetUserProfileAuthToken(view));
 
-            
+
             if (!clientParameters.ContainsKey(FILEDATA))
             {
-            HandleParametersSizeLimit(view.Database.GetLimit(Limits.ActionParametersKbSize), clientParameters);
-    userProfile.Add("request", GetRequest());
+                HandleParametersSizeLimit(view.Database.GetLimit(Limits.ActionParametersKbSize), clientParameters);
+                userProfile.Add("request", GetRequest());
             }
 
-            var call = new Jint.Engine(cfg => cfg.AllowClr(typeof(Backand.XMLHttpRequest).Assembly));
-
+            
             
             var CONSTS = new Dictionary<string, object>() { { "apiUrl", System.Web.HttpContext.Current.Request.Url.Scheme + "://" + System.Web.HttpContext.Current.Request.Url.Host + ":" + System.Web.HttpContext.Current.Request.Url.Port + System.Web.HttpContext.Current.Request.ApplicationPath } };
 
             //Newtonsoft.Json.JsonConvert.SerializeObject
             
             var theJavaScriptSerializer = new System.Web.Script.Serialization.JavaScriptSerializer();
-            var parser = new Jint.Native.Json.JsonParser(call);
+            var parser = new Jint.Native.Json.JsonParser(call2);
             //var userInput = parser.Parse(theJavaScriptSerializer.Serialize(newRow));
             //Object clientParametersToSend = null;
             //if (!clientParameters.ContainsKey("filedata"))
@@ -397,7 +396,7 @@ namespace Durados.Workflow
             var userInput = parser.Parse(Newtonsoft.Json.JsonConvert.SerializeObject(newRow));
             Object clientParametersToSend = null;
 
-            
+            bool upload = false;
 
             if (!clientParameters.ContainsKey(FILEDATA))
             {
@@ -405,6 +404,7 @@ namespace Durados.Workflow
             }
             else
             {
+                upload = true;
                 System.Web.HttpContext.Current.Items["file_stream"] = clientParameters[FILEDATA];
                 clientParameters[FILEDATA] = "file_stream";
                 clientParametersToSend = clientParameters;
@@ -417,6 +417,30 @@ namespace Durados.Workflow
             var Config = view.Database.GetConfigDictionary();
             var Config2 = parser.Parse(Newtonsoft.Json.JsonConvert.SerializeObject(Config));
 
+
+            Limits limit = Limits.ActionTimeMSec;
+            if (upload)
+            {
+                limit = Limits.UploadTimeMSec;
+            }
+
+            object actionTimeMSecObject = view.Database.GetLimit(limit);
+            int actionTimeMSec = -1;
+
+            if (!Int32.TryParse(actionTimeMSecObject.ToString(), out actionTimeMSec))
+            {
+                throw new DuradosException("actionTimeMSecLimit in web.config is not numeric or too long");
+            }
+
+            TimeSpan timeoutInterval = new TimeSpan(0, 0, 0, 0, actionTimeMSec);
+
+            string startMessage = theJavaScriptSerializer.Serialize(new { objectName = view.Name, actionName = actionName, @event = "started", time = DateTime.Now, data = new { userInput = newRow, dbRow = oldRow, parameters = clientParameters, userProfile = userProfile } });
+
+            Backand.Logger.Log(startMessage, 502);
+
+
+            var call = new Jint.Engine(cfg => cfg.AllowClr(typeof(Backand.XMLHttpRequest).Assembly), timeoutInterval);
+
             try
             {
                 call.SetValue("userInput", userInput)
@@ -427,6 +451,11 @@ namespace Durados.Workflow
                 .SetValue("CONSTS", CONSTS2)
                 .SetValue("Config", Config2)
                 .Execute(GetXhrWrapper() + code + "; function call(){return backandCallback(userInput, dbRow, parameters, userProfile);}");
+            }
+            catch (TimeoutException exception)
+            {
+                Backand.Logger.Log(exception.Message, 501);
+                throw new DuradosException("Timeout: The operation took longer than " + actionTimeMSec + " milliseconds limit. at (" + view.Name + "/" + actionName + ")", exception);
             }
             catch (Exception exception)
             {
@@ -439,6 +468,16 @@ namespace Durados.Workflow
                 var r2 = call.GetValue("call").Invoke();
                 if (!r2.IsNull())
                     r = r2.ToObject();
+
+                string endMessage = theJavaScriptSerializer.Serialize(new { objectName = view.Name, actionName = actionName, @event = "ended", time = DateTime.Now, data = r });
+
+                Backand.Logger.Log(endMessage, 503);
+
+            }
+            catch (TimeoutException exception)
+            {
+                Backand.Logger.Log(exception.Message, 501);
+                throw new DuradosException("Timeout: The operation took longer than " + actionTimeMSec + " milliseconds limit. at (" + view.Name + "/" + actionName + ")", exception);
             }
             catch (Exception exception)
             {

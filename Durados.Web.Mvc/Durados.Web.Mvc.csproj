@@ -147,10 +147,6 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\Duradus.Web.Mvc.App\deployment\Oracle.ManagedDataAccess.dll</HintPath>
     </Reference>
-    <Reference Include="PayPal, Version=1.2.2.0, Culture=neutral, PublicKeyToken=5b4afc1ccaef40fb, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\Duradus.Web.Mvc.App\deployment\PayPal.dll</HintPath>
-    </Reference>
     <Reference Include="RestSharp, Version=104.4.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\RestSharp.104.4.0\lib\net4\RestSharp.dll</HintPath>
       <Private>True</Private>
@@ -369,6 +365,14 @@
     <Compile Include="UI\Helpers\ActionNotFoundException.cs" />
     <Compile Include="UI\Helpers\AppFactory.cs" />
     <Compile Include="Farm\FarmCaching.cs" />
+    <Compile Include="UI\Helpers\CallStack\Action.cs" />
+    <Compile Include="UI\Helpers\CallStack\ActionEvent.cs" />
+    <Compile Include="UI\Helpers\CallStack\ActionTree.cs" />
+    <Compile Include="UI\Helpers\CallStack\CallStackConverter.cs" />
+    <Compile Include="UI\Helpers\CallStack\Event.cs" />
+    <Compile Include="UI\Helpers\CallStack\IAction.cs" />
+    <Compile Include="UI\Helpers\CallStack\IActionEvent.cs" />
+    <Compile Include="UI\Helpers\CallStack\IActionTree.cs" />
     <Compile Include="UI\Helpers\Cloning\Cloner.cs" />
     <Compile Include="UI\Helpers\Cloning\CopyOptions.cs" />
     <Compile Include="UI\Helpers\CronAuthorizationWasNotSuppliedException.cs" />
@@ -392,9 +396,6 @@
     <Compile Include="UI\Helpers\MenuHelper.cs" />
     <Compile Include="UI\Helpers\ModelComparer.cs" />
     <Compile Include="UI\Helpers\NewDatabaseParametersFactory.cs" />
-    <Compile Include="UI\Helpers\OnlinePayments.cs">
-      <SubType>Code</SubType>
-    </Compile>
     <Compile Include="UI\Helpers\PlugInHelper.cs" />
     <Compile Include="UI\Helpers\PreviewHelper.cs" />
     <Compile Include="UI\Helpers\QueryNotFoundException.cs" />

@@ -234,6 +234,7 @@
     <Compile Include="Controllers\Admin\limitsController.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Controllers\Admin\actionsCallStackController.cs" />
     <Compile Include="Controllers\Admin\NewFkException.cs" />
     <Compile Include="Controllers\Admin\ParseMigrationController.cs" />
     <Compile Include="Controllers\Admin\FarmController.cs" />

@@ -51,7 +51,7 @@ namespace Jint
         {
         }
 
-        public Engine(Action<Options> options)
+        public Engine(Action<Options> options, TimeSpan? timeoutInterval = null)
         {
             _executionContexts = new Stack<ExecutionContext>();
 
@@ -119,6 +119,11 @@ namespace Jint
             EnterExecutionContext(GlobalEnvironment, GlobalEnvironment, Global);
 
             Options = new Options();
+
+            if (timeoutInterval.HasValue)
+            {
+                Options.TimeoutInterval(timeoutInterval.Value);
+            }
 
             if (options != null)
             {

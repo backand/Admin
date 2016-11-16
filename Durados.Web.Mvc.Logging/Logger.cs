@@ -442,7 +442,7 @@ namespace Durados.Web.Mvc.Logging
                 Initiate();
              Log log = new Log();
 
-            bool writeTolog = (logType == 500 || logType == 501);
+             bool writeTolog = (logType == 500 || logType == 501 || logType == 502 || logType == 503);
             bool writeLogTypeToSpecificAppLog = !(LogType < logType); //|| writeTolog;
             bool writeLogTypeToGeneralLog = !(logStashLogType < logType);// || writeTolog;
             if (!writeLogTypeToGeneralLog && !writeLogTypeToSpecificAppLog && !writeTolog)

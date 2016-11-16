@@ -1425,6 +1425,8 @@ namespace Durados
     public enum Limits
     {
         Cron,
-        ActionParametersKbSize
+        ActionParametersKbSize,
+        ActionTimeMSec,
+        UploadTimeMSec
     }
 }

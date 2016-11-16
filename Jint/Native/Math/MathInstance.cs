@@ -8,7 +8,7 @@ namespace Jint.Native.Math
 {
     public sealed class MathInstance : ObjectInstance
     {
-        private static Random _random = new Random();
+        private static Random _random = new Random(Environment.TickCount);
         
         private MathInstance(Engine engine):base(engine)
         {
