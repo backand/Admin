@@ -441,30 +441,26 @@ namespace Jint.Runtime
 
         private static string GetMessage(Statement lastStatement, JavaScriptException v)
         {
-            string[] prefixes = new string[7] { "EvalError", "RangeError", "ReferenceError", "SyntaxError", "TypeError", "URIError", "Error" };
-
             string message = v.Error.ToString();
 
-            foreach (string prefix in prefixes)
-            {
-                message = GetMessage(lastStatement, prefix, message);
-            }
+            message = GetMessage(lastStatement, message);
 
             return message;
         }
 
-        private static string GetMessage(Statement lastStatement, string errorPrefix, string message)
+        private static string GetMessage(Statement lastStatement, string message)
         {
             int line = lastStatement.Location.Start.Line;
             string newMessage;
-            if (message.Contains(errorPrefix + ": Line"))
+            if (!message.Contains("Line "))
             {
-                newMessage = message.Replace(errorPrefix + ": ", "");
+                newMessage = "Line " + line + ": " + message;
             }
             else
             {
-                newMessage = message.Replace(errorPrefix + ":", "Line " + line + ":");
+                newMessage = "Line " + message.Split(new string[] { "Line " }, StringSplitOptions.None)[1];
             }
+            
             return newMessage;
         }
 

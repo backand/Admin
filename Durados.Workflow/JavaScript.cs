@@ -94,8 +94,6 @@ namespace Durados.Workflow
 
         private string HandleLineCodes(string message, string objectName, string actionName)
         {
-            message += "\n\t at " + objectName + " - " + actionName;
-            
             string[] segments = message.Split(new string[] { ":" }, StringSplitOptions.None);
             
             foreach(string segment in segments)
@@ -109,8 +107,12 @@ namespace Durados.Workflow
                         if (int.TryParse(subsegment, out number))
                         {
                             int adjustedNumber = number - 160;
-                            return message.Replace(number.ToString(), adjustedNumber.ToString());
-                            
+                            message = message.Replace("Line " + number.ToString() + ": ", "");
+            
+                            message += " at (" + objectName + "/" + actionName + ":" + adjustedNumber + ")";
+            
+            
+                            return message;
                         }
                     }
                 }
