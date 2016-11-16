@@ -784,7 +784,7 @@ namespace Durados.Web.Mvc
             {
                 System.Web.HttpContext.Current.Items.Add(Database.FullName, GetUserFullName(username));
             }
-            return System.Web.HttpContext.Current.Items[Database.FullName].ToString();
+            return (System.Web.HttpContext.Current.Items[Database.FullName] ?? string.Empty).ToString();
         }
 
         public virtual string GetUserFullName(string username)
