@@ -1021,8 +1021,6 @@ namespace Durados.Web.Mvc.Logging
             if (guid2 == null)
             {
                 guid2 = Guid.NewGuid();
-                NewRelic.Api.Agent.NewRelic.AddCustomParameter(Durados.Database.RequestId, guid2.ToString());
-
             }
             SendLogMessage(appName, applicationName, username, machineName, time.ToString(), controller, action, method, logType.ToString(), message, trace, freeText, guid2.ToString(), clientIP, clientInfo, requestTime, additional);
         }
