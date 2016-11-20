@@ -54,7 +54,7 @@ namespace BackAnd.Web.Api.Controllers
 
                 int rowCount = -1;
 
-                Dictionary<string, object>[] filterArray = new Dictionary<string, object>[2] { new Dictionary<string, object>() { { "fieldName", "Guid" }, { "operator", FilterOperandType.equals.ToString() }, { "value", guid } }, new Dictionary<string, object>() { { "fieldName", "LogType" }, { "operator", FilterOperandType.greaterThan.ToString() }, { "value", 500 } } };
+                Dictionary<string, object>[] filterArray = new Dictionary<string, object>[2] { new Dictionary<string, object>() { { "fieldName", "Guid" }, { "operator", FilterOperandType.equals.ToString() }, { "value", guid } }, new Dictionary<string, object>() { { "fieldName", "LogType" }, { "operator", FilterOperandType.greaterThan.ToString() }, { "value", 501 } } };
                 Dictionary<string, object>[] sortArray = new Dictionary<string, object>[1] { new Dictionary<string, object>() { { "fieldName", "Time" }, { "order", "asc" } } };
 
                 var items = (Dictionary<string, object>)RestHelper.Get(view, false, false, 1, limit * 2 + 1, filterArray, null, sortArray, out rowCount, false, view_BeforeSelect, view_AfterSelect, false, false, false, false, null, true, false);

@@ -9,6 +9,7 @@ using System.Net;
 using Durados.Web.Mvc;
 using Durados.Web.Mvc.Farm;
 using Durados.Data;
+using System.Runtime.Caching;
 
 namespace BackAnd.Web.Api.Controllers.Filters
 {
@@ -493,6 +494,52 @@ namespace BackAnd.Web.Api.Controllers.Filters
         }
 
         private string GetAppByToken(string anonymousToken)
+        {
+            string appName = GetAppByTokenFromCache(anonymousToken);
+
+            if (appName == null)
+            {
+                appName = GetAppByTokenFromDb(anonymousToken);
+                if (appName != null)
+                {
+                    SetAppByTokenToCache(anonymousToken, appName);
+                }
+            }
+
+            return appName;
+        }
+
+        private string GetAppByTokenFromCache(string anonymousToken)
+        {
+            if (!Maps.Instance.DuradosMap.AllKindOfCache.Contains(anonymousTokenKey))
+            {
+                return null;
+            }
+
+            var anonymousTokenCache = (MemoryCache)Maps.Instance.DuradosMap.AllKindOfCache[anonymousTokenKey];
+
+            if (anonymousTokenCache.Contains(anonymousToken))
+            {
+                return (string)anonymousTokenCache[anonymousToken];
+            }
+
+            return null;
+        }
+
+        string anonymousTokenKey = "anonymousToken";
+        private void SetAppByTokenToCache(string anonymousToken, string appName)
+        {
+            if (!Maps.Instance.DuradosMap.AllKindOfCache.Contains(anonymousTokenKey))
+            {
+                Maps.Instance.DuradosMap.AllKindOfCache[anonymousTokenKey] = new MemoryCache(anonymousTokenKey);
+            }
+
+            var anonymousTokenCache = (MemoryCache)Maps.Instance.DuradosMap.AllKindOfCache[anonymousTokenKey];
+
+            anonymousTokenCache[anonymousToken] = appName;
+        }
+
+        private string GetAppByTokenFromDb(string anonymousToken)
         {
             string sql = "SELECT [Name] FROM [durados_app] WITH(NOLOCK)  WHERE [AnonymousToken] =@AnonymousToken";
             using (System.Data.SqlClient.SqlConnection cnn = new System.Data.SqlClient.SqlConnection(Maps.Instance.DuradosMap.Database.ConnectionString))

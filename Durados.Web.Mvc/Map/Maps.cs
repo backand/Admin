@@ -29,6 +29,7 @@ using Durados.Web.Mvc.Webhook;
 using System.Collections.Specialized;
 using System.Configuration;
 using System.Web.Script.Serialization;
+using System.Runtime.Caching;
 
 namespace Durados.Web.Mvc
 {
@@ -1873,6 +1874,52 @@ namespace Durados.Web.Mvc
         }
 
         public string GetAppNameByGuid(string guid)
+        {
+            string appName = GetAppNameByGuidFromCache(guid);
+
+            if (appName == null)
+            {
+                appName = GetAppNameByGuidFromDb(guid);
+                if (appName != null)
+                {
+                    SetAppNameByGuidToCache(guid, appName);
+                }
+            }
+
+            return appName;
+        }
+
+        private string GetAppNameByGuidFromCache(string guid)
+        {
+            if (!DuradosMap.AllKindOfCache.Contains(guidTokenKey))
+            {
+                return null;
+            }
+
+            var guidTokenCache = (MemoryCache)DuradosMap.AllKindOfCache[guidTokenKey];
+
+            if (guidTokenCache.Contains(guid))
+            {
+                return (string)guidTokenCache[guid];
+            }
+
+            return null;
+        }
+
+        string guidTokenKey = "guidTokenKey";
+        private void SetAppNameByGuidToCache(string guid, string appName)
+        {
+            if (!DuradosMap.AllKindOfCache.Contains(guidTokenKey))
+            {
+                DuradosMap.AllKindOfCache[guidTokenKey] = new MemoryCache(guidTokenKey);
+            }
+
+            var guidTokenCache = (MemoryCache)DuradosMap.AllKindOfCache[guidTokenKey];
+
+            guidTokenCache[guid] = appName;
+        }
+
+        public string GetAppNameByGuidFromDb(string guid)
         {
             SqlAccess sql = new SqlAccess();
             string sSqlCommand = "";

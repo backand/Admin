@@ -454,11 +454,13 @@ namespace Durados.Workflow
             }
             catch (TimeoutException exception)
             {
+                Handle503(theJavaScriptSerializer, view.Name, actionName, exception.Message);
                 Backand.Logger.Log(exception.Message, 501);
                 throw new DuradosException("Timeout: The operation took longer than " + actionTimeMSec + " milliseconds limit. at (" + view.Name + "/" + actionName + ")", exception);
             }
             catch (Exception exception)
             {
+                Handle503(theJavaScriptSerializer, view.Name, actionName, exception.Message);
                 Backand.Logger.Log(exception.Message, 501);
                 throw new DuradosException("Syntax error: " + HandleLineCodes(exception.Message, view.Name, actionName), exception); 
             }
@@ -476,15 +478,18 @@ namespace Durados.Workflow
             }
             catch (TimeoutException exception)
             {
-                Backand.Logger.Log(exception.Message, 501);
-                throw new DuradosException("Timeout: The operation took longer than " + actionTimeMSec + " milliseconds limit. at (" + view.Name + "/" + actionName + ")", exception);
+                string message = "Timeout: The operation took longer than " + actionTimeMSec + " milliseconds limit. at (" + view.Name + "/" + actionName + ")";
+                Handle503(theJavaScriptSerializer, view.Name, actionName, message);
+                Backand.Logger.Log(message, 501);
+                throw new DuradosException(message, exception);
             }
             catch (Exception exception)
             {
                 string message = (exception.InnerException == null) ? exception.Message : exception.InnerException.Message;
                 message = HandleLineCodes(message, view.Name, actionName);
                 Exception e = new DuradosException(message, exception);
-                Backand.Logger.Log(e.Message, 501);
+                Handle503(theJavaScriptSerializer, view.Name, actionName, message);
+                Backand.Logger.Log(message, 501);
                 if (IsDebug())
                 {
                     values[ReturnedValueKey] = message;
@@ -540,6 +545,13 @@ namespace Durados.Workflow
                 else
                     values[ReturnedValueKey] = r;
             }
+        }
+
+        private void Handle503(System.Web.Script.Serialization.JavaScriptSerializer theJavaScriptSerializer, string objectName, string actionName, string message)
+        {
+            string endMessage = theJavaScriptSerializer.Serialize(new { objectName = objectName, actionName = actionName, @event = "ended", time = DateTime.Now, data = new { error = message} });
+
+            Backand.Logger.Log(endMessage, 503);
         }
 
         private void HandleParametersSizeLimit(object limit, Dictionary<string, object> clientParameters)

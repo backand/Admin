@@ -18,6 +18,7 @@ using System.Text.RegularExpressions;
 using BackAnd.Web.Api.Controllers.Admin;
 using Durados.Web.Mvc.Webhook;
 using Durados.Web.Mvc.UI.Helpers.Cloning;
+using System.Runtime.Caching;
 /*
  HTTP Verb	|Entire Collection (e.g. /customers)	                                                        |Specific Item (e.g. /customers/{id})
 -----------------------------------------------------------------------------------------------------------------------------------------------
@@ -1902,19 +1903,20 @@ namespace BackAnd.Web.Api.Controllers
 
         private void SetTemplateToCache(Dictionary<string, object> values, string id)
         {
-            if (!map.AllKindOfCache.ContainsKey(Durados.Database.CreateSchema))
+            if (!map.AllKindOfCache.Contains(Durados.Database.CreateSchema))
             {
-                map.AllKindOfCache.Add(Durados.Database.CreateSchema, new Dictionary<string, object>());
+                map.AllKindOfCache[Durados.Database.CreateSchema] = new MemoryCache(Durados.Database.CreateSchema);
             }
 
-            if (map.AllKindOfCache[Durados.Database.CreateSchema].ContainsKey(id))
+            var CreateSchemaCache = (MemoryCache)map.AllKindOfCache[Durados.Database.CreateSchema];
+            if (CreateSchemaCache.Contains(id))
             {
-                map.AllKindOfCache[Durados.Database.CreateSchema].Remove(id);
+                CreateSchemaCache.Remove(id);
             }
                 
             if (values.ContainsKey("templateId"))
             {
-                map.AllKindOfCache[Durados.Database.CreateSchema].Add(id, new Template() { TemplateType = TemplateType.TemplateId, Value = values["templateId"], CopyOptions = new CopyOptions(true) });
+                CreateSchemaCache[id] = new Template() { TemplateType = TemplateType.TemplateId, Value = values["templateId"], CopyOptions = new CopyOptions(true) };
             }
             else if (values.ContainsKey("appId"))
             {
@@ -1922,7 +1924,7 @@ namespace BackAnd.Web.Api.Controllers
                 if (values.ContainsKey("copyOptions"))
                     copyOptions = values["copyOptions"];
 
-                map.AllKindOfCache[Durados.Database.CreateSchema].Add(id, new Template() { TemplateType = TemplateType.AppId, Value = values["appId"], CopyOptions = new CopyOptions(copyOptions) });
+                CreateSchemaCache[id] = new Template() { TemplateType = TemplateType.AppId, Value = values["appId"], CopyOptions = new CopyOptions(copyOptions) };
             }
             else if (values.ContainsKey("schema"))
             {
@@ -1943,7 +1945,7 @@ namespace BackAnd.Web.Api.Controllers
 
                 string schemaJson = new JavaScriptSerializer().Serialize(schema);
 
-                map.AllKindOfCache[Durados.Database.CreateSchema].Add(id, new Template() { TemplateType = TemplateType.Schema, Value = schemaJson });
+                CreateSchemaCache[id] = new Template() { TemplateType = TemplateType.Schema, Value = schemaJson };
             }
 
         }
@@ -2219,12 +2221,15 @@ namespace BackAnd.Web.Api.Controllers
 
         private Template GetTemplateFromCache(string appName)
         {
-            if (!Maps.Instance.DuradosMap.AllKindOfCache.ContainsKey(Durados.Database.CreateSchema))
+            
+            if (!Maps.Instance.DuradosMap.AllKindOfCache.Contains(Durados.Database.CreateSchema))
                 return null;
 
-            if (Maps.Instance.DuradosMap.AllKindOfCache[Durados.Database.CreateSchema].ContainsKey(appName))
+            var CreateSchemaCache = (MemoryCache)Maps.Instance.DuradosMap.AllKindOfCache[Durados.Database.CreateSchema];
+
+            if (CreateSchemaCache.Contains(appName))
             {
-                return (Template) Maps.Instance.DuradosMap.AllKindOfCache[Durados.Database.CreateSchema][appName];
+                return (Template)CreateSchemaCache[appName];
             }
 
             return null;

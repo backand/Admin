@@ -149,6 +149,14 @@ namespace Durados.Web.Mvc.Controllers.Api
 
             return (Dictionary<string, object>[])dict;
         }
+
+        public static string[] DeserializeStringArray(string json)
+        {
+            var jss = new JavaScriptSerializer();
+            var dict = jss.Deserialize<string[]>(json);
+
+            return (string[])dict;
+        }
     }
 
     public class ApiHttpException : HttpStatusCodeResult

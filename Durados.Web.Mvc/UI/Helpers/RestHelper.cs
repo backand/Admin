@@ -10,6 +10,8 @@ using System.Linq;
 using System.Net;
 using System.Text;
 using System.Threading.Tasks;
+using Durados.Data;
+using System.Runtime.Caching;
 
 namespace Durados.Web.Mvc.UI.Helpers
 {
@@ -119,9 +121,13 @@ namespace Durados.Web.Mvc.UI.Helpers
             try
             {
                 Map map = Maps.Instance.GetMap();
-                if (map.AllKindOfCache.ContainsKey(RestDataCache))
+                //if (map.AllKindOfCache.ContainsKey(RestDataCache))
+                //{
+                //    ((Dictionary<string, object>)map.AllKindOfCache[RestDataCache]).Clear();
+                //}
+                if (map.AllKindOfCache.Contains(RestDataCache))
                 {
-                    ((Dictionary<string, object>)map.AllKindOfCache[RestDataCache]).Clear();
+                    map.AllKindOfCache[RestDataCache] = new MemoryCache(RestDataCache);
                 }
             }
             catch { }
@@ -261,7 +267,7 @@ namespace Durados.Web.Mvc.UI.Helpers
             return System.Web.HttpContext.Current.Request.Url.PathAndQuery;
         }
 
-        public static object Get(this View view, bool withSelectOptions, bool withFilterOptions, int page, int pageSize, Dictionary<string, object>[] filter, string search, Dictionary<string, object>[] sort, out int rowCount, bool deep, BeforeSelectEventHandler beforeSelectCallback, AfterSelectEventHandler afterSelectCallback, bool returnDataView = false, bool descriptive = true, bool useCache = false, bool relatedObjects = false, string where = null, bool hideMetadata = false, bool hideTotalRows = false)
+        public static object Get(this View view, bool withSelectOptions, bool withFilterOptions, int page, int pageSize, Dictionary<string, object>[] filter, string search, Dictionary<string, object>[] sort, out int rowCount, bool deep, BeforeSelectEventHandler beforeSelectCallback, AfterSelectEventHandler afterSelectCallback, bool returnDataView = false, bool descriptive = true, bool useCache = false, bool relatedObjects = false, string where = null, bool hideMetadata = false, bool hideTotalRows = false, string[] fields = null)
         {
             if (useCache)
             {
@@ -340,10 +346,14 @@ namespace Durados.Web.Mvc.UI.Helpers
             try
             {
                 Map map = Maps.Instance.GetMap();
-                if (!map.AllKindOfCache.ContainsKey(RestDataCache))
+                if (!map.AllKindOfCache.Contains(RestDataCache))
                 {
-                    map.AllKindOfCache.Add(RestDataCache, new Dictionary<string, object>());
+                    map.AllKindOfCache[RestDataCache] = new MemoryCache(RestDataCache);
                 }
+                //if (!map.AllKindOfCache.ContainsKey(RestDataCache))
+                //{
+                //    map.AllKindOfCache.Add(RestDataCache, new Dictionary<string, object>());
+                //}
 
                 Dictionary<string, object> restDataCacheDictionary = (Dictionary<string, object>)map.AllKindOfCache[RestDataCache];
                 if (restDataCacheDictionary.ContainsKey(GetRestDataCacheKey()))
@@ -367,12 +377,22 @@ namespace Durados.Web.Mvc.UI.Helpers
             {
 
                 Map map = Maps.Instance.GetMap();
-                if (map.AllKindOfCache.ContainsKey(RestDataCache))
+                //if (map.AllKindOfCache.ContainsKey(RestDataCache))
+                //{
+                //    Dictionary<string, object> restDataCacheDictionary = (Dictionary<string, object>)map.AllKindOfCache[RestDataCache];
+                //    if (restDataCacheDictionary.ContainsKey(GetRestDataCacheKey()))
+                //    {
+                //        cachedObject = restDataCacheDictionary[GetRestDataCacheKey()];
+                //        return true;
+                //    }
+                //}
+                if (map.AllKindOfCache.Contains(RestDataCache))
                 {
-                    Dictionary<string, object> restDataCacheDictionary = (Dictionary<string, object>)map.AllKindOfCache[RestDataCache];
-                    if (restDataCacheDictionary.ContainsKey(GetRestDataCacheKey()))
+                    MemoryCache restDataCacheDictionary = (MemoryCache)map.AllKindOfCache[RestDataCache];
+                    string restDataCacheKey = GetRestDataCacheKey();
+                    if (restDataCacheDictionary.Contains(restDataCacheKey))
                     {
-                        cachedObject = restDataCacheDictionary[GetRestDataCacheKey()];
+                        cachedObject = restDataCacheDictionary[restDataCacheKey];
                         return true;
                     }
                 }
@@ -3512,9 +3532,13 @@ namespace Durados.Web.Mvc.UI.Helpers
             if (view != null)
                 cacheKey = dictionaryType.ToString() + "__" + view.Name;
 
-            if (view != null && view.Database.Map.AllKindOfCache.ContainsKey(viewDictionary) && view.Database.Map.AllKindOfCache[viewDictionary].ContainsKey(cacheKey))
+            //if (view != null && view.Database.Map.AllKindOfCache.ContainsKey(viewDictionary) && view.Database.Map.AllKindOfCache[viewDictionary].ContainsKey(cacheKey))
+            //{
+            //    return (DataView)view.Database.Map.AllKindOfCache[viewDictionary][cacheKey];
+            //}
+            if (view != null && view.Database.Map.AllKindOfCache.Contains(viewDictionary) && ((MemoryCache)view.Database.Map.AllKindOfCache[viewDictionary]).Contains(cacheKey))
             {
-                return (DataView)view.Database.Map.AllKindOfCache[viewDictionary][cacheKey];
+                return (DataView)((MemoryCache)view.Database.Map.AllKindOfCache[viewDictionary])[cacheKey];
             }
 
             switch (dictionaryType)
@@ -3537,16 +3561,28 @@ namespace Durados.Web.Mvc.UI.Helpers
 
             if (view != null)
             {
-                if (!view.Database.Map.AllKindOfCache.ContainsKey(viewDictionary))
+                if (!view.Database.Map.AllKindOfCache.Contains(viewDictionary))
                 {
-                    view.Database.Map.AllKindOfCache.Add(viewDictionary, new Dictionary<string, object>());
+                    view.Database.Map.AllKindOfCache[viewDictionary] = new MemoryCache(viewDictionary);
                 }
-                if (view.Database.Map.AllKindOfCache[viewDictionary].ContainsKey(cacheKey))
+                MemoryCache viewDictionaryCache = (MemoryCache)view.Database.Map.AllKindOfCache[viewDictionary];
+                if (viewDictionaryCache.Contains(cacheKey))
                 {
-                    view.Database.Map.AllKindOfCache[viewDictionary].Remove(cacheKey);
+                    viewDictionaryCache.Remove(cacheKey);
                 }
                 if (pk != null)
-                    view.Database.Map.AllKindOfCache[viewDictionary].Add(cacheKey, dataView);
+                    viewDictionaryCache[cacheKey] = dataView;
+
+                //if (!view.Database.Map.AllKindOfCache.ContainsKey(viewDictionary))
+                //{
+                //    view.Database.Map.AllKindOfCache.Add(viewDictionary, new Dictionary<string, object>());
+                //}
+                //if (view.Database.Map.AllKindOfCache[viewDictionary].ContainsKey(cacheKey))
+                //{
+                //    view.Database.Map.AllKindOfCache[viewDictionary].Remove(cacheKey);
+                //}
+                //if (pk != null)
+                //    view.Database.Map.AllKindOfCache[viewDictionary].Add(cacheKey, dataView);
             }
 
 
@@ -5033,41 +5069,81 @@ namespace Durados.Web.Mvc.UI.Helpers
         public static Dictionary<string, object> Get(string appName, View view, string json)
         {
             Map map = GetMap(appName);
-            if (!map.AllKindOfCache.ContainsKey(key))
+            if (!map.AllKindOfCache.Contains(key))
             {
-                map.AllKindOfCache.Add(key, new Dictionary<string, object>());
+                map.AllKindOfCache[key] = new MemoryCache(key);
             }
-            if (!map.AllKindOfCache[key].ContainsKey(view.JsonName))
+
+            MemoryCache NoSqlFilterCache = (MemoryCache)map.AllKindOfCache[key];
+            if (!NoSqlFilterCache.Contains(view.JsonName))
             {
-                ((Dictionary<string, object>)map.AllKindOfCache[key]).Add(view.JsonName, new Dictionary<string, object>());
+                ((MemoryCache)NoSqlFilterCache)[view.JsonName] = new MemoryCache(view.JsonName);
                 return null;
             }
-            if (((Dictionary<string, object>)((Dictionary<string, object>)map.AllKindOfCache[key])[view.JsonName]).ContainsKey(System.Web.Helpers.Crypto.SHA256(json)))
+            if (((MemoryCache)((MemoryCache)NoSqlFilterCache)[view.JsonName]).Contains(System.Web.Helpers.Crypto.SHA256(json)))
             {
-                return (Dictionary<string, object>)((Dictionary<string, object>)((Dictionary<string, object>)map.AllKindOfCache[key])[view.JsonName])[System.Web.Helpers.Crypto.SHA256(json)];
+                return (Dictionary<string, object>)((MemoryCache)((MemoryCache)NoSqlFilterCache)[view.JsonName])[System.Web.Helpers.Crypto.SHA256(json)];
             }
             return null;
 
         }
 
+        //public static Dictionary<string, object> Get(string appName, View view, string json)
+        //{
+        //    Map map = GetMap(appName);
+        //    if (!map.AllKindOfCache.ContainsKey(key))
+        //    {
+        //        map.AllKindOfCache.Add(key, new Dictionary<string, object>());
+        //    }
+        //    if (!map.AllKindOfCache[key].ContainsKey(view.JsonName))
+        //    {
+        //        ((Dictionary<string, object>)map.AllKindOfCache[key]).Add(view.JsonName, new Dictionary<string, object>());
+        //        return null;
+        //    }
+        //    if (((Dictionary<string, object>)((Dictionary<string, object>)map.AllKindOfCache[key])[view.JsonName]).ContainsKey(System.Web.Helpers.Crypto.SHA256(json)))
+        //    {
+        //        return (Dictionary<string, object>)((Dictionary<string, object>)((Dictionary<string, object>)map.AllKindOfCache[key])[view.JsonName])[System.Web.Helpers.Crypto.SHA256(json)];
+        //    }
+        //    return null;
+
+        //}
+
+        //public static void Set(string appName, View view, string json, Dictionary<string, object> result)
+        //{
+        //    Map map = GetMap(appName);
+        //    if (!map.AllKindOfCache.ContainsKey(key))
+        //    {
+        //        map.AllKindOfCache.Add(key, new Dictionary<string, object>());
+        //    }
+        //    if (!map.AllKindOfCache[key].ContainsKey(view.JsonName))
+        //    {
+        //        ((Dictionary<string, object>)map.AllKindOfCache[key]).Add(view.JsonName, new Dictionary<string, object>());
+        //    }
+        //    if (!((Dictionary<string, object>)((Dictionary<string, object>)map.AllKindOfCache[key])[view.JsonName]).ContainsKey(System.Web.Helpers.Crypto.SHA256(json)))
+        //    {
+        //        ((Dictionary<string, object>)((Dictionary<string, object>)map.AllKindOfCache[key])[view.JsonName])
+        //            .Add(System.Web.Helpers.Crypto.SHA256(json), result);
+        //    }
+        //}
+
         public static void Set(string appName, View view, string json, Dictionary<string, object> result)
         {
             Map map = GetMap(appName);
-            if (!map.AllKindOfCache.ContainsKey(key))
+            if (!map.AllKindOfCache.Contains(key))
             {
-                map.AllKindOfCache.Add(key, new Dictionary<string, object>());
+                map.AllKindOfCache[key] = new MemoryCache(key);
             }
-            if (!map.AllKindOfCache[key].ContainsKey(view.JsonName))
+            MemoryCache NoSqlFilterCache = (MemoryCache)map.AllKindOfCache[key];
+
+            if (!NoSqlFilterCache.Contains(view.JsonName))
             {
-                ((Dictionary<string, object>)map.AllKindOfCache[key]).Add(view.JsonName, new Dictionary<string, object>());
+                ((MemoryCache)NoSqlFilterCache)[view.JsonName] = new MemoryCache(view.JsonName);
             }
-            if (!((Dictionary<string, object>)((Dictionary<string, object>)map.AllKindOfCache[key])[view.JsonName]).ContainsKey(System.Web.Helpers.Crypto.SHA256(json)))
+            if (!((MemoryCache)((MemoryCache)NoSqlFilterCache)[view.JsonName]).Contains(System.Web.Helpers.Crypto.SHA256(json)))
             {
-                ((Dictionary<string, object>)((Dictionary<string, object>)map.AllKindOfCache[key])[view.JsonName])
+                ((Dictionary<string, object>)((MemoryCache)NoSqlFilterCache)[view.JsonName])
                     .Add(System.Web.Helpers.Crypto.SHA256(json), result);
             }
-
-
         }
     }
 
@@ -5217,9 +5293,13 @@ namespace Durados.Web.Mvc.UI.Helpers
         static string key = "RefreshToken";
         static RefreshToken()
         {
-            if (!Maps.Instance.DuradosMap.AllKindOfCache.ContainsKey(key))
+            //if (!Maps.Instance.DuradosMap.AllKindOfCache.ContainsKey(key))
+            //{
+            //    Maps.Instance.DuradosMap.AllKindOfCache.Add(key, new Dictionary<string, object>());
+            //}
+            if (!Maps.Instance.DuradosMap.AllKindOfCache.Contains(key))
             {
-                Maps.Instance.DuradosMap.AllKindOfCache.Add(key, new Dictionary<string, object>());
+                Maps.Instance.DuradosMap.AllKindOfCache[key] = new MemoryCache(key);
             }
         }
 
@@ -5261,7 +5341,7 @@ namespace Durados.Web.Mvc.UI.Helpers
 
         public static bool Validate(string appName, string refreshToken, string username)
         {
-            if (!Maps.Instance.DuradosMap.AllKindOfCache[key].ContainsKey(refreshToken))
+            if (!((MemoryCache)Maps.Instance.DuradosMap.AllKindOfCache[key]).Contains(refreshToken))
             {
                 Map map = GetMap(appName);
                 if (!map.Database.UseRefreshToken && !map.Equals(Maps.Instance.DuradosMap))
@@ -5277,7 +5357,7 @@ namespace Durados.Web.Mvc.UI.Helpers
                 string userGuid = map.Database.GetGuidByUsername(username);
                 if (System.Web.Helpers.Crypto.VerifyHashedPassword(refreshToken, appGuid + userGuid))
                 {
-                    Maps.Instance.DuradosMap.AllKindOfCache[key].Add(refreshToken, new Dictionary<string, string>() { { "username", username }, { "appName", appName } });
+                    ((MemoryCache)Maps.Instance.DuradosMap.AllKindOfCache[key])[refreshToken] = new Dictionary<string, string>() { { "username", username }, { "appName", appName } };
                 }
                 else
                 {
@@ -5285,6 +5365,31 @@ namespace Durados.Web.Mvc.UI.Helpers
                 }
             }
             return true;
+
+            //if (!Maps.Instance.DuradosMap.AllKindOfCache[key].ContainsKey(refreshToken))
+            //{
+            //    Map map = GetMap(appName);
+            //    if (!map.Database.UseRefreshToken && !map.Equals(Maps.Instance.DuradosMap))
+            //        return false;
+
+            //    bool valid;
+            //    if (ExternalAuthRefreshToken.IsExternalAuth(map, refreshToken, out valid))
+            //    {
+            //        return valid;
+            //    }
+
+            //    string appGuid = map.Guid.ToString();
+            //    string userGuid = map.Database.GetGuidByUsername(username);
+            //    if (System.Web.Helpers.Crypto.VerifyHashedPassword(refreshToken, appGuid + userGuid))
+            //    {
+            //        Maps.Instance.DuradosMap.AllKindOfCache[key].Add(refreshToken, new Dictionary<string, string>() { { "username", username }, { "appName", appName } });
+            //    }
+            //    else
+            //    {
+            //        return false;
+            //    }
+            //}
+            //return true;
         }
 
         public static void Clear()
@@ -5293,7 +5398,7 @@ namespace Durados.Web.Mvc.UI.Helpers
         }
         public static void Clear(string appName)
         {
-            Maps.Instance.DuradosMap.AllKindOfCache[key].Clear();
+            Maps.Instance.DuradosMap.AllKindOfCache[key] = new MemoryCache(key);
             FarmCachingSingeltone.Instance.ClearMachinesCache(appName);
         }
     }

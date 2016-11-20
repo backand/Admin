@@ -14,6 +14,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.Caching;
 using System.Text;
 
 namespace Durados.Web.Mvc
@@ -4551,16 +4552,27 @@ namespace Durados.Web.Mvc
             }
         }
 
-        Dictionary<string, Dictionary<string, object>> allKindOfCache = new Dictionary<string, Dictionary<string, object>>();
-
-        public Dictionary<string, Dictionary<string, object>> AllKindOfCache
+        //Dictionary<string, Dictionary<string, object>> allKindOfCache = new Dictionary<string, Dictionary<string, object>>();
+        MemoryCache allKindOfCache = new MemoryCache("allKindOfCache");
+        //System.Runtime.Caching.MemoryCache
+        //public Dictionary<string, Dictionary<string, object>> AllKindOfCache
+        //{
+        //    get
+        //    {
+        //        return allKindOfCache;
+        //    }
+        //}
+        public MemoryCache AllKindOfCache
         {
             get
             {
                 return allKindOfCache;
             }
+            set
+            {
+                allKindOfCache = value;
+            }
         }
-
         MapSimpleCache mapSimpleCache = new MapSimpleCache();
         public MapSimpleCache MapSimpleCache
         {

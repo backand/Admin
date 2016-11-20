@@ -22,6 +22,7 @@ using System.Collections;
 using System.Data.SqlClient;
 using Durados.Web.Mvc.Infrastructure;
 using Durados.Web.Mvc.Farm;
+using System.Runtime.Caching;
 
 /*
  HTTP Verb	|Entire Collection (e.g. /customers)	                                                        |Specific Item (e.g. /customers/{id})
@@ -765,7 +766,7 @@ namespace BackAnd.Web.Api.Controllers
                 Map.SaveDynamicMapping();
                 Map.Refresh();
                 Map.JsonConfigCache.Clear();
-                Map.AllKindOfCache.Clear();
+                Map.AllKindOfCache = new MemoryCache("allKindOfCache");
                 RefreshOldAdmin(appName);
             }
             if (!string.IsNullOrEmpty(appName) && appName != Maps.DuradosAppName)
@@ -2246,6 +2247,7 @@ namespace BackAnd.Web.Api.Controllers
         public static readonly string StringifyFilter = "Please JSON.stringify the filter parameter";
         public static readonly string GetFilterError = "Failed to translate filter";
         public static readonly string StringifySort = "Please JSON.stringify the sort parameter";
+        public static readonly string StringifyFields = "Please provide the fields parameters as ['field1','field2']";
         public static readonly string InvalidSchema = "Invalid schema";
 
         public static readonly string MoreThanOneParseConversions = "{0} has more than one parse conversions.";

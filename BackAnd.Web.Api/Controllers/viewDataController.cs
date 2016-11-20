@@ -221,7 +221,7 @@ namespace BackAnd.Web.Api.Controllers
             return (filter.StartsWith("filter"));
         }
 
-        public virtual IHttpActionResult Get(string name, string id, bool? deep = null, int? level = null, string exclude = null)
+        public virtual IHttpActionResult Get(string name, string id, bool? deep = null, int? level = null, string exclude = null, string fields = null)
         {
             try
             {
@@ -351,7 +351,7 @@ namespace BackAnd.Web.Api.Controllers
         }
 
 
-        public virtual IHttpActionResult Get(string name, bool? withSelectOptions = null, bool? withFilterOptions = null, int? pageNumber = null, int? pageSize = null, string filter = null, string sort = null, string search = null, bool? deep = null, bool descriptive = true, bool? relatedObjects = false, string exclude = null)
+        public virtual IHttpActionResult Get(string name, bool? withSelectOptions = null, bool? withFilterOptions = null, int? pageNumber = null, int? pageSize = null, string filter = null, string sort = null, string search = null, bool? deep = null, bool descriptive = true, bool? relatedObjects = false, string exclude = null, string fields = null)
         {
             
             try
@@ -426,9 +426,24 @@ namespace BackAnd.Web.Api.Controllers
                 if (search == "null" || search == "undefined")
                     search = null;
 
+                string[] fieldsArray = null;
+                if (!string.IsNullOrEmpty(fields) && fields != "fields" && fields != "all" && fields != "false" && fields != "null" && fields != "undefined" && fields != "[]")
+                {
+                    try
+                    {
+                        fieldsArray = JsonConverter.DeserializeStringArray(fields);
+                    }
+                    catch (Exception exception)
+                    {
+                        Map.Logger.Log(GetControllerNameForLog(this.ControllerContext), this.ControllerContext.RouteData.Values["action"].ToString(), exception.Source, exception, 1, "Deserialize sort " + sort + ", original: " + System.Web.HttpContext.Current.Request.Params["sort"]);
+                        return ResponseMessage(Request.CreateResponse(HttpStatusCode.NotAcceptable, Messages.StringifyFields));
+                    }
+                }
+
+
                 bool hideMetadata = exclude != null && exclude.ToLower().Contains("metadata");
                 bool hideTotalRows = exclude != null && exclude.ToLower().Contains("totalrows");
-                var items = RestHelper.Get(view, withSelectOptions ?? false, withFilterOptions ?? false, pageNumber ?? 1, pageSize ?? view.Database.DefaultPageSize, filterArray, search, sortArray, out rowCount, deep ?? false, view_BeforeSelect, view_AfterSelect, false, descriptive, false, relatedObjects ?? false, where, hideMetadata, hideTotalRows);
+                var items = RestHelper.Get(view, withSelectOptions ?? false, withFilterOptions ?? false, pageNumber ?? 1, pageSize ?? view.Database.DefaultPageSize, filterArray, search, sortArray, out rowCount, deep ?? false, view_BeforeSelect, view_AfterSelect, false, descriptive, false, relatedObjects ?? false, where, hideMetadata, hideTotalRows, fieldsArray);
                 
                 return Ok(items);
                 
