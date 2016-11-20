@@ -19,6 +19,8 @@ namespace Durados.Web.Mvc
             {
                 try
                 {
+                    if (System.Web.HttpContext.Current == null)
+                        return null;
                     if (Maps.Instance.IsApi())
                     {
                         return System.Web.HttpContext.Current.Items[name];

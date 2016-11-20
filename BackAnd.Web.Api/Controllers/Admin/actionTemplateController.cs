@@ -122,7 +122,7 @@ namespace BackAnd.Web.Api.Controllers
                     }
                     catch (Exception exception)
                     {
-                        Map.Logger.Log(GetControllerNameForLog(this.ControllerContext), this.ControllerContext.RouteData.Values["action"].ToString(), exception.Source, exception, 1, "Deserialize filter " + filter + ", original: " + System.Web.HttpContext.Current.Request.Params["filter"]);
+                        Map.Logger.Log(GetControllerNameForLog(this.ControllerContext), "get", exception.Source, exception, 1, "Deserialize filter " + filter + ", original: " + System.Web.HttpContext.Current.Request.Params["filter"]);
                         return ResponseMessage(Request.CreateResponse(HttpStatusCode.NotAcceptable, Messages.StringifyFilter));
                     }
                 }
@@ -145,7 +145,7 @@ namespace BackAnd.Web.Api.Controllers
                     }
                     catch (Exception exception)
                     {
-                        Map.Logger.Log(GetControllerNameForLog(this.ControllerContext), this.ControllerContext.RouteData.Values["action"].ToString(), exception.Source, exception, 1, "Deserialize sort " + sort + ", original: " + System.Web.HttpContext.Current.Request.Params["sort"]);
+                        Map.Logger.Log(GetControllerNameForLog(this.ControllerContext), "get", exception.Source, exception, 1, "Deserialize sort " + sort + ", original: " + System.Web.HttpContext.Current.Request.Params["sort"]);
                         return ResponseMessage(Request.CreateResponse(HttpStatusCode.NotAcceptable, Messages.StringifySort));
                     }
                 }

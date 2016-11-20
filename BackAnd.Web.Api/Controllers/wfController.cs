@@ -125,7 +125,7 @@ namespace BackAnd.Web.Api.Controllers
             }
             catch (Exception ex)
             {
-                Map.Logger.Log(GetControllerNameForLog(this.ControllerContext), this.ControllerContext.RouteData.Values["action"].ToString(), ex.Source, ex, 1, "Save Message Board View name: " + view.Name + ", pk: " + pk);
+                Map.Logger.Log(GetControllerNameForLog(this.ControllerContext), "SaveInMessageBoard", ex.Source, ex, 1, "Save Message Board View name: " + view.Name + ", pk: " + pk);
             }
 
             return id;

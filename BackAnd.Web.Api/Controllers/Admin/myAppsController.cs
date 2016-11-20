@@ -677,7 +677,7 @@ namespace BackAnd.Web.Api.Controllers
 
             catch (Exception exception)
             {
-                Map.Logger.Log(GetControllerNameForLog(this.ControllerContext), this.ControllerContext.RouteData.Values["action"].ToString(), exception.Source, exception, 2, "delete databases and config");
+                Map.Logger.Log(GetControllerNameForLog(this.ControllerContext), "AfterDeleteBeforeCommit", exception.Source, exception, 2, "delete databases and config");
             }
 
         }

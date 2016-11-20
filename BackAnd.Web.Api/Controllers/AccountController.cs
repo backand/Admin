@@ -418,7 +418,7 @@ namespace BackAnd.Web.Api.Controllers
 
             catch (Durados.DuradosException exception)
             {
-                Map.Logger.Log(this.ControllerContext.RouteData.Values["controller"].ToString(), this.ControllerContext.RouteData.Values["action"].ToString(), exception.Source, exception, 3, null);
+                Map.Logger.Log(this.ControllerContext.RouteData.Values["controller"].ToString(), "PasswordReset", exception.Source, exception, 3, null);
                 return new Dictionary<string, object>() { { "error", "error" }, { "message", exception.Message } };
             }
 

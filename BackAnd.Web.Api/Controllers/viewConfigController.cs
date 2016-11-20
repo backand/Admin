@@ -1890,12 +1890,11 @@ namespace BackAnd.Web.Api.Controllers
                         string SqlSelectQuery = sqlSchema.GetFormula(sa.GetCalculatedFieldStatement(defaultField, defaultField.Name), currentView.DataTable.TableName);
                         try
                         {
-                            //sa.ExecuteNonQuery(currentView.Database.ConnectionString, SqlSelectQuery);
                             sa.ExecuteNonQuery(currentView.ConnectionString, SqlSelectQuery, currentView.Database.SqlProduct);
                         }
                         catch (Exception exception)
                         {
-                            Map.Logger.Log(GetControllerNameForLog(this.ControllerContext), this.ControllerContext.RouteData.Values["action"].ToString(), exception.Source, exception, 1, null);
+                            Map.Logger.Log(GetControllerNameForLog(this.ControllerContext), "BeforeEdit", exception.Source, exception, 1, null);
                             throw new Durados.DuradosException("The statement - " + SqlSelectQuery + " is incorrect, " + exception.Message);
                         }
 
@@ -1944,13 +1943,13 @@ namespace BackAnd.Web.Api.Controllers
                                 else
                                 {
                                     Exception exception = new Durados.DuradosException("Cannot change the related table of a children field");
-                                    Map.Logger.Log(GetControllerNameForLog(this.ControllerContext), this.ControllerContext.RouteData.Values["action"].ToString(), exception.Source, exception, 3, null);
+                                    Map.Logger.Log(GetControllerNameForLog(this.ControllerContext), "BeforeEdit", exception.Source, exception, 3, null);
                                     throw exception;
                                 }
                             }
                             catch (Exception exception)
                             {
-                                Map.Logger.Log(GetControllerNameForLog(this.ControllerContext), this.ControllerContext.RouteData.Values["action"].ToString(), exception.Source, exception, 3, null);
+                                Map.Logger.Log(GetControllerNameForLog(this.ControllerContext), "BeforeEdit", exception.Source, exception, 3, null);
                                 throw new Durados.DuradosException("Failed to change the related table. " + exception.Message, exception);
                             }
                             relationChanged = true;

@@ -1009,7 +1009,6 @@ namespace BackAnd.Web.Api.Controllers
                     }
                     catch { }
                 }
-                //Map.Logger.Log(GetControllerNameForLog(this.ControllerContext), this.ControllerContext.RouteData.Values["action"].ToString(), exception.Source, exception, 1, null);
                 throw exception;
             }
         }
@@ -1175,7 +1174,6 @@ namespace BackAnd.Web.Api.Controllers
                     }
                     catch { }
                 }
-                //Map.Logger.Log(GetControllerNameForLog(this.ControllerContext), this.ControllerContext.RouteData.Values["action"].ToString(), exception.Source, exception, 1, null);
                 throw exception;
             }
         }
@@ -1217,7 +1215,6 @@ namespace BackAnd.Web.Api.Controllers
                     }
                     catch { }
                 }
-                //Map.Logger.Log(GetControllerNameForLog(this.ControllerContext), this.ControllerContext.RouteData.Values["action"].ToString(), exception.Source, exception, 1, null);
                 throw exception;
             }
         }
@@ -1328,7 +1325,6 @@ namespace BackAnd.Web.Api.Controllers
                     }
                     catch { }
                 }
-                //Map.Logger.Log(GetControllerNameForLog(this.ControllerContext), this.ControllerContext.RouteData.Values["action"].ToString(), exception.Source, exception, 1, null);
                 throw exception;
             }
         }
@@ -1353,7 +1349,6 @@ namespace BackAnd.Web.Api.Controllers
                     }
                     catch { }
                 }
-                //Map.Logger.Log(GetControllerNameForLog(this.ControllerContext), this.ControllerContext.RouteData.Values["action"].ToString(), exception.Source, exception, 1, null);
                 throw exception;
             }
         }
@@ -1505,7 +1500,6 @@ namespace BackAnd.Web.Api.Controllers
                     }
                     catch { }
                 }
-                // Map.Logger.Log(GetControllerNameForLog(this.ControllerContext), this.ControllerContext.RouteData.Values["action"].ToString(), exception.Source, exception, 1, null);
                 throw exception;
             }
         }
@@ -1858,7 +1852,6 @@ namespace BackAnd.Web.Api.Controllers
                     }
                     catch { }
                 }
-                //Map.Logger.Log(GetControllerNameForLog(this.ControllerContext), this.ControllerContext.RouteData.Values["action"].ToString(), exception.Source, exception, 1, null);
                 throw exception;
             }
         }
@@ -1909,7 +1902,6 @@ namespace BackAnd.Web.Api.Controllers
                     }
                     catch { }
                 }
-                //Map.Logger.Log(GetControllerNameForLog(this.ControllerContext), this.ControllerContext.RouteData.Values["action"].ToString(), exception.Source, exception, 1, null);
                 throw exception;
             }
         }

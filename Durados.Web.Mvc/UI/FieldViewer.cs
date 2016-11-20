@@ -596,9 +596,27 @@ namespace Durados.Web.Mvc.UI
             return (!UI.Helpers.SecurityHelper.IsDenied(field.DenyCreateRoles, field.AllowCreateRoles) ||  (((View)field.View).IsViewOwner() && UI.Helpers.SecurityHelper.IsConfigFieldForViewOwner(field))) && !field.IsHiddenInCreate() && field.HasPlan;
         }
 
+        public static bool IsIncludeInRequest(this Field field)
+        {
+            if (System.Web.HttpContext.Current != null && System.Web.HttpContext.Current.Items.Contains("fieldsHash"))
+            {
+                HashSet<string> fieldsHash = (HashSet<string>)System.Web.HttpContext.Current.Items["fieldsHash"];
+                if (fieldsHash.Count == 0)
+                {
+                    return true;
+                }
+                else
+                {
+                    return fieldsHash.Contains(field.Name) || fieldsHash.Contains(field.JsonName);
+                }
+            }
+
+            return true;
+        }
+
         public static bool IsVisibleForEdit(this Field field)
         {
-            return ((!UI.Helpers.SecurityHelper.IsDenied(field.DenySelectRoles, field.AllowSelectRoles) ||  (((View)field.View).IsViewOwner() && UI.Helpers.SecurityHelper.IsConfigFieldForViewOwner(field))) && !field.IsHiddenInEdit()) && field.HasPlan;
+            return IsIncludeInRequest(field) && (((!UI.Helpers.SecurityHelper.IsDenied(field.DenySelectRoles, field.AllowSelectRoles) || (((View)field.View).IsViewOwner() && UI.Helpers.SecurityHelper.IsConfigFieldForViewOwner(field))) && !field.IsHiddenInEdit()) && field.HasPlan);
         }
 
         public static bool IsVisibleForFilter(this Field field)
@@ -622,9 +640,9 @@ namespace Durados.Web.Mvc.UI
                 return false;
 
             if (Durados.Web.Infrastructure.General.IsMobile())
-                return !field.IsHiddenInTable() && !field.IsHiddenInTableMobile() && (!UI.Helpers.SecurityHelper.IsDenied(field.DenySelectRoles, field.AllowSelectRoles) || (((View)field.View).IsViewOwner() && UI.Helpers.SecurityHelper.IsConfigFieldForViewOwner(field)));
+                return IsIncludeInRequest(field) && (!field.IsHiddenInTable() && !field.IsHiddenInTableMobile() && (!UI.Helpers.SecurityHelper.IsDenied(field.DenySelectRoles, field.AllowSelectRoles) || (((View)field.View).IsViewOwner() && UI.Helpers.SecurityHelper.IsConfigFieldForViewOwner(field))));
             else
-                return !field.IsHiddenInTable() && (!UI.Helpers.SecurityHelper.IsDenied(field.DenySelectRoles, field.AllowSelectRoles) || (((View)field.View).IsViewOwner() && UI.Helpers.SecurityHelper.IsConfigFieldForViewOwner(field)));
+                return IsIncludeInRequest(field) && (!field.IsHiddenInTable() && (!UI.Helpers.SecurityHelper.IsDenied(field.DenySelectRoles, field.AllowSelectRoles) || (((View)field.View).IsViewOwner() && UI.Helpers.SecurityHelper.IsConfigFieldForViewOwner(field))));
         }
 
         public static bool IsAllowSelect(this Field field)

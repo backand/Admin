@@ -298,6 +298,12 @@ namespace Durados.Web.Mvc.UI.Helpers
                 AddSearch(view, values, search);
             }
 
+            if (fields != null && fields.Length > 0 && System.Web.HttpContext.Current != null)
+            {
+                HashSet<string> fieldsHash = new HashSet<string>(fields);
+                System.Web.HttpContext.Current.Items.Add("fieldsHash", fieldsHash);
+            }
+
             DataView dataView = view.FillPage(page, pageSize, values, isSearch, sortColumns, out rowCount, beforeSelectCallback, afterSelectCallback);
             if (returnDataView)
                 return dataView;
@@ -543,7 +549,7 @@ namespace Durados.Web.Mvc.UI.Helpers
 
         }
 
-        public static Dictionary<string, object> Get(this View view, string pk, bool deep, BeforeSelectEventHandler beforeSelectCallback, AfterSelectEventHandler afterSelectCallback, bool displayParentValue = false, bool ignoreConfig = false, bool useCache = false, int level = 3, bool hideMetadata = false)
+        public static Dictionary<string, object> Get(this View view, string pk, bool deep, BeforeSelectEventHandler beforeSelectCallback, AfterSelectEventHandler afterSelectCallback, bool displayParentValue = false, bool ignoreConfig = false, bool useCache = false, int level = 3, bool hideMetadata = false, string[] fields = null)
         {
             try
             {
@@ -560,6 +566,12 @@ namespace Durados.Web.Mvc.UI.Helpers
             if (view.Database.IsConfig && !ignoreConfig)
             {
                 return GetConfig(view, pk, deep, beforeSelectCallback, afterSelectCallback, displayParentValue);
+            }
+
+            if (fields != null && fields.Length > 0 && System.Web.HttpContext.Current != null)
+            {
+                HashSet<string> fieldsHash = new HashSet<string>(fields);
+                System.Web.HttpContext.Current.Items.Add("fieldsHash", fieldsHash);
             }
 
             var map = view.Database.Map;
@@ -2343,7 +2355,7 @@ namespace Durados.Web.Mvc.UI.Helpers
                 Json.Field JsonField = jsonView.Fields[fieldName];
                 Field field = view.Fields[fieldName];
 
-                bool isJsonable = IsJsonable(field, row);
+                bool isJsonable = IsJsonable(field, row) && field.IsIncludeInRequest();
                 if (!isJsonable)
                     continue;
 
