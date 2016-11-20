@@ -361,15 +361,8 @@ namespace Durados.Web.Mvc.UI.Helpers
                 //    map.AllKindOfCache.Add(RestDataCache, new Dictionary<string, object>());
                 //}
 
-                Dictionary<string, object> restDataCacheDictionary = (Dictionary<string, object>)map.AllKindOfCache[RestDataCache];
-                if (restDataCacheDictionary.ContainsKey(GetRestDataCacheKey()))
-                {
-                    restDataCacheDictionary[GetRestDataCacheKey()] = json;
-                }
-                else
-                {
-                    restDataCacheDictionary.Add(GetRestDataCacheKey(), json);
-                }
+                MemoryCache restDataCache = (MemoryCache)map.AllKindOfCache[RestDataCache];
+                restDataCache[GetRestDataCacheKey()] = json;
             }
             catch { }
 
