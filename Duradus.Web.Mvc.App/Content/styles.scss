@@ -268,6 +268,7 @@ body.template tr {
 }
 .workspace{
 	margin-top:5px !important;
+background: #393a3d !important;
 }
 th.tablecmdhead.thCheck {
     padding-left: 1px !important;
@@ -371,7 +372,7 @@ input#Logon_password {
 }
 .forgotPassword a {
     color: #fe4a00;
-    font-size: 1em;
+    font-size: 12px;
 }
 #btn_login {
     margin-left: 0 !important;
@@ -392,7 +393,7 @@ input#Logon_password {
     border-radius: 50px;
 }
 label.rememberMe {
-    font-size: 14px;
+    font-size: 12px;
     color: #4c4c4c !important;
     font-weight: normal;
 }
@@ -740,4 +741,219 @@ textarea.wtextarea {
 
 .icon-info_outline {
 content: "\e921";
+}
+.workspace {
+    background: #393a3d !important;
+}
+th.ShortTextFieldType .thdiv {
+    width: 95px !important;
+}
+.loading img {
+    height: 100px;
+    width: 100px;
+}
+
+
+.bodybgimg {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  top: 0;
+  height: 100% !important;
+}
+
+.centerParent {
+  box-sizing: border-box;
+  max-width: 445px !important;
+  width: 100% !important;
+  margin: 0;
+}
+
+form#loginform input {
+  width: 100% !important;
+  box-sizing: border-box;
+}
+
+form#loginform input#rememberMe {
+  width: auto !important;
+  margin: 1px 0 0 0;
+}
+
+.ui-dialog.ui-widget.ui-widget-content.ui-corner-all.ui-draggable.ui-resizable {
+  left: 0px !important;
+  right: 10px !important;
+  top: 0;
+  max-width: 700px;
+  margin: 0 auto;
+  width: 100% !important;
+  box-sizing: border-box;
+}
+
+button.ui-button.ui-widget.ui-state-default.ui-corner-all.ui-button-text-only {
+  background: #5cb85c !important;
+}
+
+@media (max-width: 767px) {
+  .bodybgimg {
+    padding: 20px;
+    position: static;
+    height: 800px !important;
+  }
+  .footerParent {
+    margin-left: 0 !important;
+  }
+  div#mainAppDiv {
+    width: 100% !important;
+  }
+  #mainMenu > div.logo-title-container > div.title-container {
+    display: none;
+  }
+  #mainMenu .navigation-left li a {
+    font-size: 12px;
+    font-weight: normal;
+    padding: 12px 27px 12px 6px;
+  }
+  .navigation-left {
+    margin: 0;
+    width: 220px;
+  }
+  .workspace {
+    width: 80px;
+    margin-left: 10px;
+  }
+  .workspaceMenu {
+    margin-left: 320px;
+  }
+  .customDialogBtn {
+    width:130px !important;
+}
+textarea#conText {
+    width: 100%;
+}
+
+.dragonicon {
+    background:none !important;
+}
+.centerParent {
+    box-sizing: border-box;
+    max-width: 445px !important;
+    width: 100% !important;
+    margin: 0;
+    text-align: center;
+    display: block;
+    border: 1px solid #D4D4D4;
+    -moz-border-radius: 10px;
+    -webkit-border-radius: 10px;
+    -khtml-border-radius: 10px;
+    border-radius: 10px;
+    position: absolute;
+    width: auto !important;
+    top: 50%;
+    left: 50%;
+    margin-top: -250px;
+    margin-left: -350px;
+}
+#btn_login {
+    border: none;
+}
+
+body {
+    overflow-y: scroll;
+}
+div.username, div.password, div.remember {
+    float:none;
+}
+#btn_login {
+    float: none;
+}
+.remember {
+    clear: none !important;
+}
+.forgotPassword {
+    margin-top: 10px;
+}
+.changedragonimg {
+    background: none;
+}
+#btn_changepassword {
+    float: none;
+}
+
+.instructions {
+    margin-bottom: 8px;
+}
+.username {
+    font-size: 16px !important;
+    text-align: center !important;
+}
+.btn-green {
+    margin-left: 0 !important;
+    width: 90% !important;
+    box-sizing: border-box;
+    margin: 25px auto !important;
+     float:none;
+    border: none;
+}
+.bgdragonimage {
+    background:none;
+}
+#btn_reset {
+    margin-left: 0 !important;
+    width: 100% !important;
+    margin: 95px 0px auto !important;
+    float: none;
+}
+.registerdrogon {
+    background:none;
+}
+div.password input {
+    width: 100%;
+    box-sizing: border-box;
+}
+
+
+}
+
+.gridPager-div {
+  overflow-y: scroll;
+  height: auto !important;
+}
+
+.customDialogBtn {
+  height: 30px !important;
+  line-height: 20px !important;
+}
+body.template.webkit {
+    overflow-y: scroll !important;
+}
+.ui-dialog.ui-widget.ui-widget-content.ui-corner-all.ui-draggable {
+    left: 0;
+    margin: 0 auto !important;
+    right: 0;
+    width: 65% !important;
+}
+.boardtitle.portlet-header {
+    color: #000;
+    font-size: 14px;
+}
+.resetpassworduser input#username {
+    width: 100%;
+    box-sizing: border-box;
+}
+div#sections_b16_DataRowEdit {
+    height: 268px !important;
+    padding-left:40px !important;
+}
+.username {
+    text-align: center !important;
+    font-size: 16px !important;
+}
+.btn-green {
+    margin-left: 0 !important;
+    width: 100% !important;
+    box-sizing: border-box;
+    margin: 25px auto !important;
+     float:none;
+    border: none;
 }
