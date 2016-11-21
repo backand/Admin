@@ -108,10 +108,13 @@ namespace Durados.Workflow
                         {
                             int adjustedNumber = number - 160;
                             message = message.Replace("Line " + number.ToString() + ": ", "");
-            
-                            message += " at (" + objectName + "/" + actionName + ":" + adjustedNumber + ")";
-            
-            
+
+                            if (adjustedNumber >= 0)
+                            {
+                                message += " at (" + objectName + "/" + actionName + ":" + adjustedNumber + ")";
+                            }
+
+                            message = message.Replace("417: ", "").Replace("408: ", "");
                             return message;
                         }
                     }

@@ -270,7 +270,7 @@ namespace Backand
                 {
                     using (var reader = new System.IO.StreamReader(we.Response.GetResponseStream(), encoding))
                     {
-                        responseText += ": " + reader.ReadToEnd();
+                        responseText = reader.ReadToEnd();
                     }
                     status = (int)((System.Net.HttpWebResponse)(we.Response)).StatusCode;
                 }

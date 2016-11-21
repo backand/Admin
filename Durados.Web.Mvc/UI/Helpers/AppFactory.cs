@@ -274,7 +274,7 @@ namespace Durados.Web.Mvc.UI.Helpers
                     if (Maps.AllowLocalConnection)
                         username = builder.UserID;
                     else
-                        throw new Durados.DuradosException("Username Name is missing");
+                        throw new Durados.DuradosException("Username is missing");
                 }
 
                 if (!hasPassword)
@@ -282,7 +282,7 @@ namespace Durados.Web.Mvc.UI.Helpers
                     if (Maps.AllowLocalConnection)
                         password = builder.Password;
                     else
-                        throw new Durados.DuradosException("Password Name is missing");
+                        throw new Durados.DuradosException("Password is missing");
                 }
 
                 return string.Format(connectionString, serverName, catalog, username, password, localPort);
