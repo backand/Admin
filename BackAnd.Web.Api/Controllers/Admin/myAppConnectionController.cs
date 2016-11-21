@@ -1691,6 +1691,8 @@ namespace BackAnd.Web.Api.Controllers
         {
             try
             {
+                System.Web.HttpContext.Current.Items[Durados.Database.EnableDecryptionKey] = true;
+
                 id = id.ToLower();
                 Maps.Instance.DuradosMap.Logger.Log(GetControllerNameForLog(ControllerContext), GetActionName(), this.Request.Method.Method, "API Create App started", string.Empty, 3, null, DateTime.Now);
 
@@ -2356,6 +2358,8 @@ namespace BackAnd.Web.Api.Controllers
         {
             try
             {
+                System.Web.HttpContext.Current.Items[Durados.Database.EnableDecryptionKey] = true;
+
                 id = id.ToLower();
 
                 View view = GetView(AppViewName);
