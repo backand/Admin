@@ -437,7 +437,7 @@ namespace Durados.Workflow
 
             TimeSpan timeoutInterval = new TimeSpan(0, 0, 0, 0, actionTimeMSec);
 
-            string startMessage = theJavaScriptSerializer.Serialize(new { objectName = view.Name, actionName = actionName, @event = "started", time = DateTime.Now, data = new { userInput = newRow, dbRow = oldRow, parameters = clientParameters, userProfile = userProfile } });
+            string startMessage = theJavaScriptSerializer.Serialize(new { objectName = view.JsonName, actionName = actionName, @event = "started", time = DateTime.Now, data = new { userInput = newRow, dbRow = oldRow, parameters = clientParameters, userProfile = userProfile } });
 
             Backand.Logger.Log(startMessage, 502);
 
@@ -457,15 +457,15 @@ namespace Durados.Workflow
             }
             catch (TimeoutException exception)
             {
-                Handle503(theJavaScriptSerializer, view.Name, actionName, exception.Message);
+                Handle503(theJavaScriptSerializer, view.JsonName, actionName, exception.Message);
                 Backand.Logger.Log(exception.Message, 501);
-                throw new DuradosException("Timeout: The operation took longer than " + actionTimeMSec + " milliseconds limit. at (" + view.Name + "/" + actionName + ")", exception);
+                throw new DuradosException("Timeout: The operation took longer than " + actionTimeMSec + " milliseconds limit. at (" + view.JsonName + "/" + actionName + ")", exception);
             }
             catch (Exception exception)
             {
-                Handle503(theJavaScriptSerializer, view.Name, actionName, exception.Message);
+                Handle503(theJavaScriptSerializer, view.JsonName, actionName, exception.Message);
                 Backand.Logger.Log(exception.Message, 501);
-                throw new DuradosException("Syntax error: " + HandleLineCodes(exception.Message, view.Name, actionName), exception); 
+                throw new DuradosException("Syntax error: " + HandleLineCodes(exception.Message, view.JsonName, actionName), exception); 
             }
             object r = null;
             try
@@ -474,31 +474,31 @@ namespace Durados.Workflow
                 if (!r2.IsNull())
                     r = r2.ToObject();
 
-                string endMessage = theJavaScriptSerializer.Serialize(new { objectName = view.Name, actionName = actionName, @event = "ended", time = DateTime.Now, data = r });
+                string endMessage = theJavaScriptSerializer.Serialize(new { objectName = view.JsonName, actionName = actionName, @event = "ended", time = DateTime.Now, data = r });
 
                 Backand.Logger.Log(endMessage, 503);
 
             }
             catch (TimeoutException exception)
             {
-                string message = "Timeout: The operation took longer than " + actionTimeMSec + " milliseconds limit. at (" + view.Name + "/" + actionName + ")";
-                Handle503(theJavaScriptSerializer, view.Name, actionName, message);
+                string message = "Timeout: The operation took longer than " + actionTimeMSec + " milliseconds limit. at (" + view.JsonName + "/" + actionName + ")";
+                Handle503(theJavaScriptSerializer, view.JsonName, actionName, message);
                 Backand.Logger.Log(message, 501);
                 throw new DuradosException(message, exception);
             }
             catch (Exception exception)
             {
                 string message = (exception.InnerException == null) ? exception.Message : exception.InnerException.Message;
-                message = HandleLineCodes(message, view.Name, actionName);
+                message = HandleLineCodes(message, view.JsonName, actionName);
                 Exception e = new DuradosException(message, exception);
-                Handle503(theJavaScriptSerializer, view.Name, actionName, message);
+                Handle503(theJavaScriptSerializer, view.JsonName, actionName, message);
                 Backand.Logger.Log(message, 501);
-                if (IsDebug())
-                {
-                    values[ReturnedValueKey] = message;
-                    return;
-                }
-                else
+                //if (IsDebug())
+                //{
+                //    values[ReturnedValueKey] = message;
+                //    return;
+                //}
+                //else
                     throw e;
             }
 

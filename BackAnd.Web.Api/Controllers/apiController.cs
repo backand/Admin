@@ -2086,7 +2086,7 @@ namespace BackAnd.Web.Api.Controllers
 
     public class BackAndApiUnexpectedResponseException : BackAndApiResponseException
     {
-        public BackAndApiUnexpectedResponseException(Exception exception, apiController apiController)
+        public BackAndApiUnexpectedResponseException(Exception exception, apiController apiController, Dictionary<string, string> responseHeaders = null)
             : base(new HttpResponseMessage()
             {
                 StatusCode = exception is DuradosException ? HttpStatusCode.ExpectationFailed : HttpStatusCode.InternalServerError,
@@ -2094,7 +2094,19 @@ namespace BackAnd.Web.Api.Controllers
                 ReasonPhrase = Messages.Critical
             })
         {
+            AddResponseHeaders(responseHeaders);
             Log(apiController, exception);
+        }
+
+        private void AddResponseHeaders(Dictionary<string, string> responseHeaders)
+        {
+            if (responseHeaders == null || responseHeaders.Count == 0)
+                return;
+
+            foreach (string key in responseHeaders.Keys)
+            {
+                Response.Headers.Add(key, responseHeaders[key]);
+            }
         }
 
         protected virtual void Log(apiController apiController, Exception exception)

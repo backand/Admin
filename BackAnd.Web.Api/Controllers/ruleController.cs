@@ -196,7 +196,18 @@ namespace BackAnd.Web.Api.Controllers
              }
              catch (Exception exception)
              {
-                 throw new BackAndApiUnexpectedResponseException(exception, this);
+                 Dictionary<string, string> responseHeaders = null;
+                 try
+                 {
+                     if (System.Web.HttpContext.Current.Items.Contains(GuidKey))
+                     {
+                         responseHeaders = new Dictionary<string, string>();
+                         string actionHeaderGuidValue = System.Web.HttpContext.Current.Items[GuidKey].ToString();
+                         responseHeaders.Add(actionHeaderGuidName, actionHeaderGuidValue);
+                     }
+                 }
+                 catch { }
+                 throw new BackAndApiUnexpectedResponseException(exception, this, responseHeaders);
 
              }
          }

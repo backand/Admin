@@ -481,7 +481,7 @@ namespace Durados.Web.Mvc.UI.Helpers
             }
             catch (Exception exception)
             {
-                throw new DuradosException("An unexpected signup  exception occured", exception);
+                throw new DuradosException("An unexpected signup exception occured: " + exception.Message, exception);
             }
         }
 
