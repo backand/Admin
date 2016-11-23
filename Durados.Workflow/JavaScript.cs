@@ -120,10 +120,84 @@ namespace Durados.Workflow
             //        }
             //    }
             //}
-                
-            return message.Replace("#|","{").Replace("|#","}").Replace("\\\"","\"");
+
+            message = message.Replace("#|", "{").Replace("|#", "}").Replace("\\\"", "\"").Replace("|", "").Replace("#", "");
+
+            message = CleanMessage(message);
+
+            return message;
 
             // "The follwoing action: "aaa" failed to perform: Failed to load the javascript code: Line 166: Unexpected token }"
+        }
+
+        private string CleanMessage(string message)
+        {
+            try
+            {
+                var theJavaScriptSerializer = new System.Web.Script.Serialization.JavaScriptSerializer();
+                IDictionary<string, object> d2 = new Dictionary<string, object>();
+                IDictionary<string, object> d = theJavaScriptSerializer.Deserialize<Dictionary<string, object>>(message);
+                IDictionary<string, object> d2Child = d2;
+                
+                bool eoj = false;
+                while (!eoj)
+                {
+                    eoj = true;
+                    bool hasLine = false;
+                    string errorKey = null;
+                    foreach (string key in d.Keys)
+                    {
+                        if (key == "at")
+                        {
+                            if (((IDictionary<string, object>)d[key]).ContainsKey("line"))
+                            {
+                                hasLine = true;
+                            }
+                        }
+                        else
+                        {
+                            errorKey = key;
+                                
+                            if (d[key] is IDictionary<string, object>)
+                            {
+                                eoj = false;
+                            }
+                        }
+                    }
+                    if (hasLine)
+                    {
+                        foreach (string key in d.Keys)
+                        {
+                            if (key == "at" || eoj)
+                            {
+                                d2Child.Add(key, d[key]);
+                            }
+                        }
+                        if (!eoj)
+                        {
+                            d2Child.Add(errorKey, new Dictionary<string, object>());
+                            d2Child = (IDictionary<string, object>)d2Child[errorKey];
+                        }
+                    }
+                    else if (eoj && errorKey != null)
+                    {
+                        d2Child.Add(errorKey, d[errorKey]);
+                    }
+                    if (!eoj)
+                    {
+                        d = (IDictionary<string, object>)d[errorKey];
+                    }
+                        
+                }
+
+                return theJavaScriptSerializer.Serialize(d2);
+
+            }
+            catch
+            {
+                return message;
+            }
+
         }
 
         public static bool IsCrud(System.Net.WebRequest request)
