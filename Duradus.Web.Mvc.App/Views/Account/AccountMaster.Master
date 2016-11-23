@@ -21,6 +21,7 @@
         <% }%>    
     <% } else {%> 
         <link rel="stylesheet" type="text/css" href="<%=ResolveUrl("~/Content/logonMob.css") + "?id=" + guid %>" />
+        <link rel="stylesheet" type="text/css" href="<%=ResolveUrl("~/Content/styles.css") + "?id=" + guid %>" />
         <%if (Map.Database.Localizer.Direction == "RTL")
            { %>
             <link rel="stylesheet" type="text/css" href="<%=ResolveUrl("~/Content/logonMobRTL.css") + "?id=" + guid %>" />    
