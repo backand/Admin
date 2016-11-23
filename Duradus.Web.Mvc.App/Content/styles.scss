@@ -911,6 +911,9 @@ div.password input {
     width: 100%;
     box-sizing: border-box;
 }
+button.ui-button.ui-widget.ui-state-default.ui-corner-all.ui-button-text-only {
+    margin: .5em .4em .5em 0 !important;
+}
 
 
 }
@@ -956,4 +959,14 @@ div#sections_b16_DataRowEdit {
     margin: 25px auto !important;
      float:none;
     border: none;
+}
+button.ui-button.ui-widget.ui-state-default.ui-corner-all.ui-button-text-only {
+    margin: 0 10px;
+}
+
+div#sections_b37_DataRowEdit {
+    height: 345px !important;
+}
+.ui-dialog.ui-widget.ui-widget-content.ui-corner-all.ui-draggable {
+    left: 88px !important;
 }
