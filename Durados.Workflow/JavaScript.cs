@@ -511,7 +511,7 @@ namespace Durados.Workflow
 
             TimeSpan timeoutInterval = new TimeSpan(0, 0, 0, 0, actionTimeMSec);
 
-            string startMessage = theJavaScriptSerializer.Serialize(new { objectName = view.JsonName, actionName = actionName, @event = "started", time = Environment.TickCount, data = new { userInput = newRow, dbRow = oldRow, parameters = clientParameters, userProfile = userProfile } });
+            string startMessage = theJavaScriptSerializer.Serialize(new { objectName = view.JsonName, actionName = actionName, @event = "started", time = GetSequence(), data = new { userInput = newRow, dbRow = oldRow, parameters = clientParameters, userProfile = userProfile } });
 
             Backand.Logger.Log(startMessage, 502);
 
@@ -548,7 +548,7 @@ namespace Durados.Workflow
                 if (!r2.IsNull())
                     r = r2.ToObject();
 
-                string endMessage = theJavaScriptSerializer.Serialize(new { objectName = view.JsonName, actionName = actionName, @event = "ended", time = Environment.TickCount, data = r });
+                string endMessage = theJavaScriptSerializer.Serialize(new { objectName = view.JsonName, actionName = actionName, @event = "ended", time = GetSequence(), data = r });
 
                 Backand.Logger.Log(endMessage, 503);
 
@@ -626,7 +626,7 @@ namespace Durados.Workflow
 
         private void Handle503(System.Web.Script.Serialization.JavaScriptSerializer theJavaScriptSerializer, string objectName, string actionName, string message)
         {
-            string endMessage = theJavaScriptSerializer.Serialize(new { objectName = objectName, actionName = actionName, @event = "ended", time = Environment.TickCount, data = new { error = message} });
+            string endMessage = theJavaScriptSerializer.Serialize(new { objectName = objectName, actionName = actionName, @event = "ended", time = GetSequence(), data = new { error = message } });
 
             Backand.Logger.Log(endMessage, 503);
         }
@@ -760,6 +760,26 @@ namespace Durados.Workflow
             if (ip.Contains(","))
                 ip = ip.Split(',').First().Trim();
             return ip;
+        }
+
+
+        public static int GetSequence()
+        {
+            if (System.Web.HttpContext.Current != null)
+            {
+                if (!System.Web.HttpContext.Current.Items.Contains("Sequence"))
+                {
+                    int i = 0;
+                    System.Web.HttpContext.Current.Items.Add("Sequence", i);
+                }
+                int seq = (int)System.Web.HttpContext.Current.Items["Sequence"];
+                seq = seq + 1;
+                System.Web.HttpContext.Current.Items["Sequence"] = seq;
+
+                return seq;
+            }
+
+            return -1;
         }
     }
 
