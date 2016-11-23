@@ -345,6 +345,8 @@ namespace BackAnd.Web.Api.Controllers
                 DataHandler = new DataHandler((viewDataController)this);
             else if (this is userController)
                 DataHandler = new DataHandler(new viewDataController());
+            else if (this is ruleController)
+                DataHandler = new DataHandler(new viewDataController());
             //Init();
 
         }

@@ -168,8 +168,11 @@ namespace BackAnd.Web.Api.Controllers
 
                          try
                          {
-                             sysTransaction.Commit();
-                             sysConnection.Close();
+                             if (sysConnection.State != System.Data.ConnectionState.Closed)
+                             {
+                                 sysTransaction.Commit();
+                                 sysConnection.Close();
+                             }
                          }
                          catch { }
                      }
