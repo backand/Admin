@@ -7,7 +7,7 @@ namespace Durados.Web.Mvc.UI.Helpers.CallStack
 {
     public interface IActionEvent
     {
-        DateTime Time { get; }
+        int Time { get; }
         Event Event { get; }
 
         string ObjectName { get; }

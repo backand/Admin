@@ -511,7 +511,7 @@ namespace Durados.Workflow
 
             TimeSpan timeoutInterval = new TimeSpan(0, 0, 0, 0, actionTimeMSec);
 
-            string startMessage = theJavaScriptSerializer.Serialize(new { objectName = view.JsonName, actionName = actionName, @event = "started", time = DateTime.Now, data = new { userInput = newRow, dbRow = oldRow, parameters = clientParameters, userProfile = userProfile } });
+            string startMessage = theJavaScriptSerializer.Serialize(new { objectName = view.JsonName, actionName = actionName, @event = "started", time = Environment.TickCount, data = new { userInput = newRow, dbRow = oldRow, parameters = clientParameters, userProfile = userProfile } });
 
             Backand.Logger.Log(startMessage, 502);
 
@@ -548,7 +548,7 @@ namespace Durados.Workflow
                 if (!r2.IsNull())
                     r = r2.ToObject();
 
-                string endMessage = theJavaScriptSerializer.Serialize(new { objectName = view.JsonName, actionName = actionName, @event = "ended", time = DateTime.Now, data = r });
+                string endMessage = theJavaScriptSerializer.Serialize(new { objectName = view.JsonName, actionName = actionName, @event = "ended", time = Environment.TickCount, data = r });
 
                 Backand.Logger.Log(endMessage, 503);
 
@@ -626,7 +626,7 @@ namespace Durados.Workflow
 
         private void Handle503(System.Web.Script.Serialization.JavaScriptSerializer theJavaScriptSerializer, string objectName, string actionName, string message)
         {
-            string endMessage = theJavaScriptSerializer.Serialize(new { objectName = objectName, actionName = actionName, @event = "ended", time = DateTime.Now, data = new { error = message} });
+            string endMessage = theJavaScriptSerializer.Serialize(new { objectName = objectName, actionName = actionName, @event = "ended", time = Environment.TickCount, data = new { error = message} });
 
             Backand.Logger.Log(endMessage, 503);
         }
