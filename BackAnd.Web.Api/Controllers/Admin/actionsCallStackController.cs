@@ -48,6 +48,8 @@ namespace BackAnd.Web.Api.Controllers
         [HttpGet]
         public IHttpActionResult Get(string guid, int limit = 1000)
         {
+            JavaScriptSerializer jss = new JavaScriptSerializer();
+            List<IActionEvent> events = new List<IActionEvent>();
             try
             {
                 Durados.Web.Mvc.View view = GetView("durados_Log");
@@ -64,12 +66,9 @@ namespace BackAnd.Web.Api.Controllers
                     return ResponseMessage(Request.CreateResponse(HttpStatusCode.PreconditionFailed, "Number of actions is more than " + limit));
                 }
 
-                List<IActionEvent> events = new List<IActionEvent>();
-
                 var data = (Dictionary<string, object>[])items["data"];
 
-                JavaScriptSerializer jss = new JavaScriptSerializer();
-
+                
                 foreach (Dictionary<string, object> item in data)
                 {
                     var actionEventData = jss.Deserialize<Dictionary<string, object>>(item["FreeText"].ToString());
@@ -86,6 +85,8 @@ namespace BackAnd.Web.Api.Controllers
             }
             catch (Exception exception)
             {
+                string eventsJson = jss.Serialize(events);
+                Maps.Instance.DuradosMap.Logger.Log("", "", "", exception, 1, eventsJson);
                 throw new BackAndApiUnexpectedResponseException(exception, this);
             }
         }
