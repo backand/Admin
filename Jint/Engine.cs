@@ -51,7 +51,7 @@ namespace Jint
         {
         }
 
-        public Engine(Action<Options> options, TimeSpan? timeoutInterval = null)
+        public Engine(Action<Options> options, TimeSpan? timeoutInterval = null, int? startLine = null, IPath path = null)
         {
             _executionContexts = new Stack<ExecutionContext>();
 
@@ -123,6 +123,16 @@ namespace Jint
             if (timeoutInterval.HasValue)
             {
                 Options.TimeoutInterval(timeoutInterval.Value);
+            }
+
+            if (startLine.HasValue)
+            {
+                Options.StartLine(startLine.Value);
+            }
+
+            if (path != null)
+            {
+                Options.Path(path);
             }
 
             if (options != null)

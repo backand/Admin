@@ -38,6 +38,50 @@ namespace Jint.Native.Error
             FastAddProperty("toString", new ClrFunctionInstance(Engine, ToString), true, false, true);
         }
 
+        public JsValue ToJson(JsValue thisObject, JsValue[] arguments)
+        {
+            var o = thisObject.TryCast<ObjectInstance>();
+            if (o == null)
+            {
+                throw new JavaScriptException(Engine.TypeError);
+            }
+
+            var name = TypeConverter.ToString(o.Get("name"));
+
+            var msgProp = o.Get("message");
+            string msg;
+            if (msgProp == Undefined.Instance)
+            {
+                msg = "";
+            }
+            else
+            {
+                msg = TypeConverter.ToString(msgProp);
+            }
+            //if (name == "")
+            //{
+            //    return msg;
+            //}
+            //if (msg == "")
+            //{
+            //    return name;
+            //}
+            if (name == "")
+            {
+                name = "error";
+            }
+            if (msg == "")
+            {
+                return "";
+            }
+            name = "\"" + name + "\"";
+            if (!(msg.StartsWith("\"") || msg.StartsWith("{") || msg.StartsWith("#|")))
+            {
+                msg = "\"" + msg + "\"";
+            }
+            return name + ": " + msg;
+        }
+
         public JsValue ToString(JsValue thisObject, JsValue[] arguments)
         {
             var o = thisObject.TryCast<ObjectInstance>();

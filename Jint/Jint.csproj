@@ -49,6 +49,7 @@
     <Compile Include="DeclarationBindingType.cs" />
     <Compile Include="Engine.cs" />
     <Compile Include="EvalCodeScope.cs" />
+    <Compile Include="IPath.cs" />
     <Compile Include="Native\Argument\ArgumentsObject.cs">
       <SubType>Code</SubType>
     </Compile>

@@ -20,7 +20,9 @@ namespace Jint
         private TimeSpan _timeoutInterval;
         private CultureInfo _culture = CultureInfo.CurrentCulture;
         private TimeZoneInfo _localTimeZone = TimeZoneInfo.Local;
-        private List<Assembly> _lookupAssemblies = new List<Assembly>(); 
+        private List<Assembly> _lookupAssemblies = new List<Assembly>();
+        private int? _startLine;
+        private IPath _path;
 
         /// <summary>
         /// When called, doesn't initialize the global scope.
@@ -83,6 +85,18 @@ namespace Jint
         public Options TimeoutInterval(TimeSpan timeoutInterval)
         {
             _timeoutInterval = timeoutInterval;
+            return this;
+        }
+
+        public Options StartLine(int startLine)
+        {
+            _startLine = startLine;
+            return this;
+        }
+
+        public Options Path(IPath path)
+        {
+            _path = path;
             return this;
         }
 
@@ -166,6 +180,16 @@ namespace Jint
         internal TimeZoneInfo GetLocalTimeZone()
         {
             return _localTimeZone;
+        }
+
+        internal int? GetStartLine()
+        {
+            return _startLine;
+        }
+
+        internal IPath GetPath()
+        {
+            return _path;
         }
     }
 }

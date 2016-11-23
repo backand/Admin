@@ -5,6 +5,7 @@ using Jint.Native;
 using Jint.Parser.Ast;
 using Jint.Runtime.Environments;
 using Jint.Runtime.References;
+using Jint.Native.Error;
 
 namespace Jint.Runtime
 {
@@ -429,7 +430,7 @@ namespace Jint.Runtime
             catch(JavaScriptException v)
             {
                 string newMessage = GetMessage(lastStatement, v);
-                return new Completion(Completion.Throw, _engine.TypeError.Construct(new JsValue[] { newMessage }), null);
+                return new Completion(Completion.Throw, _engine.Error.Construct(new JsValue[] { newMessage }), null);
                 //return new Completion(Completion.Throw, v.Error, null);
             }
 
@@ -439,7 +440,7 @@ namespace Jint.Runtime
         
             
 
-        private static string GetMessage(Statement lastStatement, JavaScriptException v)
+        private string GetMessage(Statement lastStatement, JavaScriptException v)
         {
             string message = v.Error.ToString();
 
@@ -448,20 +449,43 @@ namespace Jint.Runtime
             return message;
         }
 
-        private static string GetMessage(Statement lastStatement, string message)
+        private string GetMessage(Statement lastStatement, string message)
         {
-            int line = lastStatement.Location.Start.Line;
-            string newMessage;
-            if (!message.Contains("Line "))
-            {
-                newMessage = "Line " + line + ": " + message;
-            }
-            else
-            {
-                newMessage = "Line " + message.Split(new string[] { "Line " }, StringSplitOptions.None)[1];
-            }
+            if (message == "")
+                return "";
+            //if (lastStatement.Type == SyntaxNodes.ReturnStatement)
+            //    return message;
             
-            return newMessage;
+
+            int line = lastStatement.Location.Start.Line;
+            int? startLine = _engine.Options.GetStartLine();
+            if (startLine.HasValue)
+            {
+                line = line - startLine.Value;
+            }
+            IPath path = _engine.Options.GetPath();
+            //string newMessage;
+            //if (!message.Contains("Line "))
+            //{
+            //    newMessage = "Line " + line + ": " + message;
+            //}
+            //else
+            //{
+            //    newMessage = "Line " + message.Split(new string[] { "Line " }, StringSplitOptions.None)[1];
+            //}
+
+            if (line > 0 && path != null)
+            {
+                if (lastStatement.Type != SyntaxNodes.ReturnStatement)
+                {
+                    message += ", \"at\": {" + path.ToString() + "," + "\"line\"" + ":" + line + "}";
+                }
+                else
+                {
+                    message += ", \"at\": {" + path.ToString() + "}";
+                }
+            }
+            return "#|" + message + "|#";
         }
 
         /// <summary>

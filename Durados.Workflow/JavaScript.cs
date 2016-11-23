@@ -94,34 +94,34 @@ namespace Durados.Workflow
 
         private string HandleLineCodes(string message, string objectName, string actionName)
         {
-            string[] segments = message.Split(new string[] { ":" }, StringSplitOptions.None);
+            //string[] segments = message.Split(new string[] { ":" }, StringSplitOptions.None);
             
-            foreach(string segment in segments)
-            {
-                if (segment.Contains("Line"))
-                {
-                    string[] subsegments = segment.Split(new string[] { " " }, StringSplitOptions.None);
-                    foreach (string subsegment in subsegments)
-                    {
-                        int number = -1;
-                        if (int.TryParse(subsegment, out number))
-                        {
-                            int adjustedNumber = number - 160;
-                            message = message.Replace("Line " + number.ToString() + ": ", "");
+            //foreach(string segment in segments)
+            //{
+            //    if (segment.Contains("Line"))
+            //    {
+            //        string[] subsegments = segment.Split(new string[] { " " }, StringSplitOptions.None);
+            //        foreach (string subsegment in subsegments)
+            //        {
+            //            int number = -1;
+            //            if (int.TryParse(subsegment, out number))
+            //            {
+            //                int adjustedNumber = number - 160;
+            //                message = message.Replace("Line " + number.ToString() + ": ", "");
 
-                            if (adjustedNumber >= 0)
-                            {
-                                message += " at (" + objectName + "/" + actionName + ":" + adjustedNumber + ")";
-                            }
+            //                if (adjustedNumber >= 0)
+            //                {
+            //                    message += " at (" + objectName + "/" + actionName + ":" + adjustedNumber + ")";
+            //                }
 
-                            message = message.Replace("417: ", "").Replace("408: ", "");
-                            return message;
-                        }
-                    }
-                }
-            }
+            //                //message = message.Replace("417: ", "").Replace("408: ", "");
+            //                return message;
+            //            }
+            //        }
+            //    }
+            //}
                 
-            return message;
+            return message.Replace("#|","{").Replace("|#","}").Replace("\\\"","\"");
 
             // "The follwoing action: "aaa" failed to perform: Failed to load the javascript code: Line 166: Unexpected token }"
         }
@@ -442,7 +442,7 @@ namespace Durados.Workflow
             Backand.Logger.Log(startMessage, 502);
 
 
-            var call = new Jint.Engine(cfg => cfg.AllowClr(typeof(Backand.XMLHttpRequest).Assembly), timeoutInterval);
+            var call = new Jint.Engine(cfg => cfg.AllowClr(typeof(Backand.XMLHttpRequest).Assembly), timeoutInterval, 160, new ActionPath() { @object = view.JsonName, action = actionName });
 
             try
             {
@@ -701,6 +701,17 @@ namespace Durados.Workflow
             : base(message, innerException)
         {
 
+        }
+    }
+
+    public class ActionPath : Jint.IPath
+    {
+        public string @object;
+        public string action;
+
+        public override string ToString()
+        {
+            return "\"object\"" + ":" + "\"" + @object + "\"" + "," + "\"action\"" + ":" + "\"" + action + "\"";
         }
     }
 
