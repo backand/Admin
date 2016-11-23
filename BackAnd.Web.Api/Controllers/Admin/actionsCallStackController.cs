@@ -79,7 +79,7 @@ namespace BackAnd.Web.Api.Controllers
 
                 CallStackConverter callStackConverter = new CallStackConverter();
 
-                var result = callStackConverter.ChronologicalListToTree(events.OrderBy(e => e.Time));
+                var result = callStackConverter.ChronologicalListToTree(events.OrderBy(e => e.Time.Ticks));
                 if (result == null)
                     return Ok(new { });
                 return Ok(result);

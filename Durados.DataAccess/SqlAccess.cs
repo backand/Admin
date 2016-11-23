@@ -9924,7 +9924,7 @@ namespace Durados.DataAccess
                     {
                         try
                         {
-                            if (sysTransaction != null)
+                            if (sysTransaction != null && sysConnection.State != ConnectionState.Closed)
                                 sysTransaction.Commit();
                         }
                         catch { }
