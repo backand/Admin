@@ -1297,7 +1297,7 @@
     </None>
     <Content Include="Reports\Microsoft.ReportViewer.WebForms.dll" />
     <Content Include="Reports\RdlcWebForm.aspx" />
-    <Content Include="Rest\Test.html" />
+    <Content Include="Scripts\Rest\Test.html" />
     <Content Include="Scripts\ajaxupload.3.6.js" />
     <Content Include="Scripts\ajaxupload.3.6.min.js" />
     <Content Include="Scripts\backand.js" />
