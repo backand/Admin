@@ -870,7 +870,10 @@ namespace Durados.Web.Mvc.UI
                 }
 
             }
-            view.Edit(values, pk, beforeEditCallback, beforeEditInDatabaseCallback, afterEditBeforeCommitCallback, afterEditAfterCommitCallback);
+
+            CrudUtility crudUtility = new CrudUtility(view.Database.Map.AppName);
+            crudUtility.Edit(view.JsonName, values, pk);
+            //view.Edit(values, pk, beforeEditCallback, beforeEditInDatabaseCallback, afterEditBeforeCommitCallback, afterEditAfterCommitCallback);
             
         }
 

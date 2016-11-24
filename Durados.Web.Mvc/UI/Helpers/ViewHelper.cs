@@ -425,6 +425,7 @@ namespace Durados.Web.Mvc.UI.Helpers
 
         public static void EditRow(this View view, FormCollection collection, string pk, bool ignoreNull, BeforeEditEventHandler beforeEditCallback, BeforeEditInDatabaseEventHandler beforeEditInDatabaseCallback, AfterEditEventHandler afterEditBeforeCommitCallback, AfterEditEventHandler afterEditAfterCommitCallback)
         {
+
             Json.View jsonView = Json.JsonSerializer.Deserialize<Json.View>(collection["jsonView"]);
             viewViewer.EditRow(view, jsonView, pk, ignoreNull, beforeEditCallback, beforeEditInDatabaseCallback, afterEditBeforeCommitCallback, afterEditAfterCommitCallback);
         }
