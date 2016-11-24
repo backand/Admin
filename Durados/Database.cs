@@ -1260,6 +1260,16 @@ namespace Durados
                 return true;
             }
         }
+
+        public virtual string GetCacheValue(string key)
+        {
+            throw new NotImplementedException();
+        }
+
+        public virtual void SetCacheValue(string key, string value, int milliseconds)
+        {
+            throw new NotImplementedException();
+        }
     }
 
     public class IlegalDateFormatException : DuradosException

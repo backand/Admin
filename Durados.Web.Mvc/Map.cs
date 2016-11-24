@@ -4696,6 +4696,16 @@ namespace Durados.Web.Mvc
                 Maps.Instance.DuradosMap.Logger.Log("Map", "LoadLimits", "LoadLimits", exception, 1, "Failed to load app limit");
             }
         }
+
+        public string GetCacheValue(string key)
+        {
+            return SharedMemorySingeltone.Instance.Get(key);
+        }
+
+        public void SetCacheValue(string key, string value, int milliseconds)
+        {
+            SharedMemorySingeltone.Instance.Set(key, value, milliseconds);
+        }
     }
 
     

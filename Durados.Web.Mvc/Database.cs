@@ -1509,6 +1509,15 @@ namespace Durados.Web.Mvc
                 return System.Web.HttpContext.Current != null && System.Web.HttpContext.Current.Items[Database.EnableDecryptionKey] != null && System.Web.HttpContext.Current.Items[Database.EnableDecryptionKey].Equals(true);
             }
         }
-        
+
+        public override string GetCacheValue(string key)
+        {
+            return Map.GetCacheValue(key);
+        }
+
+        public override void SetCacheValue(string key, string value, int milliseconds)
+        {
+            Map.SetCacheValue(key, value, milliseconds);
+        }
     }
 }

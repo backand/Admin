@@ -19,6 +19,7 @@ namespace Durados.Workflow
 
         public static readonly string ReturnedValueKey = "$$ReturnedValueKey$$";
         const string FILEDATA = "filedata";
+        public static readonly string ActionInfo = "ActionInfo";
         #endregion
 
         private static string xhr = null;
@@ -60,6 +61,9 @@ namespace Durados.Workflow
         public static readonly string LogCounter = "LogCounter";
         public static readonly string GuidKey = "JsGuid";
         public static readonly string ConnectionStringKey = "ConnectionStringKey";
+
+        static System.Web.Script.Serialization.JavaScriptSerializer jss = new System.Web.Script.Serialization.JavaScriptSerializer();
+                
         public static void SetCacheInCurrentRequest(string key, object value)
         {
             if (key == Durados.Workflow.JavaScript.GuidKey && System.Web.HttpContext.Current.Request.QueryString[Durados.Workflow.JavaScript.GuidKey] != null)
@@ -301,12 +305,20 @@ namespace Durados.Workflow
 
             if (requests.Contains(request.RequestUri.AbsoluteUri + request.Method + json))
             {
-                return true;
+                if (GetDataAction() != TriggerDataAction.OnDemand)
+                {
+                    return true;
+                }
             }
             requests.Add(request.RequestUri.AbsoluteUri + request.Method + json);
             return false;
 
             
+        }
+
+        private static bool IsAction(System.Net.WebRequest request)
+        {
+            return request.RequestUri.AbsoluteUri.Contains("objects/action") || request.RequestUri.AbsoluteUri.Contains("table/action") || request.RequestUri.AbsoluteUri.Contains("table/rule");
         }
 
         private static string GetActionName()
@@ -322,7 +334,20 @@ namespace Durados.Workflow
             return string.Empty;
         }
 
-        public virtual void Execute(object controller, Dictionary<string, Parameter> parameters, View view, Dictionary<string, object> values, DataRow prevRow, string pk, string connectionString, int currentUsetId, string currentUserRole, IDbCommand command, IDbCommand sysCommand, string actionName)
+        private static Durados.TriggerDataAction GetDataAction()
+        {
+            object args = GetCacheInCurrentRequest("js" + GetCacheInCurrentRequest(GuidKey));
+            if (args == null)
+                return Durados.TriggerDataAction.OnDemand;
+
+            Dictionary<string, object> argsDic = (Dictionary<string, object>)args;
+            if (argsDic.ContainsKey("dataAction"))
+                return (Durados.TriggerDataAction)argsDic["dataAction"];
+
+            return Durados.TriggerDataAction.OnDemand;
+        }
+
+        public virtual void Execute(object controller, Dictionary<string, Parameter> parameters, View view, Dictionary<string, object> values, DataRow prevRow, string pk, string connectionString, int currentUsetId, string currentUserRole, IDbCommand command, IDbCommand sysCommand, string actionName, Durados.TriggerDataAction dataAction)
         {
             if (pk != null && prevRow == null && controller is Durados.Data.IData)
             {
@@ -335,7 +360,7 @@ namespace Durados.Workflow
             }
 
             var guid = Guid.NewGuid();
-            SetCacheInCurrentRequest("js" + guid, new Dictionary<string, object>() { { "controller", controller }, { "connectionString", connectionString }, { "currentUsetId", currentUsetId }, { "currentUserRole", currentUserRole }, { "command", command }, { "sysCommand", sysCommand }, { "actionName", actionName } });
+            SetCacheInCurrentRequest("js" + guid, new Dictionary<string, object>() { { "controller", controller }, { "connectionString", connectionString }, { "currentUsetId", currentUsetId }, { "currentUserRole", currentUserRole }, { "command", command }, { "sysCommand", sysCommand }, { "actionName", actionName }, { "dataAction", dataAction } });
             
 
             SetCacheInCurrentRequest(ConnectionStringKey, view.Database.SysDbConnectionString);
@@ -439,7 +464,9 @@ namespace Durados.Workflow
 
             if (!clientParameters.ContainsKey(FILEDATA))
             {
-                HandleParametersSizeLimit(view.Database.GetLimit(Limits.ActionParametersKbSize), clientParameters);
+                int parametersLimit = (int)view.Database.GetLimit(Limits.ActionParametersKbSize);
+
+                HandleParametersSizeLimit(parametersLimit, clientParameters);
                 userProfile.Add("request", GetRequest());
             }
 
@@ -511,7 +538,7 @@ namespace Durados.Workflow
 
             TimeSpan timeoutInterval = new TimeSpan(0, 0, 0, 0, actionTimeMSec);
 
-            string startMessage = theJavaScriptSerializer.Serialize(new { objectName = view.JsonName, actionName = actionName, @event = "started", time = GetSequence(), data = new { userInput = newRow, dbRow = oldRow, parameters = clientParameters, userProfile = userProfile } });
+            string startMessage = theJavaScriptSerializer.Serialize(new { objectName = view.JsonName, actionName = actionName, @event = "started", time = GetSequence(view), data = new { userInput = newRow, dbRow = oldRow, parameters = clientParameters, userProfile = userProfile } });
 
             Backand.Logger.Log(startMessage, 502);
 
@@ -531,13 +558,13 @@ namespace Durados.Workflow
             }
             catch (TimeoutException exception)
             {
-                Handle503(theJavaScriptSerializer, view.JsonName, actionName, exception.Message);
+                Handle503(theJavaScriptSerializer, view.JsonName, actionName, exception.Message, view);
                 Backand.Logger.Log(exception.Message, 501);
                 throw new DuradosException("Timeout: The operation took longer than " + actionTimeMSec + " milliseconds limit. at (" + view.JsonName + "/" + actionName + ")", exception);
             }
             catch (Exception exception)
             {
-                Handle503(theJavaScriptSerializer, view.JsonName, actionName, exception.Message);
+                Handle503(theJavaScriptSerializer, view.JsonName, actionName, exception.Message, view);
                 Backand.Logger.Log(exception.Message, 501);
                 throw new DuradosException("Syntax error: " + HandleLineCodes(exception.Message, view.JsonName, actionName), exception); 
             }
@@ -548,7 +575,7 @@ namespace Durados.Workflow
                 if (!r2.IsNull())
                     r = r2.ToObject();
 
-                string endMessage = theJavaScriptSerializer.Serialize(new { objectName = view.JsonName, actionName = actionName, @event = "ended", time = GetSequence(), data = r });
+                string endMessage = theJavaScriptSerializer.Serialize(new { objectName = view.JsonName, actionName = actionName, @event = "ended", time = GetSequence(view), data = r });
 
                 Backand.Logger.Log(endMessage, 503);
 
@@ -556,7 +583,7 @@ namespace Durados.Workflow
             catch (TimeoutException exception)
             {
                 string message = "Timeout: The operation took longer than " + actionTimeMSec + " milliseconds limit. at (" + view.JsonName + "/" + actionName + ")";
-                Handle503(theJavaScriptSerializer, view.JsonName, actionName, message);
+                Handle503(theJavaScriptSerializer, view.JsonName, actionName, message, view);
                 Backand.Logger.Log(message, 501);
                 throw new DuradosException(message, exception);
             }
@@ -565,7 +592,7 @@ namespace Durados.Workflow
                 string message = (exception.InnerException == null) ? exception.Message : exception.InnerException.Message;
                 message = HandleLineCodes(message, view.JsonName, actionName);
                 Exception e = new DuradosException(message, exception);
-                Handle503(theJavaScriptSerializer, view.JsonName, actionName, message);
+                Handle503(theJavaScriptSerializer, view.JsonName, actionName, message, view);
                 Backand.Logger.Log(message, 501);
                 //if (IsDebug())
                 //{
@@ -624,9 +651,9 @@ namespace Durados.Workflow
             }
         }
 
-        private void Handle503(System.Web.Script.Serialization.JavaScriptSerializer theJavaScriptSerializer, string objectName, string actionName, string message)
+        private void Handle503(System.Web.Script.Serialization.JavaScriptSerializer theJavaScriptSerializer, string objectName, string actionName, string message, View view)
         {
-            string endMessage = theJavaScriptSerializer.Serialize(new { objectName = objectName, actionName = actionName, @event = "ended", time = GetSequence(), data = new { error = message } });
+            string endMessage = theJavaScriptSerializer.Serialize(new { objectName = objectName, actionName = actionName, @event = "ended", time = GetSequence(view), data = new { error = message } });
 
             Backand.Logger.Log(endMessage, 503);
         }
@@ -761,26 +788,27 @@ namespace Durados.Workflow
                 ip = ip.Split(',').First().Trim();
             return ip;
         }
-
-
-        public static int GetSequence()
+        
+        private static int GetSequence(View view)
         {
-            if (System.Web.HttpContext.Current != null)
+            const string Sequense = "Sequense";
+            const int TenMinutes = 1000 * 60 * 10;
+
+            Guid requestGuid = (Guid)Durados.Workflow.JavaScript.GetCacheInCurrentRequest(Durados.Workflow.JavaScript.GuidKey);
+            string value = view.Database.GetCacheValue(Sequense + requestGuid);
+            int seq = 0;
+            if (value != null)
             {
-                if (!System.Web.HttpContext.Current.Items.Contains("Sequence"))
-                {
-                    int i = 0;
-                    System.Web.HttpContext.Current.Items.Add("Sequence", i);
-                }
-                int seq = (int)System.Web.HttpContext.Current.Items["Sequence"];
-                seq = seq + 1;
-                System.Web.HttpContext.Current.Items["Sequence"] = seq;
-
-                return seq;
+                seq = System.Convert.ToInt32(value);
             }
+            seq = seq + 1;
 
-            return -1;
+            view.Database.SetCacheValue(Sequense + requestGuid, seq.ToString(), TenMinutes);
+
+            return seq;
         }
+
+        
     }
 
     public class JavaScriptException :DuradosException

@@ -516,10 +516,10 @@ namespace Durados.Web.Mvc
                 throw new DuradosException("Missing CronAuthorizationHeader key in web config");
             }
 
-            limits.Add(Limits.Cron, Convert.ToInt32(System.Configuration.ConfigurationManager.AppSettings["cronLimit"]));
-            limits.Add(Limits.ActionParametersKbSize, Convert.ToInt32(System.Configuration.ConfigurationManager.AppSettings["actionParametersKbSizeLimit"]));
-            limits.Add(Limits.ActionTimeMSec, Convert.ToInt32(System.Configuration.ConfigurationManager.AppSettings["actionTimeMSecLimit"]));
-            limits.Add(Limits.UploadTimeMSec, Convert.ToInt32(System.Configuration.ConfigurationManager.AppSettings["uploadTimeMSecLimit"]));
+            limits[Limits.Cron.ToString()] = Convert.ToInt32(System.Configuration.ConfigurationManager.AppSettings["cronLimit"]);
+            limits[Limits.ActionParametersKbSize.ToString()] = Convert.ToInt32(System.Configuration.ConfigurationManager.AppSettings["actionParametersKbSizeLimit"]);
+            limits[Limits.ActionTimeMSec.ToString()] = Convert.ToInt32(System.Configuration.ConfigurationManager.AppSettings["actionTimeMSecLimit"]);
+            limits[Limits.UploadTimeMSec.ToString()] = Convert.ToInt32(System.Configuration.ConfigurationManager.AppSettings["uploadTimeMSecLimit"]);
 
             LocalAddress = System.Configuration.ConfigurationManager.AppSettings["localAddress"] ?? "http://localhost:8080";
 
@@ -2516,11 +2516,11 @@ namespace Durados.Web.Mvc
         }
 
 
-        private static Dictionary<Limits, int> limits = new Dictionary<Limits, int>();
+        private static MemoryCache limits = new MemoryCache("limits");
         
         internal static int GetLimit(Limits limit)
         {
-            return limits[limit];
+            return (int)limits[limit.ToString()];
         }
 
         public static string LocalAddress { get; set; }

@@ -119,7 +119,7 @@ namespace Durados.Workflow
                     try
                     {
                         view.Database.Logger.Log(view.Name, "Start", "PerformAction " + rule.Name, "Engine", "", 14, view.Database.Logger.NowWithMilliseconds(), DateTime.Now);
-                        object result = PerformAction(controller, rule.WorkflowAction, rule.GetParameters(), view, values, prevRow, pk, connectionString, currentUserId, currentUserRole, command, sysCommand, rule.Name);
+                        object result = PerformAction(controller, rule.WorkflowAction, rule.GetParameters(), view, values, prevRow, pk, connectionString, currentUserId, currentUserRole, command, sysCommand, rule.Name, dataAction);
                         view.Database.Logger.Log(view.Name, "End", "PerformAction " + rule.Name, "Engine", "", 14, view.Database.Logger.NowWithMilliseconds(), DateTime.Now);
                         if (result != null)
                         {
@@ -429,7 +429,7 @@ namespace Durados.Workflow
             return string.Empty;
         }
 
-        protected virtual object PerformAction(object controller, Durados.WorkflowAction action, Dictionary<string, Parameter> parameters, View view, Dictionary<string, object> values, DataRow prevRow, string pk, string connectionString, int currentUserId, string currentUserRole, IDbCommand command, IDbCommand sysCommand, string actionName)
+        protected virtual object PerformAction(object controller, Durados.WorkflowAction action, Dictionary<string, Parameter> parameters, View view, Dictionary<string, object> values, DataRow prevRow, string pk, string connectionString, int currentUserId, string currentUserRole, IDbCommand command, IDbCommand sysCommand, string actionName, Durados.TriggerDataAction dataAction)
         {
             switch (action)
             {
@@ -442,7 +442,7 @@ namespace Durados.Workflow
                 case WorkflowAction.Execute:
                     return Execute(controller, parameters, view, prevRow, values, pk, connectionString, currentUserId, currentUserRole, command);
                 case WorkflowAction.JavaScript:
-                    return ExecuteJs(controller, parameters, view, prevRow, values, pk, connectionString, currentUserId, currentUserRole, command, sysCommand, actionName);
+                    return ExecuteJs(controller, parameters, view, prevRow, values, pk, connectionString, currentUserId, currentUserRole, command, sysCommand, actionName, dataAction);
                 case WorkflowAction.NodeJS:
                     return ExecuteNodeJS(controller, parameters, view, prevRow, values, pk, connectionString, currentUserId, currentUserRole, command, sysCommand, actionName);
                 case WorkflowAction.WebService:
@@ -494,9 +494,9 @@ namespace Durados.Workflow
             return null;
         }
 
-        protected virtual object ExecuteJs(object controller, Dictionary<string, Parameter> parameters, View view, DataRow prevRow, Dictionary<string, object> values, string pk, string connectionString, int currentUserId, string currentUserRole, IDbCommand command, IDbCommand sysCommand, string actionName)
+        protected virtual object ExecuteJs(object controller, Dictionary<string, Parameter> parameters, View view, DataRow prevRow, Dictionary<string, object> values, string pk, string connectionString, int currentUserId, string currentUserRole, IDbCommand command, IDbCommand sysCommand, string actionName, Durados.TriggerDataAction dataAction)
         {
-            javaScript.Execute(controller, parameters, view, values, prevRow, pk, connectionString, currentUserId, currentUserRole, command, sysCommand, actionName);
+            javaScript.Execute(controller, parameters, view, values, prevRow, pk, connectionString, currentUserId, currentUserRole, command, sysCommand, actionName, dataAction);
             return null;
         }
 

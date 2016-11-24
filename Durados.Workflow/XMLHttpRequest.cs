@@ -27,7 +27,8 @@ namespace Backand
         {
             Async = async;
 
-            if (url.Contains("objects/action") && System.Web.HttpContext.Current.Request.RawUrl.Contains("$$debug$$") && !url.Contains("url.Contains"))
+            //if (url.Contains("objects/action") && System.Web.HttpContext.Current.Request.RawUrl.Contains("$$debug$$") && !url.Contains("url.Contains"))
+            if (url.Contains("objects") && !url.Contains("url.Contains"))
             {
                 if (url.Contains("&parameters="))
                 {
@@ -55,6 +56,7 @@ namespace Backand
             }
             request = WebRequest.Create(url);
             request.Method = type;
+            
         }
 
         //public void basicAuth(string username, string password)
