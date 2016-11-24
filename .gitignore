@@ -160,7 +160,16 @@ $RECYCLE.BIN/
 .DS_Store
 
 packages
+/BackAnd.Web.Api/cqls.json
+/BackAnd.Web.Api/webhook1 - Copy (2).json
+/BackAnd.Web.Api/webhook1 - Copy.json
+/BackAnd.Web.Api/webhook1.json
+/Durados.Web.Mvc/Services/Postman/Collection.cs
+/Durados.Web.Mvc/Services/Postman/PostmanService.cs
+/Durados.Web.Mvc/Services/Postman/Request.cs
+/BackAnd.Web.Api/Web.config
 /Duradus.Web.Mvc.App/Web.config
 /Duradus.Web.Mvc.App/Web.qa.config
 *.config
 /Duradus.Web.Mvc.App/Web - Copy.config
+
