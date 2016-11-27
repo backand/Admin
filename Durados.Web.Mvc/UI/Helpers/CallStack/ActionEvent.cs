@@ -18,6 +18,7 @@ namespace Durados.Web.Mvc.UI.Helpers.CallStack
             ActionName = actionName;
             Data = data;
         }
+        [JsonIgnore]
         public int Time { get; private set; }
         [JsonIgnore]
         public Event Event { get; private set; }

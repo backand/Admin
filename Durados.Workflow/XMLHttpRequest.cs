@@ -52,7 +52,11 @@ namespace Backand
                         url += "?parameters=%7B%22$$debug$$%22:true%7D";
                     }
                 }
-                url += "&" + Durados.Workflow.JavaScript.GuidKey + "=" + Durados.Workflow.JavaScript.GetCacheInCurrentRequest(Durados.Workflow.JavaScript.GuidKey);
+                object requestGuid = Durados.Workflow.JavaScript.GetCacheInCurrentRequest(Durados.Workflow.JavaScript.GuidKey);
+                if (requestGuid != null)
+                {
+                    url += "&" + Durados.Workflow.JavaScript.GuidKey + "=" + requestGuid;
+                }
             }
             request = WebRequest.Create(url);
             request.Method = type;
