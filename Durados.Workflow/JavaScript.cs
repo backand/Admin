@@ -646,13 +646,15 @@ namespace Durados.Workflow
             catch (TimeoutException exception)
             {
                 Handle503(theJavaScriptSerializer, view.JsonName, actionName, exception.Message, view);
-                Backand.Logger.Log(exception.Message, 501);
+                if (!IsSubAction())
+                    Backand.Logger.Log(exception.Message, 501);
                 throw new DuradosException("Timeout: The operation took longer than " + actionTimeMSec + " milliseconds limit. at (" + view.JsonName + "/" + actionName + ")", exception);
             }
             catch (Exception exception)
             {
                 Handle503(theJavaScriptSerializer, view.JsonName, actionName, exception.Message, view);
-                Backand.Logger.Log(exception.Message, 501);
+                if (!IsSubAction())
+                    Backand.Logger.Log(exception.Message, 501);
                 throw new DuradosException("Syntax error: " + HandleLineCodes(exception.Message, view.JsonName, actionName), exception); 
             }
             object r = null;
@@ -671,7 +673,8 @@ namespace Durados.Workflow
             {
                 string message = "Timeout: The operation took longer than " + actionTimeMSec + " milliseconds limit. at (" + view.JsonName + "/" + actionName + ")";
                 Handle503(theJavaScriptSerializer, view.JsonName, actionName, message, view);
-                Backand.Logger.Log(message, 501);
+                if (!IsSubAction())
+                    Backand.Logger.Log(message, 501);
                 throw new DuradosException(message, exception);
             }
             catch (Exception exception)
@@ -680,14 +683,15 @@ namespace Durados.Workflow
                 message = HandleLineCodes(message, view.JsonName, actionName);
                 Exception e = new DuradosException(message, exception);
                 Handle503(theJavaScriptSerializer, view.JsonName, actionName, message, view);
-                Backand.Logger.Log(message, 501);
+                if (!IsSubAction())
+                    Backand.Logger.Log(message, 501);
                 //if (IsDebug())
                 //{
                 //    values[ReturnedValueKey] = message;
                 //    return;
                 //}
                 //else
-                    throw e;
+                throw e;
             }
 
             var v = call.GetValue("userInput").ToObject();
@@ -736,6 +740,11 @@ namespace Durados.Workflow
                 else
                     values[ReturnedValueKey] = r;
             }
+        }
+
+        private bool IsSubAction()
+        {
+            return System.Web.HttpContext.Current != null && System.Web.HttpContext.Current.Request.QueryString[Durados.Workflow.JavaScript.GuidKey] != null;
         }
 
         private void Handle503(System.Web.Script.Serialization.JavaScriptSerializer theJavaScriptSerializer, string objectName, string actionName, string message, View view)
