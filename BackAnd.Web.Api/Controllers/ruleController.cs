@@ -60,7 +60,7 @@ namespace BackAnd.Web.Api.Controllers
                      return Request.CreateResponse(HttpStatusCode.Forbidden, Messages.ActionIsUnauthorized);
                  }
 
-                
+
                  System.Data.DataRow row = null;
 
                  if (!string.IsNullOrEmpty(id))
@@ -137,7 +137,7 @@ namespace BackAnd.Web.Api.Controllers
                  {
                      throw new Durados.DuradosException("POST body processing error", exception);
                  }
-                 using (System.Data.IDbConnection connection = GetConnection(Map.Database.SqlProduct, Map.Database.ConnectionString ))
+                 using (System.Data.IDbConnection connection = GetConnection(Map.Database.SqlProduct, Map.Database.ConnectionString))
                  {
                      using (System.Data.IDbCommand command = GetCommand(Map.Database.SqlProduct))
                      {
@@ -152,7 +152,7 @@ namespace BackAnd.Web.Api.Controllers
                              wfe = CreateWorkflowEngine();
 
                          System.Data.IDbCommand sysCommand = null;
-                         System.Data.IDbTransaction sysTransaction = null; 
+                         System.Data.IDbTransaction sysTransaction = null;
                          System.Data.IDbConnection sysConnection = null;
                          try
                          {
@@ -196,6 +196,14 @@ namespace BackAnd.Web.Api.Controllers
                  }
 
                  return response;
+             }
+             catch (Durados.Workflow.NodeJsException exception)
+             {
+                 return Request.CreateResponse(HttpStatusCode.InternalServerError, exception.Message);
+             }
+             catch (Durados.Workflow.SubActionJavaScriptException exception)
+             {
+                 return Request.CreateResponse(HttpStatusCode.ExpectationFailed, exception.Message);
              }
              catch (Exception exception)
              {

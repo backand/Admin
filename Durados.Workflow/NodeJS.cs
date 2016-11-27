@@ -28,7 +28,10 @@ namespace Durados.Workflow
 
         public virtual void Execute(object controller, Dictionary<string, Parameter> parameters, View view, Dictionary<string, object> values, DataRow prevRow, string pk, string connectionString, int currentUsetId, string currentUserRole, IDbCommand command, IDbCommand sysCommand, string actionName)
         {
-           
+            const string FunctionError = "FunctionError";
+            const string Payload = "Payload";
+            const string ErrorMessage = "errorMessage";
+
             string url = BaseUrl + "/callLambda";
             XMLHttpRequest request = new XMLHttpRequest();
             request.open("POST", url, false);
@@ -51,7 +54,7 @@ namespace Durados.Workflow
 
             if (request.status != 200)
             {
-                throw new Durados.DuradosException("Server return status " + request.status + ", " + request.responseText);
+                throw new NodeJsException(request.responseText);
             }
 
             Dictionary<string, object> response = null;
@@ -61,7 +64,43 @@ namespace Durados.Workflow
             }
             catch (Exception exception)
             {
-                throw new Durados.DuradosException("Could not parse upload response", exception);
+                throw new Durados.DuradosException("Could not parse NodeJS response", exception);
+            }
+
+            if (response.ContainsKey(FunctionError))
+            {
+                if (response.ContainsKey(Payload))
+                {
+                    var responsePayload = response[Payload];
+                    if (responsePayload is string)
+                    {
+                        IDictionary<string, object> responsePayloadError = null;
+                        try
+                        {
+                            responsePayloadError = jss.Deserialize<Dictionary<string,object>>((string)responsePayload);
+                        }
+                        catch
+                        {
+                            throw new NodeJsException((string)responsePayload);
+                        }
+                        if (responsePayloadError.ContainsKey(ErrorMessage))
+                        {
+                            throw new NodeJsException(responsePayloadError[ErrorMessage].ToString());
+                        }
+                        else
+                        {
+                            throw new NodeJsException((string)responsePayload);
+                        }
+                    }
+                    else
+                    {
+                        throw new NodeJsException(request.responseText);
+                    }
+                }
+                else
+                {
+                    throw new NodeJsException(request.responseText);
+                }
             }
 
             if (response != null && values != null)

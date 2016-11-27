@@ -646,16 +646,31 @@ namespace Durados.Workflow
             catch (TimeoutException exception)
             {
                 Handle503(theJavaScriptSerializer, view.JsonName, actionName, exception.Message, view);
+                string errorMessage = "Timeout: The operation took longer than " + actionTimeMSec + " milliseconds limit. at (" + view.JsonName + "/" + actionName + ")";
                 if (!IsSubAction())
+                {
                     Backand.Logger.Log(exception.Message, 501);
-                throw new DuradosException("Timeout: The operation took longer than " + actionTimeMSec + " milliseconds limit. at (" + view.JsonName + "/" + actionName + ")", exception);
+                    throw new MainActionJavaScriptException(errorMessage, exception);
+                }
+                else
+                {
+                    throw new SubActionJavaScriptException(errorMessage, exception);
+                }
             }
             catch (Exception exception)
             {
                 Handle503(theJavaScriptSerializer, view.JsonName, actionName, exception.Message, view);
+                string errorMessage = "Syntax error: " + HandleLineCodes(exception.Message, view.JsonName, actionName);
                 if (!IsSubAction())
+                {
                     Backand.Logger.Log(exception.Message, 501);
-                throw new DuradosException("Syntax error: " + HandleLineCodes(exception.Message, view.JsonName, actionName), exception); 
+                    throw new MainActionJavaScriptException(errorMessage, exception);
+                }
+                else
+                {
+                    throw new SubActionJavaScriptException(errorMessage, exception);
+                }
+
             }
             object r = null;
             try
@@ -674,24 +689,35 @@ namespace Durados.Workflow
                 string message = "Timeout: The operation took longer than " + actionTimeMSec + " milliseconds limit. at (" + view.JsonName + "/" + actionName + ")";
                 Handle503(theJavaScriptSerializer, view.JsonName, actionName, message, view);
                 if (!IsSubAction())
+                {
                     Backand.Logger.Log(message, 501);
-                throw new DuradosException(message, exception);
+                    throw new MainActionJavaScriptException(message, exception);
+                }
+                else
+                {
+                    throw new SubActionJavaScriptException(message, exception);
+                }
             }
             catch (Exception exception)
             {
                 string message = (exception.InnerException == null) ? exception.Message : exception.InnerException.Message;
                 message = HandleLineCodes(message, view.JsonName, actionName);
-                Exception e = new DuradosException(message, exception);
                 Handle503(theJavaScriptSerializer, view.JsonName, actionName, message, view);
                 if (!IsSubAction())
+                {
                     Backand.Logger.Log(message, 501);
-                //if (IsDebug())
-                //{
-                //    values[ReturnedValueKey] = message;
-                //    return;
-                //}
-                //else
-                throw e;
+                    //if (IsDebug())
+                    //{
+                    //    values[ReturnedValueKey] = message;
+                    //    return;
+                    //}
+                    //else
+                    throw new MainActionJavaScriptException(message, exception);
+                }
+                else
+                {
+                    throw new SubActionJavaScriptException(message, exception);
+                }
             }
 
             var v = call.GetValue("userInput").ToObject();

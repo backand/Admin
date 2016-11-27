@@ -117,13 +117,16 @@
     <Compile Include="console.cs" />
     <Compile Include="Cookie.cs" />
     <Compile Include="JsActionArguments.cs" />
+    <Compile Include="MainActionJavaScriptException.cs" />
     <Compile Include="NodeJS.cs" />
+    <Compile Include="NodeJsException.cs" />
     <Compile Include="OverTheActionParametersSizeLimitException.cs" />
     <Compile Include="ParseAuth.cs" />
     <Compile Include="JavaScript.cs" />
     <Compile Include="files.cs" />
     <Compile Include="request.cs" />
     <Compile Include="socket.cs" />
+    <Compile Include="SubActionJavaScriptException.cs" />
     <Compile Include="WebService.cs" />
     <Compile Include="Graph.cs" />
     <Compile Include="Step.cs" />
