@@ -17,9 +17,9 @@ namespace Durados.Web.Mvc.UI.Helpers.Search
         public string FieldName { get; set; }
         public EntityType EntityType { get; set; }
 
-        public object Search(ConfigAccess config, string q, int? id, int snippetLength, string highlightTag, int tabChars)
+        public object Search(ConfigAccess config, string q, int? id, int snippetLength, bool spaceAsWildcard, string highlightTag, int tabChars)
         {
-            string whereStatement = GetWhereStatement(q, id);
+            string whereStatement = GetWhereStatement(q, id, spaceAsWildcard);
 
             DataView dataView = config.GetRows(ViewName, whereStatement, Maps.Instance.GetMap().GetConfigDatabase().ConnectionString);
 
@@ -65,7 +65,7 @@ namespace Durados.Web.Mvc.UI.Helpers.Search
 
         protected virtual string GetName(System.Data.DataRowView row, string q)
         {
-            return row["Name"].ToString();
+            return row.Row.Table.Columns.Contains("JsonName") && !row.Row.IsNull("JsonName") ? row["JsonName"].ToString() : row["Name"].ToString();
         }
 
         protected virtual object GetId(System.Data.DataRowView row)
@@ -80,30 +80,51 @@ namespace Durados.Web.Mvc.UI.Helpers.Search
 
         protected virtual object GetSnippets(System.Data.DataRowView row, string q, int snippetLength, string highlightTag, int tabChars)
         {
-            return new Dictionary<string, object>() { { "snippet", GetSnippet(row, q, snippetLength, highlightTag, tabChars) } };
+            return new Dictionary<string, object>[1] { new Dictionary<string, object>() { { "snippet", GetSnippet(row, q, snippetLength, highlightTag, tabChars) } } };
         }
 
-        
-        private string GetWhereStatement(string q, int? id)
+
+        private string GetWhereStatement(string q, int? id, bool spaceAsWildcard)
         {
             if (id.HasValue)
             {
-                return GetWhereStatementWithId(q, id.Value);
+                return GetWhereStatementWithId(q, id.Value, spaceAsWildcard);
             }
             else
             {
-                return GetWhereStatement(q);
+                return GetWhereStatement(q, spaceAsWildcard);
             }
         }
 
-        protected virtual string GetWhereStatement(string q)
+        protected virtual string GetWhereStatement(string q, bool spaceAsWildcard)
+        {
+            if (spaceAsWildcard && q.Contains(' '))
+            {
+                string w = string.Empty;
+                foreach (string word in q.Split(' '))
+                {
+                    w = w + GetWhereStatementOfWord(q) + " or ";
+                }
+                w = "(" + w.TrimEnd(" or ".ToCharArray()) + ")" + GetExcludeConfig();
+                return w;
+            }
+            else
+                return GetWhereStatementOfWord(q) + GetExcludeConfig();
+        }
+
+        protected virtual string GetWhereStatementOfWord(string q)
         {
             return FieldName + " like '%" + q + "%'";
         }
 
-        protected virtual string GetWhereStatementWithId(string q, int id)
+        protected virtual string GetExcludeConfig()
         {
-            return GetIdFilterFieldName() + " = " + id + " and " + FieldName + " like '%" + q + "%'";
+            return " and " + FieldName + " not like '%durados%'";
+        }
+
+        protected virtual string GetWhereStatementWithId(string q, int id, bool spaceAsWildcard)
+        {
+            return GetIdFilterFieldName() + " = " + id + " and (" + GetWhereStatement(q, spaceAsWildcard) + ")" + GetExcludeConfig();
         }
 
         protected virtual string GetIdFilterFieldName()
