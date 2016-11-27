@@ -397,7 +397,8 @@ namespace BackAnd.Web.Api.Controllers.Filters
                 authHeaderValue = authRequest.Parameter;
             if (string.IsNullOrEmpty(authHeaderValue))
                 return GetBasicAuthenticationIdentityFromQueryString();
-            authHeaderValue = System.Text.Encoding.Default.GetString(Convert.FromBase64String(authHeaderValue));
+            if (!authHeaderValue.Contains(':'))
+                authHeaderValue = System.Text.Encoding.Default.GetString(Convert.FromBase64String(authHeaderValue));
             var credentials = authHeaderValue.Split(':');
             return credentials.Length < 2 ? null : new BasicAuthenticationIdentity(credentials[0], credentials[1]);
         }
