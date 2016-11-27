@@ -913,7 +913,7 @@ namespace Durados.Workflow
         
         private static int GetSequence(View view)
         {
-            if (IsDebug())
+            if (!IsDebug())
                 return 0;
             const string Sequense = "Sequense";
             const int TenMinutes = 1000 * 60 * 10;
