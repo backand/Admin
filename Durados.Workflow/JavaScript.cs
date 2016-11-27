@@ -127,80 +127,167 @@ namespace Durados.Workflow
 
             message = message.Replace("#|", "{").Replace("|#", "}").Replace("\\\"", "\"").Replace("|", "").Replace("#", "");
 
-            message = CleanMessage(message);
+            try
+            {
+                var json = CleanJson(message);
 
+                message = CleanMessage(json);
+            }
+            catch { }
             return message;
 
             // "The follwoing action: "aaa" failed to perform: Failed to load the javascript code: Line 166: Unexpected token }"
         }
 
-        private string CleanMessage(string message)
+        private string CleanMessage(IDictionary<string, object> json)
         {
-            try
+            const string at = "at";
+            StringBuilder sb = new StringBuilder();
+
+            IDictionary<string, object> child = json;
+            
+            bool eoj = false;
+            while (!eoj)
             {
-                var theJavaScriptSerializer = new System.Web.Script.Serialization.JavaScriptSerializer();
-                IDictionary<string, object> d2 = new Dictionary<string, object>();
-                IDictionary<string, object> d = theJavaScriptSerializer.Deserialize<Dictionary<string, object>>(message);
-                IDictionary<string, object> d2Child = d2;
-                
-                bool eoj = false;
-                while (!eoj)
+                bool nodeHasLocation = false;
+                bool nodeHasChildren = false;
+                object value = null;
+                string key2 = string.Empty;
+                object message2 = null;
+                foreach (string key in child.Keys)
                 {
+                    value = child[key];
+
+                    if (key == at && value is IDictionary<string, object>)
+                    {
+                        string location = GetLocation((IDictionary<string, object>)value);
+                        sb.Insert(0, location);
+                        nodeHasLocation = true;
+                    }
+                    else if (value is IDictionary<string, object>)
+                    {
+                        child = (IDictionary<string, object>)value;
+                        nodeHasChildren = true;
+                        key2 = key;
+                        message2 = value;
+                    }
+                    else
+                    {
+                        key2 = key;
+                        message2 = value;
+                    }
+                }
+                if (!nodeHasLocation || !nodeHasChildren)
+                {
+                    string message = GetMessage(key2, message2);
+                    sb.Insert(0, message);
+                        
                     eoj = true;
-                    bool hasLine = false;
-                    string errorKey = null;
+                }
+            }
+
+            return sb.ToString();
+        }
+
+        private string GetLocation(IDictionary<string, object> dictionary)
+        {
+            StringBuilder sb = new StringBuilder();
+            sb.Append(" at ");
+            sb.Append("(");
+            if (dictionary.ContainsKey("object"))
+            {
+                string objectName = dictionary["object"].ToString();
+                sb.Append(objectName);
+                sb.Append("/");
+            }
+            if (dictionary.ContainsKey("action"))
+            {
+                string actionName = dictionary["action"].ToString();
+                sb.Append(actionName);
+            }
+            if (dictionary.ContainsKey("line"))
+            {
+                sb.Append(":");
+                string line = dictionary["line"].ToString();
+                sb.Append(line);
+            }
+            sb.Append(")");
+            
+            return sb.ToString();
+        }
+
+        private string GetMessage(string key, object value)
+        {
+            if (key == "417")
+                key = "CriticalError";
+            if (value is string)
+                return key + ":" + value.ToString();
+
+            return value + ":" + jss.Serialize(value);
+        }
+
+        private IDictionary<string, object> CleanJson(string message)
+        {
+
+            var theJavaScriptSerializer = new System.Web.Script.Serialization.JavaScriptSerializer();
+            IDictionary<string, object> d2 = new Dictionary<string, object>();
+            IDictionary<string, object> d = theJavaScriptSerializer.Deserialize<Dictionary<string, object>>(message);
+            IDictionary<string, object> d2Child = d2;
+
+            bool eoj = false;
+            while (!eoj)
+            {
+                eoj = true;
+                bool hasLine = false;
+                string errorKey = null;
+                foreach (string key in d.Keys)
+                {
+                    if (key == "at")
+                    {
+                        if (((IDictionary<string, object>)d[key]).ContainsKey("line"))
+                        {
+                            hasLine = true;
+                        }
+                    }
+                    else
+                    {
+                        errorKey = key;
+
+                        if (d[key] is IDictionary<string, object>)
+                        {
+                            eoj = false;
+                        }
+                    }
+                }
+                if (hasLine)
+                {
                     foreach (string key in d.Keys)
                     {
-                        if (key == "at")
+                        if (key == "at" || eoj)
                         {
-                            if (((IDictionary<string, object>)d[key]).ContainsKey("line"))
-                            {
-                                hasLine = true;
-                            }
+                            d2Child.Add(key, d[key]);
                         }
-                        else
-                        {
-                            errorKey = key;
-                                
-                            if (d[key] is IDictionary<string, object>)
-                            {
-                                eoj = false;
-                            }
-                        }
-                    }
-                    if (hasLine)
-                    {
-                        foreach (string key in d.Keys)
-                        {
-                            if (key == "at" || eoj)
-                            {
-                                d2Child.Add(key, d[key]);
-                            }
-                        }
-                        if (!eoj)
-                        {
-                            d2Child.Add(errorKey, new Dictionary<string, object>());
-                            d2Child = (IDictionary<string, object>)d2Child[errorKey];
-                        }
-                    }
-                    else if (eoj && errorKey != null)
-                    {
-                        d2Child.Add(errorKey, d[errorKey]);
                     }
                     if (!eoj)
                     {
-                        d = (IDictionary<string, object>)d[errorKey];
+                        d2Child.Add(errorKey, new Dictionary<string, object>());
+                        d2Child = (IDictionary<string, object>)d2Child[errorKey];
                     }
-                        
+                }
+                else if (eoj && errorKey != null)
+                {
+                    d2Child.Add(errorKey, d[errorKey]);
+                }
+                if (!eoj)
+                {
+                    d = (IDictionary<string, object>)d[errorKey];
                 }
 
-                return theJavaScriptSerializer.Serialize(d2);
+            }
 
-            }
-            catch
-            {
-                return message;
-            }
+            return d2;
+
+
 
         }
 
