@@ -650,7 +650,10 @@ namespace Durados.Workflow
                 if (!IsSubAction())
                 {
                     Backand.Logger.Log(exception.Message, 501);
-                    throw new MainActionJavaScriptException(errorMessage, exception);
+                    if (IsDebug())
+                        throw new MainActionInDebugJavaScriptException(errorMessage, exception);
+                    else
+                        throw new MainActionJavaScriptException(errorMessage, exception);
                 }
                 else
                 {
@@ -664,7 +667,10 @@ namespace Durados.Workflow
                 if (!IsSubAction())
                 {
                     Backand.Logger.Log(exception.Message, 501);
-                    throw new MainActionJavaScriptException(errorMessage, exception);
+                    if (IsDebug())
+                        throw new MainActionInDebugJavaScriptException(errorMessage, exception);
+                    else
+                        throw new MainActionJavaScriptException(errorMessage, exception);
                 }
                 else
                 {
@@ -691,7 +697,10 @@ namespace Durados.Workflow
                 if (!IsSubAction())
                 {
                     Backand.Logger.Log(message, 501);
-                    throw new MainActionJavaScriptException(message, exception);
+                    if (IsDebug())
+                        throw new MainActionInDebugJavaScriptException(message, exception);
+                    else
+                        throw new MainActionJavaScriptException(message, exception);
                 }
                 else
                 {
@@ -712,7 +721,10 @@ namespace Durados.Workflow
                     //    return;
                     //}
                     //else
-                    throw new MainActionJavaScriptException(message, exception);
+                    if (IsDebug())
+                        throw new MainActionInDebugJavaScriptException(message, exception);
+                    else
+                        throw new MainActionJavaScriptException(message, exception);
                 }
                 else
                 {

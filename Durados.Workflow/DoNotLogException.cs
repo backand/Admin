@@ -5,9 +5,9 @@ using System.Text;
 
 namespace Durados.Workflow
 {
-    public class SubActionJavaScriptException : DoNotLogException
+    public class DoNotLogException : DuradosException
     {
-        public SubActionJavaScriptException(string message, Exception innerException = null)
+        public DoNotLogException(string message, Exception innerException = null)
             : base(message, innerException)
         {
 

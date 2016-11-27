@@ -116,7 +116,9 @@
     <Compile Include="ApprovalProcess.cs" />
     <Compile Include="console.cs" />
     <Compile Include="Cookie.cs" />
+    <Compile Include="DoNotLogException.cs" />
     <Compile Include="JsActionArguments.cs" />
+    <Compile Include="MainActionInDebugJavaScriptException.cs" />
     <Compile Include="MainActionJavaScriptException.cs" />
     <Compile Include="NodeJS.cs" />
     <Compile Include="NodeJsException.cs" />

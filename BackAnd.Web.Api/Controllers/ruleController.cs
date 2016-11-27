@@ -201,9 +201,17 @@ namespace BackAnd.Web.Api.Controllers
              {
                  return Request.CreateResponse(HttpStatusCode.InternalServerError, exception.Message);
              }
-             catch (Durados.Workflow.SubActionJavaScriptException exception)
+             catch (Durados.Workflow.DoNotLogException exception)
              {
-                 return Request.CreateResponse(HttpStatusCode.ExpectationFailed, exception.Message);
+                 HttpResponseMessage response = Request.CreateResponse(HttpStatusCode.ExpectationFailed, exception.Message);
+
+                 if (System.Web.HttpContext.Current.Items.Contains(GuidKey))
+                 {
+                     string actionHeaderGuidValue = System.Web.HttpContext.Current.Items[GuidKey].ToString();
+                     response.Headers.Add(actionHeaderGuidName, actionHeaderGuidValue);
+                 }
+
+                 return response;
              }
              catch (Exception exception)
              {
