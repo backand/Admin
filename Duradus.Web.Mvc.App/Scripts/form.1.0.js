@@ -3582,10 +3582,10 @@ EditDialog.GetButtons = function (pk, guid, hideClose, allowEdit) {
         }
     }
 
-    //    if (allowEdit && views[guid].ShowUpDown) {
-    //        buttons['->'] = function() { EditDialog.Next(pk, guid); }
-    //        buttons['<-'] = function() { EditDialog.Prev(pk, guid); }
-    //    }
+       if (allowEdit && views[guid].ShowUpDown) {
+           buttons['->'] = function() { EditDialog.Next(pk, guid); }
+           buttons['<-'] = function() { EditDialog.Prev(pk, guid); }
+       }
 
     if (allowEdit && isAdmin(guid) && !d_autoCommit) {
         buttons[translator.saveAndCommit] = function () {
@@ -3790,22 +3790,26 @@ EditDialog.Open2 = function (pk, guid, hideClose, callback) {
     dialog.dialog('open');
 
     //1 sec
-    //    if (!allowEdit.disabled && views[guid].ShowUpDown) {
-    //        dialog.parent().find('.ui-dialog-buttonpane button').each(function() {
-    //            if ($(this).text() == '->') {
-    //                $(this).attr('title', 'Next');
-    //                $(this).attr('alt', 'Next');
-    //            }
-    //            else if ($(this).text() == '<-') {
-    //                $(this).attr('title', 'Previous');
-    //                $(this).attr('alt', 'Previous');
-    //            }
-    //        });
-    //    }
+		if(typeof(allowedit) != "undefined"){
+		   if (!allowedit.disabled && views[guid].showupdown) {
+			   dialog.parent().find('.ui-dialog-buttonpane button').each(function() {
+				   if ($(this).text() == '->') {
+					   $(this).attr('title', 'next');
+					   $(this).attr('alt', 'next');
+				   }
+				   else if ($(this).text() == '<-') {
+					   $(this).attr('title', 'previous');
+					   $(this).attr('alt', 'previous');
+				   }
+			   });
+		   }
+		}
 
-    //    if (!EditDialog.AllowEdit(guid, pk)) {
-    //        EditDialog.DisableDialog(editPrefix, guid, jsonView);
-    //    }
+		if(typeof(editdialog) != "undefined"){
+		   if (!editdialog.allowedit(guid, pk)) {
+			   editdialog.disabledialog(editprefix, guid, jsonview);
+		   }
+		}
 
     if (views[guid].ViewName == "Field") {
         var displayFormatElms = dialog.find("select[name='DisplayFormat']");
@@ -7454,27 +7458,35 @@ var copyPaste;
 function initTooltip(elm) {
 
     var title = elm.attr('title');
+    //var title = elm.attr('tooltip');
     if (title == '')
         return;
     if (title.indexOf('|') == -1) {
+        //elm.attr('tooltip', '|' + title)
         elm.attr('title', '|' + title)
     }
     elm.cluetip({
         splitTitle: '|',
         clickThrough: true,
-        cluetipClass: 'jtip',
+        cluetipClass: 'default',
+        activation: 'click',
+        cursor: '',
         arrows: true,
         dropShadow: false,
         hoverIntent: false,
         sticky: title.indexOf('href') != -1,
         mouseOutClose: true,
         closePosition: 'title',
+        //closePosition: 'tooltip',
         closeText: '<img src="/content/images/cross.png" alt="close" />'
     });
 }
 
 function initTooltips() {
-    $('#rowtabletitleSpan').each(function () {
+    //$('#rowtabletitleSpan').each(function () {
+    //    initTooltip($(this));
+    //});
+    $('i.icon-info_outline').each(function () {
         initTooltip($(this));
     });
     Durados.Preview.init();
@@ -11262,9 +11274,12 @@ function pagesManager(width, url) {
 
 
             if (document.location.href.indexOf('/Admin/Pages') > -1) {
+                $('body').addClass("page-page");
                 if (queryString('p') == 'on') {
                     openAddPageDialog();
                 }
+                else
+                    $('body').removeClass("page-page");
             }
         }
     });
@@ -11435,10 +11450,10 @@ function selectPage2(page, url, isView, text, data) {
     }
 
     var iframe = $('#mainAppFrame');
-
+  
     var c = url.indexOf('?') > -1 ? '&' : '?';
     iframe.attr('src', url + c + 'menu=off');
-
+    
     /*
     showProgress();
     $.ajax({
@@ -12247,6 +12262,9 @@ function viewProperties(guid, vfloat, width, url, viewDisplayName) {
 function viewDivResize(viewDiv, mainDiv, frame) {
     viewDiv.height(($(window).height() - mainDiv.offset().top - 16));
     frame.height((viewDiv.height() - 8));
+    $('.main-content').addClass("admin-open");
+    $('body').addClass("page-settings");
+    $('#AppFilterTreeDiv').addClass("admin-open");
 }
 
 function closeViewProperties() {
@@ -12267,6 +12285,9 @@ function closeViewProperties() {
 
     $(window).resize();
 
+    $('.main-content').removeClass("admin-open");
+    $('#AppFilterTreeDiv').removeClass("admin-open");
+    $('body').removeClass("page-settings");
     //    reloadPage();
 }
 
@@ -13677,6 +13698,9 @@ $(document).ready(function () {
         $('body').addClass('webkit');
     }
 
+    if (inIframe()) {
+        $('.main-content').addClass('in-iframe');
+    }
     logTitle.initiate();
 
     //Checkboxs	

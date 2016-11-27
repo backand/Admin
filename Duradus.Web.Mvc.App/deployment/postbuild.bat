@@ -47,6 +47,9 @@ REM CSS Start...
 java -jar yuicompressor-2.4.2.jar ..\Content\Stylesheet.css -o ..\Content\Stylesheet.min.css --type css --charset utf-8
 java -jar yuicompressor-2.4.2.jar ..\Content\Gray.css -o ..\Content\gray.min.css --type css --charset utf-8
 
+java -jar yuicompressor-2.4.2.jar ..\Content\styles.css -o ..\Content\styles.min.css --type css --charset utf-8
+
+
 java -jar yuicompressor-2.4.2.jar ..\Content\ddsmoothmenu.css -o ..\Content\ddsmoothmenu.min.css --type css --charset utf-8
 java -jar yuicompressor-2.4.2.jar ..\Content\SpryValidation.css -o ..\Content\SpryValidation.min.css --type css --charset utf-8
 
@@ -59,7 +62,7 @@ REM java -jar yuicompressor-2.4.2.jar ..\Content\jHtmlArea\jHtmlArea.css -o ..\C
 java -jar yuicompressor-2.4.2.jar ..\Content\smoothness\jquery-ui-1.7.1.custom.css -o ..\Content\smoothness\jquery-ui-1.7.1.custom.min.css --type css --charset utf-8
 java -jar yuicompressor-2.4.2.jar ..\Content\spectrum.css -o ..\Content\spectrum.min.css --type css --charset utf-8
 
-type ..\Content\SpryValidation.min.css space.txt ..\Content\jquery.toChecklist.min.css space.txt ..\Content\Stylesheet.min.css space.txt ..\Content\gray.min.css space.txt ..\Content\ddsmoothmenu.min.css space.txt ..\Content\ui.dropdownchecklist.standalone.min.css space.txt ..\Content\ui.dropdownchecklist.themeroller.min.css space.txt ..\Content\jquery.contextMenu.min.css space.txt ..\Content\anythingslider.min.css space.txt ..\Content\spectrum.min.css > ..\Content\general.min.1.0.0.css
+type ..\Content\styles.min.css ..\Content\SpryValidation.min.css space.txt ..\Content\jquery.toChecklist.min.css space.txt ..\Content\Stylesheet.min.css space.txt ..\Content\gray.min.css space.txt ..\Content\ddsmoothmenu.min.css space.txt ..\Content\ui.dropdownchecklist.standalone.min.css space.txt ..\Content\ui.dropdownchecklist.themeroller.min.css space.txt ..\Content\jquery.contextMenu.min.css space.txt ..\Content\anythingslider.min.css space.txt ..\Content\spectrum.min.css > ..\Content\general.min.1.0.0.css
 
 
 REM create javascript version

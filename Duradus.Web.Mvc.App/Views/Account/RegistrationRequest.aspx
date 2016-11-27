@@ -107,12 +107,13 @@ Registration
 
 
 <asp:Content ID="Content2" ContentPlaceHolderID="MainContent" runat="server">
+    <div class="registerdrogon"></div>
     <div class="signInHeader">
-        <%=Map.Database.Localizer.Translate("Create Account")%>
+        <%=Map.Database.Localizer.Translate("Sign in to ")%>
     </div>
             
             
- <div class="error"></div>
+ <!--<div class="error"></div>-->
         <% 
             string controller = "DuradosAccount";
             //if (Map.Database.SiteInfo.Product.ToLower() == Durados.Web.Mvc.Maps.GetMainAppName().ToLower())
@@ -128,6 +129,28 @@ Registration
                    } %>       
                    <%= content%>
             </div>
+
+             <div class="username">
+                    <label for="username"><%=Map.Database.Localizer.Translate("Username")%>&nbsp;</label>
+                    <%= Html.TextBox("username", string.Empty, new { id = "fullname", type = "email", placeholder="Full Name"})%>
+                </div>
+
+                <div class="emailaddress">
+                    
+                    <%= Html.TextBox("emailaddress", string.Empty, new { id = "emailaddress", type = "email", placeholder="Email Address (username)"})%>
+                </div>
+
+                <div class="logonpassword">
+                    
+                    <%= Html.Password("password", string.Empty, new { id="password", type = "password", placeholder="Password" })%>
+                </div>
+                 <div class="password">
+                    <label for="password"><%=Map.Database.Localizer.Translate("Password")%>&nbsp;</label>
+                    <%= Html.Password("password", string.Empty, new { id="reset_password", type = "password", placeholder="Re-type Password" })%>
+                </div>
+                <div class="signup_button" id="btn_signup" style=""><span name="submit" class="inner"><%=Map.Database.Localizer.Translate("Sign Up")%></span></div>
+         
+
         </form>
 </asp:Content>
 

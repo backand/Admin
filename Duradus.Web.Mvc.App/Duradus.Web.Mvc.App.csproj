@@ -287,6 +287,7 @@
     <Content Include="Config\Sql\Users.sql" />
     <Content Include="Config\Sql\WorkFlowGraph.sql" />
     <Content Include="Content\anythingslider.css" />
+    <Content Include="Content\fonts\backandadmin.svg" />
     <Content Include="Content\Images\back_favicon.ico" />
     <Content Include="Content\bootstrap.min.css" />
     <Content Include="Content\ddsmoothmenu-v.css" />
@@ -695,6 +696,8 @@
     <Content Include="Content\spectrum.css" />
     <Content Include="Content\SpryValidation.css" />
     <Content Include="Content\SpryValidation.min.css" />
+    <Content Include="Content\style.css" />
+    <Content Include="Content\styles.css" />
     <Content Include="Content\Stylesheet.css" />
     <Content Include="Content\Stylesheet.min.css" />
     <Content Include="Content\StylesheetRtl.css" />
@@ -855,6 +858,12 @@
     <Content Include="apps\assets\fonts\bootstrap\glyphicons-halflings-regular.eot" />
     <Content Include="apps\assets\fonts\bootstrap\glyphicons-halflings-regular.ttf" />
     <Content Include="apps\assets\fonts\bootstrap\glyphicons-halflings-regular.woff" />
+    <Content Include="Content\fonts\backandadmin.eot" />
+    <Content Include="Content\fonts\backandadmin.ttf" />
+    <Content Include="Content\fonts\backandadmin.woff" />
+    <Content Include="deployment\Registration page content" />
+    <Content Include="Content\styles.scss" />
+    <Content Include="Content\selection.json" />
     <None Include="Properties\PublishProfiles\Admin.pubxml" />
     <None Include="ws\about.html.old" />
     <Content Include="ws\about.html" />
@@ -1288,7 +1297,7 @@
     </None>
     <Content Include="Reports\Microsoft.ReportViewer.WebForms.dll" />
     <Content Include="Reports\RdlcWebForm.aspx" />
-    <Content Include="Rest\Test.html" />
+    <Content Include="Scripts\Rest\Test.html" />
     <Content Include="Scripts\ajaxupload.3.6.js" />
     <Content Include="Scripts\ajaxupload.3.6.min.js" />
     <Content Include="Scripts\backand.js" />
@@ -1819,7 +1828,9 @@
     <None Include="Microsoft.WindowsAzure.Caching\ClientPerfCountersInstaller.exe.config">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <Content Include="packages.config" />
+    <Content Include="packages.config">
+      <SubType>Designer</SubType>
+    </Content>
     <None Include="Properties\PublishProfiles\BackandQA.pubxml" />
     <None Include="Properties\PublishProfiles\backand_ver4.pubxml" />
     <None Include="Uploads\svivot_config.xsd">
@@ -1937,7 +1948,7 @@
           <AutoAssignPort>True</AutoAssignPort>
           <DevelopmentServerPort>1333</DevelopmentServerPort>
           <DevelopmentServerVPath>/</DevelopmentServerVPath>
-          <IISUrl>http://localhost:4008</IISUrl>
+          <IISUrl>http://localhost:4010</IISUrl>
           <NTLMAuthentication>False</NTLMAuthentication>
           <UseCustomServer>False</UseCustomServer>
           <CustomServerUrl>http://localhost:4009</CustomServerUrl>

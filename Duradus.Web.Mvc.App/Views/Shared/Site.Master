@@ -57,6 +57,7 @@
     <link href="~/Content/Stylesheet.css" rel="stylesheet" type="text/css" />
     <!-- Themes css -->
     <link href="~/Content/Gray.css" rel="stylesheet" type="text/css" />
+    <link href="~/Content/styles.css" rel="stylesheet" type="text/css" />
     <%--<link href="~/Content/Themes/Gray.css" rel="stylesheet" type="text/css" />--%>
     <!--For printer-->
     <link rel="stylesheet" type="text/css" media="print" href="~/Content/PrintGrid.css" />
@@ -308,6 +309,24 @@
             catch(e){}
         });
     </script>
+
+     <script type="text/javascript">
+        $(document).ready(function () {
+           
+           $('#sideMenu ul li  div a span.collapse').click(function(){
+                 $('.main-content').removeClass('left_paddd');   
+           });
+           $(' #sideMenu2').click(function(){
+                 $('.main-content').addClass('left_paddd');   
+           });
+           if ($("#sideMenu").css('display') == 'block') {
+   // ...
+   $('.main-content').addClass('left_paddd'); 
+}
+
+            });
+    </script>
+
     <asp:ContentPlaceHolder ID="head" runat="server"></asp:ContentPlaceHolder>
     <%--<script language='javascript' async='true' type='text/javascript' src='https://d3b3ehuo35wzeh.cloudfront.net/users/8098/walkme_8098_https.js'></script>--%>
 </head>
@@ -341,13 +360,17 @@
 
     <% if (!(Durados.Web.Infrastructure.General.IsMobile()))
        {%>
+
     <header>
-		<div id="topMenu">
+
+        <div id="topMenu">
             <% 
            Workspace currentWorkspace = MenuHelper.GetCurrentWorkspace(ViewData["ViewName"] as string);
            int index = Map.Database.GetWorkspaceIndex(currentWorkspace);
             %>
+
             <div>
+
             <%
            string poweredByStyle = string.Empty;
            if (!string.IsNullOrEmpty(Map.Database.PoweredByLogo))
@@ -366,39 +389,42 @@
                    poweredByTarget = urlVal[1];
                }
            }
+
+            
                  %>
                  <% if (!Durados.Web.Infrastructure.General.IsMobile())
                     { %>
                 <a href="<%= poweredByUrl%>" <%=poweredByStyle %> class="durados-logo" target="<%=poweredByTarget %>"></a>
                <%} %>
             </div>
-
+ 
            <nav id="adminButtons">
             <%  if (!Map.IsMainMap && (Durados.Web.Mvc.UI.Helpers.SecurityHelper.IsInRole("Developer") || Durados.Web.Mvc.UI.Helpers.SecurityHelper.IsInRole("Admin")) && currentWorkspace.Name != "Admin")
                 { %>
-			
-				<ul>
-					<li id="pages" <%=pagesSelected %>><a href="/Admin/Pages?menuId=<%= Request.QueryString["menuId"]%>">Pages</a></li>
+            
+                <ul>
+                    <li id="pages" <%=pagesSelected %>><a href="/Admin/Pages?menuId=<%= Request.QueryString["menuId"]%>">Pages</a></li>
                     <% if (hasSettingsSelected)
                        {%>
-					<li id="settings" <%=settingsSelected %>><a href="<%= settingsUrl%>">Settings</a></li>
-					<li id="columns" <%=columnsSelected %>><a href="<%= columnsUrl%>">Columns</a></li>
+                    <li id="settings" <%=settingsSelected %>><a href="<%= settingsUrl%>">Settings</a></li>
+                    <li id="columns" <%=columnsSelected %>><a href="<%= columnsUrl%>">Columns</a></li>
                     <%} %>
-				</ul>
-			<%}
+                </ul>
+            <%}
                 else
                 {%>
                 &nbsp;
             <%} %>
             </nav>
             
+
            
-			<div class="workspace space-selected<%=index %>">
+            <div class="workspace space-selected<%=index %>">
                 
-				<ul>
-					<li><span class="w-icon"></span><span class="w-text"><%= currentWorkspace.Name%></span><span class="w-expand"></span>
-					<div class="submenu">
-						<ul>
+                <ul>
+                    <li><span class="w-icon"></span><span class="w-text"><%= currentWorkspace.Name%></span><span class="w-expand"></span>
+                    <div class="submenu">
+                        <ul>
                             
                             <% 
                 string activeClass = string.Empty;
@@ -407,7 +433,7 @@
                 List<Durados.Workspace> workspaces = Map.Database.Workspaces.Values.Where(w => !SecurityHelper.IsDenied(w.GetDenySelectRoles(Map.Database), w.GetAllowSelectRoles(Map.Database))).OrderBy(w => w.Ordinal).ToList();
 
                             %>
-							<%foreach (Workspace workspace in workspaces.Where(w => w.ID != Map.Database.GetAdminWorkspaceId()).OrderBy(w => w.Ordinal)) //Map.Database.Workspaces.Values.Where(w => w.ID != Map.Database.GetAdminWorkspaceId()).OrderBy(w => w.Ordinal))
+                            <%foreach (Workspace workspace in workspaces.Where(w => w.ID != Map.Database.GetAdminWorkspaceId()).OrderBy(w => w.Ordinal)) //Map.Database.Workspaces.Values.Where(w => w.ID != Map.Database.GetAdminWorkspaceId()).OrderBy(w => w.Ordinal))
          { %>
                                 <% 
              string workspaceName = workspace.Name;
@@ -418,14 +444,14 @@
                                  <% if (!workspace.Equals(currentWorkspace))
                                     {%>
                                  <li class="workspace-a space<%= i%>"><a href="<%=url + "?workspaceId=" + pk %>"><%= workspaceName%></a></li>
-							    <%} %>
+                                <%} %>
                             <%} %>
                             
-						</ul>
-					</div>
-					</li>
-				</ul>
-			</div>
+                        </ul>
+                    </div>
+                    </li>
+                </ul>
+            </div>
 
             <div class="compheader">
             <% if (!(Durados.Web.Infrastructure.General.IsMobile()))
@@ -440,20 +466,25 @@
             <%} %>
             </div>
 
-			<nav id="topRight">
-				<% Html.RenderPartial("~/Views/Shared/Controls/LogOnUserControl.ascx", null); %>
-				
-			</nav>
+
+
+            <nav id="topRight" class="headNavMenu">
+                <% Html.RenderPartial("~/Views/Shared/Controls/LogOnUserControl.ascx", null); %>
+                
+            </nav>
+
+
+
             <div style="clear:both;"></div>
-		</div>
-		<div id="mainMenu">
+        </div>
+        <div id="mainMenu">
             <div class="logo-title-container">
                 <div class="logo-container">
                 <a href='<%= Map.Database.SiteInfo.LogoHref%>'>
-			    <img id="logo" src="<%= ResolveUrl("~" + Map.GetLogoSrc()) %>" alt="<%= Map.Database.SiteInfo.Company %>" align="bottom">
+                <img id="logo" src="<%= ResolveUrl("~" + Map.GetLogoSrc()) %>" alt="<%= Map.Database.SiteInfo.Company %>" align="bottom">
                 </a>
                 </div>
-			    <div class="title-container">
+                <div class="title-container">
                 <span><%= Map.Database.SiteInfo.Product%></span>
                 
                 </div>
@@ -467,8 +498,8 @@
             <div class="workspaceMenu">
                 <% Html.RenderPartial("~/Views/Shared/Controls/Page/WorkspaceSpecialMenu.ascx"); %>
             </div>
-		</div>
-	</header>
+        </div>
+    </header>
     <%} %>
     <%----%>
 
@@ -625,7 +656,7 @@
     <%if (specialMenu != null)
        { %>
     <div id="sideMenu" style="display: block;">
-		<ul style="display: block;">
+        <ul style="display: block;">
             <% if (parentMenu != null)
                { %>
                 
@@ -638,20 +669,20 @@
                        string menuUrl = menu.GetMenuUrl();
 
                 %>
-			    <li <%=selected3 %>><a href="<%=menuUrl %>"><%=menu.Name %></a></li>
-			    <%} %>--%>
+                <li <%=selected3 %>><a href="<%=menuUrl %>"><%=menu.Name %></a></li>
+                <%} %>--%>
                 <% Html.RenderPartial("~/Views/Shared/Controls/SpecialMenu.ascx", parentMenu); %>
             <%} %>
-		</ul>
-	</div>
+        </ul>
+    </div>
 
     <%} %>
 
     <div id="sideMenu2" style="display: none; left: 211px; position: absolute;">
-		<div id="sideMenu2b">
-			<p><%= specialMenu == null ? "" : specialMenu.Name %></p>
-		</div>
-	</div>
+        <div id="sideMenu2b">
+            <p><%= specialMenu == null ? "" : specialMenu.Name %></p>
+        </div>
+    </div>
     <%} %>
     <%} %>
     <div class='main-content'>
@@ -663,7 +694,7 @@
         <div class="loading">
             <div>
                     <%=Map.Database.Localizer.Translate("Please wait...")%></div>
-            <img src='<%= Durados.Web.Mvc.Infrastructure.General.GetRootPath() + "Content/Images/wait.gif"%>' alt='loading...' />
+            <img src='<%= Durados.Web.Mvc.Infrastructure.General.GetRootPath() + "Content/Images/loading .gif"%>' alt='loading...' />
         </div>
     </div>
         <%  Html.RenderPartial("~/Views/Shared/Controls/AdvancedFilter.ascx", Durados.Web.Mvc.UI.Json.AdvancedFilterType.NumericFilter.ToString()); %>
@@ -673,7 +704,7 @@
     </div> 
     <% if (displayHeader){ %>
     <div id="footer">
-			</div>  
+            </div>  
     <%} %>
     <!--[if lt IE 8]>
     <style type="text/css">
@@ -703,6 +734,8 @@
             document.addEventListener("DOMContentLoaded", function () {
                 Boomerang.init({ app: 'bustrack', addon: 'yontest' }); //hard coded
             });
+
+
          
         </script>
         <%}%>

@@ -22,15 +22,16 @@
 %>
 <%bool showLable;%>
 <% try
-   { %>
-    <table cellpadding="0" cellspacing="5" >
+   {
+       int viewColDialog = Durados.Web.Infrastructure.General.IsMobile() || (isAccordion && isDock) ? 1 : view.GetColumnsInDialog(Model.Category);
+       %>
+    <table cellpadding="0" cellspacing="5" class="editForm tableCol<%=viewColDialog %>">
     <%foreach (Durados.Field field in Model.Fields)
       {%>
       <%showLable = false; %>
        <% try
           { %>
       <%
-              int viewColDialog = Durados.Web.Infrastructure.General.IsMobile() || (isAccordion && isDock) ? 1 : field.View.GetColumnsInDialog(Model.Category);
               int fieldColSpan = Durados.Web.Infrastructure.General.IsMobile() ? 1 : field.ColSpanInDialog;
           %>
         <% if (field.IsVisibleForRow(Model.DataAction))
@@ -89,7 +90,7 @@
         <% if (field.LabelContentLayout == Durados.Orientation.Horizontal && (!isAccordion))
            { %>
            <% if (!(Model.Fields.Count == 1 && field.FieldType == Durados.FieldType.Children && !field.IsCheckList())) {%>
-            <td valign="top" style="white-space:nowrap; vertical-align:middle; padding-left:20px;" title='<%= description %>' <%=hideInDerivation %>>
+            <td class="rowViewLable" title='<%= description %>' <%=hideInDerivation %>>
                 <% if (!field.IsHidden())
                    { %>
                     <%=tableViewer.GetDisplayName(field, null, guid)%>:

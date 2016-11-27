@@ -14,12 +14,14 @@
     <link rel="stylesheet" type="text/css" href="<%=ResolveUrl("~/Content/general.min.1.0.0.css") + "?id=" + guid %>" />
     <% if (!Durados.Web.Infrastructure.General.IsMobile()){%>
         <link rel="stylesheet" type="text/css" href="<%=ResolveUrl("~/Content/logon.css") + "?id=" + guid %>" />
+        <link rel="stylesheet" type="text/css" href="<%=ResolveUrl("~/Content/styles.css") + "?id=" + guid %>" />
         <%if (Map.Database.Localizer.Direction == "RTL")
            { %>
             <link rel="stylesheet" type="text/css" href="<%=ResolveUrl("~/Content/logonRTL.css") + "?id=" + guid %>" />    
         <% }%>    
     <% } else {%> 
         <link rel="stylesheet" type="text/css" href="<%=ResolveUrl("~/Content/logonMob.css") + "?id=" + guid %>" />
+        <link rel="stylesheet" type="text/css" href="<%=ResolveUrl("~/Content/styles.css") + "?id=" + guid %>" />
         <%if (Map.Database.Localizer.Direction == "RTL")
            { %>
             <link rel="stylesheet" type="text/css" href="<%=ResolveUrl("~/Content/logonMobRTL.css") + "?id=" + guid %>" />    
@@ -38,6 +40,8 @@
 
 
 <body dir='<%=Map.Database.Localizer.Direction.ToLower() %>'>
+<div class="bodybgimg">
+<div class="logoimage"></div>
     <div class="centerParent">
          <%if (Map.Database.SiteInfo != null && !(Map is DuradosMap))
           { %>
@@ -72,6 +76,6 @@
 --%>        </div>
     <div class="footershadow"></div>
     </div>
-    
+  </div>  
 </body>
 </html>
