@@ -871,9 +871,13 @@ namespace Durados.Web.Mvc.UI
 
             }
 
-            CrudUtility crudUtility = new CrudUtility(view.Database.Map.AppName);
-            crudUtility.Edit(view.JsonName, values, pk);
-            //view.Edit(values, pk, beforeEditCallback, beforeEditInDatabaseCallback, afterEditBeforeCommitCallback, afterEditAfterCommitCallback);
+            if (!view.Database.IsConfig)
+            {
+                CrudUtility crudUtility = new CrudUtility(view.Database.Map.AppName);
+                crudUtility.Edit(view.JsonName, values, pk);
+            }
+            else
+                view.Edit(values, pk, beforeEditCallback, beforeEditInDatabaseCallback, afterEditBeforeCommitCallback, afterEditAfterCommitCallback);
             
         }
 

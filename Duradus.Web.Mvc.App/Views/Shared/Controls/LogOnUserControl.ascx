@@ -49,10 +49,10 @@
             <ul>
                 <li><a href="/Admin/Index/Database">Default Settings</a></li>
                 <li><a href="/Admin/Index/View">Tables & Views</a></li>
-                <li><a href="/Admin/Index/Workspace">Workspaces</a></li>
-                <li><a href="/Home/IndexPage/v_durados_User">Users</a></li>
-                <li><a href="/Admin/Index/Rule">Business Rules</a></li>
-                <li><a href="/Home/Index/Durados_Log">Trace</a></li>
+              <%--  <li><a href="/Admin/Index/Workspace">Workspaces</a></li>--%>
+               <%-- <li><a href="/Home/IndexPage/v_durados_User">Users</a></li>--%>
+              <%--  <li><a href="/Admin/Index/Rule">Business Rules</a></li>
+                <li><a href="/Home/Index/Durados_Log">Trace</a></li>--%>
             </ul>
             <%} %>
         </li>
@@ -75,7 +75,7 @@
                 <li>
                     <% =Html.ActionLink(Map.Database.Localizer.Translate("Change Password"), "ChangePassword", "Account")%>
                 </li>
-                <% if (!Durados.Web.Infrastructure.General.IsMobile())
+              <%--  <% if (!Durados.Web.Infrastructure.General.IsMobile())
                    { %>
                 <% if (!Durados.Web.Mvc.Infrastructure.Http.IsAlias())
                    { %>
@@ -85,7 +85,7 @@
                 <li></li>
                 <li><a href="http://blog.backand.com/questions" target="_help">
                     <%= Map.Database.Localizer.Translate("Support")%></a> </li>
-                <%} %>
+                <%} %>--%>
             </ul>
             
         </li>

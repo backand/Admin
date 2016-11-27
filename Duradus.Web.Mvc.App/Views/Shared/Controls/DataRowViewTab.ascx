@@ -93,7 +93,9 @@
             <td class="rowViewLable" title='<%= description %>' <%=hideInDerivation %>>
                 <% if (!field.IsHidden())
                    { %>
-                    <%=tableViewer.GetDisplayName(field, null, guid)%>:
+                    <%=tableViewer.GetDisplayName(field, null, guid)%><%if(!string.IsNullOrEmpty(description)){ %>
+                                        <i class="icon-info_outline" title="<%=description %>"></i>
+                                        <%} %>:
                 <%} %>
                 <%=upgradePlanContent%>
             </td>

@@ -7473,7 +7473,7 @@ function initTooltip(elm) {
         cursor: '',
         arrows: true,
         dropShadow: false,
-        hoverIntent: false,
+        hoverIntent: true,
         sticky: title.indexOf('href') != -1,
         mouseOutClose: true,
         closePosition: 'title',
