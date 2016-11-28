@@ -73,7 +73,8 @@
                 <% if (Map.Database.HasChangePassword && !isMobile)
                    { %>
                 <li>
-                    <% =Html.ActionLink(Map.Database.Localizer.Translate("Change Password"), "ChangePassword", "Account")%>
+                    <a href="https://www.backand.com/apps/#/sign_in">Change Password</a>
+                   <%-- <% =Html.ActionLink(Map.Database.Localizer.Translate("Change Password"), "ChangePassword", "Account")%>--%>
                 </li>
               <%--  <% if (!Durados.Web.Infrastructure.General.IsMobile())
                    { %>

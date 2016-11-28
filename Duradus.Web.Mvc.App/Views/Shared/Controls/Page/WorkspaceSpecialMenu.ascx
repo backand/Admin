@@ -12,10 +12,10 @@
     <div class="navigation-left">
         
           <ul class="sf-menu sf-js-enabled" id="mainmenu">
-                <% if (!Map.Database.HideMyStuff)
+               <%-- <% if (!Map.Database.HideMyStuff)
                    { %>
                     <%  Html.RenderPartial("~/Views/Shared/Controls/UserStuffMenu.ascx"); %>          
-                <%} %>
+                <%} %>--%>
 
                <%if (workspace.Name == "Admin")
                { %>

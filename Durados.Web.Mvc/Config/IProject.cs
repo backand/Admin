@@ -851,7 +851,7 @@ namespace Durados.Web.Mvc.Config
 
             //viewView.OrdinalColumnName = "DisplayName";
             viewView.Fields["ID"].HideInTable = true;
-            viewView.Fields["ID"].DisplayName = "Id";
+            viewView.Fields["ID"].DisplayName = "Idyariv";
             viewView.Fields["ID"].Preview = false;
             viewView.Fields["Controller"].DenyEditRoles = "User";
             viewView.Fields["Controller"].HideInTable = true;
@@ -3685,32 +3685,32 @@ namespace Durados.Web.Mvc.Config
             int ordinal = 10000;
             SpecialMenu link = null;
 
-            SpecialMenu dashboardMenu = new SpecialMenu() { ID = ordinal++, Name = "Dashboard", WorkspaceID = workspaceId };
-            workspace.SpecialMenus.Add(dashboardMenu.Name, dashboardMenu);
+            //SpecialMenu dashboardMenu = new SpecialMenu() { ID = ordinal++, Name = "Dashboard", WorkspaceID = workspaceId };
+            //workspace.SpecialMenus.Add(dashboardMenu.Name, dashboardMenu);
 
-            link = new SpecialMenu() { ID = ordinal++, Url = "/Home/Default?workspaceId=1", Name = "Admin Home", WorkspaceID = workspaceId, LinkType = LinkType.Page, Ordinal = ordinal, ViewName = "" };
-            dashboardMenu.Menus.Add(link.Name, link);
+            //link = new SpecialMenu() { ID = ordinal++, Url = "/Home/Default?workspaceId=1", Name = "Admin Home", WorkspaceID = workspaceId, LinkType = LinkType.Page, Ordinal = ordinal, ViewName = "" };
+            //dashboardMenu.Menus.Add(link.Name, link);
 
-            link = new SpecialMenu() { ID = ordinal++, Url = "/Admin/Index/Database", Name = "Default Settings", WorkspaceID = workspaceId, LinkType = LinkType.View, Ordinal = ordinal, ViewName = "Database" };
-            dashboardMenu.Menus.Add(link.Name, link);
+            //link = new SpecialMenu() { ID = ordinal++, Url = "/Admin/Index/Database", Name = "Default Settings", WorkspaceID = workspaceId, LinkType = LinkType.View, Ordinal = ordinal, ViewName = "Database" };
+            //dashboardMenu.Menus.Add(link.Name, link);
 
-            link = new SpecialMenu() { ID = ordinal++, Url = "/Admin/Index/View", Name = "Tables & Views", WorkspaceID = workspaceId, LinkType = LinkType.View, Ordinal = ordinal, ViewName = "View" };
-            dashboardMenu.Menus.Add(link.Name, link);
+            //link = new SpecialMenu() { ID = ordinal++, Url = "/Admin/Index/View", Name = "Tables & Views", WorkspaceID = workspaceId, LinkType = LinkType.View, Ordinal = ordinal, ViewName = "View" };
+            //dashboardMenu.Menus.Add(link.Name, link);
 
-            link = new SpecialMenu() { ID = ordinal++, Url = "/Admin/Index/Workspace", Name = "Workspaces", WorkspaceID = workspaceId, LinkType = LinkType.View, Ordinal = ordinal, ViewName = "Workspace" };
-            dashboardMenu.Menus.Add(link.Name, link);
+            //link = new SpecialMenu() { ID = ordinal++, Url = "/Admin/Index/Workspace", Name = "Workspaces", WorkspaceID = workspaceId, LinkType = LinkType.View, Ordinal = ordinal, ViewName = "Workspace" };
+            //dashboardMenu.Menus.Add(link.Name, link);
 
-            link = new SpecialMenu() { ID = ordinal++, Url = "/Home/Index/" + database.UserViewName, Name = "Users", WorkspaceID = workspaceId, LinkType = LinkType.View, Ordinal = ordinal, ViewName = database.UserViewName };
-            dashboardMenu.Menus.Add(link.Name, link);
+            //link = new SpecialMenu() { ID = ordinal++, Url = "/Home/Index/" + database.UserViewName, Name = "Users", WorkspaceID = workspaceId, LinkType = LinkType.View, Ordinal = ordinal, ViewName = database.UserViewName };
+            //dashboardMenu.Menus.Add(link.Name, link);
 
-            link = new SpecialMenu() { ID = ordinal++, Url = "/Admin/Index/Rule", Name = "Business Rules", WorkspaceID = workspaceId, LinkType = LinkType.View, Ordinal = ordinal, ViewName = "Rule" };
-            dashboardMenu.Menus.Add(link.Name, link);
+            //link = new SpecialMenu() { ID = ordinal++, Url = "/Admin/Index/Rule", Name = "Business Rules", WorkspaceID = workspaceId, LinkType = LinkType.View, Ordinal = ordinal, ViewName = "Rule" };
+            //dashboardMenu.Menus.Add(link.Name, link);
 
-            link = new SpecialMenu() { ID = ordinal++, Url = "/Home/Index/Durados_Log", Name = "Monitor", WorkspaceID = workspaceId, LinkType = LinkType.View, Ordinal = ordinal, ViewName = "Durados_Log" };
-            dashboardMenu.Menus.Add(link.Name, link);
+            //link = new SpecialMenu() { ID = ordinal++, Url = "/Home/Index/Durados_Log", Name = "Monitor", WorkspaceID = workspaceId, LinkType = LinkType.View, Ordinal = ordinal, ViewName = "Durados_Log" };
+            //dashboardMenu.Menus.Add(link.Name, link);
 
 
-            SpecialMenu designMenu = new SpecialMenu() { ID = ordinal++, Name = "Design", WorkspaceID = workspaceId };
+            SpecialMenu designMenu = new SpecialMenu() { ID = ordinal++, Name = "Main", WorkspaceID = workspaceId };
             workspace.SpecialMenus.Add(designMenu.Name, designMenu);
 
             link = new SpecialMenu() { ID = ordinal++, Url = "/Admin/Index/Database", Name = "Default Settings", WorkspaceID = workspaceId, LinkType = LinkType.View, Ordinal = ordinal, ViewName = "Database" };
@@ -3722,8 +3722,8 @@ namespace Durados.Web.Mvc.Config
             link = new SpecialMenu() { ID = ordinal++, Url = "/Admin/Index/Field", Name = "Fields", WorkspaceID = workspaceId, LinkType = LinkType.View, Ordinal = ordinal, ViewName = "Field" };
             designMenu.Menus.Add(link.Name, link);
 
-            link = new SpecialMenu() { ID = ordinal++, Url = "/Admin/Index/Rule", Name = "Business Rules", WorkspaceID = workspaceId, LinkType = LinkType.View, Ordinal = ordinal, ViewName = "Rule" };
-            designMenu.Menus.Add(link.Name, link);
+            //link = new SpecialMenu() { ID = ordinal++, Url = "/Admin/Index/Rule", Name = "Business Rules", WorkspaceID = workspaceId, LinkType = LinkType.View, Ordinal = ordinal, ViewName = "Rule" };
+            //designMenu.Menus.Add(link.Name, link);
 
             link = new SpecialMenu() { ID = ordinal++, Url = "/Admin/Index/Page", Name = "Content Pages", WorkspaceID = workspaceId, LinkType = LinkType.View, Ordinal = ordinal, ViewName = "Page" };
             designMenu.Menus.Add(link.Name, link);
