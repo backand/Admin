@@ -15,6 +15,7 @@
     <% if (!Durados.Web.Infrastructure.General.IsMobile()){%>
         <link rel="stylesheet" type="text/css" href="<%=ResolveUrl("~/Content/logon.css") + "?id=" + guid %>" />
         <link rel="stylesheet" type="text/css" href="<%=ResolveUrl("~/Content/styles.css") + "?id=" + guid %>" />
+        
         <%if (Map.Database.Localizer.Direction == "RTL")
            { %>
             <link rel="stylesheet" type="text/css" href="<%=ResolveUrl("~/Content/logonRTL.css") + "?id=" + guid %>" />    

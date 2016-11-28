@@ -784,14 +784,13 @@ form#loginform input#rememberMe {
   left: 0px !important;
   right: 10px !important;
   top: 0;
-  max-width: 700px;
   margin: 0 auto;
-  width: 100% !important;
   box-sizing: border-box;
 }
 
 button.ui-button.ui-widget.ui-state-default.ui-corner-all.ui-button-text-only {
   background: #5cb85c !important;
+  color:#jkkk;
 }
 
 @media (max-width: 767px) {
@@ -915,7 +914,6 @@ button.ui-button.ui-widget.ui-state-default.ui-corner-all.ui-button-text-only {
     margin: .5em .4em .5em 0 !important;
 }
 
-
 }
 
 .gridPager-div {
@@ -934,7 +932,8 @@ body.template.webkit {
     left: 0;
     margin: 0 auto !important;
     right: 0;
-    width: 65% !important;
+    top:300px;
+    
 }
 .boardtitle.portlet-header {
     color: #000;
@@ -944,10 +943,7 @@ body.template.webkit {
     width: 100%;
     box-sizing: border-box;
 }
-div#sections_b16_DataRowEdit {
-    height: 268px !important;
-    padding-left:40px !important;
-}
+
 .username {
     text-align: center !important;
     font-size: 16px !important;
@@ -964,9 +960,8 @@ button.ui-button.ui-widget.ui-state-default.ui-corner-all.ui-button-text-only {
     margin: 0 10px;
 }
 
-div#sections_b37_DataRowEdit {
-    height: 345px !important;
-}
+
 .ui-dialog.ui-widget.ui-widget-content.ui-corner-all.ui-draggable {
-    left: 88px !important;
+    left: 35% !important;
+    top: 37% !important;
 }
