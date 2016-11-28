@@ -568,7 +568,7 @@ namespace BackAnd.Web.Api.Controllers
             }
         }
 
-        protected void UpdateLogModel(Exception exception)
+        protected void UpdateLogModelException(Exception exception)
         {
             try
             {

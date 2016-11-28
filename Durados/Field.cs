@@ -366,7 +366,7 @@ namespace Durados
 
         public bool IsHiddenInEdit()
         {
-            return Excluded || HideInEdit;
+            return Excluded || ((!View.Database.IsApi() || View.Database.IsConfig || View.SystemView) && HideInEdit);
         }
 
         [Durados.Config.Attributes.ColumnProperty(DoNotCopy = true, Description = "Don&#39t show the field in Edit dialog")]

@@ -9671,24 +9671,20 @@ namespace Durados.DataAccess
 
             return sqlAccess;
         }
-        private SqlAccess GetSqlAccess(SqlProduct sqlProduct)
+        public static SqlAccess GetSqlAccess(SqlProduct sqlProduct)
         {
                        
                 switch (sqlProduct)
                 {
                     case SqlProduct.MySql:
                         return new MySqlAccess();
-                        break;
                     case SqlProduct.Postgre:
                         return new PostgreAccess();
-                        break;
                     case SqlProduct.Oracle:
                         return new OracleAccess();
-                        break;
 
                     default:
                         return new SqlAccess();
-                        break;
                 }
             
            

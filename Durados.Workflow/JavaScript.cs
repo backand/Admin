@@ -192,7 +192,7 @@ namespace Durados.Workflow
         private string GetLocation(IDictionary<string, object> dictionary)
         {
             StringBuilder sb = new StringBuilder();
-            sb.Append("\nat ");
+            sb.Append("\n\tat ");
             sb.Append("(");
             if (dictionary.ContainsKey("object"))
             {

@@ -38,7 +38,8 @@ namespace BackAnd.Web.Api.Controllers
     [BackAnd.Web.Api.Controllers.Filters.BackAndAuthorize("Admin,Developer")]
     public class modelController : apiController
     {
-        
+        const string OldSchema = "oldSchema";
+                
         [Route("~/1/model/Validate")]
         [HttpPost]
         public IHttpActionResult Validate()
@@ -51,7 +52,6 @@ namespace BackAnd.Web.Api.Controllers
 
                 var data = jss.Deserialize<Dictionary<string, object>>(json);
 
-                const string OldSchema = "oldSchema";
                 
                 if (!data.ContainsKey(OldSchema))
                 {
@@ -222,6 +222,8 @@ namespace BackAnd.Web.Api.Controllers
         {
             try
             {
+                JavaScriptSerializer jss = new JavaScriptSerializer();
+
                 string json = System.Web.HttpContext.Current.Server.UrlDecode(Request.Content.ReadAsStringAsync().Result);
 
                 string sql = string.Empty;
@@ -256,10 +258,11 @@ namespace BackAnd.Web.Api.Controllers
                     }
                     catch (Exception exception)
                     {
-                        UpdateLogModel(exception);
+                        UpdateLogModelException(exception);
                         Sync();
                         throw exception;
                     }
+                    SaveChangesInHistory(jss.Serialize(transformResult[OldSchema]), jss.Serialize(GetBackandToObject()));
                 }
 
                 Dictionary<string, object> syncResult = Sync();
@@ -300,6 +303,17 @@ namespace BackAnd.Web.Api.Controllers
                 throw new BackAndApiUnexpectedResponseException(exception, this);
 
             }
+        }
+
+        private void SaveChangesInHistory(string oldSchema, string newSchema)
+        {
+            //SqlAccess sqlAccess = Durados.DataAccess.Rest.GetSqlAccess(Map.SqlProduct);
+            //using (IDbConnection connection = sqlAccess.GetConnection())
+            //{
+
+            //    Durados.DataAccess.History.GetHistory(Map.Database.SystemSqlProduct).SaveCreate(sysCommand, Map.GetConfigDatabase().Views["Database"], "0", Convert.ToInt32(Map.Database.GetCurrentUserId()), Map.Database.SwVersion, "Admin");
+            //}
+
         }
 
         private bool IsDropAllTables(string json)
