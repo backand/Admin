@@ -33,7 +33,7 @@ namespace Durados.Web.Mvc.Farm
 
         private static ISharedMemory CreateInstance()
         {
-            return new SharedMemory(Maps.RedisConnectionString);
+            return new SharedMemory(Maps.RedisConnectionString, Maps.RedisHostAndPort);
         }
 
         private static ISharedMemory instance { get; set; }
@@ -44,17 +44,38 @@ namespace Durados.Web.Mvc.Farm
     {
         ConnectionMultiplexer redis;
         IDatabase database;
+        IServer server = null;
 
-        public SharedMemory(string connectionString)
+
+        public SharedMemory(string connectionString, string hostAndPort)
         {
             redis = RedisFarmTransport.CreateRedisConnection(connectionString);
             database = redis.GetDatabase();
-          
+            if (!string.IsNullOrEmpty(hostAndPort))
+                server = redis.GetServer(hostAndPort);
         }
 
         public void ListRightPush(string key, string value)
         {
-            database.ListRightPush(key, value);
+            try
+            {
+                database.ListRightPush(key, value);
+            }
+            catch (RedisServerException e)
+            {
+                if (e.Message == "OOM command not allowed when used memory > 'maxmemory'.")
+                {
+                    if (server != null)
+                    {
+                        server.FlushDatabase();
+                        database.ListRightPush(key, value);
+                    }
+                    else
+                        throw e;
+                }
+                else
+                    throw e;
+            }
 
         }
 

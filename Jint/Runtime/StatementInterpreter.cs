@@ -433,6 +433,12 @@ namespace Jint.Runtime
                 return new Completion(Completion.Throw, _engine.Error.Construct(new JsValue[] { newMessage }), null);
                 //return new Completion(Completion.Throw, v.Error, null);
             }
+            catch (Exception e)
+            {
+                string newMessage = _engine.GetMessage(lastStatement, "\"Error\":\" " + e.Message + "\"");
+                throw new JavaScriptException(_engine.Error.Construct(new JsValue[] { newMessage }));
+                
+            }
 
             return new Completion(c.Type, c.GetValueOrDefault(), c.Identifier);
         }
@@ -444,49 +450,12 @@ namespace Jint.Runtime
         {
             string message = v.Error.ToString();
 
-            message = GetMessage(lastStatement, message);
+            message = _engine.GetMessage(lastStatement, message);
 
             return message;
         }
 
-        private string GetMessage(Statement lastStatement, string message)
-        {
-            if (message == "")
-                return "";
-            //if (lastStatement.Type == SyntaxNodes.ReturnStatement)
-            //    return message;
-            
-
-            int line = lastStatement.Location.Start.Line;
-            int? startLine = _engine.Options.GetStartLine();
-            if (startLine.HasValue)
-            {
-                line = line - startLine.Value;
-            }
-            IPath path = _engine.Options.GetPath();
-            //string newMessage;
-            //if (!message.Contains("Line "))
-            //{
-            //    newMessage = "Line " + line + ": " + message;
-            //}
-            //else
-            //{
-            //    newMessage = "Line " + message.Split(new string[] { "Line " }, StringSplitOptions.None)[1];
-            //}
-
-            if (line > 0 && path != null)
-            {
-                if (lastStatement.Type != SyntaxNodes.ReturnStatement)
-                {
-                    message += ", \"at\": {" + path.ToString() + "," + "\"line\"" + ":" + line + "}";
-                }
-                else
-                {
-                    message += ", \"at\": {" + path.ToString() + "}";
-                }
-            }
-            return "#|" + message + "|#";
-        }
+        
 
         /// <summary>
         /// http://www.ecma-international.org/ecma-262/5.1/#sec-12.13

@@ -253,7 +253,8 @@ namespace Durados.Web.Mvc
             poolCreator = Convert.ToInt32(System.Configuration.ConfigurationManager.AppSettings["poolCreator"] ?? "55555");
             poolShouldBeUsed = Convert.ToBoolean(System.Configuration.ConfigurationManager.AppSettings["poolShouldBeUsed"] ?? "false");
 
-            redisConnectionString = System.Configuration.ConfigurationManager.AppSettings["redisConnectionString"] ?? "pub-redis-10938.us-east-1-4.3.ec2.garantiadata.com:10938,password=bell1234";
+            redisConnectionString = System.Configuration.ConfigurationManager.AppSettings["redisConnectionString"] ?? "pub-redis-10938.us-east-1-4.3.ec2.garantiadata.com:10938,password=bell1234,allowAdmin=true";
+            redisHostAndPort = System.Configuration.ConfigurationManager.AppSettings["redisHostAndPort"];
 
 
             mainAppConfigName = System.Configuration.ConfigurationManager.AppSettings["mainAppConfigName"] ?? "backand";
@@ -659,7 +660,8 @@ namespace Durados.Web.Mvc
         private static bool poolShouldBeUsed = false;
 
         private static string redisConnectionString = "";
-
+        private static string redisHostAndPort = "";
+        
         private static string mainAppConfigName = "backand";
         private static bool hostByUs = false;
         private static string duradosAppName = "www";
@@ -861,7 +863,7 @@ namespace Durados.Web.Mvc
                 return poolCreator;
             }
         }
-
+        
         public static string RedisConnectionString
         {
             get
@@ -870,6 +872,13 @@ namespace Durados.Web.Mvc
             }
         }
 
+        public static string RedisHostAndPort
+        {
+            get
+            {
+                return redisHostAndPort;
+            }
+        }
 
         public static bool PoolShouldBeUsed
         {

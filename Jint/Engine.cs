@@ -891,5 +891,45 @@ namespace Jint
                 }
             }
         }
+
+        internal string GetMessage(SyntaxNode syntaxNode, string message)
+        {
+            if (message == "")
+                return "";
+            //if (lastStatement.Type == SyntaxNodes.ReturnStatement)
+            //    return message;
+
+
+            int line = syntaxNode.Location.Start.Line;
+            int column = syntaxNode.Location.Start.Column;
+            int? startLine = Options.GetStartLine();
+            if (startLine.HasValue)
+            {
+                line = line - startLine.Value;
+            }
+            IPath path = Options.GetPath();
+            //string newMessage;
+            //if (!message.Contains("Line "))
+            //{
+            //    newMessage = "Line " + line + ": " + message;
+            //}
+            //else
+            //{
+            //    newMessage = "Line " + message.Split(new string[] { "Line " }, StringSplitOptions.None)[1];
+            //}
+
+            if (line > 0 && path != null)
+            {
+                if (syntaxNode.Type != SyntaxNodes.ReturnStatement)
+                {
+                    message += ", \"at\": {" + path.ToString() + "," + "\"line\"" + ":" + line + "," + "\"column\"" + ":" + column + "}";
+                }
+                else
+                {
+                    message += ", \"at\": {" + path.ToString() + "}";
+                }
+            }
+            return "#|" + message + "|#";
+        }
     }
 }

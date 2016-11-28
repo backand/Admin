@@ -24,6 +24,8 @@ namespace Jint.Runtime
             return _engine.EvaluateExpression(expression);
         }
 
+        
+
         public JsValue EvaluateConditionalExpression(ConditionalExpression conditionalExpression)
         {
             var lref = _engine.EvaluateExpression(conditionalExpression.Test);

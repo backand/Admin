@@ -186,13 +186,13 @@ namespace Durados.Workflow
                 }
             }
 
-            return sb.ToString();
+            return sb.ToString().TrimStart("CriticalError:".ToCharArray());
         }
 
         private string GetLocation(IDictionary<string, object> dictionary)
         {
             StringBuilder sb = new StringBuilder();
-            sb.Append(" at ");
+            sb.Append("\nat ");
             sb.Append("(");
             if (dictionary.ContainsKey("object"))
             {
@@ -211,6 +211,12 @@ namespace Durados.Workflow
                 string line = dictionary["line"].ToString();
                 sb.Append(line);
             }
+            //if (dictionary.ContainsKey("column"))
+            //{
+            //    sb.Append(":");
+            //    string column = dictionary["column"].ToString();
+            //    sb.Append(column);
+            //}
             sb.Append(")");
             
             return sb.ToString();

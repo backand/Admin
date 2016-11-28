@@ -658,6 +658,10 @@ namespace BackAnd.Web.Api.Controllers
             {
                 return ResponseMessage(Request.CreateResponse(HttpStatusCode.Forbidden, Messages.PostContradictsPredefinedFilter));
             }
+            catch (Durados.Workflow.DoNotLogException exception)
+            {
+                return DoNotLogExceptionHandler(exception);
+            }
             catch (Exception exception)
             {
 
@@ -680,6 +684,19 @@ namespace BackAnd.Web.Api.Controllers
                 
                 
             }
+        }
+
+        private IHttpActionResult DoNotLogExceptionHandler(Durados.Workflow.DoNotLogException exception)
+        {
+            var response = Request.CreateResponse(HttpStatusCode.ExpectationFailed, exception.Message);
+
+            if (System.Web.HttpContext.Current.Items.Contains(GuidKey))
+            {
+                string actionHeaderGuidValue = System.Web.HttpContext.Current.Items[GuidKey].ToString();
+                response.Headers.Add(actionHeaderGuidName, actionHeaderGuidValue);
+            }
+
+            return ResponseMessage(response);
         }
 
         internal static Dictionary<string, object>[] GetParameters(string parameters, View view, string json, bool deep)
@@ -862,6 +879,10 @@ namespace BackAnd.Web.Api.Controllers
 
                 return Ok();
             }
+            catch (Durados.Workflow.DoNotLogException exception)
+            {
+                return DoNotLogExceptionHandler(exception);
+            }
             catch (Exception exception)
             {
                 throw new BackAndApiUnexpectedResponseException(exception, this);
@@ -926,6 +947,10 @@ namespace BackAnd.Web.Api.Controllers
                 if (message.StartsWith("The DELETE statement conflicted with the REFERENCE constraint"))
                     message = Messages.ForeignKeyDeleteViolation;
                 return ResponseMessage(Request.CreateResponse(HttpStatusCode.ExpectationFailed, message));
+            }
+            catch (Durados.Workflow.DoNotLogException exception)
+            {
+                return DoNotLogExceptionHandler(exception);
             }
             
             catch (Exception exception)
