@@ -8997,6 +8997,41 @@ namespace Durados.DataAccess
         {
         }
 
+        public virtual void SaveModel(string connectionString, View view, string oldValue, string newValue, int userId, string version)
+        {
+            using (IDbConnection connection = GetConnection(connectionString))
+            {
+                connection.Open();
+                using (IDbCommand command = GetCommand())
+                {
+                    command.Connection = connection;
+                    SaveModel(command, view, oldValue, newValue, userId, version);
+                }
+                connection.Close();
+            }
+            
+        }
+        public virtual void SaveModel(IDbCommand command, View view, string oldValue, string newValue, int userId, string version)
+        {
+            int id = SaveAction(command, view, "0", userId, 2, version, "Admin", null);
+
+            string sql = "insert into durados_ChangeHistoryField(ChangeHistoryId, FieldName, ColumnNames, OldValue, NewValue, OldValueKey, NewValueKey) values (@ChangeHistoryId, @FieldName, @ColumnNames, @OldValue, @NewValue, @OldValueKey, @NewValueKey) ";
+
+            command.CommandText = sql;
+
+            command.Parameters.Clear();
+            command.Parameters.Add(GetNewParameter(command, "@ChangeHistoryId", id));
+            command.Parameters.Add(GetNewParameter(command, "@FieldName", "Model"));
+            command.Parameters.Add(GetNewParameter(command, "@ColumnNames", "Model"));
+            command.Parameters.Add(GetNewParameter(command, "@OldValue", oldValue));
+            command.Parameters.Add(GetNewParameter(command, "@NewValue", newValue));
+            command.Parameters.Add(GetNewParameter(command, "@OldValueKey", string.Empty));
+            command.Parameters.Add(GetNewParameter(command, "@NewValueKey", string.Empty));
+
+            command.ExecuteNonQuery();
+            
+        }
+
         public virtual int? SaveEdit(IDbCommand command, View view, DataRow prevRow, Dictionary<string, object> values, string pk, int userId, out OldNewValue[] oldNewValues, string version, string workspace)
         {
             //string sql = "insert into durados_ChangeHistory(ViewName, PK, ActionId, UpdateUserId) values (@ViewName, @PK, @ActionId, @UpdateUserId) ";
@@ -9682,7 +9717,7 @@ namespace Durados.DataAccess
                         return new PostgreAccess();
                     case SqlProduct.Oracle:
                         return new OracleAccess();
-
+      
                     default:
                         return new SqlAccess();
                 }

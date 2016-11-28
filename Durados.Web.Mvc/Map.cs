@@ -771,6 +771,7 @@ namespace Durados.Web.Mvc
                 isChangesInConfigStructure = false;
                 SetSaveChangesIndicationFromDb();
 
+                HandleSystemDatabase();
                 //HandleWorkspaceContent();
 
                 Commit();
@@ -779,6 +780,74 @@ namespace Durados.Web.Mvc
             }
 
             return false;
+        }
+
+        private void HandleSystemDatabase()
+        {
+            HandleSystemDatabaseHistory();
+        }
+
+        private void HandleSystemDatabaseHistory()
+        {
+            HandleSystemDatabaseHistoryOldNewValuesType();
+        }
+
+        private void HandleSystemDatabaseHistoryOldNewValuesType()
+        {
+            if (IsHistoryOldNewValueShort())
+            {
+                UpdateHistoryOldNewValueToLongText();
+            }
+        }
+
+        private void UpdateHistoryOldNewValueToLongText()
+        {
+            if (this.SqlProduct != Durados.SqlProduct.MySql)
+            {
+                return;
+            }
+
+            string sql = "ALTER TABLE `durados_changehistoryfield` CHANGE COLUMN `OldValue` `OldValue` LONGTEXT NOT NULL;ALTER TABLE `durados_changehistoryfield` CHANGE COLUMN `NewValue` `NewValue` LONGTEXT NOT NULL;";
+
+            using (MySql.Data.MySqlClient.MySqlConnection connection = new MySql.Data.MySqlClient.MySqlConnection(systemConnectionString))
+            {
+                connection.Open();
+                using (MySql.Data.MySqlClient.MySqlCommand command = new MySql.Data.MySqlClient.MySqlCommand(sql, connection))
+                {
+                    command.ExecuteNonQuery();
+                }
+                connection.Close();
+            }
+
+        }
+
+        private bool IsHistoryOldNewValueShort()
+        {
+            if (this.SqlProduct != Durados.SqlProduct.MySql)
+            {
+                return false;
+            }
+
+            string sql = "SELECT  DATA_TYPE FROM  INFORMATION_SCHEMA.COLUMNS WHERE  TABLE_SCHEMA = DATABASE() AND  TABLE_NAME = 'durados_ChangeHistoryField' AND	COLUMN_NAME = 'NewValue'";
+            string datatype = string.Empty;
+            using (MySql.Data.MySqlClient.MySqlConnection connection = new MySql.Data.MySqlClient.MySqlConnection(systemConnectionString))
+            {
+                connection.Open();
+                using (MySql.Data.MySqlClient.MySqlCommand command = new MySql.Data.MySqlClient.MySqlCommand(sql, connection))
+                {
+                    object scalar = command.ExecuteScalar();
+                    if (scalar == null || scalar == DBNull.Value)
+                    {
+                    }
+                    else
+                    {
+                        datatype = scalar.ToString();
+                    }
+                }
+                connection.Close();
+            }
+
+            return datatype.ToLower() != "longtext";
         }
 
         private bool? isChangesInConfigStructure = null;

@@ -55,8 +55,8 @@ CREATE TABLE `durados_ChangeHistoryField`(
 	`ChangeHistoryId` INT NOT NULL,
 	`FieldName` VARCHAR(500) NOT NULL,
 	`ColumnNames` VARCHAR(500) NOT NULL,
-	`OldValue` varchar(5000) CHARACTER SET utf8  NOT NULL,
-	`NewValue` varchar(5000) CHARACTER SET utf8  NOT NULL,
+	`OldValue` LONGTEXT CHARACTER SET utf8  NOT NULL,
+	`NewValue` LONGTEXT CHARACTER SET utf8  NOT NULL,
 	`OldValueKey` varchar(5000) CHARACTER SET utf8  NULL,
 	`NewValueKey` varchar(5000) CHARACTER SET utf8  NULL,
  PRIMARY KEY (`Id`)

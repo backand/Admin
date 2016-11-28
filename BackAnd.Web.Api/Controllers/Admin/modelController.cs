@@ -262,7 +262,13 @@ namespace BackAnd.Web.Api.Controllers
                         Sync();
                         throw exception;
                     }
-                    SaveChangesInHistory(jss.Serialize(transformResult[OldSchema]), jss.Serialize(GetBackandToObject()));
+                    try
+                    {
+                        string oldSchema = Newtonsoft.Json.JsonConvert.SerializeObject(GetBackandToObject(), Newtonsoft.Json.Formatting.Indented);
+                        string newSchema = Newtonsoft.Json.JsonConvert.SerializeObject(jss.Deserialize<Dictionary<string, object>>(json)["newSchema"], Newtonsoft.Json.Formatting.Indented);
+                        SaveChangesInHistory(oldSchema, newSchema);
+                    }
+                    catch { }
                 }
 
                 Dictionary<string, object> syncResult = Sync();
@@ -307,13 +313,7 @@ namespace BackAnd.Web.Api.Controllers
 
         private void SaveChangesInHistory(string oldSchema, string newSchema)
         {
-            //SqlAccess sqlAccess = Durados.DataAccess.Rest.GetSqlAccess(Map.SqlProduct);
-            //using (IDbConnection connection = sqlAccess.GetConnection())
-            //{
-
-            //    Durados.DataAccess.History.GetHistory(Map.Database.SystemSqlProduct).SaveCreate(sysCommand, Map.GetConfigDatabase().Views["Database"], "0", Convert.ToInt32(Map.Database.GetCurrentUserId()), Map.Database.SwVersion, "Admin");
-            //}
-
+            Durados.DataAccess.History.GetHistory(Map.Database.SystemSqlProduct).SaveModel(map.systemConnectionString, Map.GetConfigDatabase().Views["Database"], oldSchema, newSchema, Convert.ToInt32(Map.Database.GetUserID()), Map.Database.SwVersion);
         }
 
         private bool IsDropAllTables(string json)
