@@ -1,3 +1,4 @@
+
 @import 'style.css';
 
 $green: #5cb85c;
@@ -46,7 +47,9 @@ $black: #1c2b36;
   content: $icon;
 
 }
-
+* {
+  box-sizing: border-box;
+}
 #topRight {
 	
 }

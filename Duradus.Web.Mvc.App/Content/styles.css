@@ -22,6 +22,10 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
+* {
+  box-sizing: border-box;
+}
+
 #adminButtons li {
   height: 50px;
 }
