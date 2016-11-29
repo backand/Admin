@@ -47,9 +47,7 @@ $black: #1c2b36;
   content: $icon;
 
 }
-* {
-  box-sizing: border-box;
-}
+
 #topRight {
 	
 }
@@ -223,7 +221,9 @@ body tr.gridviewhead {
 	}
 }
 
-
+*{
+  box-sizing: border-box;
+}
 
 table.gridview th {
 	    padding: 10px 10px !important;
@@ -238,7 +238,7 @@ table.gridview th {
 		display:none !important;
 	}
 	.main-content {
-		padding-left:0;
+		padding-left:0 !important;
 	}
 }
 .main-content.in-iframe {
@@ -283,18 +283,13 @@ div.fixedViewPort tbody td div {
 table.gridview th {
     text-align: center !important;
 }
-
-#mainMenu .title-container * {
-    margin-top: 20px;
-}
 body tr.gridviewhead th div.thdiv div.sortIcon-con {
     right: -5px;
 }
 #mainAppDiv .gridview th, #mainAppDiv .gridviewhead th, #mainAppDiv tr.gridviewhead td.ScrollPlace {
     text-align: center;
-    background: #ffffff;
+    background: #ffffff !important;
 }
-
 
 .centerParent {
     background: none !important;
@@ -726,7 +721,7 @@ th.HtmlFieldType {
 	z-index:999;
 }
 .left_paddd{
-	padding-left:260px;
+	padding-left:260px !important;
 }
 textarea.wtextarea {
     height: 45px;
@@ -784,16 +779,15 @@ form#loginform input#rememberMe {
 }
 
 .ui-dialog.ui-widget.ui-widget-content.ui-corner-all.ui-draggable.ui-resizable {
-  left: 0px !important;
-  right: 10px !important;
+  right: 70px !important;
   top: 0;
   margin: 0 auto;
   box-sizing: border-box;
+  left: 70px !important;
 }
 
 button.ui-button.ui-widget.ui-state-default.ui-corner-all.ui-button-text-only {
   background: #5cb85c !important;
-  color:#jkkk;
 }
 
 @media (max-width: 767px) {
@@ -964,5 +958,23 @@ button.ui-button.ui-widget.ui-state-default.ui-corner-all.ui-button-text-only {
 }
 .ui-dialog.ui-widget.ui-widget-content.ui-corner-all.ui-draggable {
     left: 35% !important;
-    top: 37% !important;
+    margin-right:25px !important;
 }
+.title-container span {
+    margin-top: 20px !important;
+}
+#sideMenu li:first-child div+div {
+    display:block !important;
+}
+.contextMenu {
+    position: absolute !important;
+    top: 245.9531px !important;
+    left: 500.938px !important;
+}
+th a.Sortable, th span.sortable {
+    color: #1c2b36 !important;
+}
+#adminButtons li.selected {
+    width: auto;
+}
+
