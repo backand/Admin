@@ -1442,9 +1442,15 @@ namespace Durados.Web.Mvc
             return DataAccessFactory.GetDataAccess(connectionString);
         }
 
+        bool? isApi = null;
         public override bool IsApi()
         {
-            return Maps.Instance.IsApi();
+            if (!isApi.HasValue)
+            {
+                string s = System.Configuration.ConfigurationManager.AppSettings["GoogleClientId"];
+                isApi = !string.IsNullOrEmpty(s);
+            }
+            return isApi.Value;
         }
 
         public override string GetConnectionSource()

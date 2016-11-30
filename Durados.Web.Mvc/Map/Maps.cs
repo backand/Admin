@@ -1440,10 +1440,15 @@ namespace Durados.Web.Mvc
             return !string.IsNullOrEmpty(s);
         }
 
+        bool? isApi = null;
         public bool IsApi()
         {
-            string s = System.Configuration.ConfigurationManager.AppSettings["GoogleClientId"];
-            return !string.IsNullOrEmpty(s);
+            if (!isApi.HasValue)
+            {
+                string s = System.Configuration.ConfigurationManager.AppSettings["GoogleClientId"];
+                isApi = !string.IsNullOrEmpty(s);
+            }
+            return isApi.Value;
         }
 
         private bool BlobExists(string appName)

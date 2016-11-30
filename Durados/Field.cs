@@ -350,7 +350,7 @@ namespace Durados
 
         public bool IsHiddenInTableMobile()
         {
-            return Excluded || HideInTableMobile;
+            return Excluded || ((!View.Database.IsApi() || View.Database.IsConfig || View.SystemView) && HideInTableMobile);
         }
 
         [Durados.Config.Attributes.ColumnProperty(DoNotCopy = true, Description = "Hide from View only in mobilde mode")]
@@ -358,7 +358,7 @@ namespace Durados
 
         public bool IsHiddenInTable()
         {
-            return Excluded || HideInTable;
+            return Excluded || ((!View.Database.IsApi() || View.Database.IsConfig || View.SystemView) && HideInTable);
         }
 
         [Durados.Config.Attributes.ColumnProperty(DoNotCopy = true, Description = "Don&#39t show the field in the table View")]
