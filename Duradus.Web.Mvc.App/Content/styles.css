@@ -746,10 +746,6 @@ th.HtmlFieldType {
   display: none;
 }
 
-.main-content {
-  padding-left: 0px;
-}
-
 #sideMenu {
   z-index: 999;
 }
@@ -830,6 +826,22 @@ button.ui-button.ui-widget.ui-state-default.ui-corner-all.ui-button-text-only {
   background: #5cb85c !important;
 }
 
+@media (max-width: 991px) {
+  .selected2 a.sf-with-ul {
+    padding-right: 30px !important;
+    padding-left: 0 !important;
+  }
+  .ui-dialog.ui-widget.ui-widget-content.ui-corner-all.ui-draggable {
+    left: 0;
+    margin: 0 auto !important;
+    right: 0;
+    width: 75%;
+  }
+  .ui-dialog.ui-widget.ui-widget-content.ui-corner-all.ui-draggable {
+    margin-right: 0px !important;
+  }
+}
+
 @media (max-width: 767px) {
   .bodybgimg {
     padding: 20px;
@@ -893,7 +905,7 @@ button.ui-button.ui-widget.ui-state-default.ui-corner-all.ui-button-text-only {
     border: none;
   }
   body {
-    overflow-y: scroll;
+    overflow-y: scroll !important;
   }
   div.username, div.password, div.remember {
     float: none;
@@ -946,6 +958,174 @@ button.ui-button.ui-widget.ui-state-default.ui-corner-all.ui-button-text-only {
   }
   button.ui-button.ui-widget.ui-state-default.ui-corner-all.ui-button-text-only {
     margin: .5em .4em .5em 0 !important;
+  }
+  .ui-dialog.ui-widget.ui-widget-content.ui-corner-all.ui-draggable {
+    left: 0;
+    margin: 0 auto !important;
+    right: 0;
+    top: 300px !important;
+    width: 60%;
+  }
+  .gridboard .preview-container {
+    height: 140px !important;
+  }
+  .ui-widget-content {
+    position: static !important;
+    width: 100% !important;
+  }
+  .ui-dialog.ui-widget.ui-widget-content.ui-corner-all.ui-draggable {
+    margin-right: 0px !important;
+  }
+  #topMenu {
+    height: 120px;
+  }
+  #adminButtons li {
+    padding-left: 0;
+  }
+  #topMenu #adminButtons a {
+    font-size: 12px;
+  }
+  #adminButtons #settings a::before, #adminButtons #columns a::before, #adminButtons #pages a::before {
+    font-size: 16px;
+  }
+  #topRight .sf-menu, #topRight .sf-menu * {
+    font-size: 12px;
+  }
+  .workspace {
+    margin-left: 0;
+  }
+  #topRight {
+    position: static;
+    float: left;
+  }
+  .navigation-left {
+    width: 350px !important;
+  }
+}
+
+@media (max-width: 500px) {
+  #topMenu {
+    height: 120px;
+  }
+  #adminButtons li {
+    padding-left: 20px;
+  }
+  #topMenu #adminButtons a {
+    font-size: 12px;
+  }
+  #adminButtons #settings a::before, #adminButtons #columns a::before, #adminButtons #pages a::before {
+    font-size: 16px;
+  }
+  #topRight .sf-menu, #topRight .sf-menu * {
+    font-size: 12px;
+  }
+  .workspace {
+    margin-left: 0;
+  }
+  #topRight {
+    position: static;
+    float: left;
+  }
+  #adminButtons {
+    margin-left: 85px;
+  }
+  #topRight a {
+    padding: 15px 20px !important;
+  }
+}
+
+@media (min-width: 320px) and (max-width: 650px) {
+  .gridboard .preview-container {
+    height: 140px !important;
+  }
+  .ui-widget-content {
+    position: static !important;
+    width: 100% !important;
+  }
+  .ui-dialog.ui-widget.ui-widget-content.ui-corner-all.ui-draggable {
+    margin-right: 0px !important;
+  }
+}
+
+@media (max-width: 420px) {
+  header {
+    position: relative;
+  }
+  #topMenu {
+    height: 170px;
+  }
+  #topRight {
+    float: right;
+    text-align: center;
+    width: 100%;
+  }
+  #topMenu #adminButtons a {
+    font-size: 12px;
+  }
+  .workspace.space-selected1 {
+    position: absolute;
+    right: 0;
+    top: 66px;
+  }
+}
+
+@media (max-width: 375px) {
+  #topMenu {
+    height: 200px;
+  }
+  a.durados-logo {
+    left: 0;
+    margin: 0 auto;
+    right: 0;
+    width: 35%;
+  }
+  #adminButtons {
+    width: 100%;
+    float: none;
+  }
+  #adminButtons > ul {
+    margin-top: 50px;
+    text-align: center;
+  }
+  #adminButtons li {
+    float: none;
+    padding-left: 0px;
+  }
+  #adminButtons li#settings, #adminButtons li#pages, #adminButtons li#columns {
+    float: none;
+    width: auto;
+  }
+  #adminButtons li a {
+    padding: 15px 5px;
+  }
+  #adminButtons #settings a::before, #adminButtons #columns a::before, #adminButtons #pages a::before {
+    font-size: 16px;
+  }
+  .space-selected1 {
+    margin-left: 0;
+    margin: auto;
+  }
+  #topRight {
+    position: static;
+  }
+  #topRight {
+    padding: 12px 17px 0;
+  }
+  .headNavMenu {
+    padding: 0 !important;
+  }
+  #topRight .sf-menu, #topRight .sf-menu * {
+    font-size: 12px;
+  }
+  #topRight a {
+    display: block;
+    padding: 15px 24px !important;
+  }
+  #mainMenu > div.logo-title-container > div.title-settings > span.desc-icon {
+    margin-right: 0;
+  }
+  .navigation-left {
+    margin-right: 65px;
   }
 }
 
@@ -1022,5 +1202,5 @@ th a.Sortable, th span.sortable {
 }
 
 #adminButtons li.selected {
-  width: auto;
+  width: auto !important;
 }
