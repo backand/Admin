@@ -817,7 +817,7 @@ form#loginform input#rememberMe {
 .ui-dialog.ui-widget.ui-widget-content.ui-corner-all.ui-draggable.ui-resizable {
   right: 70px !important;
   top: 0;
-  margin: 0 auto;
+  margin: 0 auto !important;
   box-sizing: border-box;
   left: 70px !important;
 }
@@ -837,8 +837,35 @@ button.ui-button.ui-widget.ui-state-default.ui-corner-all.ui-button-text-only {
     right: 0;
     width: 75%;
   }
+  .navigation-left {
+    width: 350px;
+  }
+  div#mainMenu .navigation-left {
+    margin-right: 0;
+    margin-left: 0;
+  }
+  div.fixedviewportWrapper div.headWrapper {
+    overflow-y: scroll;
+  }
+  .Sortable.col-header {
+    font-size: 12px;
+  }
+  .fixedViewPort.strechViewPort {
+    overflow-y: scroll !important;
+  }
   .ui-dialog.ui-widget.ui-widget-content.ui-corner-all.ui-draggable {
     margin-right: 0px !important;
+  }
+  header div#topMenu #adminButtons li {
+    float: left;
+    padding-left: 0;
+  }
+  #topRight a {
+    padding: 15px 15px !important;
+    display: block;
+  }
+  .workspace.space-selected1 {
+    margin-left: 0 !important;
   }
 }
 
@@ -858,16 +885,16 @@ button.ui-button.ui-widget.ui-state-default.ui-corner-all.ui-button-text-only {
     display: none;
   }
   #mainMenu .navigation-left li a {
-    font-size: 12px;
+    font-size: 12px !important;
     font-weight: normal;
     padding: 12px 27px 12px 6px;
   }
   .navigation-left {
     margin: 0;
-    width: 220px;
+    width: 220px !important;
   }
   .workspace {
-    width: 80px;
+    width: 80px !important;
     margin-left: 10px;
   }
   .workspaceMenu {
@@ -963,7 +990,6 @@ button.ui-button.ui-widget.ui-state-default.ui-corner-all.ui-button-text-only {
     left: 0;
     margin: 0 auto !important;
     right: 0;
-    top: 300px !important;
     width: 60%;
   }
   .gridboard .preview-container {
@@ -983,51 +1009,78 @@ button.ui-button.ui-widget.ui-state-default.ui-corner-all.ui-button-text-only {
     padding-left: 0;
   }
   #topMenu #adminButtons a {
-    font-size: 12px;
+    font-size: 12px !important;
   }
   #adminButtons #settings a::before, #adminButtons #columns a::before, #adminButtons #pages a::before {
     font-size: 16px;
   }
   #topRight .sf-menu, #topRight .sf-menu * {
-    font-size: 12px;
+    font-size: 12px !important;
   }
   .workspace {
     margin-left: 0;
   }
   #topRight {
-    position: static;
+    position: static !important;
     float: left;
   }
   .navigation-left {
-    width: 350px !important;
+    width: 350px;
+  }
+  div#mainMenu .navigation-left {
+    margin-right: 0;
+    margin-left: 0;
+  }
+  header div#topMenu #adminButtons {
+    width: auto;
+    float: left;
+    margin-left: 115px;
+  }
+  .ui-dialog.ui-widget.ui-widget-content.ui-corner-all.ui-draggable.ui-resizable {
+    right: 70px !important;
+    top: 0;
+    margin: 0 auto !important;
+    box-sizing: border-box;
+    left: 70px !important;
+  }
+  .ui-dialog-content.ui-widget-content {
+    height: 170px !important;
+  }
+}
+
+@media (max-width: 690px) {
+  header div#topMenu #adminButtons {
+    width: auto;
+    float: left;
+    margin-left: 115px;
   }
 }
 
 @media (max-width: 500px) {
-  #topMenu {
+  header div#topMenu {
     height: 120px;
   }
   #adminButtons li {
-    padding-left: 20px;
+    padding-left: 20px !important;
   }
   #topMenu #adminButtons a {
     font-size: 12px;
   }
   #adminButtons #settings a::before, #adminButtons #columns a::before, #adminButtons #pages a::before {
-    font-size: 16px;
+    font-size: 14px;
   }
   #topRight .sf-menu, #topRight .sf-menu * {
     font-size: 12px;
   }
   .workspace {
-    margin-left: 0;
+    margin-left: 0 !important;
   }
   #topRight {
     position: static;
     float: left;
   }
   #adminButtons {
-    margin-left: 85px;
+    margin-left: 85px !important;
   }
   #topRight a {
     padding: 15px 20px !important;
@@ -1051,7 +1104,7 @@ button.ui-button.ui-widget.ui-state-default.ui-corner-all.ui-button-text-only {
   header {
     position: relative;
   }
-  #topMenu {
+  header div#topMenu {
     height: 170px;
   }
   #topRight {
@@ -1067,19 +1120,17 @@ button.ui-button.ui-widget.ui-state-default.ui-corner-all.ui-button-text-only {
     right: 0;
     top: 66px;
   }
-}
-
-@media (max-width: 375px) {
-  #topMenu {
-    height: 200px;
+  header div#topMenu {
+    height: 170px;
   }
-  a.durados-logo {
+  header div#topMenu .durados-logo {
     left: 0;
     margin: 0 auto;
     right: 0;
     width: 35%;
+    margin-right: auto;
   }
-  #adminButtons {
+  header div#topMenu #adminButtons {
     width: 100%;
     float: none;
   }
@@ -1089,27 +1140,25 @@ button.ui-button.ui-widget.ui-state-default.ui-corner-all.ui-button-text-only {
   }
   #adminButtons li {
     float: none;
-    padding-left: 0px;
+    padding-left: 0px !important;
   }
   #adminButtons li#settings, #adminButtons li#pages, #adminButtons li#columns {
     float: none;
-    width: auto;
+    width: auto !important;
   }
   #adminButtons li a {
     padding: 15px 5px;
   }
   #adminButtons #settings a::before, #adminButtons #columns a::before, #adminButtons #pages a::before {
-    font-size: 16px;
+    font-size: 14px;
   }
   .space-selected1 {
-    margin-left: 0;
+    margin-left: 0 !important;
     margin: auto;
+    width: 84px !important;
   }
   #topRight {
-    position: static;
-  }
-  #topRight {
-    padding: 12px 17px 0;
+    position: static !important;
   }
   .headNavMenu {
     padding: 0 !important;
@@ -1119,13 +1168,10 @@ button.ui-button.ui-widget.ui-state-default.ui-corner-all.ui-button-text-only {
   }
   #topRight a {
     display: block;
-    padding: 15px 24px !important;
+    padding: 15px 15px !important;
   }
   #mainMenu > div.logo-title-container > div.title-settings > span.desc-icon {
     margin-right: 0;
-  }
-  .navigation-left {
-    margin-right: 65px;
   }
 }
 
@@ -1203,4 +1249,8 @@ th a.Sortable, th span.sortable {
 
 #adminButtons li.selected {
   width: auto !important;
+}
+
+.main-content {
+  padding-left: 0 !important;
 }
