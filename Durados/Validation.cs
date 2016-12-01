@@ -325,9 +325,16 @@ namespace Durados
                 {
                     return DateTime.Parse(date);
                 }
-                catch (Exception exception)
+                catch (Exception)
                 {
-                    throw new DuradosException("Please provide a valid date in the format: " + dateFormat, exception);
+                    try
+                    {
+                        return DateTime.ParseExact(date.Replace("GMT", "UTC"), "ddd MMM dd yyyy HH:mm:ss UTCzzzzz", System.Globalization.CultureInfo.InvariantCulture);
+                    }
+                    catch (Exception exception)
+                    {
+                        throw new DuradosException("Please provide a valid date in the format: " + dateFormat, exception);
+                    }
                 }
             }
         }

@@ -30,7 +30,7 @@ namespace Backand
                 {
                     dictData.Add(key, System.Web.HttpContext.Current.Request.QueryString.Get(key));
                 }
-                return Durados.Workflow.JavaScript.GetJintObject(dictData);
+                return dictData;
             }
         }
 
@@ -47,7 +47,7 @@ namespace Backand
         {
             get
             {
-                return Durados.Workflow.JavaScript.GetJintObject(Durados.Workflow.JavaScript.GetHeaders(System.Web.HttpContext.Current.Request.Headers));
+                return Durados.Workflow.JavaScript.GetHeaders(System.Web.HttpContext.Current.Request.Headers);
             }
         }
     }

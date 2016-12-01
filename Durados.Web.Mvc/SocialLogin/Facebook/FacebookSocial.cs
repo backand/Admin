@@ -236,7 +236,7 @@ namespace Durados.Web.Mvc.SocialLogin
 
         protected override string FetchProfileFromService(string accessToken)
         {
-            string GraphApiEndpoint = "https://graph.facebook.com/me?fields=id,email,name";
+            string GraphApiEndpoint = "https://graph.facebook.com/me?fields=id,email,name,first_name,last_name";
             string graphAddress = GraphApiEndpoint + "&access_token=" + Uri.EscapeDataString(accessToken);
 
             string response = Durados.Web.Mvc.Infrastructure.Http.GetWebRequest(graphAddress);
