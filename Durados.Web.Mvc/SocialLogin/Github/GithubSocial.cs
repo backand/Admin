@@ -137,6 +137,17 @@ namespace Durados.Web.Mvc.SocialLogin
 
             //get the access token from the return JSON
             Dictionary<string, object> accessObject = Durados.Web.Mvc.UI.Json.JsonSerializer.Deserialize(response);
+            if (!accessObject.ContainsKey("access_token"))
+            {
+                if (accessObject.ContainsKey("error") && accessObject.ContainsKey("error_description"))
+                {
+                    throw new DuradosException(accessObject["error"].ToString() + ":" + accessObject["error_description"].ToString());
+                }
+                else
+                {
+                    throw new DuradosException(response);
+                }
+            }
             string accessToken = accessObject["access_token"].ToString();
 
             return GetProfile(appName, accessToken, null, returnAddress, activity, parameters, email, signupIfNotSignedIn, useHashRouting);
