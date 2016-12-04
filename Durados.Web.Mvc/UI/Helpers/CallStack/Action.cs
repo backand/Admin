@@ -8,7 +8,7 @@ namespace Durados.Web.Mvc.UI.Helpers.CallStack
 {
     public class Action : IAction
     {
-        private List<IAction> actionChildren;
+        private List<IAction> innerActions;
 
         public Action(string objectName, string actionName, IActionEvent started, IActionEvent ended = null)
         {
@@ -16,7 +16,7 @@ namespace Durados.Web.Mvc.UI.Helpers.CallStack
             ActionName = actionName;
             Started = started;
             Ended = ended;
-            actionChildren = new List<IAction>();
+            innerActions = new List<IAction>();
 
         }
         public string ObjectName { get; private set; }
@@ -31,13 +31,13 @@ namespace Durados.Web.Mvc.UI.Helpers.CallStack
 
         public void AddActionChild(IAction action)
         {
-            actionChildren.Add(action);
+            innerActions.Add(action);
         }
-        public IAction[] ActionChildren
+        public IAction[] InnerActions
         {
             get
             {
-                return actionChildren.ToArray();
+                return innerActions.ToArray();
             }
         }
     }

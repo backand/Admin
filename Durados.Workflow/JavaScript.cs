@@ -442,7 +442,7 @@ namespace Durados.Workflow
 
         public virtual void Execute(object controller, Dictionary<string, Parameter> parameters, View view, Dictionary<string, object> values, DataRow prevRow, string pk, string connectionString, int currentUsetId, string currentUserRole, IDbCommand command, IDbCommand sysCommand, string actionName, Durados.TriggerDataAction dataAction)
         {
-            if (pk != null && prevRow == null && controller is Durados.Data.IData)
+            if (pk != null && (prevRow == null || dataAction == TriggerDataAction.AfterCreate || dataAction == TriggerDataAction.AfterEdit) && controller is Durados.Data.IData)
             {
                 try
                 {

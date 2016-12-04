@@ -28,6 +28,8 @@ using System.Threading;
 using System.Text;
 using Durados.Web.Mvc.Analytics;
 using Durados.Web.Mvc.UI.Helpers.CallStack;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Serialization;
 /*
  HTTP Verb	|Entire Collection (e.g. /customers)	                                                        |Specific Item (e.g. /customers/{id})
 -----------------------------------------------------------------------------------------------------------------------------------------------
@@ -81,7 +83,7 @@ namespace BackAnd.Web.Api.Controllers
                 var result = callStackConverter.ChronologicalListToTree(events.OrderBy(e => e.Time));
                 if (result == null)
                     return Ok(new { });
-                return Ok(result);
+                return Json(result, ViewHelpers.CamelCase);
             }
             catch (Exception exception)
             {
@@ -91,7 +93,19 @@ namespace BackAnd.Web.Api.Controllers
             }
         }
 
-        
-        
+
+        internal static class ViewHelpers
+        {
+            public static JsonSerializerSettings CamelCase
+            {
+                get
+                {
+                    return new JsonSerializerSettings
+                    {
+                        ContractResolver = new CamelCasePropertyNamesContractResolver()
+                    };
+                }
+            }
+        }
     }
 }

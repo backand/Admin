@@ -5449,6 +5449,10 @@ namespace Durados.DataAccess
                 {
                     command.Parameters.Add(GetNewParameter(command, parameter.ParameterName, parameter.Value));
                 }
+                else
+                {
+                    ((IDataParameter)command.Parameters[parameter.ParameterName]).Value = parameter.Value;
+                }
             }
 
             DataTable table = view.DataTable.Copy();
@@ -9782,6 +9786,11 @@ namespace Durados.DataAccess
             }
             else
             {
+                if (afterCreateAfterCommitCallback != null)
+                {
+                    afterCreateAfterCommitCallback(this, createEventArgs);
+                }
+            
                 SqlAccess.Cache.Clear(view.Name);
             }
 
@@ -9927,12 +9936,15 @@ namespace Durados.DataAccess
                     }
                 }
 
+                List<AfterCommitDispatcher> afterCommitDispatcherList = new List<AfterCommitDispatcher>();
                 int i = 0;
                 foreach (var deepObject in deepObjects)
                 {
+                    AfterCommitDispatcher afterCommitDispatcher = new AfterCommitDispatcher(null, afterCreateAfterCommitCallback, null);
                     try
                     {
-                        pk += Create(view, deepObject, deep, command, sysCommand, beforeCreateCallback, beforeCreateInDatabaseCallback, afterCreateBeforeCommitCallback, afterCreateAfterCommitCallback) + ";";
+                        pk += Create(view, deepObject, deep, command, sysCommand, beforeCreateCallback, beforeCreateInDatabaseCallback, afterCreateBeforeCommitCallback, afterCommitDispatcher.AfterCreateAfterCommitCallback) + ";";
+                        afterCommitDispatcherList.Add(afterCommitDispatcher);
                     }
                     catch (Exception exception)
                     {
@@ -9960,13 +9972,18 @@ namespace Durados.DataAccess
                         }
                         catch { }
                     }
+
+                    foreach (var afterCommitDispatcher in afterCommitDispatcherList)
+                    {
+                        afterCommitDispatcher.Dispatch();
+                    }
                 }
 
                 foreach (var deepObject in deepObjects)
                 {
-                    CreateEventArgs createEventArgs = new CreateEventArgs(view, GetValues(view, deepObject), pk, null, null);
-                    if (afterCreateAfterCommitCallback != null)
-                        afterCreateAfterCommitCallback(this, createEventArgs);
+                    //CreateEventArgs createEventArgs = new CreateEventArgs(view, GetValues(view, deepObject), pk, null, null);
+                    //if (afterCreateAfterCommitCallback != null)
+                    //    afterCreateAfterCommitCallback(this, createEventArgs);
                     view.SendRealTimeEvent(pk, Crud.create);
                 }
 
@@ -10157,7 +10174,9 @@ namespace Durados.DataAccess
                     }
                 }
 
-                affected = Update(view, deepObject, pk, deep, command, sysCommand, beforeEditCallback, beforeEditInDatabaseCallback, afterEditBeforeCommitCallback, afterEditAfterCommitCallback, beforeCreateCallback, beforeCreateInDatabaseCallback, afterCreateBeforeCommitCallback, afterCreateAfterCommitCallback, overwrite, beforeDeleteCallback, afterDeleteBeforeCommitCallback, afterDeleteAfterCommitCallback);
+                AfterCommitDispatcher dispatcher = new AfterCommitDispatcher(afterEditAfterCommitCallback, afterCreateAfterCommitCallback, afterDeleteAfterCommitCallback);
+
+                affected = Update(view, deepObject, pk, deep, command, sysCommand, beforeEditCallback, beforeEditInDatabaseCallback, afterEditBeforeCommitCallback, dispatcher.AfterEditAfterCommitCallback, beforeCreateCallback, beforeCreateInDatabaseCallback, afterCreateBeforeCommitCallback, dispatcher.AfterCreateAfterCommitCallback, overwrite, beforeDeleteCallback, afterDeleteBeforeCommitCallback, dispatcher.AfterDeleteAfterCommitCallback);
 
                 if (connection != null)
                 {
@@ -10184,9 +10203,11 @@ namespace Durados.DataAccess
                                 try
                                 {
                                     sysTransaction.Commit();
+                                    dispatcher.Dispatch();
                                 }
                                 catch { }
                         }
+                        dispatcher.Dispatch();
                     }
                 }
                 SqlAccess.Cache.Clear(view.Name);

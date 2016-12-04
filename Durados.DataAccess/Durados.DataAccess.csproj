@@ -105,6 +105,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AfterCommitDispatcher.cs" />
     <Compile Include="AppLockerGetter.cs" />
     <Compile Include="AutoGeneration\Content.cs">
       <SubType>Code</SubType>

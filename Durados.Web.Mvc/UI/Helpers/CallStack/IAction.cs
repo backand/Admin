@@ -19,6 +19,6 @@ namespace Durados.Web.Mvc.UI.Helpers.CallStack
 
         void AddActionChild(IAction action);
 
-        IAction[] ActionChildren { get; }
+        IAction[] InnerActions { get; }
     }
 }

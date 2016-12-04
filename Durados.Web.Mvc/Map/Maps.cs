@@ -517,8 +517,14 @@ namespace Durados.Web.Mvc
                 throw new DuradosException("Missing CronAuthorizationHeader key in web config");
             }
 
+            var actionParametersKbSizeLimit = System.Configuration.ConfigurationManager.AppSettings["actionParametersKbSizeLimit"];
+            if (string.IsNullOrEmpty(actionParametersKbSizeLimit))
+            {
+                throw new DuradosException("Missing actionParametersKbSizeLimit key in web config");
+            }
+
             limits[Limits.Cron.ToString()] = Convert.ToInt32(System.Configuration.ConfigurationManager.AppSettings["cronLimit"]);
-            limits[Limits.ActionParametersKbSize.ToString()] = Convert.ToInt32(System.Configuration.ConfigurationManager.AppSettings["actionParametersKbSizeLimit"]);
+            limits[Limits.ActionParametersKbSize.ToString()] = Convert.ToInt32(actionParametersKbSizeLimit);
             limits[Limits.ActionTimeMSec.ToString()] = Convert.ToInt32(System.Configuration.ConfigurationManager.AppSettings["actionTimeMSecLimit"]);
             limits[Limits.UploadTimeMSec.ToString()] = Convert.ToInt32(System.Configuration.ConfigurationManager.AppSettings["uploadTimeMSecLimit"]);
 
