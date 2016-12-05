@@ -525,8 +525,20 @@ namespace Durados.Web.Mvc
 
             limits[Limits.Cron.ToString()] = Convert.ToInt32(System.Configuration.ConfigurationManager.AppSettings["cronLimit"]);
             limits[Limits.ActionParametersKbSize.ToString()] = Convert.ToInt32(actionParametersKbSizeLimit);
-            limits[Limits.ActionTimeMSec.ToString()] = Convert.ToInt32(System.Configuration.ConfigurationManager.AppSettings["actionTimeMSecLimit"]);
-            limits[Limits.UploadTimeMSec.ToString()] = Convert.ToInt32(System.Configuration.ConfigurationManager.AppSettings["uploadTimeMSecLimit"]);
+
+
+            var actionTimeMSecLimit = System.Configuration.ConfigurationManager.AppSettings["actionTimeMSecLimit"];
+            if (string.IsNullOrEmpty(actionTimeMSecLimit))
+            {
+                throw new DuradosException("Missing actionTimeMSecLimit key in web config");
+            }
+            limits[Limits.ActionTimeMSec.ToString()] = Convert.ToInt32(actionTimeMSecLimit);
+            var uploadTimeMSecLimit = System.Configuration.ConfigurationManager.AppSettings["uploadTimeMSecLimit"];
+            if (string.IsNullOrEmpty(uploadTimeMSecLimit))
+            {
+                throw new DuradosException("Missing uploadTimeMSecLimit key in web config");
+            }
+            limits[Limits.UploadTimeMSec.ToString()] = Convert.ToInt32(uploadTimeMSecLimit);
 
             LocalAddress = System.Configuration.ConfigurationManager.AppSettings["localAddress"] ?? "http://localhost:8080";
 
