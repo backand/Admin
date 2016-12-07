@@ -929,7 +929,11 @@ namespace Jint
                     message += ", \"at\": {" + path.ToString() + "}";
                 }
             }
-            return "#|" + message + "|#";
+            else
+            {
+
+            }
+            return "<<" + message + ">>";
         }
     }
 }

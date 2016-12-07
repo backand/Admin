@@ -125,7 +125,7 @@ namespace Durados.Workflow
             //    }
             //}
 
-            message = message.Replace("#|", "{").Replace("|#", "}").Replace("\\\"", "\"").Replace("|", "").Replace("#", "");
+            message = message.Replace("<<", "{").Replace(">>", "}").Replace("\\\"", "\"");
 
             try
             {

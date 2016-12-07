@@ -75,7 +75,7 @@ namespace Jint.Native.Error
                 return "";
             }
             name = "\"" + name + "\"";
-            if (!(msg.StartsWith("\"") || msg.StartsWith("{") || msg.StartsWith("#|")))
+            if (!(msg.StartsWith("\"") || msg.StartsWith("{") || msg.StartsWith("<<")))
             {
                 msg = "\"" + msg + "\"";
             }
