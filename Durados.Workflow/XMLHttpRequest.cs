@@ -28,7 +28,8 @@ namespace Backand
             Async = async;
 
             //if (url.Contains("objects/action") && System.Web.HttpContext.Current.Request.RawUrl.Contains("$$debug$$") && !url.Contains("url.Contains"))
-            if (url.Contains("objects") && !url.Contains("url.Contains"))
+            //if (url.Contains("objects") && !url.Contains("url.Contains"))
+            if (url.Contains("objects") && System.Web.HttpContext.Current.Request.RawUrl.Contains("$$debug$$") && !url.Contains("url.Contains"))
             {
                 if (url.Contains("&parameters="))
                 {
@@ -39,6 +40,17 @@ namespace Backand
                     else
                     {
                         url = url.Replace("&parameters=%7B", "&parameters=%7B%22$$debug$$%22:true,");
+                    }
+                }
+                else if (url.Contains("?parameters="))
+                {
+                    if (url.Contains("?parameters=%7B%7D"))
+                    {
+                        url = url.Replace("?parameters=%7B%7D", "?parameters=%7B%22$$debug$$%22:true%7D");
+                    }
+                    else
+                    {
+                        url = url.Replace("?parameters=%7B", "?parameters=%7B%22$$debug$$%22:true,");
                     }
                 }
                 else

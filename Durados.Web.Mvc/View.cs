@@ -669,7 +669,8 @@ namespace Durados.Web.Mvc
                     string via = ((ChildrenField)field).GetRelatedParentField().JsonName;
                     values.Add(type, relatedObject);
                     values.Add("via", via);
-                    types.Add(field.JsonName, values);
+                    if (!types.ContainsKey(field.JsonName))
+                        types.Add(field.JsonName, values);
                 }
                 else
                 {

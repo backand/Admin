@@ -765,20 +765,39 @@ namespace Jint.Runtime
                 if (string.IsNullOrEmpty(exception.Message))
                 {
                     string undefinedObjectName = null;
-                    string undefinedPropertyName = null;
+                    string message =  "Jint error";
 
                     try
                     {
                         undefinedObjectName = memberExpression.Object.As<MemberExpression>().Property.As<Identifier>().Name;
-                        undefinedPropertyName = memberExpression.Property.As<Identifier>().Name;
+                        switch (memberExpression.Property.Type)
+                        {
+                            case SyntaxNodes.Identifier:
+                                string undefinedPropertyName = memberExpression.Property.As<Identifier>().Name;
+                                if (!string.IsNullOrEmpty(undefinedObjectName) && !string.IsNullOrEmpty(undefinedPropertyName))
+                                {
+                                    message = string.Format("Could not evaluate property '{0}' of undefined object '{1}'", undefinedPropertyName, undefinedObjectName);
+                                }
+                                break;
 
+                            case SyntaxNodes.Literal:
+                                string undefinedLiteral = memberExpression.Property.As<Literal>().GetKey();
+                                if (!string.IsNullOrEmpty(undefinedObjectName) && !string.IsNullOrEmpty(undefinedLiteral))
+                                {
+                                    message = string.Format("Could not evaluate object '{1}' with literal {0}", undefinedLiteral, undefinedObjectName);
+                                }
+                                break;
+
+                            default:
+                                break;
+                        }
+                        
                         
                     }
-                    catch { }
-                    if (!string.IsNullOrEmpty(undefinedObjectName) && !string.IsNullOrEmpty(undefinedPropertyName))
+                    catch 
                     {
-                        throw new JavaScriptException(_engine.TypeError, string.Format("Could not evaluate property '{0}' of undefined object '{1}'", undefinedPropertyName, undefinedObjectName));
                     }
+                    throw new JavaScriptException(_engine.TypeError, message);
                 }
 
                 throw exception;

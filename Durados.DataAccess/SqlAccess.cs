@@ -10203,7 +10203,6 @@ namespace Durados.DataAccess
                                 try
                                 {
                                     sysTransaction.Commit();
-                                    dispatcher.Dispatch();
                                 }
                                 catch { }
                         }
