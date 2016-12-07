@@ -253,15 +253,17 @@ namespace BackAnd.Web.Api.Controllers.Filters
                 return false;
             string username = null;
             string appName = null;
+            Exception outException = null;
 
             try
             {
                 BasicAuthenticationIdentity basicAuthenticationIdentity = GetBasicAuthenticationIdentity(actionContext);
-                if (!IsBasicAuthorized(basicAuthenticationIdentity, out username, out appName))
+                if (!IsBasicAuthorized(basicAuthenticationIdentity, out username, out appName, out outException))
                 {
+                    Exception e = outException ?? new BasicAuthorizationException();
                     actionContext.Response = actionContext.Request.CreateErrorResponse(
-                            HttpStatusCode.Unauthorized,
-                            new BasicAuthorizationException());
+                            HttpStatusCode.Unauthorized, e.Message,
+                           e);
                     return true;
                 }
             }
@@ -314,10 +316,11 @@ namespace BackAnd.Web.Api.Controllers.Filters
             return true;
         }
 
-        private bool IsBasicAuthorized(BasicAuthenticationIdentity basicAuthenticationIdentity, out string username, out string appName)
+        private bool IsBasicAuthorized(BasicAuthenticationIdentity basicAuthenticationIdentity, out string username, out string appName, out Exception exception)
         {
             appName = null;
             username = null;
+            exception = null;
             if (basicAuthenticationIdentity == null)
             {
                 return false;
@@ -326,8 +329,9 @@ namespace BackAnd.Web.Api.Controllers.Filters
             {
                 appName = Maps.Instance.GetAppNameByGuid(basicAuthenticationIdentity.AppGuid);
             }
-            catch (ArgumentException)
+            catch (ArgumentException argumentException)
             {
+                exception = argumentException;
                 return false;
             }
             Map map = Maps.Instance.GetMap(appName);
