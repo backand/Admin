@@ -120,7 +120,7 @@ namespace Durados.Workflow
                     }
                     catch (Exception exception)
                     {
-                        throw new WorkflowEngineException(string.IsNullOrEmpty(parameters[expression].Value) ? exception.Message : parameters[expression].Value);
+                        throw new SqlExecuteException((string.IsNullOrEmpty(parameters[expression].Value) ? "Failed to run: " + spCommand.CommandText + "; \nError: " + exception.Message : parameters[expression].Value));
                     }
                 }
             }

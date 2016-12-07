@@ -133,6 +133,10 @@ namespace Durados.Workflow
                             }
                         }
                     }
+                    catch (SqlExecuteException sqlExecuteException)
+                    {
+                        throw new WorkflowEngineException(sqlExecuteException.Message + "\nat (" + view.JsonName + "/" + rule.Name + ")");
+                    }
                     catch (WorkflowEngineException workflowEngineException)
                     {
                         if ((rule.Name == "Create My App User" || rule.Name == "Update My App User" || rule.Name == "Delete My App User") && !view.Database.Views.ContainsKey("users"))

@@ -128,6 +128,7 @@
     <Compile Include="files.cs" />
     <Compile Include="request.cs" />
     <Compile Include="socket.cs" />
+    <Compile Include="SqlExecuteException.cs" />
     <Compile Include="SubActionJavaScriptException.cs" />
     <Compile Include="WebService.cs" />
     <Compile Include="Graph.cs" />
