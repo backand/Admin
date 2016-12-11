@@ -10,10 +10,11 @@ namespace Durados.Web.Mvc.UI.Helpers.CallStack
     {
         private List<IAction> innerActions;
 
-        public Action(string objectName, string actionName, IActionEvent started, IActionEvent ended = null)
+        public Action(string objectName, string actionName, string id, IActionEvent started, IActionEvent ended = null)
         {
             ObjectName = objectName;
             ActionName = actionName;
+            Id = id;
             Started = started;
             Ended = ended;
             innerActions = new List<IAction>();
@@ -21,6 +22,7 @@ namespace Durados.Web.Mvc.UI.Helpers.CallStack
         }
         public string ObjectName { get; private set; }
         public string ActionName { get; private set; }
+        public string Id { get; private set; }
         public IActionEvent Started { get; private set; }
         public IActionEvent Ended { get; private set; }
 

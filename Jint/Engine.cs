@@ -899,6 +899,14 @@ namespace Jint
             //if (lastStatement.Type == SyntaxNodes.ReturnStatement)
             //    return message;
 
+            if (!message.StartsWith("\"") && message.Contains(":"))
+            {
+                string[] messageParts = message.Split(":".ToCharArray(), StringSplitOptions.RemoveEmptyEntries);
+                if (messageParts.Length == 2)
+                {
+                    message = "\"" + messageParts[0] + "\"" + ":" + "\"" + messageParts[1] + "\"";
+                }
+            }
 
             int line = syntaxNode.Location.Start.Line;
             int column = syntaxNode.Location.Start.Column;

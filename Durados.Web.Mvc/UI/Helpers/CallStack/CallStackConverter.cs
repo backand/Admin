@@ -8,33 +8,51 @@ namespace Durados.Web.Mvc.UI.Helpers.CallStack
 {
     public class CallStackConverter
     {
-        public IActionTree ChronologicalListToTree(IEnumerable<IActionEvent> events)
+        public IList<IAction> ChronologicalListToTree(IList<IActionEvent> events)
         {
             if (events.Count() == 0)
                 return null;
 
             IActionEvent firstEvent = events.First();
-            IActionEvent lastEvent = events.Last();
+            IActionEvent lastEvent = GetEndEvent(firstEvent, events, 1);
 
-            IAction root = GetNewAction(firstEvent, lastEvent);
+            IAction firstAction = GetNewAction(firstEvent, lastEvent);
 
-            IActionTree tree = GetNewTree(root);
+            IList<IAction> actions = new List<IAction>() { firstAction };
 
-            IList<IAction> parentActions = new List<IAction>() { root };
+            IList<IAction> parentActions = new List<IAction>() { firstAction };
 
-            foreach (IActionEvent actionEvent in events)
+            for (int i = 1; i < events.Count(); i++ )
             {
-                if (actionEvent == firstEvent)
+                IActionEvent actionEvent = events[i];
+
+                IAction parentAction = parentActions.LastOrDefault();
+                
+                if (actionEvent == lastEvent)
                 {
+                    if (parentAction != null)
+                        parentActions.Remove(parentAction);
                     continue;
                 }
 
-                if (actionEvent == lastEvent)
+                if (parentAction == null)
                 {
-                    break;
-                }
+                    if (!actionEvent.Event.Equals(Event.Started))
+                    {
+                        throw new Exception();
+                    }
 
-                IAction parentAction = parentActions.Last();
+                    firstEvent = actionEvent;
+                    lastEvent = GetEndEvent(firstEvent, events, i);
+
+                    IAction nextSibling = GetNewAction(firstEvent, lastEvent);
+
+                    actions.Add(nextSibling);
+
+                    parentActions = new List<IAction>() { nextSibling };
+
+                    continue;
+                }
 
                 if (actionEvent.Event.Equals(Event.Started))
                 {
@@ -47,23 +65,34 @@ namespace Durados.Web.Mvc.UI.Helpers.CallStack
                     parentAction.SetEnded(actionEvent);
                     parentActions.Remove(parentAction);
                 }
-                
+
 
             }
 
 
-            return tree;
+            return actions;
+        }
+
+        private IActionEvent GetEndEvent(IActionEvent starttEvent, IList<IActionEvent> events, int start)
+        {
+            for (int i = start; i < events.Count(); i++)
+            {
+                IActionEvent actionEvent = events[i];
+                if (actionEvent.Id.Equals(starttEvent.Id))
+                {
+                    return actionEvent;
+                }
+            }
+
+            return null;
         }
 
         private IAction GetNewAction(IActionEvent started, IActionEvent ended = null)
         {
-            return new Action(started.ObjectName, started.ActionName, started, ended);
+            return new Action(started.ObjectName, started.ActionName, started.Id, started, ended);
         }
 
         
-        protected virtual IActionTree GetNewTree(IAction root)
-        {
-            return new ActionTree(root);
-        }
+       
     }
 }

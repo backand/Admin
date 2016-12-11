@@ -12,6 +12,7 @@ namespace Durados.Web.Mvc.UI.Helpers.CallStack
 
         string ObjectName { get; }
         string ActionName { get; }
-
+        string Id { get; }
+        
     }
 }

@@ -769,7 +769,21 @@ namespace Jint.Runtime
 
                     try
                     {
-                        undefinedObjectName = memberExpression.Object.As<MemberExpression>().Property.As<Identifier>().Name;
+                        switch (memberExpression.Object.Type)
+                        {
+                            case SyntaxNodes.MemberExpression:
+                                if (memberExpression.Object.As<MemberExpression>().Property.Type.Equals(SyntaxNodes.Identifier))
+                                {
+                                    undefinedObjectName = memberExpression.Object.As<MemberExpression>().Property.As<Identifier>().Name;
+                                }
+                                break;
+                            case SyntaxNodes.Identifier:
+                                undefinedObjectName = memberExpression.Object.As<Identifier>().Name;
+                                break;
+
+                            default:
+                                break;
+                        }
                         switch (memberExpression.Property.Type)
                         {
                             case SyntaxNodes.Identifier:

@@ -9,13 +9,14 @@ namespace Durados.Web.Mvc.UI.Helpers.CallStack
 {
     public class ActionEvent : IActionEvent
     {
-        
-        public ActionEvent(int time, Event @event, string objectName, string actionName, object data)
+
+        public ActionEvent(int time, Event @event, string objectName, string actionName, string id, object data)
         {
             Time = time;
             Event = @event;
             ObjectName = objectName;
             ActionName = actionName;
+            Id = id;
             Data = data;
         }
         [JsonIgnore]
@@ -26,6 +27,7 @@ namespace Durados.Web.Mvc.UI.Helpers.CallStack
         public string ObjectName { get; private set; }
         [JsonIgnore]
         public string ActionName { get; private set; }
+        public string Id { get; private set; }
         public object Data { get; private set; }
 
         

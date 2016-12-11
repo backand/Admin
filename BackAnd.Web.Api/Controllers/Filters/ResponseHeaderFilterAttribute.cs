@@ -28,7 +28,8 @@ namespace BackAnd.Web.Api.Controllers.Filters
             if (System.Web.HttpContext.Current.Items.Contains(apiController.GuidKey))
             {
                 string actionHeaderGuidValue = System.Web.HttpContext.Current.Items[apiController.GuidKey].ToString();
-                actionContext.Response.Headers.Add(apiController.actionHeaderGuidName, actionHeaderGuidValue);
+                if (!actionContext.Response.Headers.Contains(apiController.actionHeaderGuidName))
+                    actionContext.Response.Headers.Add(apiController.actionHeaderGuidName, actionHeaderGuidValue);
             }
         }
     }

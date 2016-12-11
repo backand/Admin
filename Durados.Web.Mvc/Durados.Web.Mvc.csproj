@@ -367,12 +367,10 @@
     <Compile Include="Farm\FarmCaching.cs" />
     <Compile Include="UI\Helpers\CallStack\Action.cs" />
     <Compile Include="UI\Helpers\CallStack\ActionEvent.cs" />
-    <Compile Include="UI\Helpers\CallStack\ActionTree.cs" />
     <Compile Include="UI\Helpers\CallStack\CallStackConverter.cs" />
     <Compile Include="UI\Helpers\CallStack\Event.cs" />
     <Compile Include="UI\Helpers\CallStack\IAction.cs" />
     <Compile Include="UI\Helpers\CallStack\IActionEvent.cs" />
-    <Compile Include="UI\Helpers\CallStack\IActionTree.cs" />
     <Compile Include="UI\Helpers\Cloning\Cloner.cs" />
     <Compile Include="UI\Helpers\Cloning\CopyOptions.cs" />
     <Compile Include="UI\Helpers\CronAuthorizationWasNotSuppliedException.cs" />

@@ -2107,7 +2107,8 @@ namespace BackAnd.Web.Api.Controllers
 
             foreach (string key in responseHeaders.Keys)
             {
-                Response.Headers.Add(key, responseHeaders[key]);
+                if (!Response.Headers.Contains(key))
+                    Response.Headers.Add(key, responseHeaders[key]);
             }
         }
 

@@ -74,13 +74,13 @@ namespace BackAnd.Web.Api.Controllers
                 foreach (Dictionary<string, object> item in data)
                 {
                     var actionEventData = jss.Deserialize<Dictionary<string, object>>(item["FreeText"].ToString());
-                    IActionEvent actionEvent = new ActionEvent((int)actionEventData["time"], (Event)Enum.Parse(typeof(Event), actionEventData["event"].ToString(), true), actionEventData["objectName"].ToString(), actionEventData["actionName"].ToString(), actionEventData["data"]);
+                    IActionEvent actionEvent = new ActionEvent((int)actionEventData["time"], (Event)Enum.Parse(typeof(Event), actionEventData["event"].ToString(), true), actionEventData["objectName"].ToString(), actionEventData["actionName"].ToString(), actionEventData["id"].ToString(), actionEventData["data"]);
                     events.Add(actionEvent);
                 }
 
                 CallStackConverter callStackConverter = new CallStackConverter();
 
-                var result = callStackConverter.ChronologicalListToTree(events.OrderBy(e => e.Time));
+                var result = callStackConverter.ChronologicalListToTree(events.OrderBy(e => e.Time).ToList());
                 if (result == null)
                     return Ok(new { });
                 return Json(result, ViewHelpers.CamelCase);

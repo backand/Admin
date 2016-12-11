@@ -631,7 +631,9 @@ namespace Durados.Workflow
 
             TimeSpan timeoutInterval = new TimeSpan(0, 0, 0, 0, actionTimeMSec);
 
-            string startMessage = theJavaScriptSerializer.Serialize(new { objectName = view.JsonName, actionName = actionName, @event = "started", time = GetSequence(view), data = new { userInput = newRow, dbRow = oldRow, parameters = clientParameters, userProfile = userProfile } });
+            string actionId = Guid.NewGuid().ToString();
+
+            string startMessage = theJavaScriptSerializer.Serialize(new { objectName = view.JsonName, actionName = actionName, id = actionId, @event = "started", time = GetSequence(view), data = new { userInput = newRow, dbRow = oldRow, parameters = clientParameters, userProfile = userProfile } });
 
             Backand.Logger.Log(startMessage, 502);
 
@@ -651,7 +653,7 @@ namespace Durados.Workflow
             }
             catch (TimeoutException exception)
             {
-                Handle503(theJavaScriptSerializer, view.JsonName, actionName, exception.Message, view);
+                Handle503(theJavaScriptSerializer, view.JsonName, actionName, actionId, exception.Message, view);
                 string errorMessage = "Timeout: The operation took longer than " + actionTimeMSec + " milliseconds limit. at (" + view.JsonName + "/" + actionName + ")";
                 if (!IsSubAction())
                 {
@@ -668,7 +670,7 @@ namespace Durados.Workflow
             }
             catch (Exception exception)
             {
-                Handle503(theJavaScriptSerializer, view.JsonName, actionName, exception.Message, view);
+                Handle503(theJavaScriptSerializer, view.JsonName, actionName, actionId, exception.Message, view);
                 string errorMessage = "Syntax error: " + HandleLineCodes(exception.Message, view.JsonName, actionName);
                 if (!IsSubAction())
                 {
@@ -691,7 +693,7 @@ namespace Durados.Workflow
                 if (!r2.IsNull())
                     r = r2.ToObject();
 
-                string endMessage = theJavaScriptSerializer.Serialize(new { objectName = view.JsonName, actionName = actionName, @event = "ended", time = GetSequence(view), data = r });
+                string endMessage = theJavaScriptSerializer.Serialize(new { objectName = view.JsonName, actionName = actionName, id = actionId, @event = "ended", time = GetSequence(view), data = r });
 
                 Backand.Logger.Log(endMessage, 503);
 
@@ -699,7 +701,7 @@ namespace Durados.Workflow
             catch (TimeoutException exception)
             {
                 string message = "Timeout: The operation took longer than " + actionTimeMSec + " milliseconds limit. at (" + view.JsonName + "/" + actionName + ")";
-                Handle503(theJavaScriptSerializer, view.JsonName, actionName, message, view);
+                Handle503(theJavaScriptSerializer, view.JsonName, actionName, actionId, message, view);
                 if (!IsSubAction())
                 {
                     Backand.Logger.Log(message, 501);
@@ -717,7 +719,7 @@ namespace Durados.Workflow
             {
                 string message = (exception.InnerException == null) ? exception.Message : exception.InnerException.Message;
                 message = HandleLineCodes(message, view.JsonName, actionName);
-                Handle503(theJavaScriptSerializer, view.JsonName, actionName, message, view);
+                Handle503(theJavaScriptSerializer, view.JsonName, actionName, actionId, message, view);
                 if (!IsSubAction())
                 {
                     Backand.Logger.Log(message, 501);
@@ -791,9 +793,9 @@ namespace Durados.Workflow
             return System.Web.HttpContext.Current != null && System.Web.HttpContext.Current.Request.QueryString[Durados.Workflow.JavaScript.GuidKey] != null;
         }
 
-        private void Handle503(System.Web.Script.Serialization.JavaScriptSerializer theJavaScriptSerializer, string objectName, string actionName, string message, View view)
+        private void Handle503(System.Web.Script.Serialization.JavaScriptSerializer theJavaScriptSerializer, string objectName, string actionName, string actionId, string message, View view)
         {
-            string endMessage = theJavaScriptSerializer.Serialize(new { objectName = objectName, actionName = actionName, @event = "ended", time = GetSequence(view), data = new { error = message } });
+            string endMessage = theJavaScriptSerializer.Serialize(new { objectName = objectName, actionName = actionName, id = actionId, @event = "ended", time = GetSequence(view), data = new { error = message } });
 
             Backand.Logger.Log(endMessage, 503);
         }

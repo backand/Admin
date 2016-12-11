@@ -693,7 +693,8 @@ namespace BackAnd.Web.Api.Controllers
             if (System.Web.HttpContext.Current.Items.Contains(GuidKey))
             {
                 string actionHeaderGuidValue = System.Web.HttpContext.Current.Items[GuidKey].ToString();
-                response.Headers.Add(actionHeaderGuidName, actionHeaderGuidValue);
+                if (!response.Headers.Contains(actionHeaderGuidName))
+                    response.Headers.Add(actionHeaderGuidName, actionHeaderGuidValue);
             }
 
             return ResponseMessage(response);
