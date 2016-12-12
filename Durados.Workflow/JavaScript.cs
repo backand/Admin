@@ -299,12 +299,13 @@ namespace Durados.Workflow
 
         public static bool IsCrud(System.Net.WebRequest request)
         {
-            if (System.Web.HttpContext.Current == null || System.Web.HttpContext.Current.Request.Headers["Authorization"] == null || request.Headers["Authorization"] == null || (System.Web.HttpContext.Current.Request.Url.PathAndQuery.ToLower().Contains("1/user/signup")))
+            if (System.Web.HttpContext.Current == null || System.Web.HttpContext.Current.Request.Headers["Authorization"] == null || request.Headers["Authorization"] == null || (System.Web.HttpContext.Current.Request.Headers["Authorization"] != request.Headers["Authorization"]) || (System.Web.HttpContext.Current.Request.Url.PathAndQuery.ToLower().Contains("1/user/signup")))
                 return false;
-            HashSet<string> methods = new HashSet<string>() { "POST", "PUT", "DELETE" };
+            HashSet<string> methods = new HashSet<string>(StringComparer.OrdinalIgnoreCase) { "POST", "PUT", "DELETE" };
             string route = "/objects/";
+            string actionRoute = "/objects/action/";
 
-            return IsBackand(request) && request.RequestUri.AbsoluteUri.Contains(route) & methods.Contains(request.Method.ToUpper());
+            return IsBackand(request) && request.RequestUri.AbsoluteUri.Contains(route) && !request.RequestUri.AbsoluteUri.Contains(actionRoute) && methods.Contains(request.Method.ToUpper());
         }
 
         private static bool IsBackand(System.Net.WebRequest request)
