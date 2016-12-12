@@ -236,8 +236,16 @@ namespace Backand
                     asyncRequest.Method = request.Method;
                     asyncRequest.ContentType = request.ContentType;
                     foreach (var header in request.Headers.AllKeys)
-                        if (!(header.ToLower() == "content-type" || header.ToLower() == "accept"))
-                            asyncRequest.Headers.Add(header, request.Headers[header]);
+                    {
+                        if (!(header.ToLower() == "content-type" || header.ToLower() == "accept" || header.ToLower() == "host" || header.ToLower() == "content-length" || header.ToLower() == "expect" || header.ToLower() == "connection"))
+                        {
+                            try
+                            {
+                                asyncRequest.Headers.Add(header, request.Headers[header]);
+                            }
+                            catch { }
+                        }
+                    }
                     asyncRequest.BeginGetResponse(null, null);
                 
                 }).Start();
