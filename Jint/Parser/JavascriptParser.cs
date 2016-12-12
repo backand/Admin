@@ -59,14 +59,16 @@ namespace Jint.Parser
         private readonly Stack<IVariableScope> _variableScopes = new Stack<IVariableScope>();
         private readonly Stack<IFunctionScope> _functionScopes = new Stack<IFunctionScope>();
 
+        private Engine _engine;
 
-        public JavaScriptParser()
+        public JavaScriptParser(Engine engine = null)
         {
-            
+            _engine = engine;
         }
 
-        public JavaScriptParser(bool strict)
+        public JavaScriptParser(bool strict, Engine engine = null)
         {
+            _engine = engine;
             _strict = strict;
         }
 
@@ -1865,9 +1867,10 @@ namespace Jint.Parser
             ParserException exception;
             string msg = String.Format(messageFormat, arguments);
 
+            int adjustedLine = GetAdustedLine();
             if (token != null && token.LineNumber.HasValue)
             {
-                exception = new ParserException("Line " + token.LineNumber + ": " + msg)
+                exception = new ParserException("Line " + adjustedLine + ": " + msg)
                     {
                         Index = token.Range[0],
                         LineNumber = token.LineNumber.Value,
@@ -1877,7 +1880,7 @@ namespace Jint.Parser
             }
             else
             {
-                exception = new ParserException("Line " + _lineNumber + ": " + msg)
+                exception = new ParserException("Line " + adjustedLine + ": " + msg)
                     {
                         Index = _index,
                         LineNumber = _lineNumber,
@@ -1888,6 +1891,20 @@ namespace Jint.Parser
 
             exception.Description = msg;
             throw exception;
+        }
+
+        private int GetAdustedLine()
+        {
+            int adjustedLine = _lineNumber;
+            if (_engine != null)
+            {
+                int? startLine = _engine.Options.GetStartLine();
+                if (startLine.HasValue)
+                {
+                    adjustedLine = _lineNumber - startLine.Value;
+                }
+            }
+            return adjustedLine;
         }
 
         private void ThrowErrorTolerant(Token token, string messageFormat, params object[] arguments)

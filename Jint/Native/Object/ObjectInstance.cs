@@ -14,20 +14,20 @@ namespace Jint.Native.Object
             Properties = new Dictionary<string, PropertyDescriptor>();
         }
 
-        public Engine Engine { get; set; }
+        internal Engine Engine { get; set; }
 
-        public IDictionary<string, PropertyDescriptor> Properties { get; private set; }
+        internal IDictionary<string, PropertyDescriptor> Properties { get; private set; }
 
         /// <summary>
         /// The prototype of this object.
         /// </summary>
-        public ObjectInstance Prototype { get; set; }
+        internal ObjectInstance Prototype { get; set; }
         
         /// <summary>
         /// If true, own properties may be added to the 
         /// object.
         /// </summary>
-        public bool Extensible { get; set; }
+        internal bool Extensible { get; set; }
 
         /// <summary>
         /// A String value indicating a specification defined 

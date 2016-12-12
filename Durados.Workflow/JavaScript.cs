@@ -96,7 +96,7 @@ namespace Durados.Workflow
             return System.Convert.ToBoolean(Durados.Workflow.JavaScript.GetCacheInCurrentRequest(Durados.Workflow.JavaScript.Debug) ?? false);
         }
 
-        private string HandleLineCodes(string message, string objectName, string actionName)
+        public static string HandleLineCodes(string message, string objectName, string actionName)
         {
             //string[] segments = message.Split(new string[] { ":" }, StringSplitOptions.None);
             
@@ -125,7 +125,7 @@ namespace Durados.Workflow
             //    }
             //}
 
-            message = message.Replace("<<", "{").Replace(">>", "}").Replace("\\\"", "\"");
+            message = message.Replace(Jint.Engine.EscapeCurlyBrackets.Left, "{").Replace(Jint.Engine.EscapeCurlyBrackets.Right, "}").Replace("\\\"", "\"");
 
             try
             {
@@ -139,7 +139,7 @@ namespace Durados.Workflow
             // "The follwoing action: "aaa" failed to perform: Failed to load the javascript code: Line 166: Unexpected token }"
         }
 
-        private string CleanMessage(IDictionary<string, object> json)
+        private static string CleanMessage(IDictionary<string, object> json)
         {
             const string at = "at";
             StringBuilder sb = new StringBuilder();
@@ -189,7 +189,7 @@ namespace Durados.Workflow
             return sb.ToString().TrimStart("CriticalError:".ToCharArray());
         }
 
-        private string GetLocation(IDictionary<string, object> dictionary)
+        private static string GetLocation(IDictionary<string, object> dictionary)
         {
             StringBuilder sb = new StringBuilder();
             sb.Append("\n\tat ");
@@ -222,7 +222,7 @@ namespace Durados.Workflow
             return sb.ToString();
         }
 
-        private string GetMessage(string key, object value)
+        private static string GetMessage(string key, object value)
         {
             if (key == "417")
                 key = "CriticalError";
@@ -232,7 +232,7 @@ namespace Durados.Workflow
             return value + ":" + jss.Serialize(value);
         }
 
-        private IDictionary<string, object> CleanJson(string message)
+        private static IDictionary<string, object> CleanJson(string message)
         {
 
             var theJavaScriptSerializer = new System.Web.Script.Serialization.JavaScriptSerializer();
@@ -693,7 +693,33 @@ namespace Durados.Workflow
                 if (!r2.IsNull())
                     r = r2.ToObject();
 
-                string endMessage = theJavaScriptSerializer.Serialize(new { objectName = view.JsonName, actionName = actionName, id = actionId, @event = "ended", time = GetSequence(view), data = r });
+                string endMessage = null;
+                try
+                {
+                    endMessage = theJavaScriptSerializer.Serialize(new { objectName = view.JsonName, actionName = actionName, id = actionId, @event = "ended", time = GetSequence(view), data = r });
+                }
+                catch (Exception exception)
+                {
+                    endMessage = "Failed to serialize response";
+                    if (!IsSubAction())
+                    {
+                        Backand.Logger.Log(endMessage, 501);
+                        //if (IsDebug())
+                        //{
+                        //    values[ReturnedValueKey] = message;
+                        //    return;
+                        //}
+                        //else
+                        if (IsDebug())
+                            throw new MainActionInDebugJavaScriptException(endMessage, exception);
+                        else
+                            throw new MainActionJavaScriptException(endMessage, exception);
+                    }
+                    else
+                    {
+                        throw new SubActionJavaScriptException(endMessage, exception);
+                    }
+                }
 
                 Backand.Logger.Log(endMessage, 503);
 

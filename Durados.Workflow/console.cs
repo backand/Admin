@@ -100,7 +100,14 @@ namespace Backand
             {
                 try
                 {
-                    messageString = Newtonsoft.Json.JsonConvert.SerializeObject(message);
+                    if (message is IDictionary<string, object> && ((IDictionary<string, object>)message).Count == 1 && (((IDictionary<string, object>)message)).Values.First() is Jint.Native.Error.ErrorInstance)
+                    {
+                        messageString = (((IDictionary<string, object>)message)).Values.First().ToString();
+                    }
+                    else
+                    {
+                        messageString = Newtonsoft.Json.JsonConvert.SerializeObject(message);
+                    }
                 }
                 catch
                 {

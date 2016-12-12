@@ -259,13 +259,13 @@ namespace Jint
 
         public Engine Execute(string source, DebugInfo debugInfo = null)
         {
-            var parser = new JavaScriptParser();
+            var parser = new JavaScriptParser(this);
             return Execute(parser.Parse(source), debugInfo);
         }
 
         public Engine Execute(string source, ParserOptions parserOptions, DebugInfo debugInfo = null)
         {
-            var parser = new JavaScriptParser();
+            var parser = new JavaScriptParser(this);
             return Execute(parser.Parse(source, parserOptions), debugInfo);
         }
 
@@ -892,6 +892,12 @@ namespace Jint
             }
         }
 
+        public class EscapeCurlyBrackets
+        {
+            public static readonly string Right = "}";//">>\"";
+            public static readonly string Left = "{";//"\"<<";
+        }
+
         internal string GetMessage(SyntaxNode syntaxNode, string message)
         {
             if (message == "")
@@ -941,7 +947,7 @@ namespace Jint
             {
 
             }
-            return "<<" + message + ">>";
+            return EscapeCurlyBrackets.Left + message + EscapeCurlyBrackets.Right;
         }
     }
 }
