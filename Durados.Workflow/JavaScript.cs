@@ -299,7 +299,7 @@ namespace Durados.Workflow
 
         public static bool IsCrud(System.Net.WebRequest request)
         {
-            if (System.Web.HttpContext.Current == null || System.Web.HttpContext.Current.Request.Headers["Authorization"] == null || request.Headers["Authorization"] == null || (System.Web.HttpContext.Current.Request.Headers["Authorization"] != request.Headers["Authorization"]) || (System.Web.HttpContext.Current.Request.Url.PathAndQuery.ToLower().Contains("1/user/signup")))
+            if (System.Web.HttpContext.Current == null || System.Web.HttpContext.Current.Request.Headers["Authorization"] == null || (System.Web.HttpContext.Current.Request.Url.PathAndQuery.ToLower().Contains("1/user/signup")))
                 return false;
             HashSet<string> methods = new HashSet<string>(StringComparer.OrdinalIgnoreCase) { "POST", "PUT", "DELETE" };
             string route = "/objects/";
@@ -385,6 +385,10 @@ namespace Durados.Workflow
             if (IsEndlessLoop(request, json))
             {
                 throw new JavaScriptException(string.Format("The request '{0}' is repeating calling itself. Please change the action {1}", request.RequestUri.AbsoluteUri, actionName), new StackOverflowException());
+            }
+            if (controller.DataHandler == null)
+            {
+                throw new DuradosException("Not performing CRUD");
             }
             return controller.DataHandler.PerformCrud(request, json, executeArgs);
         }
