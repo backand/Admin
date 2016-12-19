@@ -75,9 +75,9 @@ namespace Jint.Native.Error
                 return "";
             }
             name = "\"" + name + "\"";
-            if (!(msg.StartsWith("\"") || msg.StartsWith("{") || msg.StartsWith(Engine.EscapeCurlyBrackets.Left)))
+            if (!(msg.StartsWith("\"") || msg.StartsWith("{") || msg.StartsWith("[") || msg.StartsWith(Engine.EscapeCurlyBrackets.Left)))
             {
-                msg = "\"" + msg + "\"";
+                msg = "\"" + msg.Replace("\"", "") + "\"";
             }
             return name + ": " + msg;
         }

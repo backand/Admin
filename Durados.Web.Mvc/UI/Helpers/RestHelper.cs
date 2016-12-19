@@ -4717,6 +4717,10 @@ namespace Durados.Web.Mvc.UI.Helpers
                     {
                         userValidationError = UserValidationError.LockedOut;
                     }
+                    else if (!accountMembershipService.IsApproved(username))
+                    {
+                        userValidationError = UserValidationError.NotApproved;
+                    }
                     else
                     {
                         userValidationError = UserValidationError.IncorrectUsernameOrPassword;

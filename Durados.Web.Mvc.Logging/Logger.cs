@@ -525,7 +525,10 @@ namespace Durados.Web.Mvc.Logging
             
             try
             {
-                guid = GetRequestGuid();
+                if (!((logType == 502 || logType == 503) && guid != null))
+                {
+                    guid = GetRequestGuid();
+                }
             }
             catch { }
             try

@@ -68,6 +68,11 @@ namespace Backand
                 if (requestGuid != null)
                 {
                     url += "&" + Durados.Workflow.JavaScript.GuidKey + "=" + requestGuid;
+                    if (Durados.Workflow.JavaScript.IsDebug() && !url.Contains("$$debug$$"))
+                    {
+                        url += "&$$debug$$=true";
+                   
+                    }
                 }
             }
             request = WebRequest.Create(url);

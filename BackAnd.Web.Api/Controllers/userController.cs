@@ -255,7 +255,7 @@ namespace BackAnd.Web.Api.Controllers
                 string confirmPassword = values["confirmPassword"].ToString();
 
                 if (!password.Equals(confirmPassword))
-                    return ResponseMessage(Request.CreateResponse(HttpStatusCode.NotAcceptable, "The password is is not confirmed"));
+                    return ResponseMessage(Request.CreateResponse(HttpStatusCode.NotAcceptable, "The password is not confirmed"));
 
 
                 Dictionary<string, object> parameters = null;

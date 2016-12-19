@@ -169,7 +169,7 @@ namespace Backand
 
         private static bool IsDebug()
         {
-            return System.Convert.ToBoolean(Durados.Workflow.JavaScript.GetCacheInCurrentRequest(Durados.Workflow.JavaScript.Debug) ?? false);
+            return System.Convert.ToBoolean(Durados.Workflow.JavaScript.GetCacheInCurrentRequest(Durados.Workflow.JavaScript.Debug) ?? false) || System.Web.HttpContext.Current.Request.QueryString["$$debug$$"] != null;
         }
 
         private static void CheckLimit()

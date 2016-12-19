@@ -320,6 +320,10 @@ namespace Durados.Workflow
         {
             //, { "parameters", parameters }, { "view", view }, { "values", values }, { "prevRow", prevRow }, { "pk", pk }
             Dictionary<string, object> executeArgs = (Dictionary<string, object>)GetCacheInCurrentRequest("js" + GetCacheInCurrentRequest(GuidKey));
+            if (executeArgs == null)
+            {
+                throw new DuradosException("Not performing CRUD");
+            }
             if (executeArgs.ContainsKey("view"))
                 executeArgs["view"] = GetViewName(request);
             else
@@ -458,6 +462,10 @@ namespace Durados.Workflow
             }
 
             var guid = Guid.NewGuid();
+            //if (System.Web.HttpContext.Current != null && System.Web.HttpContext.Current.Request.QueryString[GuidKey] != null)
+            //{
+            //    guid = new Guid(System.Web.HttpContext.Current.Request.QueryString[GuidKey]);
+            //}
             SetCacheInCurrentRequest("js" + guid, new Dictionary<string, object>() { { "controller", controller }, { "connectionString", connectionString }, { "currentUsetId", currentUsetId }, { "currentUserRole", currentUserRole }, { "command", command }, { "sysCommand", sysCommand }, { "actionName", actionName }, { "dataAction", dataAction } });
             
 
@@ -568,9 +576,9 @@ namespace Durados.Workflow
                 userProfile.Add("request", GetRequest());
             }
 
-            
-            
-            var CONSTS = new Dictionary<string, object>() { { "apiUrl", System.Web.HttpContext.Current.Request.Url.Scheme + "://" + System.Web.HttpContext.Current.Request.Url.Host + ":" + System.Web.HttpContext.Current.Request.Url.Port + System.Web.HttpContext.Current.Request.ApplicationPath } };
+
+
+            var CONSTS = new Dictionary<string, object>() { { "apiUrl", System.Web.HttpContext.Current.Request.Url.Scheme + "://" + System.Web.HttpContext.Current.Request.Url.Host + ":" + System.Web.HttpContext.Current.Request.Url.Port + System.Web.HttpContext.Current.Request.ApplicationPath }, { "actionGuid", System.Web.HttpContext.Current.Request.QueryString[GuidKey] ?? (System.Web.HttpContext.Current.Items[GuidKey] ?? guid.ToString()) } };
 
             //Newtonsoft.Json.JsonConvert.SerializeObject
             

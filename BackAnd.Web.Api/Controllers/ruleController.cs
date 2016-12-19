@@ -213,6 +213,12 @@ namespace BackAnd.Web.Api.Controllers
                          response.Headers.Add(actionHeaderGuidName, actionHeaderGuidValue);
                  }
 
+                 if (exception.InnerException != null && exception.InnerException is TimeoutException)
+                 {
+                     map.Logger.Log(GetControllerNameForLog(ControllerContext), Request.Method.Method, exception.Source, exception, 1, null);
+
+                 }
+
                  return response;
              }
              catch (Exception exception)
