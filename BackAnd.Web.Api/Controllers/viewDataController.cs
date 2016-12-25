@@ -665,25 +665,33 @@ namespace BackAnd.Web.Api.Controllers
             catch (Exception exception)
             {
 
-                //if (System.Web.HttpContext.Current.Items.Contains(GuidKey))
-                //{
-                //    string actionHeaderGuidValue = System.Web.HttpContext.Current.Items[GuidKey].ToString();
-                //    this.ActionContext.Response.Headers.Add(actionHeaderGuidName, actionHeaderGuidValue);
-                //}
-
-                //if (values[0].ContainsKey(Durados.Workflow.JavaScript.ReturnedValueKey))
-                //{
-                //    var returnedValue = values[0][Durados.Workflow.JavaScript.ReturnedValueKey];
-                //    return Ok(returnedValue);
-                //}
-                //else
-                //{
-                    throw new BackAndApiUnexpectedResponseException(exception, this);
-                //}
-
+                Dictionary<string, string> responseHeaders = GetJintTraceHeader(exception);
+                exception = GetExceptionFromAction(exception);
+                throw new BackAndApiUnexpectedResponseException(exception, this, responseHeaders);
                 
                 
             }
+        }
+
+        private Exception GetExceptionFromAction(Exception exception)
+        {
+            if (exception is Durados.Workflow.IMainActionJavaScriptException)
+            {
+                exception = new Durados.DuradosException(((Durados.Workflow.IMainActionJavaScriptException)exception).JintTrace);
+            }
+            return exception;
+        }
+
+        private static Dictionary<string, string> GetJintTraceHeader(Exception exception)
+        {
+            Dictionary<string, string> responseHeaders = null;
+            if (exception is Durados.Workflow.IMainActionJavaScriptException)
+            {
+                responseHeaders = new Dictionary<string, string>();
+                responseHeaders.Add(actionHeaderStack, ((Durados.Workflow.IMainActionJavaScriptException)exception).JintTrace);
+
+            }
+            return responseHeaders;
         }
 
         private IHttpActionResult DoNotLogExceptionHandler(Durados.Workflow.DoNotLogException exception)
@@ -892,7 +900,8 @@ namespace BackAnd.Web.Api.Controllers
             }
             catch (Exception exception)
             {
-                throw new BackAndApiUnexpectedResponseException(exception, this);
+                Dictionary<string, string> responseHeaders = GetJintTraceHeader(exception);
+                throw new BackAndApiUnexpectedResponseException(exception, this, responseHeaders);
                 
             }
         }
@@ -962,7 +971,8 @@ namespace BackAnd.Web.Api.Controllers
             
             catch (Exception exception)
             {
-                throw new BackAndApiUnexpectedResponseException(exception, this);
+                Dictionary<string, string> responseHeaders = GetJintTraceHeader(exception);
+                throw new BackAndApiUnexpectedResponseException(exception, this, responseHeaders);
                 
 
             }

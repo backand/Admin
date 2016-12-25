@@ -64,20 +64,24 @@ namespace Backand
                         url += "?parameters=%7B%22$$debug$$%22:true%7D";
                     }
                 }
-                object requestGuid = Durados.Workflow.JavaScript.GetCacheInCurrentRequest(Durados.Workflow.JavaScript.GuidKey);
-                if (requestGuid != null)
+                if (Durados.Workflow.JavaScript.IsDebug() && !url.Contains("$$debug$$"))
                 {
-                    url += "&" + Durados.Workflow.JavaScript.GuidKey + "=" + requestGuid;
-                    if (Durados.Workflow.JavaScript.IsDebug() && !url.Contains("$$debug$$"))
-                    {
-                        url += "&$$debug$$=true";
+                    url += "&$$debug$$=true";
                    
-                    }
                 }
+                
+
             }
+
+            
             request = WebRequest.Create(url);
             request.Method = type;
-            
+
+            object requestGuid = Durados.Workflow.JavaScript.GetCacheInCurrentRequest(Durados.Workflow.JavaScript.GuidKey);
+            if (requestGuid != null)
+            {
+                setRequestHeader(Durados.Workflow.JavaScript.ActionHeaderKey, requestGuid.ToString());
+            }
         }
 
         //public void basicAuth(string username, string password)
@@ -254,6 +258,7 @@ namespace Backand
                     asyncRequest.BeginGetResponse(null, null);
                 
                 }).Start();
+                responseText = string.Empty;
                 return;
             }
 

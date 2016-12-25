@@ -120,7 +120,7 @@ namespace Jint
 
             Options = new Options();
 
-            if (timeoutInterval.HasValue)
+            if (timeoutInterval.HasValue && timeoutInterval.Value.TotalMilliseconds > 0)
             {
                 Options.TimeoutInterval(timeoutInterval.Value);
             }
@@ -898,21 +898,29 @@ namespace Jint
             public static readonly string Left = "{";//"\"<<";
         }
 
-        internal string GetMessage(SyntaxNode syntaxNode, string message)
+        internal string GetTrace(SyntaxNode syntaxNode, string trace)
         {
+            string message = trace;
+
             if (message == "")
                 return "";
             //if (lastStatement.Type == SyntaxNodes.ReturnStatement)
             //    return message;
 
-            if (!message.StartsWith("\"") && message.Contains(":"))
+            //if (!message.StartsWith("\"") && message.Contains(":"))
+            //{
+            //    string[] messageParts = message.Split(":".ToCharArray(), StringSplitOptions.RemoveEmptyEntries);
+            //    if (messageParts.Length == 2)
+            //    {
+            //        message = "\"" + messageParts[0] + "\"" + ":" + "\"" + messageParts[1] + "\"";
+            //    }
+            //}
+
+            if (!message.StartsWith("\"") && !message.Contains(":"))
             {
-                string[] messageParts = message.Split(":".ToCharArray(), StringSplitOptions.RemoveEmptyEntries);
-                if (messageParts.Length == 2)
-                {
-                    message = "\"" + messageParts[0] + "\"" + ":" + "\"" + messageParts[1] + "\"";
-                }
+                message = "\"error\"" + ":" + "\"" + message + "\"";
             }
+            
 
             int line = syntaxNode.Location.Start.Line;
             int column = syntaxNode.Location.Start.Column;

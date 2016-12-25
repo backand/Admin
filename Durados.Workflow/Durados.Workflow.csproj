@@ -117,6 +117,7 @@
     <Compile Include="console.cs" />
     <Compile Include="Cookie.cs" />
     <Compile Include="DoNotLogException.cs" />
+    <Compile Include="IMainActionJavaScriptException.cs" />
     <Compile Include="JsActionArguments.cs" />
     <Compile Include="MainActionInDebugJavaScriptException.cs" />
     <Compile Include="MainActionJavaScriptException.cs" />

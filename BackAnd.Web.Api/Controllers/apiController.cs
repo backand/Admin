@@ -335,7 +335,8 @@ namespace BackAnd.Web.Api.Controllers
         public Durados.Database Database { get; private set; }
         protected Durados.Web.Mvc.Workflow.Engine wfe = null;
         public const string GuidKey = "JsGuid";
-        public const string actionHeaderGuidName = "Action-Guid";
+        public const string actionHeaderGuidName = "Backand-Action-Guid";
+        public const string actionHeaderStack = "Backand-Action-Stack";
 
         public apiController()
             : base()

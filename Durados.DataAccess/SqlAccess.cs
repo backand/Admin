@@ -5438,8 +5438,9 @@ namespace Durados.DataAccess
 
             string tableName = view.DataTable.TableName;
 
-            string sql = "select * from " + sqlTextBuilder.EscapeDbObject("{0}") + " where {1}";
-            sql = string.Format(sql, tableName, GetWhereStatement(view, tableName));
+            //string sql = "select * from " + sqlTextBuilder.EscapeDbObject("{0}") + " where {1}";
+            //sql = string.Format(sql, tableName, GetWhereStatement(view, tableName));
+            string sql = GetSelectStatement(view, 1, 1, GetFilter(view, pk.Split(','), false), null, SortDirection.Asc).Replace("@id ","@pk_id ");
 
             command.CommandText = sql;
 

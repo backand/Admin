@@ -37,6 +37,22 @@ namespace Jint.Runtime
                 return string.Empty;            
         }
 
+        public string GetTrace()
+        {
+            if (_errorObject.IsObject())
+            {
+                var oi = _errorObject.AsObject();
+                if (oi.Properties.ContainsKey("trace"))
+                {
+                    var message = oi.Get("trace").AsString();
+                    return message;
+                }
+                return string.Empty;
+            }
+            else
+                return string.Empty;
+        }
+
         public JsValue Error { get { return _errorObject; } }
 
         public override string ToString()

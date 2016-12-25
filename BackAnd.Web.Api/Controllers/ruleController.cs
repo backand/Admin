@@ -231,6 +231,11 @@ namespace BackAnd.Web.Api.Controllers
                          responseHeaders = new Dictionary<string, string>();
                          string actionHeaderGuidValue = System.Web.HttpContext.Current.Items[GuidKey].ToString();
                          responseHeaders.Add(actionHeaderGuidName, actionHeaderGuidValue);
+                         if (exception is Durados.Workflow.IMainActionJavaScriptException)
+                         {
+                             responseHeaders.Add(actionHeaderStack, ((Durados.Workflow.IMainActionJavaScriptException)exception).JintTrace);
+                         
+                         }
                      }
                  }
                  catch { }

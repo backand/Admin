@@ -50,6 +50,19 @@ namespace Jint.Native.Error
             {
                 instance.Put("message", TypeConverter.ToString(arguments.At(0)), false);
             }
+            try
+            {
+                if (arguments.At(1) != Undefined.Instance)
+                {
+                    instance.Put("trace", TypeConverter.ToString(arguments.At(1)), false);
+                }
+                else
+                {
+                    instance.Put("trace", TypeConverter.ToString(arguments.At(0)), false);
+                }
+            }
+            catch { }
+
 
             return instance;
         }

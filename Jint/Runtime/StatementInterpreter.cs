@@ -429,14 +429,22 @@ namespace Jint.Runtime
             }
             catch(JavaScriptException v)
             {
-                string newMessage = GetMessage(lastStatement, v);
-                return new Completion(Completion.Throw, _engine.Error.Construct(new JsValue[] { newMessage }), null);
+                string trace ;
+                if (lastStatement.Type != SyntaxNodes.ReturnStatement)
+                {
+                    trace = GetTrace(lastStatement, v);
+                }
+                else
+                {
+                    trace = v.GetTrace();
+                }
+                return new Completion(Completion.Throw, _engine.Error.Construct(new JsValue[] { v.Error, trace }), null);
                 //return new Completion(Completion.Throw, v.Error, null);
             }
             catch (Exception e)
             {
-                string newMessage = _engine.GetMessage(lastStatement, "\"Error\":\" " + e.Message + "\"");
-                throw new JavaScriptException(_engine.Error.Construct(new JsValue[] { newMessage }));
+                string trace = _engine.GetTrace(lastStatement, e.Message);
+                throw new JavaScriptException(_engine.Error.Construct(new JsValue[] { e.Message, trace }));
                 
             }
 
@@ -446,13 +454,13 @@ namespace Jint.Runtime
         
             
 
-        private string GetMessage(Statement lastStatement, JavaScriptException v)
+        private string GetTrace(Statement lastStatement, JavaScriptException v)
         {
-            string message = v.Error.ToString();
+            string trace = v.GetTrace();
 
-            message = _engine.GetMessage(lastStatement, message);
+            trace = _engine.GetTrace(lastStatement, trace);
 
-            return message;
+            return trace;
         }
 
         
@@ -465,6 +473,13 @@ namespace Jint.Runtime
         public Completion ExecuteThrowStatement(ThrowStatement throwStatement)
         {
             var exprRef = _engine.EvaluateExpression(throwStatement.Argument);
+
+            //JsValue jsValue = _engine.GetValue(exprRef);
+
+            //string trace = _engine.GetTrace(throwStatement, jsValue.ToString());
+
+            //return new Completion(Completion.Throw, _engine.Error.Construct(new JsValue[] { jsValue, trace }), null);
+
             return new Completion(Completion.Throw, _engine.GetValue(exprRef), null);
         }
 

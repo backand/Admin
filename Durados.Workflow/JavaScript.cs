@@ -20,6 +20,8 @@ namespace Durados.Workflow
         public static readonly string ReturnedValueKey = "$$ReturnedValueKey$$";
         const string FILEDATA = "filedata";
         public static readonly string ActionInfo = "ActionInfo";
+        public static readonly string ActionHeaderKey = "Backand-Action-Guid";
+        
         #endregion
 
         private static string xhr = null;
@@ -66,9 +68,9 @@ namespace Durados.Workflow
                 
         public static void SetCacheInCurrentRequest(string key, object value)
         {
-            if (key == Durados.Workflow.JavaScript.GuidKey && System.Web.HttpContext.Current.Request.QueryString[Durados.Workflow.JavaScript.GuidKey] != null)
+            if (key == Durados.Workflow.JavaScript.GuidKey && System.Web.HttpContext.Current.Request.Headers[Durados.Workflow.JavaScript.ActionHeaderKey] != null)
             {
-                value = Guid.Parse(System.Web.HttpContext.Current.Request.QueryString[Durados.Workflow.JavaScript.GuidKey]);
+                value = Guid.Parse(System.Web.HttpContext.Current.Request.Headers[Durados.Workflow.JavaScript.ActionHeaderKey]);
             }
             if (key == Durados.Workflow.JavaScript.GuidKey && System.Web.HttpContext.Current.Items.Contains(key))
                 return;
@@ -96,47 +98,65 @@ namespace Durados.Workflow
             return System.Convert.ToBoolean(Durados.Workflow.JavaScript.GetCacheInCurrentRequest(Durados.Workflow.JavaScript.Debug) ?? false);
         }
 
-        public static string HandleLineCodes(string message, string objectName, string actionName)
+        public static string HandleLineCodes(string message, string objectName, string actionName, View view, bool debug)
         {
-            //string[] segments = message.Split(new string[] { ":" }, StringSplitOptions.None);
             
-            //foreach(string segment in segments)
-            //{
-            //    if (segment.Contains("Line"))
-            //    {
-            //        string[] subsegments = segment.Split(new string[] { " " }, StringSplitOptions.None);
-            //        foreach (string subsegment in subsegments)
-            //        {
-            //            int number = -1;
-            //            if (int.TryParse(subsegment, out number))
-            //            {
-            //                int adjustedNumber = number - 160;
-            //                message = message.Replace("Line " + number.ToString() + ": ", "");
-
-            //                if (adjustedNumber >= 0)
-            //                {
-            //                    message += " at (" + objectName + "/" + actionName + ":" + adjustedNumber + ")";
-            //                }
-
-            //                //message = message.Replace("417: ", "").Replace("408: ", "");
-            //                return message;
-            //            }
-            //        }
-            //    }
-            //}
 
             message = message.Replace(Jint.Engine.EscapeCurlyBrackets.Left, "{").Replace(Jint.Engine.EscapeCurlyBrackets.Right, "}").Replace("\\\"", "\"");
-
+            Guid requestGuid = (Guid)Durados.Workflow.JavaScript.GetCacheInCurrentRequest(Durados.Workflow.JavaScript.GuidKey);
+            string actionGuid = requestGuid.ToString();
+            
             try
             {
                 var json = CleanJson(message);
 
+                string previousTrace = null;
+                if (debug || true)
+                {
+                    previousTrace = GetPreviousTrace(view, actionGuid);
+
+                    if (!string.IsNullOrEmpty(previousTrace))
+                    {
+                        json = MergeTrace(json, previousTrace);
+                    }
+
+                    SetCurrentTrace(view, json, actionGuid);
+                }
+
                 message = CleanMessage(json);
             }
             catch { }
+
+            
+
             return message;
 
             // "The follwoing action: "aaa" failed to perform: Failed to load the javascript code: Line 166: Unexpected token }"
+        }
+
+        private static void SetCurrentTrace(View view, IDictionary<string, object> json, string actionGuid)
+        {
+            const int TenMinutes = 1000 * 60 * 10;
+
+            view.Database.SetCacheValue(actionGuid, jss.Serialize(json), TenMinutes);
+        }
+
+        private static IDictionary<string, object> MergeTrace(IDictionary<string, object> json, string previousTrace)
+        {
+            var previousTraceJson = jss.Deserialize<Dictionary<string,object>>(previousTrace);
+            if (previousTraceJson.Keys.Count == 2)
+            {
+                string key = previousTraceJson.Keys.Where(k => k != "at").FirstOrDefault();
+                previousTraceJson[key] = json;
+                return previousTraceJson;
+            }
+            return json;
+        }
+
+        private static string GetPreviousTrace(View view, string actionGuid)
+        {
+            string value = view.Database.GetCacheValue(actionGuid);
+            return value;
         }
 
         private static string CleanMessage(IDictionary<string, object> json)
@@ -145,6 +165,7 @@ namespace Durados.Workflow
             StringBuilder sb = new StringBuilder();
 
             IDictionary<string, object> child = json;
+            IDictionary<string, object> grandChild = null;
             
             bool eoj = false;
             while (!eoj)
@@ -166,7 +187,7 @@ namespace Durados.Workflow
                     }
                     else if (value is IDictionary<string, object>)
                     {
-                        child = (IDictionary<string, object>)value;
+                        grandChild = (IDictionary<string, object>)value;
                         nodeHasChildren = true;
                         key2 = key;
                         message2 = value;
@@ -176,6 +197,10 @@ namespace Durados.Workflow
                         key2 = key;
                         message2 = value;
                     }
+                }
+                if (nodeHasChildren)
+                {
+                    child = grandChild;
                 }
                 if (!nodeHasLocation || !nodeHasChildren)
                 {
@@ -451,7 +476,7 @@ namespace Durados.Workflow
 
         public virtual void Execute(object controller, Dictionary<string, Parameter> parameters, View view, Dictionary<string, object> values, DataRow prevRow, string pk, string connectionString, int currentUsetId, string currentUserRole, IDbCommand command, IDbCommand sysCommand, string actionName, Durados.TriggerDataAction dataAction)
         {
-            if (pk != null && (prevRow == null || dataAction == TriggerDataAction.AfterCreate || dataAction == TriggerDataAction.AfterEdit) && controller is Durados.Data.IData)
+            if (pk != null && (prevRow == null || dataAction == TriggerDataAction.AfterCreate || dataAction == TriggerDataAction.AfterEdit || dataAction == TriggerDataAction.AfterCreateBeforeCommit || dataAction == TriggerDataAction.AfterEditBeforeCommit) && controller is Durados.Data.IData)
             {
                 try
                 {
@@ -684,7 +709,7 @@ namespace Durados.Workflow
             catch (Exception exception)
             {
                 Handle503(theJavaScriptSerializer, view.JsonName, actionName, actionId, exception.Message, view);
-                string errorMessage = "Syntax error: " + HandleLineCodes(exception.Message, view.JsonName, actionName);
+                string errorMessage = "Syntax error: " + HandleLineCodes(exception.Message, view.JsonName, actionName, view, IsDebug());
                 if (!IsSubAction())
                 {
                     Backand.Logger.Log(exception.Message, 501);
@@ -713,24 +738,33 @@ namespace Durados.Workflow
                 }
                 catch (Exception exception)
                 {
-                    endMessage = "Failed to serialize response";
-                    if (!IsSubAction())
+                    if (exception.Message.StartsWith("A circular reference was detected while serializing an object"))
                     {
-                        Backand.Logger.Log(endMessage, 501);
-                        //if (IsDebug())
-                        //{
-                        //    values[ReturnedValueKey] = message;
-                        //    return;
-                        //}
-                        //else
-                        if (IsDebug())
-                            throw new MainActionInDebugJavaScriptException(endMessage, exception);
-                        else
-                            throw new MainActionJavaScriptException(endMessage, exception);
+                        object oNull = null;
+                        endMessage = theJavaScriptSerializer.Serialize(new { objectName = view.JsonName, actionName = actionName, id = actionId, @event = "ended", time = GetSequence(view), data = oNull });
+
                     }
                     else
                     {
-                        throw new SubActionJavaScriptException(endMessage, exception);
+                        endMessage = "Failed to serialize response";
+                        if (!IsSubAction())
+                        {
+                            Backand.Logger.Log(endMessage, 501);
+                            //if (IsDebug())
+                            //{
+                            //    values[ReturnedValueKey] = message;
+                            //    return;
+                            //}
+                            //else
+                            if (IsDebug())
+                                throw new MainActionInDebugJavaScriptException(endMessage, exception);
+                            else
+                                throw new MainActionJavaScriptException(endMessage, exception);
+                        }
+                        else
+                        {
+                            throw new SubActionJavaScriptException(endMessage, exception);
+                        }
                     }
                 }
 
@@ -757,21 +791,24 @@ namespace Durados.Workflow
             catch (Exception exception)
             {
                 string message = (exception.InnerException == null) ? exception.Message : exception.InnerException.Message;
-                message = HandleLineCodes(message, view.JsonName, actionName);
-                Handle503(theJavaScriptSerializer, view.JsonName, actionName, actionId, message, view);
+                string trace = message;
+                if (exception is Jint.Runtime.JavaScriptException)
+                {
+                    trace = ((Jint.Runtime.JavaScriptException)exception).GetTrace();
+                }
+                trace = HandleLineCodes(trace, view.JsonName, actionName, view, IsDebug());
+                Handle503(theJavaScriptSerializer, view.JsonName, actionName, actionId, trace, view);
                 if (!IsSubAction())
                 {
-                    Backand.Logger.Log(message, 501);
-                    //if (IsDebug())
-                    //{
-                    //    values[ReturnedValueKey] = message;
-                    //    return;
-                    //}
-                    //else
+                    IMainActionJavaScriptException mainActionJavaScriptException;
+                    Backand.Logger.Log(trace, 501);
                     if (IsDebug())
-                        throw new MainActionInDebugJavaScriptException(message, exception);
+                        mainActionJavaScriptException = new MainActionInDebugJavaScriptException(message, exception);
                     else
-                        throw new MainActionJavaScriptException(message, exception);
+                        mainActionJavaScriptException = new MainActionJavaScriptException(message, exception);
+
+                    mainActionJavaScriptException.JintTrace = trace;
+                    throw (Exception)mainActionJavaScriptException;
                 }
                 else
                 {
@@ -829,7 +866,7 @@ namespace Durados.Workflow
 
         private bool IsSubAction()
         {
-            return System.Web.HttpContext.Current != null && System.Web.HttpContext.Current.Request.QueryString[Durados.Workflow.JavaScript.GuidKey] != null;
+            return System.Web.HttpContext.Current != null && System.Web.HttpContext.Current.Request.Headers[Durados.Workflow.JavaScript.ActionHeaderKey] != null;
         }
 
         private void Handle503(System.Web.Script.Serialization.JavaScriptSerializer theJavaScriptSerializer, string objectName, string actionName, string actionId, string message, View view)
