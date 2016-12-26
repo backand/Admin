@@ -2117,6 +2117,7 @@ namespace BackAnd.Web.Api.Controllers
         {
             try
             {
+                exception = AddJintTraceToException(exception);
                 Map map = apiController.Map;
 
                 string exceptionSource = exception == null ? null : exception.Source;
@@ -2136,6 +2137,15 @@ namespace BackAnd.Web.Api.Controllers
             {
 
             }
+        }
+
+        private Exception AddJintTraceToException(Exception exception)
+        {
+            if (exception is Durados.Workflow.IMainActionJavaScriptException)
+            {
+                exception = new Exception(((Durados.Workflow.IMainActionJavaScriptException)exception).JintTrace);
+            }
+            return exception;
         }
 
         protected virtual void SendError(int logType, Exception exception, string controller, string action, Durados.Web.Mvc.Logging.Logger logger, Map map, apiController apiController)
