@@ -6039,6 +6039,8 @@ namespace Durados.DataAccess
                                             try
                                             {
                                                 first = removeWrapper(first, "\"", "\"");
+                                                if (eq == "not like")
+                                                    first = first.TrimStart("not ".ToCharArray());
 
                                                 parameterValue = Field.ChangeType(first, view.DataTable.Columns[columnName].DataType, fieldFormat);
                                             }

@@ -2097,8 +2097,22 @@ namespace BackAnd.Web.Api.Controllers
                 ReasonPhrase = Messages.Critical
             })
         {
+            //HandleSpecificException(exception, apiController.Map);
             AddResponseHeaders(responseHeaders);
             Log(apiController, exception);
+        }
+
+        private void HandleSpecificException(Exception exception, Map map)
+        {
+            if (exception is NoLongerChecklistException)
+            {
+                Durados.Web.Mvc.ChildrenField childrenField = (Durados.Web.Mvc.ChildrenField)((NoLongerChecklistException)exception).ChildrenField;
+                
+                Durados.Web.Mvc.View fieldsView = (Durados.Web.Mvc.View)map.GetConfigDatabase().Views["Field"];
+
+                fieldsView.Edit(new Dictionary<string, object>() { { "ChildrenHtmlControlType", "Grid" } }, childrenField.ID.ToString(), null, null, null, null);
+
+            }
         }
 
         private void AddResponseHeaders(Dictionary<string, string> responseHeaders)

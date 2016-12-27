@@ -2045,6 +2045,11 @@ namespace Durados
         {
             throw new NotImplementedException();
         }
+
+        public virtual Dictionary<string, object> RowToShallowDictionary(DataRow row, string pk)
+        {
+            throw new NotImplementedException();
+        }
     }
 
     public class DataActionEventArgs : EventArgs

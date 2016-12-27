@@ -850,6 +850,12 @@ namespace Durados.Web.Mvc
                     });
             }
         }
+
+
+        public override Dictionary<string, object> RowToShallowDictionary(DataRow row, string pk)
+        {
+            return (new DictionaryConverter()).RowToShallowDictionary(this, row, pk, false, true);
+        }
     }
 
 

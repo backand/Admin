@@ -394,6 +394,7 @@
     <Compile Include="UI\Helpers\MenuHelper.cs" />
     <Compile Include="UI\Helpers\ModelComparer.cs" />
     <Compile Include="UI\Helpers\NewDatabaseParametersFactory.cs" />
+    <Compile Include="UI\Helpers\NoLongerChecklistException.cs" />
     <Compile Include="UI\Helpers\PlugInHelper.cs" />
     <Compile Include="UI\Helpers\PreviewHelper.cs" />
     <Compile Include="UI\Helpers\QueryNotFoundException.cs" />

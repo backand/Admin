@@ -584,6 +584,17 @@ namespace Durados.Workflow
                         }
                     }
                 }
+                //var shallowRow = view.RowToShallowDictionary(prevRow, pk);
+                //foreach (Field field in view.Fields.Values)
+                //{
+                //    if (oldRow.ContainsKey(field.JsonName) && shallowRow.ContainsKey(field.JsonName))
+                //    {
+                //        if (field.FieldType == FieldType.Column && (field.IsBoolean || field.IsPoint || field.IsNumeric))
+                //        {
+                //            oldRow[field.JsonName] = shallowRow[field.JsonName];
+                //        }
+                //    }
+                //}
             }
 
             userProfile.Add("username", view.Database.GetCurrentUsername());

@@ -170,6 +170,11 @@ namespace Durados.Web.Mvc.UI.Helpers
 
             //return keys.ToArray();
 
+            if (parentField == null)
+            {
+                throw new NoLongerChecklistException(childrenField);
+            }
+
             return childrenView.GetKeys(parentField, fkField.Name, fk);
         }
 

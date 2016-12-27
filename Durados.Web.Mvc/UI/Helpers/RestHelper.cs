@@ -579,7 +579,16 @@ namespace Durados.Web.Mvc.UI.Helpers
 
             map.Logger.Log(view.Name, pk, "before row to json", null, 5, null);
 
-            Dictionary<string, object> dic = RowToDictionary(view, dataRow, pk, deep, false, level, hideMetadata);
+            Dictionary<string, object> dic = null;
+            try
+            {
+                dic = RowToDictionary(view, dataRow, pk, deep, false, level, hideMetadata);
+            }
+            catch (NoLongerChecklistException exception)
+            {
+                exception.ChildrenField.ChildrenHtmlControlType = ChildrenHtmlControlType.Grid;
+                dic = RowToDictionary(view, dataRow, pk, deep, false, level, hideMetadata);
+            }
 
             map.Logger.Log(view.Name, pk, "after row to json", null, 5, null);
 
