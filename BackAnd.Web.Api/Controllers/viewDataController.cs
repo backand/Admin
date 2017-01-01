@@ -675,7 +675,7 @@ namespace BackAnd.Web.Api.Controllers
 
         private Exception GetExceptionFromAction(Exception exception)
         {
-            if (exception is Durados.Workflow.IMainActionJavaScriptException)
+            if (exception is Durados.Workflow.IMainActionJavaScriptException && ((Durados.Workflow.IMainActionJavaScriptException)exception).JintTrace != null)
             {
                 exception = new Durados.DuradosException(((Durados.Workflow.IMainActionJavaScriptException)exception).JintTrace);
             }

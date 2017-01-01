@@ -319,13 +319,13 @@ namespace Backand
                     responseText += we.Response.Headers["error"];
                 }
                 //Log(1, "Ended with status " + status, we);
-                Log(1, request.RequestUri.OriginalString, we);
+                Log(3, request.RequestUri.OriginalString, we);
             
             }
             catch (Exception ex) 
             {
                 //Log(1, "Ended with status " + status, ex);
-                Log(1, request.RequestUri.OriginalString, ex);
+                Log(3, request.RequestUri.OriginalString, ex);
  
                 throw new Exception(ex.Message); 
             }

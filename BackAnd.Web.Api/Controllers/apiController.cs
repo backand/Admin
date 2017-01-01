@@ -2140,7 +2140,7 @@ namespace BackAnd.Web.Api.Controllers
 
                 string verb = apiController.Request.Method.Method;
 
-                map.Logger.Log(apiController.GetControllerNameForLog(apiController.ControllerContext), verb, exceptionSource, exception, logType, null);
+                map.Logger.Log(apiController.GetControllerNameForLog(apiController.ControllerContext), verb, exceptionSource, exception, logType, apiController.Request.RequestUri.ToString());
 
                 Durados.Web.Mvc.Logging.Logger logger = new Durados.Web.Mvc.Logging.Logger();
 
