@@ -144,11 +144,30 @@ namespace Durados.Workflow
         private static IDictionary<string, object> MergeTrace(IDictionary<string, object> json, string previousTrace)
         {
             var previousTraceJson = jss.Deserialize<Dictionary<string,object>>(previousTrace);
-            if (previousTraceJson.Keys.Count == 2)
+            IDictionary<string, object> child = previousTraceJson;
+            
+            bool eoj = false;
+            while (!eoj)
             {
-                string key = previousTraceJson.Keys.Where(k => k != "at").FirstOrDefault();
-                previousTraceJson[key] = json;
-                return previousTraceJson;
+
+                if (child.Keys.Count == 2)
+                {
+                    string key = child.Keys.Where(k => k != "at").FirstOrDefault();
+                    if (child[key] is IDictionary<string, object>)
+                    {
+                        child = (IDictionary<string, object>)child[key];
+                    }
+                    else
+                    {
+                        child[key] = json;
+                        return previousTraceJson;
+                    }
+                }
+                else
+                {
+                    eoj = true;
+                }
+
             }
             return json;
         }
@@ -185,7 +204,8 @@ namespace Durados.Workflow
                         sb.Insert(0, location);
                         nodeHasLocation = true;
                     }
-                    else if (value is IDictionary<string, object>)
+                    //else if (value is IDictionary<string, object>)
+                    else if (value is IDictionary<string, object> && ((IDictionary<string, object>)value).ContainsKey(at))
                     {
                         grandChild = (IDictionary<string, object>)value;
                         nodeHasChildren = true;
@@ -242,7 +262,7 @@ namespace Durados.Workflow
             //    string column = dictionary["column"].ToString();
             //    sb.Append(column);
             //}
-            sb.Append(")");
+            sb.Append(")"); 
             
             return sb.ToString();
         }
@@ -254,7 +274,7 @@ namespace Durados.Workflow
             if (value is string)
                 return key + ":" + value.ToString();
 
-            return value + ":" + jss.Serialize(value);
+            return key + ":" + jss.Serialize(value);
         }
 
         private static IDictionary<string, object> CleanJson(string message)
@@ -265,6 +285,8 @@ namespace Durados.Workflow
             IDictionary<string, object> d = theJavaScriptSerializer.Deserialize<Dictionary<string, object>>(message);
             IDictionary<string, object> d2Child = d2;
 
+            const string at = "at";
+
             bool eoj = false;
             while (!eoj)
             {
@@ -273,7 +295,7 @@ namespace Durados.Workflow
                 string errorKey = null;
                 foreach (string key in d.Keys)
                 {
-                    if (key == "at")
+                    if (key == at)
                     {
                         if (((IDictionary<string, object>)d[key]).ContainsKey("line"))
                         {
@@ -284,7 +306,8 @@ namespace Durados.Workflow
                     {
                         errorKey = key;
 
-                        if (d[key] is IDictionary<string, object>)
+                        //if (d[key] is IDictionary<string, object>)
+                        if (d[key] is IDictionary<string, object> && ((IDictionary<string, object>)d[key]).ContainsKey(at))
                         {
                             eoj = false;
                         }
@@ -294,7 +317,7 @@ namespace Durados.Workflow
                 {
                     foreach (string key in d.Keys)
                     {
-                        if (key == "at" || eoj)
+                        if (key == at || eoj)
                         {
                             d2Child.Add(key, d[key]);
                         }
@@ -678,7 +701,9 @@ namespace Durados.Workflow
                 throw new DuradosException("actionTimeMSecLimit in web.config is not numeric or too long");
             }
 
-            TimeSpan timeoutInterval = new TimeSpan(0, 0, 0, 0, actionTimeMSec);
+            TimeSpan? timeoutInterval = new TimeSpan(0, 0, 0, 0, actionTimeMSec);
+            if (actionTimeMSec == 0)
+                timeoutInterval = null;
 
             string actionId = Guid.NewGuid().ToString();
 

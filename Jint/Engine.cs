@@ -916,9 +916,20 @@ namespace Jint
             //    }
             //}
 
+            message = message.Trim();
+            //if (message.StartsWith("{") && message.EndsWith("}"))
+            //{
+            //    message = message.TrimStart('{').TrimEnd('}');
+            //}
+
             if (!message.StartsWith("\"") && !message.Contains(":"))
             {
                 message = "\"error\"" + ":" + "\"" + message + "\"";
+            }
+
+            if (message.StartsWith("{") && message.EndsWith("}"))
+            {
+                message = "\"error\"" + ":" + message;
             }
             
 

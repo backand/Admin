@@ -11,6 +11,15 @@ namespace BackAnd.Web.Api.Providers
 {
     public class SimpleAuthorizationServerProvider : OAuthAuthorizationServerProvider
     {
+        public override Task MatchEndpoint(OAuthMatchEndpointContext context)
+        {
+            if (context.Request.Path.ToUriComponent().ToLower() == "/1/user/signin")
+            {
+                context.MatchesTokenEndpoint();
+            }
+                
+            return base.MatchEndpoint(context);
+        }
         public override Task TokenEndpoint(OAuthTokenEndpointContext context)
         {
             var usernameObj = context.Identity.Claims.Where(c => c.Type == Database.Username).Single();
