@@ -891,7 +891,7 @@ namespace Durados.Workflow
                 }
             }
 
-            if (r != null && values != null)
+            if (r != null && values != null && dataAction == TriggerDataAction.OnDemand)
             {
                 if (!values.ContainsKey(ReturnedValueKey))
                     values.Add(ReturnedValueKey, r);

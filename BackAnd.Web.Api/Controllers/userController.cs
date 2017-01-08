@@ -212,6 +212,12 @@ namespace BackAnd.Web.Api.Controllers
                 string json = Request.Content.ReadAsStringAsync().Result;
                 Dictionary<string, object> values = Durados.Web.Mvc.UI.Json.JsonSerializer.Deserialize(json);
 
+                if (values == null)
+                {
+                    return ResponseMessage(Request.CreateResponse(HttpStatusCode.NotAcceptable, "The body of the request is missing"));
+
+                }
+
                 if (!values.ContainsKey("firstName"))
                 {
                     return ResponseMessage(Request.CreateResponse(HttpStatusCode.NotAcceptable, "First name is missing"));
