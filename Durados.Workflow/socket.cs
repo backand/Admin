@@ -149,9 +149,10 @@ namespace Backand
         {
             get
             {
-                if (System.Web.HttpContext.Current == null)
+                Durados.Database dataabase = Durados.Workflow.Engine.GetCurrentDatabase();
+                if (dataabase == null)
                     return null;
-                return (Durados.Diagnostics.ILogger)System.Web.HttpContext.Current.Items[Durados.Database.MainLogger];
+                return (Durados.Diagnostics.ILogger)dataabase.Logger;
             }
         }
         
