@@ -141,6 +141,7 @@
     <Compile Include="FKPath.cs" />
     <Compile Include="ILockGetter.cs" />
     <Compile Include="MailingServices\GroBootPushAppNotification.cs" />
+    <Compile Include="MissingRequiredFieldWithoutDefaultValue.cs" />
     <Compile Include="OracleAccess.cs" />
     <Compile Include="PostgreAccess.cs" />
     <Compile Include="Csv.cs" />

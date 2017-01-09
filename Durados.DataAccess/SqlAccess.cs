@@ -6611,9 +6611,21 @@ namespace Durados.DataAccess
                         }
                     }
                 }
+                else
+                {
+                    HandleRequired(field, dataAction);
+                }
             }
 
             return columnNamesList;
+        }
+
+        private void HandleRequired(Field field, DataAction dataAction)
+        {
+            if (!field.IsAutoIdentity && dataAction == DataAction.Create && field.FieldType == FieldType.Column && field.Required && (field.DefaultValue == null || field.DefaultValue == DBNull.Value))
+            {
+                throw new MissingRequiredFieldWithoutDefaultValue(field);
+            }
         }
 
         private string GetDelimitedColumns(List<string> columnNamesList, View view)
