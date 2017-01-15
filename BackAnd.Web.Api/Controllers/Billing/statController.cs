@@ -109,6 +109,7 @@ namespace BackAnd.Web.Api.Controllers.Billing
         {
             System.Web.HttpContext.Current.Items[Durados.Database.EnableDecryptionKey] = true;
 
+
             string[] emails = null;
             if (!Maps.IsDevUser())
             {
