@@ -953,7 +953,7 @@ namespace Durados.Workflow
 
         private static string GetUserProfileAuthToken(View view)
         {
-            if (System.Web.HttpContext.Current.Request.Url.PathAndQuery.ToLower().Contains("1/user/signup"))
+            if (System.Web.HttpContext.Current.Request.Url.PathAndQuery.ToLower().Contains("1/user/signup") || System.Web.HttpContext.Current.Request.Url.PathAndQuery.ToLower().Contains("1/user/requestResetPassword".ToLower()))
                 return view.Database.GetAuthorization();
             else
                 return System.Web.HttpContext.Current.Request.Headers["Authorization"] ?? view.Database.GetAuthorization();

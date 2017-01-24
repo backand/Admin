@@ -2147,9 +2147,16 @@ namespace Durados.Web.Mvc.Controllers
             }
         }
 
-        public bool AuthenticateUser(string userName, string password)
+        public bool AuthenticateUser(Map map, string userName, string password)
         {
-            return _provider.ValidateUser(userName, password);
+            if (map.Database.BackandSSO)
+            {
+                return _provider.ValidateUser(userName, password);
+            }
+            else
+            {
+                return MultiSignOnValidation(map, userName, password);
+            }
         }
 
         public bool IsRegisterd(string userName)
@@ -2291,7 +2298,8 @@ namespace Durados.Web.Mvc.Controllers
                     {
                         if (ignoreAD)
                         {
-                            valid = _provider.ValidateUser(userName, password); //try users that are not in Active Directory
+
+                            valid = AuthenticateUser(Map, userName, password); //try users that are not in Active Directory
                             
                         }
                         else
@@ -2307,7 +2315,7 @@ namespace Durados.Web.Mvc.Controllers
             }
             else
             {
-                valid = _provider.ValidateUser(userName, password) && ValidateUser(userName);
+                valid = AuthenticateUser(Map, userName, password) && ValidateUser(userName);
             }
 
             if (valid && userInfo == null)
@@ -2328,6 +2336,11 @@ namespace Durados.Web.Mvc.Controllers
 
             return valid;
 
+        }
+
+        private bool MultiSignOnValidation(Map map, string userName, string password)
+        {
+            return AccountService.MultiSignOnValidation(map, userName, password);
         }
 
         public bool ValidateUser(string userName)

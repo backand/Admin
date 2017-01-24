@@ -97,8 +97,8 @@ namespace Durados
              
         }
 
-        public DuplicateFieldException(string fieldName, string tableName)
-            : base(String.Format("The field {0} already exists in object {1}", fieldName, tableName))
+        public DuplicateFieldException(string fieldName, string tableName, string appName)
+            : base(String.Format("The field {0} already exists in object {1}, in app {2}", fieldName, tableName, appName))
         {
 
         }

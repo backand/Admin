@@ -20,7 +20,7 @@ CREATE TABLE `durados_User` (
   `FirstName` varchar(50) NOT NULL,
   `LastName` varchar(50) NOT NULL,
   `Email` varchar(250) NOT NULL,
-  `Password` varchar(20) DEFAULT NULL,
+  `Password` varchar(250) DEFAULT NULL,
   `Role` varchar(256) CHARACTER set latin1 NOT NULL,
   `Guid` varchar(64) NOT NULL,
   `Signature` varchar(4000) DEFAULT NULL,

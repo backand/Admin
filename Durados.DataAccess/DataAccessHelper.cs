@@ -88,10 +88,13 @@ namespace Durados.DataAccess
             if (!view.AllowCreate && !view.AllowDuplicate)
                 throw new AccessViolationException();
 
-            string[] fields = ValidateTextLength(view, values);
-            if (fields.Length > 0)
+            if (!view.SystemView)
             {
-                throw new ExceedLengthException(fields);
+                string[] fields = ValidateTextLength(view, values);
+                if (fields.Length > 0)
+                {
+                    throw new ExceedLengthException(fields);
+                }
             }
             return GetDataTableAccess(view).GetNewRow(view, values, insertAbovePK, beforeCreateCallback, beforeCreateInDatabaseEventHandler, afterCreateBeforeCommitCallback, afterCreateAfterCommitCallback);
         }

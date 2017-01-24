@@ -265,7 +265,7 @@ namespace BackAnd.Web.Api.Controllers
 
 
                 Dictionary<string, object> parameters = null;
-                if (values.ContainsKey("parameters"))
+                if (values.ContainsKey("parameters") && values["parameters"] != null)
                 {
                     if (!(values["parameters"] is Dictionary<string, object>))
                     {
@@ -432,7 +432,7 @@ namespace BackAnd.Web.Api.Controllers
                     return ResponseMessage(Request.CreateResponse(HttpStatusCode.PreconditionFailed, "You cannot change the password to a user that belongs to additional Backand apps, other than yours. In this case, user must reset password using your app UI."));
                 }
 
-                account.ChangePassword(username, password);
+                account.ChangePassword(username, password, map);
 
 
                 return Ok();
@@ -443,6 +443,7 @@ namespace BackAnd.Web.Api.Controllers
             }
         }
 
+        
         [Route("changePassword")]
         [HttpPost]
         [BackAnd.Web.Api.Controllers.Filters.BackAndAuthorize]
@@ -469,10 +470,21 @@ namespace BackAnd.Web.Api.Controllers
                 string oldPassword = values["oldPassword"].ToString();
                 string username = Map.Database.GetCurrentUsername();
 
+                DuradosAuthorizationHelper authorizationHelper = new DuradosAuthorizationHelper();
+
+                if (authorizationHelper.HasCustomChangePassword())
+                {
+                    string customError = null;
+                    UserValidationError userValidationError = UserValidationError.Custom;
+                    bool? result = authorizationHelper.CustomChangePassword(username, oldPassword, newPassword, out userValidationError, out customError);
+                    if (!result.HasValue || !result.Value)
+                    {
+                        return ResponseMessage(Request.CreateResponse(HttpStatusCode.Unauthorized, customError));
+                    }
+                }
 
                 AccountService account = new AccountService(this);
-                account.ChangePassword(username, newPassword, oldPassword);
-
+                account.ChangePassword(Map, username, newPassword, oldPassword);
 
                 return Ok();
             }

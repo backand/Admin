@@ -4693,7 +4693,7 @@ namespace Durados.Web.Mvc.UI.Helpers
             }
             else
             {
-                bool authenticated = accountMembershipService.AuthenticateUser(username, password);
+                bool authenticated = accountMembershipService.AuthenticateUser(map, username, password);
                 if (authenticated)
                 {
                     bool belongToApp = accountMembershipService.ValidateUser(username);
@@ -4744,6 +4744,108 @@ namespace Durados.Web.Mvc.UI.Helpers
         {
             return new Durados.Web.Mvc.Workflow.Engine();
         }
+
+        public bool? CustomChangePassword(string username, string oldPassword, string newPassword, out UserValidationError userValidationError, out string customError)
+        {
+            customError = null;
+            userValidationError = UserValidationError.Custom;
+
+            Dictionary<string, object> values = null;
+            values = new Dictionary<string, object>();
+            values.Add("username", username);
+            values.Add("oldPassword", oldPassword);
+            values.Add("newPassword", newPassword);
+
+            Map map = Maps.Instance.GetMap();
+            View view = (View)map.Database.GetUserView();
+            string parameters = System.Web.HttpContext.Current.Request.QueryString["parameters"];
+            if (!string.IsNullOrEmpty(parameters))
+            {
+                string json = System.Web.HttpContext.Current.Server.UrlDecode(parameters);
+
+                try
+                {
+                    Dictionary<string, object> rulesParameters = view.Deserialize(System.Web.HttpContext.Current.Server.UrlDecode(parameters));
+                    foreach (string key in rulesParameters.Keys)
+                    {
+                        if (!values.ContainsKey(key))
+                            values.Add(key.AsToken(), rulesParameters[key]);
+                    }
+                }
+                catch (Exception exception)
+                {
+                    map.Logger.Log("ChangePassword", "CustomChangePassword", "get parameters json", exception, 2, string.Empty);
+                }
+            }
+            Durados.Web.Mvc.Workflow.Engine wfe = CreateWorkflowEngine();
+            try
+            {
+                wfe.PerformActions(this, view, Durados.TriggerDataAction.OnDemand, values, null, null, map.Database.ConnectionString, Convert.ToInt32(map.Database.GetUserID()), map.Database.GetUserRole(), null, null, Durados.Database.ChangePasswordOverride);
+
+            }
+            catch (Exception exception)
+            {
+                customError = exception.Message;
+                return false;
+            }
+            if (values.ContainsKey(Durados.Workflow.JavaScript.ReturnedValueKey))
+            {
+                var returnedValue = values[Durados.Workflow.JavaScript.ReturnedValueKey];
+                if (returnedValue is IDictionary<string, object>)
+                {
+                    const string Result = "result";
+                    const string Allow = "allow";
+                    const string Deny = "deny";
+                    const string Ignore = "ignore";
+                    const string Message = "message";
+                    IDictionary<string, object> result = (IDictionary<string, object>)returnedValue;
+                    if (result.ContainsKey(Result))
+                    {
+                        if (result[Result].Equals(Ignore))
+                        {
+                            return null;
+                        }
+                        else if (result[Result].Equals(Allow))
+                        {
+                            
+                        }
+                        else if (result[Result].Equals(Deny))
+                        {
+                            if (result.ContainsKey(Message))
+                            {
+                                customError = result[Message].ToString();
+                                return false;
+                            }
+                            else
+                            {
+                                customError = Database.CustomValidationActionName + " did not return the expected result. Missing " + Message + " field in the returned object";
+                                return false;
+                            }
+                        }
+                        else
+                        {
+                            customError = Database.CustomValidationActionName + " did not return the expected result. " + Result + " must return either \"" + Allow + "\", \"" + Deny + "\" or \"" + Ignore + "\".";
+                            return false;
+                        }
+                    }
+                    else
+                    {
+                        customError = Database.CustomValidationActionName + " did not return the expected result. Missing " + Result + " field in the returned object.";
+                        return false;
+                    }
+                }
+                else
+                {
+                    customError = Database.CustomValidationActionName + " did not return the expected result.";
+                    return false;
+                }
+
+            }
+            
+            return true;
+        }
+
+
         private bool? CustomValidation(string username, string password, out UserValidationError userValidationError, out string customError)
         {
             customError = null;
@@ -4968,10 +5070,21 @@ namespace Durados.Web.Mvc.UI.Helpers
             return map.Database.GetUserRow(username) != null;
         }
 
+
         private bool HasCustomValidation()
         {
+            return HasCustomAction(Database.CustomValidationActionName, Map.EmptyCode);
+        }
+
+        private static bool HasCustomAction(string actionName, string emptyCode)
+        {
             Map map = Maps.Instance.GetMap();
-            return map.HasRule(Database.CustomValidationActionName) && (map.GetRule(Database.CustomValidationActionName).Code != Map.EmptyCode);
+            return map.HasRule(actionName) && (map.GetRule(actionName).Code != emptyCode);
+        }
+        public bool HasCustomChangePassword()
+        {
+            return false;
+            //return HasCustomAction(Database.ChangePasswordOverride, Map.EmptyChangePasswordCode);
         }
 
         public bool ValidateLogOnAuthUrl(Durados.Web.Mvc.Map map, System.Collections.Specialized.NameValueCollection formCollecion)

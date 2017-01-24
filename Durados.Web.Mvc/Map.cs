@@ -642,6 +642,12 @@ namespace Durados.Web.Mvc
                         Commit();
                     }
 
+                    if (!(this is DuradosMap) && !HasRule(Database.ChangePasswordOverride))
+                    {
+                        AddChangePasswordOverride();
+                        Commit();
+                    }
+
                     if (!(this is DuradosMap) && !HasRule("userApproval"))
                     {
                         AddUserApproval();
@@ -785,11 +791,17 @@ namespace Durados.Web.Mvc
         private void HandleSystemDatabase()
         {
             HandleSystemDatabaseHistory();
+            HandleSystemDatabaseUsers();
         }
 
         private void HandleSystemDatabaseHistory()
         {
             HandleSystemDatabaseHistoryOldNewValuesType();
+        }
+
+        private void HandleSystemDatabaseUsers()
+        {
+            HandleSystemDatabaseUsersPasswordLength();
         }
 
         private void HandleSystemDatabaseHistoryOldNewValuesType()
@@ -798,6 +810,36 @@ namespace Durados.Web.Mvc
             {
                 UpdateHistoryOldNewValueToLongText();
             }
+        }
+
+        private void HandleSystemDatabaseUsersPasswordLength()
+        {
+            if (IsUsersPasswordShort())
+            {
+                UpdateUsersPasswordTo250();
+            }
+        }
+
+
+        private void UpdateUsersPasswordTo250()
+        {
+            if (this.SqlProduct != Durados.SqlProduct.MySql)
+            {
+                return;
+            }
+
+            string sql = "ALTER TABLE `durados_user` CHANGE COLUMN `Password` `Password` VARCHAR(250) NULL DEFAULT NULL ;";
+
+            using (MySql.Data.MySqlClient.MySqlConnection connection = new MySql.Data.MySqlClient.MySqlConnection(systemConnectionString))
+            {
+                connection.Open();
+                using (MySql.Data.MySqlClient.MySqlCommand command = new MySql.Data.MySqlClient.MySqlCommand(sql, connection))
+                {
+                    command.ExecuteNonQuery();
+                }
+                connection.Close();
+            }
+
         }
 
         private void UpdateHistoryOldNewValueToLongText()
@@ -820,6 +862,38 @@ namespace Durados.Web.Mvc
             }
 
         }
+
+
+        private bool IsUsersPasswordShort()
+        {
+            if (this.SqlProduct != Durados.SqlProduct.MySql)
+            {
+                return false;
+            }
+
+            string sql = "SELECT  CHARACTER_MAXIMUM_LENGTH FROM  INFORMATION_SCHEMA.COLUMNS WHERE  TABLE_SCHEMA = DATABASE() AND  TABLE_NAME = 'durados_user' AND	COLUMN_NAME = 'Password'";
+            int? length = null;
+            using (MySql.Data.MySqlClient.MySqlConnection connection = new MySql.Data.MySqlClient.MySqlConnection(systemConnectionString))
+            {
+                connection.Open();
+                using (MySql.Data.MySqlClient.MySqlCommand command = new MySql.Data.MySqlClient.MySqlCommand(sql, connection))
+                {
+                    object scalar = command.ExecuteScalar();
+                    if (scalar == null || scalar == DBNull.Value)
+                    {
+                        return false;
+                    }
+                    else
+                    {
+                        length = Convert.ToInt32(scalar);
+                    }
+                }
+                connection.Close();
+            }
+
+            return length.Value == 20;
+        }
+
 
         private bool IsHistoryOldNewValueShort()
         {
@@ -1774,6 +1848,8 @@ namespace Durados.Web.Mvc
 
         }
 
+        public const string EmptyChangePasswordCode = "/* globals\n";
+
         public const string EmptyCode = "/* globals\n" +
     "$http - Service for AJAX calls \n" +
     "CONSTS - CONSTS.apiUrl for Backands API URL\n" +
@@ -1804,6 +1880,25 @@ namespace Durados.Web.Mvc
             values.Add("WhereCondition", "true");
 
             values.Add("Code", EmptyCode);
+
+            DataRow row = ruleView.Create(values, null, null, null, null, null);
+            string rulePK = ruleView.GetPkValue(row);
+
+        }
+
+        private void AddChangePasswordOverride()
+        {
+            ConfigAccess configAccess = new DataAccess.ConfigAccess();
+            string userViewPK = configAccess.GetViewPK(Database.UserViewName, configDatabase.ConnectionString);
+            View ruleView = (View)configDatabase.Views["Rule"];
+            Dictionary<string, object> values = new Dictionary<string, object>();
+            values.Add("Name", Database.ChangePasswordOverride);
+            values.Add("Rules_Parent", userViewPK);
+            values.Add("DataAction", Durados.TriggerDataAction.OnDemand.ToString());
+            values.Add("WorkflowAction", Durados.WorkflowAction.JavaScript.ToString());
+            values.Add("WhereCondition", "true");
+
+            values.Add("Code", EmptyChangePasswordCode);
 
             DataRow row = ruleView.Create(values, null, null, null, null, null);
             string rulePK = ruleView.GetPkValue(row);
@@ -2976,8 +3071,8 @@ namespace Durados.Web.Mvc
                 ColumnField passwordField = (ColumnField)userView.Fields["Password"];
                 passwordField.HideInEdit = true;
                 passwordField.HideInCreate = true;
-                passwordField.ExcludeInInsert = true;
-                passwordField.ExcludeInUpdate = true;
+                passwordField.ExcludeInInsert = false;
+                passwordField.ExcludeInUpdate = false;
                 passwordField.HideInTable = true;
             }
 
@@ -3719,7 +3814,8 @@ namespace Durados.Web.Mvc
             }
             else
             {
-                ds.WriteXml(filename, XmlWriteMode.WriteSchema);
+                if (!(this is DuradosMap))
+                    ds.WriteXml(filename, XmlWriteMode.WriteSchema);
             }
         }
 
@@ -3812,7 +3908,8 @@ namespace Durados.Web.Mvc
                         Maps.Instance.DuradosMap.Logger.Log("ReadConfigFromCloud", "ReadConfigFromCloud", "ReadConfigFromCloud", e, 1, errMsg);
                     }
                 }
-                return;
+                if (ds.Tables.Count > 0)
+                    return;
             }
 
 

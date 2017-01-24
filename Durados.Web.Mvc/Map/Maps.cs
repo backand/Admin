@@ -143,39 +143,46 @@ namespace Durados.Web.Mvc
             return storage.GetContainer(filename);
         }
 
+        static readonly object _object = new object();
+
         private Maps()
         {
             InitPersistency();
 
             if (multiTenancy)
             {
-                duradosMap = new DuradosMap();
-                duradosMap.connectionString = persistency.ConnectionString;
-                duradosMap.systemConnectionString = persistency.ConnectionString;
-                duradosMap.ConfigFileName = Maps.GetConfigPath(Maps.GetmainAppConfigName() + ".xml");
-                duradosMap.Url = GetAppUrl(duradosAppName);
-                duradosMap.Initiate(false);
-
-                View appView = (View)duradosMap.Database.Views["durados_App"];
-                appView.PermanentFilter = "(durados_App.toDelete =0 AND (durados_App.Creator = [m_User] or durados_App.id in (select durados_UserApp.AppId from durados_UserApp where durados_UserApp.UserId = [m_User] and (durados_UserApp.[Role] = 'Admin' or durados_UserApp.[Role] = 'Developer'))))";
-                appView.Controller = "MultiTenancy";
-
-                View connectionView = (View)duradosMap.Database.Views["durados_SqlConnection"];
-                connectionView.PermanentFilter = "";// "DuradosUser = [Durados_User] ";//OR durados_SqlConnection.id  in 
-                //((select SqlConnectionId from durados_app inner join durados_userApp on durados_app.id =durados_userApp.appId where durados_UserApp.UserId = [Durados_User])
-                //union
-                //(select SystemSqlConnectionId from durados_app inner join durados_userApp on durados_app.id =durados_userApp.appId where durados_UserApp.UserId = [Durados_User]))";
-
-                //maps = new Dictionary<string, Map>();
-                mapsCache = CacheFactory.CreateCache<Map>("maps");
-
-                LoadDnsAliases();
-
-                PluginsCache = new Dictionary<PlugInType, PluginCache>();
-
-                foreach (PlugInType plugInType in Enum.GetValues(typeof(PlugInType)))
+                lock (_object)
                 {
-                    PluginsCache.Add(plugInType, new PluginCache());
+                    duradosMap = new DuradosMap();
+                    duradosMap.connectionString = persistency.ConnectionString;
+                    duradosMap.systemConnectionString = persistency.ConnectionString;
+                    duradosMap.ConfigFileName = Maps.GetConfigPath(Maps.GetmainAppConfigName() + ".xml");
+                    duradosMap.Url = GetAppUrl(duradosAppName);
+                    duradosMap.Initiate(false);
+
+                    duradosMap.Database.BackandSSO = true;
+
+                    View appView = (View)duradosMap.Database.Views["durados_App"];
+                    appView.PermanentFilter = "(durados_App.toDelete =0 AND (durados_App.Creator = [m_User] or durados_App.id in (select durados_UserApp.AppId from durados_UserApp where durados_UserApp.UserId = [m_User] and (durados_UserApp.[Role] = 'Admin' or durados_UserApp.[Role] = 'Developer'))))";
+                    appView.Controller = "MultiTenancy";
+
+                    View connectionView = (View)duradosMap.Database.Views["durados_SqlConnection"];
+                    connectionView.PermanentFilter = "";// "DuradosUser = [Durados_User] ";//OR durados_SqlConnection.id  in 
+                    //((select SqlConnectionId from durados_app inner join durados_userApp on durados_app.id =durados_userApp.appId where durados_UserApp.UserId = [Durados_User])
+                    //union
+                    //(select SystemSqlConnectionId from durados_app inner join durados_userApp on durados_app.id =durados_userApp.appId where durados_UserApp.UserId = [Durados_User]))";
+
+                    //maps = new Dictionary<string, Map>();
+                    mapsCache = CacheFactory.CreateCache<Map>("maps");
+
+                    LoadDnsAliases();
+
+                    PluginsCache = new Dictionary<PlugInType, PluginCache>();
+
+                    foreach (PlugInType plugInType in Enum.GetValues(typeof(PlugInType)))
+                    {
+                        PluginsCache.Add(plugInType, new PluginCache());
+                    }
                 }
             }
         }

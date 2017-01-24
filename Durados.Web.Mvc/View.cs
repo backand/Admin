@@ -661,6 +661,10 @@ namespace Durados.Web.Mvc
                 {
                     string relatedObject = ((ParentField)field).ParentView.JsonName;
                     values.Add(type, relatedObject);
+                    if (types.ContainsKey(field.JsonName))
+                    {
+                        throw new DuplicateFieldException(field.JsonName, field.View.Name, Map.AppName);
+                    }
                     types.Add(field.JsonName, values);
                 }
                 else if (type == "collection")
@@ -701,7 +705,7 @@ namespace Durados.Web.Mvc
 
                     if (types.ContainsKey(field.JsonName))
                     {
-                        throw new DuplicateFieldException(field.JsonName,field.View.Name);
+                        throw new DuplicateFieldException(field.JsonName, field.View.Name, Map.AppName);
                     }
 
                     types.Add(field.JsonName, values);

@@ -54,6 +54,7 @@ namespace Durados
         public static readonly string AnonymousToken = "AnonymousToken";
         public static readonly string CreateSchema = "CreateSchema";
         public static readonly string CustomValidationActionName = "backandAuthOverride";
+        public static readonly string ChangePasswordOverride = "ChangePasswordOverride";
         public static readonly string CustomTokenAttrKey = "CustomTokenAttr";
         public static readonly string AutoGuidPkType = "char(36)";
 
@@ -162,6 +163,10 @@ namespace Durados
                 defaultLevelOfDept = value;
             }
         }
+
+
+        [Durados.Config.Attributes.ColumnProperty(Description = "Backand Single Sign On")]
+        public bool BackandSSO { get; set; }
 
         public virtual Durados.Data.IDataAccess GetDataAccess(string connectionString) { return null; }
         public void SetNextMinorConfigVersion()
@@ -640,6 +645,8 @@ namespace Durados
             FilterParameterOptions = GetFilterParameterOptions();
 
             SignupEmailVerification = false;
+
+            BackandSSO = false;
         }
 
         private int GetDefaultLevelOfDept()

@@ -615,7 +615,7 @@ namespace Durados.Web.Mvc.UI.Helpers
             return dictionary;
         }
 
-        public static string GetReferences(this Services.IStyleable view, ReferenceType referenceType)
+        public static string GetReferences(this Durados.Services.IStyleable view, ReferenceType referenceType)
         {
             string references = string.Empty;
             if (referenceType == ReferenceType.JavaScript)

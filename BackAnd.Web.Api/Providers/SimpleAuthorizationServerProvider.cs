@@ -414,7 +414,7 @@ namespace BackAnd.Web.Api.Providers
             {
                 if (map.Database.SecureLevel == SecureLevel.AllUsers)
                 {
-                    if (!(new Durados.Web.Mvc.Controllers.AccountMembershipService().AuthenticateUser(username, password)))
+                    if (!(new Durados.Web.Mvc.Controllers.AccountMembershipService().AuthenticateUser(map, username, password)))
                     {
                         context.SetError(UserValidationErrorMessages.InvalidGrant, UserValidationErrorMessages.IncorrectUsernameOrPassword);
 

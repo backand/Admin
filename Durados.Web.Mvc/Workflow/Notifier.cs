@@ -341,7 +341,7 @@ namespace Durados.Web.Mvc.Workflow
                 
                 content = content.Replace(nameValueDictionary, controller.GetTableViewer(), view);
                 content = content.Replace(dicFields.ToDictionary(k => k.Key, v => ((Durados.Workflow.DictionaryField)v.Value).Value), controller.GetTableViewer(), view);
-                content = content.Replace(values, controller.GetTableViewer(), view);
+                //content = content.Replace(values, controller.GetTableViewer(), view);
                 
                 if (content.Contains("[User.First Name]"))
                 {

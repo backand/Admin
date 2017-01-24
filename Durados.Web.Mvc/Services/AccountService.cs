@@ -15,6 +15,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Web.Mvc;
 using System.Web.Security;
+using Durados.Web.Mvc.Services;
 
 namespace Durados.Web.Mvc.UI.Helpers
 {
@@ -42,10 +43,10 @@ namespace Durados.Web.Mvc.UI.Helpers
             return Maps.Instance.DuradosMap;
         }
 
-        protected virtual bool VerifyPassword(string username, string password)
+        protected virtual bool VerifyPassword(Map map, string username, string password)
         {
             Durados.Web.Mvc.Controllers.AccountMembershipService accountMembershipService = new Durados.Web.Mvc.Controllers.AccountMembershipService();
-            return accountMembershipService.AuthenticateUser(username, password);
+            return accountMembershipService.AuthenticateUser(map, username, password);
         }
 
         public string GetEmailBySocialId(string provider, string socialId, int appId)
@@ -158,19 +159,45 @@ namespace Durados.Web.Mvc.UI.Helpers
 
         private static MembershipProvider _provider = System.Web.Security.Membership.Provider;
 
-        public virtual void ChangePassword(string username, string password)
+        public virtual void ChangePassword(string username, string password, Map map)
         {
             _provider.UnlockUser(username);
             string oldPassword = _provider.ResetPassword(username, null);
             _provider.ChangePassword(username, oldPassword, password);
+            if (map != null && !map.Database.BackandSSO)
+            {
+                UpdateHashPassword(username, password, map);
+            }
+
         }
 
-        public virtual void ChangePassword(string username, string newPassword, string oldPassword)
+        private static void UpdateHashPassword(string username, string password, Map map)
         {
-            if (!VerifyPassword(username, oldPassword))
+            int userId = (int)map.Database.GetUserRow(username)["ID"];
+            View userView = (View)map.Database.GetUserView();
+
+            Dictionary<string, object> values = new Dictionary<string, object>();
+            try
+            {
+                string hashedPassword = (string)new Backand.security().hash(password);
+                values.Add("Password", hashedPassword);
+            }
+            catch (Exception exception)
+            {
+                throw new HashPasswordException(exception);
+            }
+
+            userView.Edit(values, userId.ToString(), null, null, null, null);
+        }
+
+        
+
+        public virtual void ChangePassword(Map map, string username, string newPassword, string oldPassword)
+        {
+            if (!VerifyPassword(map, username, oldPassword))
                 throw new DuradosException("The old password is incorrect");
 
-            ChangePassword(username, newPassword);
+            ChangePassword(username, newPassword, map);
         }
 
         public static bool IsValidRole(string appName, string role)
@@ -439,7 +466,7 @@ namespace Durados.Web.Mvc.UI.Helpers
 
                 if (!isInvited)
                 {
-                    Invite(appName, firstName, lastName, username, role, parameters, beforeCreateCallback, beforeCreateInDatabaseEventHandler, afterCreateBeforeCommitCallback, afterCreateAfterCommitCallback);
+                    Invite(appName, firstName, lastName, username, password, role, parameters, beforeCreateCallback, beforeCreateInDatabaseEventHandler, afterCreateBeforeCommitCallback, afterCreateAfterCommitCallback);
                 }
 
                 SignUpResults signUpResults = new SignUpResults() { AppName = appName, Username = username };
@@ -876,7 +903,7 @@ namespace Durados.Web.Mvc.UI.Helpers
             }
         }
 
-        protected virtual void Invite(string appName, string firstName, string lastName, string username, string role, Dictionary<string, object> parameters, BeforeCreateEventHandler beforeCreateCallback, BeforeCreateInDatabaseEventHandler beforeCreateInDatabaseEventHandler, AfterCreateEventHandler afterCreateBeforeCommitCallback, AfterCreateEventHandler afterCreateAfterCommitCallback)
+        protected virtual void Invite(string appName, string firstName, string lastName, string username, string password, string role, Dictionary<string, object> parameters, BeforeCreateEventHandler beforeCreateCallback, BeforeCreateInDatabaseEventHandler beforeCreateInDatabaseEventHandler, AfterCreateEventHandler afterCreateBeforeCommitCallback, AfterCreateEventHandler afterCreateAfterCommitCallback)
         {
             Map map = GetMap(appName);
             if (map is DuradosMap)
@@ -891,6 +918,18 @@ namespace Durados.Web.Mvc.UI.Helpers
             values.Add("Email", username);
             values.Add("IsApproved", false);
             values.Add(userView.GetFieldByColumnNames("Role").Name, role ?? GetDefaultUserRole(appName));
+            if (!map.Database.BackandSSO)
+            {
+                try
+                {
+                    string hashedPassword = (string)new Backand.security().hash(password);
+                    values.Add("Password", hashedPassword);
+                }
+                catch (Exception exception)
+                {
+                    throw new HashPasswordException(exception);
+                }
+            }
 
             if (parameters != null)
             {
@@ -1318,12 +1357,36 @@ namespace Durados.Web.Mvc.UI.Helpers
             if (!string.IsNullOrEmpty(currentAppUrl))
                 currentAppUrl += "?token=" + token;
 
+            // todo
+            // add appName to [durados_ValidGuid] instead of using redis
+            SetAppNameByToken(token, appName);
+
             Dictionary<string, object> values = new Dictionary<string, object>();
             string id = row["ID"].ToString();
             values.Add("token".AsToken(), token);
             values.Add("ForgotPasswordUrl".AsToken(), string.IsNullOrEmpty(currentAppUrl) ? mainAppUrl : currentAppUrl);
             values.Add("AppName".AsToken(), appName);
             values.Add("FirstName".AsToken(), row.IsNull("FirstName") ? username : row["FirstName"].ToString());
+            values.Add("username".AsToken(), username);
+
+            int? usersId = null;
+            if (map.Database.Views.ContainsKey("users"))
+            {
+                View usersView = (View)map.Database.Views["users"];
+                if (usersView.Fields.ContainsKey("email"))
+                {
+                    Field field = usersView.Fields["email"];
+                    var usersRow = usersView.GetDataRow(field, username);
+                    if (usersRow != null)
+                    {
+                        usersId = (int)usersRow["id"];
+                    }
+                }
+            }
+            if (usersId.HasValue)
+            {
+                values.Add("usersId".AsToken(), usersId.Value);
+            }
 
 
             wfe.PerformActions(this.controller, view, Durados.TriggerDataAction.OnDemand, values, id, row, map.Database.ConnectionString, Convert.ToInt32(id), row["Role"].ToString(), null, null, "requestResetPassword");
@@ -1331,6 +1394,7 @@ namespace Durados.Web.Mvc.UI.Helpers
             Debug.WriteLine(token);
         }
 
+        
         public static string GetUserGuid(string userName)
         {
             try
@@ -1343,7 +1407,7 @@ namespace Durados.Web.Mvc.UI.Helpers
                 object guid = sql.ExecuteScalar(Maps.Instance.DuradosMap.connectionString, "SELECT TOP 1 [durados_user].[guid] FROM durados_user WITH(NOLOCK)  WHERE [durados_user].[username]=@username", parameters);
 
                 if (guid == null || guid == DBNull.Value)
-                    throw new DuradosException("Username has no unique guid, password canot be reset.");
+                    throw new DuradosException("Username has no unique guid, cannot reset password.");
 
                 return guid.ToString();
             }
@@ -1354,10 +1418,35 @@ namespace Durados.Web.Mvc.UI.Helpers
 
         }
 
+        public static string GetUserTempToken(string username)
+        {
 
+            try
+            {
+                string guid = GetUserGuid(username);
+
+                Durados.DataAccess.SqlAccess sql = new Durados.DataAccess.SqlAccess();
+
+                Dictionary<string, object> parameters = new Dictionary<string, object>();
+
+                parameters.Add("@UserGuid", guid);
+                object tempGuid = sql.ExecuteScalar(Maps.Instance.DuradosMap.connectionString, "SELECT TOP 1 Id FROM [durados_ValidGuid] WITH(NOLOCK)  WHERE UserGuid=@UserGuid and Used=0", parameters);
+
+                if (tempGuid == null || tempGuid == DBNull.Value)
+                    throw new DuradosException("Temp token not found for " + username);
+
+                return tempGuid.ToString();
+            }
+            catch (Exception ex)
+            {
+                throw new DuradosException("Failed to get temp token for " + username, ex);
+            }
+        }
 
         public string ChangePassword(Guid token, string password)
         {
+            string appName = GetAppNameByToken(token.ToString());
+            Map map = Maps.Instance.GetMap(appName);
             string userSysGuid = SecurityHelper.GetUserGuidFromTmpGuid(token.ToString());
             if (string.IsNullOrEmpty(userSysGuid))
             {
@@ -1370,10 +1459,26 @@ namespace Durados.Web.Mvc.UI.Helpers
 
             }
 
-            ChangePassword(username, password);
+            ChangePassword(username, password, map);
 
             return username;
         }
+
+        private string GetAppNameByToken(string token)
+        {
+            string appName = Durados.Web.Mvc.Farm.SharedMemorySingeltone.Instance.Get(token);
+
+            Durados.Web.Mvc.Farm.SharedMemorySingeltone.Instance.Delete(token);
+
+            return appName;
+        }
+
+        private void SetAppNameByToken(string token, string appName)
+        {
+            int hour = 1000 * 60 * 60;
+            Durados.Web.Mvc.Farm.SharedMemorySingeltone.Instance.Set(token, appName, hour);
+        }
+
 
         private string GetUsername(string guid)
         {
@@ -1586,6 +1691,38 @@ namespace Durados.Web.Mvc.UI.Helpers
 
                     }
                 }
+            }
+        }
+
+        public static bool MultiSignOnValidation(Map map, string userName, string password)
+        {
+            const string Password = "Password";
+            const string Username = "Username";
+            View userView = (View)map.Database.GetUserView();
+            DataRow row = userView.GetDataRow(userView.GetFieldByColumnNames(Username), userName);
+            if (row == null)
+                return false;
+            if (row.IsNull(Password))
+            {
+                bool valid = _provider.ValidateUser(userName, password);
+                if (valid)
+                {
+                    UpdateHashPassword(userName, password, map);
+                    return true;
+                }
+                else
+                {
+                    return false;
+                }
+            }
+            string hashedPassword = row[Password].ToString();
+            try
+            {
+                return (bool)new Backand.security().compare(password, hashedPassword);
+            }
+            catch (Exception exception)
+            {
+                throw new MultiSignOnValidationException(exception);
             }
         }
     }
