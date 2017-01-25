@@ -840,6 +840,15 @@ namespace Durados.Web.Mvc
         {
             if (IsUsersPasswordShort())
             {
+                Maps.Instance.DuradosMap.Logger.Log(AppName, "HandleSystemDatabaseUsersPasswordLength", "HandleSystemDatabaseUsersPasswordLength", "started2", "", 500, AppName, DateTime.Now);
+                Maps.Instance.DuradosMap.Logger.Log(AppName, "HandleSystemDatabaseUsersPasswordLength", "HandleSystemDatabaseUsersPasswordLength", "started2", "", 3, AppName, DateTime.Now);
+                try
+                {
+                    Logger.Log(AppName, "HandleSystemDatabaseUsersPasswordLength", "HandleSystemDatabaseUsersPasswordLength", "started2", "", 500, AppName, DateTime.Now);
+                    Logger.Log(AppName, "HandleSystemDatabaseUsersPasswordLength", "HandleSystemDatabaseUsersPasswordLength", "started2", "", 3, AppName, DateTime.Now);
+                }
+                catch { }
+            
                 UpdateUsersPasswordTo250();
             }
         }
@@ -895,11 +904,16 @@ namespace Durados.Web.Mvc
                 return false;
             }
 
-            string sql = "SELECT  CHARACTER_MAXIMUM_LENGTH FROM  INFORMATION_SCHEMA.COLUMNS WHERE  TABLE_SCHEMA = DATABASE() AND  TABLE_NAME = 'durados_user' AND	COLUMN_NAME = 'Password'";
-            int? length = null;
+           
+
+           int? length = null;
             using (MySql.Data.MySqlClient.MySqlConnection connection = new MySql.Data.MySqlClient.MySqlConnection(systemConnectionString))
             {
                 connection.Open();
+                
+                 string sql = "SELECT  CHARACTER_MAXIMUM_LENGTH FROM  INFORMATION_SCHEMA.COLUMNS WHERE  TABLE_SCHEMA = " + connection.Database + " AND  TABLE_NAME = 'durados_user' AND	COLUMN_NAME = 'Password'";
+                 Maps.Instance.DuradosMap.Logger.Log(AppName, "HandleSystemDatabaseUsersPasswordLength", "HandleSystemDatabaseUsersPasswordLength", "started3", connection.Database, 3, AppName, DateTime.Now);
+                
                 using (MySql.Data.MySqlClient.MySqlCommand command = new MySql.Data.MySqlClient.MySqlCommand(sql, connection))
                 {
                     object scalar = command.ExecuteScalar();
