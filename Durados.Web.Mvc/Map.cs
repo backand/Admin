@@ -904,14 +904,15 @@ namespace Durados.Web.Mvc
                 return false;
             }
 
-           
+            MySql.Data.MySqlClient.MySqlConnection tempConnection = new MySql.Data.MySqlClient.MySqlConnection(systemConnectionString);
+            string sql = "SELECT  CHARACTER_MAXIMUM_LENGTH FROM  INFORMATION_SCHEMA.COLUMNS WHERE  TABLE_SCHEMA = '" + tempConnection.Database + "' AND  TABLE_NAME = 'durados_user' AND	COLUMN_NAME = 'Password'";
+                
 
            int? length = null;
-            using (MySql.Data.MySqlClient.MySqlConnection connection = new MySql.Data.MySqlClient.MySqlConnection(systemConnectionString))
+           using (MySql.Data.MySqlClient.MySqlConnection connection = new MySql.Data.MySqlClient.MySqlConnection(GetSystemMapsConnectionString()))
             {
                 connection.Open();
                 
-                string sql = "SELECT  CHARACTER_MAXIMUM_LENGTH FROM  INFORMATION_SCHEMA.COLUMNS WHERE  TABLE_SCHEMA = '" + connection.Database + "' AND  TABLE_NAME = 'durados_user' AND	COLUMN_NAME = 'Password'";
                 Maps.Instance.DuradosMap.Logger.Log(AppName, "HandleSystemDatabaseUsersPasswordLength", "HandleSystemDatabaseUsersPasswordLength", "started3", connection.Database, 3, systemConnectionString, DateTime.Now);
                 
                 using (MySql.Data.MySqlClient.MySqlCommand command = new MySql.Data.MySqlClient.MySqlCommand(sql, connection))
@@ -933,7 +934,11 @@ namespace Durados.Web.Mvc
             Maps.Instance.DuradosMap.Logger.Log(AppName, "HandleSystemDatabaseUsersPasswordLength", "HandleSystemDatabaseUsersPasswordLength", "started5", length.Value.ToString(), 3, AppName, DateTime.Now);
             return length.Value == 20;
         }
-
+        
+        private string GetSystemMapsConnectionString()
+        {
+            return System.Configuration.ConfigurationManager.ConnectionStrings["SystemMapsConnectionString"].ToString();
+        }
 
         private bool IsHistoryOldNewValueShort()
         {
@@ -942,9 +947,11 @@ namespace Durados.Web.Mvc
                 return false;
             }
 
-            string sql = "SELECT  DATA_TYPE FROM  INFORMATION_SCHEMA.COLUMNS WHERE  TABLE_SCHEMA = DATABASE() AND  TABLE_NAME = 'durados_ChangeHistoryField' AND	COLUMN_NAME = 'NewValue'";
+            MySql.Data.MySqlClient.MySqlConnection tempConnection = new MySql.Data.MySqlClient.MySqlConnection(systemConnectionString);
+
+            string sql = "SELECT  DATA_TYPE FROM  INFORMATION_SCHEMA.COLUMNS WHERE  TABLE_SCHEMA = '" + tempConnection.Database + "' AND  TABLE_NAME = 'durados_ChangeHistoryField' AND	COLUMN_NAME = 'NewValue'";
             string datatype = string.Empty;
-            using (MySql.Data.MySqlClient.MySqlConnection connection = new MySql.Data.MySqlClient.MySqlConnection(systemConnectionString))
+            using (MySql.Data.MySqlClient.MySqlConnection connection = new MySql.Data.MySqlClient.MySqlConnection(GetSystemMapsConnectionString()))
             {
                 connection.Open();
                 using (MySql.Data.MySqlClient.MySqlCommand command = new MySql.Data.MySqlClient.MySqlCommand(sql, connection))
