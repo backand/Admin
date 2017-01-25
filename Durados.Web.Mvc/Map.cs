@@ -911,7 +911,7 @@ namespace Durados.Web.Mvc
             {
                 connection.Open();
                 
-                string sql = "SELECT  CHARACTER_MAXIMUM_LENGTH FROM  INFORMATION_SCHEMA.COLUMNS WHERE  TABLE_SCHEMA = " + connection.Database + " AND  TABLE_NAME = 'durados_user' AND	COLUMN_NAME = 'Password'";
+                string sql = "SELECT  CHARACTER_MAXIMUM_LENGTH FROM  INFORMATION_SCHEMA.COLUMNS WHERE  TABLE_SCHEMA = '" + connection.Database + "' AND  TABLE_NAME = 'durados_user' AND	COLUMN_NAME = 'Password'";
                 Maps.Instance.DuradosMap.Logger.Log(AppName, "HandleSystemDatabaseUsersPasswordLength", "HandleSystemDatabaseUsersPasswordLength", "started3", connection.Database, 3, systemConnectionString, DateTime.Now);
                 
                 using (MySql.Data.MySqlClient.MySqlCommand command = new MySql.Data.MySqlClient.MySqlCommand(sql, connection))
