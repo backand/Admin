@@ -911,14 +911,15 @@ namespace Durados.Web.Mvc
             {
                 connection.Open();
                 
-                 string sql = "SELECT  CHARACTER_MAXIMUM_LENGTH FROM  INFORMATION_SCHEMA.COLUMNS WHERE  TABLE_SCHEMA = " + connection.Database + " AND  TABLE_NAME = 'durados_user' AND	COLUMN_NAME = 'Password'";
-                 Maps.Instance.DuradosMap.Logger.Log(AppName, "HandleSystemDatabaseUsersPasswordLength", "HandleSystemDatabaseUsersPasswordLength", "started3", connection.Database, 3, AppName, DateTime.Now);
+                string sql = "SELECT  CHARACTER_MAXIMUM_LENGTH FROM  INFORMATION_SCHEMA.COLUMNS WHERE  TABLE_SCHEMA = " + connection.Database + " AND  TABLE_NAME = 'durados_user' AND	COLUMN_NAME = 'Password'";
+                Maps.Instance.DuradosMap.Logger.Log(AppName, "HandleSystemDatabaseUsersPasswordLength", "HandleSystemDatabaseUsersPasswordLength", "started3", connection.Database, 3, systemConnectionString, DateTime.Now);
                 
                 using (MySql.Data.MySqlClient.MySqlCommand command = new MySql.Data.MySqlClient.MySqlCommand(sql, connection))
                 {
                     object scalar = command.ExecuteScalar();
                     if (scalar == null || scalar == DBNull.Value)
                     {
+                        Maps.Instance.DuradosMap.Logger.Log(AppName, "HandleSystemDatabaseUsersPasswordLength", "HandleSystemDatabaseUsersPasswordLength", "started4", connection.Database, 3, AppName, DateTime.Now);
                         return false;
                     }
                     else
@@ -929,6 +930,7 @@ namespace Durados.Web.Mvc
                 connection.Close();
             }
 
+            Maps.Instance.DuradosMap.Logger.Log(AppName, "HandleSystemDatabaseUsersPasswordLength", "HandleSystemDatabaseUsersPasswordLength", "started5", length.Value.ToString(), 3, AppName, DateTime.Now);
             return length.Value == 20;
         }
 
