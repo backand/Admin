@@ -861,7 +861,7 @@ namespace Durados.Web.Mvc
                 return;
             }
 
-            string sql = "ALTER TABLE `durados_user` CHANGE COLUMN `Password` `Password` VARCHAR(250) NULL DEFAULT NULL ;";
+            string sql = "ALTER TABLE `durados_User` CHANGE COLUMN `Password` `Password` VARCHAR(250) NULL DEFAULT NULL ;";
 
             using (MySql.Data.MySqlClient.MySqlConnection connection = new MySql.Data.MySqlClient.MySqlConnection(systemConnectionString))
             {
