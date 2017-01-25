@@ -905,7 +905,7 @@ namespace Durados.Web.Mvc
             }
 
             MySql.Data.MySqlClient.MySqlConnection tempConnection = new MySql.Data.MySqlClient.MySqlConnection(systemConnectionString);
-            string sql = "SELECT  CHARACTER_MAXIMUM_LENGTH FROM  INFORMATION_SCHEMA.COLUMNS WHERE  TABLE_SCHEMA = '" + tempConnection.Database + "' AND  TABLE_NAME = 'durados_user' AND	COLUMN_NAME = 'Password'";
+            string sql = "SELECT  CHARACTER_MAXIMUM_LENGTH FROM  INFORMATION_SCHEMA.COLUMNS WHERE  TABLE_SCHEMA = '" + tempConnection.Database + "' AND  TABLE_NAME = 'durados_User' AND	COLUMN_NAME = 'Password'";
                 
 
            int? length = null;
