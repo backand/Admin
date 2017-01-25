@@ -801,7 +801,31 @@ namespace Durados.Web.Mvc
 
         private void HandleSystemDatabaseUsers()
         {
-            HandleSystemDatabaseUsersPasswordLength();
+
+            Maps.Instance.DuradosMap.Logger.Log(AppName, "HandleSystemDatabaseUsersPasswordLength", "HandleSystemDatabaseUsersPasswordLength","started","", 500, AppName, DateTime.Now);
+            Maps.Instance.DuradosMap.Logger.Log(AppName, "HandleSystemDatabaseUsersPasswordLength", "HandleSystemDatabaseUsersPasswordLength", "started", "", 3, AppName, DateTime.Now);
+            try
+            {
+                Logger.Log(AppName, "HandleSystemDatabaseUsersPasswordLength", "HandleSystemDatabaseUsersPasswordLength", "started", "", 500, AppName, DateTime.Now);
+                Logger.Log(AppName, "HandleSystemDatabaseUsersPasswordLength", "HandleSystemDatabaseUsersPasswordLength", "started", "", 3, AppName, DateTime.Now);
+            }
+            catch { }
+            try
+            {
+                HandleSystemDatabaseUsersPasswordLength();
+            }
+            catch (Exception exception)
+            {
+                Maps.Instance.DuradosMap.Logger.Log(AppName, "HandleSystemDatabaseUsersPasswordLength", "HandleSystemDatabaseUsersPasswordLength", exception, 1, AppName);
+                Maps.Instance.DuradosMap.Logger.Log(AppName, "HandleSystemDatabaseUsersPasswordLength", "HandleSystemDatabaseUsersPasswordLength", exception, 501, AppName);
+                try
+                {
+                    Logger.Log(AppName, "HandleSystemDatabaseUsersPasswordLength", "HandleSystemDatabaseUsersPasswordLength", exception, 1, AppName);
+                    Logger.Log(AppName, "HandleSystemDatabaseUsersPasswordLength", "HandleSystemDatabaseUsersPasswordLength", exception, 501, AppName);
+                }
+                catch { }
+                throw new DuradosException("HandleSystemDatabaseUsersPasswordLength failed!", exception);
+            }
         }
 
         private void HandleSystemDatabaseHistoryOldNewValuesType()
