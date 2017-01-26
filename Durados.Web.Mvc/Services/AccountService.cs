@@ -922,7 +922,11 @@ namespace Durados.Web.Mvc.UI.Helpers
             {
                 try
                 {
-                    string hashedPassword = (string)new Backand.security().hash(password);
+                    string hashedPassword = null;
+                    if (password != string.Empty)
+                    {
+                        hashedPassword = (string)new Backand.security().hash(password);
+                    }
                     values.Add("Password", hashedPassword);
                 }
                 catch (Exception exception)
