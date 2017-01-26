@@ -4662,7 +4662,7 @@ namespace Durados.Web.Mvc.UI.Helpers
             return Durados.Web.Mvc.Maps.Instance.AppLocked(appname);
         }
 
-        public bool IsValid(string username, string password, out UserValidationError userValidationError, out string customError, out bool hasCustomValidation, out bool customValid)
+        public bool IsValid(string appName, string username, string password, out UserValidationError userValidationError, out string customError, out bool hasCustomValidation, out bool customValid)
         {
             hasCustomValidation = false;
             customValid = false;
@@ -4693,6 +4693,10 @@ namespace Durados.Web.Mvc.UI.Helpers
             }
             else
             {
+                if (map == null)
+                {
+                    map = Maps.Instance.GetMap(appName);
+                }
                 bool authenticated = accountMembershipService.AuthenticateUser(map, username, password);
                 if (authenticated)
                 {

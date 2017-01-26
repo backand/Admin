@@ -358,52 +358,75 @@ namespace BackAnd.Web.Api.Providers
                 System.Web.HttpContext.Current.Items.Add(Database.Username, username);
 
             Durados.Web.Mvc.Maps.Instance.DuradosMap.Logger.Log("auth-start", appname, username, null, 3, string.Empty);
+            if (Durados.Web.Mvc.Maps.Instance.AppInCach(appname))
+            {
+                Durados.Web.Mvc.Maps.Instance.GetMap(appname).Logger.Log("auth-start", appname, username, null, 3, string.Empty);
+            }
 
             UserValidationError userValidationError = UserValidationError.Valid;
             string customError = null;
             bool hasCustomValidation = false;
             bool customValid = false;
-            if (!IsValid(username, password, out userValidationError, out customError, out hasCustomValidation, out customValid))
+            try
             {
-
-
-                Durados.Web.Mvc.Controllers.AccountMembershipService accountMembershipService = new Durados.Web.Mvc.Controllers.AccountMembershipService();
-
-                string message = UserValidationErrorMessages.Unknown;
-
-                switch (userValidationError)
+                if (!IsValid(appname, username, password, out userValidationError, out customError, out hasCustomValidation, out customValid))
                 {
-                    case UserValidationError.IncorrectUsernameOrPassword:
-                        message = UserValidationErrorMessages.IncorrectUsernameOrPassword;
-                        break;
-                    case UserValidationError.LockedOut:
-                        message = UserValidationErrorMessages.LockedOut;
-                        break;
-                    case UserValidationError.NotApproved:
-                        message = UserValidationErrorMessages.NotApproved;
-                        break;
-                    case UserValidationError.NotRegistered:
-                        message = UserValidationErrorMessages.NotRegistered;
-                        break;
-                    case UserValidationError.UserDoesNotBelongToApp:
-                        message = UserValidationErrorMessages.UserDoesNotBelongToApp;
-                        break;
-                    case UserValidationError.Custom:
-                        if (customError != null)
-                            message = customError;
-                        else
+
+
+                    Durados.Web.Mvc.Controllers.AccountMembershipService accountMembershipService = new Durados.Web.Mvc.Controllers.AccountMembershipService();
+
+                    string message = UserValidationErrorMessages.Unknown;
+
+                    switch (userValidationError)
+                    {
+                        case UserValidationError.IncorrectUsernameOrPassword:
+                            message = UserValidationErrorMessages.IncorrectUsernameOrPassword;
+                            break;
+                        case UserValidationError.LockedOut:
+                            message = UserValidationErrorMessages.LockedOut;
+                            break;
+                        case UserValidationError.NotApproved:
+                            message = UserValidationErrorMessages.NotApproved;
+                            break;
+                        case UserValidationError.NotRegistered:
+                            message = UserValidationErrorMessages.NotRegistered;
+                            break;
+                        case UserValidationError.UserDoesNotBelongToApp:
+                            message = UserValidationErrorMessages.UserDoesNotBelongToApp;
+                            break;
+                        case UserValidationError.Custom:
+                            if (customError != null)
+                                message = customError;
+                            else
+                                message = UserValidationErrorMessages.Unknown;
+                            break;
+
+                        default:
                             message = UserValidationErrorMessages.Unknown;
-                        break;
+                            break;
 
-                    default:
-                        message = UserValidationErrorMessages.Unknown;
-                        break;
+                    }
 
+                    context.SetError(UserValidationErrorMessages.InvalidGrant, message);
+
+                    Durados.Web.Mvc.Maps.Instance.DuradosMap.Logger.Log("auth-end-failure", appname, username, null, 3, message);
+                    if (Durados.Web.Mvc.Maps.Instance.AppInCach(appname))
+                    {
+                        Durados.Web.Mvc.Maps.Instance.GetMap(appname).Logger.Log("auth-start", appname, username, null, 3, message);
+                    }
+
+                    return;
                 }
+            }
+            catch (System.Exception exception)
+            {
+                context.SetError(UserValidationErrorMessages.InvalidGrant, exception.Message);
 
-                context.SetError(UserValidationErrorMessages.InvalidGrant, message);
-
-                Durados.Web.Mvc.Maps.Instance.DuradosMap.Logger.Log("auth-end-failure", appname, username, null, 3, message);
+                Durados.Web.Mvc.Maps.Instance.DuradosMap.Logger.Log("auth-end-failure", appname, username, null, 1, exception.Message);
+                if (Durados.Web.Mvc.Maps.Instance.AppInCach(appname))
+                {
+                    Durados.Web.Mvc.Maps.Instance.GetMap(appname).Logger.Log("auth-end-failure", appname, username, null, 1, exception.Message);
+                }
 
                 return;
             }
@@ -414,12 +437,24 @@ namespace BackAnd.Web.Api.Providers
             {
                 if (map.Database.SecureLevel == SecureLevel.AllUsers)
                 {
-                    if (!(new Durados.Web.Mvc.Controllers.AccountMembershipService().AuthenticateUser(map, username, password)))
+                    try
                     {
-                        context.SetError(UserValidationErrorMessages.InvalidGrant, UserValidationErrorMessages.IncorrectUsernameOrPassword);
+                        if (!(new Durados.Web.Mvc.Controllers.AccountMembershipService().AuthenticateUser(map, username, password)))
+                        {
+                            context.SetError(UserValidationErrorMessages.InvalidGrant, UserValidationErrorMessages.IncorrectUsernameOrPassword);
 
-                        Durados.Web.Mvc.Maps.Instance.DuradosMap.Logger.Log("auth-end-failure", appname, username, null, 3, UserValidationErrorMessages.IncorrectUsernameOrPassword);
+                            Durados.Web.Mvc.Maps.Instance.DuradosMap.Logger.Log("auth-end-failure", appname, username, null, 3, UserValidationErrorMessages.IncorrectUsernameOrPassword);
+                            if (Durados.Web.Mvc.Maps.Instance.AppInCach(appname))
+                            {
+                                Durados.Web.Mvc.Maps.Instance.GetMap(appname).Logger.Log("auth-end-failure", appname, username, null, 3, UserValidationErrorMessages.IncorrectUsernameOrPassword);
+                            }
 
+                            return;
+                        }
+                    }
+                    catch (System.Exception exception)
+                    {
+                        context.SetError(UserValidationErrorMessages.Unknown, exception.Message);
                         return;
                     }
                 }
@@ -431,6 +466,10 @@ namespace BackAnd.Web.Api.Providers
                 context.SetError(UserValidationErrorMessages.InvalidGrant, message);
 
                 Durados.Web.Mvc.Maps.Instance.DuradosMap.Logger.Log("auth-end-failure", appname, username, null, 3, message);
+                if (Durados.Web.Mvc.Maps.Instance.AppInCach(appname))
+                {
+                    Durados.Web.Mvc.Maps.Instance.GetMap(appname).Logger.Log("auth-end-failure", appname, username, null, 3, message);
+                }
 
                 return;
             }
@@ -449,6 +488,10 @@ namespace BackAnd.Web.Api.Providers
             context.Validated(identity);
 
             Durados.Web.Mvc.Maps.Instance.DuradosMap.Logger.Log("auth-end", appname, username, null, 3, string.Empty);
+            if (Durados.Web.Mvc.Maps.Instance.AppInCach(appname))
+            {
+                Durados.Web.Mvc.Maps.Instance.GetMap(appname).Logger.Log("auth-end", appname, username, null, 3, string.Empty);
+            }
         }
 
         private void ValidateByRefreshToken(OAuthGrantResourceOwnerCredentialsContext context, string username, string appName, string refreshToken)
@@ -459,6 +502,10 @@ namespace BackAnd.Web.Api.Providers
                 {
                     context.SetError(UserValidationErrorMessages.InvalidRefreshToken, "Either invalid refresh or wrong username or app name");
                     Durados.Web.Mvc.Maps.Instance.DuradosMap.Logger.Log("refresh token", appName, username, null, 3, UserValidationErrorMessages.InvalidRefreshToken);
+                    if (Durados.Web.Mvc.Maps.Instance.AppInCach(appName))
+                    {
+                        Durados.Web.Mvc.Maps.Instance.GetMap(appName).Logger.Log("refresh token", appName, username, null, 3, UserValidationErrorMessages.InvalidRefreshToken);
+                    }
                     return;
                 }
             }
@@ -466,18 +513,32 @@ namespace BackAnd.Web.Api.Providers
             {
                 context.SetError(exception.Message, exception.Message);
                 Durados.Web.Mvc.Maps.Instance.DuradosMap.Logger.Log("refresh token", appName, username, exception, 2, string.Empty);
+                if (Durados.Web.Mvc.Maps.Instance.AppInCach(appName))
+                {
+                    Durados.Web.Mvc.Maps.Instance.GetMap(appName).Logger.Log("refresh token", appName, username, exception, 2, string.Empty);
+                }
                 return;
             }
             catch (RefereshTokenException exception)
             {
                 context.SetError(exception.Message, exception.Message);
                 Durados.Web.Mvc.Maps.Instance.DuradosMap.Logger.Log("refresh token", appName, username, exception, 2, string.Empty);
+                if (Durados.Web.Mvc.Maps.Instance.AppInCach(appName))
+                {
+                    Durados.Web.Mvc.Maps.Instance.GetMap(appName).Logger.Log("refresh token", appName, username, exception, 2, string.Empty);
+                }
+                
                 return;
             }
             catch (System.Exception exception)
             {
                 context.SetError(UserValidationErrorMessages.Unknown, UserValidationErrorMessages.Unknown);
                 Durados.Web.Mvc.Maps.Instance.DuradosMap.Logger.Log("refresh token", appName, username, exception, 1, string.Empty);
+                if (Durados.Web.Mvc.Maps.Instance.AppInCach(appName))
+                {
+                    Durados.Web.Mvc.Maps.Instance.GetMap(appName).Logger.Log("refresh token", appName, username, exception, 1, string.Empty);
+                }
+                
                 return;
             }
             var identity = new ClaimsIdentity(context.Options.AuthenticationType);
@@ -487,6 +548,11 @@ namespace BackAnd.Web.Api.Providers
             context.Validated(identity);
 
             Durados.Web.Mvc.Maps.Instance.DuradosMap.Logger.Log("refresh token", appName, username, null, 3, string.Empty);
+            if (Durados.Web.Mvc.Maps.Instance.AppInCach(appName))
+            {
+                Durados.Web.Mvc.Maps.Instance.GetMap(appName).Logger.Log("refresh token", appName, username, null, 3, string.Empty);
+            }
+                
         }
 
         public static bool IsAppExists(string appname)
@@ -504,10 +570,10 @@ namespace BackAnd.Web.Api.Providers
         }
 
 
-        public bool IsValid(string username, string password, out UserValidationError userValidationError, out string customError, out bool hasCustomValidation, out bool customValid)
+        public bool IsValid(string appName, string username, string password, out UserValidationError userValidationError, out string customError, out bool hasCustomValidation, out bool customValid)
         {
-
-            return new DuradosAuthorizationHelper().IsValid(username, password, out userValidationError, out customError, out hasCustomValidation, out customValid);
+            return new DuradosAuthorizationHelper().IsValid(appName, username, password, out userValidationError, out customError, out hasCustomValidation, out customValid);
+            
         }
 
         public override Task ValidateAuthorizeRequest(OAuthValidateAuthorizeRequestContext context)
