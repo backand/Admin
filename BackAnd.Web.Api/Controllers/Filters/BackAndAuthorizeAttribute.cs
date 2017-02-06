@@ -82,7 +82,18 @@ namespace BackAnd.Web.Api.Controllers.Filters
                 string appNameFromToken = appnameObj.Value;
                 if (actionContext.Request.Headers.Contains("AppName"))
                 {
-                    appname = actionContext.Request.Headers.GetValues("AppName").FirstOrDefault();
+                    if (appname.ToLower() == Maps.DuradosAppName)
+                    {
+                        appname = actionContext.Request.Headers.GetValues("AppName").FirstOrDefault();
+                    }
+                    else
+                    {
+                        // BackandSSO
+                        actionContext.Response = actionContext.Request.CreateErrorResponse(
+                    HttpStatusCode.Unauthorized,
+                    string.Format(Durados.Web.Mvc.UI.Helpers.UserValidationErrorMessages.AccessTokenNotAllowedToApp, actionContext.Request.Headers.GetValues("AppName").FirstOrDefault()));
+                        return;
+                    }
                 }
 
                 if (!System.Web.HttpContext.Current.Items.Contains(Database.Username))
@@ -113,7 +124,8 @@ namespace BackAnd.Web.Api.Controllers.Filters
                     //{
                     //    throw new Durados.DuradosException("App is not ready yet");
                     //}
-                    if (!accountMembershipService.ValidateUser(username) || !accountMembershipService.IsApproved(username) || Revoked(appname, GetAuthToken(actionContext)))
+                    //if (!accountMembershipService.ValidateUser(username) || !accountMembershipService.IsApproved(username) || Revoked(appname, GetAuthToken(actionContext)))
+                    if (!accountMembershipService.IsApproved(username) || Revoked(appname, GetAuthToken(actionContext)))
                     {
                         HandleUnauthorized(actionContext, appname, username);
                         return;

@@ -160,7 +160,7 @@ namespace Durados.Web.Mvc
                     duradosMap.Url = GetAppUrl(duradosAppName);
                     duradosMap.Initiate(false);
 
-                    duradosMap.Database.BackandSSO = true;
+                    //duradosMap.Database.BackandSSO = true;
 
                     View appView = (View)duradosMap.Database.Views["durados_App"];
                     appView.PermanentFilter = "(durados_App.toDelete =0 AND (durados_App.Creator = [m_User] or durados_App.id in (select durados_UserApp.AppId from durados_UserApp where durados_UserApp.UserId = [m_User] and (durados_UserApp.[Role] = 'Admin' or durados_UserApp.[Role] = 'Developer'))))";
@@ -1721,7 +1721,8 @@ namespace Durados.Web.Mvc
 
             try
             {
-                map.SiteInfo.Logo = appRow.Image;
+                if (!appRow.IsImageNull())
+                    map.SiteInfo.Logo = appRow.Image;
             }
             catch { }
 

@@ -451,6 +451,18 @@ namespace BackAnd.Web.Api.Providers
 
                             return;
                         }
+                        else if (!(new Durados.Web.Mvc.Controllers.AccountMembershipService().IsApproved(username)))
+                        {
+                            context.SetError(UserValidationErrorMessages.InvalidGrant, UserValidationErrorMessages.NotApproved);
+
+                            Durados.Web.Mvc.Maps.Instance.DuradosMap.Logger.Log("auth-end-failure", appname, username, null, 3, UserValidationErrorMessages.NotApproved);
+                            if (Durados.Web.Mvc.Maps.Instance.AppInCach(appname))
+                            {
+                                Durados.Web.Mvc.Maps.Instance.GetMap(appname).Logger.Log("auth-end-failure", appname, username, null, 3, UserValidationErrorMessages.NotApproved);
+                            }
+
+                            return;
+                        }
                     }
                     catch (System.Exception exception)
                     {

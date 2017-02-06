@@ -3,6 +3,7 @@ using Durados.Web.Mvc.UI.Helpers;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.Data;
 using System.Linq;
 using System.Web;
@@ -71,6 +72,12 @@ namespace Durados.Web.Mvc
             DefaultSymmetricKeyName = GetDefaultSymmetricKeyName();
             DefaultCertificateName = GetDefaultCertificateName();
             DefaultSymmetricKeyAlgorithm = SymmetricKeyAlgorithm.TRIPLE_DES;
+            MaxInvalidPasswordAttempts = 5;
+            MinRequiredPasswordLength = 6;
+            MinRequiredNonalphanumericCharacters = 0;
+            PasswordAttemptWindow = 10;
+            PasswordStrengthRegularExpression = string.Empty;
+            RequiresQuestionAndAnswer = false;
 
             EnableUserRegistration = true;
         }
@@ -1524,6 +1531,46 @@ namespace Durados.Web.Mvc
         public override void SetCacheValue(string key, string value, int milliseconds)
         {
             Map.SetCacheValue(key, value, milliseconds);
+        }
+
+        [Durados.Config.Attributes.ColumnProperty(Description = "max invalid password attempts")]
+        public int MaxInvalidPasswordAttempts { get; set; }
+
+        [Durados.Config.Attributes.ColumnProperty(Description = "min required password length")]
+        public int MinRequiredPasswordLength { get; set; }
+
+        [Durados.Config.Attributes.ColumnProperty(Description = "min required non alphanumeric characters")]
+        public int MinRequiredNonalphanumericCharacters { get; set; }
+
+        [Durados.Config.Attributes.ColumnProperty(Description = "password attempt window")]
+        public int PasswordAttemptWindow { get; set; }
+
+        [Durados.Config.Attributes.ColumnProperty(Description = "password strength regular expression")]
+        public string PasswordStrengthRegularExpression { get; set; }
+
+        [Durados.Config.Attributes.ColumnProperty(Description = "requires question and answer")]
+        public bool RequiresQuestionAndAnswer { get; set; }
+        
+        
+        
+
+        public override NameValueCollection GetSecuritySettings(string appId)
+        {
+    
+            NameValueCollection _config = new NameValueCollection();
+            _config.Add("connectionStringName", "SecurityConnectionString");
+            _config.Add("enablePasswordRetrieval", "false");
+            _config.Add("enablePasswordReset", "true");
+            _config.Add("requiresQuestionAndAnswer", RequiresQuestionAndAnswer ? "true" : "false");
+            _config.Add("requiresUniqueEmail", "false");
+            _config.Add("passwordFormat", "Hashed");
+            _config.Add("maxInvalidPasswordAttempts", MaxInvalidPasswordAttempts.ToString());
+            _config.Add("minRequiredPasswordLength", MinRequiredPasswordLength.ToString());
+            _config.Add("minRequiredNonalphanumericCharacters", MinRequiredNonalphanumericCharacters.ToString());
+            _config.Add("passwordAttemptWindow", PasswordAttemptWindow.ToString());
+            _config.Add("passwordStrengthRegularExpression", PasswordStrengthRegularExpression);
+            _config.Add("applicationName", appId);
+            return _config;
         }
 
     }

@@ -1687,7 +1687,7 @@ namespace BackAnd.Web.Api.Controllers
         }
 
         
-        public virtual IHttpActionResult Post(string id)
+        public virtual IHttpActionResult Post(string id, bool force = false)
         {
             try
             {
@@ -1814,17 +1814,18 @@ namespace BackAnd.Web.Api.Controllers
                 bool success = false;
                 bool isNewDatabase = IsNewDatabase(product);
                 bool? poolSuccess = false;
+                var responseMessage = ResponseMessage(Request.CreateResponse(HttpStatusCode.OK)); 
                 if (isNewDatabase)
                 {
                     int? appIdFromPool = null;
                     if (!IsSampleApp(values))
-                        poolSuccess = new AppsPool().Pop(id, title, Maps.Instance.DuradosMap.Database.GetCurrentUsername(), out appIdFromPool, product, templateId);
+                        poolSuccess = new AppsPool().Pop(id, title, Maps.Instance.DuradosMap.Database.GetCurrentUsername(), out appIdFromPool, product, templateId, force);
 
                     for (int i = 0; i < 3; i++)
                     {
                         if (!poolSuccess.HasValue)
                         {
-                            poolSuccess = new AppsPool().Pop(id, title, Maps.Instance.DuradosMap.Database.GetCurrentUsername(), out appIdFromPool, product, templateId);
+                            poolSuccess = new AppsPool().Pop(id, title, Maps.Instance.DuradosMap.Database.GetCurrentUsername(), out appIdFromPool, product, templateId, force);
                         }
                         else
                         {
@@ -1834,10 +1835,12 @@ namespace BackAnd.Web.Api.Controllers
 
                     if (poolSuccess.Value)
                     {
+                        responseMessage.Response.Headers.Add("pool", "true");
                         result = new Dictionary<string, object>() { { "Success", true } };
                     }
                     else
                     {
+                        responseMessage.Response.Headers.Add("pool", "false");
                         SetTemplateToCache(values, id);
                         
                         string sampleApp = null;
@@ -1883,7 +1886,7 @@ namespace BackAnd.Web.Api.Controllers
                             webhook.HandleException(WebhookType.AppCreated, exception);
                         }
                     }
-                    return Ok();
+                    return responseMessage;
                 }
                 else
                 {

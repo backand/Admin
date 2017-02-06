@@ -3,6 +3,7 @@ using System.Data;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Collections.Specialized;
 
 namespace Durados
 {
@@ -165,8 +166,8 @@ namespace Durados
         }
 
 
-        [Durados.Config.Attributes.ColumnProperty(Description = "Backand Single Sign On")]
-        public bool BackandSSO { get; set; }
+        //[Durados.Config.Attributes.ColumnProperty(Description = "Backand Single Sign On")]
+        //public bool BackandSSO { get; set; }
 
         public virtual Durados.Data.IDataAccess GetDataAccess(string connectionString) { return null; }
         public void SetNextMinorConfigVersion()
@@ -646,7 +647,7 @@ namespace Durados
 
             SignupEmailVerification = false;
 
-            BackandSSO = false;
+            //BackandSSO = false;
         }
 
         private int GetDefaultLevelOfDept()
@@ -1274,6 +1275,11 @@ namespace Durados
         }
 
         public virtual void SetCacheValue(string key, string value, int milliseconds)
+        {
+            throw new NotImplementedException();
+        }
+
+        public virtual NameValueCollection GetSecuritySettings(string appId)
         {
             throw new NotImplementedException();
         }

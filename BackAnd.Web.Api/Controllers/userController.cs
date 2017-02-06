@@ -253,6 +253,12 @@ namespace BackAnd.Web.Api.Controllers
                 }
                 string password = values["password"].ToString();
 
+                if (string.IsNullOrEmpty(password))
+                {
+                    return ResponseMessage(Request.CreateResponse(HttpStatusCode.NotAcceptable, "Password is missing"));
+
+                }
+                
                 if (!values.ContainsKey("confirmPassword"))
                 {
                     return ResponseMessage(Request.CreateResponse(HttpStatusCode.NotAcceptable, "Confirm password is missing"));
@@ -527,7 +533,7 @@ namespace BackAnd.Web.Api.Controllers
                 }
 
 
-                if (map.Database.GetUserRow(username) == null)
+                if (map2.Database.GetUserRow(username) == null)
                 {
                     return ResponseMessage(Request.CreateResponse(HttpStatusCode.NotFound, "The username is not correct or does not belong to this app."));
                 }

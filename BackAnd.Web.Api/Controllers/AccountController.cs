@@ -554,8 +554,11 @@ namespace BackAnd.Web.Api.Controllers
 
         protected virtual string AssignPendingAppsCallback(Dictionary<string, object> paraemeters)
         {
+            string appName = paraemeters["@appName"].ToString();
+            Durados.Web.Mvc.Map map = Durados.Web.Mvc.Maps.Instance.GetMap(appName);
+            
             string username = paraemeters["@newUser"].ToString();
-            System.Web.Security.MembershipUser user = System.Web.Security.Membership.Provider.GetUser(username, true);
+            System.Web.Security.MembershipUser user = map.GetMembershipProvider().GetUser(username, true);
             if (user != null)
             {
                 if (!user.IsApproved && Durados.Web.Mvc.Maps.MultiTenancy)
@@ -567,6 +570,14 @@ namespace BackAnd.Web.Api.Controllers
 
 
             }
+
+            //string appName = paraemeters["@appName"].ToString();
+            //Durados.Web.Mvc.Map map = Durados.Web.Mvc.Maps.Instance.GetMap(appName);
+            //if (!map.Database.BackandSSO)
+            //{
+            //    Durados.Web.Mvc.UI.Helpers.AccountService.UpdateIsApproved(username, true, map);
+            //}
+
             return "success";
         }
 

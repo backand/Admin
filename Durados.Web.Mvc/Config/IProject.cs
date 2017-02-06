@@ -3474,13 +3474,13 @@ namespace Durados.Web.Mvc.Config
                 EnableTwitter.HideInTable = true;
             }
 
-            if (databaseView.Fields.ContainsKey("BackandSSO"))
-            {
-                ColumnField BackandSSO = (ColumnField)databaseView.Fields["BackandSSO"];
-                BackandSSO.Order = 600;
-                BackandSSO.Category = rolesCategory;
-                BackandSSO.HideInTable = true;
-            }
+            //if (databaseView.Fields.ContainsKey("BackandSSO"))
+            //{
+            //    ColumnField BackandSSO = (ColumnField)databaseView.Fields["BackandSSO"];
+            //    BackandSSO.Order = 600;
+            //    BackandSSO.Category = rolesCategory;
+            //    BackandSSO.HideInTable = true;
+            //}
             
             
             if (databaseView.Fields.ContainsKey("PkType"))

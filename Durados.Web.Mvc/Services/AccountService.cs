@@ -161,13 +161,25 @@ namespace Durados.Web.Mvc.UI.Helpers
 
         public virtual void ChangePassword(string username, string password, Map map)
         {
-            _provider.UnlockUser(username);
-            string oldPassword = _provider.ResetPassword(username, null);
-            _provider.ChangePassword(username, oldPassword, password);
-            if (map != null && !map.Database.BackandSSO)
+            if (map == null)
             {
-                UpdateHashPassword(username, password, map);
+                ChangePasswordInner(username, password, _provider);
             }
+            else // map.Database.BackandSSO
+            {
+                ChangePasswordInner(username, password, map.GetMembershipProvider());
+
+            }
+
+        }
+
+        private void ChangePasswordInner(string username, string password, MembershipProvider provider)
+        {
+            provider.UnlockUser(username);
+            string oldPassword = provider.ResetPassword(username, null);
+            provider.ChangePassword(username, oldPassword, password);
+
+            
 
         }
 
@@ -186,6 +198,17 @@ namespace Durados.Web.Mvc.UI.Helpers
             {
                 throw new HashPasswordException(exception);
             }
+
+            userView.Edit(values, userId.ToString(), null, null, null, null);
+        }
+
+        public static void UpdateIsApproved(string username, bool isApproved, Map map)
+        {
+            int userId = (int)map.Database.GetUserRow(username)["ID"];
+            View userView = (View)map.Database.GetUserView();
+
+            Dictionary<string, object> values = new Dictionary<string, object>();
+            values.Add("IsApproved", isApproved);
 
             userView.Edit(values, userId.ToString(), null, null, null, null);
         }
@@ -339,14 +362,15 @@ namespace Durados.Web.Mvc.UI.Helpers
             string password = paraemeters["@Password"].ToString();
             string email = paraemeters["@Email"].ToString();
             string role = paraemeters["@Role"].ToString();
-
+            
             if (String.IsNullOrEmpty(role))
             {
                 //System.Web.Security.Membership.Provider.DeleteUser(username, true);
                 return Maps.Instance.DuradosMap.Database.Localizer.Translate("Failed to create user, Role is missing");
             }
 
-            System.Web.Security.MembershipCreateStatus status = CreateUser(username, password, email);
+
+            System.Web.Security.MembershipCreateStatus status = CreateUser(username, password, email, System.Web.Security.Membership.Provider);
 
             if (status == MembershipCreateStatus.Success)
             {
@@ -461,7 +485,7 @@ namespace Durados.Web.Mvc.UI.Helpers
                 }
                 else
                 {
-                    isPending = IsPending(username);
+                    isPending = IsPending(appName, username);
                 }
 
                 if (!isInvited)
@@ -587,6 +611,25 @@ namespace Durados.Web.Mvc.UI.Helpers
             values.Add("apiPath".AsToken(), siteWithoutQueryString);
             values.Add("appName".AsToken(), appName);
             values.Add("firstName".AsToken(), row.IsNull("FirstName") ? username : row["FirstName"].ToString());
+            int? usersId = null;
+            if (map.Database.Views.ContainsKey("users"))
+            {
+                View usersView = (View)map.Database.Views["users"];
+                if (usersView.Fields.ContainsKey("email"))
+                {
+                    Field field = usersView.Fields["email"];
+                    var usersRow = usersView.GetDataRow(field, username);
+                    if (usersRow != null)
+                    {
+                        usersId = (int)usersRow["id"];
+                    }
+                }
+            }
+            if (usersId.HasValue)
+            {
+                values.Add("usersId".AsToken(), usersId.Value);
+            }
+
             
             if (parameters != null && parameters.Count > 0)
             {
@@ -696,7 +739,7 @@ namespace Durados.Web.Mvc.UI.Helpers
 
         public virtual void ActivateAdmin(string username, string appName)
         {
-            bool isAuthenticated = IsAuthenticated(username, appName);
+            bool isAuthenticated = IsAuthenticated(username, null);
 
             if (isAuthenticated)
             {
@@ -918,22 +961,22 @@ namespace Durados.Web.Mvc.UI.Helpers
             values.Add("Email", username);
             values.Add("IsApproved", false);
             values.Add(userView.GetFieldByColumnNames("Role").Name, role ?? GetDefaultUserRole(appName));
-            if (!map.Database.BackandSSO)
-            {
-                try
-                {
-                    string hashedPassword = null;
-                    if (password != string.Empty)
-                    {
-                        hashedPassword = (string)new Backand.security().hash(password);
-                    }
-                    values.Add("Password", hashedPassword);
-                }
-                catch (Exception exception)
-                {
-                    throw new HashPasswordException(exception);
-                }
-            }
+            //if (!map.Database.BackandSSO)
+            //{
+            //    try
+            //    {
+            //        string hashedPassword = null;
+            //        if (password != string.Empty)
+            //        {
+            //            hashedPassword = (string)new Backand.security().hash(password);
+            //        }
+            //        values.Add("Password", hashedPassword);
+            //    }
+            //    catch (Exception exception)
+            //    {
+            //        throw new HashPasswordException(exception);
+            //    }
+            //}
 
             if (parameters != null)
             {
@@ -947,9 +990,11 @@ namespace Durados.Web.Mvc.UI.Helpers
             userView.Create(values, null, beforeCreateCallback, beforeCreateInDatabaseEventHandler, afterCreateBeforeCommitCallback, afterCreateAfterCommitCallback);
         }
 
-        protected virtual bool IsPending(string username)
+        protected virtual bool IsPending(string appName, string username)
         {
-            System.Web.Security.MembershipUser existingUser = System.Web.Security.Membership.Provider.GetUser(username, false);
+            Map map = GetMap(appName);
+
+            System.Web.Security.MembershipUser existingUser = map.GetMembershipProvider().GetUser(username, false);
 
             if (existingUser == null)
             {
@@ -957,6 +1002,22 @@ namespace Durados.Web.Mvc.UI.Helpers
             }
 
             return !existingUser.IsApproved;
+
+            //if (map.Database.BackandSSO)
+            //{
+            //    System.Web.Security.MembershipUser existingUser = System.Web.Security.Membership.Provider.GetUser(username, false);
+
+            //    if (existingUser == null)
+            //    {
+            //        throw new NotSignedUpToBackandException();
+            //    }
+
+            //    return !existingUser.IsApproved;
+            //}
+            //else
+            //{
+            //    return true;
+            //}
         }
 
         //protected virtual void AddToAuthenticatedUsers(string appName, string firstName, string lastName, string username, string password, bool isPending)
@@ -994,6 +1055,7 @@ namespace Durados.Web.Mvc.UI.Helpers
             parameters.Add("Email", username);
             parameters.Add("Role", role);
             parameters.Add("Guid", Guid.NewGuid());
+            parameters.Add("AppName", appName);
             Durados.DataAccess.SqlAccess sql = new Durados.DataAccess.SqlAccess();
             sql.ExecuteNonQuery(GetDuradosMap().Database.GetUserView().ConnectionString, "INSERT INTO [" + GetDuradosMap().Database.GetUserView().GetTableName() + "] ([Username],[FirstName],[LastName],[Email],[Role],[Guid]) VALUES (@Username,@FirstName,@LastName,@Email,@Role,@Guid)", parameters, AddToAuthenticatedUsersCallback);
 
@@ -1001,10 +1063,10 @@ namespace Durados.Web.Mvc.UI.Helpers
 
         protected virtual string AddToAuthenticatedUsersCallback(Dictionary<string, object> paraemeters)
         {
-            CreateMembership(paraemeters["Username"].ToString(), paraemeters["Password"].ToString(), paraemeters["Role"].ToString());
+            CreateMembership(paraemeters["Username"].ToString(), paraemeters["Password"].ToString(), paraemeters["Role"].ToString(), paraemeters["AppName"].ToString());
             return "success";
         }
-        protected virtual void CreateMembership(string username, string password, string role)
+        protected virtual void CreateMembership(string username, string password, string role, string appName, bool isApproved = false)
         {
 
             System.Web.Security.MembershipUser existingUser = System.Web.Security.Membership.Provider.GetUser(username, false);
@@ -1016,19 +1078,19 @@ namespace Durados.Web.Mvc.UI.Helpers
                 }
             }
 
-            System.Web.Security.MembershipCreateStatus status = CreateUser(username, password, username);
+            Map map = GetMap(appName);
+
+            var provider = map.GetMembershipProvider();
+            System.Web.Security.MembershipCreateStatus status = CreateUser(username, password, username, provider);
 
             if (status == MembershipCreateStatus.Success)
             {
 
                 //System.Web.Security.Roles.AddUserToRole(username, role);
 
-                System.Web.Security.MembershipUser user = System.Web.Security.Membership.Provider.GetUser(username, false);
-                user.IsApproved = false;
-                System.Web.Security.Membership.UpdateUser(user);
-            }
-            else if (status == MembershipCreateStatus.DuplicateUserName)
-            {
+                System.Web.Security.MembershipUser user = provider.GetUser(username, false);
+                user.IsApproved = isApproved;
+                provider.UpdateUser(user);
             }
             else
             {
@@ -1036,16 +1098,24 @@ namespace Durados.Web.Mvc.UI.Helpers
             }
         }
 
-        protected virtual MembershipCreateStatus CreateUser(string userName, string password, string email)
+        //public MembershipCreateStatus CreateAdminMembership(string appName, string userName, string password)
+        //{
+        //    return CreateMembership(userName, password, null, appName, true);
+        //}
+
+        protected virtual MembershipCreateStatus CreateUser(string userName, string password, string email, MembershipProvider provider)
         {
-            MembershipCreateStatus status;
-            System.Web.Security.Membership.Provider.CreateUser(userName, password, email, null, null, true, null, out status);
+            MembershipCreateStatus status = MembershipCreateStatus.Success;
+            provider.CreateUser(userName, password, email, null, null, true, null, out status);
             return status;
         }
 
         protected virtual bool IsAuthenticated(string username, string appName)
         {
-            return GetDuradosMap().Database.GetUserRow(username) != null;
+            if (appName == null)
+                return GetDuradosMap().Database.GetUserRow(username) != null;
+
+            return Maps.Instance.GetMap(appName).GetMembershipProvider().GetUser(username, false) != null;
         }
 
         protected virtual bool IsActive(string username, string appName)
@@ -1094,7 +1164,7 @@ namespace Durados.Web.Mvc.UI.Helpers
 
         private SignUpResults Verified(string appName, SignUpResults signUpResults, BeforeEditEventHandler beforeEditCallback, BeforeEditInDatabaseEventHandler beforeEditInDatabaseCallback, AfterEditEventHandler afteEditBeforeCommitCallback, AfterEditEventHandler afterEditAfterCommitCallback)
         {
-            FinishPendingUser(signUpResults.Username);
+            FinishPendingUser(appName, signUpResults.Username);
 
             if (appName == Maps.DuradosAppName)
             {
@@ -1147,11 +1217,21 @@ namespace Durados.Web.Mvc.UI.Helpers
             return url + appendSign + "verificationError=true";
         }
 
-        private void FinishPendingUser(string username)
+        private void FinishPendingUser(string appName, string username)
         {
-            System.Web.Security.MembershipUser user = System.Web.Security.Membership.Provider.GetUser(username, false);
+            Map map = GetMap(appName);
+
+            var provider = map.GetMembershipProvider();
+            System.Web.Security.MembershipUser user = provider.GetUser(username, false);
             user.IsApproved = true;
-            System.Web.Security.Membership.UpdateUser(user);
+            provider.UpdateUser(user);
+
+            UpdateIsApproved(username, true, map);
+
+            //if (!map.Database.BackandSSO)
+            //{
+            //    UpdateIsApproved(username, true, map);
+            //}
         }
 
         private SignUpResults Decrypt(string token)
@@ -1700,34 +1780,59 @@ namespace Durados.Web.Mvc.UI.Helpers
 
         public static bool MultiSignOnValidation(Map map, string userName, string password)
         {
-            const string Password = "Password";
-            const string Username = "Username";
-            View userView = (View)map.Database.GetUserView();
-            DataRow row = userView.GetDataRow(userView.GetFieldByColumnNames(Username), userName);
-            if (row == null)
-                return false;
-            if (row.IsNull(Password))
+            MembershipProvider provider = map.GetMembershipProvider();
+            bool valid = provider.ValidateUser(userName, password);
+            if (valid)
             {
-                bool valid = _provider.ValidateUser(userName, password);
-                if (valid)
-                {
-                    UpdateHashPassword(userName, password, map);
-                    return true;
-                }
-                else
-                {
+                provider.UnlockUser(userName);
+                return valid;
+            }
+
+            if (provider.GetUser(userName, false) == null)
+            {
+                valid = _provider.ValidateUser(userName, password);
+
+                if (!valid)
+                    return valid;
+
+                if (map.Database.GetUserRow(userName) == null)
                     return false;
-                }
+
+                MembershipCreateStatus status;
+                provider.CreateUser(userName, password, userName, null, null, true, null, out status);
+                
             }
-            string hashedPassword = row[Password].ToString();
-            try
-            {
-                return (bool)new Backand.security().compare(password, hashedPassword);
-            }
-            catch (Exception exception)
-            {
-                throw new MultiSignOnValidationException(exception);
-            }
+
+            return valid;
+
+            //const string Password = "Password";
+            //const string Username = "Username";
+            //View userView = (View)map.Database.GetUserView();
+            //DataRow row = userView.GetDataRow(userView.GetFieldByColumnNames(Username), userName);
+            //if (row == null)
+            //    return false;
+            //if (row.IsNull(Password))
+            //{
+            //    bool valid = _provider.ValidateUser(userName, password);
+            //    if (valid)
+            //    {
+            //        UpdateHashPassword(userName, password, map);
+            //        return true;
+            //    }
+            //    else
+            //    {
+            //        return false;
+            //    }
+            //}
+            //string hashedPassword = row[Password].ToString();
+            //try
+            //{
+            //    return (bool)new Backand.security().compare(password, hashedPassword);
+            //}
+            //catch (Exception exception)
+            //{
+            //    throw new MultiSignOnValidationException(exception);
+            //}
         }
     }
     public class VerificationToken

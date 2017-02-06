@@ -16,6 +16,7 @@ using System.Linq;
 using System.Reflection;
 using System.Runtime.Caching;
 using System.Text;
+using System.Web.Security;
 
 namespace Durados.Web.Mvc
 {
@@ -810,6 +811,57 @@ namespace Durados.Web.Mvc
             {
                 throw new DuradosException("HandleSystemDatabaseUsersPasswordLength failed!", exception);
             }
+
+            //try
+            //{
+            //    HandleSystemDatabaseUpdateUsersAddIsLockedOut();
+            //}
+            //catch (Exception exception)
+            //{
+            //    throw new DuradosException("HandleSystemDatabaseUpdateUsersAddIsLockedOut failed!", exception);
+            //}
+
+            //try
+            //{
+            //    HandleSystemDatabaseUpdateUsersAddcreatedAt();
+            //}
+            //catch (Exception exception)
+            //{
+            //    throw new DuradosException("HandleSystemDatabaseUpdateUsersAddcreatedAt failed!", exception);
+            //}
+
+            //try
+            //{
+            //    HandleSystemDatabaseUpdateUsersAddupdatedAt();
+            //}
+            //catch (Exception exception)
+            //{
+            //    throw new DuradosException("HandleSystemDatabaseUpdateUsersAddupdatedAt failed!", exception);
+            //}
+        }
+
+        private void HandleSystemDatabaseUpdateUsersAddIsLockedOut()
+        {
+            if (IsColumnExists("durados_User", "IsLockedOut"))
+            {
+                UpdateUsersAddIsLockedOut();
+            }
+        }
+
+        private void HandleSystemDatabaseUpdateUsersAddcreatedAt()
+        {
+            if (IsColumnExists("durados_User", "createdAt"))
+            {
+                UpdateUsersAddcreatedAt();
+            }
+        }
+
+        private void HandleSystemDatabaseUpdateUsersAddupdatedAt()
+        {
+            if (IsColumnExists("durados_User", "updatedAt"))
+            {
+                UpdateUsersAddupdatedAt();
+            }
         }
 
         private void HandleSystemDatabaseHistoryOldNewValuesType()
@@ -849,6 +901,46 @@ namespace Durados.Web.Mvc
             }
 
         }
+
+        private void UpdateUsersAddIsLockedOut()
+        {
+            AddColumn("durados_User", "IsLockedOut", "BIT(1)", true, "0");
+        }
+
+        private void UpdateUsersAddcreatedAt()
+        {
+            AddColumn("durados_User", "createdAt", "DATETIME");
+        }
+
+        private void UpdateUsersAddupdatedAt()
+        {
+            AddColumn("durados_User", "updatedAt", "DATETIME");
+        }
+
+        private void AddColumn(string tableName, string columnName, string columnType, bool required = false, string defaultValue = null)
+        {
+            if (this.SqlProduct != Durados.SqlProduct.MySql)
+            {
+                return;
+            }
+
+            string nullable = required ? "NOT NULL" : "NULL";
+            string defaultValue2 = defaultValue == null ? "" : "DEFAULT " + defaultValue;
+
+            string sql = string.Format("ALTER TABLE `{0}` ADD COLUMN `{1}` {2} {3} {4};", tableName, columnName, columnType, nullable, defaultValue2);
+
+            using (MySql.Data.MySqlClient.MySqlConnection connection = new MySql.Data.MySqlClient.MySqlConnection(systemConnectionString))
+            {
+                connection.Open();
+                using (MySql.Data.MySqlClient.MySqlCommand command = new MySql.Data.MySqlClient.MySqlCommand(sql, connection))
+                {
+                    command.ExecuteNonQuery();
+                }
+                connection.Close();
+            }
+
+        }
+
 
         private void UpdateHistoryOldNewValueToLongText()
         {
@@ -913,6 +1005,31 @@ namespace Durados.Web.Mvc
         private string GetSystemMapsConnectionString()
         {
             return System.Configuration.ConfigurationManager.ConnectionStrings["SystemMapsConnectionString"].ToString();
+        }
+
+        private bool IsColumnExists(string tableName, string columnName)
+        {
+            if (this.SqlProduct != Durados.SqlProduct.MySql)
+            {
+                return false;
+            }
+
+            MySql.Data.MySqlClient.MySqlConnection tempConnection = new MySql.Data.MySqlClient.MySqlConnection(systemConnectionString);
+
+            string sql = "SELECT  DATA_TYPE FROM  INFORMATION_SCHEMA.COLUMNS WHERE  TABLE_SCHEMA = '" + tempConnection.Database + "' AND  TABLE_NAME = '" + tableName + "' AND	COLUMN_NAME = '" + columnName + "'";
+            bool exsits = true;
+            using (MySql.Data.MySqlClient.MySqlConnection connection = new MySql.Data.MySqlClient.MySqlConnection(GetSystemMapsConnectionString()))
+            {
+                connection.Open();
+                using (MySql.Data.MySqlClient.MySqlCommand command = new MySql.Data.MySqlClient.MySqlCommand(sql, connection))
+                {
+                    object scalar = command.ExecuteScalar();
+                    exsits = !(scalar == null || scalar == DBNull.Value);
+                }
+                connection.Close();
+            }
+
+            return exsits;
         }
 
         private bool IsHistoryOldNewValueShort()
@@ -3152,6 +3269,27 @@ namespace Durados.Web.Mvc
                 isApprovedField.Required = false;
             }
 
+            if (userView.Fields.ContainsKey("IsLockedOut"))
+            {
+                ColumnField IsLockedOut = (ColumnField)userView.Fields["IsLockedOut"];
+                IsLockedOut.HideInEdit = false;
+                IsLockedOut.HideInCreate = false;
+                if (this is DuradosMap)
+                {
+                    IsLockedOut.ExcludeInInsert = true;
+                    IsLockedOut.ExcludeInUpdate = true;
+                }
+                else
+                {
+                    IsLockedOut.ExcludeInInsert = false;
+                    IsLockedOut.ExcludeInUpdate = false;
+                }
+                IsLockedOut.ExcludeInUpdate = false;
+                IsLockedOut.HideInTable = false;
+                IsLockedOut.DefaultValue = true;
+                IsLockedOut.Required = false;
+            }
+
             if (userView.Fields.ContainsKey("FullName"))
             {
                 ColumnField fullNameField = (ColumnField)userView.Fields["FullName"];
@@ -4893,6 +5031,20 @@ namespace Durados.Web.Mvc
         public void SetCacheValue(string key, string value, int milliseconds)
         {
             SharedMemorySingeltone.Instance.Set(key, value, milliseconds);
+        }
+
+        private MembershipProvider _provider = null;
+
+        public System.Web.Security.MembershipProvider GetMembershipProvider()
+        {
+            if (_provider == null)
+            {
+                _provider = new SqlMembershipProvider();
+                _provider.Initialize("AspNetSqlMembershipProviderMulti", Database.GetSecuritySettings(Id));
+            
+            }
+
+            return _provider;
         }
     }
 

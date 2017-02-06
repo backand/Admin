@@ -28,6 +28,9 @@ CREATE TABLE `durados_User` (
   `IsApproved` bit(1) NOT NULL DEFAULT b'1',
   `NewUser` bit(1) DEFAULT NULL,
   `Comments` varchar(8000) CHARACTER SET utf8 DEFAULT NULL,
+  /*`IsLockedOut` bit(1) NOT NULL DEFAULT b'0',
+  `createdAt` datetime NOT NULL,
+  `updatedAt` datetime NOT NULL,*/
   PRIMARY KEY (`ID`),
   UNIQUE KEY `Guid` (`Guid`),
   UNIQUE KEY `IX_durados_Username` (`Username`(255)),

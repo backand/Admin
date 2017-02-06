@@ -356,6 +356,33 @@ namespace Durados.Workflow
             return IsBackand(request) && request.RequestUri.AbsoluteUri.Contains(route) && !request.RequestUri.AbsoluteUri.Contains(actionRoute) && methods.Contains(request.Method.ToUpper());
         }
 
+        private static bool IsBackandRequest
+        {
+            get
+            {
+                string localhost = "localhost";
+                string backand = "backand";
+
+                return System.Web.HttpContext.Current.Request.Url.AbsoluteUri.ToLower().Contains(localhost) || System.Web.HttpContext.Current.Request.Url.AbsoluteUri.ToLower().Contains(backand);
+            }
+        }
+
+        private static bool IsBasic
+        {
+            get
+            {
+                return System.Web.HttpContext.Current.Request.Headers != null && System.Web.HttpContext.Current.Request.Headers["authorization"] != null && System.Web.HttpContext.Current.Request.Headers["authorization"].ToLower().StartsWith("basic");
+            }
+        }
+
+        private static bool HasAppId
+        {
+            get
+            {
+                return System.Web.HttpContext.Current.Request.Headers != null && System.Web.HttpContext.Current.Request.Headers["AppId"] != null;
+            }
+        }
+
         private static bool IsBackand(System.Net.WebRequest request)
         {
             string localhost = "localhost";
@@ -954,6 +981,8 @@ namespace Durados.Workflow
         private static string GetUserProfileAuthToken(View view)
         {
             if (System.Web.HttpContext.Current.Request.Url.PathAndQuery.ToLower().Contains("1/user/signup") || System.Web.HttpContext.Current.Request.Url.PathAndQuery.ToLower().Contains("1/user/requestResetPassword".ToLower()))
+                return view.Database.GetAuthorization();
+            else if (IsBackandRequest && IsBasic && HasAppId)
                 return view.Database.GetAuthorization();
             else
                 return System.Web.HttpContext.Current.Request.Headers["Authorization"] ?? view.Database.GetAuthorization();

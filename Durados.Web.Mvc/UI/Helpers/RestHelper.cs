@@ -940,7 +940,7 @@ namespace Durados.Web.Mvc.UI.Helpers
         }
 
 
-        private static SqlAccess GetSqlAccess(SqlProduct sqlProduct)
+        public static SqlAccess GetSqlAccess(SqlProduct sqlProduct)
         {
             SqlAccess sqlAccess = null;
 
@@ -4320,6 +4320,7 @@ namespace Durados.Web.Mvc.UI.Helpers
         public static readonly string InvalidGrant = "invalid_grant";
         public static readonly string AppNameNotSupplied = "The app name was not supplied.";
         public static readonly string AppNameNotExists = "The app {0} does not exist.";
+        public static readonly string AccessTokenNotAllowedToApp = "The access token is not not allowed to app {0}, that was provided in the header";
         public static string AppLocked
         {
             get
@@ -5776,10 +5777,10 @@ namespace Durados.Web.Mvc.UI.Helpers
 
     public class AppsPool
     {
-        public bool? Pop(string appName, string title, string username, out int? appId, string template, int? templateId)
+        public bool? Pop(string appName, string title, string username, out int? appId, string template, int? templateId, bool force)
         {
             int creator = GetCreator(username);
-            return Pop(appName, title, username, creator, out appId, template, templateId);
+            return Pop(appName, title, username, creator, out appId, template, templateId, force);
         }
 
         private int GetCreator(string username)
@@ -5787,11 +5788,11 @@ namespace Durados.Web.Mvc.UI.Helpers
             return Maps.Instance.DuradosMap.Database.GetUserID(username);
         }
 
-        public bool? Pop(string appName, string title, string username, int creator, out int? appId, string template, int? templateId)
+        public bool? Pop(string appName, string title, string username, int creator, out int? appId, string template, int? templateId, bool force)
         {
             Map mainMap = null;
             appId = null;
-            if (template != "10")
+            if (force || template != "10")
             {
                 return false;
             }
@@ -5822,6 +5823,7 @@ namespace Durados.Web.Mvc.UI.Helpers
                 string lastName = userMainRow["LastName"].ToString();
 
                 ReplaceUsernameInSysDb(mainMap, appName, username, firstName, lastName);
+                //RegisterAdminToAppSecurity(mainMap, appName, username, firstName, lastName);
                 ReplaceUsernameInUsers(mainMap, appName, username, firstName, lastName);
 
                 mainMap.Logger.Log("AppsPool", "Pop", "", string.Format("success for creator id = {0}, pool creator = {1}, app id = {2}, appName = {3} ", creator, poolCreator, appId, appName), "", 3, string.Empty, DateTime.Now);
@@ -5848,6 +5850,11 @@ namespace Durados.Web.Mvc.UI.Helpers
             }
         }
 
+        //private void RegisterAdminToAppSecurity(Map mainMap, string appName, string username, string firstName, string lastName)
+        //{
+        //    (new AccountService(null)).CreateAdminMembership(appName, username, password);
+        //}
+
         private void DeleteBadApp(int appId, string connectionString)
         {
 
@@ -5869,7 +5876,20 @@ namespace Durados.Web.Mvc.UI.Helpers
                 throw new Durados.DuradosException("users should contain one row for " + appName);
             System.Data.DataRow currentUserRow = dataView[0].Row;
             string pk = userView.GetPkValue(currentUserRow);
-            userView.Edit(new Dictionary<string, object>() { { "email", username }, { "firstName", firstName }, { "lastName", lastName } }, pk, null, null, null, null);
+
+            SqlAccess sqlAccess = RestHelper.GetSqlAccess(userView.Database.SqlProduct);
+
+            string sql = string.Format("update {0} set email = '{1}', firstName = '{2}', lastName = '{3}' where id = {4}", userView.Name, username, firstName, lastName, pk);
+            try
+            {
+                sqlAccess.ExecuteNonQuery(userView.ConnectionString, sql, userView.Database.SqlProduct);
+            }
+            catch (Exception exception)
+            {
+                throw new DuradosException("Failed replace username in users", exception);
+            }
+
+            //userView.Edit(new Dictionary<string, object>() { { "email", username }, { "firstName", firstName }, { "lastName", lastName } }, pk, null, null, null, null);
         }
 
         private void ReplaceUsernameInSysDb(Map mainMap, string appName, string username, string firstName, string lastName)

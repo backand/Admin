@@ -497,6 +497,17 @@ namespace BackAnd.Web.Api.Controllers
 
                 view.Update(values, appId.Value.ToString(), false, view_BeforeEdit, view_BeforeEditInDatabase, view_AfterEditBeforeCommit, view_AfterEditAfterCommit);
 
+                try
+                {
+                    RestHelper.Refresh(id);
+
+                    FarmCachingSingeltone.Instance.ClearMachinesCache(id);
+                }
+                catch (Exception exception)
+                {
+                    Map.Logger.Log("myApps", "delete", "refresh", exception, 1, string.Empty);
+                }
+
                 return Ok();
             }
             catch (Exception exception)
@@ -789,7 +800,12 @@ namespace BackAnd.Web.Api.Controllers
 
 
                 Maps.Instance.DuradosMap.Logger.Log("myApps", "delete", "", null, 1, "The app " + id + " was deleted");
-                Maps.Instance.Restart(id);
+                //Maps.Instance.Restart(id);
+
+                RestHelper.Refresh(id);
+
+                FarmCachingSingeltone.Instance.ClearMachinesCache(id);
+       
 
                 //RefreshOldAdmin(id);
 

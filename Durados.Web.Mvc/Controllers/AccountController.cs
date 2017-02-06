@@ -2149,7 +2149,8 @@ namespace Durados.Web.Mvc.Controllers
 
         public bool AuthenticateUser(Map map, string userName, string password)
         {
-            if (map.Database.BackandSSO)
+            //if (map.Database.BackandSSO)
+            if (map is DuradosMap)
             {
                 return _provider.ValidateUser(userName, password);
             }
@@ -2210,8 +2211,9 @@ namespace Durados.Web.Mvc.Controllers
                     }
                     else if (!authenticated)
                     {
-                        string role = Map.Database.GetUserRole(userName);
-                        validated = string.IsNullOrEmpty(role) || role.Equals(Map.Database.DefaultGuestRole);
+                        //string role = Map.Database.GetUserRole(userName);
+                        //validated = string.IsNullOrEmpty(role) || role.Equals(Map.Database.DefaultGuestRole);
+                        validated = false;
                     }
                 }
                 else
@@ -2315,7 +2317,10 @@ namespace Durados.Web.Mvc.Controllers
             }
             else
             {
-                valid = AuthenticateUser(Map, userName, password) && ValidateUser(userName);
+                if (Map is DuradosMap)
+                    valid = AuthenticateUser(Map, userName, password) && ValidateUser(userName);
+                else
+                    valid = AuthenticateUser(Map, userName, password);
             }
 
             if (valid && userInfo == null)
@@ -2612,51 +2617,6 @@ namespace Durados.Web.Mvc.Controllers
         #endregion
     }
 
-    public class MapMembershipProvider : SqlMembershipProvider
-    {
-        private Map Map
-        {
-            get
-            {
-                return Maps.Instance.GetMap();
-            }
-        }
-   
-        public override void Initialize(string name, System.Collections.Specialized.NameValueCollection config)  
-         {
-             NameValueCollection _config = GetMembershipProviderSettings(ref name);
-		        base.Initialize(name, _config);  
-   
-				// Update the private connection string field in the base class.  
-				//string connectionString = "my new connection string value that I get from a custom decryption class not shown here" 
-                string connectionString = Map.securityConnectionString;
-			    // Set private property of Membership provider.  
-			    System.Reflection.FieldInfo connectionStringField = GetType().BaseType.GetField("_sqlConnectionString", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic);  
-			    connectionStringField.SetValue(this, connectionString);  
-         }
-
-        public virtual  NameValueCollection GetMembershipProviderSettings(ref string name)
-        {
-            name = "MapSqlMembershipProvider";
-            
-            NameValueCollection _config = new NameValueCollection();
-            _config.Add("connectionStringName", "SecurityConnectionString");
-            bool b;
-            b=(bool.TryParse(System.Web.Security.Membership.Provider.RequiresQuestionAndAnswer.ToString(),out b))?b:false;
-            _config.Add("requiresQuestionAndAnswer", b.ToString());
-            _config.Add("passwordFormat",System.Web.Security.Membership.Provider.PasswordFormat.ToString()?? "Hashed");
-            _config.Add("maxInvalidPasswordAttempts", System.Web.Security.Membership.Provider.MaxInvalidPasswordAttempts.ToString()??"5");
-            _config.Add("minRequiredPasswordLength", System.Web.Security.Membership.Provider .MinRequiredPasswordLength.ToString()?? "6");
-            _config.Add("minRequiredNonalphanumericCharacters", System.Web.Security.Membership.Provider.MinRequiredNonAlphanumericCharacters.ToString() ?? "0");
-            _config.Add("passwordAttemptWindow", System.Web.Security.Membership.Provider.PasswordAttemptWindow.ToString() ?? "10");
-            _config.Add("passwordStrengthRegularExpression", System.Web.Security.Membership.Provider.PasswordStrengthRegularExpression??string.Empty);
-            _config.Add("applicationName", System.Web.Security.Membership.Provider.ApplicationName??"Security");
-            
-            return _config;
-        }
-        
-
-
-    }
+    
 
 }
