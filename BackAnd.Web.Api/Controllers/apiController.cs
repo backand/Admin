@@ -1917,9 +1917,9 @@ namespace BackAnd.Web.Api.Controllers
             string userViewName = ((Durados.Web.Mvc.Database)Database).UserViewName;
             if (e.View.Name == userViewName)
             {
+                string deletedUsername = null;
                 try
                 {
-                    string deletedUsername = null;
                     try
                     {
                         deletedUsername = e.PrevRow["Username"].ToString();
@@ -1934,6 +1934,19 @@ namespace BackAnd.Web.Api.Controllers
                     }
                 }
                 catch { }
+                try
+                {
+                    var provider = map.GetMembershipProvider();
+                    var membershipUser = provider.GetUser(deletedUsername, false);
+                    if (membershipUser != null)
+                    {
+                        provider.DeleteUser(deletedUsername, true);
+                    }
+                }
+                catch (Exception exception)
+                {
+                    throw new DuradosException("Fail to delete the user " + deletedUsername + " from membership", exception);
+                }
             }
             if (wfe == null)
                 wfe = CreateWorkflowEngine();
