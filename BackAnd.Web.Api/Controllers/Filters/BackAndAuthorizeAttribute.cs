@@ -82,17 +82,21 @@ namespace BackAnd.Web.Api.Controllers.Filters
                 string appNameFromToken = appnameObj.Value;
                 if (actionContext.Request.Headers.Contains("AppName"))
                 {
+                    string appNameInHeader = actionContext.Request.Headers.GetValues("AppName").FirstOrDefault();
                     if (appname.ToLower() == Maps.DuradosAppName)
                     {
-                        appname = actionContext.Request.Headers.GetValues("AppName").FirstOrDefault();
+                        appname = appNameInHeader;
                     }
                     else
                     {
-                        // BackandSSO
-                        actionContext.Response = actionContext.Request.CreateErrorResponse(
-                    HttpStatusCode.Unauthorized,
-                    string.Format(Durados.Web.Mvc.UI.Helpers.UserValidationErrorMessages.AccessTokenNotAllowedToApp, actionContext.Request.Headers.GetValues("AppName").FirstOrDefault()));
-                        return;
+                        if (appname != appNameInHeader)
+                        {
+                            // BackandSSO
+                            actionContext.Response = actionContext.Request.CreateErrorResponse(
+                        HttpStatusCode.Unauthorized,
+                        string.Format(Durados.Web.Mvc.UI.Helpers.UserValidationErrorMessages.AccessTokenNotAllowedToApp, appNameInHeader));
+                            return;
+                        }
                     }
                 }
 
