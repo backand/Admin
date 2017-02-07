@@ -1151,7 +1151,7 @@ namespace Durados.Web.Mvc.UI.Helpers
             {
                 try
                 {
-                    GetMap(appName).Logger.Log("signup", "verify", string.Empty, exception, 2, string.Empty);
+                    GetMap(appName).Logger.Log("signup", "verify", string.Empty, exception, 1, "token:" + token);
                 }
                 catch { };
                 signUpResults = new SignUpResults() { AppName = appName };
