@@ -1057,7 +1057,7 @@ namespace Durados.Web.Mvc.UI.Helpers
             parameters.Add("Guid", Guid.NewGuid());
             parameters.Add("AppName", appName);
             Durados.DataAccess.SqlAccess sql = new Durados.DataAccess.SqlAccess();
-            sql.ExecuteNonQuery(GetDuradosMap().Database.GetUserView().ConnectionString, "INSERT INTO [" + GetDuradosMap().Database.GetUserView().GetTableName() + "] ([Username],[FirstName],[LastName],[Email],[Role],[Guid]) VALUES (@Username,@FirstName,@LastName,@Email,@Role,@Guid)", parameters, AddToAuthenticatedUsersCallback);
+            sql.ExecuteNonQuery(GetDuradosMap().Database.GetUserView().ConnectionString, "if NOT EXISTS (Select [Username] From  [" + GetDuradosMap().Database.GetUserView().GetTableName() + "] WHERE [Username] = @Username) begin INSERT INTO [" + GetDuradosMap().Database.GetUserView().GetTableName() + "] ([Username],[FirstName],[LastName],[Email],[Role],[Guid]) VALUES (@Username,@FirstName,@LastName,@Email,@Role,@Guid) end", parameters, AddToAuthenticatedUsersCallback);
 
         }
 

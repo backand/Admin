@@ -1927,7 +1927,7 @@ namespace BackAnd.Web.Api.Controllers
                     catch { }
                     if (!string.IsNullOrEmpty(deletedUsername))
                     {
-                        int userId = Map.Database.GetUserID(deletedUsername);
+                        int userId = Maps.Instance.DuradosMap.Database.GetUserID(deletedUsername);
                         string appId = Map.Id;
                         SqlAccess sqlAccess = new SqlAccess();
                         sqlAccess.ExecuteNonQuery(Maps.Instance.DuradosMap.connectionString, string.Format("delete durados_UserApp where UserId = {0} and AppId = {1}", userId, appId));
