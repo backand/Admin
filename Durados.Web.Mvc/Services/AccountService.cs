@@ -1069,14 +1069,14 @@ namespace Durados.Web.Mvc.UI.Helpers
         protected virtual void CreateMembership(string username, string password, string role, string appName, bool isApproved = false)
         {
 
-            System.Web.Security.MembershipUser existingUser = System.Web.Security.Membership.Provider.GetUser(username, false);
-            if (existingUser != null)
-            {
-                if (!System.Web.Security.Membership.Provider.ValidateUser(username, password))
-                {
-                    throw new AlreadySignedUpToBackandException();
-                }
-            }
+            //System.Web.Security.MembershipUser existingUser = System.Web.Security.Membership.Provider.GetUser(username, false);
+            //if (existingUser != null)
+            //{
+            //    if (!System.Web.Security.Membership.Provider.ValidateUser(username, password))
+            //    {
+            //        throw new AlreadySignedUpToBackandException();
+            //    }
+            //}
 
             Map map = GetMap(appName);
 
