@@ -250,7 +250,9 @@ namespace Durados.Web.Mvc.UI.Helpers
                 parameters.Add("@Email", email);
                 parameters.Add("@Username", username);
 
-                if (sql.ExecuteScalar(Maps.Instance.DuradosMap.Database.ConnectionString, "SELECT TOP 1 [Username] FROM [durados_User] WHERE [Username]=@Username", parameters) != string.Empty)
+                //if (sql.ExecuteScalar(Maps.Instance.DuradosMap.Database.ConnectionString, "SELECT TOP 1 [Username] FROM [durados_User] WHERE [Username]=@Username", parameters) != string.Empty)
+                System.Web.Security.MembershipUser user = System.Web.Security.Membership.Provider.GetUser(username, false);
+                if (user != null)
                 {
                     return new Dictionary<string, object>() { { "Success", false }, { "Message", string.Format("{0} is already signed up.", username) } };
                 }
@@ -293,18 +295,18 @@ namespace Durados.Web.Mvc.UI.Helpers
                 Guid guid = Guid.NewGuid();
                 parameters.Add("@Guid", guid);
 
-                sql.ExecuteNonQuery(Maps.Instance.DuradosMap.Database.ConnectionString, "INSERT INTO [durados_User] ([Username],[FirstName],[LastName],[Email],[Role],[Guid]) VALUES (@Username,@FirstName,@LastName,@Email,@Role,@Guid)", parameters, CreateMembershipCallback);
+                sql.ExecuteNonQuery(Maps.Instance.DuradosMap.Database.ConnectionString, "if NOT EXISTS (Select [Username] From  [" + GetDuradosMap().Database.GetUserView().GetTableName() + "] WHERE [Username] = @Username) begin INSERT INTO [durados_User] ([Username],[FirstName],[LastName],[Email],[Role],[Guid]) VALUES (@Username,@FirstName,@LastName,@Email,@Role,@Guid) end", parameters, CreateMembershipCallback);
 
-                System.Web.Security.MembershipUser user = System.Web.Security.Membership.Provider.GetUser(username, true);
-                if (user != null)
-                {
-                    if (!user.IsApproved && Maps.MultiTenancy)
-                    {
-                        user.IsApproved = true;
-                        System.Web.Security.Membership.UpdateUser(user);
+                //System.Web.Security.MembershipUser user = System.Web.Security.Membership.Provider.GetUser(username, true);
+                //if (user != null)
+                //{
+                //    if (!user.IsApproved && Maps.MultiTenancy)
+                //    {
+                //        user.IsApproved = true;
+                //        System.Web.Security.Membership.UpdateUser(user);
 
-                    }
-                }
+                //    }
+                //}
 
                 //FormsAuth.SignIn(username, true);
 
@@ -377,16 +379,16 @@ namespace Durados.Web.Mvc.UI.Helpers
 
                 //System.Web.Security.Roles.AddUserToRole(username, role);
 
-                System.Web.Security.MembershipUser user = System.Web.Security.Membership.Provider.GetUser(username, true);
-                user.IsApproved = false;
-                System.Web.Security.Membership.UpdateUser(user);
+                //System.Web.Security.MembershipUser user = System.Web.Security.Membership.Provider.GetUser(username, true);
+                //user.IsApproved = false;
+                //System.Web.Security.Membership.UpdateUser(user);
 
                 return "success";
             }
-            else if (status == MembershipCreateStatus.DuplicateUserName)
-            {
-                return "success";
-            }
+            //else if (status == MembershipCreateStatus.DuplicateUserName)
+            //{
+            //    return "success";
+            //}
             else
             {
                 return ErrorCodeToString(status);
