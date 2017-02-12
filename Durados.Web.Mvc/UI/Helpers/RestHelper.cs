@@ -1919,9 +1919,13 @@ namespace Durados.Web.Mvc.UI.Helpers
             if (row == null)
                 return;
 
+            Map map = Maps.Instance.GetMap();
+
+            var provider = (map is DuradosMap) ? System.Web.Security.Membership.Provider : map.GetMembershipProvider();
+
             string username = row["Username"].ToString();
 
-            System.Web.Security.MembershipUser existingUser = System.Web.Security.Membership.Provider.GetUser(username, false);
+            System.Web.Security.MembershipUser existingUser = provider.GetUser(username, false);
             
             Durados.Web.Mvc.Controllers.AccountMembershipService accountMembershipService = new Durados.Web.Mvc.Controllers.AccountMembershipService();
             bool valid = accountMembershipService.ValidateUser(username);

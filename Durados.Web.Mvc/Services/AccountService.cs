@@ -1080,9 +1080,13 @@ namespace Durados.Web.Mvc.UI.Helpers
             //    }
             //}
 
-            Map map = GetMap(appName);
+            Map map = null;
+            if (appName == Maps.DuradosAppName)
+                map = Maps.Instance.DuradosMap;
+            else
+                map = GetMap(appName);
 
-            var provider = map.GetMembershipProvider();
+            var provider = (map is DuradosMap) ? System.Web.Security.Membership.Provider : map.GetMembershipProvider();
             System.Web.Security.MembershipCreateStatus status = CreateUser(username, password, username, provider);
 
             if (status == MembershipCreateStatus.Success)
@@ -1221,9 +1225,14 @@ namespace Durados.Web.Mvc.UI.Helpers
 
         private void FinishPendingUser(string appName, string username)
         {
-            Map map = GetMap(appName);
+            Map map = null;
+            if (appName == Maps.DuradosAppName)
+                map = Maps.Instance.DuradosMap;
+            else
+                map = GetMap(appName);
 
-            var provider = map.GetMembershipProvider();
+            var provider = (map is DuradosMap) ? System.Web.Security.Membership.Provider : map.GetMembershipProvider();
+            
             System.Web.Security.MembershipUser user = provider.GetUser(username, false);
             user.IsApproved = true;
             provider.UpdateUser(user);
