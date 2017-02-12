@@ -373,11 +373,12 @@ namespace BackAnd.Web.Api.Controllers
                 if (!MembershipService.PasswordResetEnabled) throw new Durados.DuradosException(PWResetNotAllowedMessage);
 
                 if (!MembershipService.ValidateUserExists(userName))
-                    if (string.IsNullOrEmpty(Map.Database.GetGuidByUsername(userName)))
-                        return new Dictionary<string, object>() { { "error", "error" }, { "message", UsernameNotExistsMessage } };
-                    else
-                        return new Dictionary<string, object>() { { "error", "error" }, { "message", UsernameNotfinishRegister } };
-
+                    return new Dictionary<string, object>() { { "error", "error" }, { "message", UsernameNotExistsMessage } };
+                    //if (string.IsNullOrEmpty(Map.Database.GetGuidByUsername(userName)))
+                    //    return new Dictionary<string, object>() { { "error", "error" }, { "message", UsernameNotExistsMessage } };
+                    //else
+                    //    return new Dictionary<string, object>() { { "error", "error" }, { "message", UsernameNotfinishRegister } };
+                    
                 string guid = GetUserGuid(userName);
 
                 //string guid = Map.Database.GetGuidByUsername(userName);
