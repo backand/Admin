@@ -80,9 +80,17 @@ namespace BackAnd.Web.Api.Controllers.Filters
                 string username = usernameObj.Value;
                 string appname = appnameObj.Value;
                 string appNameFromToken = appnameObj.Value;
+
+                string appNameInHeader = null;
                 if (actionContext.Request.Headers.Contains("AppName"))
+                    appNameInHeader = actionContext.Request.Headers.GetValues("AppName").FirstOrDefault();
+                else if (actionContext.Request.Headers.Contains("appName"))
+                    appNameInHeader = actionContext.Request.Headers.GetValues("appName").FirstOrDefault();
+                else if (actionContext.Request.Headers.Contains("appname"))
+                    appNameInHeader = actionContext.Request.Headers.GetValues("appname").FirstOrDefault();
+
+                if (appNameInHeader != null)
                 {
-                    string appNameInHeader = actionContext.Request.Headers.GetValues("AppName").FirstOrDefault();
                     if (appname.ToLower() == Maps.DuradosAppName)
                     {
                         appname = appNameInHeader;

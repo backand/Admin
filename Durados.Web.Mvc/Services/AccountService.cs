@@ -208,17 +208,14 @@ namespace Durados.Web.Mvc.UI.Helpers
             View userView = (View)map.Database.GetUserView();
 
             Dictionary<string, object> values = new Dictionary<string, object>();
-            values.Add("IsApproved", isApproved);
+            if (map is DuradosMap)
+                values.Add("IsApproved", Convert.ToInt32(isApproved));
+            else 
+                values.Add("IsApproved", isApproved);
 
-            try
-            {
-                userView.Edit(values, userId.ToString(), null, null, null, null);
-            }
-            catch (DuradosException)
-            {
-                values["IsApproved"] = Convert.ToInt32(isApproved);
-                userView.Edit(values, userId.ToString(), null, null, null, null);
-            }
+
+            userView.Edit(values, userId.ToString(), null, null, null, null);
+            
         }
 
         
