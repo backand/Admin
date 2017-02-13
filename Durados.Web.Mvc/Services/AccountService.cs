@@ -210,7 +210,15 @@ namespace Durados.Web.Mvc.UI.Helpers
             Dictionary<string, object> values = new Dictionary<string, object>();
             values.Add("IsApproved", isApproved);
 
-            userView.Edit(values, userId.ToString(), null, null, null, null);
+            try
+            {
+                userView.Edit(values, userId.ToString(), null, null, null, null);
+            }
+            catch (DuradosException)
+            {
+                values["IsApproved"] = Convert.ToInt32(isApproved);
+                userView.Edit(values, userId.ToString(), null, null, null, null);
+            }
         }
 
         
