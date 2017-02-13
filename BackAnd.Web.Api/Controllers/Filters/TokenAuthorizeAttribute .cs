@@ -22,7 +22,7 @@ namespace BackAnd.Web.Api.Controllers.Filters
         public override void OnAuthorization(System.Web.Http.Controllers.HttpActionContext actionContext)
         {
             string token = GetToken(actionContext.Request, HeaderToken.ToString());
-            if (!string.IsNullOrEmpty(token) && token != "null")
+            if (!string.IsNullOrEmpty(token) && token != "null" && IsGuid(token))
             {
 
                 string appName = GetAppName(token);
@@ -42,6 +42,12 @@ namespace BackAnd.Web.Api.Controllers.Filters
                         HttpStatusCode.Unauthorized,
                         new MissingOrIncorrectSignUpToken());
 
+        }
+
+        private bool IsGuid(string token)
+        {
+            Guid guid;
+            return Guid.TryParse(token, out guid);
         }
 
         protected virtual string GetAppName(string token)

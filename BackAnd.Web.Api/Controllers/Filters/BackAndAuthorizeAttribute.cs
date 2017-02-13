@@ -475,6 +475,10 @@ namespace BackAnd.Web.Api.Controllers.Filters
             if (HasAccessToken(actionContext))
                 return false;
             string anonymousToken = GetAnonymousToken(actionContext);
+            Guid guid;
+            if (!Guid.TryParse(anonymousToken, out guid))
+                return false;
+           
             if (string.IsNullOrEmpty(anonymousToken))
                 return false;
             string appName = GetAppByToken(anonymousToken);
