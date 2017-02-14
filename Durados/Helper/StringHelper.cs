@@ -106,6 +106,9 @@ namespace System
             string content = template;
             foreach (string name in nameValueDictionary.Keys)
             {
+                if (!name.IsToken())
+                    continue;
+
                 object value = nameValueDictionary[name];
                 if (value is string)
                 {
@@ -144,6 +147,11 @@ namespace System
             }
 
             return content;
+        }
+
+        private static bool IsToken(this string token)
+        {
+            return token.StartsWith("{{") || token.StartsWith("[");
         }
         public static string ReplaceAllTokens(this string template, View view, Dictionary<string, object> values, string pk, string currentUsetId, string currentUsername, string currentUserRole, DataRow prevRow)
         {
