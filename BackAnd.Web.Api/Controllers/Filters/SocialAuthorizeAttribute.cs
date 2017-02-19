@@ -24,9 +24,10 @@ namespace BackAnd.Web.Api.Controllers.Filters
         public override void OnAuthorization(System.Web.Http.Controllers.HttpActionContext actionContext)
         {
             string appName = null;
-            try
+            string provider = null;
+                try
             {
-                string provider = GetProvider(actionContext.Request);
+                provider = GetProvider(actionContext.Request);
                 appName = GetAppName(actionContext.Request);
                 Map map = Maps.Instance.GetMap(appName);
                 var providers = map.Database.GetSocialProviders();
@@ -43,7 +44,7 @@ namespace BackAnd.Web.Api.Controllers.Filters
             {
                 actionContext.Response = actionContext.Request.CreateErrorResponse(
                             HttpStatusCode.Unauthorized,
-                            exception);
+                            provider + " provider failed to authenticate in " + appName + ": " + exception.Message);
             }
         }
 
