@@ -21,23 +21,30 @@ namespace BackAnd.Web.Api.Controllers.Filters
             this.queryStringAppNameKey = queryStringAppNameKey;
         }
 
-        public Map GetMap(HttpRequestMessage request)
-        {
-            return Maps.Instance.GetMap(GetAppName(request));
-        }
         public override void OnAuthorization(System.Web.Http.Controllers.HttpActionContext actionContext)
         {
-            string provider = GetProvider(actionContext.Request);
-            var providers = GetMap(actionContext.Request).Database.GetSocialProviders();
-            if (provider != null && providers.Contains(provider.ToLower()))
+            string appName = null;
+            try
             {
-                return;
+                string provider = GetProvider(actionContext.Request);
+                appName = GetAppName(actionContext.Request);
+                Map map = Maps.Instance.GetMap(appName);
+                var providers = map.Database.GetSocialProviders();
+                if (provider != null && providers.Contains(provider.ToLower()))
+                {
+                    return;
+                }
+
+                actionContext.Response = actionContext.Request.CreateErrorResponse(
+                            HttpStatusCode.Unauthorized,
+                            new UnauthorizedSocialProviderException(provider));
             }
-
-            actionContext.Response = actionContext.Request.CreateErrorResponse(
-                        HttpStatusCode.Unauthorized,
-                        new UnauthorizedSocialProviderException(provider));
-
+            catch (Exception exception)
+            {
+                actionContext.Response = actionContext.Request.CreateErrorResponse(
+                            HttpStatusCode.Unauthorized,
+                            exception);
+            }
         }
 
         protected virtual string GetAppName(HttpRequestMessage request)
