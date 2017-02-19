@@ -1289,7 +1289,7 @@ namespace Durados.Web.Mvc.UI.Helpers
 
 
 
-        protected virtual bool IsPrivate(string appName)
+        public virtual bool IsPrivate(string appName)
         {
             if (appName == Maps.DuradosAppName)
                 return true;

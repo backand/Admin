@@ -1930,7 +1930,7 @@ namespace Durados.Web.Mvc.UI.Helpers
             Durados.Web.Mvc.Controllers.AccountMembershipService accountMembershipService = new Durados.Web.Mvc.Controllers.AccountMembershipService();
             bool valid = accountMembershipService.ValidateUser(username);
             
-            bool readyToSignin = existingUser != null && valid;
+            bool readyToSignin = existingUser == null || valid;
 
             dictionary.Add("readyToSignin", readyToSignin);
         }
@@ -4749,6 +4749,224 @@ namespace Durados.Web.Mvc.UI.Helpers
             return valid;
         }
 
+
+        public bool IsSocialCustomDeny(SocialProfile profile, out string customError)
+        {
+            customError = null;
+
+            if (HasSocialCustomValidation(profile.appName))
+            {
+                try
+                {
+                    bool? customValidation = SocialCustomValidation(profile, out customError);
+
+                    if (customValidation.HasValue)
+                    {
+                        return !customValidation.Value;
+                    }
+                }
+                catch (Exception exception)
+                {
+                    map.Logger.Log("signin", "SocialCustomValidation", "general", exception, 1, string.Empty);
+                }
+            }
+
+
+            return false;
+
+            
+        }
+
+        private bool? SocialCustomValidation(SocialProfile profile, out string customError)
+        {
+            customError = null;
+            
+            Dictionary<string, object> values = null;
+            values = new Dictionary<string, object>();
+            values.Add("username", profile.email);
+            values.Add("firstName", profile.firstName);
+            values.Add("lastName", profile.lastName);
+            values.Add("id", profile.id);
+            
+            foreach (string key in profile.additionalValues.Keys)
+            {
+                if (!values.ContainsKey(key))
+                    values.Add(key, profile.additionalValues[key]);
+            }
+
+            Map map = Maps.Instance.GetMap();
+            View view = (View)map.Database.GetUserView();
+            string parameters = profile.parameters;
+            if (!string.IsNullOrEmpty(parameters))
+            {
+                string json = System.Web.HttpContext.Current.Server.UrlDecode(parameters);
+
+                try
+                {
+                    Dictionary<string, object> rulesParameters = view.Deserialize(System.Web.HttpContext.Current.Server.UrlDecode(parameters));
+                    foreach (string key in rulesParameters.Keys)
+                    {
+                        if (!values.ContainsKey(key))
+                            values.Add(key.AsToken(), rulesParameters[key]);
+                    }
+                }
+                catch (Exception exception)
+                {
+                    map.Logger.Log("signin", "SocialCustomValidation", "get parameters json", exception, 2, string.Empty);
+                }
+            }
+            Durados.Web.Mvc.Workflow.Engine wfe = CreateWorkflowEngine();
+            try
+            {
+                wfe.PerformActions(this, view, Durados.TriggerDataAction.OnDemand, values, null, null, map.Database.ConnectionString, Convert.ToInt32(map.Database.GetUserID()), map.Database.GetUserRole(), null, null, Durados.Database.CustomSocialValidationActionName);
+
+            }
+            catch (Exception exception)
+            {
+                customError = exception.Message;
+                return false;
+            }
+            if (values.ContainsKey(Durados.Workflow.JavaScript.ReturnedValueKey))
+            {
+                var returnedValue = values[Durados.Workflow.JavaScript.ReturnedValueKey];
+                if (returnedValue is IDictionary<string, object>)
+                {
+                    const string Result = "result";
+                    const string Allow = "allow";
+                    const string Deny = "deny";
+                    const string Ignore = "ignore";
+                    const string Message = "message";
+                    const string AdditionalTokenInfo = "additionalTokenInfo";
+                    IDictionary<string, object> result = (IDictionary<string, object>)returnedValue;
+                    if (result.ContainsKey(Result))
+                    {
+                        if (result[Result].Equals(Ignore))
+                        {
+                            return null;
+                        }
+                        else if (result[Result].Equals(Allow))
+                        {
+                            if (result.ContainsKey(AdditionalTokenInfo))
+                            {
+                                System.Web.HttpContext.Current.Items.Add(Durados.Database.CustomTokenAttrKey, result[AdditionalTokenInfo]);
+                                IDictionary<string, object> additionalTokenInfo = (IDictionary<string, object>)result[AdditionalTokenInfo];
+                                foreach (string key in additionalTokenInfo.Keys)
+                                {
+                                    if (!additionalTokenInfo.ContainsKey(key))
+                                        profile.additionalValues.Add(key, additionalTokenInfo[key]);
+                                }
+                            }
+                            
+                        }
+                        else if (result[Result].Equals(Deny))
+                        {
+                            if (result.ContainsKey(Message))
+                            {
+                                customError = result[Message].ToString();
+                                return false;
+                            }
+                            else
+                            {
+                                customError = Database.CustomValidationActionName + " did not return the expected result. Missing " + Message + " field in the returned object";
+                                return false;
+                            }
+                        }
+                        else
+                        {
+                            customError = Database.CustomValidationActionName + " did not return the expected result. " + Result + " must return either \"" + Allow + "\", \"" + Deny + "\" or \"" + Ignore + "\".";
+                            return false;
+                        }
+                    }
+                    else
+                    {
+                        customError = Database.CustomValidationActionName + " did not return the expected result. Missing " + Result + " field in the returned object.";
+                        return false;
+                    }
+                }
+                else
+                {
+                    customError = Database.CustomValidationActionName + " did not return the expected result.";
+                    return false;
+                }
+
+            }
+
+            string username = null;
+            if (values.ContainsKey("Username"))
+            {
+                username = values["Username"].ToString();
+            }
+            if (values.ContainsKey("username"))
+            {
+                username = values["username"].ToString();
+            }
+
+            if (System.Web.HttpContext.Current != null && System.Web.HttpContext.Current.Items.Contains(Database.Username) && System.Web.HttpContext.Current.Items[Database.Username] != username)
+            {
+                System.Web.HttpContext.Current.Items[Database.Username] = username;
+            }
+
+            string firstName = null;
+            if (values.ContainsKey("FirstName"))
+            {
+                firstName = values["FirstName"].ToString();
+            }
+            if (values.ContainsKey("firstName"))
+            {
+                firstName = values["firstName"].ToString();
+            }
+
+            string lastName = null;
+            if (values.ContainsKey("LastName"))
+            {
+                lastName = values["LastName"].ToString();
+            }
+            if (values.ContainsKey("lastName"))
+            {
+                lastName = values["lastName"].ToString();
+            }
+
+            string role = null;
+            if (values.ContainsKey("Role"))
+            {
+                role = values["Role"].ToString();
+            }
+            if (values.ContainsKey("UserRole_Parent"))
+            {
+                role = values["UserRole_Parent"].ToString();
+            }
+
+            string password = null;
+            if (values.ContainsKey("password"))
+            {
+                password = values["password"].ToString();
+            }
+            if (values.ContainsKey("Password"))
+            {
+                password = values["Password"].ToString();
+            }
+
+            if (!IsUserExist(username))
+            {
+                try
+                {
+                    View roleView = Map.Database.GetRoleView();
+                    if (!string.IsNullOrEmpty(role) && roleView.GetDataRow(role) == null)
+                    {
+                        roleView.Create(new Dictionary<string, object>() { { "Name", role }, { "Description", role } });
+                    }
+                    AddUser(username, password, firstName, lastName, role);
+                }
+                catch (Exception exception)
+                {
+                    customError = "Failed to add user: " + exception.Message;
+                    return false;
+                }
+            }
+            return true;
+
+        }
+
         protected virtual Durados.Web.Mvc.Workflow.Engine CreateWorkflowEngine()
         {
             return new Durados.Web.Mvc.Workflow.Engine();
@@ -5079,6 +5297,10 @@ namespace Durados.Web.Mvc.UI.Helpers
             return map.Database.GetUserRow(username) != null;
         }
 
+        private bool HasSocialCustomValidation(string appName)
+        {
+            return HasCustomAction(appName, Database.CustomSocialValidationActionName, Maps.Instance.GetCode(Database.CustomSocialValidationActionFileName));
+        }
 
         private bool HasCustomValidation()
         {
@@ -5088,6 +5310,12 @@ namespace Durados.Web.Mvc.UI.Helpers
         private static bool HasCustomAction(string actionName, string emptyCode)
         {
             Map map = Maps.Instance.GetMap();
+            return HasCustomAction(map.AppName, actionName, emptyCode);
+        }
+
+        private static bool HasCustomAction(string appName, string actionName, string emptyCode)
+        {
+            Map map = Maps.Instance.GetMap(appName);
             return map.HasRule(actionName) && (map.GetRule(actionName).Code != emptyCode);
         }
         public bool HasCustomChangePassword()

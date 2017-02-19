@@ -55,6 +55,9 @@ namespace Durados
         public static readonly string AnonymousToken = "AnonymousToken";
         public static readonly string CreateSchema = "CreateSchema";
         public static readonly string CustomValidationActionName = "backandAuthOverride";
+        public static readonly string CustomSocialValidationActionName = "socialAuthOverride";
+        public static readonly string CustomSocialValidationActionFileName = "socialAuthOverride.js";
+        
         public static readonly string ChangePasswordOverride = "ChangePasswordOverride";
         public static readonly string CustomTokenAttrKey = "CustomTokenAttr";
         public static readonly string AutoGuidPkType = "char(36)";

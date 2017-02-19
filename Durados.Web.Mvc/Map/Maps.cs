@@ -1929,6 +1929,27 @@ namespace Durados.Web.Mvc
             return appName;
         }
 
+
+        MemoryCache codes = new MemoryCache("codes");
+        public string GetCode(string fileName)
+        {
+            string path = Path.GetDirectoryName(AppDomain.CurrentDomain.BaseDirectory) + @"\deployment\" + fileName;
+            if (!codes.Contains(fileName))
+            {
+                if (File.Exists(path))
+                {
+                    codes[fileName] = File.ReadAllText(path);
+                }
+                else
+                {
+                    throw new System.IO.FileNotFoundException("The js infrastructure file was not found", path);
+                }
+            }
+
+            return (string)codes.Get(fileName);
+        }
+
+        
         private string GetAppNameByGuidFromCache(string guid)
         {
             if (!DuradosMap.AllKindOfCache.Contains(guidTokenKey))

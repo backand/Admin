@@ -730,6 +730,7 @@ namespace BackAnd.Web.Api.Controllers
 
         [AllowAnonymous]
         [Route("socialSignin")]
+        [SocialAuthorizeAttribute]
         [HttpGet]
         public async Task<IHttpActionResult> socialSignin(string provider, string appName, string returnAddress = null, string code = null, string email = null, bool signupIfNotSignedIn = false, bool useHashRouting = true)
         {
@@ -766,11 +767,17 @@ namespace BackAnd.Web.Api.Controllers
 
         [AllowAnonymous]
         [Route("socialSignup")]
+        [SocialAuthorizeAttribute]
         [HttpGet]
         public async Task<IHttpActionResult> socialSignup(string provider, string appName, string returnAddress = null, string parameters = null, string email = null, bool useHashRouting = true)
         {
             try
             {
+                if (new AccountService(this).IsPrivate(appName))
+                {
+                    throw new Durados.Web.Mvc.UI.Helpers.AccountService.OnlyInvitedUsersAreAllowedException();
+                }
+
                 AbstractSocialProvider social = SocialProviderFactory.GetSocialProvider(provider);
                 return Redirect(social.GetAuthUrl(appName, returnAddress ?? GetCurrentAddress(), parameters, "signup", email, false, useHashRouting));
             }
@@ -831,7 +838,7 @@ namespace BackAnd.Web.Api.Controllers
                 }
                 catch (UserNotSignedUpSocialException userNotSignedUpSocialException)
                 {
-                    if (signupIfNotSignedIn)
+                    if (signupIfNotSignedIn /*&& !(new AccountService(this)).IsPrivate(appName)*/)
                     {
                         SocialSignupInner(profile);
                         SocialSigninInner(profile);
@@ -1076,7 +1083,7 @@ namespace BackAnd.Web.Api.Controllers
                     }
                     catch (UserNotSignedUpSocialException userNotSignedUpSocialException)
                     {
-                        if (!profile.signupIfNotSignedIn)
+                        if (!profile.signupIfNotSignedIn || (new AccountService(this)).IsPrivate(profile.appName))
                         {
                             return BadRequest(userNotSignedUpSocialException.Message);
                         }
@@ -1095,7 +1102,7 @@ namespace BackAnd.Web.Api.Controllers
 
 
                 //login the user use email
-                ClaimsIdentity identity = CreateIdentity(profile.email, profile.appName, provider);
+                //ClaimsIdentity identity = CreateIdentity(profile.email, profile.appName, provider);
 
                 // create token
                 string AccessToken = SecurityHelper.GetTmpUserGuidFromGuid(AccountService.GetUserGuid(profile.email));//CreateToken(identity);
@@ -1106,6 +1113,8 @@ namespace BackAnd.Web.Api.Controllers
                     Durados.Web.Mvc.Farm.SharedMemorySingeltone.Instance.Set(AccessToken, profile.additionalValues["refreshToken"].ToString(), tenMinutes);
 
                 }
+
+                SetProfileInSharedMemoryToModulateInAccessToken(AccessToken, profile);
 
                 // return token
 
@@ -1142,6 +1151,19 @@ namespace BackAnd.Web.Api.Controllers
 
                 }
             }
+        }
+
+        private bool SocialAuthOverrideDeny(SocialProfile profile, out string message)
+        {
+            return (new DuradosAuthorizationHelper()).IsSocialCustomDeny(profile, out message);
+        }
+
+        private void SetProfileInSharedMemoryToModulateInAccessToken(string token, SocialProfile profile)
+        {
+            int day = 1000 * 60 * 60 * 24;
+            var jss = new JavaScriptSerializer();
+            
+            Durados.Web.Mvc.Farm.SharedMemorySingeltone.Instance.Set(token, jss.Serialize(profile), day);
         }
 
         private static bool GetCanLoginWithProfile(SocialProfile profile)
@@ -1358,6 +1380,11 @@ namespace BackAnd.Web.Api.Controllers
             if (!System.Web.HttpContext.Current.Items.Contains(Durados.Database.RequestId))
                 System.Web.HttpContext.Current.Items.Add(Durados.Database.RequestId, Guid.NewGuid().ToString());
 
+            if (new AccountService(this).IsPrivate(profile.appName))
+            {
+                throw new Durados.Web.Mvc.UI.Helpers.AccountService.OnlyInvitedUsersAreAllowedException();
+            }
+
             NewRelic.Api.Agent.NewRelic.AddCustomParameter(Durados.Database.RequestId, System.Web.HttpContext.Current.Items[Durados.Database.RequestId].ToString());
             var canLoginWithProfile = GetCanLoginWithProfile(profile);
 
@@ -1473,6 +1500,13 @@ namespace BackAnd.Web.Api.Controllers
                 }
                 else
                 {
+                    string message;
+
+                    if (SocialAuthOverrideDeny(profile, out message))
+                    {
+                        throw new SocialException(message);
+                    }
+
                     userRow = Maps.Instance.GetMap(profile.appName).Database.GetUserRow(profile.email, true);
 
                     if (userRow == null)

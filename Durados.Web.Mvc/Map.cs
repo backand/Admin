@@ -643,6 +643,12 @@ namespace Durados.Web.Mvc
                         Commit();
                     }
 
+                    if (!(this is DuradosMap) && !HasRule(Database.CustomSocialValidationActionName))
+                    {
+                        AddSocialAuthenticationOverride();
+                        Commit();
+                    }
+
                     if (!(this is DuradosMap) && !HasRule(Database.ChangePasswordOverride))
                     {
                         AddChangePasswordOverride();
@@ -2024,6 +2030,32 @@ namespace Durados.Web.Mvc
             string rulePK = ruleView.GetPkValue(row);
 
         }
+
+        
+       
+
+        private void AddSocialAuthenticationOverride()
+        {
+            string code = Maps.Instance.GetCode(Database.CustomSocialValidationActionFileName);
+
+            ConfigAccess configAccess = new DataAccess.ConfigAccess();
+            string userViewPK = configAccess.GetViewPK(Database.UserViewName, configDatabase.ConnectionString);
+            View ruleView = (View)configDatabase.Views["Rule"];
+            Dictionary<string, object> values = new Dictionary<string, object>();
+            values.Add("Name", Database.CustomSocialValidationActionName);
+            values.Add("Rules_Parent", userViewPK);
+            values.Add("DataAction", Durados.TriggerDataAction.OnDemand.ToString());
+            values.Add("WorkflowAction", Durados.WorkflowAction.JavaScript.ToString());
+            values.Add("WhereCondition", "true");
+
+            values.Add("Code", code);
+
+            DataRow row = ruleView.Create(values, null, null, null, null, null);
+            string rulePK = ruleView.GetPkValue(row);
+
+        }
+
+        
 
         private void AddChangePasswordOverride()
         {
