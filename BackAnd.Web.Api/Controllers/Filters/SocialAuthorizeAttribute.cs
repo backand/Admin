@@ -37,7 +37,7 @@ namespace BackAnd.Web.Api.Controllers.Filters
 
                 actionContext.Response = actionContext.Request.CreateErrorResponse(
                             HttpStatusCode.Unauthorized,
-                            new UnauthorizedSocialProviderException(provider));
+                            "The " + provider + " provider is unauthorized.");
             }
             catch (Exception exception)
             {
