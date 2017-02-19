@@ -1397,6 +1397,9 @@ namespace Durados.Web.Mvc
                 return duradosMap;
             }
 
+            if (!System.Web.HttpContext.Current.Items.Contains(Database.AppName))
+                System.Web.HttpContext.Current.Items.Add(Database.AppName, appName);
+
             Map map = null;
 
             if (IsInMemoryMode())

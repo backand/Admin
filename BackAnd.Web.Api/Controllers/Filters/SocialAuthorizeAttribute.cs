@@ -29,6 +29,7 @@ namespace BackAnd.Web.Api.Controllers.Filters
             {
                 provider = GetProvider(actionContext.Request);
                 appName = GetAppName(actionContext.Request);
+                
                 Map map = Maps.Instance.GetMap(appName);
                 var providers = map.Database.GetSocialProviders();
                 if (provider != null && providers.Contains(provider.ToLower()))
