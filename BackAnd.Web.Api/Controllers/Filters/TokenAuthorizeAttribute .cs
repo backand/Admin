@@ -29,7 +29,8 @@ namespace BackAnd.Web.Api.Controllers.Filters
 
                 if (!string.IsNullOrEmpty(appName))
                 {
-                    System.Web.HttpContext.Current.Items.Add(Database.AppName, appName);
+                    if (!System.Web.HttpContext.Current.Items.Contains(Database.AppName))
+                        System.Web.HttpContext.Current.Items.Add(Database.AppName, appName);
 
                     if (!System.Web.HttpContext.Current.Items.Contains(Database.RequestId))
                         System.Web.HttpContext.Current.Items.Add(Database.RequestId, Guid.NewGuid().ToString());

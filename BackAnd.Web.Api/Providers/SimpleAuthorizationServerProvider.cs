@@ -188,9 +188,11 @@ namespace BackAnd.Web.Api.Providers
                 return;
             }
 
-            System.Web.HttpContext.Current.Items.Add(Database.AppName, appName);
+            if (!System.Web.HttpContext.Current.Items.Contains(Database.AppName))
+                System.Web.HttpContext.Current.Items.Add(Database.AppName, appName);
 
-            System.Web.HttpContext.Current.Items.Add(Database.Username, username);
+            if (!System.Web.HttpContext.Current.Items.Contains(Database.Username))
+                System.Web.HttpContext.Current.Items.Add(Database.Username, username);
 
 
             var identity = new ClaimsIdentity(context.Options.AuthenticationType);

@@ -1375,7 +1375,8 @@ namespace BackAnd.Web.Api.Controllers
         private void SocialSignupInner(SocialProfile profile)
         {
 
-            System.Web.HttpContext.Current.Items.Add(Durados.Database.AppName, profile.appName);
+            if (!System.Web.HttpContext.Current.Items.Contains(Durados.Database.AppName))
+                System.Web.HttpContext.Current.Items.Add(Durados.Database.AppName, profile.appName);
 
             if (!System.Web.HttpContext.Current.Items.Contains(Durados.Database.RequestId))
                 System.Web.HttpContext.Current.Items.Add(Durados.Database.RequestId, Guid.NewGuid().ToString());

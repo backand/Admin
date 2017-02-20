@@ -23,7 +23,8 @@ namespace BackAnd.UnitTests
             var appName = new FarmTest().ValidAppName;
             var res = Maps.Instance.GetMap(appName);
 
-            System.Web.HttpContext.Current.Items.Add(Durados.Database.AppName, appName);
+            if (!System.Web.HttpContext.Current.Items.Contains(Durados.Database.AppName))
+                System.Web.HttpContext.Current.Items.Add(Durados.Database.AppName, appName);
             this.RefreshConfigCache(res);
 
             var transport = typeof(FarmCachingNormal).GetField("transport", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(FarmCachingSingeltone.Instance);
