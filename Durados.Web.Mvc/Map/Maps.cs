@@ -1397,9 +1397,7 @@ namespace Durados.Web.Mvc
                 return duradosMap;
             }
 
-            if (!System.Web.HttpContext.Current.Items.Contains(Database.AppName))
-                System.Web.HttpContext.Current.Items.Add(Database.AppName, appName);
-
+            
             Map map = null;
 
             if (IsInMemoryMode())
@@ -1429,6 +1427,9 @@ namespace Durados.Web.Mvc
                     lock (lockerPerApp.GetLock(appName))
                     {
                         map = CreateMap(appName, out newStructure);
+                        if (!System.Web.HttpContext.Current.Items.Contains(Database.AppName))
+                            System.Web.HttpContext.Current.Items.Add(Database.AppName, appName);
+
                     }
                 }
                 catch (Exception exception)
