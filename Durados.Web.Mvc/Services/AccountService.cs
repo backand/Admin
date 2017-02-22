@@ -1292,7 +1292,7 @@ namespace Durados.Web.Mvc.UI.Helpers
         public virtual bool IsPrivate(string appName)
         {
             if (appName == Maps.DuradosAppName)
-                return true;
+                return false;
             Map map = GetMap(appName);
             return !map.Database.EnableUserRegistration;
         }
