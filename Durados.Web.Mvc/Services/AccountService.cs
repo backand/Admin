@@ -161,7 +161,7 @@ namespace Durados.Web.Mvc.UI.Helpers
 
         public virtual void ChangePassword(string username, string password, Map map)
         {
-            if (map == null)
+            if (map == null || map.GetMembershipProvider().GetUser(username, false) == null)
             {
                 ChangePasswordInner(username, password, _provider);
             }
