@@ -535,14 +535,14 @@ namespace BackAnd.Web.Api.Controllers
                     View view = (View)map.GetConfigDatabase().Views["Database"];
                     view.Edit(GetAdjustedValues(view, databaseSettings), "0", view_BeforeEdit, view_BeforeEditInDatabase, view_AfterEditBeforeCommit, view_AfterEditAfterCommit);
                     UpdateAnonymousUserRole(map, databaseSettings);
-                    if (e.Values.ContainsKey("IsAuthApp"))
-                    {
-                        bool isAuthApp = Convert.ToBoolean(e.Values["IsAuthApp"]);
-                        if (!isAuthApp.Equals(map.IsAuthApp))
-                        {
-                            UpdateIsAuthApp(map, isAuthApp);
-                        }
-                    }
+                    //if (e.Values.ContainsKey("IsAuthApp"))
+                    //{
+                    //    bool isAuthApp = Convert.ToBoolean(e.Values["IsAuthApp"]);
+                    //    if (!isAuthApp.Equals(map.IsAuthApp))
+                    //    {
+                    //        UpdateIsAuthApp(map, isAuthApp);
+                    //    }
+                    //}
 
                     if (newAppName != null)
                     {
