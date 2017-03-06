@@ -562,7 +562,7 @@ namespace BackAnd.Web.Api.Controllers
             catch (Exception exception)
             {
                 e.Cancel = true;
-                throw new Durados.DuradosException("Failed to update database configuration", exception);
+                throw new Durados.DuradosException("Failed to update database configuration: " + exception.Message, exception);
 
             }
         }
