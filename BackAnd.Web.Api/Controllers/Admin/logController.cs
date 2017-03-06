@@ -70,6 +70,73 @@ namespace BackAnd.Web.Api.Controllers
             return System.Convert.ToBoolean(System.Configuration.ConfigurationManager.AppSettings["writeToLogStash"] ?? "true");
         }
 
-        
+        private string BaseUrl = System.Configuration.ConfigurationManager.AppSettings["nodeHost"] ?? "http://127.0.0.1:9000";
+
+        [Route("~/1/last2hoursLog")]
+        [HttpGet]
+        public IHttpActionResult Get(int pageNumber = 1, int pageSize = 100, int minutesAgo = 120)
+        {
+            try
+            {
+                if (pageNumber <= 0)
+                    throw new Durados.DuradosException("pageNumber must be larger than 0");
+                if (pageSize <= 0)
+                    throw new Durados.DuradosException("pageSize must be larger than 0");
+                if (minutesAgo <= 0)
+                    throw new Durados.DuradosException("minutesAgo must be larger than 0");
+
+                if (pageSize > 1000)
+                    return ResponseMessage(Request.CreateResponse(HttpStatusCode.BadRequest, new { Messsage = "pageSize is limited to 1000" }));
+                if (minutesAgo > 1200)
+                    return ResponseMessage(Request.CreateResponse(HttpStatusCode.BadRequest, new { Messsage = "minutesAgo is limited to 1200" }));
+
+                pageNumber = pageNumber - 1;
+
+                Dictionary<string, object> data = new Dictionary<string, object>();
+
+                data.Add("appName", Map.AppName);
+                data.Add("fromTimeEpochTime", GetEpochTime(DateTime.Now.Subtract(new TimeSpan(0, minutesAgo, 0))));
+                data.Add("toTimeEpochTime", GetEpochTime(DateTime.Now));
+                data.Add("offset", pageNumber);
+                data.Add("count", pageSize);
+
+                string url = BaseUrl + "/lastHourExceptions";
+                XMLHttpRequest request = new XMLHttpRequest();
+                request.open("POST", url, false);
+                request.setRequestHeader("content-type", "application/json");
+
+                System.Web.Script.Serialization.JavaScriptSerializer jss = new System.Web.Script.Serialization.JavaScriptSerializer();
+                request.send(jss.Serialize(data));
+
+                Dictionary<string, object> response = null;
+                if (request.status == 200)
+                {
+                    try
+                    {
+                        response = jss.Deserialize<Dictionary<string, object>>(request.responseText);
+                    }
+                    catch (Exception exception)
+                    {
+                        throw new Durados.DuradosException("Failed to deserialize response " + request.status + ", " + request.responseText, exception);
+                    }
+                }
+                else
+                {
+                    throw new Durados.DuradosException("Status: " + request.status + ", " + request.responseText);
+                }
+
+                return Ok(response);
+            }
+            catch (Exception exception)
+            {
+                throw new BackAndApiUnexpectedResponseException(exception, this);
+            }
+        }
+
+        private int GetEpochTime(DateTime dateTime)
+        {
+            TimeSpan t = dateTime - new DateTime(1970, 1, 1);
+            return (int)t.TotalSeconds;
+        }
     }
 }

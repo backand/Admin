@@ -1390,7 +1390,7 @@ namespace Durados.Web.Mvc.UI.Helpers
             if (appName == Maps.DuradosAppName)
                 return false;
             Map map = GetMap(appName);
-            return !map.Database.EnableUserRegistration || map.IsDomainController;
+            return !map.Database.EnableUserRegistration || ((map.HasAuthApp || map.IsAuthApp) && map.IsDomainController);
         }
 
         public virtual bool IsDomainController(string appName)
