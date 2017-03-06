@@ -108,12 +108,12 @@ namespace BackAnd.Web.Api.Controllers
                 System.Web.Script.Serialization.JavaScriptSerializer jss = new System.Web.Script.Serialization.JavaScriptSerializer();
                 request.send(jss.Serialize(data));
 
-                Dictionary<string, object> response = null;
+                Dictionary<string, object>[] response = null;
                 if (request.status == 200)
                 {
                     try
                     {
-                        response = jss.Deserialize<Dictionary<string, object>>(request.responseText);
+                        response = jss.Deserialize<Dictionary<string, object>[]>(request.responseText);
                     }
                     catch (Exception exception)
                     {
