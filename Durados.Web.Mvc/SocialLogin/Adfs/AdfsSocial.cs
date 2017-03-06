@@ -9,6 +9,14 @@ namespace Durados.Web.Mvc.SocialLogin
 {
     public class AdfsSocialProvider : AbstractSocialProvider
     {
+        public virtual bool IsDomainController
+        {
+            get
+            {
+                return true;
+            }
+        }
+
         protected override SocialProfile GetNewProfile(Dictionary<string, object> dictionary)
         {
             if (!(dictionary.ContainsKey("upn") || dictionary.ContainsKey("email")))
@@ -28,7 +36,7 @@ namespace Durados.Web.Mvc.SocialLogin
 
         protected virtual SocialProfile GetNewSocialProfile(Dictionary<string, object> dictionary)
         {
-            return new AdfsProfile(dictionary); 
+            return new Adfs.AdfsProfile(dictionary); 
         }
 
         protected override string ProviderName

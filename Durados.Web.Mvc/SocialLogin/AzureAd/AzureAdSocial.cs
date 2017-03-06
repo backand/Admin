@@ -25,7 +25,7 @@ namespace Durados.Web.Mvc.SocialLogin
 
         protected override SocialProfile GetNewSocialProfile(Dictionary<string, object> dictionary)
         {
-            return new AzureAdProfile(dictionary);
+            return new AzureAd.AzureAdProfile(dictionary);
         }
 
         protected override string GetAccessTokenData(string code, string clientId, string redirectUri, string resource = null)

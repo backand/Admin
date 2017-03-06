@@ -14,6 +14,8 @@ namespace Durados.Web.Mvc.SocialLogin
             switch (providerName.ToLower())
             {
                 case "google":
+                    if (IsTest())
+                        return new GoogleSocialProviderTest();
                     return new GoogleSocialProvider();
                 case "github":
                     return new GithubSocialProvider();
@@ -24,11 +26,18 @@ namespace Durados.Web.Mvc.SocialLogin
                 case "adfs":
                     return new AdfsSocialProvider();
                 case "azuread":
+                    if (IsTest())
+                        return new AzureAdSocialProviderTest();
                     return new AzureAdSocialProvider();
                 
                 default:
                     return null;
             }
+        }
+
+        private static bool IsTest()
+        {
+            return System.Web.HttpContext.Current.Request.QueryString["test"] != null;
         }
     }
 }

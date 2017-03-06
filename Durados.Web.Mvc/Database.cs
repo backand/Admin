@@ -253,11 +253,7 @@ namespace Durados.Web.Mvc
         [Durados.Config.Attributes.ColumnProperty()]
         public bool EnableTwitter { get; set; }
 
-        [Durados.Config.Attributes.ColumnProperty()]
-        public bool EnableAdfs { get; set; }
-        [Durados.Config.Attributes.ColumnProperty()]
-        public bool EnableAzureAd { get; set; }
-
+       
 
         [Durados.Config.Attributes.ColumnProperty()]
         public string FacebookClientId { get; set; }
@@ -268,27 +264,187 @@ namespace Durados.Web.Mvc
         [Durados.Config.Attributes.ColumnProperty()]
         public string FacebookScope { get; set; }
 
-        [Durados.Config.Attributes.ColumnProperty()]
-        public string AdfsClientId { get; set; }
 
+        private bool _enableAdfs;
         [Durados.Config.Attributes.ColumnProperty()]
-        public string AdfsResource { get; set; }
+        public bool EnableAdfs
+        {
+            get
+            {
+                if (HasAuthApp)
+                {
+                    return Map.GetAuthAppMap().Database.EnableAdfs;
+                }
+                else
+                {
+                    return _enableAdfs;
+                }
+            }
+            set
+            {
+                _enableAdfs = value;
+            }
+        }
 
+        private bool _enableAzureAd;
         [Durados.Config.Attributes.ColumnProperty()]
-        public string AdfsHost { get; set; }
+        public bool EnableAzureAd
+        {
+            get
+            {
+                if (HasAuthApp)
+                {
+                    return Map.GetAuthAppMap().Database.EnableAzureAd;
+                }
+                else
+                {
+                    return _enableAzureAd;
+                }
+            }
+            set
+            {
+                _enableAzureAd = value;
+            }
+        }
 
-        [Durados.Config.Attributes.ColumnProperty()]
-        public string AzureAdClientId { get; set; }
 
+        private string _adfsClientId;
         [Durados.Config.Attributes.ColumnProperty()]
-        public string AzureAdResource { get; set; }
+        public string AdfsClientId
+        {
+            get
+            {
+                if (HasAuthApp)
+                {
+                    return Map.GetAuthAppMap().Database.AdfsClientId;
+                }
+                else
+                {
+                    return _adfsClientId;
+                }
+            }
+            set
+            {
+                _adfsClientId = value;
+            }
+        }
 
+        private string _adfsResource;
         [Durados.Config.Attributes.ColumnProperty()]
-        public string AzureAdHost { get; set; }
+        public string AdfsResource
+        {
+            get
+            {
+                if (HasAuthApp)
+                {
+                    return Map.GetAuthAppMap().Database.AdfsResource;
+                }
+                else
+                {
+                    return _adfsResource;
+                }
+            }
+            set
+            {
+                _adfsResource = value;
+            }
+        }
+
+        private string _adfsHost;
+        [Durados.Config.Attributes.ColumnProperty()]
+        public string AdfsHost
+        {
+            get
+            {
+                if (HasAuthApp)
+                {
+                    return Map.GetAuthAppMap().Database.AdfsHost;
+                }
+                else
+                {
+                    return _adfsHost;
+                }
+            }
+            set
+            {
+                _adfsHost = value;
+            }
+        }
+
+        private string _azureAdClientId;
+        [Durados.Config.Attributes.ColumnProperty()]
+        public string AzureAdClientId
+        {
+            get
+            {
+                if (HasAuthApp)
+                {
+                    return Map.GetAuthAppMap().Database.AzureAdClientId;
+                }
+                else
+                {
+                    return _azureAdClientId;
+                }
+            }
+            set
+            {
+                _azureAdClientId = value;
+            }
+        }
+
+        private string _azureAdResource;
+        [Durados.Config.Attributes.ColumnProperty()]
+        public string AzureAdResource
+        {
+            get
+            {
+                if (HasAuthApp)
+                {
+                    return Map.GetAuthAppMap().Database.AzureAdResource;
+                }
+                else
+                {
+                    return _azureAdResource;
+                }
+            }
+            set
+            {
+                _azureAdResource = value;
+            }
+        }
+
+        private string _azureAdHost;
+        [Durados.Config.Attributes.ColumnProperty()]
+        public string AzureAdHost
+        {
+            get
+            {
+                if (HasAuthApp)
+                {
+                    return Map.GetAuthAppMap().Database.AzureAdHost;
+                }
+                else
+                {
+                    return _azureAdHost;
+                }
+            }
+            set
+            {
+                _azureAdHost = value;
+            }
+        }
+
+
+
+
+
 
 
         [Durados.Config.Attributes.ColumnProperty()]
         public bool EnableFacebook { get; set; }
+
+
+
 
 
         [Durados.Config.Attributes.ColumnProperty()]
@@ -342,8 +498,26 @@ namespace Durados.Web.Mvc
         [Durados.Config.Attributes.ColumnProperty()]
         public bool ApproveNewUsersManually { get; set; }
 
+        private bool _enableUserRegistration;
         [Durados.Config.Attributes.ColumnProperty()]
-        public bool EnableUserRegistration { get; set; }
+        public bool EnableUserRegistration
+        {
+            get
+            {
+                if (HasAuthApp)
+                {
+                    return Map.GetAuthAppMap().Database.EnableUserRegistration;
+                }
+                else
+                {
+                    return _enableUserRegistration;
+                }
+            }
+            set
+            {
+                _enableUserRegistration = value;
+            }
+        }
 
 
         [Durados.Config.Attributes.ColumnProperty()]
@@ -1550,9 +1724,36 @@ namespace Durados.Web.Mvc
 
         [Durados.Config.Attributes.ColumnProperty(Description = "requires question and answer")]
         public bool RequiresQuestionAndAnswer { get; set; }
-        
-        
-        
+
+
+        protected override bool GetIsAuthApp()
+        {
+            return Map.IsAuthApp;
+        }
+
+        public override bool IsDomainController
+        {
+            get
+            {
+                return EnableAdfs || EnableAzureAd;
+            }
+        }
+
+        public override string GetDomainControllerProvider()
+        {
+            if (EnableAzureAd)
+            {
+                return "azuread";
+            }
+            else if (EnableAdfs)
+            {
+                return "adfs";
+            }
+            else
+            {
+                return null;
+            }
+        }
 
         public override NameValueCollection GetSecuritySettings(string appId)
         {

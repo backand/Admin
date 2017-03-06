@@ -906,6 +906,42 @@ namespace BackAnd.Web.Api.Controllers
             }
         }
 
+        protected override void BeforeEdit(Durados.EditEventArgs e)
+        {
+            if (e.View.Equals(Map.Database.GetUserView()))
+            {
+                string RoleColumnName = "Role";
+                string RoleFieldName = e.View.GetFieldByColumnNames(RoleColumnName).Name;
+                if (Map.IsAuthApp)
+                {
+                    if (e.Values.ContainsKey(RoleFieldName))
+                    {
+                        throw new CannotUpdateRoleInAuthApp();
+                    }
+                }
+                else if (Map.HasAuthApp)
+                {
+                    if (e.Values.Count > 1 || (!e.Values.ContainsKey(RoleFieldName)))
+                    {
+                        throw new CanOnlyUpdateRoleInAppWithAuthApp();
+                    }
+                }
+            }
+            base.BeforeEdit(e);
+        }
+
+        protected override void BeforeDelete(Durados.DeleteEventArgs e)
+        {
+            if (e.View.Equals(Map.Database.GetUserView()))
+            {
+                if (Map.HasAuthApp)
+                {
+                    throw new CannotDeleteRegisteredUserFromAppWithAuthApp();
+                }
+            }
+            base.BeforeDelete(e);
+        }
+
         [BackAnd.Web.Api.Controllers.Filters.ResponseHeaderFilter]
         public virtual IHttpActionResult Delete(string name, string id, bool? deep = null, string parameters = null)
         {
@@ -1112,7 +1148,7 @@ namespace BackAnd.Web.Api.Controllers
                 catch (Exception exception)
                 {
                     Map.Logger.Log("viewData", "bulk", exception.Source, exception, 1, "Deserialize requests " + json);
-                    return ResponseMessage(Request.CreateResponse(HttpStatusCode.NotAcceptable, Messages.StringifyFilter));
+                    return ResponseMessage(Request.CreateResponse(HttpStatusCode.NotAcceptable, Messages.StringifyBulk + ": " + exception.Message));
                 }
             }
 

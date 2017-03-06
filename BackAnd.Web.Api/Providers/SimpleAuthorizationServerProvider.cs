@@ -6,6 +6,8 @@ using System.Threading.Tasks;
 using System.Linq;
 using System.Collections.Generic;
 using Durados.Web.Mvc.UI.Helpers;
+using BackAnd.Web.Api.Controllers;
+using System.Data;
 
 namespace BackAnd.Web.Api.Providers
 {
@@ -76,9 +78,14 @@ namespace BackAnd.Web.Api.Providers
                     if (System.Web.HttpContext.Current.Items.Contains(Durados.Database.CustomTokenAttrKey))
                     {
                         IDictionary<string, object> dic = (IDictionary<string, object>)System.Web.HttpContext.Current.Items[Durados.Database.CustomTokenAttrKey];
-                        foreach (string key in dic.Keys)
+                        const string ForToken = "forToken";
+                        if (dic.ContainsKey(ForToken))
                         {
-                            context.AdditionalResponseParameters.Add(key, dic[key]);
+                            var additionalValuesForToken = (IDictionary<string, object>)dic[ForToken];
+                            foreach (string key in additionalValuesForToken.Keys)
+                            {
+                                context.AdditionalResponseParameters.Add(key, additionalValuesForToken[key]);
+                            }
                         }
                     }
                 }
@@ -150,6 +157,8 @@ namespace BackAnd.Web.Api.Providers
             Durados.Web.Mvc.Maps.Instance.DuradosMap.Logger.Log("auth-end", appName, username, null, 3, string.Empty);
         }
 
+        const string AdditionalValues = "additionalValues";
+
         private void ValidateByOneTimeAccessToken(OAuthGrantResourceOwnerCredentialsContext context)
         {
             if (System.Web.HttpContext.Current.Request.Form["accessToken"] == null)
@@ -199,9 +208,46 @@ namespace BackAnd.Web.Api.Providers
             identity.AddClaim(new Claim(Database.Username, username));
             identity.AddClaim(new Claim(Database.AppName, appName));
 
+            
+            if (!System.Web.HttpContext.Current.Items.Contains(Durados.Database.CustomTokenAttrKey))
+            {
+                string tokenInfo;
+                var profile = GetProfileFromSharedMemoryToModulateInAccessToken(accessToken, out tokenInfo);
+                if (profile != null)
+                {
+                    if (profile.ContainsKey(AdditionalValues) && profile[AdditionalValues] is IDictionary<string, object>)
+                    {
+                        System.Web.HttpContext.Current.Items.Add(Durados.Database.CustomTokenAttrKey, (IDictionary<string, object>)profile[AdditionalValues]);
+                    }
+                    identity.AddClaim(new Claim(Database.TokenInfo, tokenInfo));
+
+                }
+            }
+
             context.Validated(identity);
 
+            
             Durados.Web.Mvc.Maps.Instance.DuradosMap.Logger.Log("auth-end", appName, username, null, 3, string.Empty);
+        }
+                    
+        private Dictionary<string, object> GetProfileFromSharedMemoryToModulateInAccessToken(string token, out string tokenInfo)
+        {
+            tokenInfo = string.Empty;
+            var jss = new System.Web.Script.Serialization.JavaScriptSerializer();
+
+            string profileJson = Durados.Web.Mvc.Farm.SharedMemorySingeltone.Instance.Get(token);
+
+            if (string.IsNullOrEmpty(profileJson))
+                return null;
+
+            var profile =  jss.Deserialize<Dictionary<string, object>>(profileJson);
+
+            if (profile.ContainsKey(AdditionalValues) && profile[AdditionalValues] is IDictionary<string, object>)
+            {
+                tokenInfo = jss.Serialize(profile[AdditionalValues]);
+            }
+
+            return profile;
         }
 
         private string GetAppName(string appId)
@@ -434,6 +480,7 @@ namespace BackAnd.Web.Api.Providers
             }
 
             Durados.Web.Mvc.Map map = Durados.Web.Mvc.Maps.Instance.GetMap(appname);
+            Durados.Web.Mvc.Controllers.AccountMembershipService account = new Durados.Web.Mvc.Controllers.AccountMembershipService();
 
             if (!hasCustomValidation || !customValid)
             {
@@ -441,7 +488,7 @@ namespace BackAnd.Web.Api.Providers
                 {
                     try
                     {
-                        if (!(new Durados.Web.Mvc.Controllers.AccountMembershipService().AuthenticateUser(map, username, password)))
+                        if (!(account.AuthenticateUser(map, username, password)))
                         {
                             context.SetError(UserValidationErrorMessages.InvalidGrant, UserValidationErrorMessages.IncorrectUsernameOrPassword);
 
@@ -453,17 +500,27 @@ namespace BackAnd.Web.Api.Providers
 
                             return;
                         }
-                        else if (!(new Durados.Web.Mvc.Controllers.AccountMembershipService().IsApproved(username)))
+                        else if (!(account.IsApproved(username)))
                         {
-                            context.SetError(UserValidationErrorMessages.InvalidGrant, UserValidationErrorMessages.NotApproved);
-
-                            Durados.Web.Mvc.Maps.Instance.DuradosMap.Logger.Log("auth-end-failure", appname, username, null, 3, UserValidationErrorMessages.NotApproved);
-                            if (Durados.Web.Mvc.Maps.Instance.AppInCach(appname))
+                            if (map.HasAuthApp && account.IsApproved(username, map.AuthAppName))
                             {
-                                Durados.Web.Mvc.Maps.Instance.GetMap(appname).Logger.Log("auth-end-failure", appname, username, null, 3, UserValidationErrorMessages.NotApproved);
+                                userController uc = new userController();
+                                var userRow = map.GetAuthAppMap().Database.GetUserRow(username);
+                                var signUpResults = uc.SignUp(appname, null, null, true, GetFirstName(userRow), username, GetLastName(userRow), password, password, new Dictionary<string, object>());
+                                                
                             }
+                            else
+                            {
+                                context.SetError(UserValidationErrorMessages.InvalidGrant, UserValidationErrorMessages.NotApproved);
 
-                            return;
+                                Durados.Web.Mvc.Maps.Instance.DuradosMap.Logger.Log("auth-end-failure", appname, username, null, 3, UserValidationErrorMessages.NotApproved);
+                                if (Durados.Web.Mvc.Maps.Instance.AppInCach(appname))
+                                {
+                                    Durados.Web.Mvc.Maps.Instance.GetMap(appname).Logger.Log("auth-end-failure", appname, username, null, 3, UserValidationErrorMessages.NotApproved);
+                                }
+
+                                return;
+                            }
                         }
                     }
                     catch (System.Exception exception)
@@ -506,6 +563,16 @@ namespace BackAnd.Web.Api.Providers
             {
                 Durados.Web.Mvc.Maps.Instance.GetMap(appname).Logger.Log("auth-end", appname, username, null, 3, string.Empty);
             }
+        }
+
+        private string GetLastName(DataRow userRow)
+        {
+            return (string)userRow["LastName"];
+        }
+
+        private string GetFirstName(DataRow userRow)
+        {
+            return (string)userRow["FirstName"];
         }
 
         private void ValidateByRefreshToken(OAuthGrantResourceOwnerCredentialsContext context, string username, string appName, string refreshToken)

@@ -2167,9 +2167,15 @@ namespace Durados.Web.Mvc.Controllers
                     
         }
 
-        public bool IsApproved(string userName)
+        public bool IsApproved(string userName, string appName = null)
         {
-            System.Data.DataRow userRow = Map.Database.GetUserRow(userName);
+            Map map;
+            if (appName == null)
+                map = Map;
+            else
+                map = Maps.Instance.GetMap(appName);
+
+            System.Data.DataRow userRow = map.Database.GetUserRow(userName);
             bool registerd = (userRow != null);
             return registerd && !userRow["IsApproved"].Equals(false);
         }
@@ -2478,47 +2484,7 @@ namespace Durados.Web.Mvc.Controllers
 
         public string GetRandomPassword(int chars)
         {
-            string s = string.Empty;
-
-            Random r = new Random(DateTime.Now.Millisecond);
-
-            bool[] ts = new bool[3];
-
-            ts[0] = false;
-            ts[1] = false;
-            ts[2] = false;
-
-
-            for (int i = 0; i < chars; i++)
-            {
-                int t = r.Next(1, 4);
-                if (t == 1)
-                {
-                    ts[0] = true;
-                    s += r.Next(0, 10).ToString();
-                }
-                else if (t == 2)
-                {
-                    ts[1] = true;
-                    s += Convert.ToChar(r.Next(97, 123));
-                }
-                else if (t == 3)
-                {
-                    ts[2] = true;
-                    s += Convert.ToChar(r.Next(65, 91));
-                }
-            }
-
-            if (!ts[0])
-                s += r.Next(0, 10).ToString();
-
-            if (!ts[1])
-                s += Convert.ToChar(r.Next(97, 123));
-
-            if (!ts[2])
-                s += Convert.ToChar(r.Next(65, 91));
-
-            return s;
+            return AccountService.GetRandomPassword(chars);
         }
         
         #region forgot password

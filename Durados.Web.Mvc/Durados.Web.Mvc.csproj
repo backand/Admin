@@ -318,6 +318,7 @@
     <Compile Include="SocialLogin\Adfs\AdfsException.cs" />
     <Compile Include="SocialLogin\Adfs\AdfsProfile.cs" />
     <Compile Include="SocialLogin\Adfs\AdfsSocial.cs" />
+    <Compile Include="SocialLogin\AzureAdTest\AzureAdSocialTest.cs" />
     <Compile Include="SocialLogin\AzureAd\AzureAdProfile.cs" />
     <Compile Include="SocialLogin\AzureAd\AzureAdSocial.cs" />
     <Compile Include="SocialLogin\ExternalLoginData.cs" />
@@ -327,6 +328,7 @@
     <Compile Include="SocialLogin\Github\GithubException.cs" />
     <Compile Include="SocialLogin\Github\GithubProfile.cs" />
     <Compile Include="SocialLogin\Github\GithubSocial.cs" />
+    <Compile Include="SocialLogin\GoogleTest\GoogleSocialTest.cs" />
     <Compile Include="SocialLogin\Google\GoogleException.cs" />
     <Compile Include="SocialLogin\Google\GoogleProfile.cs" />
     <Compile Include="SocialLogin\Google\GoogleSocial.cs" />

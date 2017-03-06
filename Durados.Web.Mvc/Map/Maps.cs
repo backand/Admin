@@ -1758,6 +1758,7 @@ namespace Durados.Web.Mvc
             map.PaymentStatus = (Billing.PaymentStatus)Enum.ToObject(typeof(Billing.PaymentStatus), appRow.PaymentStatus);
             map.AnonymousToken = appRow.AnonymousToken;
             map.SignUpToken = appRow.SignUpToken;
+            map.IsAuthApp = appRow.IsAuthApp;
             map.LoadLimits();
 
             int themeId = 0;

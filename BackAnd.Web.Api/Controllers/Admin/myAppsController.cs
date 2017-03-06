@@ -18,6 +18,7 @@ using System.Text.RegularExpressions;
 using Durados.Web.Mvc.Farm;
 using Durados.Data;
 using Durados.Web.Mvc.Webhook;
+using BackAnd.Web.Api.Controllers.Admin;
 /*
  HTTP Verb	|Entire Collection (e.g. /customers)	                                                        |Specific Item (e.g. /customers/{id})
 -----------------------------------------------------------------------------------------------------------------------------------------------
@@ -495,6 +496,7 @@ namespace BackAnd.Web.Api.Controllers
                         return ResponseMessage(Request.CreateResponse(HttpStatusCode.Conflict, "An app by this name already exists"));
                 }
 
+                
                 view.Update(values, appId.Value.ToString(), false, view_BeforeEdit, view_BeforeEditInDatabase, view_AfterEditBeforeCommit, view_AfterEditAfterCommit);
 
                 try
@@ -533,6 +535,15 @@ namespace BackAnd.Web.Api.Controllers
                     View view = (View)map.GetConfigDatabase().Views["Database"];
                     view.Edit(GetAdjustedValues(view, databaseSettings), "0", view_BeforeEdit, view_BeforeEditInDatabase, view_AfterEditBeforeCommit, view_AfterEditAfterCommit);
                     UpdateAnonymousUserRole(map, databaseSettings);
+                    if (e.Values.ContainsKey("IsAuthApp"))
+                    {
+                        bool isAuthApp = Convert.ToBoolean(e.Values["IsAuthApp"]);
+                        if (!isAuthApp.Equals(map.IsAuthApp))
+                        {
+                            UpdateIsAuthApp(map, isAuthApp);
+                        }
+                    }
+
                     if (newAppName != null)
                     {
                         map.AppName = newAppName;
@@ -542,11 +553,17 @@ namespace BackAnd.Web.Api.Controllers
                         Maps.Instance.Rename(appName, newAppName);
                 }
             }
+            catch (ValidateAuthAppException exception)
+            {
+                e.Cancel = true;
+                throw exception;
+
+            }
             catch (Exception exception)
             {
                 e.Cancel = true;
                 throw new Durados.DuradosException("Failed to update database configuration", exception);
-                
+
             }
         }
 
@@ -569,6 +586,19 @@ namespace BackAnd.Web.Api.Controllers
         {
             string sql = "update durados_User set `Role` = '" + role + "' where username = 'Guest'";
             (new MySqlAccess()).ExecuteNonQuery(map.Database.SystemConnectionString, sql, Durados.SqlProduct.MySql);
+
+        }
+
+        private void UpdateIsAuthApp(Map map, bool isAuthApp)
+        {
+            UpdateIsAuthApp(Convert.ToInt32(map.Id), isAuthApp);
+            map.IsAuthApp = isAuthApp;
+        }
+
+        private void UpdateIsAuthApp(int id, bool isAuthApp)
+        {
+            string sql = "update durados_App set IsAuthApp = @isAuthApp where id = @id";
+            (new SqlAccess()).ExecuteNonQuery(map.Database.SystemConnectionString, sql, Durados.SqlProduct.SqlServer, new Dictionary<string, object>() { { "id", id }, { "IsAuthApp", isAuthApp } }, null);
 
         }
 
@@ -619,6 +649,7 @@ namespace BackAnd.Web.Api.Controllers
 
         protected override void BeforeEdit(Durados.EditEventArgs e)
         {
+            ValidateAuthApp(e);
             if (e.Values.ContainsKey("Name"))
             {
                 MapDataSet.durados_AppRow appRow = (MapDataSet.durados_AppRow)e.PrevRow;
@@ -636,6 +667,42 @@ namespace BackAnd.Web.Api.Controllers
             }
 
             base.BeforeEdit(e);
+        }
+
+        private void ValidateAuthApp(Durados.EditEventArgs e)
+        {
+            if (!e.View.Database.IsConfig)
+                return;
+            
+            if (!e.Values.ContainsKey("AuthAppId"))
+                return;
+
+            if (e.Values["AuthAppId"] == null)
+                return;
+
+            if (e.Values["AuthAppId"].Equals(string.Empty))
+                return;
+
+
+            if (!e.PrevRow.IsNull("AuthAppId") && e.PrevRow["AuthAppId"].Equals(e.Values["AuthAppId"]))
+                return;
+
+            int appId;
+            if (!Int32.TryParse((string)e.Values["AuthAppId"], out appId))
+                throw new ValidateAuthAppException("AuthAppId must be numeric");
+            
+
+            if (!IsAuthAppBelongToUser(appId))
+                throw new ValidateAuthAppException("AuthAppId " + appId + " does not belong to " + Map.Database.GetCurrentUsername());
+        }
+
+        private bool IsAuthAppBelongToUser(int appId)
+        {
+            string appName = Maps.Instance.GetAppNameById(appId);
+            if (string.IsNullOrEmpty(appName))
+                throw new ValidateAuthAppException("AuthAppId does not exist");
+
+            return Maps.Instance.AppExists(appName, Convert.ToInt32(Map.Database.GetUserID()), true).HasValue;
         }
 
 

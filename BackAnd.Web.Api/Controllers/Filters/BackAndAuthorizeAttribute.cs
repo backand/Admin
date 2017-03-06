@@ -10,6 +10,7 @@ using Durados.Web.Mvc;
 using Durados.Web.Mvc.Farm;
 using Durados.Data;
 using System.Runtime.Caching;
+using System.Data;
 
 namespace BackAnd.Web.Api.Controllers.Filters
 {
@@ -64,7 +65,8 @@ namespace BackAnd.Web.Api.Controllers.Filters
 
                 var appnameObj = principal.Claims.Where(c => c.Type == Database.AppName).Single();
 
-                
+                var infoObj = principal.Claims.Where(c => c.Type == Database.TokenInfo).SingleOrDefault();
+
                 if (usernameObj == null)
                 {
                     HandleUnauthorized(actionContext, null, null);
@@ -80,6 +82,7 @@ namespace BackAnd.Web.Api.Controllers.Filters
                 string username = usernameObj.Value;
                 string appname = appnameObj.Value;
                 string appNameFromToken = appnameObj.Value;
+                bool mainAppFromToken = appNameFromToken == Maps.DuradosAppName;
 
                 string appNameInHeader = null;
                 if (actionContext.Request.Headers.Contains("AppName"))
@@ -89,6 +92,8 @@ namespace BackAnd.Web.Api.Controllers.Filters
                 else if (actionContext.Request.Headers.Contains("appname"))
                     appNameInHeader = actionContext.Request.Headers.GetValues("appname").FirstOrDefault();
 
+                Durados.Web.Mvc.Controllers.AccountMembershipService accountMembershipService = new Durados.Web.Mvc.Controllers.AccountMembershipService();
+                
                 if (appNameInHeader != null)
                 {
                     if (appname.ToLower() == Maps.DuradosAppName)
@@ -100,19 +105,102 @@ namespace BackAnd.Web.Api.Controllers.Filters
                         if (appname != appNameInHeader)
                         {
                             // BackandSSO
-                            actionContext.Response = actionContext.Request.CreateErrorResponse(
-                        HttpStatusCode.Unauthorized,
-                        string.Format(Durados.Web.Mvc.UI.Helpers.UserValidationErrorMessages.AccessTokenNotAllowedToApp, appNameInHeader));
-                            return;
+                            if (!IsSso(appname, appNameInHeader))
+                            {
+                                actionContext.Response = actionContext.Request.CreateErrorResponse(
+                            HttpStatusCode.Unauthorized,
+                            string.Format(Durados.Web.Mvc.UI.Helpers.UserValidationErrorMessages.AccessTokenNotAllowedToApp, appNameInHeader));
+                                return;
+                            }
+                            else
+                            {
+                                appname = appNameInHeader;
+                                if (!System.Web.HttpContext.Current.Items.Contains(Database.AppName))
+                                    System.Web.HttpContext.Current.Items.Add(Database.AppName, appname);
+                                else
+                                    System.Web.HttpContext.Current.Items[Database.AppName] = appname;
+                                if (!accountMembershipService.IsApproved(username))
+                                {
+                                    try
+                                    {
+                                        userController uc = new userController();
+                                        string provider = GetDomainControllerProvider(appname);
+                                        var userRow = (DataRow)GetUserRow(appnameObj.Value, username);
+                                        string socialId = GetSocialId(provider, username, appnameObj.Value);
+                                        bool hasSocialId = socialId != null;
+                                        string password = GetPassword();
+                                        System.Web.HttpContext.Current.Items.Add(Database.SignupInProcess, true);
+                                        if (hasSocialId)
+                                        {
+                                            uc.SignUpCommand(appname, username, provider, socialId, GetValues(userRow, username), GetFirstName(userRow), GetLastName(userRow), password, true);
+                                        }
+                                        else
+                                        {
+                                            bool hasMembership = Maps.Instance.GetMap(appname).GetMembershipProvider().GetUser(username, false) != null;
+                                            if (hasMembership)
+                                            {
+                                                var signUpResults = uc.SignUp(appname, null, null, true, GetFirstName(userRow), username, GetLastName(userRow), password, password, new Dictionary<string, object>());
+                                                
+                                            }
+                                            else
+                                            {
+                                                actionContext.Response = actionContext.Request.CreateErrorResponse(
+                                                HttpStatusCode.Unauthorized,
+                                                string.Format(Durados.Web.Mvc.UI.Helpers.UserValidationErrorMessages.AccessTokenNotAllowedToApp, appNameInHeader));
+                                                return;
+                                            }
+                                        }
+                                    }
+                                    catch (Exception exception)
+                                    {
+                                        actionContext.Response = actionContext.Request.CreateErrorResponse(
+                                           HttpStatusCode.Unauthorized,
+                                           exception.Message,
+                                           exception);
+                                    }
+                                }
+
+                                string key = appname + "_userRow_" + username;
+
+                                System.Web.HttpContext.Current.Items.Remove(key);
+
+
+                            }
                         }
                     }
                 }
+
 
                 if (!System.Web.HttpContext.Current.Items.Contains(Database.Username))
                     System.Web.HttpContext.Current.Items.Add(Database.Username, username);
 
                 if (!System.Web.HttpContext.Current.Items.Contains(Database.AppName))
                     System.Web.HttpContext.Current.Items.Add(Database.AppName, appname);
+                else
+                    System.Web.HttpContext.Current.Items[Database.AppName] = appname;
+
+                if (!System.Web.HttpContext.Current.Items.Contains(Database.MainAppFromToken))
+                    System.Web.HttpContext.Current.Items.Add(Database.MainAppFromToken, mainAppFromToken);
+
+                string infoJson = null;
+                object info = null;
+                if (infoObj != null)
+                {
+                    infoJson = infoObj.Value;
+                    var jss = new System.Web.Script.Serialization.JavaScriptSerializer();
+                    info = jss.Deserialize<Dictionary<string, object>>(infoJson);
+                }
+
+                const string ForToken = "forToken";
+                                
+                IDictionary<string, object> tokenInfo = new Dictionary<string, object>();
+                if (info != null && info is IDictionary<string, object> && ((IDictionary<string, object>)info).ContainsKey(ForToken) && ((IDictionary<string, object>)info)[ForToken] is IDictionary<string, object>)
+                {
+                    tokenInfo = (IDictionary<string, object>)((IDictionary<string, object>)info)[ForToken];
+                }
+
+                if (!System.Web.HttpContext.Current.Items.Contains(Database.TokenInfo))
+                    System.Web.HttpContext.Current.Items.Add(Database.TokenInfo, tokenInfo);
 
                 try
                 {
@@ -129,7 +217,6 @@ namespace BackAnd.Web.Api.Controllers.Filters
                 NewRelic.Api.Agent.NewRelic.AddCustomParameter(Durados.Database.RequestId, System.Web.HttpContext.Current.Items[Database.RequestId].ToString());
                 //if (actionContext.Request.Headers.Contains("AppName"))
                 //{
-                Durados.Web.Mvc.Controllers.AccountMembershipService accountMembershipService = new Durados.Web.Mvc.Controllers.AccountMembershipService();
                 try
                 {
                     //if (!IsAppReady()) 
@@ -208,6 +295,20 @@ namespace BackAnd.Web.Api.Controllers.Filters
                         return;
                     }
                 }
+                try
+                {
+                    string message = null;
+                    if (!mainAppFromToken && IsCustomDeny(appname, username, out message))
+                    {
+                        HandleUnauthorized(actionContext, appname, username, message);
+                        return;
+                    }
+                }
+                catch (Exception exception)
+                {
+                    HandleUnauthorized(actionContext, appname, username, "Unexpected error: " + exception.Message);
+                    return;
+                }
                 ((apiController)actionContext.ControllerContext.Controller).Init();
             }
             catch
@@ -215,6 +316,71 @@ namespace BackAnd.Web.Api.Controllers.Filters
                 HandleUnauthorized(actionContext, null, null);
                 return;
             }
+        }
+
+        private string GetPassword()
+        {
+            return Durados.Web.Mvc.UI.Helpers.DuradosAuthorizationHelper.GeneratePassword(4, 4, 4); ;
+        }
+
+        private string GetLastName(DataRow userRow)
+        {
+            return (string)userRow["LastName"];
+        }
+
+        private string GetFirstName(DataRow userRow)
+        {
+            return (string)userRow["FirstName"]; 
+        }
+
+        private Dictionary<string, object> GetValues(DataRow userRow, string email)
+        {
+            return new Dictionary<string, object>() { { "firstName", GetFirstName(userRow) }, { "lastName", GetLastName(userRow) } , { "email", email } };
+            
+        }
+
+        private string GetSocialId(string provider, string username, string appname)
+        {
+            return new Durados.Web.Mvc.UI.Helpers.AccountService(null).GetSocialIdlByEmail(provider, username, appname);
+        }
+
+        private object GetUserRow(string appname, string username)
+        {
+            return Maps.Instance.GetMap(appname).Database.GetUserRow(username);
+        }
+
+        private string GetDomainControllerProvider(string appname)
+        {
+            return Maps.Instance.GetMap(appname).GetDomainControllerProvider();
+        }
+
+        private bool IsSso(string appNameInToken, string appNameInHeader)
+        {
+            Map appNameInHeaderMap = Maps.Instance.GetMap(appNameInHeader);
+            Map appNameInTokenMap = Maps.Instance.GetMap(appNameInToken);
+                
+            if (appNameInHeaderMap.HasAuthApp)
+            {
+                if (appNameInTokenMap.IsAuthApp)
+                    return (appNameInHeaderMap.AuthAppName == appNameInToken);
+                else if (appNameInTokenMap.HasAuthApp)
+                    return (appNameInHeaderMap.AuthAppName == appNameInTokenMap.AuthAppName);
+                else
+                    return false;
+            }
+            else if (appNameInHeaderMap.IsAuthApp)
+            {
+                return (appNameInTokenMap.AuthAppName == appNameInHeader);
+            }
+            else
+            {
+                return false;
+            }
+        }
+
+        private bool IsCustomDeny(string appname, string username, out string message)
+        {
+            return new Durados.Web.Mvc.UI.Helpers.DuradosAuthorizationHelper().IsAccessFilterDeny(appname, username, out message);
         }
 
         private static string GetAuthToken(System.Web.Http.Controllers.HttpActionContext actionContext)
@@ -723,9 +889,15 @@ namespace BackAnd.Web.Api.Controllers.Filters
         }
 
 
-        private void HandleUnauthorized(System.Web.Http.Controllers.HttpActionContext actionContext, string appName, string username)
+        private void HandleUnauthorized(System.Web.Http.Controllers.HttpActionContext actionContext, string appName, string username, string message = null)
         {
-            if (appName == null)
+            if (message != null)
+            {
+                actionContext.Response = actionContext.Request.CreateErrorResponse(
+                       HttpStatusCode.Unauthorized,
+                       message);
+            }
+            else if (appName == null)
             {
                 actionContext.Response = actionContext.Request.CreateErrorResponse(
                         HttpStatusCode.Unauthorized,
@@ -774,10 +946,10 @@ namespace BackAnd.Web.Api.Controllers.Filters
             }
             else if (!string.IsNullOrEmpty(appName) && Maps.Instance.AppExists(appName).HasValue && Maps.Instance.GetOnBoardingStatus(Maps.Instance.AppExists(appName).Value.ToString()) != OnBoardingStatus.Ready)
             {
-                string message = new Durados.Web.Mvc.UI.Helpers.AppNotReadyException(appName).Message;
+                string message2 = new Durados.Web.Mvc.UI.Helpers.AppNotReadyException(appName).Message;
                 actionContext.Response = actionContext.Request.CreateResponse(
                         HttpStatusCode.NoContent,
-                        message);
+                        message2);
             }
             else
             {

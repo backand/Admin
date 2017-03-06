@@ -17,6 +17,24 @@ namespace Durados.Web.Mvc.UI.Helpers
             get;
         }
 
+        public virtual bool IsDomainController
+        {
+            get
+            {
+                return false;
+            }
+        }
+
+        protected string[] GetTestAppNames()
+        {
+            return (System.Configuration.ConfigurationManager.AppSettings["socialTestApps"] ?? "testwebhook13,authapp1,sso1,sso2").Split(',');
+        }
+
+        protected bool IsTestApp(string appName)
+        {
+            return GetTestAppNames().ToHashSet().Contains(appName);
+        }
+
         protected abstract SocialProfile FetchProfileByCode(string code, string appName, string returnUrl, string activity, string parameters, string redirectUrl, string email, bool signupIfNotSignedIn, bool useHashRouting);
 
         public virtual SocialProfile FetchProfileByRefreshToken(string refreshToken, string appName)
@@ -121,6 +139,8 @@ namespace Durados.Web.Mvc.UI.Helpers
             profile.Add("useHashRouting", useHashRouting);
             profile.Add("parameters", parameters);
             profile.Add("refreshToken", refreshToken);
+            profile.Add("providerAccessToken", accessToken);
+            profile.Add("provider", ProviderName);
 
             if (!string.IsNullOrEmpty(email))
             {

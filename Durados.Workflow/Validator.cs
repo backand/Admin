@@ -39,14 +39,17 @@ namespace Durados.Workflow
 
             hasErrors = false;
 
-            foreach (string expression in expressions)
+            if (controller is Durados.Workflow.INotifier)
             {
-                string template = expression.ReplaceAllTokens(view, values, pk, currentUserId.ToString(), view.Database.GetCurrentUsername(), currentUserRole, prevRow);
-                template = template.Replace(Engine.AsToken(values), ((Durados.Workflow.INotifier)controller).GetTableViewer(), view);
-                if (!parser.Check(template.ReplaceWithoutPrefix(view, values, prevRow)))
+                foreach (string expression in expressions)
                 {
-                    hasErrors = true;
-                    message += parameters[expression].Value.Replace(displayNames);
+                    string template = expression.ReplaceAllTokens(view, values, pk, currentUserId.ToString(), view.Database.GetCurrentUsername(), currentUserRole, prevRow);
+                    template = template.Replace(Engine.AsToken(values), ((Durados.Workflow.INotifier)controller).GetTableViewer(), view);
+                    if (!parser.Check(template.ReplaceWithoutPrefix(view, values, prevRow)))
+                    {
+                        hasErrors = true;
+                        message += parameters[expression].Value.Replace(displayNames);
+                    }
                 }
             }
 

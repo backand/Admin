@@ -635,6 +635,10 @@ namespace Durados.Web.Mvc.Logging
             {
                 guid = Guid.NewGuid();
             }
+
+            const int MaxFreeTextLength = 1000000;
+            if (freeText != null && freeText.Length > MaxFreeTextLength)
+                freeText = freeText.Substring(0, MaxFreeTextLength);
             using (IDbConnection sqlConnection = GetConnection(connectionString))
             {
                 using (IDbCommand command = GetCommand(sqlConnection, "Durados_LogInsert"))

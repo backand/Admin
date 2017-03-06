@@ -91,6 +91,102 @@ namespace Durados.Web.Mvc.UI.Helpers
             return GetDuradosMap().Database.GetUsernameById(userId);
         }
 
+        public string GetSocialIdlByEmail(string provider, string email, string appName)
+        {
+            int appId = Convert.ToInt32(Maps.Instance.GetMap(appName).Id);
+
+            return GetSocialIdlByEmail(provider, GetUserId(email), appId);
+        }
+
+        public static string GetRandomPassword(int chars)
+        {
+            string s = string.Empty;
+
+            Random r = new Random(DateTime.Now.Millisecond);
+
+            bool[] ts = new bool[3];
+
+            ts[0] = false;
+            ts[1] = false;
+            ts[2] = false;
+
+
+            for (int i = 0; i < chars; i++)
+            {
+                int t = r.Next(1, 4);
+                if (t == 1)
+                {
+                    ts[0] = true;
+                    s += r.Next(0, 10).ToString();
+                }
+                else if (t == 2)
+                {
+                    ts[1] = true;
+                    s += Convert.ToChar(r.Next(97, 123));
+                }
+                else if (t == 3)
+                {
+                    ts[2] = true;
+                    s += Convert.ToChar(r.Next(65, 91));
+                }
+            }
+
+            if (!ts[0])
+                s += r.Next(0, 10).ToString();
+
+            if (!ts[1])
+                s += Convert.ToChar(r.Next(97, 123));
+
+            if (!ts[2])
+                s += Convert.ToChar(r.Next(65, 91));
+
+            return s;
+        }
+        public string GetSocialIdlByEmail(string provider, int userId, int appId)
+        {
+            View view = GetUserSocialView();
+            
+            SqlAccess sa = new SqlAccess();
+
+            string sql = "select SocialId from durados_UserSocial WITH(NOLOCK) where Provider = @Provider and UserId = @UserId and AppId = @AppId";
+
+            object scalar = sa.ExecuteScalar(view.ConnectionString, sql, new Dictionary<string, object>() { { "Provider", provider }, { "UserId", userId }, { "AppId", appId } });
+
+            if (scalar == null)
+            {
+                sql = "select SocialId from durados_UserSocial WITH(NOLOCK) where Provider = @Provider and UserId = @UserId and AppId is null";
+
+                scalar = sa.ExecuteScalar(view.ConnectionString, sql, new Dictionary<string, object>() { { "Provider", provider }, { "UserId", userId } });
+            }
+
+            if (scalar == null || scalar.Equals(string.Empty))
+            {
+                return null;
+            }
+
+            return scalar.ToString();
+        }
+
+        //public void SignUpCommand(string appName, string email, string provider, string socialId, Dictionary<string, object> values, string firstName, string lastName, string password, bool overridePrivate)
+        //{
+        //    SignUp(appName, firstName, lastName, email, null, overridePrivate, password,
+        //        password, false, values,
+        //        null, null,
+        //        null, null,
+        //        null, null,
+        //        null, null);
+
+        //    int appId = Convert.ToInt32(Maps.Instance.GetMap(appName).Id);
+
+        //    var currentData = GetEmailBySocialId(provider, socialId, appId);
+
+        //    if (string.IsNullOrEmpty(currentData))
+        //    {
+        //        SetEmailBySocialId(provider, socialId, email, appId);
+        //    }
+
+        //}
+
         private View GetUserSocialView()
         {
             string UserSocialViewName = "durados_UserSocial";
@@ -1294,7 +1390,15 @@ namespace Durados.Web.Mvc.UI.Helpers
             if (appName == Maps.DuradosAppName)
                 return false;
             Map map = GetMap(appName);
-            return !map.Database.EnableUserRegistration;
+            return !map.Database.EnableUserRegistration || map.IsDomainController;
+        }
+
+        public virtual bool IsDomainController(string appName)
+        {
+            if (appName == Maps.DuradosAppName)
+                return false;
+            Map map = GetMap(appName);
+            return map.IsDomainController;
         }
 
         protected virtual bool IsAppExists(string appName)
@@ -1514,6 +1618,29 @@ namespace Durados.Web.Mvc.UI.Helpers
             catch (Exception ex)
             {
                 throw new DuradosException("User guid was not found.", ex);
+            }
+
+        }
+
+        public static int GetUserId(string userName)
+        {
+            try
+            {
+                Durados.DataAccess.SqlAccess sql = new Durados.DataAccess.SqlAccess();
+
+                Dictionary<string, object> parameters = new Dictionary<string, object>();
+
+                parameters.Add("@username", userName);
+                object id = sql.ExecuteScalar(Maps.Instance.DuradosMap.connectionString, "SELECT TOP 1 [durados_user].[id] FROM durados_user WITH(NOLOCK)  WHERE [durados_user].[username]=@username", parameters);
+
+                if (id == null || id == DBNull.Value)
+                    throw new DuradosException("Username has no unique username.");
+
+                return Convert.ToInt32(id);
+            }
+            catch (Exception ex)
+            {
+                throw new DuradosException("Username was not found.", ex);
             }
 
         }
@@ -1811,8 +1938,16 @@ namespace Durados.Web.Mvc.UI.Helpers
                 if (!valid)
                     return valid;
 
-                if (map.Database.GetUserRow(userName) == null)
-                    return false;
+                if (map.HasAuthApp)
+                {
+                    if (map.GetAuthAppMap().Database.GetUserRow(userName) == null && map.Database.GetUserRow(userName) == null)
+                        return false;
+                }
+                else
+                {
+                    if (map.Database.GetUserRow(userName) == null)
+                        return false;
+                }
 
                 MembershipCreateStatus status;
                 provider.CreateUser(userName, password, userName, null, null, true, null, out status);

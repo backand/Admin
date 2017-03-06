@@ -43,6 +43,9 @@ namespace Durados
         public static readonly string backand_appNotInCache = "backand_appNotInCache";
         public static readonly string backand_appGuidNotMatch = "backand_appGuidNotMatch";
         public static readonly string AppName = "appname";
+        public static readonly string TokenInfo = "info";
+        public static readonly string MainAppFromToken = "MainAppFromToken";
+        
         public static readonly string AppId = "appid";
         public static readonly string CurAppName = "curappname";
         public static readonly string AppGuid = "appguid";
@@ -57,7 +60,9 @@ namespace Durados
         public static readonly string CustomValidationActionName = "backandAuthOverride";
         public static readonly string CustomSocialValidationActionName = "socialAuthOverride";
         public static readonly string CustomSocialValidationActionFileName = "socialAuthOverride.js";
-        
+        public static readonly string CustomAccessFilterActionName = "accessFilter";
+        public static readonly string CustomAccessFilterActionFileName = "accessFilter.js";
+
         public static readonly string ChangePasswordOverride = "ChangePasswordOverride";
         public static readonly string CustomTokenAttrKey = "CustomTokenAttr";
         public static readonly string AutoGuidPkType = "char(36)";
@@ -67,7 +72,8 @@ namespace Durados
         public static readonly string ObjectName = "ObjectName";
         public static readonly string QueryName = "QueryName";
         public static readonly string ActionName = "ActionName";
-
+        public static readonly string SignupInProcess = "SignupInProcess";
+        
         public static readonly string MainLogger = "MainLogger";
         public static readonly string EnableDecryptionKey = "EnableDecryption";
         
@@ -1286,6 +1292,43 @@ namespace Durados
         {
             throw new NotImplementedException();
         }
+
+
+        [Durados.Config.Attributes.ColumnProperty()]
+        public string AuthAppId { get; set; }
+
+        public virtual bool HasAuthApp
+        {
+            get
+            {
+                return !string.IsNullOrEmpty(AuthAppId);
+            }
+        }
+
+        public bool IsAuthApp {
+            get { return GetIsAuthApp(); }
+            set { }
+        }
+
+        public virtual bool IsDomainController
+        {
+            get
+            {
+                return false;
+            }
+        }
+
+        protected virtual bool GetIsAuthApp()
+        {
+            throw new NotImplementedException();
+        }
+
+        public virtual string GetDomainControllerProvider()
+        {
+            return null;
+        }
+        
+
     }
 
     public class IlegalDateFormatException : DuradosException

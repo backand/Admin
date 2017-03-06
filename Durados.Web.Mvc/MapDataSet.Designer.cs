@@ -859,6 +859,8 @@ namespace Durados.Web.Mvc {
             
             private global::System.Data.DataColumn columnPaymentLocked;
             
+            private global::System.Data.DataColumn columnIsAuthApp;
+            
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
             public durados_AppDataTable() {
@@ -1198,6 +1200,14 @@ namespace Durados.Web.Mvc {
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
+            public global::System.Data.DataColumn IsAuthAppColumn {
+                get {
+                    return this.columnIsAuthApp;
+                }
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
             [global::System.ComponentModel.Browsable(false)]
             public int Count {
                 get {
@@ -1270,7 +1280,8 @@ namespace Durados.Web.Mvc {
                         System.Guid SignUpToken, 
                         System.Guid AnonymousToken, 
                         int PaymentStatus, 
-                        bool PaymentLocked) {
+                        bool PaymentLocked, 
+                        bool IsAuthApp) {
                 durados_AppRow rowdurados_AppRow = ((durados_AppRow)(this.NewRow()));
                 object[] columnValuesArray = new object[] {
                         null,
@@ -1310,7 +1321,8 @@ namespace Durados.Web.Mvc {
                         SignUpToken,
                         AnonymousToken,
                         PaymentStatus,
-                        PaymentLocked};
+                        PaymentLocked,
+                        IsAuthApp};
                 if ((parentv_durados_UserRowByFK_durados_App_durados_User != null)) {
                     columnValuesArray[2] = parentv_durados_UserRowByFK_durados_App_durados_User[0];
                 }
@@ -1399,6 +1411,7 @@ namespace Durados.Web.Mvc {
                 this.columnAnonymousToken = base.Columns["AnonymousToken"];
                 this.columnPaymentStatus = base.Columns["PaymentStatus"];
                 this.columnPaymentLocked = base.Columns["PaymentLocked"];
+                this.columnIsAuthApp = base.Columns["IsAuthApp"];
             }
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
@@ -1480,6 +1493,8 @@ namespace Durados.Web.Mvc {
                 base.Columns.Add(this.columnPaymentStatus);
                 this.columnPaymentLocked = new global::System.Data.DataColumn("PaymentLocked", typeof(bool), null, global::System.Data.MappingType.Element);
                 base.Columns.Add(this.columnPaymentLocked);
+                this.columnIsAuthApp = new global::System.Data.DataColumn("IsAuthApp", typeof(bool), null, global::System.Data.MappingType.Element);
+                base.Columns.Add(this.columnIsAuthApp);
                 this.Constraints.Add(new global::System.Data.UniqueConstraint("Constraint1", new global::System.Data.DataColumn[] {
                                 this.columnId}, true));
                 this.columnId.AutoIncrement = true;
@@ -6223,6 +6238,22 @@ namespace Durados.Web.Mvc {
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
+            public bool IsAuthApp {
+                get {
+                    try {
+                        return ((bool)(this[this.tabledurados_App.IsAuthAppColumn]));
+                    }
+                    catch (global::System.InvalidCastException e) {
+                        throw new global::System.Data.StrongTypingException("The value for column \'IsAuthApp\' in table \'durados_App\' is DBNull.", e);
+                    }
+                }
+                set {
+                    this[this.tabledurados_App.IsAuthAppColumn] = value;
+                }
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
             public durados_DataSourceTypeRow durados_DataSourceTypeRow {
                 get {
                     return ((durados_DataSourceTypeRow)(this.GetParentRow(this.Table.ParentRelations["FK_durados_App_durados_DataSourceType"])));
@@ -6668,6 +6699,18 @@ namespace Durados.Web.Mvc {
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
             public void SetPaymentLockedNull() {
                 this[this.tabledurados_App.PaymentLockedColumn] = global::System.Convert.DBNull;
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
+            public bool IsIsAuthAppNull() {
+                return this.IsNull(this.tabledurados_App.IsAuthAppColumn);
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
+            public void SetIsAuthAppNull() {
+                this[this.tabledurados_App.IsAuthAppColumn] = global::System.Convert.DBNull;
             }
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]

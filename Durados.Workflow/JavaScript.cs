@@ -65,6 +65,11 @@ namespace Durados.Workflow
         public static readonly string ConnectionStringKey = "ConnectionStringKey";
 
         static System.Web.Script.Serialization.JavaScriptSerializer jss = new System.Web.Script.Serialization.JavaScriptSerializer();
+
+        static JavaScript()
+        {
+            jss.MaxJsonLength = int.MaxValue;
+        }
                 
         public static void SetCacheInCurrentRequest(string key, object value)
         {
@@ -281,6 +286,8 @@ namespace Durados.Workflow
         {
 
             var theJavaScriptSerializer = new System.Web.Script.Serialization.JavaScriptSerializer();
+            theJavaScriptSerializer.MaxJsonLength = int.MaxValue;
+
             IDictionary<string, object> d2 = new Dictionary<string, object>();
             IDictionary<string, object> d = theJavaScriptSerializer.Deserialize<Dictionary<string, object>>(message);
             IDictionary<string, object> d2Child = d2;
@@ -348,6 +355,8 @@ namespace Durados.Workflow
         public static bool IsCrud(System.Net.WebRequest request)
         {
             if (System.Web.HttpContext.Current == null || System.Web.HttpContext.Current.Request.Headers["Authorization"] == null || (System.Web.HttpContext.Current.Request.Url.PathAndQuery.ToLower().Contains("1/user/signup")))
+                return false;
+            if (System.Web.HttpContext.Current.Items.Contains(Database.SignupInProcess))
                 return false;
             HashSet<string> methods = new HashSet<string>(StringComparer.OrdinalIgnoreCase) { "POST", "PUT", "DELETE" };
             string route = "/objects/";
@@ -652,6 +661,7 @@ namespace Durados.Workflow
             userProfile.Add("app", view.Database.GetCurrentAppName());
             userProfile.Add("userId", view.Database.GetCurrentUserId());
             userProfile.Add("token", GetUserProfileAuthToken(view));
+            userProfile.Add("info", GetUserProfileInfo(view));
 
 
             if (!clientParameters.ContainsKey(FILEDATA))
@@ -669,6 +679,8 @@ namespace Durados.Workflow
             //Newtonsoft.Json.JsonConvert.SerializeObject
             
             var theJavaScriptSerializer = new System.Web.Script.Serialization.JavaScriptSerializer();
+            theJavaScriptSerializer.MaxJsonLength = int.MaxValue;
+
             var parser = new Jint.Native.Json.JsonParser(call2);
             //var userInput = parser.Parse(theJavaScriptSerializer.Serialize(newRow));
             //Object clientParametersToSend = null;
@@ -925,6 +937,15 @@ namespace Durados.Workflow
                 else
                     values[ReturnedValueKey] = r;
             }
+        }
+
+        private object GetUserProfileInfo(View view)
+        {
+            if (System.Web.HttpContext.Current.Items.Contains(Durados.Database.TokenInfo))
+            {
+                return System.Web.HttpContext.Current.Items[Durados.Database.TokenInfo];
+            }
+            return null;
         }
 
         private bool IsSubAction()

@@ -1929,10 +1929,26 @@ namespace Durados.Web.Mvc.UI.Helpers
             
             Durados.Web.Mvc.Controllers.AccountMembershipService accountMembershipService = new Durados.Web.Mvc.Controllers.AccountMembershipService();
             bool valid = accountMembershipService.ValidateUser(username);
-            
-            bool readyToSignin = existingUser == null || valid;
 
-            dictionary.Add("readyToSignin", readyToSignin);
+            if (map.HasAuthApp)
+            {
+                bool readyToSignin = existingUser != null || valid;
+
+                dictionary.Add("readyToSignin", readyToSignin);
+                if (dictionary.ContainsKey("IsApproved"))
+                {
+                    if (existingUser == null)
+                    {
+                        dictionary["IsApproved"] = false;
+                    }
+                }
+            }
+            else
+            {
+                bool readyToSignin = existingUser == null || valid;
+
+                dictionary.Add("readyToSignin", readyToSignin);
+            }
         }
 
         protected virtual void AddFieldValue(Field field, DataRow row, string name, object value, Dictionary<string, object> dictionary)
@@ -4777,6 +4793,120 @@ namespace Durados.Web.Mvc.UI.Helpers
             
         }
 
+        public bool IsAccessFilterDeny(string appName, string username, out string customError)
+        {
+            customError = null;
+
+            if (HasAccessFilterValidation(appName))
+            {
+                try
+                {
+                    bool? customValidation = AccessFilterValidation(appName, username, out customError);
+
+                    if (customValidation.HasValue)
+                    {
+                        return !customValidation.Value;
+                    }
+                }
+                catch (Exception exception)
+                {
+                    map.Logger.Log("access token", "AccessFilterValidation", "general", exception, 1, string.Empty);
+                }
+            }
+
+
+            return false;
+
+
+        }
+
+        private bool? AccessFilterValidation(string appName, string username, out string customError)
+        {
+            customError = null;
+
+            Dictionary<string, object> values = null;
+            values = new Dictionary<string, object>();
+            values.Add("username", username);
+            
+            
+            Map map = Maps.Instance.GetMap(appName);
+            View view = (View)map.Database.GetUserView();
+            Durados.Web.Mvc.Workflow.Engine wfe = CreateWorkflowEngine();
+            try
+            {
+                wfe.PerformActions(this, view, Durados.TriggerDataAction.OnDemand, values, null, null, map.Database.ConnectionString, Convert.ToInt32(map.Database.GetUserID()), map.Database.GetUserRole(), null, null, Durados.Database.CustomAccessFilterActionName);
+
+            }
+            catch (Exception exception)
+            {
+                customError = exception.Message;
+                return false;
+            }
+            if (values.ContainsKey(Durados.Workflow.JavaScript.ReturnedValueKey))
+            {
+                var returnedValue = values[Durados.Workflow.JavaScript.ReturnedValueKey];
+                if (returnedValue is IDictionary<string, object>)
+                {
+                    const string Result = "result";
+                    const string Allow = "allow";
+                    const string Deny = "deny";
+                    const string Ignore = "ignore";
+                    const string Message = "message";
+                    IDictionary<string, object> result = (IDictionary<string, object>)returnedValue;
+                    if (result.ContainsKey(Result))
+                    {
+                        if (result[Result].Equals(Ignore))
+                        {
+                            return null;
+                        }
+                        else if (result[Result].Equals(Allow))
+                        {
+                            
+
+                        }
+                        else if (result[Result].Equals(Deny))
+                        {
+                            if (result.ContainsKey(Message))
+                            {
+                                customError = result[Message].ToString();
+                                return false;
+                            }
+                            else
+                            {
+                                customError = Database.CustomValidationActionName + " did not return the expected result. Missing " + Message + " field in the returned object";
+                                return false;
+                            }
+                        }
+                        else
+                        {
+                            customError = Database.CustomValidationActionName + " did not return the expected result. " + Result + " must return either \"" + Allow + "\", \"" + Deny + "\" or \"" + Ignore + "\".";
+                            return false;
+                        }
+                    }
+                    else
+                    {
+                        customError = Database.CustomValidationActionName + " did not return the expected result. Missing " + Result + " field in the returned object.";
+                        return false;
+                    }
+                }
+                else
+                {
+                    customError = Database.CustomValidationActionName + " did not return the expected result.";
+                    return false;
+                }
+
+            }
+
+            
+            return true;
+
+        }
+
+        private bool HasAccessFilterValidation(string appName)
+        {
+            return HasCustomAction(appName, Database.CustomAccessFilterActionName, Maps.Instance.GetCode(Database.CustomAccessFilterActionFileName));
+        }
+
         private bool? SocialCustomValidation(SocialProfile profile, out string customError)
         {
             customError = null;
@@ -4786,6 +4916,8 @@ namespace Durados.Web.Mvc.UI.Helpers
             values.Add("username", profile.email);
             values.Add("firstName", profile.firstName);
             values.Add("lastName", profile.lastName);
+            values.Add("provider", profile.additionalValues["provider"]);
+            values.Add("providerAccessToken", profile.additionalValues["providerAccessToken"]);
             values.Add("id", profile.id);
             
             foreach (string key in profile.additionalValues.Keys)
@@ -4794,7 +4926,7 @@ namespace Durados.Web.Mvc.UI.Helpers
                     values.Add(key, profile.additionalValues[key]);
             }
 
-            Map map = Maps.Instance.GetMap();
+            Map map = Maps.Instance.GetMap(profile.appName);
             View view = (View)map.Database.GetUserView();
             string parameters = profile.parameters;
             if (!string.IsNullOrEmpty(parameters))
@@ -4848,12 +4980,21 @@ namespace Durados.Web.Mvc.UI.Helpers
                         {
                             if (result.ContainsKey(AdditionalTokenInfo))
                             {
-                                System.Web.HttpContext.Current.Items.Add(Durados.Database.CustomTokenAttrKey, result[AdditionalTokenInfo]);
+                                //System.Web.HttpContext.Current.Items.Add(Durados.Database.CustomTokenAttrKey, result[AdditionalTokenInfo]);
                                 IDictionary<string, object> additionalTokenInfo = (IDictionary<string, object>)result[AdditionalTokenInfo];
+                                const string ForToken = "forToken";
+                                var additionalValuesForToken = new Dictionary<string, object>();
+                                if (!profile.additionalValues.ContainsKey(ForToken))
+                                {
+                                    profile.additionalValues.Add(ForToken, additionalValuesForToken);
+                                }
+                                else
+                                {
+                                    additionalValuesForToken = (Dictionary<string, object>)profile.additionalValues[ForToken];
+                                }
                                 foreach (string key in additionalTokenInfo.Keys)
                                 {
-                                    if (!additionalTokenInfo.ContainsKey(key))
-                                        profile.additionalValues.Add(key, additionalTokenInfo[key]);
+                                    additionalValuesForToken.Add(key, additionalTokenInfo[key]);
                                 }
                             }
                             
@@ -4909,41 +5050,41 @@ namespace Durados.Web.Mvc.UI.Helpers
             string firstName = null;
             if (values.ContainsKey("FirstName"))
             {
-                firstName = values["FirstName"].ToString();
+                firstName = (string)values["FirstName"];
             }
             if (values.ContainsKey("firstName"))
             {
-                firstName = values["firstName"].ToString();
+                firstName = (string)values["firstName"];
             }
 
             string lastName = null;
             if (values.ContainsKey("LastName"))
             {
-                lastName = values["LastName"].ToString();
+                lastName = (string)values["LastName"];
             }
             if (values.ContainsKey("lastName"))
             {
-                lastName = values["lastName"].ToString();
+                lastName = (string)values["lastName"];
             }
 
             string role = null;
             if (values.ContainsKey("Role"))
             {
-                role = values["Role"].ToString();
+                role = (string)values["Role"];
             }
             if (values.ContainsKey("UserRole_Parent"))
             {
-                role = values["UserRole_Parent"].ToString();
+                role = (string)values["UserRole_Parent"];
             }
 
             string password = null;
             if (values.ContainsKey("password"))
             {
-                password = values["password"].ToString();
+                password = (string)values["password"];
             }
             if (values.ContainsKey("Password"))
             {
-                password = values["Password"].ToString();
+                password = (string)values["Password"];
             }
 
             if (!IsUserExist(username))

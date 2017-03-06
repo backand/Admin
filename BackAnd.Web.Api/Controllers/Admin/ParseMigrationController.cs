@@ -109,15 +109,22 @@ namespace BackAnd.Web.Api.Controllers.Admin
             request.Headers[Authorization] = GetBasicAuth();
 
             string data = null;
-            using (var response = request.GetResponse())
+            try
             {
-                using (Stream datastream = response.GetResponseStream())
+                using (var response = request.GetResponse())
                 {
-                    using (StreamReader sr = new StreamReader(datastream, System.Text.Encoding.UTF8))
+                    using (Stream datastream = response.GetResponseStream())
                     {
-                        data = sr.ReadToEnd();
+                        using (StreamReader sr = new StreamReader(datastream, System.Text.Encoding.UTF8))
+                        {
+                            data = sr.ReadToEnd();
+                        }
                     }
                 }
+            }
+            catch
+            {
+                return null;
             }
             if (string.IsNullOrEmpty(data))
             {

@@ -215,6 +215,14 @@ namespace BackAnd.Web.Api.Controllers
                     values = viewDataController.GetParameters(parameters, view, values2);
                 }
 
+                if (view.DataTable.PrimaryKey[0].DataType.Equals(typeof(int)))
+                {
+                    int n;
+                    if (!int.TryParse(id, out n))
+                    {
+                        throw new Durados.Data.DataHandlerException((int)HttpStatusCode.NotFound, "The id of the PUT request is either missing or in a non numeric format.");
+                    }
+                }
 
                 view.Update(values, id, deep ?? false, controller.view_BeforeEdit, controller.view_BeforeEditInDatabase, controller.view_AfterEditBeforeCommit, controller.view_AfterEditAfterCommit, controller.view_BeforeCreate, controller.view_BeforeCreateInDatabase, controller.view_AfterCreateBeforeCommit, controller.view_AfterCreateAfterCommit, overwrite ?? false, controller.view_BeforeDelete, controller.view_AfterDeleteBeforeCommit, controller.view_AfterDeleteAfterCommit, false, command, sysCommand);
 
@@ -1280,9 +1288,10 @@ namespace BackAnd.Web.Api.Controllers
 
             wfe.PerformActions(this, e.View, TriggerDataAction.AfterCreateBeforeCommit, e.Values, e.PrimaryKey, null, Map.Database.ConnectionString, Convert.ToInt32(((Durados.Web.Mvc.Database)e.View.Database).GetUserID()), currentUserRole, e.Command, e.SysCommand);
 
-
+            
         }
 
+        
         protected internal void view_AfterCreateAfterCommit(object sender, CreateEventArgs e)
         {
             AfterCreateAfterCommit(e);
@@ -2290,6 +2299,7 @@ namespace BackAnd.Web.Api.Controllers
         public static readonly string NotImplemented = "The action is not implemented yet.";
         public static readonly string FailedToGetJsonFromParameters = "Failed to get json from parameters.";
         public static readonly string StringifyFilter = "Please JSON.stringify the filter parameter";
+        public static readonly string StringifyBulk = "Failed to parse the Bulk JSON";
         public static readonly string GetFilterError = "Failed to translate filter";
         public static readonly string StringifySort = "Please JSON.stringify the sort parameter";
         public static readonly string StringifyFields = "Please provide the fields parameters as ['field1','field2']";

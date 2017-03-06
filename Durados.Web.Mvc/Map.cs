@@ -649,6 +649,12 @@ namespace Durados.Web.Mvc
                         Commit();
                     }
 
+                    if (!(this is DuradosMap) && !HasRule(Database.CustomAccessFilterActionName))
+                    {
+                        AddAccessFilterOverride();
+                        Commit();
+                    }
+
                     if (!(this is DuradosMap) && !HasRule(Database.ChangePasswordOverride))
                     {
                         AddChangePasswordOverride();
@@ -1759,10 +1765,17 @@ namespace Durados.Web.Mvc
                 "   // If you are using a different object for your users then change this action accordingly. \n" +
                 "\n" +
                 "   // Get the user id by the user's email\n" +
-                GetAllCode("currentUser", USERS, "{filter:[{\"fieldName\":\"email\", \"operator\":\"equals\", \"value\": userInput.Username }]}") + "\n" +
+                GetAllCode("currentUser", USERS, "{filter:[{\"fieldName\":\"email\", \"operator\":\"equals\", \"value\": dbRow.Username }]}") + "\n" +
                 "   if (currentUser.data.length == 1) { \n" +
                 "      var currentUserId = currentUser.data[0].__metadata.id; \n" +
-                GetPutCode("response", USERS, "\" + currentUserId + \"", null, "{\"firstName\": userInput.FirstName, \"lastName\": userInput.LastName }", 2) + "\n" +
+                "   var data = {}; \n" +
+                "   if (userInput.FirstName){ \n" +
+                "       data[\"firstName\"] = userInput.FirstName; \n" +
+                "   }\n" +
+                "   if (userInput.LastName){\n" +
+                "       data[\"lastName\"] = userInput.LastName;\n" +
+                "   }\n" +
+                GetPutCode("response", USERS, "\" + currentUserId + \"", null, "data", 2) + "\n" +
                 "   } \n";
 
             values = new Dictionary<string, object>();
@@ -2031,18 +2044,16 @@ namespace Durados.Web.Mvc
 
         }
 
-        
-       
 
-        private void AddSocialAuthenticationOverride()
+        private void AddActionFromFile(string fileName, string actionName)
         {
-            string code = Maps.Instance.GetCode(Database.CustomSocialValidationActionFileName);
+            string code = Maps.Instance.GetCode(fileName);
 
             ConfigAccess configAccess = new DataAccess.ConfigAccess();
             string userViewPK = configAccess.GetViewPK(Database.UserViewName, configDatabase.ConnectionString);
             View ruleView = (View)configDatabase.Views["Rule"];
             Dictionary<string, object> values = new Dictionary<string, object>();
-            values.Add("Name", Database.CustomSocialValidationActionName);
+            values.Add("Name", actionName);
             values.Add("Rules_Parent", userViewPK);
             values.Add("DataAction", Durados.TriggerDataAction.OnDemand.ToString());
             values.Add("WorkflowAction", Durados.WorkflowAction.JavaScript.ToString());
@@ -2053,6 +2064,18 @@ namespace Durados.Web.Mvc
             DataRow row = ruleView.Create(values, null, null, null, null, null);
             string rulePK = ruleView.GetPkValue(row);
 
+        }
+
+        private void AddAccessFilterOverride()
+        {
+            AddActionFromFile(Database.CustomAccessFilterActionFileName, Database.CustomAccessFilterActionName);
+            
+        }
+
+        private void AddSocialAuthenticationOverride()
+        {
+            AddActionFromFile(Database.CustomSocialValidationActionFileName, Database.CustomSocialValidationActionName);
+            
         }
 
         
@@ -5065,18 +5088,80 @@ namespace Durados.Web.Mvc
             SharedMemorySingeltone.Instance.Set(key, value, milliseconds);
         }
 
-        private MembershipProvider _provider = null;
+        
+        public bool HasAuthApp
+        {
+            get
+            {
+                return Database.HasAuthApp;
+            }
+        }
 
+        public string AuthAppName
+        {
+            get
+            {
+                return Maps.Instance.GetAppNameById(Convert.ToInt32(Database.AuthAppId));
+            }
+        }
+
+        public bool IsDomainController
+        {
+            get
+            {
+                return Database.IsDomainController;
+            }
+        }
+
+        private Map _authMap = null;
+
+        public Map GetAuthAppMap()
+        {
+            if (!HasAuthApp)
+                return null;
+
+            if (_authMap == null)
+            {
+                _authMap = Maps.Instance.GetMap(AuthAppName);
+            }
+            return _authMap;
+        }
+
+        private MembershipProvider _provider = null;
         public System.Web.Security.MembershipProvider GetMembershipProvider()
         {
             if (_provider == null)
             {
-                _provider = new SqlMembershipProvider();
-                _provider.Initialize("AspNetSqlMembershipProviderMulti", Database.GetSecuritySettings(Id));
-            
+                if (HasAuthApp)
+                {
+                    return GetAuthAppMap().GetMembershipProvider();
+                }
+                else
+                {
+                    _provider = new SqlMembershipProvider();
+                    _provider.Initialize("AspNetSqlMembershipProviderMulti", Database.GetSecuritySettings(Id));
+                }
             }
 
             return _provider;
+        }
+
+        private bool _isAuthApp = false;
+        public bool IsAuthApp
+        {
+            get
+            {
+                return _isAuthApp;
+            }
+            set
+            {
+                _isAuthApp = value;
+            }
+        }
+
+        public string GetDomainControllerProvider()
+        {
+            return Database.GetDomainControllerProvider();
         }
     }
 

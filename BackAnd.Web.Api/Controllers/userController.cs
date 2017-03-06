@@ -209,8 +209,28 @@ namespace BackAnd.Web.Api.Controllers
         {
             try
             {
-                string json = Request.Content.ReadAsStringAsync().Result;
-                Dictionary<string, object> values = Durados.Web.Mvc.UI.Json.JsonSerializer.Deserialize(json);
+                string json = null;
+                try
+                {
+                    json = Request.Content.ReadAsStringAsync().Result;
+                }
+                catch (Exception exception)
+                {
+                    return ResponseMessage(Request.CreateResponse(HttpStatusCode.InternalServerError, "Failed to get the body of the request. " + exception.Message));
+
+                }
+
+                Dictionary<string, object> values = null;
+
+                try
+                {
+                    values = Durados.Web.Mvc.UI.Json.JsonSerializer.Deserialize(json);
+                }
+                catch (Exception exception)
+                {
+                    return ResponseMessage(Request.CreateResponse(HttpStatusCode.InternalServerError, "Failed to deserialize the body of the request. Body: " + json + ". Error: " + exception.Message));
+
+                }
 
                 if (values == null)
                 {
@@ -302,6 +322,26 @@ namespace BackAnd.Web.Api.Controllers
                     Durados.Web.Mvc.UI.Helpers.AccountService.SignUpResults signUpResults = account.SignUp(appName, firstName, lastName, email, role, byAdmin, password, confirmPassword, isSignupEmailVerification, parameters, view_BeforeCreate, view_BeforeCreateInDatabase, view_AfterCreateBeforeCommit, view_AfterCreateAfterCommit, view_BeforeEdit, view_BeforeEditInDatabase, view_AfterEditBeforeCommit, view_AfterEditAfterCommit);
 
                     GetMap(appName).Logger.Log(GetControllerNameForLog(ControllerContext), string.Empty, string.Empty, null, -37, signUpResults.Username + ": " + account.GetSignUpStatusMessage(signUpResults.Status));
+                    if (Map.HasAuthApp)
+                    {
+                        string authAppName = Map.GetAuthAppMap().AppName;
+                        if (Map.GetAuthAppMap().Database.GetUserRow(email) == null)
+                        {
+                            if (!System.Web.HttpContext.Current.Items.Contains(Durados.Database.AppName))
+                                System.Web.HttpContext.Current.Items.Add(Durados.Database.AppName, authAppName);
+                            else
+                                System.Web.HttpContext.Current.Items[Durados.Database.AppName] = authAppName;
+
+                            System.Web.HttpContext.Current.Items.Add(Durados.Database.SignupInProcess, true);
+                            signUpResults = SignUp(Map.GetAuthAppMap().AppName, isSignupEmailVerification, role, byAdmin, firstName, email, lastName, password, confirmPassword, parameters);
+
+                            if (!System.Web.HttpContext.Current.Items.Contains(Durados.Database.AppName))
+                                System.Web.HttpContext.Current.Items.Add(Durados.Database.AppName, appName);
+                            else
+                                System.Web.HttpContext.Current.Items[Durados.Database.AppName] = appName;
+
+                        }
+                    }
 
                     if (signUpResults.Status == AccountService.SignUpStatus.Ready)
                     {
@@ -336,6 +376,38 @@ namespace BackAnd.Web.Api.Controllers
             }
         }
 
+        internal AccountService.SignUpResults SignUp(string appName, bool? isSignupEmailVerification, string role, bool byAdmin, string firstName, string email, string lastName, string password, string confirmPassword, Dictionary<string, object> parameters)
+        {
+            AccountService account = new AccountService(this);
+            return account.SignUp(appName, firstName, lastName, email, role, byAdmin, password, confirmPassword, isSignupEmailVerification, parameters, view_BeforeCreate, view_BeforeCreateInDatabase, view_AfterCreateBeforeCommit, view_AfterCreateAfterCommit, view_BeforeEdit, view_BeforeEditInDatabase, view_AfterEditBeforeCommit, view_AfterEditAfterCommit);
+        }
+
+        //private void HandleDomainControllerSignup(CreateEventArgs e)
+        //{
+        //    if (Map.HasAuthApp)
+        //    {
+        //        string currentAppName = Map.AppName;
+        //        userController uc = new userController();
+        //        string appname = Map.GetAuthAppMap().AppName;
+        //        string firstName = (string)e.Values["FirstName"];
+        //        string lastName = (string)e.Values["LastName"];
+        //        string email = (string)e.Values["Username"];
+        //        string password = (string)e.Values["Password"];
+        //        if (!System.Web.HttpContext.Current.Items.Contains(Durados.Database.AppName))
+        //            System.Web.HttpContext.Current.Items.Add(Durados.Database.AppName, appname);
+        //        else
+        //            System.Web.HttpContext.Current.Items[Durados.Database.AppName] = appname;
+
+        //        System.Web.HttpContext.Current.Items.Add(Durados.Database.SignupInProcess, true);
+        //        uc.Signup(null, null, false, firstName, email, lastName, password, password, null, appname);
+        //        if (!System.Web.HttpContext.Current.Items.Contains(Durados.Database.AppName))
+        //            System.Web.HttpContext.Current.Items.Add(Durados.Database.AppName, currentAppName);
+        //        else
+        //            System.Web.HttpContext.Current.Items[Durados.Database.AppName] = currentAppName;
+
+
+        //    }
+        //}
 
         private Map GetMap(string appName)
         {
@@ -1083,13 +1155,14 @@ namespace BackAnd.Web.Api.Controllers
                     }
                     catch (UserNotSignedUpSocialException userNotSignedUpSocialException)
                     {
-                        if (!profile.signupIfNotSignedIn || (new AccountService(this)).IsPrivate(profile.appName))
+                        AccountService accountService = new AccountService(this);
+                        if (!accountService.IsDomainController(profile.appName) && (!profile.signupIfNotSignedIn || accountService.IsPrivate(profile.appName)))
                         {
                             return BadRequest(userNotSignedUpSocialException.Message);
                         }
                         else
                         {
-                            SocialSignupInner(profile);
+                            SocialSignupInner(profile, true);
                             SocialSigninInner(profile);
                         }
 
@@ -1372,18 +1445,46 @@ namespace BackAnd.Web.Api.Controllers
             }
         }
 
-        private void SocialSignupInner(SocialProfile profile)
+        private void SocialSignupInner(SocialProfile profile, bool fromSignIn = false)
+        {
+            string appName = profile.appName;
+            Map map = Maps.Instance.GetMap(appName);
+            bool hasAuthApp = map.HasAuthApp;
+            string authAppName = map.AuthAppName;
+            bool overridePrivate = false;
+            if (hasAuthApp)
+            {
+                if (map.IsDomainController && fromSignIn)
+                {
+                    overridePrivate = true;
+                }
+                if (Maps.Instance.GetMap(authAppName).Database.GetUserRow(profile.email) == null)
+                {
+                    profile.appName = authAppName;
+                    SocialSignupInner2(profile, overridePrivate);
+                    profile.appName = appName;
+                }
+            }
+            SocialSignupInner2(profile, overridePrivate);
+        }
+
+        private void SocialSignupInner2(SocialProfile profile, bool overridePrivate = false)
         {
 
             if (!System.Web.HttpContext.Current.Items.Contains(Durados.Database.AppName))
                 System.Web.HttpContext.Current.Items.Add(Durados.Database.AppName, profile.appName);
+            else
+                System.Web.HttpContext.Current.Items[Durados.Database.AppName] = profile.appName;
 
             if (!System.Web.HttpContext.Current.Items.Contains(Durados.Database.RequestId))
                 System.Web.HttpContext.Current.Items.Add(Durados.Database.RequestId, Guid.NewGuid().ToString());
 
-            if (new AccountService(this).IsPrivate(profile.appName))
+            if (!overridePrivate)
             {
-                throw new Durados.Web.Mvc.UI.Helpers.AccountService.OnlyInvitedUsersAreAllowedException();
+                if (new AccountService(this).IsPrivate(profile.appName))
+                {
+                    throw new Durados.Web.Mvc.UI.Helpers.AccountService.OnlyInvitedUsersAreAllowedException();
+                }
             }
 
             NewRelic.Api.Agent.NewRelic.AddCustomParameter(Durados.Database.RequestId, System.Web.HttpContext.Current.Items[Durados.Database.RequestId].ToString());
@@ -1434,7 +1535,7 @@ namespace BackAnd.Web.Api.Controllers
 
                 // todo: start transaction
 
-                SignUpCommand(profile, values, firstName, lastName, password);
+                SignUpCommand(profile, values, firstName, lastName, password, overridePrivate);
 
                 // todo: stop transaction
 
@@ -1451,23 +1552,28 @@ namespace BackAnd.Web.Api.Controllers
 
         }
 
-        private void SignUpCommand(SocialProfile profile, Dictionary<string, object> values, string firstName, string lastName, string password)
+        private void SignUpCommand(SocialProfile profile, Dictionary<string, object> values, string firstName, string lastName, string password, bool overridePrivate)
+        {
+            SignUpCommand(profile.appName, profile.email, profile.Provider, profile.id, values, firstName, lastName, password, overridePrivate);
+        }
+
+        internal void SignUpCommand(string appName, string email, string provider, string socialId, Dictionary<string, object> values, string firstName, string lastName, string password, bool overridePrivate)
         {
             AccountService accountService = new AccountService(this);
-            accountService.SignUp(profile.appName, firstName, lastName, profile.email, null, false, password,
+            accountService.SignUp(appName, firstName, lastName, email, null, overridePrivate, password,
                 password, false, values,
                 view_BeforeCreate, view_BeforeCreateInDatabase,
                 view_AfterCreateBeforeCommit, view_AfterCreateAfterCommit,
                 view_BeforeEdit, view_BeforeEditInDatabase,
                 view_AfterEditBeforeCommit, view_AfterEditAfterCommit);
 
-            int appId = Convert.ToInt32(Maps.Instance.GetMap(profile.appName).Id);
+            int appId = Convert.ToInt32(Maps.Instance.GetMap(appName).Id);
 
-            var currentData = accountService.GetEmailBySocialId(profile.Provider, profile.id, appId);
+            var currentData = accountService.GetEmailBySocialId(provider, socialId, appId);
 
             if (string.IsNullOrEmpty(currentData))
             {
-                accountService.SetEmailBySocialId(profile.Provider, profile.id, profile.email, appId);
+                accountService.SetEmailBySocialId(provider, socialId, email, appId);
             }
 
         }

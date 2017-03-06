@@ -266,7 +266,7 @@ namespace Durados.DataAccess.AutoGeneration
                         {
                             try
                             {
-                                long maxLength64 = reader.GetInt64(reader.GetOrdinal("character_maximum_length"));
+                                long maxLength64 = Convert.ToInt64(reader.GetValue((reader.GetOrdinal("character_maximum_length"))));
                                 if (maxLength64 < maxLength)
                                     maxLength = Convert.ToInt32(maxLength64);
                             }

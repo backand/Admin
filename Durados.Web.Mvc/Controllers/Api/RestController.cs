@@ -137,6 +137,8 @@ namespace Durados.Web.Mvc.Controllers.Api
         public static Dictionary<string, object> Deserialize(string json)
         {
             var jss = new JavaScriptSerializer();
+            jss.MaxJsonLength = Int32.MaxValue; 
+
             var dict = jss.Deserialize<dynamic>(json);
 
             return (Dictionary<string, object>)dict;
@@ -145,6 +147,7 @@ namespace Durados.Web.Mvc.Controllers.Api
         public static Dictionary<string, object>[] DeserializeArray(string json)
         {
             var jss = new JavaScriptSerializer();
+            jss.MaxJsonLength = Int32.MaxValue;
             var dict = jss.Deserialize<Dictionary<string, object>[]>(json);
 
             return (Dictionary<string, object>[])dict;

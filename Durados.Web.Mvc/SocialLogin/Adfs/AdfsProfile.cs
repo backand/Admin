@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 
-namespace Durados.Web.Mvc.SocialLogin.Facebook
+namespace Durados.Web.Mvc.SocialLogin.Adfs
 {
     public class AdfsProfile : SocialProfile
     {

@@ -3414,6 +3414,46 @@ namespace Durados.Web.Mvc.Config
                 EnableAdfs.HideInTable = true;
             }
 
+            if (databaseView.Fields.ContainsKey("MaxInvalidPasswordAttempts"))
+            {
+                ColumnField MaxInvalidPasswordAttempts = (ColumnField)databaseView.Fields["MaxInvalidPasswordAttempts"];
+                MaxInvalidPasswordAttempts.Order = 600;
+                MaxInvalidPasswordAttempts.Category = rolesCategory;
+                MaxInvalidPasswordAttempts.HideInTable = true;
+            }
+
+            if (databaseView.Fields.ContainsKey("MinRequiredPasswordLength"))
+            {
+                ColumnField MinRequiredPasswordLength = (ColumnField)databaseView.Fields["MinRequiredPasswordLength"];
+                MinRequiredPasswordLength.Order = 600;
+                MinRequiredPasswordLength.Category = rolesCategory;
+                MinRequiredPasswordLength.HideInTable = true;
+            }
+
+            if (databaseView.Fields.ContainsKey("PasswordAttemptWindow"))
+            {
+                ColumnField PasswordAttemptWindow = (ColumnField)databaseView.Fields["PasswordAttemptWindow"];
+                PasswordAttemptWindow.Order = 600;
+                PasswordAttemptWindow.Category = rolesCategory;
+                PasswordAttemptWindow.HideInTable = true;
+            }
+
+            if (databaseView.Fields.ContainsKey("PasswordStrengthRegularExpression"))
+            {
+                ColumnField PasswordStrengthRegularExpression = (ColumnField)databaseView.Fields["PasswordStrengthRegularExpression"];
+                PasswordStrengthRegularExpression.Order = 600;
+                PasswordStrengthRegularExpression.Category = rolesCategory;
+                PasswordStrengthRegularExpression.HideInTable = true;
+            }
+
+            if (databaseView.Fields.ContainsKey("AuthAppId"))
+            {
+                ColumnField AuthAppId = (ColumnField)databaseView.Fields["AuthAppId"];
+                AuthAppId.Order = 600;
+                AuthAppId.Category = rolesCategory;
+                AuthAppId.HideInTable = true;
+            }
+
             if (databaseView.Fields.ContainsKey("EnableTokenRevokation"))
             {
                 ColumnField EnableTokenRevokation = (ColumnField)databaseView.Fields["EnableTokenRevokation"];
