@@ -10,7 +10,12 @@ namespace Backand
 
         protected virtual string GetNodeUrl()
         {
-            return System.Configuration.ConfigurationManager.AppSettings["nodeHost"] ?? "http://127.0.0.1:9000";
+            string socketHost = System.Configuration.ConfigurationManager.AppSettings["socketHost"];
+            if (string.IsNullOrEmpty(socketHost))
+            {
+                throw new Durados.DuradosException("Missing socketHost key in web config");
+            }
+            return System.Configuration.ConfigurationManager.AppSettings["socketHost"] ;
         }
 
         protected virtual string GetAppName()
