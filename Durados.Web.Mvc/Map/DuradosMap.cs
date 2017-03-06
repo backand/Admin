@@ -116,7 +116,7 @@ namespace Durados.Web.Mvc
             Dictionary<string, object> values = new Dictionary<string, object>();
             SqlAccess sqlAccess = new SqlAccess();
 
-            DataTable table = sqlAccess.ExecuteTable(Maps.Instance.DuradosMap.Database.ConnectionString, "select * from durados_App where durados_app.[ToDelete]=0 AND  Creator = " + userId + " or id in (select durados_UserApp.AppId from durados_UserApp where durados_UserApp.UserId = " + userId + ") ", null, CommandType.Text);
+            DataTable table = sqlAccess.ExecuteTable(Maps.Instance.DuradosMap.Database.ConnectionString, "select * from durados_App with(nolock) where durados_app.[ToDelete]=0 AND  Creator = " + userId + " or id in (select durados_UserApp.AppId from durados_UserApp with(nolock) where durados_UserApp.UserId = " + userId + ") ", null, CommandType.Text);
 
             Dictionary<string, string> apps = new Dictionary<string, string>();
             foreach (System.Data.DataRow row in table.Rows)

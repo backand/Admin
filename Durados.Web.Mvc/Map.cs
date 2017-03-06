@@ -1132,7 +1132,7 @@ namespace Durados.Web.Mvc
 
         private int GetSaveChangesIndicationFromDb2()
         {
-            string sql = "select ConfigChangesIndication from durados_App where id = " + Id;
+            string sql = "select ConfigChangesIndication from durados_App with(nolock) where id = " + Id;
             string scalar = new SqlAccess().ExecuteScalar(Maps.Instance.DuradosMap.connectionString, sql);
             return Convert.ToInt32(string.IsNullOrEmpty(scalar) ? "0" : scalar);
 
@@ -5053,7 +5053,7 @@ namespace Durados.Web.Mvc
             try
             {
                 SqlAccess sqlAccess = new SqlAccess();
-                DataTable table = sqlAccess.ExecuteTable(Maps.Instance.DuradosMap.connectionString, "select Name, Limit from durados_AppLimits where AppId = " + Id, null, CommandType.Text);
+                DataTable table = sqlAccess.ExecuteTable(Maps.Instance.DuradosMap.connectionString, "select Name, Limit from durados_AppLimits with(nolock) where AppId = " + Id, null, CommandType.Text);
                 foreach (DataRow row in table.Rows)
                 {
                     string limitName = row["Name"].ToString();

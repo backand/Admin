@@ -2373,7 +2373,7 @@ namespace Durados.Web.Mvc.Controllers
 
         private bool ValidateUser(int appID, int userId)
         {
-            string sql = string.Format("select Cast( case when exists(select 1 from durados_App where durados_app.[ToDelete]=0 AND  Id = {0} and Creator = {1}) or exists(select 1 from dbo.durados_UserApp where  AppId = {0} and UserId = {1}) then 1 else 0 end as bit)", appID, userId);
+            string sql = string.Format("select Cast( case when exists(select 1 from durados_App with(nolock) where durados_app.[ToDelete]=0 AND  Id = {0} and Creator = {1}) or exists(select 1 from dbo.durados_UserApp with(nolock) where  AppId = {0} and UserId = {1}) then 1 else 0 end as bit)", appID, userId);
             string scalar = (new SqlAccess()).ExecuteScalar(Maps.Instance.DuradosMap.Database.ConnectionString, sql);
 
             if (string.IsNullOrEmpty(scalar))

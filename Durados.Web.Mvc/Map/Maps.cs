@@ -1833,7 +1833,7 @@ namespace Durados.Web.Mvc
             }
 
             int? themeId = null;
-            string sql = "select ThemeId from durados_App where [Name]=@appName";
+            string sql = "select ThemeId from durados_App with(nolock) where [Name]=@appName";
             try
             {
 
@@ -1847,7 +1847,7 @@ namespace Durados.Web.Mvc
             }
             if (themeId.Equals(CustomTheme))
             {
-                sql = "select CustomThemePath from durados_App where [Name]=@appName";
+                sql = "select CustomThemePath from durados_App with(nolock) where [Name]=@appName";
                 try
                 {
 
