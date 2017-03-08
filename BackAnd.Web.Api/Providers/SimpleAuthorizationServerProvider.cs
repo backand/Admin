@@ -87,6 +87,13 @@ namespace BackAnd.Web.Api.Providers
                                 context.AdditionalResponseParameters.Add(key, additionalValuesForToken[key]);
                             }
                         }
+                        //else
+                        //{
+                        //    foreach (string key in dic.Keys)
+                        //    {
+                        //        context.AdditionalResponseParameters.Add(key, dic[key]);		
+                        //    }
+                        //}
                     }
                 }
                 catch { }

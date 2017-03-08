@@ -5278,7 +5278,10 @@ namespace Durados.Web.Mvc.UI.Helpers
                         {
                             if (result.ContainsKey(AdditionalTokenInfo))
                             {
-                                System.Web.HttpContext.Current.Items.Add(Durados.Database.CustomTokenAttrKey, result[AdditionalTokenInfo]);
+                                const string ForToken = "forToken";
+                                var additionalValuesForToken = new Dictionary<string, object>();
+                                additionalValuesForToken.Add(ForToken, result[AdditionalTokenInfo]);
+                                System.Web.HttpContext.Current.Items.Add(Durados.Database.CustomTokenAttrKey, additionalValuesForToken);
                             }
                         }
                         else if (result[Result].Equals(Deny))

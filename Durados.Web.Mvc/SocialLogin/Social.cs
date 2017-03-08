@@ -27,7 +27,7 @@ namespace Durados.Web.Mvc.UI.Helpers
 
         protected string[] GetTestAppNames()
         {
-            return (System.Configuration.ConfigurationManager.AppSettings["socialTestApps"] ?? "testwebhook13,authapp1,sso1,sso2").Split(',');
+            return (System.Configuration.ConfigurationManager.AppSettings["socialTestApps"] ?? "testwebhook13,testwebhook132,authapp1,sso1,sso2").Split(',');
         }
 
         protected bool IsTestApp(string appName)
