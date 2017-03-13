@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Collections.Specialized;
+using System.Reflection;
 
 namespace Durados
 {
@@ -102,8 +103,31 @@ namespace Durados
         [Durados.Config.Attributes.ChildrenProperty(TableName = "Tooltip", Type = typeof(Tooltip), DictionaryKeyColumnName = "Name")]
         public Dictionary<string, Tooltip> Tooltips { get; private set; }
 
+        public virtual Database GetAuthDatabase()
+        {
+            throw new NotImplementedException();
+        }
+
+        private bool _signupEmailVerification;
         [Durados.Config.Attributes.ColumnProperty()]
-        public bool SignupEmailVerification { get; set; }
+        public bool SignupEmailVerification
+        {
+            get
+            {
+                if (HasAuthApp)
+                {
+                    return GetAuthDatabase().SignupEmailVerification;
+                }
+                else
+                {
+                    return _signupEmailVerification;
+                }
+            }
+            set
+            {
+                _signupEmailVerification = value;
+            }
+        }
 
 
         [Durados.Config.Attributes.ColumnProperty()]
@@ -657,6 +681,23 @@ namespace Durados
             SignupEmailVerification = false;
 
             //BackandSSO = false;
+        }
+
+        public object this[string fieldName]
+        {
+            get
+            {
+                PropertyInfo info = this.GetType().GetProperty(fieldName);
+                if (info == null)
+                    return null;
+                return info.GetValue(this, null);
+            }
+            //set
+            //{
+            //    PropertyInfo info = this.GetType().GetProperty(fieldName);
+            //    if (info != null)
+            //        info.SetValue(this, value, null);
+            //}
         }
 
         private int GetDefaultLevelOfDept()

@@ -560,7 +560,10 @@ namespace BackAnd.Web.Api.Controllers
                         return ResponseMessage(Request.CreateResponse(HttpStatusCode.Unauthorized, customError));
                     }
                 }
-
+                else if (Map.IsDomainController && Map.GetMembershipProvider().GetUser(username, false) == null)
+                {
+                    return ResponseMessage(Request.CreateResponse(HttpStatusCode.Unauthorized, "The app authentication is controlled by a domain controller. Request to change password is not allowed."));
+                }
                 AccountService account = new AccountService(this);
                 account.ChangePassword(Map, username, newPassword, oldPassword);
 
@@ -604,6 +607,10 @@ namespace BackAnd.Web.Api.Controllers
                     return ResponseMessage(Request.CreateResponse(HttpStatusCode.NotFound, Messages.AppNotFound));
                 }
 
+                if (map2.IsDomainController)
+                {
+                    return ResponseMessage(Request.CreateResponse(HttpStatusCode.BadRequest, "The app authentication is controlled by a domain controller. Request to reset password is not allowed."));
+                }
 
                 if (map2.Database.GetUserRow(username) == null)
                 {

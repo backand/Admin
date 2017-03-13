@@ -546,7 +546,7 @@ namespace Durados.Web.Mvc.UI.Helpers
         {
             try
             {
-                if (useCache)
+                if (useCache && !view.Database.Map.HasAuthApp)
                 {
                     object cachedObject = null;
                     if (ExistsInCache(out cachedObject))
@@ -1279,7 +1279,18 @@ namespace Durados.Web.Mvc.UI.Helpers
             "InsideTextSearch","DefaultWorkspaceId","DefaultDenyCreateRoles","DefaultDenyEditRoles","DefaultDenyDeleteRoles","DefaultDenySelectRoles","DoLocalizeAdmin","SsrsDomain",
             "StyleSheets","HideMyStuff","IsMultiLanguages","SsrsPassword","SsrsPath","GrobootNotificationAccessKey","SecureLevel","SsrsReportServerUrl","RequiresSSL","UserGuidFieldName",
             "SsrsUsername","ViewOwnerRoles"
-       };
+        };
+
+        HashSet<string> authAppFields = new HashSet<string>() {
+            "GoogleClientId","GoogleClientSecret","TwitterClientId","TwitterClientSecret","GithubClientId","GithubClientSecret","FacebookClientId","FacebookClientSecret","FacebookScope",
+            "EnableGithub","EnableGoogle","EnableTwitter","EnableFacebook",
+            "EnableAdfs","EnableAzureAd",
+            "AdfsClientId","AdfsResource","AdfsHost","AzureAdClientId","AzureAdResource","AzureAdHost",
+            "NewUserDefaultRole",
+            "EnableUserRegistration",
+            "SignupEmailVerification",
+            "TokenExpiration"
+        };
 
         HashSet<string> appExcludeFieldsForAdminFromJson = new HashSet<string>();
         protected override bool IsJsonable(Field field, DataRow dataRow)
@@ -1297,6 +1308,27 @@ namespace Durados.Web.Mvc.UI.Helpers
             }
 
             return base.IsJsonable(field, dataRow);
+        }
+
+        protected override object GetColumnValue(View view, DataRow dataRow, ColumnField columnField)
+        {
+            string name = columnField.Name;
+            if (HasAuthApp(view) && authAppFields.Contains(name))
+            {
+                return GetAuthValue(view, name);
+            }
+            return base.GetColumnValue(view, dataRow, columnField);
+        }
+
+        private bool HasAuthApp(View view)
+        {
+            return ((View)view).Database.Map.HasAuthApp;
+        }
+        
+
+        private object GetAuthValue(View view, string name)
+        {
+            return ((View)view).Database.Map.Database[name];
         }
     }
 
@@ -1957,7 +1989,7 @@ namespace Durados.Web.Mvc.UI.Helpers
                 dictionary.Add(name, value);
         }
 
-        private bool HandleHistory(Field field, DataRow row, string name, object value, Dictionary<string, object> dictionary)
+        protected bool HandleHistory(Field field, DataRow row, string name, object value, Dictionary<string, object> dictionary)
         {
             try
             {

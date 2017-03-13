@@ -220,50 +220,311 @@ namespace Durados.Web.Mvc
         public bool EnableTokenRevokation { get; set; }
 
 
+        private int _tokenExpiration { get; set; }
         [Durados.Config.Attributes.ColumnProperty()]
-        public int TokenExpiration { get; set; }
+        public int TokenExpiration
+        {
+            get
+            {
+                if (HasAuthApp)
+                {
+                    return Map.GetAuthAppMap().Database.TokenExpiration;
+                }
+                else
+                {
+                    return _tokenExpiration;
+                }
+            }
+            set
+            {
+                _tokenExpiration = value;
+            }
+        }
 
         [Durados.Config.Attributes.ColumnProperty()]
         public bool UseRefreshToken { get; set; }
 
+
+
+        private string _googleClientId;
         [Durados.Config.Attributes.ColumnProperty()]
-        public string GoogleClientId { get; set; }
+        public string GoogleClientId
+        {
+            get
+            {
+                if (HasAuthApp)
+                {
+                    return Map.GetAuthAppMap().Database.GoogleClientId;
+                }
+                else
+                {
+                    return _googleClientId;
+                }
+            }
+            set
+            {
+                _googleClientId = value;
+            }
+        }
 
+        private string _googleClientSecret;
         [Durados.Config.Attributes.ColumnProperty()]
-        public string GoogleClientSecret { get; set; }
+        public string GoogleClientSecret
+        {
+            get
+            {
+                if (HasAuthApp)
+                {
+                    return Map.GetAuthAppMap().Database.GoogleClientSecret;
+                }
+                else
+                {
+                    return _googleClientSecret;
+                }
+            }
+            set
+            {
+                _googleClientSecret = value;
+            }
+        }
 
+        private string _twitterClientId;
         [Durados.Config.Attributes.ColumnProperty()]
-        public string TwitterClientId { get; set; }
+        public string TwitterClientId
+        {
+            get
+            {
+                if (HasAuthApp)
+                {
+                    return Map.GetAuthAppMap().Database.TwitterClientId;
+                }
+                else
+                {
+                    return _twitterClientId;
+                }
+            }
+            set
+            {
+                _twitterClientId = value;
+            }
+        }
 
+        private string _twitterClientSecret;
         [Durados.Config.Attributes.ColumnProperty()]
-        public string TwitterClientSecret { get; set; }
+        public string TwitterClientSecret
+        {
+            get
+            {
+                if (HasAuthApp)
+                {
+                    return Map.GetAuthAppMap().Database.TwitterClientSecret;
+                }
+                else
+                {
+                    return _twitterClientSecret;
+                }
+            }
+            set
+            {
+                _twitterClientSecret = value;
+            }
+        }
 
+        private string _githubClientId;
         [Durados.Config.Attributes.ColumnProperty()]
-        public string GithubClientId { get; set; }
+        public string GithubClientId
+        {
+            get
+            {
+                if (HasAuthApp)
+                {
+                    return Map.GetAuthAppMap().Database.GithubClientId;
+                }
+                else
+                {
+                    return _githubClientId;
+                }
+            }
+            set
+            {
+                _githubClientId = value;
+            }
+        }
 
+        private string _githubClientSecret;
         [Durados.Config.Attributes.ColumnProperty()]
-        public string GithubClientSecret { get; set; }
+        public string GithubClientSecret
+        {
+            get
+            {
+                if (HasAuthApp)
+                {
+                    return Map.GetAuthAppMap().Database.GithubClientSecret;
+                }
+                else
+                {
+                    return _githubClientSecret;
+                }
+            }
+            set
+            {
+                _githubClientSecret = value;
+            }
+        }
 
+        private string _facebookClientId;
         [Durados.Config.Attributes.ColumnProperty()]
-        public bool EnableGithub { get; set; }
+        public string FacebookClientId
+        {
+            get
+            {
+                if (HasAuthApp)
+                {
+                    return Map.GetAuthAppMap().Database.FacebookClientId;
+                }
+                else
+                {
+                    return _facebookClientId;
+                }
+            }
+            set
+            {
+                _facebookClientId = value;
+            }
+        }
 
+        private string _facebookClientSecret;
         [Durados.Config.Attributes.ColumnProperty()]
-        public bool EnableGoogle { get; set; }
+        public string FacebookClientSecret
+        {
+            get
+            {
+                if (HasAuthApp)
+                {
+                    return Map.GetAuthAppMap().Database.FacebookClientSecret;
+                }
+                else
+                {
+                    return _facebookClientSecret;
+                }
+            }
+            set
+            {
+                _facebookClientSecret = value;
+            }
+        }
 
+        private string _facebookScope;
         [Durados.Config.Attributes.ColumnProperty()]
-        public bool EnableTwitter { get; set; }
+        public string FacebookScope
+        {
+            get
+            {
+                if (HasAuthApp)
+                {
+                    return Map.GetAuthAppMap().Database.FacebookScope;
+                }
+                else
+                {
+                    return _facebookScope;
+                }
+            }
+            set
+            {
+                _facebookScope = value;
+            }
+        }
 
-       
 
+
+        private bool _enableGithub;
         [Durados.Config.Attributes.ColumnProperty()]
-        public string FacebookClientId { get; set; }
+        public bool EnableGithub
+        {
+            get
+            {
+                if (HasAuthApp)
+                {
+                    return Map.GetAuthAppMap().Database.EnableGithub;
+                }
+                else
+                {
+                    return _enableGithub;
+                }
+            }
+            set
+            {
+                _enableGithub = value;
+            }
+        }
 
+        private bool _enableGoogle;
         [Durados.Config.Attributes.ColumnProperty()]
-        public string FacebookClientSecret { get; set; }
+        public bool EnableGoogle
+        {
+            get
+            {
+                if (HasAuthApp)
+                {
+                    return Map.GetAuthAppMap().Database.EnableGoogle;
+                }
+                else
+                {
+                    return _enableGoogle;
+                }
+            }
+            set
+            {
+                _enableGoogle = value;
+            }
+        }
 
+        private bool _enableTwitter;
         [Durados.Config.Attributes.ColumnProperty()]
-        public string FacebookScope { get; set; }
+        public bool EnableTwitter
+        {
+            get
+            {
+                if (HasAuthApp)
+                {
+                    return Map.GetAuthAppMap().Database.EnableTwitter;
+                }
+                else
+                {
+                    return _enableTwitter;
+                }
+            }
+            set
+            {
+                _enableTwitter = value;
+            }
+        }
 
+        private bool _enableFacebook;
+        [Durados.Config.Attributes.ColumnProperty()]
+        public bool EnableFacebook
+        {
+            get
+            {
+                if (HasAuthApp)
+                {
+                    return Map.GetAuthAppMap().Database.EnableFacebook;
+                }
+                else
+                {
+                    return _enableFacebook;
+                }
+            }
+            set
+            {
+                _enableFacebook = value;
+            }
+        }
+
+
+
+
+        
 
         private bool _enableAdfs;
         [Durados.Config.Attributes.ColumnProperty()]
@@ -440,11 +701,7 @@ namespace Durados.Web.Mvc
 
 
 
-        [Durados.Config.Attributes.ColumnProperty()]
-        public bool EnableFacebook { get; set; }
-
-
-
+        
 
 
         [Durados.Config.Attributes.ColumnProperty()]
@@ -492,8 +749,26 @@ namespace Durados.Web.Mvc
         [Durados.Config.Attributes.ColumnProperty()]
         public string ForgotPasswordUrl { get; set; }
 
+        private string _newUserDefaultRole;
         [Durados.Config.Attributes.ColumnProperty()]
-        public string NewUserDefaultRole { get; set; }
+        public string NewUserDefaultRole
+        {
+            get
+            {
+                if (HasAuthApp)
+                {
+                    return Map.GetAuthAppMap().Database.NewUserDefaultRole;
+                }
+                else
+                {
+                    return _newUserDefaultRole;
+                }
+            }
+            set
+            {
+                _newUserDefaultRole = value;
+            }
+        }
 
         [Durados.Config.Attributes.ColumnProperty()]
         public bool ApproveNewUsersManually { get; set; }
@@ -519,6 +794,10 @@ namespace Durados.Web.Mvc
             }
         }
 
+        public override Durados.Database GetAuthDatabase()
+        {
+            return Map.GetAuthAppMap().Database;
+        }
 
         [Durados.Config.Attributes.ColumnProperty()]
         public string UploadFolder { get; set; }
@@ -1735,7 +2014,7 @@ namespace Durados.Web.Mvc
         {
             get
             {
-                return EnableAdfs || EnableAzureAd;
+                return (EnableAdfs || EnableAzureAd) && !EnableFacebook && !EnableGithub && ! EnableGoogle && ! EnableTwitter;
             }
         }
 
