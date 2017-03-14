@@ -400,6 +400,25 @@ namespace Durados.Web.Mvc
             permanentFilter = ReplaceQueryString(permanentFilter);
             permanentFilter = ReplaceQueryStringParameters(permanentFilter);
 
+            permanentFilter = ReplaceTokenInfo(permanentFilter);
+
+
+            return permanentFilter;
+        }
+
+        private string ReplaceTokenInfo(string permanentFilter)
+        {
+            if (System.Web.HttpContext.Current.Items.Contains(Durados.Database.TokenInfo) && System.Web.HttpContext.Current.Items[Durados.Database.TokenInfo] is IDictionary<string, object>)
+            {
+                IDictionary<string, object> tokenInfo = (IDictionary<string, object>)System.Web.HttpContext.Current.Items[Durados.Database.TokenInfo];
+                foreach (string key in tokenInfo.Keys)
+                {
+                    if (!string.IsNullOrEmpty(key))
+                        permanentFilter = permanentFilter.Replace((Durados.Database.TokenInfoPrefixForPredefindFilter + key).AsToken(), tokenInfo[key].ToString(), false);
+                }
+            }
+
+            
 
             return permanentFilter;
         }

@@ -58,10 +58,14 @@ namespace BackAnd.Web.Api.Controllers
                 }
                 Cron cron = Map.Database.Crons[id];
 
+                if (!IsActive(id))
+                {
+                    return ResponseMessage(Request.CreateResponse(HttpStatusCode.NotFound, "The Cron " + id + " is not active. Please switch active to 'ON'"));
+                }
 
                 CronRequestInfo cronInfo = GetRequestInfo(cron, test);
-                
 
+                
                 XMLHttpRequest request = new XMLHttpRequest();
                 request.open(cronInfo.method, cronInfo.url, false);
                 string appName = Map.AppName;
@@ -124,6 +128,25 @@ namespace BackAnd.Web.Api.Controllers
             }
         }
 
+        private bool IsActive(int id)
+        {
+            bool? active = null;
+            try
+            {
+                var crons = CronHelper.getCron();
+                string key = id.ToString();
+                if (crons.ContainsKey(key))
+                {
+                    active = ((Dictionary<string, object>)crons[key])[STATE].ToString() == ENABLED;
+                }
+            }
+            catch { }
+
+            if (!active.HasValue)
+                return true;
+
+            return active.Value;
+        }
         
         [Route("~/1/jobs/run/{id}/test")]
         [Route("~/1/cron/run/{id}/test")]
@@ -222,14 +245,15 @@ namespace BackAnd.Web.Api.Controllers
             return GetList(withSelectOptions, pageNumber, pageSize, filter, sort, search);
         }
 
+        const string DATA = "data";
+        const string ID = "iD";
+        const string STATE = "State";
+        const string ENABLED = "ENABLED";
+        const string ACTIVE = "active";
+
         protected override System.Web.Http.Results.OkNegotiatedContentResult<T> Ok<T>(T content)
         {
-            const string DATA = "data";
-            const string ID = "iD";
-            const string STATE = "State";
-            const string ENABLED = "ENABLED";
-            const string ACTIVE = "active";
-
+            
             if (!(content is IDictionary<string, object>))
                 return base.Ok<T>(content);
 
@@ -469,7 +493,13 @@ namespace BackAnd.Web.Api.Controllers
 
         private void DeleteAwsCron(Cron cron)
         {
-            CronHelper.deleteCron(cron);
+            try
+            {
+                CronHelper.deleteCron(cron);
+            }
+            catch (Exception) 
+            { 
+            }
         }
     }
 }

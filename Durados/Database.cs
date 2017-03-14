@@ -45,6 +45,7 @@ namespace Durados
         public static readonly string backand_appGuidNotMatch = "backand_appGuidNotMatch";
         public static readonly string AppName = "appname";
         public static readonly string TokenInfo = "info";
+        public static readonly string TokenInfoPrefixForPredefindFilter = "tokenInfo.";
         public static readonly string MainAppFromToken = "MainAppFromToken";
         
         public static readonly string AppId = "appid";
