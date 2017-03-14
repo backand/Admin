@@ -2643,7 +2643,7 @@ namespace Durados.Web.Mvc.UI.Helpers
                     }
                 }
 
-                if (outOperator != null && (!string.IsNullOrEmpty(value) || inOperator == FilterOperandType.notEmpty.ToString() || inOperator == FilterOperandType.empty.ToString()))
+                if (outOperator != null && (value != null || inOperator == FilterOperandType.notEmpty.ToString() || inOperator == FilterOperandType.empty.ToString()))
                 {
                     if (filterOut.ContainsKey(fieldName))
                     {
