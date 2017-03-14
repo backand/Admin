@@ -651,10 +651,10 @@ namespace Durados.Web.Mvc
                     {
                         continue;
                     }
-                    else if (field.Name == CreateDateColumnName || field.Name == ModifiedDateColumnName)
-                    {
-                        continue;
-                    }
+                    //else if (field.Name == CreateDateColumnName || field.Name == ModifiedDateColumnName)
+                    //{
+                    //    continue;
+                    //}
                 }
                 
                 if (type == "object")

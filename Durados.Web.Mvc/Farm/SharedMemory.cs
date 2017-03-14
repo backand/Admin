@@ -53,6 +53,11 @@ namespace Durados.Web.Mvc.Farm
             database = redis.GetDatabase();
             if (!string.IsNullOrEmpty(hostAndPort))
                 server = redis.GetServer(hostAndPort);
+            //try
+            //{
+            //    server = redis.GetServer(connectionString);
+            //}
+            //catch { }
         }
 
         public void ListRightPush(string key, string value)

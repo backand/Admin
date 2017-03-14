@@ -94,9 +94,10 @@ namespace BackAnd.Web.Api.Controllers
 
                 Dictionary<string, object> data = new Dictionary<string, object>();
 
+                DateTime now = DateTime.UtcNow;
                 data.Add("appName", Map.AppName);
-                data.Add("fromTimeEpochTime", GetEpochTime(DateTime.Now.Subtract(new TimeSpan(0, minutesAgo, 0))));
-                data.Add("toTimeEpochTime", GetEpochTime(DateTime.Now));
+                data.Add("fromTimeEpochTime", GetEpochTime(now.Subtract(new TimeSpan(0, minutesAgo, 0))));
+                data.Add("toTimeEpochTime", GetEpochTime(now.Add(new TimeSpan(0, 1, 0))));
                 data.Add("offset", pageNumber);
                 data.Add("count", pageSize);
 
@@ -106,7 +107,8 @@ namespace BackAnd.Web.Api.Controllers
                 request.setRequestHeader("content-type", "application/json");
 
                 System.Web.Script.Serialization.JavaScriptSerializer jss = new System.Web.Script.Serialization.JavaScriptSerializer();
-                request.send(jss.Serialize(data));
+                string json = jss.Serialize(data);
+                request.send(json);
 
                 Dictionary<string, object>[] response = null;
                 if (request.status == 200)
@@ -133,10 +135,10 @@ namespace BackAnd.Web.Api.Controllers
             }
         }
 
-        private int GetEpochTime(DateTime dateTime)
+        private long GetEpochTime(DateTime dateTime)
         {
-            TimeSpan t = dateTime - new DateTime(1970, 1, 1);
-            return (int)t.TotalSeconds;
+            TimeSpan t = dateTime - new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
+            return (long)t.TotalSeconds * 100;
         }
     }
 }

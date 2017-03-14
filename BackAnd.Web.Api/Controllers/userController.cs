@@ -1616,17 +1616,23 @@ namespace BackAnd.Web.Api.Controllers
                 {
                     string message;
 
-                    if (SocialAuthOverrideDeny(profile, out message))
-                    {
-                        throw new SocialException(message);
-                    }
-
                     userRow = Maps.Instance.GetMap(profile.appName).Database.GetUserRow(profile.email, true);
 
                     if (userRow == null)
                     {
                         throw new UserNotSignedUpSocialException(profile.appName);
                     }
+
+                    if (!System.Web.HttpContext.Current.Items.Contains(Durados.Database.AppName))
+                        System.Web.HttpContext.Current.Items.Add(Durados.Database.AppName, profile.appName);
+                    else
+                        System.Web.HttpContext.Current.Items[Durados.Database.AppName] = profile.appName;
+
+                    if (SocialAuthOverrideDeny(profile, out message))
+                    {
+                        throw new SocialException(message);
+                    }
+
 
                     if (!userRow.IsNull("IsApproved"))
                     {

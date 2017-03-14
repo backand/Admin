@@ -655,11 +655,11 @@ namespace Durados.Web.Mvc
                         Commit();
                     }
 
-                    if (!(this is DuradosMap) && !HasRule(Database.ChangePasswordOverride))
-                    {
-                        AddChangePasswordOverride();
-                        Commit();
-                    }
+                    //if (!(this is DuradosMap) && !HasRule(Database.ChangePasswordOverride))
+                    //{
+                    //    AddChangePasswordOverride();
+                    //    Commit();
+                    //}
 
                     if (!(this is DuradosMap) && !HasRule("userApproval"))
                     {

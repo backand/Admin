@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using Durados.Web.Mvc.UI.Helpers;
 using BackAnd.Web.Api.Controllers;
 using System.Data;
+using Durados.Web.Mvc.Farm;
 
 namespace BackAnd.Web.Api.Providers
 {
@@ -329,8 +330,7 @@ namespace BackAnd.Web.Api.Providers
 
         public override async Task GrantResourceOwnerCredentials(OAuthGrantResourceOwnerCredentialsContext context)
         {
-
-
+            
             context.OwinContext.Response.Headers.Add("Access-Control-Allow-Origin", new[] { "*" });
             if (System.Web.HttpContext.Current.Request.Form["username"] == null && System.Web.HttpContext.Current.Request.Form["userid"] != null)
             {
@@ -368,6 +368,15 @@ namespace BackAnd.Web.Api.Providers
             string appname = null;
 
             appname = System.Web.HttpContext.Current.Request.Form[Database.AppName];
+
+
+            if (SharedMemorySingeltone.Instance.Contains(appname, Durados.Data.SharedMemoryKey.DebugMode))
+            {
+                System.Web.HttpContext.Current.Items[Durados.Workflow.JavaScript.Debug] = true;
+            }
+
+            
+
             if (string.IsNullOrEmpty(appname))
             {
                 context.SetError(UserValidationErrorMessages.InvalidGrant, UserValidationErrorMessages.AppNameNotSupplied);
