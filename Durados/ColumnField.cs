@@ -83,7 +83,7 @@ namespace Durados
             return !DataColumn.AllowDBNull && !DataColumn.AutoIncrement && !IsAutoGuid; 
         }
 
-        public bool IsAutoGuid
+        public override bool IsAutoGuid
         {
             get
             {

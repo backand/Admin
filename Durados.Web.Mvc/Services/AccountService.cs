@@ -1581,7 +1581,7 @@ namespace Durados.Web.Mvc.UI.Helpers
                 {
                     Field field = usersView.Fields["email"];
                     var usersRow = usersView.GetDataRow(field, username);
-                    if (usersRow != null)
+                    if (usersRow != null && usersRow["id"] is int)
                     {
                         usersId = (int)usersRow["id"];
                     }

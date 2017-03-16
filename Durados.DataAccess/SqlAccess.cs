@@ -6622,7 +6622,7 @@ namespace Durados.DataAccess
 
         private void HandleRequired(Field field, DataAction dataAction)
         {
-            if (!field.IsAutoIdentity && dataAction == DataAction.Create && field.FieldType == FieldType.Column && field.Required && (field.DefaultValue == null || field.DefaultValue == DBNull.Value))
+            if (!field.IsAutoIdentity && !field.IsGuidIdentity && !field.IsAutoGuid && dataAction == DataAction.Create && field.FieldType == FieldType.Column && field.Required && (field.DefaultValue == null || field.DefaultValue == DBNull.Value))
             {
                 throw new MissingRequiredFieldWithoutDefaultValue(field);
             }

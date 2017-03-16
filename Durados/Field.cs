@@ -856,6 +856,14 @@ namespace Durados
             }
         }
 
+        public virtual bool IsAutoGuid
+        {
+            get
+            {
+                return false;
+            }
+        }
+
         public virtual bool IsGuidIdentity
         {
             get

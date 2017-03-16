@@ -2298,6 +2298,7 @@ namespace Durados.Web.Mvc
 
         private void AddSystemTables(DataSet ds)
         {
+            AddSystemRootTable(ds);
             AddSystemBlockTable(ds);
             AddSystemImportTable(ds);
             AddSystemUploadConfigTable(ds);
@@ -2373,7 +2374,21 @@ namespace Durados.Web.Mvc
         }
 
 
+        private void AddSystemRootTable(DataSet ds)
+        {
+            string tableName = "_root";
 
+            if (ds.Tables.Contains(tableName))
+                return;
+
+            DataTable table = ds.Tables.Add(tableName);
+
+            table.ExtendedProperties.Add("system", true);
+
+            DataColumn pk = table.Columns.Add("id", typeof(string));
+
+            table.PrimaryKey = new DataColumn[1] { pk };
+        }
         private void AddSystemBlockTable(DataSet ds)
         {
             string tableName = "Block";

@@ -95,9 +95,17 @@ namespace BackAnd.Web.Api.Controllers
                 Dictionary<string, object> data = new Dictionary<string, object>();
 
                 DateTime now = DateTime.UtcNow;
+
+                var fromTimeEpochTime = GetEpochTime(now.Subtract(new TimeSpan(0, minutesAgo, 0)));
+                var toTimeEpochTime = GetEpochTime(now.Add(new TimeSpan(0, 1, 0)));
+
+                Debug.WriteLine("now:" + now);
+                Debug.WriteLine("fromTimeEpochTime:" + fromTimeEpochTime);
+                Debug.WriteLine("toTimeEpochTime:" + toTimeEpochTime);
+
                 data.Add("appName", Map.AppName);
-                data.Add("fromTimeEpochTime", GetEpochTime(now.Subtract(new TimeSpan(0, minutesAgo, 0))));
-                data.Add("toTimeEpochTime", GetEpochTime(now.Add(new TimeSpan(0, 1, 0))));
+                data.Add("fromTimeEpochTime", fromTimeEpochTime);
+                data.Add("toTimeEpochTime", toTimeEpochTime);
                 data.Add("offset", pageNumber);
                 data.Add("count", pageSize);
 
@@ -138,7 +146,7 @@ namespace BackAnd.Web.Api.Controllers
         private long GetEpochTime(DateTime dateTime)
         {
             TimeSpan t = dateTime - new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
-            return (long)t.TotalSeconds * 100;
+            return (long)t.TotalSeconds * 1000;
         }
     }
 }
