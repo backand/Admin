@@ -32,7 +32,7 @@ namespace Durados.Web.Mvc.SocialLogin
         }
 
 
-        public override string GetAuthUrl(string appName, string returnAddress, string parameters, string activity, string email, bool signupIfNotSignedIn, bool useHashRouting)
+        protected override string GetAuthUrl(string appName, string returnAddress, string parameters, string activity, string email, bool signupIfNotSignedIn, bool useHashRouting)
         {
             var socialKeys = GetSocialKeys(appName);
             string clientId = socialKeys.ClientId;

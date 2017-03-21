@@ -332,6 +332,7 @@
     <Compile Include="SocialLogin\Google\GoogleException.cs" />
     <Compile Include="SocialLogin\Google\GoogleProfile.cs" />
     <Compile Include="SocialLogin\Google\GoogleSocial.cs" />
+    <Compile Include="SocialLogin\InvalidReturnAddressException.cs" />
     <Compile Include="SocialLogin\Profile.cs" />
     <Compile Include="SocialLogin\RedirectState.cs" />
     <Compile Include="SocialLogin\Social.cs" />

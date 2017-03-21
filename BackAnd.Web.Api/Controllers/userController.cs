@@ -826,7 +826,7 @@ namespace BackAnd.Web.Api.Controllers
             try
             {
                 // return Redirect("http://wwww.backand.aaaaaaaaa?message={'hello' : 'world'}");
-                authUrl = social.GetAuthUrl(appName, returnAddress ?? GetCurrentAddress(), null, "signin", email, signupIfNotSignedIn, useHashRouting);
+                authUrl = social.GetAuthUrlWithValidation(appName, returnAddress ?? GetCurrentAddress(), null, "signin", email, signupIfNotSignedIn, useHashRouting);
                 return Redirect(authUrl);
             }
             catch (Exception exception)
@@ -858,7 +858,7 @@ namespace BackAnd.Web.Api.Controllers
                 }
 
                 AbstractSocialProvider social = SocialProviderFactory.GetSocialProvider(provider);
-                return Redirect(social.GetAuthUrl(appName, returnAddress ?? GetCurrentAddress(), parameters, "signup", email, false, useHashRouting));
+                return Redirect(social.GetAuthUrlWithValidation(appName, returnAddress ?? GetCurrentAddress(), parameters, "signup", email, false, useHashRouting));
             }
             catch (Exception exception)
             {
@@ -1227,7 +1227,7 @@ namespace BackAnd.Web.Api.Controllers
                 }
                 catch (Exception e)
                 {
-                    return BadRequest(e.Message + ": " + e.StackTrace + (e.InnerException != null ? "||| message: " + e.InnerException.Message : string.Empty));
+                    return BadRequest(e.Message + ": " + (e.InnerException != null ? "||| message: " + e.InnerException.Message : string.Empty));
 
                 }
             }

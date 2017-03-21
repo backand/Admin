@@ -9,13 +9,13 @@ namespace Durados.Web.Mvc.SocialLogin
 {
     public class AdfsSocialProvider : AbstractSocialProvider
     {
-        public virtual bool IsDomainController
+        protected override bool ValidateReturnAddress(string appName, string returnAddress)
         {
-            get
-            {
-                return true;
-            }
+            Map map = Maps.Instance.GetMap(appName);
+
+            return map.Database.HasReturnAddressURI(returnAddress);
         }
+
 
         protected override SocialProfile GetNewProfile(Dictionary<string, object> dictionary)
         {
@@ -52,7 +52,7 @@ namespace Durados.Web.Mvc.SocialLogin
             }
         }
 
-        public override string GetAuthUrl(string appName, string returnAddress, string parameters, string activity, string email, bool signupIfNotSignedIn, bool useHashRouting)
+        protected override string GetAuthUrl(string appName, string returnAddress, string parameters, string activity, string email, bool signupIfNotSignedIn, bool useHashRouting)
         {
             AdfsApplicationKeys keys = (AdfsApplicationKeys)GetSocialKeys(appName);
             string clientId = keys.ClientId;

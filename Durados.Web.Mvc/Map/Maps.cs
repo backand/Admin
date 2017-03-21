@@ -550,6 +550,8 @@ namespace Durados.Web.Mvc
             LocalAddress = System.Configuration.ConfigurationManager.AppSettings["localAddress"] ?? "http://localhost:8080";
 
             SocialRedirectHost = System.Configuration.ConfigurationManager.AppSettings["socialRedirectHost"];
+
+            ReturnAddressForMobile = System.Configuration.ConfigurationManager.AppSettings["returnAddressForMobile"] ?? "http://www.backandblabla.bla";
         }
 
         private static Dictionary<string, string> GetCqls(string cqlsFileName)
@@ -2591,6 +2593,7 @@ namespace Durados.Web.Mvc
 
         public static string LocalAddress { get; set; }
         public static string SocialRedirectHost { get; set; }
+        public static string ReturnAddressForMobile { get; set; }
 
         
     }

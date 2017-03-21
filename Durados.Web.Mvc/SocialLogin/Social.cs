@@ -6,7 +6,35 @@ namespace Durados.Web.Mvc.UI.Helpers
 {
     public abstract class AbstractSocialProvider
     {
-        public abstract string GetAuthUrl(string appName, string returnAddress, string parameters, string activity, string email, bool signupIfNotSignedIn, bool useHashRouting);
+        public virtual string GetAuthUrlWithValidation(string appName, string returnAddress, string parameters, string activity, string email, bool signupIfNotSignedIn, bool useHashRouting)
+        {
+            if (!ValidateReturnAddress(appName, returnAddress))
+            {
+                throw new InvalidReturnAddressException(appName, returnAddress);
+            }
+
+            return GetAuthUrl(appName, returnAddress, parameters, activity, email, signupIfNotSignedIn, useHashRouting);
+        }
+        protected abstract string GetAuthUrl(string appName, string returnAddress, string parameters, string activity, string email, bool signupIfNotSignedIn, bool useHashRouting);
+
+        protected virtual bool ValidateReturnAddress(string appName, string returnAddress)
+        {
+            Map map = Maps.Instance.GetMap(appName);
+
+            return map.Database.HasReturnAddressURI(returnAddress) || returnAddress.Equals(GetCurrentAddress()) || IsReturnAddressForMobile(returnAddress);
+        }
+
+        private bool IsReturnAddressForMobile(string returnAddress)
+        {
+            return returnAddress.Equals(Maps.ReturnAddressForMobile);
+        }
+
+        protected string GetCurrentAddress()
+        {
+            if (System.Web.HttpContext.Current.Request.UrlReferrer == null)
+                return string.Empty;
+            return System.Web.HttpContext.Current.Request.UrlReferrer.AbsoluteUri;
+        }
 
         public abstract SocialProfile Authenticate();
 

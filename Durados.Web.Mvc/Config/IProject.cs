@@ -3414,6 +3414,14 @@ namespace Durados.Web.Mvc.Config
                 EnableAdfs.HideInTable = true;
             }
 
+            if (databaseView.Fields.ContainsKey("ReturnAddressURIs"))
+            {
+                ColumnField ReturnAddressURIs = (ColumnField)databaseView.Fields["ReturnAddressURIs"];
+                ReturnAddressURIs.Order = 600;
+                ReturnAddressURIs.Category = rolesCategory;
+                ReturnAddressURIs.HideInTable = true;
+            }
+
             if (databaseView.Fields.ContainsKey("MaxInvalidPasswordAttempts"))
             {
                 ColumnField MaxInvalidPasswordAttempts = (ColumnField)databaseView.Fields["MaxInvalidPasswordAttempts"];

@@ -739,6 +739,26 @@ namespace Durados.Web.Mvc
             return providers;
         }
 
+        
+        [Durados.Config.Attributes.ColumnProperty()]
+        public string ReturnAddressURIs { get; set; }
+
+        private HashSet<string> returnAddressURIs = null;
+        private HashSet<string> GetReturnAddressURIs()
+        {
+            if (returnAddressURIs == null)
+            {
+                returnAddressURIs = ReturnAddressURIs.Split(',').ToHashSet();
+            }
+            return returnAddressURIs;
+        }
+
+        public bool HasReturnAddressURI(string returnAddress)
+        {
+            if (string.IsNullOrEmpty(ReturnAddressURIs))
+                return false;
+            return GetReturnAddressURIs().Contains(returnAddress);
+        } 
 
         [Durados.Config.Attributes.ColumnProperty()]
         public string RegistrationRedirectUrl { get; set; }
