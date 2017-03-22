@@ -37,12 +37,13 @@ namespace BackAnd.Web.Api.Controllers
         [Route("table/rule/{viewName}/{id}")]
         [Route("table/action/{viewName}/{id}")]
         [Route("objects/action/{viewName}/{id}")]
-        [Route("function/{actionName}")]
+        [Route("function/{category}/{actionName}")]
+        [Route("integration/{category}/{actionName}")]
         [HttpDelete]
         [HttpPut]
         [HttpPost]
         [HttpGet]
-        public virtual HttpResponseMessage Perform(string viewName = "_root", string id = null, string name = null, string actionName = null, string parameters = null)
+        public virtual HttpResponseMessage Perform(string viewName = "_root", string id = null, string name = null, string actionName = null, string parameters = null, string category = null)
          {
              try
              {

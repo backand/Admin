@@ -76,6 +76,59 @@ namespace BackAnd.Web.Api.Controllers
             return GetList(withSelectOptions, pageNumber, pageSize, filter, sort, search);
         }
 
+        protected override void AdjustItems(object items, Dictionary<string, object>[] filterArray, Dictionary<string, object>[] sortArray)
+        {
+            AdjustItems((Dictionary<string, object>)items, filterArray, sortArray);
+        }
+
+        protected virtual void AdjustItems(Dictionary<string, object> items, Dictionary<string, object>[] filterArray, Dictionary<string, object>[] sortArray)
+        {
+            if (!items.ContainsKey("data"))
+                return;
+
+            if (!(items["data"] is Dictionary<string,object>[]))
+                return;
+
+            Dictionary<string,object>[] rules = (Dictionary<string,object>[])items["data"];
+
+            HashSet<string> categories = new HashSet<string>();
+
+            foreach(Dictionary<string, object> rule in rules)
+            {
+                if (rule.ContainsKey("category"))
+                {
+                    string category = rule["category"].ToString();
+
+                    if (!categories.Contains(category))
+                    {
+                        categories.Add(category);
+                    }
+                }
+            }
+
+            Dictionary<string, object> relatedObjects = null;
+
+            if (items.ContainsKey("relatedObjects"))
+            {
+                if (items["relatedObjects"] is Dictionary<string, object>)
+                {
+                    relatedObjects = ((Dictionary<string, object>)items["relatedObjects"]);
+                }
+                else
+                {
+                    throw new Durados.DuradosException("relatedObjects is not a Dictionary");
+                }
+            }
+            else
+            {
+                relatedObjects = new Dictionary<string, object>();
+                items.Add("relatedObjects", relatedObjects);
+            }
+
+            
+            relatedObjects.Add("categories", categories.ToArray());
+        }
+
         protected override void AdjustSortItem(Dictionary<string, object>[] sortArray)
         {
             foreach (Dictionary<string, object> sortItem in sortArray)

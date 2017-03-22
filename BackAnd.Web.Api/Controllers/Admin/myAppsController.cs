@@ -589,18 +589,18 @@ namespace BackAnd.Web.Api.Controllers
 
         }
 
-        private void UpdateIsAuthApp(Map map, bool isAuthApp)
-        {
-            UpdateIsAuthApp(Convert.ToInt32(map.Id), isAuthApp);
-            map.IsAuthApp = isAuthApp;
-        }
+        //private void UpdateIsAuthApp(Map map, bool isAuthApp)
+        //{
+        //    UpdateIsAuthApp(Convert.ToInt32(map.Id), isAuthApp);
+        //    map.IsAuthApp = isAuthApp;
+        //}
 
-        private void UpdateIsAuthApp(int id, bool isAuthApp)
-        {
-            string sql = "update durados_App set IsAuthApp = @isAuthApp where id = @id";
-            (new SqlAccess()).ExecuteNonQuery(map.Database.SystemConnectionString, sql, Durados.SqlProduct.SqlServer, new Dictionary<string, object>() { { "id", id }, { "IsAuthApp", isAuthApp } }, null);
+        //private void UpdateIsAuthApp(int id, bool isAuthApp)
+        //{
+        //    string sql = "update durados_App set IsAuthApp = @isAuthApp where id = @id";
+        //    (new SqlAccess()).ExecuteNonQuery(map.Database.SystemConnectionString, sql, Durados.SqlProduct.SqlServer, new Dictionary<string, object>() { { "id", id }, { "IsAuthApp", isAuthApp } }, null);
 
-        }
+        //}
 
         private string GetAnonymousRole(Dictionary<string, object> databaseSettings)
         {

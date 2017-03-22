@@ -861,6 +861,10 @@ namespace Durados.Web.Mvc {
             
             private global::System.Data.DataColumn columnIsAuthApp;
             
+            private global::System.Data.DataColumn columnEnvironment;
+            
+            private global::System.Data.DataColumn columnEnvVar;
+            
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
             public durados_AppDataTable() {
@@ -1208,6 +1212,22 @@ namespace Durados.Web.Mvc {
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
+            public global::System.Data.DataColumn EnvironmentColumn {
+                get {
+                    return this.columnEnvironment;
+                }
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
+            public global::System.Data.DataColumn EnvVarColumn {
+                get {
+                    return this.columnEnvVar;
+                }
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
             [global::System.ComponentModel.Browsable(false)]
             public int Count {
                 get {
@@ -1281,7 +1301,9 @@ namespace Durados.Web.Mvc {
                         System.Guid AnonymousToken, 
                         int PaymentStatus, 
                         bool PaymentLocked, 
-                        bool IsAuthApp) {
+                        bool IsAuthApp, 
+                        string Environment, 
+                        string EnvVar) {
                 durados_AppRow rowdurados_AppRow = ((durados_AppRow)(this.NewRow()));
                 object[] columnValuesArray = new object[] {
                         null,
@@ -1322,7 +1344,9 @@ namespace Durados.Web.Mvc {
                         AnonymousToken,
                         PaymentStatus,
                         PaymentLocked,
-                        IsAuthApp};
+                        IsAuthApp,
+                        Environment,
+                        EnvVar};
                 if ((parentv_durados_UserRowByFK_durados_App_durados_User != null)) {
                     columnValuesArray[2] = parentv_durados_UserRowByFK_durados_App_durados_User[0];
                 }
@@ -1412,6 +1436,8 @@ namespace Durados.Web.Mvc {
                 this.columnPaymentStatus = base.Columns["PaymentStatus"];
                 this.columnPaymentLocked = base.Columns["PaymentLocked"];
                 this.columnIsAuthApp = base.Columns["IsAuthApp"];
+                this.columnEnvironment = base.Columns["Environment"];
+                this.columnEnvVar = base.Columns["EnvVar"];
             }
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
@@ -1495,6 +1521,10 @@ namespace Durados.Web.Mvc {
                 base.Columns.Add(this.columnPaymentLocked);
                 this.columnIsAuthApp = new global::System.Data.DataColumn("IsAuthApp", typeof(bool), null, global::System.Data.MappingType.Element);
                 base.Columns.Add(this.columnIsAuthApp);
+                this.columnEnvironment = new global::System.Data.DataColumn("Environment", typeof(string), null, global::System.Data.MappingType.Element);
+                base.Columns.Add(this.columnEnvironment);
+                this.columnEnvVar = new global::System.Data.DataColumn("EnvVar", typeof(string), null, global::System.Data.MappingType.Element);
+                base.Columns.Add(this.columnEnvVar);
                 this.Constraints.Add(new global::System.Data.UniqueConstraint("Constraint1", new global::System.Data.DataColumn[] {
                                 this.columnId}, true));
                 this.columnId.AutoIncrement = true;
@@ -6254,6 +6284,38 @@ namespace Durados.Web.Mvc {
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
+            public string Environment {
+                get {
+                    try {
+                        return ((string)(this[this.tabledurados_App.EnvironmentColumn]));
+                    }
+                    catch (global::System.InvalidCastException e) {
+                        throw new global::System.Data.StrongTypingException("The value for column \'Environment\' in table \'durados_App\' is DBNull.", e);
+                    }
+                }
+                set {
+                    this[this.tabledurados_App.EnvironmentColumn] = value;
+                }
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
+            public string EnvVar {
+                get {
+                    try {
+                        return ((string)(this[this.tabledurados_App.EnvVarColumn]));
+                    }
+                    catch (global::System.InvalidCastException e) {
+                        throw new global::System.Data.StrongTypingException("The value for column \'EnvVar\' in table \'durados_App\' is DBNull.", e);
+                    }
+                }
+                set {
+                    this[this.tabledurados_App.EnvVarColumn] = value;
+                }
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
             public durados_DataSourceTypeRow durados_DataSourceTypeRow {
                 get {
                     return ((durados_DataSourceTypeRow)(this.GetParentRow(this.Table.ParentRelations["FK_durados_App_durados_DataSourceType"])));
@@ -6711,6 +6773,30 @@ namespace Durados.Web.Mvc {
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
             public void SetIsAuthAppNull() {
                 this[this.tabledurados_App.IsAuthAppColumn] = global::System.Convert.DBNull;
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
+            public bool IsEnvironmentNull() {
+                return this.IsNull(this.tabledurados_App.EnvironmentColumn);
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
+            public void SetEnvironmentNull() {
+                this[this.tabledurados_App.EnvironmentColumn] = global::System.Convert.DBNull;
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
+            public bool IsEnvVarNull() {
+                return this.IsNull(this.tabledurados_App.EnvVarColumn);
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
+            public void SetEnvVarNull() {
+                this[this.tabledurados_App.EnvVarColumn] = global::System.Convert.DBNull;
             }
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]

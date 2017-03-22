@@ -2161,6 +2161,13 @@ namespace Durados
 
     }
 
+    public enum ActionType
+    {
+        Action,
+        Function,
+        Integration
+    }
+
     public enum WorkflowAction
     {
         Notify,

@@ -110,6 +110,7 @@ namespace BackAnd.Web.Api.Controllers
 
                 var items = RestHelper.Get(view, withSelectOptions ?? false, false, pageNumber ?? 1, pageSize ?? 20, filterArray, search, sortArray, out rowCount, false, view_BeforeSelect, view_AfterSelect);
 
+                AdjustItems(items, filterArray, sortArray);
                
                 return Ok(items);
 
@@ -119,6 +120,11 @@ namespace BackAnd.Web.Api.Controllers
                 throw new BackAndApiUnexpectedResponseException(exception, this);
 
             }
+        }
+
+        protected virtual void AdjustItems(object items, Dictionary<string, object>[] filterArray, Dictionary<string, object>[] sortArray)
+        {
+            
         }
 
         protected virtual void AdjustSortItem(Dictionary<string, object>[] sortArray)

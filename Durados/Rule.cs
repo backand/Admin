@@ -16,6 +16,7 @@ namespace Durados
             Parameters = new Dictionary<string, Parameter>();
             UseSqlParser = true;
             Code = "function backandCallback(newRow, oldRow, parameters, userProfile) { \n/* Your code here.\nThe function result will be returned to the client as a json. */ \n}";
+            Category = "general";
         }
 
         public bool ShouldTrigger(Durados.TriggerDataAction dataAction)
@@ -30,6 +31,10 @@ namespace Durados
         public string Name { get; set; }
 
         [Durados.Config.Attributes.ColumnProperty()]
+        public string Category { get; set; }
+
+
+        [Durados.Config.Attributes.ColumnProperty()]
         public TriggerDataAction DataAction { get; set; }
 
         [Durados.Config.Attributes.ColumnProperty()]
@@ -37,7 +42,11 @@ namespace Durados
 
         [Durados.Config.Attributes.ColumnProperty()]
         public WorkflowAction WorkflowAction { get; set; }
+        
+        [Durados.Config.Attributes.ColumnProperty()]
+        public ActionType ActionType { get; set; }
 
+        
         [Durados.Config.Attributes.ColumnProperty()]
         public string WhereCondition { get; set; }
 
