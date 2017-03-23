@@ -1952,6 +1952,12 @@ namespace Durados.Web.Mvc
             }
         }
 
+        public override Dictionary<string, object> GetEnvironmentDictionary()
+        {
+            return Map.GetEnvironmentDictionary();
+        }
+
+
         public System.Collections.ArrayList GetModel()
         {
             ArrayList list = new ArrayList();

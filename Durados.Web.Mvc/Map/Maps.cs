@@ -1761,6 +1761,8 @@ namespace Durados.Web.Mvc
             map.AnonymousToken = appRow.AnonymousToken;
             map.SignUpToken = appRow.SignUpToken;
             map.IsAuthApp = appRow.IsAuthApp;
+            map.Environment = appRow.IsEnvironmentNull() ? null : appRow.Environment;
+            map.EnvVar = appRow.IsEnvVarNull() ? null : appRow.EnvVar;
             map.LoadLimits();
 
             int themeId = 0;
@@ -2437,7 +2439,7 @@ namespace Durados.Web.Mvc
         //    return webhookJson;
         //}
 
-        private static Dictionary<string, object> GetJsonFromString(string json)
+        public static Dictionary<string, object> GetJsonFromString(string json)
         {
             JavaScriptSerializer jss = new JavaScriptSerializer();
             var  webhookJson = (Dictionary<string, object>)jss.Deserialize<dynamic>(json);

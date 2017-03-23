@@ -5178,6 +5178,40 @@ namespace Durados.Web.Mvc
         {
             return Database.GetDomainControllerProvider();
         }
+
+        public string Environment { get; set; }
+
+        public string EnvVar { get; set; }
+
+        private Dictionary<string, object> _environmentDictionary = null;
+        public Dictionary<string, object> GetEnvironmentDictionary()
+        {
+            if (_environmentDictionary == null)
+            {
+                _environmentDictionary = new Dictionary<string, object>();
+
+                object envVar = null;
+                _environmentDictionary.Add("name", Environment);
+                if (string.IsNullOrEmpty(EnvVar))
+                {
+
+                }
+                else
+                {
+                    try
+                    {
+                        envVar = Maps.GetJsonFromString(EnvVar);
+                    }
+                    catch (Exception exception)
+                    {
+                        envVar = "Invalid JSON: " + exception.Message;
+                    }
+                }
+                _environmentDictionary.Add("var", envVar);
+            }
+
+            return _environmentDictionary;
+        }
     }
 
     

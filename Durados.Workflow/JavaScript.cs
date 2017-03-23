@@ -725,6 +725,9 @@ namespace Durados.Workflow
             var Config = view.Database.GetConfigDictionary();
             var Config2 = parser.Parse(Newtonsoft.Json.JsonConvert.SerializeObject(Config));
 
+            var Environment = view.Database.GetEnvironmentDictionary();
+            var Environment2 = parser.Parse(Newtonsoft.Json.JsonConvert.SerializeObject(Environment));
+
 
             Limits limit = Limits.ActionTimeMSec;
             if (upload)
@@ -762,6 +765,7 @@ namespace Durados.Workflow
                 .SetValue("userProfile", userProfile2)
                 .SetValue("CONSTS", CONSTS2)
                 .SetValue("Config", Config2)
+                .SetValue("Environment", Environment2)
                 .Execute(GetXhrWrapper() + code + "; function call(){return backandCallback(userInput, dbRow, parameters, userProfile);}");
             }
             catch (TimeoutException exception)

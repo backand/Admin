@@ -1282,6 +1282,11 @@ namespace Durados
             return null;
         }
 
+        public virtual Dictionary<string, object> GetEnvironmentDictionary()
+        {
+            return null;
+        }
+
         //public Dictionary<string, object> GetGlobalsDictionary()
         //{
         //    Dictionary<string, object> dic = new Dictionary<string, object>();

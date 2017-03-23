@@ -367,6 +367,7 @@ namespace BackAnd.Web.Api.Controllers
                 const string DatabaseStatus = "DatabaseStatus";
                 const string Name = "Name";
                 const string Title = "Title";
+                const string Environment = "Environment";
 
                 if (values.ContainsKey(Name))
                 {
@@ -394,6 +395,10 @@ namespace BackAnd.Web.Api.Controllers
                 if (values.ContainsKey(Creator))
                 {
                     values.Remove(Creator);
+                }
+                if (!values.ContainsKey(Environment))
+                {
+                    values.Add(Environment, "development");
                 }
                 values.Add(Creator, view.Database.GetUserID());
                 values.Add(DatabaseStatus, (int)OnBoardingStatus.NotStarted);
