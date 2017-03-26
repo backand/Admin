@@ -2298,7 +2298,6 @@ namespace Durados.Web.Mvc
 
         private void AddSystemTables(DataSet ds)
         {
-            AddSystemRootTable(ds);
             AddSystemBlockTable(ds);
             AddSystemImportTable(ds);
             AddSystemUploadConfigTable(ds);
@@ -2310,7 +2309,8 @@ namespace Durados.Web.Mvc
             //
             AddSystemLogTable(ds);
             AddSystemSchemaTable(ds);
-
+            AddSystemRootTable(ds);
+            
             if (this is DuradosMap && !Maps.PrivateCloud)
             {
                 AddSystemPlugInTable(ds);

@@ -236,7 +236,7 @@ namespace BackAnd.Web.Api.Controllers
 
         [Route("~/1/template/{service}")]
         [HttpGet]
-        public IHttpActionResult template(string service)
+        public IHttpActionResult template(string service, string template = "template")
         {
             try
             {
@@ -244,7 +244,7 @@ namespace BackAnd.Web.Api.Controllers
                 switch (service)
                 {
                     case "nodejs":
-                        response.Add("url", "http://s3.amazonaws.com/templates.backand.net/action/nodejs/1.0/template.zip");
+                        response.Add("url", "http://s3.amazonaws.com/templates.backand.net/action/nodejs/1.0/" + template + ".zip");
                         break;
 
                     default:
