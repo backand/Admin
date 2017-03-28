@@ -2629,7 +2629,7 @@ namespace Durados.Web.Mvc.UI.Helpers
                     string emptyValueIn = "[null]";
                     string emptyValueOut = ",[null]";
 
-                    if (value == emptyValueIn)
+                    if (value == emptyValueIn || value == string.Empty)
                     {
                         filterOut.Add(fieldName, emptyValueOut);
                     }

@@ -19,7 +19,7 @@ namespace Durados.Web.Mvc.UI.Helpers.Search
 
         public object Search(ConfigAccess config, string q, int? id, int snippetLength, bool spaceAsWildcard, string highlightTag, int tabChars)
         {
-            string whereStatement = GetWhereStatement(q, id, spaceAsWildcard);
+            string whereStatement = GetWhereStatement(q.Replace("'", "''"), id, spaceAsWildcard);
 
             DataView dataView = config.GetRows(ViewName, whereStatement, Maps.Instance.GetMap().GetConfigDatabase().ConnectionString);
 

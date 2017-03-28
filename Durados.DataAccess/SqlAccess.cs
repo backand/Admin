@@ -6444,7 +6444,7 @@ namespace Durados.DataAccess
                                             whereStatement += sqlTextBuilder.EscapeDbObject(view.DataTable.TableName) + sqlTextBuilder.DbTableColumnSeperator + sqlTextBuilder.EscapeDbObject(columnName) + " is null " + LogicCondition.And.ToString() + " ";
                                             whereStatementWithoutTablePrefix += "[" + columnName + "]" + " is null " + LogicCondition.And.ToString() + " ";
                                         }
-                                        if (values[field.Name] is Filter)
+                                        else if (values[field.Name] is Filter)
                                         {
                                             Filter filter = (Filter)values[field.Name];
                                             whereStatement += sqlTextBuilder.EscapeDbObject(view.DataTable.TableName) + sqlTextBuilder.DbTableColumnSeperator + sqlTextBuilder.EscapeDbObject(columnName) + " in " + filter.WhereStatement + " " + LogicCondition.And.ToString() + " ";

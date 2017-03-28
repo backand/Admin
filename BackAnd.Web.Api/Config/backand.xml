@@ -133,6 +133,7 @@
                 <xs:element name="HeaderContent" msdata:Caption="" type="xs:string" minOccurs="0" />
                 <xs:element name="GrobootNotificationAccessKey" msdata:Caption="" type="xs:string" minOccurs="0" />
                 <xs:element name="Config" msdata:Caption="" type="xs:string" minOccurs="0" />
+                <xs:element name="returnAddressURIs" msdata:Caption="" type="xs:string" minOccurs="0" />
               </xs:sequence>
             </xs:complexType>
           </xs:element>
@@ -1030,6 +1031,7 @@
     <InsideTextSearch>false</InsideTextSearch>
     <DefaultExportImportFormat>Excel</DefaultExportImportFormat>
     <TranslateAllViews>false</TranslateAllViews>
+    <returnAddressURIs>http://hosting.backand.io/bklocal/#/sign_in</returnAddressURIs>
   </Database>
   <SiteInfo>
     <ID>0</ID>
