@@ -211,10 +211,10 @@ namespace Durados.Web.Mvc.SocialLogin
             string TokenEndpoint = "https://graph.facebook.com/oauth/access_token";
 
             string response = Infrastructure.Http.GetWebRequest(TokenEndpoint + "?" + tokenRequest);
-            var validateResponse = System.Web.HttpUtility.ParseQueryString(response);
-
+            var validateResponse = Durados.Web.Mvc.UI.Json.JsonSerializer.Deserialize(response); // System.Web.HttpUtility.ParseQueryString(response);
+            
             string accessToken = validateResponse["access_token"].ToString();
-            string expires = validateResponse["expires"].ToString();
+            string expires = validateResponse["expires_in"].ToString();
 
             SocialProfile profile = GetProfile(appName, accessToken, null, returnAddress, activity, parameters, email, signupIfNotSignedIn, useHashRouting);
 
