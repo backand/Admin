@@ -20,10 +20,13 @@ namespace Durados.Web.Mvc.UI.Helpers
         protected virtual bool ValidateReturnAddress(string appName, string returnAddress)
         {
             Map map = Maps.Instance.GetMap(appName);
-
-            return map.Database.HasReturnAddressURI(returnAddress) || returnAddress.Equals(GetCurrentAddress()) || IsReturnAddressForMobile(returnAddress);
+            returnAddress = ReformReturnAddress(returnAddress);
+            return map.Database.HasReturnAddressURI(returnAddress) || returnAddress.Equals(GetCurrentAddress()) ||  IsReturnAddressForMobile(returnAddress);
         }
-
+        protected virtual string ReformReturnAddress(string returnAddress)
+        {
+            return returnAddress;
+        } 
         private bool IsReturnAddressForMobile(string returnAddress)
         {
             return returnAddress.Equals(Maps.ReturnAddressForMobile);
