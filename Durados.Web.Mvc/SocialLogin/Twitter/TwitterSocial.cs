@@ -339,7 +339,10 @@ namespace Durados.Web.Mvc.SocialLogin
         {
             throw new NotImplementedException();
         }
-
+        protected override string ReformReturnAddress(string returnAddress)
+        {
+            return returnAddress.Split('?')[0];
+        } 
     }
 
     public class RequestToken
