@@ -865,6 +865,8 @@ namespace Durados.Web.Mvc {
             
             private global::System.Data.DataColumn columnEnvVar;
             
+            private global::System.Data.DataColumn columnProductType;
+            
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
             public durados_AppDataTable() {
@@ -1228,6 +1230,14 @@ namespace Durados.Web.Mvc {
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
+            public global::System.Data.DataColumn ProductTypeColumn {
+                get {
+                    return this.columnProductType;
+                }
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
             [global::System.ComponentModel.Browsable(false)]
             public int Count {
                 get {
@@ -1303,7 +1313,8 @@ namespace Durados.Web.Mvc {
                         bool PaymentLocked, 
                         bool IsAuthApp, 
                         string Environment, 
-                        string EnvVar) {
+                        string EnvVar, 
+                        int ProductType) {
                 durados_AppRow rowdurados_AppRow = ((durados_AppRow)(this.NewRow()));
                 object[] columnValuesArray = new object[] {
                         null,
@@ -1346,7 +1357,8 @@ namespace Durados.Web.Mvc {
                         PaymentLocked,
                         IsAuthApp,
                         Environment,
-                        EnvVar};
+                        EnvVar,
+                        ProductType};
                 if ((parentv_durados_UserRowByFK_durados_App_durados_User != null)) {
                     columnValuesArray[2] = parentv_durados_UserRowByFK_durados_App_durados_User[0];
                 }
@@ -1438,6 +1450,7 @@ namespace Durados.Web.Mvc {
                 this.columnIsAuthApp = base.Columns["IsAuthApp"];
                 this.columnEnvironment = base.Columns["Environment"];
                 this.columnEnvVar = base.Columns["EnvVar"];
+                this.columnProductType = base.Columns["ProductType"];
             }
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
@@ -1525,6 +1538,8 @@ namespace Durados.Web.Mvc {
                 base.Columns.Add(this.columnEnvironment);
                 this.columnEnvVar = new global::System.Data.DataColumn("EnvVar", typeof(string), null, global::System.Data.MappingType.Element);
                 base.Columns.Add(this.columnEnvVar);
+                this.columnProductType = new global::System.Data.DataColumn("ProductType", typeof(int), null, global::System.Data.MappingType.Element);
+                base.Columns.Add(this.columnProductType);
                 this.Constraints.Add(new global::System.Data.UniqueConstraint("Constraint1", new global::System.Data.DataColumn[] {
                                 this.columnId}, true));
                 this.columnId.AutoIncrement = true;
@@ -6316,6 +6331,22 @@ namespace Durados.Web.Mvc {
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
+            public int ProductType {
+                get {
+                    try {
+                        return ((int)(this[this.tabledurados_App.ProductTypeColumn]));
+                    }
+                    catch (global::System.InvalidCastException e) {
+                        throw new global::System.Data.StrongTypingException("The value for column \'ProductType\' in table \'durados_App\' is DBNull.", e);
+                    }
+                }
+                set {
+                    this[this.tabledurados_App.ProductTypeColumn] = value;
+                }
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
             public durados_DataSourceTypeRow durados_DataSourceTypeRow {
                 get {
                     return ((durados_DataSourceTypeRow)(this.GetParentRow(this.Table.ParentRelations["FK_durados_App_durados_DataSourceType"])));
@@ -6797,6 +6828,18 @@ namespace Durados.Web.Mvc {
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
             public void SetEnvVarNull() {
                 this[this.tabledurados_App.EnvVarColumn] = global::System.Convert.DBNull;
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
+            public bool IsProductTypeNull() {
+                return this.IsNull(this.tabledurados_App.ProductTypeColumn);
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
+            public void SetProductTypeNull() {
+                this[this.tabledurados_App.ProductTypeColumn] = global::System.Convert.DBNull;
             }
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
