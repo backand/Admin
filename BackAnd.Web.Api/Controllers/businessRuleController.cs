@@ -437,7 +437,70 @@ namespace BackAnd.Web.Api.Controllers
             {
                 CreateNodeJSFunction(e);
             }
+            WriteToAnalytics(e);
+
             base.BeforeCreate(e);
+        }
+
+        private void WriteToAnalytics(Durados.CreateEventArgs e)
+        {
+            try
+            {
+                string writeKey = Convert.ToString(System.Configuration.ConfigurationManager.AppSettings["SegmentWriteKey"] ?? "W21J7U7JO9IXajS1w292q1atMOGklmPi");
+                if (Segment.Analytics.Client == null)
+                    Segment.Analytics.Initialize(writeKey, new Segment.Config().SetAsync(false));
+                
+                Durados.WorkflowAction workflowAction = GetActionType(e);
+                string name = GetActionName(e);
+
+                switch (workflowAction)
+                {
+                    case Durados.WorkflowAction.NodeJS:
+                        Segment.Analytics.Client.Track("Template Selected", "{template: 'lambda'}");
+                        break;
+
+                    case Durados.WorkflowAction.JavaScript:
+                        if (IsFunction(e))
+                        {
+                            Segment.Analytics.Client.Track("AddedFunction", "{rule: '" + name + "'}");
+                        }
+                        else if (IsIntegration(e))
+                        {
+                            Segment.Analytics.Client.Track("AddedIntegration", "{rule: '" + name + "'}");
+                        }
+                        else
+                        {
+                            Segment.Analytics.Client.Track("AddedRule", "{rule: '" + name + "'}");
+                        }
+                        break;
+
+
+                    default:
+                        break;
+                }
+            }
+            catch { }
+            
+        }
+
+        private bool IsIntegration(Durados.CreateEventArgs e)
+        {
+            return e.Values["ActionType"].Equals("Integration");
+        }
+
+        private bool IsFunction(Durados.CreateEventArgs e)
+        {
+            return e.Values["ActionType"].Equals("Function");
+        }
+
+        private string GetActionName(Durados.CreateEventArgs e)
+        {
+            return e.Values["Name"].ToString();
+        }
+
+        private Durados.WorkflowAction GetActionType(Durados.CreateEventArgs e)
+        {
+            return (Durados.WorkflowAction)Enum.Parse(typeof(Durados.WorkflowAction), e.Values["WorkflowAction"].ToString());
         }
 
         protected override void BeforeDelete(Durados.DeleteEventArgs e)
