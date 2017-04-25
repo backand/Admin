@@ -203,7 +203,11 @@ namespace BackAnd.Web.Api.Controllers
        
         protected virtual bool IsAllow(View view)
         {
-            if (view.SystemView && view.Database.Map.IsMainMap)
+            if (view.Name == "_root")
+            {
+                return true;
+            }
+            else if (view.SystemView && view.Database.Map.IsMainMap)
             {
                 return false;
             }

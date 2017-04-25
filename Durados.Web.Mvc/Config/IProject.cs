@@ -5912,6 +5912,28 @@ namespace Durados.Web.Mvc.Config
                 column.ColSpanInDialog = 2;
                 column.HideInTable = true;
             }
+            if (configDatabase.Views["Rule"].Fields.ContainsKey("Precedent"))
+            {
+                ColumnField column = (ColumnField)configDatabase.Views["Rule"].Fields["Precedent"];
+                column.DisplayName = "precedent";
+                column.HideInDerivation = true;
+                column.HideInTable = true;
+            }
+            if (configDatabase.Views["Rule"].Fields.ContainsKey("AllowSelectRoles"))
+            {
+                ColumnField column = (ColumnField)configDatabase.Views["Rule"].Fields["AllowSelectRoles"];
+                
+                column.TextHtmlControlType = TextHtmlControlType.CheckList;
+                column.MultiValueAdditionals = "everyone,everyone";
+                column.MultiValueParentViewName = string.IsNullOrEmpty(configDatabase.RoleViewName) ? "durados_UserRole" : configDatabase.RoleViewName;
+                column.MinWidth = 200;
+                column.Order = 130;
+                column.DisplayName = "allowSelectRoles";
+                column.Description = "Can view information and history";
+                column.DefaultValue = "Developer,Admin,User";
+                column.HideInTable = true;
+                column.ColSpanInDialog = 2;
+            }
             configDatabase.Views["Rule"].Fields["WorkflowAction"].OrderForCreate = 50;
             configDatabase.Views["Rule"].Fields["WorkflowAction"].OrderForEdit = 50;
             configDatabase.Views["Rule"].Fields["DatabaseViewName"].OrderForCreate = 60;

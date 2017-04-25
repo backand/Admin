@@ -234,6 +234,28 @@ namespace Durados
         [Durados.Config.Attributes.Parameter(WFAction = "WebService",  ParameterName = "URL")]
         [Durados.Config.Attributes.ColumnProperty()]
         public string WebService1 { get; set; }
+
+
+        [Durados.Config.Attributes.ColumnProperty(DoNotCopy = true, Description = "If true page takes the page roles, otherwise the page takes the workspace roles")]
+        public bool Precedent { get; set; }
+
+        private string allowSelectRoles;
+
+        [Durados.Config.Attributes.ColumnProperty(DoNotCopy = true, Description = "Hide/Show page to users with these roles.")]
+        public string AllowSelectRoles
+        {
+            get
+            {
+
+                return allowSelectRoles;
+            }
+            set
+            {
+                allowSelectRoles = value;
+            }
+        }
+
+        
     }
 
 

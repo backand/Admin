@@ -11,6 +11,9 @@ namespace Durados.Workflow
     {
         private string BaseUrl = System.Configuration.ConfigurationManager.AppSettings["nodeHost"] ?? "http://127.0.0.1:9000";
         private string NodeJSBucket = System.Configuration.ConfigurationManager.AppSettings["NodeJSBucket"] ?? "nodejs.backand.net";
+        private const string ARN = "arn:aws:iam::328923390206:role/lambda_control";
+        private const int MemorySize = 128;
+        private const int Timeout = 3;
 
         private Dictionary<string, object> GetCallLambdaPayload(object controller, Dictionary<string, Parameter> parameters, View view, Dictionary<string, object> values, DataRow prevRow, string pk, string connectionString, int currentUsetId, string currentUserRole, IDbCommand command)
         {
@@ -26,7 +29,7 @@ namespace Durados.Workflow
  
         }
 
-        public virtual void Execute(object controller, Dictionary<string, Parameter> parameters, View view, Dictionary<string, object> values, DataRow prevRow, string pk, string connectionString, int currentUsetId, string currentUserRole, IDbCommand command, IDbCommand sysCommand, string actionName)
+        public virtual void Execute(object controller, Dictionary<string, Parameter> parameters, View view, Dictionary<string, object> values, DataRow prevRow, string pk, string connectionString, int currentUsetId, string currentUserRole, IDbCommand command, IDbCommand sysCommand, string actionName, string arn = ARN)
         {
             const string FunctionError = "FunctionError";
             const string Payload = "Payload";
@@ -45,6 +48,7 @@ namespace Durados.Workflow
             data.Add("folder", folder);
             data.Add("functionName", functionName);
             data.Add("payload", payload);
+            data.Add("Role", arn);
 
 
             request.setRequestHeader("content-type", "application/json");
@@ -121,7 +125,7 @@ namespace Durados.Workflow
         /// <param name="functionName">the lambda function name</param>
         /// <param name="handlerName">the js file with the root function</param>
         /// <param name="callFunctionName">the root function name</param>
-        public virtual void Create(string bucket, string folder, string fileName, string functionName, string handlerName, string callFunctionName)
+        public virtual void Create(string bucket, string folder, string fileName, string functionName, string handlerName, string callFunctionName, string arn = ARN, int memorySize = MemorySize, int timeout = Timeout)
         {
             string url = BaseUrl + "/createLambda";
             XMLHttpRequest request = new XMLHttpRequest();
@@ -134,7 +138,10 @@ namespace Durados.Workflow
             data.Add("functionName", functionName);
             data.Add("handlerName", handlerName);
             data.Add("callFunctionName", callFunctionName);
-
+            data.Add("Role", arn);
+            data.Add("memorySize", memorySize);
+            data.Add("timeout", timeout);
+            
 
             request.setRequestHeader("content-type", "application/json");
 
@@ -158,7 +165,7 @@ namespace Durados.Workflow
 
         }
 
-        public virtual void Update(string bucket, string folder, string fileName, string functionName)
+        public virtual void Update(string bucket, string folder, string fileName, string functionName, string arn = ARN, int memorySize = MemorySize, int timeout = Timeout)
         {
             string url = BaseUrl + "/updateLambda";
             XMLHttpRequest request = new XMLHttpRequest();
@@ -169,7 +176,10 @@ namespace Durados.Workflow
             data.Add("folder", folder);
             data.Add("fileName", fileName);
             data.Add("functionName", functionName);
-
+            data.Add("Role", arn);
+            data.Add("memorySize", memorySize);
+            data.Add("timeout", timeout);
+            
 
             request.setRequestHeader("content-type", "application/json");
 
@@ -192,7 +202,7 @@ namespace Durados.Workflow
             }
         }
 
-        public virtual void Delete(string folder, string functionName)
+        public virtual void Delete(string folder, string functionName, string arn = ARN)
         {
             string url = BaseUrl + "/deleteLambda";
             XMLHttpRequest request = new XMLHttpRequest();
@@ -201,6 +211,7 @@ namespace Durados.Workflow
 
             data.Add("folder", folder);
             data.Add("functionName", functionName);
+            data.Add("Role", arn);
 
             request.setRequestHeader("content-type", "application/json");
 

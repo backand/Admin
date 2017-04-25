@@ -29,6 +29,13 @@ namespace BackAnd.Web.Api.Controllers
     [RoutePrefix("1")]
     public class ruleController : businessRuleController
     {
+        protected virtual bool IsAllow(View view, Durados.Rule rule)
+        {
+            if (view.Name != "_root")
+                return true;
+
+            return view.IsRuleAllow(rule);
+        }
 
         //[BackAnd.Web.Api.Controllers.Filters.TimeoutFilter(30000)]
         [Route("table/rule/{viewName}")]
@@ -83,11 +90,18 @@ namespace BackAnd.Web.Api.Controllers
                  if (string.IsNullOrEmpty(name))
                      name = actionName;
 
-                 if (rules.Where(r => r.Name.Equals(name)).Count() == 0)
+                 var rules2 = rules.Where(r => r.Name.Equals(name));
+                 if (rules2.Count() == 0)
                  {
                      return Request.CreateResponse(HttpStatusCode.NotFound, "Action not found, or is not on demand");
                  }
 
+                 var rule = rules2.FirstOrDefault();
+
+                 if (!IsAllow(view, rule))
+                 {
+                     return Request.CreateResponse(HttpStatusCode.Forbidden, Messages.ActionIsUnauthorized);
+                 }
 
                  Dictionary<string, object> values = null;
                  values = new Dictionary<string, object>();

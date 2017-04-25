@@ -315,6 +315,17 @@ namespace Durados.Web.Mvc
             return !UI.Helpers.SecurityHelper.IsDenied(DenySelectRoles, AllowSelectRoles) || UI.Helpers.SecurityHelper.IsConfigViewForViewOwner(this);
         }
 
+        public bool IsRuleAllow(Rule rule)
+        {
+            string allowSelectRoles;
+            if (rule.Precedent)
+                allowSelectRoles = rule.AllowSelectRoles;
+            else
+                allowSelectRoles = AllowSelectRoles;
+
+            return !UI.Helpers.SecurityHelper.IsDenied(null, allowSelectRoles);
+        }
+
         public override bool IsVisible()
         {
             return !this.HideInMenu && !UI.Helpers.SecurityHelper.IsDenied(DenySelectRoles, AllowSelectRoles);

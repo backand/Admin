@@ -1804,6 +1804,11 @@ namespace BackAnd.Web.Api.Controllers
                 if (values.ContainsKey("copyOptions"))
                     copyOptions = values["copyOptions"];
 
+                int productType = 1;
+                if (values.ContainsKey("productType"))
+                    productType = Convert.ToInt32(values["productType"]);
+
+
 
                 object[] serverAndPort = GetProductPortAndServer(values);
                 server = (string)serverAndPort[0];
@@ -1864,6 +1869,7 @@ namespace BackAnd.Web.Api.Controllers
                 success = Convert.ToBoolean(result["Success"]);
                 if (success)
                 {
+                    UpdateProductType(id, productType);
                     ProcessDatabase(appId.Value, id);
                     string message = "App " + id + " id: " + appId.Value + " connected";
                     Maps.Instance.DuradosMap.Logger.Log(GetControllerNameForLog(ControllerContext), GetActionName(), this.Request.Method.Method, message, HttpStatusCode.OK.ToString(), 3, null, DateTime.Now);
@@ -1904,6 +1910,17 @@ namespace BackAnd.Web.Api.Controllers
                 throw new BackAndApiUnexpectedResponseException(exception, this);
 
             }
+        }
+
+        private void UpdateProductType(string appName, int productType)
+        {
+            if (productType == 1)
+                return;
+
+            string sql =
+                "update durados_App set productType = @productType where Name = @name";
+            new SqlAccess().ExecuteNonQuery(Maps.Instance.DuradosMap.connectionString, sql, new Dictionary<string, object>() { { "productType", productType }, { "name", appName } }, null);
+            
         }
 
         private void SetTemplateToCache(Dictionary<string, object> values, string id)

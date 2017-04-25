@@ -2333,6 +2333,8 @@ namespace Durados.Web.Mvc
             ConfigSystemSchemaTable();
             ConfigSystemLogTable();
             ConfigSystemRoleTable();
+            ConfigSystemRootTable();
+
             ConfigSystemPlugInTable();
             if (this is DuradosMap && !Maps.PrivateCloud)
             {
@@ -3420,6 +3422,18 @@ namespace Durados.Web.Mvc
                 View instanceView = (View)db.Views["durados_PlugInInstance"];
 
                 instanceView.Fields["Id"].ExcludeInInsert = false;
+            }
+        }
+
+
+        private void ConfigSystemRootTable()
+        {
+            if (db.Views.ContainsKey("_root"))
+            {
+
+                View rootView = (View)db.Views["_root"];
+                rootView.Precedent = true;
+                rootView.AllowSelectRoles = "everyone";
             }
         }
 
