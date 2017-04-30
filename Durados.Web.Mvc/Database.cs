@@ -1583,6 +1583,8 @@ namespace Durados.Web.Mvc
 
         private static bool UserIsAuthorizedOrAnonymous()
         {
+            if (!string.IsNullOrEmpty(HttpContext.Current.Request.Headers["SignUpToken"]))
+                return false;
             return (string.IsNullOrEmpty(HttpContext.Current.Request.Headers["Authorization"]) &&
                             !string.IsNullOrEmpty(HttpContext.Current.Request.Headers[Database.AnonymousToken])) ||
                             (!string.IsNullOrEmpty(HttpContext.Current.Request.Headers["Authorization"]) &&

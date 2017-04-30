@@ -505,10 +505,10 @@ namespace BackAnd.Web.Api.Controllers
 
                 AccountService account = new AccountService(this);
 
-                if (account.UserBelongToMoreThanOneApp(username, Map.AppName))
-                {
-                    return ResponseMessage(Request.CreateResponse(HttpStatusCode.PreconditionFailed, "You cannot change the password to a user that belongs to additional Backand apps, other than yours. In this case, user must reset password using your app UI."));
-                }
+                //if (account.UserBelongToMoreThanOneApp(username, Map.AppName))
+                //{
+                //    return ResponseMessage(Request.CreateResponse(HttpStatusCode.PreconditionFailed, "You cannot change the password to a user that belongs to additional Backand apps, other than yours. In this case, user must reset password using your app UI."));
+                //}
 
                 account.ChangePassword(username, password, map);
 
