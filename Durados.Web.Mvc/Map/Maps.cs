@@ -1780,7 +1780,6 @@ namespace Durados.Web.Mvc
             map.IsAuthApp = appRow.IsAuthApp;
             map.Environment = appRow.IsEnvironmentNull() ? null : appRow.Environment;
             map.EnvVar = appRow.IsEnvVarNull() ? null : appRow.EnvVar;
-            map.SysEnv = appRow.IsSysEnvNull() ? null : appRow.SysEnv;
             map.LoadLimits();
 
             int themeId = 0;
