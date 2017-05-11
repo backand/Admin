@@ -4949,7 +4949,10 @@ namespace Durados.Web.Mvc.UI.Helpers
             values.Add("firstName", profile.firstName);
             values.Add("lastName", profile.lastName);
             values.Add("provider", profile.additionalValues["provider"]);
-            values.Add("providerAccessToken", profile.additionalValues["providerAccessToken"]);
+            if (profile.additionalValues.ContainsKey("providerAccessToken"))
+            {
+                values.Add("providerAccessToken", profile.additionalValues["providerAccessToken"]);
+            }
             values.Add("id", profile.id);
             
             foreach (string key in profile.additionalValues.Keys)
@@ -5568,6 +5571,145 @@ namespace Durados.Web.Mvc.UI.Helpers
         }
 
 
+    }
+
+    public class LambdaSelection
+    {
+        public int cloudId { get; set; }
+        public string name { get; set; }
+        public string arn { get; set; }
+        public bool select { get; set; }
+    }
+
+    public class LambdaSelectionResult : LambdaSelection
+    {
+        public bool result { get; set; }
+        public string error { get; set; }
+    }
+
+    public class LambdaHelper
+    {
+        public Dictionary<string, object> Get()
+        {
+            Dictionary<string, object> json = new Dictionary<string, object>();
+
+            json.Add("totalRows", json.Count);
+
+            Dictionary<string, object>[] cloudsJson = GetClouds();
+
+            foreach (Dictionary<string, object> cloudJson in cloudsJson)
+            {
+                int cloudId = Convert.ToInt32(cloudJson["id"]);
+                cloudJson["functions"] = GetLambdaList(Maps.Instance.GetMap().Database.Clouds[cloudId]);
+            }
+
+            json.Add("data", cloudsJson);
+
+            return json;
+        }
+
+        private Dictionary<string, object>[] GetClouds()
+        {
+            List<Dictionary<string, object>> cloudsJson = new List<Dictionary<string,object>>();
+            
+            foreach (Cloud cloud in Maps.Instance.GetMap().Database.Clouds.Values)
+            {
+                cloudsJson.Add(new Dictionary<string, object>() { { "id", cloud.Id }, { "name", cloud.Name }, { "accessKeyId", cloud.AccessKeyId }, { "functions", null } });
+            }
+
+            return cloudsJson.ToArray();
+        }
+
+        private Dictionary<string, object>[] GetLambdaList(Cloud cloud)
+        {
+            Durados.Workflow.NodeJS nodejs = new Durados.Workflow.NodeJS();
+
+            return nodejs.GetLambdaList(cloud.GetAwsCredentials());
+
+        }
+
+        public LambdaSelectionResult[] Select(LambdaSelection[] selections)
+        {
+            List<LambdaSelectionResult> results = new List<LambdaSelectionResult>();
+
+            foreach (LambdaSelection selection in selections)
+            {
+                results.Add(Select(selection));
+            }
+
+            return results.ToArray();
+        }
+
+        private LambdaSelectionResult Select(LambdaSelection selection)
+        {
+            LambdaSelectionResult result = new LambdaSelectionResult() { cloudId = selection.cloudId, name = selection.name };
+            try
+            {
+                if (selection.select)
+                {
+                    CreateAction(selection);
+                }
+                else
+                {
+                    DeleteAction(selection);
+                }
+                result.result = true;
+            }
+            catch (Exception e)
+            {
+                result.result = false;
+                result.error = e.Message;
+            }
+
+            return result;
+        }
+
+        View ruleView = (View)Maps.Instance.GetMap().GetConfigDatabase().Views["Rule"];
+        View functionView = (View)Maps.Instance.GetMap().Database.Views["_root"];
+
+        
+        private void DeleteAction(LambdaSelection selection)
+        {
+            Rule rule = GetRuleByName(selection.name);
+
+            if (rule == null)
+                throw new LambdaFunctionSelectionNotFound(selection.name);
+
+            ruleView.Delete(rule.ID.ToString(), null, null, null);
+
+        }
+
+        private void CreateAction(LambdaSelection selection)
+        {
+            Rule rule = GetRuleByName(selection.name);
+
+            if (rule != null)
+                throw new LambdaFunctionSelectionAlreadyExists(selection.name);
+
+            Dictionary<string, object> values = new Dictionary<string, object>();
+
+            values.Add("Name", selection.name);
+            values.Add("LambdaName", selection.name);
+            values.Add("LambdaArn", selection.arn);
+            values.Add("CloudSecurity", selection.cloudId);
+            values.Add("ActionType", ActionType.Function.ToString());
+            values.Add("WorkflowAction", WorkflowAction.Lambda.ToString());
+            values.Add("DataAction", TriggerDataAction.OnDemand.ToString());
+            values.Add("Rules_Parent", functionView.ID.ToString());
+            values.Add("AdditionalView", "");
+            values.Add("DatabaseViewName", "");
+            values.Add("UseSqlParser", "false");
+            values.Add("WhereCondition", "true");
+            values.Add("Category", "general");
+                
+            ruleView.Create(values, null, null, null, null, null);
+
+        }
+
+        private Rule GetRuleByName(string name)
+        {
+            return functionView.GetRules().Where(r => r.LambdaName == name).FirstOrDefault();
+        }
     }
 
     public class GoogleResult

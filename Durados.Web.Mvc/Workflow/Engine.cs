@@ -123,6 +123,19 @@ namespace Durados.Web.Mvc.Workflow
         {
             return ((Database)view.Database).GetCurrentUsername();
         }
+
+        protected override object ExecuteNodeJS(object controller, Dictionary<string, Parameter> parameters, Durados.View view, System.Data.DataRow prevRow, Dictionary<string, object> values, string pk, string connectionString, int currentUserId, string currentUserRole, System.Data.IDbCommand command, System.Data.IDbCommand sysCommand, string actionName)
+        {
+            nodeJS.Execute(controller, parameters, view, values, prevRow, pk, connectionString, currentUserId, currentUserRole, command, sysCommand, actionName, Maps.LambdaArnRoot, Maps.AwsCredentials, false);
+            return null;
+        }
+
+        protected override object ExecuteLambda(object controller, Dictionary<string, Parameter> parameters, Durados.View view, System.Data.DataRow prevRow, Dictionary<string, object> values, string pk, string connectionString, int currentUserId, string currentUserRole, System.Data.IDbCommand command, System.Data.IDbCommand sysCommand, string actionName, Rule rule)
+        {
+            nodeJS.Execute(controller, parameters, view, values, prevRow, pk, connectionString, currentUserId, currentUserRole, command, sysCommand, actionName, rule.LambdaArn, view.GetRuleCredentials(rule), true);
+            return null;
+        }
+
         
     }
 }

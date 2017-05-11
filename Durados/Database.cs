@@ -531,6 +531,26 @@ namespace Durados
             private set { crons = value; }
         }
 
+        private Dictionary<int, Cloud> clouds = null;
+        public Dictionary<int, Cloud> Clouds
+        {
+            get
+            {
+                if (clouds == null)
+                {
+                    clouds = new Dictionary<int, Cloud>();
+                    LoadClouds();
+                }
+
+                return clouds;
+            }
+        }
+
+        protected virtual void LoadClouds()
+        {
+            throw new NotImplementedException();
+        }
+
         [Durados.Config.Attributes.ParentProperty(TableName = "MyCharts")]
         public MyCharts MyCharts { get; set; }
 
@@ -1374,8 +1394,13 @@ namespace Durados
         {
             return null;
         }
-        
 
+
+
+        public virtual string DecryptKey(string text)
+        {
+            return null;
+        }
     }
 
     public class IlegalDateFormatException : DuradosException

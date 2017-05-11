@@ -184,6 +184,7 @@
     <Content Include="deployment\signupBeforeAction.js" />
     <Content Include="deployment\Sql\ApprovalProcess.sql" />
     <Content Include="deployment\Sql\ApprovalProcess_sandisk.sql" />
+    <Content Include="deployment\Sql\Cloud.sql" />
     <Content Include="deployment\Sql\Content-MySql.sql" />
     <Content Include="deployment\Sql\Content.sql" />
     <Content Include="deployment\Sql\CustomViews-MySql.sql" />
@@ -195,6 +196,7 @@
     <Content Include="deployment\Sql\durados_AssignPendingAppsAlter.sql" />
     <Content Include="deployment\Sql\EventScript.sql" />
     <Content Include="deployment\Sql\HebPack.sql" />
+    <Content Include="deployment\Sql\Cloud-MySql.sql" />
     <Content Include="deployment\Sql\History-MySql.sql" />
     <Content Include="deployment\Sql\History.sql" />
     <Content Include="deployment\Sql\Link-MySql.sql" />
@@ -237,6 +239,7 @@
     <Compile Include="ChallengeResult.cs" />
     <Compile Include="Controllers\accountController.cs" />
     <Compile Include="Controllers\Admin\actionTemplateController.cs" />
+    <Compile Include="Controllers\Admin\lambdaController.cs" />
     <Compile Include="Controllers\Admin\cronController.cs" />
     <Compile Include="Controllers\Admin\limitsController.cs">
       <SubType>Code</SubType>

@@ -350,7 +350,6 @@
     <Compile Include="Stat\Measurements\Development\TotalRows.cs" />
     <Compile Include="Stat\Measurements\Development\Factor.cs" />
     <Compile Include="Stat\Measurements\Development\XmlSize.cs" />
-    <Compile Include="Stat\Measurements\S3\AwsCredentials.cs" />
     <Compile Include="Stat\Measurements\S3\NodeJsS3Measurement.cs" />
     <Compile Include="Stat\Measurements\S3\FilesS3Measurement.cs" />
     <Compile Include="Stat\Measurements\S3\S3Measurement.cs" />
@@ -396,6 +395,8 @@
     <Compile Include="Farm\IFarmCaching.cs" />
     <Compile Include="UI\Helpers\InvalidCronHeadersJsonException.cs" />
     <Compile Include="UI\Helpers\InvalidHttpMethodException.cs" />
+    <Compile Include="UI\Helpers\LambdaFunctionSelectionAlreadyExists.cs" />
+    <Compile Include="UI\Helpers\LambdaFunctionSelectionNotFound.cs" />
     <Compile Include="UI\Helpers\MailingServiceHelper.cs" />
     <Compile Include="UI\Helpers\MenuHelper.cs" />
     <Compile Include="UI\Helpers\ModelComparer.cs" />

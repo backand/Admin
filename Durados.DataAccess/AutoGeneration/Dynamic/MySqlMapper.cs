@@ -29,6 +29,11 @@ namespace Durados.DataAccess.AutoGeneration.Dynamic
         {
             return new  MySqlHistory(systemConnectionString, historySchemaGeneratorFileName);
         }
+
+        public override Cloud GetCloudGenerator(string systemConnectionString, string cloudSchemaGeneratorFileName)
+        {
+            return new MySqlCloud(systemConnectionString, cloudSchemaGeneratorFileName);
+        }
         public override Durados.DataAccess.AutoGeneration.PersistentSession GetPersistentSessionGenerator(string systemConnectionString, string sessionSchemaGeneratorFileName)
         {
             return new Durados.DataAccess.AutoGeneration.MySqPersistentSession(systemConnectionString, sessionSchemaGeneratorFileName);

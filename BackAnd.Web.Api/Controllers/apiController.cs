@@ -1030,6 +1030,7 @@ namespace BackAnd.Web.Api.Controllers
             LoadCreationSignature(e.View, e.Values);
             LoadModificationSignature(e.View, e.Values);
             HandleSpecialDefaults((Durados.Web.Mvc.View)e.View, e.Values);
+            HandleEncryption(e.View, e.Values);
 
             int currentUserId = Convert.ToInt32(Map.Database.GetUserID());
             string currentUserRole = null;
@@ -1050,6 +1051,21 @@ namespace BackAnd.Web.Api.Controllers
             }
 
             CreateWorkflowEngine().PerformActions(this, e.View, TriggerDataAction.BeforeCreate, e.Values, e.PrimaryKey, null, Map.Database.ConnectionString, currentUserId, currentUserRole, e.Command, e.SysCommand);
+        }
+
+        private void HandleEncryption(Durados.View view, Dictionary<string, object> values)
+        {
+            foreach (Field field in view.GetSysEncryptedFields())
+            {
+                if (values.ContainsKey(field.JsonName))
+                {
+                    values[field.JsonName] = map.Encrypt(values[field.JsonName].ToString());
+                }
+                else if (values.ContainsKey(field.Name))
+                {
+                    values[field.Name] = map.Encrypt(values[field.Name].ToString());
+                }
+            }
         }
 
         private void LoadCreationSignature(Durados.View view, Dictionary<string, object> values)
@@ -1314,7 +1330,10 @@ namespace BackAnd.Web.Api.Controllers
                 wfe = CreateWorkflowEngine();
             wfe.PerformActions(this, e.View, TriggerDataAction.AfterCreate, e.Values, e.PrimaryKey, null, Map.Database.ConnectionString, Convert.ToInt32(((Durados.Web.Mvc.Database)e.View.Database).GetUserID()), currentUserRole, e.Command, e.SysCommand);
 
-
+            if (e.View.Name == "durados_Cloud")
+            {
+                RefreshConfigCache();
+            }
         }
 
         #endregion create callbacks
@@ -1368,6 +1387,8 @@ namespace BackAnd.Web.Api.Controllers
         protected virtual void BeforeEdit(EditEventArgs e)
         {
             HandleEncryptedHiddenFields(e);
+            
+            HandleEncryption(e.View, e.Values);
 
             LoadModificationSignature(e.View, e.Values);
 
@@ -1841,6 +1862,11 @@ namespace BackAnd.Web.Api.Controllers
                     sqlAcces.RunScriptFile(scriptFile, Map.GetLocalizationDatabase().ConnectionString);
                     Map.Database.Localizer.SetCurrentUserLanguageCode(code);
                 }
+            }
+
+            if (e.View.Name == "durados_Cloud")
+            {
+                RefreshConfigCache();
             }
         }
 

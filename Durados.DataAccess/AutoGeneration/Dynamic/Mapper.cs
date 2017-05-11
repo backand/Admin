@@ -3990,6 +3990,11 @@ namespace Durados.DataAccess.AutoGeneration.Dynamic
            return new Durados.DataAccess.AutoGeneration.History(systemConnectionString, historySchemaGeneratorFileName);
         }
 
+        public virtual Cloud GetCloudGenerator(string systemConnectionString, string historySchemaGeneratorFileName)
+        {
+            return new Durados.DataAccess.AutoGeneration.Cloud(systemConnectionString, historySchemaGeneratorFileName);
+        }
+
         public virtual Durados.DataAccess.AutoGeneration.PersistentSession GetPersistentSessionGenerator(string systemConnectionString, string sessionSchemaGeneratorFileName)
         {
             return new Durados.DataAccess.AutoGeneration.PersistentSession(systemConnectionString, sessionSchemaGeneratorFileName);

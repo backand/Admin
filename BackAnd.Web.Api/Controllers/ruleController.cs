@@ -261,6 +261,55 @@ namespace BackAnd.Web.Api.Controllers
          }
 
 
+
+        [Route("lambda/log")]
+        [HttpPost]
+        public virtual IHttpActionResult LambdaLog()
+        {
+            try
+            {
+                Dictionary<string, object> data = GetData();
+                Dictionary<string, object> backandRequest = (Dictionary<string, object>)data["backandRequest"];
+                Guid requestId = Guid.Parse(backandRequest["id"].ToString());
+                string appName = backandRequest["appName"].ToString();
+                string username = backandRequest["username"].ToString();
+
+                if (data.ContainsKey("error"))
+                {
+                    SendSocketMessage(data["error"], null, appName, username);
+
+                }
+                else
+                {
+                    System.Collections.ArrayList logs = (System.Collections.ArrayList)data["logs"];
+
+                    ConvertLambdaLog(logs, requestId);
+                    SendSocketMessage(null, requestId, appName, username);
+                }
+                return Ok();
+            }
+            catch (Exception exception)
+            {
+                throw new BackAndApiUnexpectedResponseException(exception, this);
+            }
+        }
+
+        private Dictionary<string, object> GetData()
+        {
+            string json = System.Web.HttpContext.Current.Server.UrlDecode(Request.Content.ReadAsStringAsync().Result.Replace("%22", "%2522").Replace("%2B", "%252B").Replace("+", "%2B"));
+            return JsonConverter.Deserialize(json);
+                
+        }
+
+        private void ConvertLambdaLog(System.Collections.ArrayList logs, Guid requestId)
+        {
+            new Durados.Workflow.NodeJS().LambdaLog(logs, requestId);
+        }
+
+        private void SendSocketMessage(object error, object data, string appName, string username)
+        {
+
+        }
     }
 
 }

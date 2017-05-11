@@ -6,6 +6,9 @@ namespace Backand
     public class security
     {
         private string BaseUrl = System.Configuration.ConfigurationManager.AppSettings["nodeHost"] ?? "http://127.0.0.1:9000";
+        const string Encrypted = "encrypted";
+        const string Decrypted = "decrypted";
+
         public object compare(string password, string hashedPassword)
         {
             string url = BaseUrl + "/security/compare";
@@ -41,8 +44,7 @@ namespace Backand
         }
         public object hash(string password, string salt)
         {
-            const string encrypted = "encrypted";
-
+            
             string url = BaseUrl + "/security/hash";
             XMLHttpRequest request = new XMLHttpRequest();
             request.open("POST", url, false);
@@ -68,11 +70,88 @@ namespace Backand
                 {
                     throw new Durados.DuradosException("Failed to deserialize hash response " + request.status + ", " + request.responseText, exception);
                 }
-                if (!response.ContainsKey(encrypted))
+                if (!response.ContainsKey(Encrypted))
                 {
                     throw new Durados.DuradosException("hash response not contain encrypted " + request.status + ", " + request.responseText);
                 }
-                return response[encrypted];
+                return response[Encrypted];
+            }
+            else
+            {
+                throw new Durados.DuradosException("Server return status " + request.status + ", " + request.responseText);
+            }
+        }
+
+
+        public string encrypt(string text, string password)
+        {
+            string url = BaseUrl + "/security/encrypt";
+            XMLHttpRequest request = new XMLHttpRequest();
+            request.open("POST", url, false);
+            Dictionary<string, object> data = new Dictionary<string, object>();
+
+            data.Add("password", password);
+            data.Add("text", text);
+
+            request.setRequestHeader("content-type", "application/json");
+
+            System.Web.Script.Serialization.JavaScriptSerializer jss = new System.Web.Script.Serialization.JavaScriptSerializer();
+            request.send(jss.Serialize(data));
+
+            if (request.status == 200)
+            {
+                Dictionary<string, object> response = null;
+                try
+                {
+                    response = jss.Deserialize<Dictionary<string, object>>(request.responseText);
+                }
+                catch (Exception exception)
+                {
+                    throw new Durados.DuradosException("Failed to deserialize hash response " + request.status + ", " + request.responseText, exception);
+                }
+                if (!response.ContainsKey(Encrypted))
+                {
+                    throw new Durados.DuradosException("hash response not contain encrypted " + request.status + ", " + request.responseText);
+                }
+                return response[Encrypted].ToString();
+            }
+            else
+            {
+                throw new Durados.DuradosException("Server return status " + request.status + ", " + request.responseText);
+            }
+        }
+
+        public string decrypt(string encrypted, string password)
+        {
+            string url = BaseUrl + "/security/decrypt";
+            XMLHttpRequest request = new XMLHttpRequest();
+            request.open("POST", url, false);
+            Dictionary<string, object> data = new Dictionary<string, object>();
+
+            data.Add("password", password);
+            data.Add("encrypted", encrypted);
+
+            request.setRequestHeader("content-type", "application/json");
+
+            System.Web.Script.Serialization.JavaScriptSerializer jss = new System.Web.Script.Serialization.JavaScriptSerializer();
+            request.send(jss.Serialize(data));
+
+            if (request.status == 200)
+            {
+                Dictionary<string, object> response = null;
+                try
+                {
+                    response = jss.Deserialize<Dictionary<string, object>>(request.responseText);
+                }
+                catch (Exception exception)
+                {
+                    throw new Durados.DuradosException("Failed to deserialize hash response " + request.status + ", " + request.responseText, exception);
+                }
+                if (!response.ContainsKey(Decrypted))
+                {
+                    throw new Durados.DuradosException("hash response not contain encrypted " + request.status + ", " + request.responseText);
+                }
+                return response[Decrypted].ToString();
             }
             else
             {

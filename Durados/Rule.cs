@@ -246,7 +246,6 @@ namespace Durados
         {
             get
             {
-
                 return allowSelectRoles;
             }
             set
@@ -255,7 +254,15 @@ namespace Durados
             }
         }
 
-        
+        [Durados.Config.Attributes.ColumnProperty()]
+        public string LambdaName { get; set; }
+
+        [Durados.Config.Attributes.ColumnProperty()]
+        public string LambdaArn { get; set; }
+
+        [Durados.Config.Attributes.ColumnProperty()]
+        public int CloudSecurity { get; set; }
+
     }
 
 

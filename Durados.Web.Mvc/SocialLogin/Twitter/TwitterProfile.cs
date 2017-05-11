@@ -15,7 +15,7 @@ namespace Durados.Web.Mvc.SocialLogin.Google
             base(string.IsNullOrEmpty(email) ? "" : email.Split('@').FirstOrDefault() // if email exist, first name can be the prefix part of email address
                 , "", email, id, appName, returnUrl, activity, parameters, signupIfNotSignedIn, useHashRouting)
         {
-
+            dictionary = new Dictionary<string, object>() { { "provider", Provider } };
         }
 
         protected override string firstNameInner

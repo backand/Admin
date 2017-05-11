@@ -114,6 +114,7 @@
     <Compile Include="AutoGeneration\Dynamic\OracleMapper.cs" />
     <Compile Include="AutoGeneration\Dynamic\PostgreMapper.cs" />
     <Compile Include="AutoGeneration\Dynamic\MySqlMapper.cs" />
+    <Compile Include="AutoGeneration\Cloud.cs" />
     <Compile Include="AutoGeneration\MailingService.cs" />
     <Compile Include="AutoGeneration\PlugIn.cs" />
     <Compile Include="AutoGeneration\User.cs" />

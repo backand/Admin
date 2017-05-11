@@ -1807,6 +1807,8 @@ namespace BackAnd.Web.Api.Controllers
                 int productType = 1;
                 if (values.ContainsKey("productType"))
                     productType = Convert.ToInt32(values["productType"]);
+                else if (values.ContainsKey("ProductType"))
+                    productType = Convert.ToInt32(values["ProductType"]);
 
 
 

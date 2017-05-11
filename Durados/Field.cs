@@ -204,6 +204,9 @@ namespace Durados
             }
         }
 
+        [Durados.Config.Attributes.ColumnProperty(Description = "Encrypted field")]
+        public bool SysEncrypted { get; set; }
+
 
         protected Category category = null;
         [Durados.Config.Attributes.ParentProperty(DoNotCopy = true, TableName = "Category", Description = "The Tab the field include in")]

@@ -7,6 +7,7 @@ using Durados.Web.Mvc.UI.Helpers;
 using Microsoft.WindowsAzure.StorageClient;
 using Newtonsoft.Json;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
@@ -16,6 +17,7 @@ using System.Linq;
 using System.Reflection;
 using System.Runtime.Caching;
 using System.Text;
+using System.Web.Script.Serialization;
 using System.Web.Security;
 
 namespace Durados.Web.Mvc
@@ -359,8 +361,7 @@ namespace Durados.Web.Mvc
             }
         }
 
-
-
+        
         public string ConfigFileName { get; set; }
 
         private DataSet dataset;
@@ -498,9 +499,17 @@ namespace Durados.Web.Mvc
             }
             catch (Exception exception)
             {
-                string appName = Maps.Instance.GetAppName();
-                Maps.Instance.DuradosMap.Logger.Log("Map", "Initiate", appName, exception, 1, GetCaller("caller") + "; " + GetRequest());
-                throw new AppNotReadyException(appName);
+                try
+                {
+                    string appName = //Maps.Instance.GetAppName();
+                        System.Web.HttpContext.Current.Items[Database.AppName].ToString();
+                    Maps.Instance.DuradosMap.Logger.Log("Map", "Initiate", appName, exception, 1, GetCaller("caller") + "; " + GetRequest());
+                    throw new AppNotReadyException(appName);
+                }
+                catch 
+                {
+                    throw new AppNotReadyException("");
+                }
             }
         }
 
@@ -553,6 +562,12 @@ namespace Durados.Web.Mvc
             Durados.DataAccess.AutoGeneration.History history =
                 SystemDynamicMapper.GetHistoryGenerator(systemConnectionString, historySchemaGeneratorFileName);
 
+            if (!(this is DuradosMap))
+            {
+                string cloudSchemaGeneratorFileName = SystemDynamicMapper.GetGenerateScriptFileName(Maps.GetDeploymentPath("Sql/Cloud.sql"));
+                Durados.DataAccess.AutoGeneration.Cloud cloud =
+                    SystemDynamicMapper.GetCloudGenerator(systemConnectionString, cloudSchemaGeneratorFileName);
+            }
             //string messageBoardSchemaGeneratorFileName = Maps.GetDeploymentPath("Sql/MessageBoard.sql");
             //Durados.DataAccess.AutoGeneration.MessageBoard persistentMessageBoard =
             //    new Durados.DataAccess.AutoGeneration.MessageBoard(systemConnectionString, messageBoardSchemaGeneratorFileName);
@@ -953,7 +968,7 @@ namespace Durados.Web.Mvc
 
         }
 
-
+        
         private void UpdateHistoryOldNewValueToLongText()
         {
             if (this.SqlProduct != Durados.SqlProduct.MySql)
@@ -2309,6 +2324,8 @@ namespace Durados.Web.Mvc
             //
             AddSystemLogTable(ds);
             AddSystemSchemaTable(ds);
+            if (!this.IsMainMap)
+                AddSystemCloudTable(ds);
             AddSystemRootTable(ds);
             
             if (this is DuradosMap && !Maps.PrivateCloud)
@@ -2333,8 +2350,9 @@ namespace Durados.Web.Mvc
             ConfigSystemSchemaTable();
             ConfigSystemLogTable();
             ConfigSystemRoleTable();
+            ConfigSystemCloudTable();
             ConfigSystemRootTable();
-
+            
             ConfigSystemPlugInTable();
             if (this is DuradosMap && !Maps.PrivateCloud)
             {
@@ -2425,6 +2443,21 @@ namespace Durados.Web.Mvc
             table.Columns.Add("Text", typeof(string)).MaxLength = 1073741823;
 
             table.PrimaryKey = new DataColumn[1] { pk };
+        }
+
+        private void AddSystemCloudTable(DataSet ds)
+        {
+            string tableName = "durados_Cloud";
+
+            if (ds.Tables.Contains(tableName))
+                return;
+
+            DataTable table = systemGenerator.CreateTable(tableName, systemConnectionString);
+
+            ds.Tables.Add(table);
+
+
+            table.ExtendedProperties.Add("system", true);
         }
 
 
@@ -2879,6 +2912,38 @@ namespace Durados.Web.Mvc
             textField.Upload = new Upload() { FileAllowedTypes = "jpg,png,gif", FileMaxSize = 100, Override = false, Title = "UploadContent", UploadFileType = Mvc.UploadFileType.Image, UploadStorageType = Mvc.UploadStorageType.File, UploadVirtualPath = "/Uploads/" + Id ?? string.Empty + "/" };
             textField.CssClass = "wtextarealarge";
             db.Views["durados_Html"].SystemView = true;
+        }
+
+        private void ConfigSystemCloudTable()
+        {
+            if (this.IsMainMap)
+                return;
+            //db.Views["durados_Import"].HideInMenu = true;
+            View cloudView = (View)db.Views["durados_Cloud"];
+            cloudView.JsonName = "cloudServiceProvider";
+            //contentView.AllowCreate = false;
+            //contentView.AllowDelete = false;
+            //contentView.AllowDuplicate = false;
+
+            cloudView.Precedent = true;
+            cloudView.AllowCreateRoles = "Developer,Admin";
+            cloudView.AllowDeleteRoles = "Developer,Admin";
+            cloudView.AllowEditRoles = "Developer,Admin";
+            cloudView.AllowSelectRoles = "Developer,Admin";
+
+            cloudView.DataDisplayType = DataDisplayType.Preview;
+            cloudView.FilterType = FilterType.Group;
+            cloudView.SortingType = SortingType.Group;
+            cloudView.DashboardWidth = "300";
+
+            cloudView.DisplayName = "Cloud";
+
+            ColumnField encryptedSecretAccessKeyField = cloudView.Fields["EncryptedSecretAccessKey"] as ColumnField;
+            encryptedSecretAccessKeyField.SysEncrypted = true;
+            encryptedSecretAccessKeyField.HideInEdit = true;
+            encryptedSecretAccessKeyField.HideInTable = true;
+
+            db.Views["durados_Cloud"].SystemView = true;
         }
 
         private void ConfigSystemMailingServiceTable()
@@ -3649,6 +3714,23 @@ namespace Durados.Web.Mvc
 
                     //db.Localizer.Initiate(connectionString, localizationSchemaGeneratorFileName);
                 }
+            }
+        }
+
+        public void LoadClouds()
+        {
+            View view = (View)Database.Views["durados_Cloud"];
+            int rowCount;
+            DataView dataView = view.FillPage(1, 1000, null, null, null, out rowCount, null, null);
+            foreach (System.Data.DataRowView row in dataView)
+            {
+                int id = (int)row["Id"];
+                string accessKeyId = row.Row.IsNull("AccessKeyId") ? null : (string)row["AccessKeyId"];
+                string awsRegion = row.Row.IsNull("AwsRegion") ? null : (string)row["AwsRegion"]; 
+                CloudVendor cloudVendor = row.Row.IsNull("CloudVendor") ? CloudVendor.AWS : (CloudVendor)Enum.Parse(typeof(CloudVendor), (string)row["CloudVendor"]);
+                string encryptedSecretAccessKey = row.Row.IsNull("EncryptedSecretAccessKey") ? null : (string)row["EncryptedSecretAccessKey"];
+                string name = row.Row.IsNull("Name") ? null : (string)row["Name"]; 
+                Database.Clouds.Add(id, new Cloud(Database) { Id = id, AccessKeyId = accessKeyId, AwsRegion = awsRegion, CloudVendor = cloudVendor, EncryptedSecretAccessKey = encryptedSecretAccessKey, Name = name });
             }
         }
 
@@ -5196,6 +5278,9 @@ namespace Durados.Web.Mvc
         public string Environment { get; set; }
 
         public string EnvVar { get; set; }
+        public string SysEnv { get; set; }
+
+        
 
         private Dictionary<string, object> _environmentDictionary = null;
         public Dictionary<string, object> GetEnvironmentDictionary()
@@ -5225,6 +5310,19 @@ namespace Durados.Web.Mvc
             }
 
             return _environmentDictionary;
+        }
+
+        Backand.security security = new Backand.security();
+
+        public string Decrypt(string text)
+        {
+            return security.decrypt(text, Guid.ToString() + Maps.AwsAccountSecretKeyPart);
+        }
+
+        public string Encrypt(string text)
+        {
+            
+            return security.encrypt(text, Guid.ToString() + Maps.AwsAccountSecretKeyPart);
         }
     }
 

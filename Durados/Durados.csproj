@@ -124,6 +124,7 @@
     <Compile Include="Bookmark.cs" />
     <Compile Include="CalculatedField.cs" />
     <Compile Include="Category.cs" />
+    <Compile Include="Cloud.cs" />
     <Compile Include="Data\CacheStatus.cs" />
     <Compile Include="Data\CacheWithStatus.cs" />
     <Compile Include="Data\ICache.cs" />
@@ -150,6 +151,8 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Page.cs" />
+    <Compile Include="Security\Aws\AwsCredentials.cs" />
+    <Compile Include="Security\Aws\IAwsCredentials.cs" />
     <Compile Include="SmartRun\RunWithRetry.cs" />
     <Compile Include="Security\Ssh\ISession.cs" />
     <Compile Include="Security\Ssh\ITunnel.cs" />

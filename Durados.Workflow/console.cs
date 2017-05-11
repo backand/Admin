@@ -139,20 +139,21 @@ namespace Backand
     internal class Logger
     {
 
-        internal static void Log(string message, int logType = 500)
+        internal static void Log(string message, int logType = 500, DateTime? dateTime = null, Guid? requestGuid = null, bool isDebug = false)
         {
-            Guid requestGuid = (Guid)(Durados.Workflow.JavaScript.GetCacheInCurrentRequest(Durados.Workflow.JavaScript.GuidKey) ?? Guid.NewGuid());
+            if (!requestGuid.HasValue)
+                requestGuid = (Guid)(Durados.Workflow.JavaScript.GetCacheInCurrentRequest(Durados.Workflow.JavaScript.GuidKey) ?? Guid.NewGuid());
             Durados.Database database = Durados.Workflow.Engine.GetCurrentDatabase();
             if (database == null) 
                 return;
-            database.Logger.Log("", "", Durados.Database.LogMessage, "", "", logType, message, DateTime.Now, requestGuid);
+            database.Logger.Log("", "", Durados.Database.LogMessage, "", "", logType, message, dateTime ?? DateTime.Now, requestGuid);
 
-            if (!IsDebug())
+            if (!isDebug && !IsDebug())
                 return;
 
             CheckLimit();
 
-            database.Logger.Log("", "", "", "", "", logType, message, DateTime.Now, requestGuid);
+            database.Logger.Log("", "", "", "", "", logType, message, dateTime ?? DateTime.Now, requestGuid);
             //using (System.Data.SqlClient.SqlConnection connection = new System.Data.SqlClient.SqlConnection(Durados.Workflow.JavaScript.GetCacheInCurrentRequest(Durados.Workflow.JavaScript.ConnectionStringKey).ToString()))
             //{
             //    connection.Open();

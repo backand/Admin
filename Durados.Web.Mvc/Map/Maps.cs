@@ -30,6 +30,7 @@ using System.Collections.Specialized;
 using System.Configuration;
 using System.Web.Script.Serialization;
 using System.Runtime.Caching;
+using Durados.Security.Aws;
 
 namespace Durados.Web.Mvc
 {
@@ -480,7 +481,18 @@ namespace Durados.Web.Mvc
             {
                 throw new DuradosException("Missing awsSecretAccessKey key in web config");
             }
-            awsCredentials = new AwsCredentials() { AccessKeyID = awsAccessKeyId, SecretAccessKey = awsSecretAccessKey };
+            string awsRegion = System.Configuration.ConfigurationManager.AppSettings["awsRegion"];
+            if (string.IsNullOrEmpty(awsRegion))
+            {
+                throw new DuradosException("Missing awsRegion key in web config");
+            }
+            awsCredentials = new AwsCredentials() { AccessKeyID = awsAccessKeyId, SecretAccessKey = awsSecretAccessKey, Region = awsRegion };
+
+            LambdaArnRoot = System.Configuration.ConfigurationManager.AppSettings["lambdaArnRoot"];
+            if (string.IsNullOrEmpty(LambdaArnRoot))
+            {
+                throw new DuradosException("Missing lambdaArnRoot key in web config");
+            }
 
             WebhooksParametersFileName = System.Configuration.ConfigurationManager.AppSettings["webhooksParametersFileName"];
 
@@ -552,6 +564,8 @@ namespace Durados.Web.Mvc
             SocialRedirectHost = System.Configuration.ConfigurationManager.AppSettings["socialRedirectHost"];
 
             ReturnAddressForMobile = System.Configuration.ConfigurationManager.AppSettings["returnAddressForMobile"] ?? "http://www.backandblabla.bla";
+
+            AwsAccountSecretKeyPart = System.Configuration.ConfigurationManager.AppSettings["AwsAccountSecretKeyPart"];
         }
 
         private static Dictionary<string, string> GetCqls(string cqlsFileName)
@@ -650,7 +664,10 @@ namespace Durados.Web.Mvc
         public static string[] DevUsers { get; private set; }
 
         public static string ParseConverterMasterKey { get; private set; }
+
         public static string LambdaArn { get; private set; }
+        public static string LambdaArnRoot { get; private set; }
+
         public static string CronPrefix { get; private set; }
         public static string CronAuthorizationHeader { get; private set; }
         
@@ -1763,6 +1780,7 @@ namespace Durados.Web.Mvc
             map.IsAuthApp = appRow.IsAuthApp;
             map.Environment = appRow.IsEnvironmentNull() ? null : appRow.Environment;
             map.EnvVar = appRow.IsEnvVarNull() ? null : appRow.EnvVar;
+            map.SysEnv = appRow.IsSysEnvNull() ? null : appRow.SysEnv;
             map.LoadLimits();
 
             int themeId = 0;
@@ -2597,6 +2615,8 @@ namespace Durados.Web.Mvc
         public static string SocialRedirectHost { get; set; }
         public static string ReturnAddressForMobile { get; set; }
 
-        
+
+
+        public static string AwsAccountSecretKeyPart { get; private set; }
     }
 }

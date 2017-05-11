@@ -119,6 +119,7 @@
     <Compile Include="DoNotLogException.cs" />
     <Compile Include="IMainActionJavaScriptException.cs" />
     <Compile Include="JsActionArguments.cs" />
+    <Compile Include="LambdaLogConverter.cs" />
     <Compile Include="MainActionInDebugJavaScriptException.cs" />
     <Compile Include="MainActionJavaScriptException.cs" />
     <Compile Include="NodeJS.cs" />

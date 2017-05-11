@@ -14,6 +14,7 @@ namespace Durados.Workflow
         private const string ARN = "arn:aws:iam::328923390206:role/lambda_control";
         private const int MemorySize = 128;
         private const int Timeout = 3;
+        private const string DebugKey = "{{$$debug$$}}";
 
         private Dictionary<string, object> GetCallLambdaPayload(object controller, Dictionary<string, Parameter> parameters, View view, Dictionary<string, object> values, DataRow prevRow, string pk, string connectionString, int currentUsetId, string currentUserRole, IDbCommand command)
         {
@@ -29,11 +30,18 @@ namespace Durados.Workflow
  
         }
 
-        public virtual void Execute(object controller, Dictionary<string, Parameter> parameters, View view, Dictionary<string, object> values, DataRow prevRow, string pk, string connectionString, int currentUsetId, string currentUserRole, IDbCommand command, IDbCommand sysCommand, string actionName, string arn = ARN)
+        private bool IsDebug(Dictionary<string, object> values)
+        {
+            return values.ContainsKey("{{$$debug$$}}");
+        }
+
+        public virtual void ExecuteOld(object controller, Dictionary<string, Parameter> parameters, View view, Dictionary<string, object> values, DataRow prevRow, string pk, string connectionString, int currentUsetId, string currentUserRole, IDbCommand command, IDbCommand sysCommand, string actionName, string arn, Durados.Security.Aws.IAwsCredentials awsCredentials)
         {
             const string FunctionError = "FunctionError";
             const string Payload = "Payload";
             const string ErrorMessage = "errorMessage";
+
+            bool isDebug = IsDebug(values);
 
             string url = BaseUrl + "/callLambda";
             XMLHttpRequest request = new XMLHttpRequest();
@@ -49,7 +57,12 @@ namespace Durados.Workflow
             data.Add("functionName", functionName);
             data.Add("payload", payload);
             data.Add("Role", arn);
-
+            if (isDebug)
+            {
+                if (!System.Web.HttpContext.Current.Items.Contains(JavaScript.GuidKey))
+                    System.Web.HttpContext.Current.Items.Add(JavaScript.GuidKey, Guid.NewGuid());
+                data.Add("getLog", true);
+            }
 
             request.setRequestHeader("content-type", "application/json");
 
@@ -109,10 +122,225 @@ namespace Durados.Workflow
 
             if (response != null && values != null)
             {
+                if (isDebug)
+                {
+                    //HandleLog(response);
+                }
+
                 if (!values.ContainsKey(JavaScript.ReturnedValueKey))
                     values.Add(JavaScript.ReturnedValueKey, response);
                 else
                     values[JavaScript.ReturnedValueKey] = response;
+            }
+        }
+
+        public virtual Dictionary<string, object>[] GetLambdaList(Durados.Security.Aws.IAwsCredentials awsCredentials)
+        {
+            string url = BaseUrl + "/getLambdaList";
+            XMLHttpRequest request = new XMLHttpRequest();
+            request.open("POST", url, false);
+            Dictionary<string, object> data = new Dictionary<string, object>();
+
+            data.Add("awsRegion", awsCredentials.Region);
+            data.Add("accessKeyId", awsCredentials.AccessKeyID);
+            data.Add("secretAccessKey", awsCredentials.SecretAccessKey);
+            
+            request.setRequestHeader("content-type", "application/json");
+
+            System.Web.Script.Serialization.JavaScriptSerializer jss = new System.Web.Script.Serialization.JavaScriptSerializer();
+            request.send(jss.Serialize(data));
+
+            if (request.status != 200)
+            {
+                throw new NodeJsException(request.responseText);
+            }
+
+            Dictionary<string, object>[] response = null;
+            try
+            {
+                response = jss.Deserialize<Dictionary<string, object>[]>(request.responseText);
+            }
+            catch (Exception exception)
+            {
+                throw new Durados.DuradosException("Could not parse NodeJS response", exception);
+            }
+
+            return response;
+        }
+
+        public virtual void Execute(object controller, Dictionary<string, Parameter> parameters, View view, Dictionary<string, object> values, DataRow prevRow, string pk, string connectionString, int currentUserId, string currentUserRole, IDbCommand command, IDbCommand sysCommand, string actionName, string arn, Durados.Security.Aws.IAwsCredentials awsCredentials, bool isLambda)
+        {
+            const string FunctionError = "FunctionError";
+            const string Payload = "Payload";
+            const string ErrorMessage = "errorMessage";
+
+            bool isDebug = IsDebug(values);
+
+            string url = BaseUrl + "/invokeLambda";
+            XMLHttpRequest request = new XMLHttpRequest();
+            request.open("POST", url, false);
+            Dictionary<string, object> data = new Dictionary<string, object>();
+
+            Dictionary<string, object> payload = GetCallLambdaPayload(controller, parameters, view, values, prevRow, pk, connectionString, currentUserId, currentUserRole, command);
+
+            string folder = view.Database.GetCurrentAppName();
+            string functionArn = arn + folder + "_" + view.Name + "_" + actionName;
+            if (isLambda)
+            {
+                functionArn = arn;
+                payload = new Dictionary<string, object>();
+                foreach (string key in values.Keys)
+                {
+                    if (key != DebugKey)
+                    {
+                        payload.Add(key, values[key]);
+                    }
+                }
+            }
+
+            data.Add("awsRegion", awsCredentials.Region);
+            data.Add("accessKeyId", awsCredentials.AccessKeyID);
+            data.Add("secretAccessKey", awsCredentials.SecretAccessKey);
+            data.Add("functionArn", functionArn);
+            data.Add("payload", payload);
+            Guid requestId = Guid.NewGuid();
+            if (isDebug)
+            {
+                if (!System.Web.HttpContext.Current.Items.Contains(JavaScript.GuidKey))
+                    System.Web.HttpContext.Current.Items.Add(JavaScript.GuidKey, requestId);
+                else
+                    requestId = (Guid)System.Web.HttpContext.Current.Items[JavaScript.GuidKey];
+
+                string appName = (string)System.Web.HttpContext.Current.Items["appName"];
+                string username = (string)System.Web.HttpContext.Current.Items["username"];
+                string token = (string)System.Web.HttpContext.Current.Request.Headers["authorization"];
+
+
+                data.Add("backandRequest", new { id = requestId.ToString(), appName = appName, username = username, accessToken = token });
+            
+                data.Add("isProduction", false);
+            }
+            else
+            {
+                data.Add("isProduction", true);
+            }
+
+            request.setRequestHeader("content-type", "application/json");
+
+            System.Web.Script.Serialization.JavaScriptSerializer jss = new System.Web.Script.Serialization.JavaScriptSerializer();
+            request.send(jss.Serialize(data));
+
+            if (request.status != 200)
+            {
+                throw new NodeJsException(request.responseText);
+            }
+
+            Dictionary<string, object> response = null;
+            try
+            {
+                response = jss.Deserialize<Dictionary<string, object>>(request.responseText);
+            }
+            catch (Exception exception)
+            {
+                throw new Durados.DuradosException("Could not parse NodeJS response", exception);
+            }
+
+            if (response.ContainsKey(FunctionError))
+            {
+                if (response.ContainsKey(Payload))
+                {
+                    var responsePayload = response[Payload];
+                    if (responsePayload is string)
+                    {
+                        IDictionary<string, object> responsePayloadError = null;
+                        try
+                        {
+                            responsePayloadError = jss.Deserialize<Dictionary<string, object>>((string)responsePayload);
+                        }
+                        catch
+                        {
+                            throw new NodeJsException((string)responsePayload);
+                        }
+                        if (responsePayloadError.ContainsKey(ErrorMessage))
+                        {
+                            throw new NodeJsException(responsePayloadError[ErrorMessage].ToString());
+                        }
+                        else
+                        {
+                            throw new NodeJsException((string)responsePayload);
+                        }
+                    }
+                    else
+                    {
+                        throw new NodeJsException(request.responseText);
+                    }
+                }
+                else
+                {
+                    throw new NodeJsException(request.responseText);
+                }
+            }
+
+            if (response != null && values != null)
+            {
+                if (isDebug)
+                {
+                    HandleLog(response, requestId);
+                }
+
+                CleanResponse(response);
+
+                
+                if (!values.ContainsKey(JavaScript.ReturnedValueKey))
+                    values.Add(JavaScript.ReturnedValueKey, response);
+                else
+                    values[JavaScript.ReturnedValueKey] = response;
+            }
+        }
+        private void HandleLog(Dictionary<string, object> response, Guid requestId)
+        {
+            if (response.ContainsKey("logs"))
+            {
+                LambdaLogConverter lambdaLog = new LambdaLogConverter();
+
+                lambdaLog.Convert((System.Collections.ArrayList)response["logs"], requestId);
+                
+            }
+            
+        }
+
+        public void LambdaLog(System.Collections.ArrayList logs, Guid requestId)
+        {
+            LambdaLogConverter lambdaLog = new LambdaLogConverter();
+
+            lambdaLog.Convert(logs, requestId);
+        }
+
+        
+        
+        private void CleanResponse(Dictionary<string, object> response)
+        {
+            if (response.ContainsKey("LogResult"))
+            {
+                response.Remove("LogResult");
+            }
+            if (response.ContainsKey("logs"))
+            {
+                //var log = response["logs"];
+                response.Remove("logs");
+                //response.Add("log", log);
+            }
+            if (response.ContainsKey("startTime"))
+            {
+                response.Remove("startTime");
+            }
+            if (response.ContainsKey("endTime"))
+            {
+                response.Remove("endTime");
+            }
+            if (response.ContainsKey("requestId"))
+            {
+                response.Remove("requestId");
             }
         }
 

@@ -2050,6 +2050,32 @@ namespace Durados
         {
             throw new NotImplementedException();
         }
+
+        Field[] encryptedFields = null;
+        public Field[] GetSysEncryptedFields()
+        {
+            if (encryptedFields == null)
+            {
+                encryptedFields = Fields.Values.Where(f => f.SysEncrypted).ToArray();
+            }
+
+            return encryptedFields;
+        }
+
+        public Durados.Security.Aws.IAwsCredentials GetRuleCredentials(Rule rule)
+        {
+            return GetRuleCredentials(rule.CloudSecurity);
+        }
+
+        public Durados.Security.Aws.IAwsCredentials GetRuleCredentials(int cloudId)
+        {
+            string region = Database.Clouds[cloudId].AwsRegion.ToString();
+            string secretAccessKey = Database.Clouds[cloudId].DecryptedSecretAccessKey;
+            string accessKeyID = Database.Clouds[cloudId].AccessKeyId;
+            return new Durados.Security.Aws.AwsCredentials() { Region = region, SecretAccessKey = secretAccessKey, AccessKeyID = accessKeyID };
+        }
+
+
     }
 
     public class DataActionEventArgs : EventArgs
@@ -2181,7 +2207,8 @@ namespace Durados
         Xml,
         Custom,
         NodeJS,
-        JavaScript
+        JavaScript,
+        Lambda
     }
 
     public enum TriggerDataAction

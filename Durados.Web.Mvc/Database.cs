@@ -2081,5 +2081,14 @@ namespace Durados.Web.Mvc
             return _config;
         }
 
+        public override string DecryptKey(string text)
+        {
+            return Map.Decrypt(text);
+        }
+
+        protected override void LoadClouds()
+        {
+            this.Map.LoadClouds();
+        }
     }
 }

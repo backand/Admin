@@ -119,7 +119,7 @@ namespace Durados.Workflow
                     try
                     {
                         view.Database.Logger.Log(view.Name, "Start", "PerformAction " + rule.Name, "Engine", "", 14, view.Database.Logger.NowWithMilliseconds(), DateTime.Now);
-                        object result = PerformAction(controller, rule.WorkflowAction, rule.GetParameters(), view, values, prevRow, pk, connectionString, currentUserId, currentUserRole, command, sysCommand, rule.Name, dataAction);
+                        object result = PerformAction(controller, rule.WorkflowAction, rule.GetParameters(), view, values, prevRow, pk, connectionString, currentUserId, currentUserRole, command, sysCommand, rule.Name, dataAction, rule);
                         view.Database.Logger.Log(view.Name, "End", "PerformAction " + rule.Name, "Engine", "", 14, view.Database.Logger.NowWithMilliseconds(), DateTime.Now);
                         if (result != null)
                         {
@@ -433,7 +433,7 @@ namespace Durados.Workflow
             return string.Empty;
         }
 
-        protected virtual object PerformAction(object controller, Durados.WorkflowAction action, Dictionary<string, Parameter> parameters, View view, Dictionary<string, object> values, DataRow prevRow, string pk, string connectionString, int currentUserId, string currentUserRole, IDbCommand command, IDbCommand sysCommand, string actionName, Durados.TriggerDataAction dataAction)
+        protected virtual object PerformAction(object controller, Durados.WorkflowAction action, Dictionary<string, Parameter> parameters, View view, Dictionary<string, object> values, DataRow prevRow, string pk, string connectionString, int currentUserId, string currentUserRole, IDbCommand command, IDbCommand sysCommand, string actionName, Durados.TriggerDataAction dataAction, Rule rule)
         {
             switch (action)
             {
@@ -449,6 +449,8 @@ namespace Durados.Workflow
                     return ExecuteJs(controller, parameters, view, prevRow, values, pk, connectionString, currentUserId, currentUserRole, command, sysCommand, actionName, dataAction);
                 case WorkflowAction.NodeJS:
                     return ExecuteNodeJS(controller, parameters, view, prevRow, values, pk, connectionString, currentUserId, currentUserRole, command, sysCommand, actionName);
+                case WorkflowAction.Lambda:
+                    return ExecuteLambda(controller, parameters, view, prevRow, values, pk, connectionString, currentUserId, currentUserRole, command, sysCommand, actionName, rule);
                 case WorkflowAction.WebService:
                     return CallWebService(controller, parameters, view, prevRow, values, pk, connectionString, currentUserId, currentUserRole, command);
                 case WorkflowAction.CompleteStep:
@@ -506,10 +508,16 @@ namespace Durados.Workflow
 
         protected virtual object ExecuteNodeJS(object controller, Dictionary<string, Parameter> parameters, View view, DataRow prevRow, Dictionary<string, object> values, string pk, string connectionString, int currentUserId, string currentUserRole, IDbCommand command, IDbCommand sysCommand, string actionName)
         {
-            nodeJS.Execute(controller, parameters, view, values, prevRow, pk, connectionString, currentUserId, currentUserRole, command, sysCommand, actionName);
+            //nodeJS.Execute(controller, parameters, view, values, prevRow, pk, connectionString, currentUserId, currentUserRole, command, sysCommand, actionName);
             return null;
         }
 
+        protected virtual object ExecuteLambda(object controller, Dictionary<string, Parameter> parameters, View view, DataRow prevRow, Dictionary<string, object> values, string pk, string connectionString, int currentUserId, string currentUserRole, IDbCommand command, IDbCommand sysCommand, string actionName, Rule rule)
+        {
+            //nodeJS.Execute(controller, parameters, view, values, prevRow, pk, connectionString, currentUserId, currentUserRole, command, sysCommand, actionName);
+            return null;
+        }
+        
         protected virtual object CallWebService(object controller, Dictionary<string, Parameter> parameters, View view, DataRow prevRow, Dictionary<string, object> values, string pk, string connectionString, int currentUserId, string currentUserRole, IDbCommand command)
         {
             webService.Call(controller, parameters, view, values, prevRow, pk, connectionString, currentUserId, currentUserRole, command);
