@@ -3365,7 +3365,7 @@ namespace Durados.Web.Mvc.UI.Helpers
 
         private static Durados.Web.Mvc.Logging.IExternalAnalytics xLogger;
 
-        public static void Log(Durados.Web.Mvc.Logging.ExternalAnalyticsAction eventName, string username, Dictionary<string, object> dict)
+        public static void Log(Durados.Web.Mvc.Logging.ExternalAnalyticsAction eventName, string username, Dictionary<string, object> dict, Dictionary<string, object> page = null, Dictionary<string, object> campaign = null, string userAgent = null)
         {
             try
             {
@@ -3377,7 +3377,7 @@ namespace Durados.Web.Mvc.UI.Helpers
 
 
                 if (xLogger != null)
-                    xLogger.Log(eventName, null, username, dict, true);
+                    xLogger.Log(eventName, null, username, dict, true, page, campaign, userAgent);
             }
             catch (Exception exception)
             {

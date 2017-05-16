@@ -10,8 +10,8 @@ namespace Durados.Web.Mvc.Logging
     public interface IExternalAnalytics
     {
         void Init();
-       
-        void Log(ExternalAnalyticsAction externalLoggerAction, DateTime? dateTime,string username, Dictionary<string, object> traits, bool identify = false);
+
+        void Log(ExternalAnalyticsAction externalLoggerAction, DateTime? dateTime, string username, Dictionary<string, object> traits, bool identify = false, Dictionary<string, object> page = null, Dictionary<string, object> campaign = null, string userAgent = null);
     }
 
     public static class ExternalAnalyticsFactory

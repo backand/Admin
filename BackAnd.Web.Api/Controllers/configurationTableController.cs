@@ -73,11 +73,11 @@ namespace BackAnd.Web.Api.Controllers
             return GetList(withSelectOptions, pageNumber, pageSize, filter, sort, search);
         }
 
-        protected virtual IHttpActionResult GetList(bool? withSelectOptions, int? pageNumber, int? pageSize, string filter, string sort, string search)
+        protected virtual IHttpActionResult GetList(bool? withSelectOptions, int? pageNumber, int? pageSize, string filter, string sort, string search, bool ignoreAdmin = false)
         {
             try
             {
-                if (!IsAdmin())
+                if (!ignoreAdmin && !IsAdmin())
                 {
                     return ResponseMessage(Request.CreateResponse(HttpStatusCode.Forbidden, Messages.ActionIsUnauthorized));
                 }

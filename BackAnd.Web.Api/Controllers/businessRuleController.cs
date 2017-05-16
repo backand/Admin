@@ -16,6 +16,7 @@ using Durados.Web.Mvc.Controllers.Api;
 using System.Reflection;
 using Durados.Workflow;
 using System.Data;
+
 /*
  HTTP Verb	|Entire Collection (e.g. /customers)	                                                        |Specific Item (e.g. /customers/{id})
 -----------------------------------------------------------------------------------------------------------------------------------------------
@@ -73,7 +74,7 @@ namespace BackAnd.Web.Api.Controllers
         public IHttpActionResult Get(bool? withSelectOptions = null, int? pageNumber = null, int? pageSize = null, string filter = null, string sort = null, string search = null)
         {
 
-            return GetList(withSelectOptions, pageNumber, pageSize, filter, sort, search);
+            return GetList(withSelectOptions, pageNumber, pageSize, filter, sort, search, true);
         }
 
         protected override void AdjustItems(object items, Dictionary<string, object>[] filterArray, Dictionary<string, object>[] sortArray)
@@ -106,6 +107,11 @@ namespace BackAnd.Web.Api.Controllers
                 }
             }
 
+            if (!IsAdmin())
+            {
+                RemoveNotAllowedRules(items);
+            }
+
             Dictionary<string, object> relatedObjects = null;
 
             if (items.ContainsKey("relatedObjects"))
@@ -127,6 +133,26 @@ namespace BackAnd.Web.Api.Controllers
 
             
             relatedObjects.Add("categories", categories.ToArray());
+        }
+
+        private void RemoveNotAllowedRules(Dictionary<string, object> items)
+        {
+            HashSet<string> allowedRuleNames = ((View)map.Database.Views["_root"]).GetAllAllowedRuleNames();
+            Dictionary<string,object>[] currentRules = (Dictionary<string,object>[])items["data"];
+            List<Dictionary<string,object>> allowedRules = new List<Dictionary<string,object>>();
+
+
+            foreach (Dictionary<string, object> rule in currentRules)
+            {
+                string ruleName = rule["name"].ToString();
+
+                if (allowedRuleNames.Contains(ruleName))
+                {
+                    allowedRules.Add(rule);
+                }
+            }
+
+            items["data"] = allowedRules.ToArray();
         }
 
         protected override void AdjustSortItem(Dictionary<string, object>[] sortArray)
@@ -446,9 +472,6 @@ namespace BackAnd.Web.Api.Controllers
         {
             try
             {
-                string writeKey = Convert.ToString(System.Configuration.ConfigurationManager.AppSettings["SegmentWriteKey"] ?? "W21J7U7JO9IXajS1w292q1atMOGklmPi");
-                if (Segment.Analytics.Client == null)
-                    Segment.Analytics.Initialize(writeKey, new Segment.Config().SetAsync(false));
                 
                 Durados.WorkflowAction workflowAction = GetActionType(e);
                 string name = GetActionName(e);
@@ -456,21 +479,21 @@ namespace BackAnd.Web.Api.Controllers
                 switch (workflowAction)
                 {
                     case Durados.WorkflowAction.NodeJS:
-                        Segment.Analytics.Client.Track("Template Selected", "{template: 'lambda'}");
+                        SendAnalyticsInfo("Template Selected", "{template: 'lambda'}");
                         break;
 
                     case Durados.WorkflowAction.JavaScript:
                         if (IsFunction(e))
                         {
-                            Segment.Analytics.Client.Track("AddedFunction", "{rule: '" + name + "'}");
+                            SendAnalyticsInfo("AddedFunction", "{rule: '" + name + "'}");
                         }
                         else if (IsIntegration(e))
                         {
-                            Segment.Analytics.Client.Track("AddedIntegration", "{rule: '" + name + "'}");
+                            SendAnalyticsInfo("AddedIntegration", "{rule: '" + name + "'}");
                         }
                         else
                         {
-                            Segment.Analytics.Client.Track("AddedRule", "{rule: '" + name + "'}");
+                            SendAnalyticsInfo("AddedRule", "{rule: '" + name + "'}");
                         }
                         break;
 
@@ -483,14 +506,75 @@ namespace BackAnd.Web.Api.Controllers
             
         }
 
+        const string ActionType = "ActionType";
+
+        private void SendAnalyticsInfo(string ruleType, string ruleName)
+        {
+            string writeKey = Convert.ToString(System.Configuration.ConfigurationManager.AppSettings["SegmentWriteKey"] ?? "W21J7U7JO9IXajS1w292q1atMOGklmPi");
+            if (Segment.Analytics.Client == null)
+                Segment.Analytics.Initialize(writeKey, new Segment.Config().SetAsync(false));
+
+            //Segment.Analytics.Client.Track(ruleType, ruleName);
+
+            //Segment.Analytics
+            var req = System.Web.HttpContext.Current.Request;
+            
+            var options = new Segment.Model.Options();
+            var properties = new Segment.Model.Properties();
+
+            string referrer = req.UrlReferrer.AbsolutePath;
+            string userAgent = req.UserAgent;
+
+
+            string ip = Durados.Web.Mvc.Logging.Logger.GetUserIP();
+            
+            const string utm_content = "utm_content";
+            const string utm_campaign = "utm_campaign";
+            const string utm_medium = "utm_medium";
+            const string utm_source = "utm_source";
+            const string utm_term = "utm_term";
+
+            var campaign = new Segment.Model.Dict();
+
+
+            
+            var query = System.Web.HttpContext.Current.Request.UrlReferrer.ParseQueryString();
+            if (query[utm_content] != null) campaign.Add("content", query[utm_content]);
+            if (query[utm_campaign] != null) campaign.Add("name", query[utm_campaign]);
+            if (query[utm_medium] != null) campaign.Add("medium", query[utm_medium]);
+            if (query[utm_source] != null) campaign.Add("source", query[utm_source]);
+            if (query[utm_term] != null) campaign.Add("keyword", query[utm_term]);
+            
+            properties.Add("query", query.ToString());
+            properties.Add("referrer", referrer);
+            properties.Add("path", req.Path);
+            properties.Add("host", req.UserHostName);
+            properties.Add("url", req.Url.AbsolutePath);
+            /* ++ any custom props (eg. title) */
+
+            var context = new Segment.Model.Context();
+            context.Add("campaign", campaign);
+            context.Add("userAgent", userAgent);
+            context.Add("ip", ip);
+            
+            options.SetContext(context);
+
+            Segment.Analytics.Client.Page(ruleType, ruleName, properties, new Segment.Model.Options()
+                .SetContext(new Segment.Model.Context() {
+                    { "campaign", campaign },
+                    { "userAgent", "userAgent" }})
+            );
+
+        }
+
         private bool IsIntegration(Durados.CreateEventArgs e)
         {
-            return e.Values["ActionType"].Equals("Integration");
+            return e.Values.ContainsKey(ActionType) && e.Values[ActionType] != null && e.Values[ActionType].Equals("Integration");
         }
 
         private bool IsFunction(Durados.CreateEventArgs e)
         {
-            return e.Values["ActionType"].Equals("Function");
+            return e.Values.ContainsKey(ActionType) && e.Values[ActionType] != null && e.Values[ActionType].Equals("Function");
         }
 
         private string GetActionName(Durados.CreateEventArgs e)

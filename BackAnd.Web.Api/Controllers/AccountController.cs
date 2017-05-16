@@ -1,5 +1,6 @@
 //﻿using Backand.Web.Api;
 using BackAnd.Web.Api.Models;
+using Durados.Web.Mvc.Logging;
 //using BackAnd.Web.Api.Providers;
 using Microsoft.Owin.Infrastructure;
 using Microsoft.Owin.Security;
@@ -727,7 +728,8 @@ namespace BackAnd.Web.Api.Controllers
                     account.InviteAdminAfterSignUp(email);
                     Durados.Web.Mvc.UI.Helpers.Analytics.Log(Durados.Web.Mvc.Logging.ExternalAnalyticsAction.SignedUp, email, new Dictionary<string, object>() {
                         { Durados.Database.AppName, Durados.Web.Mvc.Maps.DuradosAppName }
-                        , { Durados.Web.Mvc.Logging.ExternalAnalyticsTraitsKey.name.ToString(), fullName } });
+                        , { Durados.Web.Mvc.Logging.ExternalAnalyticsTraitsKey.name.ToString(), fullName } },
+                      SegmentAnalytics.GetPage(), SegmentAnalytics.GetCampaign(), SegmentAnalytics.GetUserAgent());
                     return Ok();
                 }
                 else

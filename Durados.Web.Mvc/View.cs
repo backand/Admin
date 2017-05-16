@@ -326,6 +326,21 @@ namespace Durados.Web.Mvc
             return !UI.Helpers.SecurityHelper.IsDenied(null, allowSelectRoles);
         }
 
+        public HashSet<string> GetAllAllowedRuleNames()
+        {
+            HashSet<string> allowedRules = new HashSet<string>();
+
+            foreach (Rule rule in Rules.Values)
+            {
+                if (IsRuleAllow(rule))
+                {
+                    allowedRules.Add(rule.Name);
+                }
+            }
+
+            return allowedRules;
+        }
+
         public override bool IsVisible()
         {
             return !this.HideInMenu && !UI.Helpers.SecurityHelper.IsDenied(DenySelectRoles, AllowSelectRoles);
