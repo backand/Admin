@@ -5628,26 +5628,26 @@ namespace Durados.Web.Mvc.UI.Helpers
 
         }
 
-        public LambdaSelectionResult[] Select(LambdaSelection[] selections)
+        public LambdaSelectionResult[] Select(LambdaSelection[] selections, BeforeCreateEventHandler beforeCreateCallback, BeforeCreateInDatabaseEventHandler beforeCreateInDatabaseEventHandler, AfterCreateEventHandler afterCreateBeforeCommitCallback, AfterCreateEventHandler afterCreateAfterCommitCallback)
         {
             List<LambdaSelectionResult> results = new List<LambdaSelectionResult>();
 
             foreach (LambdaSelection selection in selections)
             {
-                results.Add(Select(selection));
+                results.Add(Select(selection, beforeCreateCallback, beforeCreateInDatabaseEventHandler, afterCreateBeforeCommitCallback, afterCreateAfterCommitCallback));
             }
 
             return results.ToArray();
         }
 
-        private LambdaSelectionResult Select(LambdaSelection selection)
+        private LambdaSelectionResult Select(LambdaSelection selection, BeforeCreateEventHandler beforeCreateCallback, BeforeCreateInDatabaseEventHandler beforeCreateInDatabaseEventHandler, AfterCreateEventHandler afterCreateBeforeCommitCallback, AfterCreateEventHandler afterCreateAfterCommitCallback)
         {
             LambdaSelectionResult result = new LambdaSelectionResult() { cloudId = selection.cloudId, name = selection.name };
             try
             {
                 if (selection.select)
                 {
-                    CreateAction(selection);
+                    CreateAction(selection, beforeCreateCallback, beforeCreateInDatabaseEventHandler, afterCreateBeforeCommitCallback, afterCreateAfterCommitCallback);
                 }
                 else
                 {
@@ -5679,7 +5679,7 @@ namespace Durados.Web.Mvc.UI.Helpers
 
         }
 
-        private void CreateAction(LambdaSelection selection)
+        private void CreateAction(LambdaSelection selection, BeforeCreateEventHandler beforeCreateCallback, BeforeCreateInDatabaseEventHandler beforeCreateInDatabaseEventHandler, AfterCreateEventHandler afterCreateBeforeCommitCallback, AfterCreateEventHandler afterCreateAfterCommitCallback)
         {
             Rule rule = GetRuleByName(selection.name);
 
@@ -5702,7 +5702,7 @@ namespace Durados.Web.Mvc.UI.Helpers
             values.Add("WhereCondition", "true");
             values.Add("Category", "general");
                 
-            ruleView.Create(values, null, null, null, null, null);
+            ruleView.Create(values, null, beforeCreateCallback, beforeCreateInDatabaseEventHandler, afterCreateBeforeCommitCallback, afterCreateAfterCommitCallback);
 
         }
 

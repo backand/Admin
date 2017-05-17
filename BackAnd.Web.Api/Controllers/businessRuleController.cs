@@ -317,7 +317,12 @@ namespace BackAnd.Web.Api.Controllers
                 }
                 if (Map.Database.Views[viewName].GetRules().Where(r => r.Name == ruleName && r.ID.ToString() != id).FirstOrDefault() != null)
                 {
-                    return ResponseMessage(Request.CreateResponse(HttpStatusCode.Conflict, string.Format(Messages.RuleWithNameAlreadyExists, ruleName, viewName)));
+                    string message;
+                    if (viewName == "_root")
+                        message = string.Format(Messages.FunctionWithNameAlreadyExists, ruleName);
+                    else
+                        message = string.Format(Messages.ActionWithNameAlreadyExists, ruleName, viewName);
+                    return ResponseMessage(Request.CreateResponse(HttpStatusCode.Conflict, message));
 
                 }
                 
@@ -404,7 +409,7 @@ namespace BackAnd.Web.Api.Controllers
 
             if (Map.Database.Views[viewName].GetRules().Where(r => r.Name == ruleName).FirstOrDefault() != null)
             {
-                return ResponseMessage(Request.CreateResponse(HttpStatusCode.Conflict, string.Format(Messages.RuleWithNameAlreadyExists, ruleName, viewName)));
+                return ResponseMessage(Request.CreateResponse(HttpStatusCode.Conflict, string.Format(Messages.ActionWithNameAlreadyExists, ruleName, viewName)));
             }
             return null;
         }
@@ -468,6 +473,31 @@ namespace BackAnd.Web.Api.Controllers
             base.BeforeCreate(e);
         }
 
+        private void WriteToAnalytics(Durados.EditEventArgs e)
+        {
+            try
+            {
+                string username = GetUsername();
+
+                Durados.WorkflowAction workflowAction = GetActionType(e);
+                string name = GetActionName(e);
+
+                string type = IsFunction(e) ? "function" : "action";
+
+                switch (workflowAction)
+                {
+                    case Durados.WorkflowAction.NodeJS:
+                        SendAnalyticsInfo(username, "LambdaDeployed", new Dictionary<string, object>() { { "rule", name }, { "type", type } });
+                        break;
+
+                    default:
+                        break;
+                }
+            }
+            catch { }
+
+        }
+
         private void WriteToAnalytics(Durados.CreateEventArgs e)
         {
             try
@@ -477,26 +507,32 @@ namespace BackAnd.Web.Api.Controllers
                 Durados.WorkflowAction workflowAction = GetActionType(e);
                 string name = GetActionName(e);
 
+                string type = IsFunction(e) ? "function" : "action";
+
                 switch (workflowAction)
                 {
                     case Durados.WorkflowAction.NodeJS:
-                        SendAnalyticsInfo(username, "Template Selected", new Dictionary<string, object>() { { "template", "lambda" } }); 
+                        SendAnalyticsInfo(username, "LambdaAdded", new Dictionary<string, object>() { { "rule", name }, { "type", type } }); 
                         break;
 
-                    case Durados.WorkflowAction.JavaScript:
-                        if (IsFunction(e))
-                        {
-                            SendAnalyticsInfo(username, "AddedFunction", new Dictionary<string, object>() { { "rule", name } });
-                        }
-                        else if (IsIntegration(e))
-                        {
-                            SendAnalyticsInfo(username, "AddedIntegration", new Dictionary<string, object>() { { "rule", name } });
-                        }
-                        else
-                        {
-                            SendAnalyticsInfo(username, "AddedRule", new Dictionary<string, object>() { { "rule", name } });
-                        }
+                    case Durados.WorkflowAction.Lambda:
+                        SendAnalyticsInfo(username, "LambdaLinked", new Dictionary<string, object>() { { "rule", name }, { "type", type } });
                         break;
+
+                    //case Durados.WorkflowAction.JavaScript:
+                    //    if (IsFunction(e))
+                    //    {
+                    //        SendAnalyticsInfo(username, "AddedFunction", new Dictionary<string, object>() { { "rule", name } });
+                    //    }
+                    //    else if (IsIntegration(e))
+                    //    {
+                    //        SendAnalyticsInfo(username, "AddedIntegration", new Dictionary<string, object>() { { "rule", name } });
+                    //    }
+                    //    else
+                    //    {
+                    //        SendAnalyticsInfo(username, "AddedRule", new Dictionary<string, object>() { { "rule", name } });
+                    //    }
+                    //    break;
 
 
                     default:
@@ -538,18 +574,20 @@ namespace BackAnd.Web.Api.Controllers
             var campaign = new Segment.Model.Dict();
 
 
+            if (referrer != null)
+            {
+                var query = referrer.ParseQueryString();
+                if (query[utm_content] != null) campaign.Add("content", query[utm_content]);
+                if (query[utm_campaign] != null) campaign.Add("name", query[utm_campaign]);
+                if (query[utm_medium] != null) campaign.Add("medium", query[utm_medium]);
+                if (query[utm_source] != null) campaign.Add("source", query[utm_source]);
+                if (query[utm_term] != null) campaign.Add("keyword", query[utm_term]);
 
-            var query = referrer.ParseQueryString();
-            if (query[utm_content] != null) campaign.Add("content", query[utm_content]);
-            if (query[utm_campaign] != null) campaign.Add("name", query[utm_campaign]);
-            if (query[utm_medium] != null) campaign.Add("medium", query[utm_medium]);
-            if (query[utm_source] != null) campaign.Add("source", query[utm_source]);
-            if (query[utm_term] != null) campaign.Add("keyword", query[utm_term]);
-
-            properties.Add("query", referrer.Query);
-            properties.Add("path", referrer.PathAndQuery);
-            properties.Add("host", referrer.Host);
-            properties.Add("url", referrer.ToString());
+                properties.Add("query", referrer.Query);
+                properties.Add("path", referrer.PathAndQuery);
+                properties.Add("host", referrer.Host);
+                properties.Add("url", referrer.ToString());
+            }
             foreach (string key in contextInfo.Keys)
             {
                 properties.Add(key, contextInfo[key]);
@@ -574,17 +612,17 @@ namespace BackAnd.Web.Api.Controllers
             return e.Values.ContainsKey(ActionType) && e.Values[ActionType] != null && e.Values[ActionType].Equals("Integration");
         }
 
-        private bool IsFunction(Durados.CreateEventArgs e)
+        private bool IsFunction(Durados.DataActionEventArgs e)
         {
             return e.Values.ContainsKey(ActionType) && e.Values[ActionType] != null && e.Values[ActionType].Equals("Function");
         }
 
-        private string GetActionName(Durados.CreateEventArgs e)
+        private string GetActionName(Durados.DataActionEventArgs e)
         {
             return e.Values["Name"].ToString();
         }
 
-        private Durados.WorkflowAction GetActionType(Durados.CreateEventArgs e)
+        private Durados.WorkflowAction GetActionType(Durados.DataActionEventArgs e)
         {
             return (Durados.WorkflowAction)Enum.Parse(typeof(Durados.WorkflowAction), e.Values["WorkflowAction"].ToString());
         }
@@ -634,6 +672,9 @@ namespace BackAnd.Web.Api.Controllers
             {
                 UpdateNodeJSFunction(e);
             }
+
+            WriteToAnalytics(e);
+
             base.BeforeEdit(e);
         }
 

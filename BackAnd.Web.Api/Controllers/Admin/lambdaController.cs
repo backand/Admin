@@ -37,13 +37,13 @@ namespace BackAnd.Web.Api.Controllers
 {
     [RoutePrefix("1")]
     [BackAnd.Web.Api.Controllers.Filters.BackAndAuthorize("Admin,Developer")]
-    public class lambdaController : apiController
+    public class lambdaController : businessRuleController
     {
 
 
         [Route("~/1/lambda")]
         [HttpGet]
-        public IHttpActionResult Get()
+        public IHttpActionResult GetList()
         {
             try
             {
@@ -68,7 +68,7 @@ namespace BackAnd.Web.Api.Controllers
                 LambdaSelection[] selections = jss.Deserialize<LambdaSelection[]>(json);
 
                 LambdaHelper lambdaHelper = new LambdaHelper();
-                var result = lambdaHelper.Select(selections);
+                var result = lambdaHelper.Select(selections, view_BeforeCreate, view_BeforeCreateInDatabase, view_AfterCreateBeforeCommit, view_AfterCreateAfterCommit);
                 RefreshConfigCache();
 
                 return Ok(result);

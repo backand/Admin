@@ -2320,7 +2320,8 @@ namespace BackAnd.Web.Api.Controllers
         public static readonly string AppNameAlreadyExists = "An application by the name {0} already exists.";
         public static readonly string AppNameCannotBeNull = "App name cannot be empty.";
         public static readonly string AppNameInvalid = "App name must be alphanumeric.";
-        public static readonly string RuleWithNameAlreadyExists = "An rule with the name {0} already exists for table {1}.";
+        public static readonly string ActionWithNameAlreadyExists = "An action with the name {0} already exists for table {1}.";
+        public static readonly string FunctionWithNameAlreadyExists = "A function with the name {0} already exists.";
         public static readonly string RuleNotFound = "The action does not exist.";
         public static readonly string NotImplemented = "The action is not implemented yet.";
         public static readonly string FailedToGetJsonFromParameters = "Failed to get json from parameters.";
