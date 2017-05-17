@@ -550,17 +550,18 @@ namespace BackAnd.Web.Api.Controllers
             properties.Add("path", referrer.PathAndQuery);
             properties.Add("host", referrer.Host);
             properties.Add("url", referrer.ToString());
+            foreach (string key in contextInfo.Keys)
+            {
+                properties.Add(key, contextInfo[key]);
+
+            }
             /* ++ any custom props (eg. title) */
 
             var context = new Segment.Model.Context();
             context.Add("campaign", campaign);
             context.Add("userAgent", userAgent);
             context.Add("ip", Durados.Web.Mvc.Logging.Logger.UserIPAddress);
-            foreach (string key in contextInfo.Keys)
-            {
-                context.Add(key, contextInfo[key]);
             
-            }
             
             options.SetContext(context);
 
