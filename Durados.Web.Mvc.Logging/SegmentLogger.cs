@@ -179,7 +179,7 @@ namespace Durados.Web.Mvc.Logging
             try
             {
                 if (!traits.ContainsKey(ExternalAnalyticsTraitsKey.ipAddress.ToString()))
-                    traits.Add(ExternalAnalyticsTraitsKey.ipAddress.ToString(), logger.UserIPAddress);
+                    traits.Add(ExternalAnalyticsTraitsKey.ipAddress.ToString(), Logger.UserIPAddress);
 
                 if (async)
                     System.Threading.Tasks.Task.Run(() => _Log(actioName, timestamp, username, traits, identify, page, campaign, userAgent));

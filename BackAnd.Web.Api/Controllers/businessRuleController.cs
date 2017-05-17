@@ -472,28 +472,29 @@ namespace BackAnd.Web.Api.Controllers
         {
             try
             {
-                
+                string username = GetUsername();
+
                 Durados.WorkflowAction workflowAction = GetActionType(e);
                 string name = GetActionName(e);
 
                 switch (workflowAction)
                 {
                     case Durados.WorkflowAction.NodeJS:
-                        SendAnalyticsInfo("Template Selected", "{template: 'lambda'}");
+                        SendAnalyticsInfo(username, "Template Selected", new Dictionary<string, object>() { { "template", "lambda" } }); 
                         break;
 
                     case Durados.WorkflowAction.JavaScript:
                         if (IsFunction(e))
                         {
-                            SendAnalyticsInfo("AddedFunction", "{rule: '" + name + "'}");
+                            SendAnalyticsInfo(username, "AddedFunction", new Dictionary<string, object>() { { "rule", name } });
                         }
                         else if (IsIntegration(e))
                         {
-                            SendAnalyticsInfo("AddedIntegration", "{rule: '" + name + "'}");
+                            SendAnalyticsInfo(username, "AddedIntegration", new Dictionary<string, object>() { { "rule", name } });
                         }
                         else
                         {
-                            SendAnalyticsInfo("AddedRule", "{rule: '" + name + "'}");
+                            SendAnalyticsInfo(username, "AddedRule", new Dictionary<string, object>() { { "rule", name } });
                         }
                         break;
 
@@ -508,7 +509,7 @@ namespace BackAnd.Web.Api.Controllers
 
         const string ActionType = "ActionType";
 
-        private void SendAnalyticsInfo(string ruleType, string ruleName)
+        private void SendAnalyticsInfo(string username,  string eventName, Dictionary<string, object> contextInfo)
         {
             string writeKey = Convert.ToString(System.Configuration.ConfigurationManager.AppSettings["SegmentWriteKey"] ?? "W21J7U7JO9IXajS1w292q1atMOGklmPi");
             if (Segment.Analytics.Client == null)
@@ -522,7 +523,7 @@ namespace BackAnd.Web.Api.Controllers
             var options = new Segment.Model.Options();
             var properties = new Segment.Model.Properties();
 
-            string referrer = req.UrlReferrer.AbsolutePath;
+            Uri referrer = req.UrlReferrer;
             string userAgent = req.UserAgent;
 
 
@@ -537,33 +538,33 @@ namespace BackAnd.Web.Api.Controllers
             var campaign = new Segment.Model.Dict();
 
 
-            
-            var query = System.Web.HttpContext.Current.Request.UrlReferrer.ParseQueryString();
+
+            var query = referrer.ParseQueryString();
             if (query[utm_content] != null) campaign.Add("content", query[utm_content]);
             if (query[utm_campaign] != null) campaign.Add("name", query[utm_campaign]);
             if (query[utm_medium] != null) campaign.Add("medium", query[utm_medium]);
             if (query[utm_source] != null) campaign.Add("source", query[utm_source]);
             if (query[utm_term] != null) campaign.Add("keyword", query[utm_term]);
-            
-            properties.Add("query", query.ToString());
-            properties.Add("referrer", referrer);
-            properties.Add("path", req.Path);
-            properties.Add("host", req.UserHostName);
-            properties.Add("url", req.Url.AbsolutePath);
+
+            properties.Add("query", referrer.Query);
+            properties.Add("path", referrer.PathAndQuery);
+            properties.Add("host", referrer.Host);
+            properties.Add("url", referrer.ToString());
             /* ++ any custom props (eg. title) */
 
             var context = new Segment.Model.Context();
             context.Add("campaign", campaign);
             context.Add("userAgent", userAgent);
-            context.Add("ip", ip);
+            context.Add("ip", Durados.Web.Mvc.Logging.Logger.UserIPAddress);
+            foreach (string key in contextInfo.Keys)
+            {
+                context.Add(key, contextInfo[key]);
+            
+            }
             
             options.SetContext(context);
 
-            Segment.Analytics.Client.Page(ruleType, ruleName, properties, new Segment.Model.Options()
-                .SetContext(new Segment.Model.Context() {
-                    { "campaign", campaign },
-                    { "userAgent", "userAgent" }})
-            );
+            Segment.Analytics.Client.Track(username, eventName, properties, options);
 
         }
 

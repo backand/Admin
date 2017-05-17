@@ -866,7 +866,7 @@ namespace BackAnd.Web.Api.Controllers
             return childrenField.GetDataView(pk);
         }
 
-        private string GetUsername()
+        protected string GetUsername()
         {
             return Database.GetCurrentUsername();
 

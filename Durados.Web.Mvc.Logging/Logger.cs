@@ -359,7 +359,7 @@ namespace Durados.Web.Mvc.Logging
             }
         }
 
-        public string UserIPAddress
+        public static string UserIPAddress
         {
             get
             {
