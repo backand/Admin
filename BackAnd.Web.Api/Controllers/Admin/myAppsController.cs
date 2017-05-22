@@ -382,7 +382,8 @@ namespace BackAnd.Web.Api.Controllers
                 }
                 else
                 {
-                    return ResponseMessage(Request.CreateResponse(HttpStatusCode.Conflict, Messages.AppNameCannotBeNull));
+                    values.Add(Name, GetDefaultAppName());
+                    //return ResponseMessage(Request.CreateResponse(HttpStatusCode.Conflict, Messages.AppNameCannotBeNull));
                 }
                 if (!values.ContainsKey(Title))
                 {
@@ -428,6 +429,66 @@ namespace BackAnd.Web.Api.Controllers
                 throw new BackAndApiUnexpectedResponseException(exception, this);
 
             }
+        }
+
+        private object GetDefaultAppName()
+        {
+            return GetDefaultAppName(GetUsername());
+        }
+
+        private object GetDefaultAppName(string username)
+        {
+            const string SuffixPrefix = "app";
+            string emailPrefix = GetEmailPrefix(username);
+
+
+            return emailPrefix + SuffixPrefix + GetNextUserAppNameNumber(emailPrefix + SuffixPrefix);
+        }
+
+        
+        private int GetNextUserAppNameNumber(string appNamePrefix)
+        {
+            string[] appNames = GetAppNamesWithPrefix(appNamePrefix);
+            List<int> numbers = new List<int>();
+            foreach (string appName in appNames)
+            {
+                int number = GetNumber(appName, appNamePrefix);
+                numbers.Add(number);
+            }
+            if (numbers.Count == 0)
+                return 1;
+            return numbers.Max() + 1;
+        }
+
+        private string[] GetAppNamesWithPrefix(string appNamePrefix)
+        {
+            SqlAccess sqlAccess = new SqlAccess();
+            string sql = "select name from durados_app where name like '" + appNamePrefix + "%'";
+            System.Data.DataTable table = sqlAccess.ExecuteTable(Maps.Instance.DuradosMap.connectionString, sql, null, System.Data.CommandType.Text);
+            List<string> list = new List<string>();
+
+            foreach (System.Data.DataRow row in table.Rows)
+            {
+                list.Add(row["Name"].ToString());
+            }
+
+            return list.ToArray();
+        }
+
+        private int GetNumber(string appName, string appNamePrefix)
+        {
+            int number;
+            if (int.TryParse(appName.TrimStart(appNamePrefix.ToCharArray()), out number))
+            {
+                return number;
+            }
+            return 0;
+        }
+
+        private string GetEmailPrefix(string email)
+        {
+            string emailPrefix = email.Split('@')[0];
+            return emailPrefix.ReplaceNonAlphaNumeric2(string.Empty);
         }
 
         protected string GetCleanName(string name)

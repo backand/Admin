@@ -193,7 +193,7 @@ namespace Durados.Workflow
                 {
                     if (key != DebugKey)
                     {
-                        payload.Add(key, values[key]);
+                        payload.Add(key.ReplaceToken("{{", "").ReplaceToken("}}", ""), values[key]);
                     }
                 }
             }
