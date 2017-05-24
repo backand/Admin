@@ -158,6 +158,9 @@ namespace Durados.Workflow
 
             if (exceptions.Count > 0)
             {
+                if (exceptions[0] is NodeJsException && ((NodeJsException)exceptions[0]).JsonFormat)
+                    throw exceptions[0];
+
                 //Backand.Logger.Log(exceptions[0].Message + "\n" + exceptions[0].StackTrace, 501);
                 if (IsDebug())
                     throw new WorkflowEngineException(exceptions.ToArray(), failedRules.ToArray());

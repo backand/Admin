@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
+using System.Net;
 using System.Text;
 
 namespace Durados.Workflow
@@ -15,6 +16,11 @@ namespace Durados.Workflow
         private const int MemorySize = 128;
         private const int Timeout = 3;
         private const string DebugKey = "{{$$debug$$}}";
+        private const string Logs = "logs";
+        private const string Handled = "Handled";
+        private const string FunctionError = "FunctionError";
+        private const string Payload = "Payload";
+        private const string ErrorMessage = "errorMessage";
 
         private Dictionary<string, object> GetCallLambdaPayload(object controller, Dictionary<string, Parameter> parameters, View view, Dictionary<string, object> values, DataRow prevRow, string pk, string connectionString, int currentUsetId, string currentUserRole, IDbCommand command)
         {
@@ -32,15 +38,14 @@ namespace Durados.Workflow
 
         private bool IsDebug(Dictionary<string, object> values)
         {
-            return values.ContainsKey("{{$$debug$$}}");
+            return values.ContainsKey("{{$$debug$$}}") || System.Web.HttpContext.Current.Request.QueryString["$$debug$$"] == "true"; ;
         }
 
         public virtual void ExecuteOld(object controller, Dictionary<string, Parameter> parameters, View view, Dictionary<string, object> values, DataRow prevRow, string pk, string connectionString, int currentUsetId, string currentUserRole, IDbCommand command, IDbCommand sysCommand, string actionName, string arn, Durados.Security.Aws.IAwsCredentials awsCredentials)
         {
-            const string FunctionError = "FunctionError";
             const string Payload = "Payload";
             const string ErrorMessage = "errorMessage";
-
+            
             bool isDebug = IsDebug(values);
 
             string url = BaseUrl + "/callLambda";
@@ -168,12 +173,10 @@ namespace Durados.Workflow
             return response;
         }
 
+        
         public virtual void Execute(object controller, Dictionary<string, Parameter> parameters, View view, Dictionary<string, object> values, DataRow prevRow, string pk, string connectionString, int currentUserId, string currentUserRole, IDbCommand command, IDbCommand sysCommand, string actionName, string arn, Durados.Security.Aws.IAwsCredentials awsCredentials, bool isLambda)
         {
-            const string FunctionError = "FunctionError";
-            const string Payload = "Payload";
-            const string ErrorMessage = "errorMessage";
-
+            
             bool isDebug = IsDebug(values);
 
             string url = BaseUrl + "/invokeLambda";
@@ -229,6 +232,12 @@ namespace Durados.Workflow
 
             System.Web.Script.Serialization.JavaScriptSerializer jss = new System.Web.Script.Serialization.JavaScriptSerializer();
             request.send(jss.Serialize(data));
+
+            if (IsFunction(view))
+            {
+                FunctionResponse(request, jss, values, isDebug, requestId);
+                return;
+            }
 
             if (request.status != 200)
             {
@@ -297,13 +306,161 @@ namespace Durados.Workflow
                     values[JavaScript.ReturnedValueKey] = response;
             }
         }
+
+        private bool IsFunction(View view)
+        {
+            return view.Name == "_root";
+        }
+
+        private void FunctionResponse(XMLHttpRequest request, System.Web.Script.Serialization.JavaScriptSerializer jss, Dictionary<string, object> values, bool isDebug, Guid requestId)
+        {
+            if (request.status != 200)
+            {
+                throw new NodeJsException(request.responseText);
+            }
+
+            Dictionary<string, object> response = null;
+            try
+            {
+                response = jss.Deserialize<Dictionary<string, object>>(request.responseText);
+            }
+            catch (Exception exception)
+            {
+                throw new Durados.DuradosException("Could not parse NodeJS response", exception);
+            }
+
+            object responsePayload = null;
+            if (response.ContainsKey(Payload))
+            {
+                responsePayload = response[Payload];
+                if (((string)responsePayload).EndsWith("Z\""))
+                {
+                    try
+                    {
+                        responsePayload = jss.Deserialize<DateTime>((string)responsePayload);
+                    }
+                    catch
+                    {
+                        try
+                        {
+                            responsePayload = jss.Deserialize<object>((string)responsePayload);
+                        }
+                        catch
+                        {
+                            //throw new NodeJsException((string)responsePayload);
+                        }
+                    }
+                }
+                else
+                {
+                    try
+                    {
+                        responsePayload = jss.Deserialize<object>((string)responsePayload);
+                    }
+                    catch
+                    {
+                        //throw new NodeJsException((string)responsePayload);
+                    }
+                }
+            }
+            else
+            {
+                throw new NodeJsException(request.responseText);
+            }
+
+            //if (response.ContainsKey(FunctionError))
+            //{
+
+            //    if (responsePayload != null && responsePayload is string)
+            //    {
+            //        IDictionary<string, object> responsePayloadError = null;
+            //        try
+            //        {
+            //            responsePayloadError = jss.Deserialize<Dictionary<string, object>>((string)responsePayload);
+            //        }
+            //        catch
+            //        {
+            //            throw new NodeJsException((string)responsePayload);
+            //        }
+            //        if (responsePayloadError.ContainsKey(ErrorMessage))
+            //        {
+            //            throw new NodeJsException(responsePayloadError[ErrorMessage].ToString());
+            //        }
+            //        else
+            //        {
+            //            throw new NodeJsException((string)responsePayload);
+            //        }
+            //    }
+            //    else
+            //    {
+            //        throw new NodeJsException(request.responseText);
+            //    }
+            //}
+
+            if (response.ContainsKey(FunctionError))
+            {
+                object logs = null;
+                if (response.ContainsKey(Logs))
+                {
+                    logs = response[Logs];
+                }
+                HandleError(response, responsePayload, jss, logs);
+            }
+
+            if (response != null && values != null)
+            {
+                if (isDebug)
+                {
+                    HandleLog(response, requestId);
+                }
+
+                CleanResponse(response);
+
+                if (!values.ContainsKey(JavaScript.ReturnedValueKey))
+                    values.Add(JavaScript.ReturnedValueKey, responsePayload);
+                else
+                    values[JavaScript.ReturnedValueKey] = responsePayload;
+            }
+        }
+
+        const string StatusCode = "StatusCode";
+        const string StackTrace = "stackTrace";
+        private void HandleError(Dictionary<string, object> response, object responsePayload, System.Web.Script.Serialization.JavaScriptSerializer jss, object logs)
+        {
+            string responsePayloadString;
+            if (responsePayload is IDictionary<string, object>)
+            {
+                if (!response.ContainsKey(StackTrace) && logs != null)
+                {
+                    ((IDictionary<string, object>)responsePayload).Add(StackTrace, logs);
+                }
+                responsePayloadString = jss.Serialize(responsePayload);
+            }
+            else
+            {
+                responsePayloadString = responsePayload.ToString();
+            }
+            if (response.ContainsKey(StatusCode) && !response[StatusCode].Equals(200))
+            {
+                HttpStatusCode httpStatusCode = (HttpStatusCode)Enum.ToObject(typeof(HttpStatusCode), System.Convert.ToInt32(response[StatusCode]));
+                throw new NodeJsException(responsePayloadString, true, httpStatusCode);
+            }
+            throw new NodeJsException(responsePayloadString, true);
+        }
+
+        private bool IsHandled(Dictionary<string, object> response)
+        {
+            
+            return response.ContainsKey(FunctionError) && response[FunctionError].Equals(Handled);
+        }
+
         private void HandleLog(Dictionary<string, object> response, Guid requestId)
         {
-            if (response.ContainsKey("logs"))
+            if (response.ContainsKey(Logs))
             {
                 LambdaLogConverter lambdaLog = new LambdaLogConverter();
 
-                lambdaLog.Convert((System.Collections.ArrayList)response["logs"], requestId);
+                lambdaLog.Convert((System.Collections.ArrayList)response[Logs], requestId);
                 
             }
             

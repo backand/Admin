@@ -67,6 +67,12 @@ namespace BackAnd.Web.Api
             );
 
             config.Routes.MapHttpRoute(
+                name: "cloudServiceProviderWithId",
+                routeTemplate: "admin/function/provider/{id}",
+                defaults: new { controller = "viewData", name = "cloudServiceProvider", id = RouteParameter.Optional }
+            );
+
+            config.Routes.MapHttpRoute(
                name: "tableDataWithId",
                routeTemplate: "1/table/data/{name}/{id}",
                defaults: new { controller = "viewData", name = RouteParameter.Optional, id = RouteParameter.Optional }
@@ -89,6 +95,12 @@ namespace BackAnd.Web.Api
                 name: "viewData",
                 routeTemplate: "1/view/data/{name}",
                 defaults: new { controller = "viewData", name = RouteParameter.Optional }
+            );
+
+            config.Routes.MapHttpRoute(
+                name: "cloudServiceProvider",
+                routeTemplate: "admin/function/provider",
+                defaults: new { controller = "viewData", name = "cloudServiceProvider" }
             );
 
             config.Routes.MapHttpRoute(

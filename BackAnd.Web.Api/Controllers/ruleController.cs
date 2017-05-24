@@ -216,7 +216,15 @@ namespace BackAnd.Web.Api.Controllers
              }
              catch (Durados.Workflow.NodeJsException exception)
              {
-                 return Request.CreateResponse(HttpStatusCode.InternalServerError, exception.Message);
+                 if (exception.JsonFormat)
+                 {
+                     JavaScriptSerializer jss = new JavaScriptSerializer();
+                     return Request.CreateResponse(exception.HttpStatusCode, jss.Deserialize<Dictionary<string, object>>(exception.Message));
+                 }
+                 else
+                 {
+                     return Request.CreateResponse(HttpStatusCode.InternalServerError, exception.Message);
+                 }
              }
              catch (Durados.Workflow.DoNotLogException exception)
              {
