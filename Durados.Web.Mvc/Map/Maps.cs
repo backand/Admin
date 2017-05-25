@@ -160,7 +160,7 @@ namespace Durados.Web.Mvc
                     duradosMap.ConfigFileName = Maps.GetConfigPath(Maps.GetmainAppConfigName() + ".xml");
                     duradosMap.Url = GetAppUrl(duradosAppName);
                     duradosMap.Initiate(false);
-                    duradosMap.Logger.RedisProvider = SharedMemorySingeltone.Instance;
+                    //duradosMap.Logger.RedisProvider = SharedMemorySingeltone.Instance;
                     //duradosMap.Database.BackandSSO = true;
 
                     View appView = (View)duradosMap.Database.Views["durados_App"];
