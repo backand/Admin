@@ -47,7 +47,7 @@ namespace Durados
             {
                 if (string.IsNullOrEmpty(AwsRegion))
                     return new string[0];
-                return AwsRegion.Split(',');
+                return AwsRegion.Split(new char[1] { ',' }, StringSplitOptions.RemoveEmptyEntries);
             }
         }
 

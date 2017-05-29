@@ -5771,7 +5771,7 @@ namespace Durados.Web.Mvc.UI.Helpers
 
         private Rule GetRuleByName(string name)
         {
-            return functionView.GetRules().Where(r => r.LambdaName == name).FirstOrDefault();
+            return functionView.GetRules().Where(r => r.Name == name).FirstOrDefault();
         }
 
     }

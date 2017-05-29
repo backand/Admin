@@ -173,6 +173,41 @@ namespace Durados.Workflow
             return response;
         }
 
+        public virtual object Download(Durados.Security.Aws.IAwsCredentials awsCredentials, string lambdaFunctionName)
+        {
+            string url = BaseUrl + "/downloadLambda";
+            XMLHttpRequest request = new XMLHttpRequest();
+            request.open("POST", url, false);
+            Dictionary<string, object> data = new Dictionary<string, object>();
+
+            data.Add("awsRegion", awsCredentials.Region);
+            data.Add("accessKeyId", awsCredentials.AccessKeyID);
+            data.Add("secretAccessKey", awsCredentials.SecretAccessKey);
+            data.Add("functionName", lambdaFunctionName);
+
+            request.setRequestHeader("content-type", "application/json");
+
+            System.Web.Script.Serialization.JavaScriptSerializer jss = new System.Web.Script.Serialization.JavaScriptSerializer();
+            request.send(jss.Serialize(data));
+
+            if (request.status != 200)
+            {
+                throw new NodeJsException(request.responseText);
+            }
+
+            object response = null;
+            try
+            {
+                response = jss.Deserialize<object>(request.responseText);
+            }
+            catch (Exception exception)
+            {
+                throw new Durados.DuradosException("Could not parse NodeJS response", exception);
+            }
+
+            return response;
+        }
+
         
         public virtual void Execute(object controller, Dictionary<string, Parameter> parameters, View view, Dictionary<string, object> values, DataRow prevRow, string pk, string connectionString, int currentUserId, string currentUserRole, IDbCommand command, IDbCommand sysCommand, string actionName, string arn, Durados.Security.Aws.IAwsCredentials awsCredentials, bool isLambda)
         {

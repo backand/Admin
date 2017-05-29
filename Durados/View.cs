@@ -2064,12 +2064,26 @@ namespace Durados
 
         public Durados.Security.Aws.IAwsCredentials GetRuleCredentials(Rule rule)
         {
-            return GetRuleCredentials(rule.CloudSecurity);
+            return GetRuleCredentials(rule.CloudSecurity, rule.LambdaArn);
         }
 
-        public Durados.Security.Aws.IAwsCredentials GetRuleCredentials(int cloudId)
+        public Durados.Security.Aws.IAwsCredentials GetRuleCredentials(int cloudId, string arn)
         {
-            string region = Database.Clouds[cloudId].AwsRegion.ToString();
+            string[] regions = Database.Clouds[cloudId].AwsRegion.ToString().Split(new char[1] { ',' }, StringSplitOptions.RemoveEmptyEntries);
+            string region = string.Empty;
+            if (regions.Length == 1)
+                region = regions[0];
+            else
+            {
+                foreach (string r in regions)
+                {
+                    if (arn.Contains(r))
+                    {
+                        region = r;
+                        break;
+                    }
+                }
+            }
             string secretAccessKey = Database.Clouds[cloudId].DecryptedSecretAccessKey;
             string accessKeyID = Database.Clouds[cloudId].AccessKeyId;
             return new Durados.Security.Aws.AwsCredentials() { Region = region, SecretAccessKey = secretAccessKey, AccessKeyID = accessKeyID };

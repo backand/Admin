@@ -786,6 +786,43 @@ namespace BackAnd.Web.Api.Controllers
         {
             return value != null && value.Equals(Durados.WorkflowAction.NodeJS.ToString());
         }
+
+        [HttpGet]
+        [HttpPost]
+        public virtual IHttpActionResult Download(string functionName)
+        {
+            try
+            {
+                View view = GetView("_root");
+                Durados.Rule rule = GetRule(view, functionName);
+
+                if (rule == null)
+                {
+                    return ResponseMessage(Request.CreateResponse(HttpStatusCode.NotFound, Messages.RuleNotFound));
+                }
+
+                if (!(rule.WorkflowAction == Durados.WorkflowAction.Lambda || rule.WorkflowAction == Durados.WorkflowAction.NodeJS))
+                {
+                    return ResponseMessage(Request.CreateResponse(HttpStatusCode.BadRequest, "not a lambda function"));
+                }
+
+                NodeJS nodejs = new NodeJS();
+                return Ok(nodejs.Download(view.GetRuleCredentials(rule), rule.LambdaName));
+            }
+            catch (Exception exception)
+            {
+                throw new BackAndApiUnexpectedResponseException(exception, this);
+
+            }
+        }
+
+        private Durados.Rule GetRule(View view, string functionName)
+        {
+            return view.GetRules().Where(r => r.Name == functionName).FirstOrDefault();
+        }
+
+        
+ 
     }
 
 }

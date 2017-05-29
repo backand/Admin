@@ -73,6 +73,12 @@ namespace BackAnd.Web.Api
             );
 
             config.Routes.MapHttpRoute(
+                name: "downloadLambdaFunction",
+                routeTemplate: "admin/function/download/{functionName}",
+                defaults: new { controller = "businessRule", name = "Download", functionName = RouteParameter.Optional }
+            );
+
+            config.Routes.MapHttpRoute(
                name: "tableDataWithId",
                routeTemplate: "1/table/data/{name}/{id}",
                defaults: new { controller = "viewData", name = RouteParameter.Optional, id = RouteParameter.Optional }
