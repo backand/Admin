@@ -1,0 +1,58 @@
+{
+	"AppCreated": {
+		"Url": "http://localhost:4110/1/objects/action/items/?name=addRequest",
+		"Method": "POST",
+		"Headers": {
+			"Authorization": "Basic OTllZTc1NjEtYWJkOC00ZGQxLWJhNzUtMzI4NWNkYjYxNjUzOmZlNjIwOTEwLTJkOTMtMTFlNi05MmY5LWVjZjRiYjA4MjgzZQ=="
+		}
+	},
+	"AppDeleted": {
+		"Url": "http://localhost:4110/1/objects/action/items/?name=addRequest",
+		"Method": "POST",
+		"Headers": {
+			"Authorization": "Basic OTllZTc1NjEtYWJkOC00ZGQxLWJhNzUtMzI4NWNkYjYxNjUzOmZlNjIwOTEwLTJkOTMtMTFlNi05MmY5LWVjZjRiYjA4MjgzZQ=="
+		}
+	},
+	"ac1a": {
+		"Url": "http://localhost:4110/1/objects/action/items/?name=act1&parameters=%7B%22a1%22:%22a1%22%7D",
+		"Method": "POST",
+		"Body": {
+			"AppName": "$AppName$",
+			"Username": "$Username$",
+			"Creator": "$Creator$"
+		},
+		"Headers": {
+			"Authorization": "Basic OTllZTc1NjEtYWJkOC00ZGQxLWJhNzUtMzI4NWNkYjYxNjUzOmZlNjIwOTEwLTJkOTMtMTFlNi05MmY5LWVjZjRiYjA4MjgzZQ=="
+		},
+		"public": true
+	},
+	"GetAppCurrentUsageAndPlan":{
+		"Url": "https://api.backand.com/1/objects/action/backand_billing_queue/33?name=GetAppCurrentUsageAndPlan&parameters={'app':'$AppName$','appId':'$AppId$','date':'$date$'}",
+		"Method": "GET",
+		"Headers": {
+			"Authorization": "Basic MDIzNDIzYTctMDQ4NS00ZDJlLTkyMjEtZmI0YWQzOTI0ZjAwOjBiZjVjY2RmLTJjOTctMTFlNi1iMTEyLTBlZDcwNTM0MjZjYg=="
+		},
+		"public": true
+	},
+	"GetAppCurrentAddOns":{
+		"Url": "https://api.backand.com/1/objects/action/backand_billing_queue/33?name=GetAppCurrentAddOns&parameters={'app':'$AppName$','appId':'$AppId$','date':'$date$'}",
+		"Method": "GET",
+		"Headers": {
+			"Authorization": "Basic MDIzNDIzYTctMDQ4NS00ZDJlLTkyMjEtZmI0YWQzOTI0ZjAwOjBiZjVjY2RmLTJjOTctMTFlNi1iMTEyLTBlZDcwNTM0MjZjYg=="
+		},
+		"public": true
+	},
+	"stat.Post": {
+		"Url": "https://api.backand.com/1/objects/action/modubiz_LogStats2/1?name=EmailAfterLogStats2",
+		"Method": "POST",
+		"Body": {
+			"AppName": "$AppName$",
+			"Username": "$Username$",
+			"Creator": "$Creator$"
+		},
+		"Headers": {
+			"Authorization": "Basic YmM4YzUxMjEtNWQ2Yy00OWZiLTlhM2EtNDNmOTljYzBlMmVhOmNlMzdlMjk2LTIzMmQtMTFlNi1iMTEyLTBlZDcwNTM0MjZjYg=="
+		},
+		"public": true
+	}
+}

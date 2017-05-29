@@ -410,7 +410,7 @@ namespace BackAnd.Web.Api.Controllers
 
                
 
-                return Ok(new { __metadata = new { id = key } });
+                return Ok(new { __metadata = new { id = key, appName = appName } });
             }
             catch (System.Data.SqlClient.SqlException exception)
             {

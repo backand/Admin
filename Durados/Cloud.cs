@@ -41,11 +41,31 @@ namespace Durados
             }
         }
 
+        public string[] AwsRegions
+        {
+            get
+            {
+                if (string.IsNullOrEmpty(AwsRegion))
+                    return new string[0];
+                return AwsRegion.Split(',');
+            }
+        }
+
         public Database Database { get; private set; }
 
-        public AwsCredentials GetAwsCredentials()
+        //public AwsCredentials GetAwsCredentials()
+        //{
+        //    return new AwsCredentials() { AccessKeyID = AccessKeyId, SecretAccessKey = DecryptedSecretAccessKey, Region = AwsRegion.ToString() };
+        //}
+
+        public AwsCredentials[] GetAwsCredentials()
         {
-            return new AwsCredentials() { AccessKeyID = AccessKeyId, SecretAccessKey = DecryptedSecretAccessKey, Region = AwsRegion.ToString() };
+            List<AwsCredentials> list = new List<AwsCredentials>();
+            foreach (string region in AwsRegions)
+            {
+                list.Add(new AwsCredentials() { AccessKeyID = AccessKeyId, SecretAccessKey = DecryptedSecretAccessKey, Region = region });
+            }
+            return list.ToArray();
         }
     }
 

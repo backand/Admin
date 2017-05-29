@@ -5600,7 +5600,7 @@ namespace Durados.Web.Mvc.UI.Helpers
             foreach (Dictionary<string, object> cloudJson in cloudsJson)
             {
                 int cloudId = Convert.ToInt32(cloudJson["id"]);
-                cloudJson["functions"] = GetLambdaList(Maps.Instance.GetMap().Database.Clouds[cloudId]);
+                cloudJson["functions"] = GetLambdaListByRegions(Maps.Instance.GetMap().Database.Clouds[cloudId]);
             }
 
             json.Add("data", cloudsJson);
@@ -5620,13 +5620,24 @@ namespace Durados.Web.Mvc.UI.Helpers
             return cloudsJson.ToArray();
         }
 
-        private Dictionary<string, object>[] GetLambdaList(Cloud cloud)
+        private Dictionary<string, object> GetLambdaListByRegions(Cloud cloud)
         {
+            Dictionary<string, object> regions = new Dictionary<string, object>();
+
             Durados.Workflow.NodeJS nodejs = new Durados.Workflow.NodeJS();
 
-            return nodejs.GetLambdaList(cloud.GetAwsCredentials());
+            Durados.Security.Aws.AwsCredentials[] credentials = cloud.GetAwsCredentials();
+            foreach (Durados.Security.Aws.AwsCredentials credential in credentials)
+            {
+                regions.Add(credential.Region, nodejs.GetLambdaList(credential));
+            }
 
+            //Durados.Security.Aws.AwsCredentials credential = cloud.GetAwsCredentials();
+            //regions.Add(credential.Region, nodejs.GetLambdaList(credential));
+
+            return regions;
         }
+
 
         public LambdaSelectionResult[] Select(LambdaSelection[] selections, BeforeCreateEventHandler beforeCreateCallback, BeforeCreateInDatabaseEventHandler beforeCreateInDatabaseEventHandler, AfterCreateEventHandler afterCreateBeforeCommitCallback, AfterCreateEventHandler afterCreateAfterCommitCallback)
         {
