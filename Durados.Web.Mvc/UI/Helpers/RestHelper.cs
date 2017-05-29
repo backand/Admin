@@ -5629,13 +5629,36 @@ namespace Durados.Web.Mvc.UI.Helpers
             Durados.Security.Aws.AwsCredentials[] credentials = cloud.GetAwsCredentials();
             foreach (Durados.Security.Aws.AwsCredentials credential in credentials)
             {
-                regions.Add(credential.Region, nodejs.GetLambdaList(credential));
+                regions.Add(credential.Region, GetLambdaList(nodejs, credential));
             }
 
             //Durados.Security.Aws.AwsCredentials credential = cloud.GetAwsCredentials();
             //regions.Add(credential.Region, nodejs.GetLambdaList(credential));
 
             return regions;
+        }
+
+        private Dictionary<string, object>[] GetLambdaList(Durados.Workflow.NodeJS nodejs, Durados.Security.Aws.AwsCredentials credential)
+        {
+            var lambdaList = nodejs.GetLambdaList(credential);
+
+            SetSelectedFunctions(lambdaList);
+
+            return lambdaList;
+        }
+
+        private void SetSelectedFunctions(Dictionary<string, object>[] lambdaList)
+        {
+            foreach (var lambdaFunction in lambdaList)
+            {
+                const string ARN = "FunctionArn";
+                const string SELECTED = "selected";
+                if (!lambdaFunction.ContainsKey(ARN))
+                    throw new DuradosException("ORM did not return lambda list with FunctionArn");
+                string arn = lambdaFunction[ARN].ToString();
+                bool selected = (GetRuleByArn(arn) != null);
+                lambdaFunction.Add(SELECTED, selected);
+            }
         }
 
 
@@ -5681,7 +5704,7 @@ namespace Durados.Web.Mvc.UI.Helpers
         
         private void DeleteAction(LambdaSelection selection)
         {
-            Rule rule = GetRuleByName(selection.name);
+            Rule rule = GetRuleByArn(selection);
 
             if (rule == null)
                 throw new LambdaFunctionSelectionNotFound(selection.name);
@@ -5692,14 +5715,22 @@ namespace Durados.Web.Mvc.UI.Helpers
 
         private void CreateAction(LambdaSelection selection, BeforeCreateEventHandler beforeCreateCallback, BeforeCreateInDatabaseEventHandler beforeCreateInDatabaseEventHandler, AfterCreateEventHandler afterCreateBeforeCommitCallback, AfterCreateEventHandler afterCreateAfterCommitCallback)
         {
-            Rule rule = GetRuleByName(selection.name);
+            Rule rule = GetRuleByArn(selection);
 
             if (rule != null)
                 throw new LambdaFunctionSelectionAlreadyExists(selection.name);
 
+            rule = GetRuleByName(selection.name);
+
+            string newName = selection.name;
+            if (rule != null)
+            {
+                newName = GetUniqueName(newName);
+            }
+
             Dictionary<string, object> values = new Dictionary<string, object>();
 
-            values.Add("Name", selection.name);
+            values.Add("Name", newName);
             values.Add("LambdaName", selection.name);
             values.Add("LambdaArn", selection.arn);
             values.Add("CloudSecurity", selection.cloudId);
@@ -5717,10 +5748,32 @@ namespace Durados.Web.Mvc.UI.Helpers
 
         }
 
+        private string GetUniqueName(string newName)
+        {
+            for (int i = 1; i < 1000; i++)
+            {
+                if (GetRuleByName(newName + i) == null)
+                    return newName + i;
+            }
+
+            throw new DuradosException("Over 1000 names");
+        }
+
+        private Rule GetRuleByArn(LambdaSelection selection)
+        {
+            return GetRuleByArn(selection.arn);
+        }
+
+        private Rule GetRuleByArn(string arn)
+        {
+            return functionView.GetRules().Where(r => r.LambdaArn == arn).FirstOrDefault();
+        }
+
         private Rule GetRuleByName(string name)
         {
             return functionView.GetRules().Where(r => r.LambdaName == name).FirstOrDefault();
         }
+
     }
 
     public class GoogleResult
