@@ -396,6 +396,7 @@
     <Compile Include="UI\Helpers\InvalidCronHeadersJsonException.cs" />
     <Compile Include="UI\Helpers\InvalidHttpMethodException.cs" />
     <Compile Include="UI\Helpers\LambdaFunctionSelectionAlreadyExists.cs" />
+    <Compile Include="UI\Helpers\LambdaFunctionSelectionNotContainsArn.cs" />
     <Compile Include="UI\Helpers\LambdaFunctionSelectionNotFound.cs" />
     <Compile Include="UI\Helpers\MailingServiceHelper.cs" />
     <Compile Include="UI\Helpers\MenuHelper.cs" />

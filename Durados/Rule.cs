@@ -263,6 +263,9 @@ namespace Durados
         [Durados.Config.Attributes.ColumnProperty()]
         public int CloudSecurity { get; set; }
 
+        [Durados.Config.Attributes.ColumnProperty(DoNotCopy = true, Description = "A group of views that have a common security configuration")]
+        public int WorkspaceID { get; set; }
+       
     }
 
 

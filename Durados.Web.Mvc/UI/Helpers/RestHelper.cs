@@ -5704,6 +5704,9 @@ namespace Durados.Web.Mvc.UI.Helpers
         
         private void DeleteAction(LambdaSelection selection)
         {
+            if (string.IsNullOrEmpty(selection.arn))
+                throw new LambdaFunctionSelectionNotContainsArn(selection.name);
+
             Rule rule = GetRuleByArn(selection);
 
             if (rule == null)
@@ -5715,6 +5718,9 @@ namespace Durados.Web.Mvc.UI.Helpers
 
         private void CreateAction(LambdaSelection selection, BeforeCreateEventHandler beforeCreateCallback, BeforeCreateInDatabaseEventHandler beforeCreateInDatabaseEventHandler, AfterCreateEventHandler afterCreateBeforeCommitCallback, AfterCreateEventHandler afterCreateAfterCommitCallback)
         {
+            if (string.IsNullOrEmpty(selection.arn))
+                throw new LambdaFunctionSelectionNotContainsArn(selection.name);
+
             Rule rule = GetRuleByArn(selection);
 
             if (rule != null)

@@ -315,13 +315,27 @@ namespace Durados.Web.Mvc
             return !UI.Helpers.SecurityHelper.IsDenied(DenySelectRoles, AllowSelectRoles) || UI.Helpers.SecurityHelper.IsConfigViewForViewOwner(this);
         }
 
+        private string GetAllowSelectRolesForRule(Rule rule)
+        {
+            if (rule.Precedent)
+                return rule.AllowSelectRoles;
+            else if (Database.Workspaces.ContainsKey(rule.WorkspaceID) && Database.Workspaces[rule.WorkspaceID].Name.ToLower() != "admin")
+            {
+                return Database.Workspaces[rule.WorkspaceID].AllowSelectRoles;
+            }
+            else
+            {
+                return AllowSelectRoles;
+            }
+        }
+
         public bool IsRuleAllow(Rule rule)
         {
-            string allowSelectRoles;
-            if (rule.Precedent)
-                allowSelectRoles = rule.AllowSelectRoles;
-            else
-                allowSelectRoles = AllowSelectRoles;
+            string allowSelectRoles = GetAllowSelectRolesForRule(rule);
+            //if (rule.Precedent)
+            //    allowSelectRoles = rule.AllowSelectRoles;
+            //else
+            //    allowSelectRoles = AllowSelectRoles;
 
             return !UI.Helpers.SecurityHelper.IsDenied(null, allowSelectRoles);
         }
