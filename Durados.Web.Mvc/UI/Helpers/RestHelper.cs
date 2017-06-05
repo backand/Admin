@@ -5651,13 +5651,17 @@ namespace Durados.Web.Mvc.UI.Helpers
         {
             foreach (var lambdaFunction in lambdaList)
             {
+                const string FunctionId = "functionId";
                 const string ARN = "FunctionArn";
                 const string SELECTED = "selected";
                 if (!lambdaFunction.ContainsKey(ARN))
                     throw new DuradosException("ORM did not return lambda list with FunctionArn");
                 string arn = lambdaFunction[ARN].ToString();
-                bool selected = (GetRuleByArn(arn) != null);
+                Rule rule = GetRuleByArn(arn);
+                bool selected = (rule != null);
                 lambdaFunction.Add(SELECTED, selected);
+                if (rule != null)
+                    lambdaFunction.Add(FunctionId, rule.ID);
             }
         }
 

@@ -465,7 +465,7 @@ namespace Durados.Workflow
             string responsePayloadString;
             if (responsePayload is IDictionary<string, object>)
             {
-                if (!response.ContainsKey(StackTrace) && logs != null)
+                if (!((IDictionary<string, object>)responsePayload).ContainsKey(StackTrace) && logs != null)
                 {
                     ((IDictionary<string, object>)responsePayload).Add(StackTrace, logs);
                 }
