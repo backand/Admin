@@ -661,6 +661,7 @@ namespace Durados.Workflow
             userProfile.Add("app", view.Database.GetCurrentAppName());
             userProfile.Add("userId", view.Database.GetCurrentUserId());
             userProfile.Add("token", GetUserProfileAuthToken(view));
+            userProfile.Add("anonymousToken", view.Database.GetAnonymousToken().ToString());
             userProfile.Add("info", GetUserProfileInfo(view));
 
 
