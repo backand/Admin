@@ -5585,6 +5585,7 @@ namespace Durados.Web.Mvc.UI.Helpers
     {
         public bool result { get; set; }
         public string error { get; set; }
+        public int functionId { get; set; }
     }
 
     public class LambdaHelper
@@ -5681,17 +5682,19 @@ namespace Durados.Web.Mvc.UI.Helpers
         private LambdaSelectionResult Select(LambdaSelection selection, BeforeCreateEventHandler beforeCreateCallback, BeforeCreateInDatabaseEventHandler beforeCreateInDatabaseEventHandler, AfterCreateEventHandler afterCreateBeforeCommitCallback, AfterCreateEventHandler afterCreateAfterCommitCallback)
         {
             LambdaSelectionResult result = new LambdaSelectionResult() { cloudId = selection.cloudId, name = selection.name };
+            int? id;
             try
             {
                 if (selection.select)
                 {
-                    CreateAction(selection, beforeCreateCallback, beforeCreateInDatabaseEventHandler, afterCreateBeforeCommitCallback, afterCreateAfterCommitCallback);
+                    id = CreateAction(selection, beforeCreateCallback, beforeCreateInDatabaseEventHandler, afterCreateBeforeCommitCallback, afterCreateAfterCommitCallback);
                 }
                 else
                 {
-                    DeleteAction(selection);
+                    id = DeleteAction(selection);
                 }
                 result.result = true;
+                result.functionId = id.Value;
             }
             catch (Exception e)
             {
@@ -5705,8 +5708,8 @@ namespace Durados.Web.Mvc.UI.Helpers
         View ruleView = (View)Maps.Instance.GetMap().GetConfigDatabase().Views["Rule"];
         View functionView = (View)Maps.Instance.GetMap().Database.Views["_root"];
 
-        
-        private void DeleteAction(LambdaSelection selection)
+
+        private int? DeleteAction(LambdaSelection selection)
         {
             if (string.IsNullOrEmpty(selection.arn))
                 throw new LambdaFunctionSelectionNotContainsArn(selection.name);
@@ -5718,9 +5721,11 @@ namespace Durados.Web.Mvc.UI.Helpers
 
             ruleView.Delete(rule.ID.ToString(), null, null, null);
 
+            return rule.ID;
+
         }
 
-        private void CreateAction(LambdaSelection selection, BeforeCreateEventHandler beforeCreateCallback, BeforeCreateInDatabaseEventHandler beforeCreateInDatabaseEventHandler, AfterCreateEventHandler afterCreateBeforeCommitCallback, AfterCreateEventHandler afterCreateAfterCommitCallback)
+        private int? CreateAction(LambdaSelection selection, BeforeCreateEventHandler beforeCreateCallback, BeforeCreateInDatabaseEventHandler beforeCreateInDatabaseEventHandler, AfterCreateEventHandler afterCreateBeforeCommitCallback, AfterCreateEventHandler afterCreateAfterCommitCallback)
         {
             if (string.IsNullOrEmpty(selection.arn))
                 throw new LambdaFunctionSelectionNotContainsArn(selection.name);
@@ -5754,8 +5759,9 @@ namespace Durados.Web.Mvc.UI.Helpers
             values.Add("WhereCondition", "true");
             values.Add("Category", "general");
                 
-            ruleView.Create(values, null, beforeCreateCallback, beforeCreateInDatabaseEventHandler, afterCreateBeforeCommitCallback, afterCreateAfterCommitCallback);
+            var dataRow = ruleView.Create(values, null, beforeCreateCallback, beforeCreateInDatabaseEventHandler, afterCreateBeforeCommitCallback, afterCreateAfterCommitCallback);
 
+            return System.Convert.ToInt32(ruleView.GetPkValue(dataRow));
         }
 
         private string GetUniqueName(string newName)
