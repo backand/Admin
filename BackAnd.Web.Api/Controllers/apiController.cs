@@ -2000,7 +2000,10 @@ namespace BackAnd.Web.Api.Controllers
 
             wfe.PerformActions(this, e.View, TriggerDataAction.AfterDelete, e.Values, e.PrimaryKey, e.PrevRow, Map.Database.ConnectionString, Convert.ToInt32(Map.Database.GetUserID()), ((Durados.Web.Mvc.Database)e.View.Database).GetUserRole(), e.Command, e.SysCommand);
             //wfe.Notifier.Notify((View)e.View, 3, GetUsername(), null, e.PrimaryKey, e.PrevRow, this, null, GetSiteWithoutQueryString(), GetMainSiteWithoutQueryString());
-
+            if (e.View.Name == "durados_Cloud")
+            {
+                RefreshConfigCache();
+            }
         }
 
         #endregion delete callbacks
