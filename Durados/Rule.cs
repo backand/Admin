@@ -17,6 +17,7 @@ namespace Durados
             UseSqlParser = true;
             Code = "function backandCallback(newRow, oldRow, parameters, userProfile) { \n/* Your code here.\nThe function result will be returned to the client as a json. */ \n}";
             Category = "general";
+            WorkspaceID = 0;
         }
 
         public bool ShouldTrigger(Durados.TriggerDataAction dataAction)
