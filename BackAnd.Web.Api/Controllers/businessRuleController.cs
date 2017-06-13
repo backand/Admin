@@ -464,6 +464,8 @@ namespace BackAnd.Web.Api.Controllers
 
         protected override void BeforeCreate(Durados.CreateEventArgs e)
         {
+            HandleFriendlyName(e);
+
             if (IsNodeJSFunction(e))
             {
                 CreateNodeJSFunction(e);
@@ -471,6 +473,43 @@ namespace BackAnd.Web.Api.Controllers
             WriteToAnalytics(e);
 
             base.BeforeCreate(e);
+        }
+
+        const string friendlyNameFieldName = "friendlyName";
+        const string FriendlyNameFieldName = "FriendlyName";
+        private void HandleFriendlyName(Durados.CreateEventArgs e)
+        {
+            string friendlyName = GetFriendlyName(e.Values);
+
+            if (e.View.Name == "Rule")
+            {
+                if (e.Values.ContainsKey(friendlyNameFieldName) && (e.Values[friendlyNameFieldName] == null || e.Values[friendlyNameFieldName].ToString().Equals(string.Empty)))
+                {
+                    e.Values[friendlyNameFieldName] = friendlyName;
+                }
+                else if (e.Values.ContainsKey(FriendlyNameFieldName) && (e.Values[FriendlyNameFieldName] == null || e.Values[FriendlyNameFieldName].ToString().Equals(string.Empty)))
+                {
+                    e.Values[FriendlyNameFieldName] = friendlyName;
+                }
+                else
+                {
+                    e.Values.Add(FriendlyNameFieldName, friendlyName);
+                }
+            }
+            
+        }
+        const string nameFieldName = "name";
+        const string NameFieldName = "Name";
+        
+
+        private string GetFriendlyName(Dictionary<string, object> values)
+        {
+            if (values.ContainsKey(nameFieldName) && values[nameFieldName] != null)
+                return values[nameFieldName].ToString().GetDecamal();
+            else if (values.ContainsKey(NameFieldName) && values[NameFieldName] != null)
+                return values[NameFieldName].ToString().GetDecamal();
+            else
+                return string.Empty;
         }
 
         private void WriteToAnalytics(Durados.EditEventArgs e)

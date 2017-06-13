@@ -1459,7 +1459,7 @@ namespace System
                 }
 
 
-                return d.ToString();
+                return System.Globalization.CultureInfo.CurrentCulture.TextInfo.ToTitleCase(d.ToString());
             }
             catch
             {

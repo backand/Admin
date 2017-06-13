@@ -177,6 +177,7 @@
   <ItemGroup>
     <Content Include="Config\backand.xml" />
     <Content Include="Config\backand.xml.xml" />
+    <Content Include="deployment\helloWorld.js" />
     <Content Include="deployment\jsInfrastructure.js" />
     <Content Include="deployment\accessFilter.js" />
     <Content Include="deployment\socialAuthOverride.js" />

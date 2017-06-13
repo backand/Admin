@@ -430,7 +430,7 @@ namespace BackAnd.Web.Api.Controllers
 
         [Route("verify")]
         [HttpGet]
-        public virtual HttpResponseMessage Verify(string appName, string parameters)
+        public virtual HttpResponseMessage Verify(string appName, string parameters, string redirectUrl = null)
         {
             if (string.IsNullOrEmpty(appName))
                 return Request.CreateResponse(HttpStatusCode.NotFound, "appName cannot be empty");

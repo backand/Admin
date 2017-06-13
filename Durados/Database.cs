@@ -62,7 +62,12 @@ namespace Durados
         public static readonly string CustomValidationActionName = "backandAuthOverride";
         public static readonly string CustomSocialValidationActionName = "socialAuthOverride";
         public static readonly string CustomSocialValidationActionFileName = "socialAuthOverride.js";
+        public static readonly string HelloWorldActionFileName = "helloWorld.js";
+
+        
         public static readonly string CustomAccessFilterActionName = "accessFilter";
+        public static readonly string HelloWorldActionName = "helloWorld";
+        public static readonly string HelloWorldActionFriendlyName = "Hello World";
         public static readonly string CustomAccessFilterActionFileName = "accessFilter.js";
 
         public static readonly string ChangePasswordOverride = "ChangePasswordOverride";

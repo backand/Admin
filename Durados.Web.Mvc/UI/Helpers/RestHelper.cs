@@ -5578,6 +5578,8 @@ namespace Durados.Web.Mvc.UI.Helpers
         public int cloudId { get; set; }
         public string name { get; set; }
         public string arn { get; set; }
+        public string description { get; set; }
+        public string friendlyName { get; set; }
         public bool select { get; set; }
     }
 
@@ -5758,6 +5760,7 @@ namespace Durados.Web.Mvc.UI.Helpers
             values.Add("UseSqlParser", "false");
             values.Add("WhereCondition", "true");
             values.Add("Category", "general");
+            values.Add("Description", selection.description);
                 
             var dataRow = ruleView.Create(values, null, beforeCreateCallback, beforeCreateInDatabaseEventHandler, afterCreateBeforeCommitCallback, afterCreateAfterCommitCallback);
 

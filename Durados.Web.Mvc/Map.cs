@@ -670,6 +670,13 @@ namespace Durados.Web.Mvc
                         Commit();
                     }
 
+                    if (!(this is DuradosMap) && !HasRule("_root", Database.HelloWorldActionName))
+                    {
+                        AddHelloWorld();
+                        Commit();
+                    }
+                    
+
                     //if (!(this is DuradosMap) && !HasRule(Database.ChangePasswordOverride))
                     //{
                     //    AddChangePasswordOverride();
@@ -761,6 +768,11 @@ namespace Durados.Web.Mvc
         public bool HasRule(string ruleName)
         {
             return Database.GetUserView().GetRules().Where(r => r.Name.Equals(ruleName)).Count() > 0;
+        }
+
+        public bool HasRule(string viewName, string ruleName)
+        {
+            return Database.Views[viewName].GetRules().Where(r => r.Name.Equals(ruleName)).Count() > 0;
         }
 
         public Rule GetRule(string ruleName)
@@ -2058,7 +2070,40 @@ namespace Durados.Web.Mvc
             string rulePK = ruleView.GetPkValue(row);
 
         }
+        private void AddFunctionFromFile(string fileName, string actionName, string friendlyName, string description)
+        {
+            string code = Maps.Instance.GetCode(fileName);
 
+            ConfigAccess configAccess = new DataAccess.ConfigAccess();
+            string userViewPK = configAccess.GetViewPK("_root", configDatabase.ConnectionString);
+            View ruleView = (View)configDatabase.Views["Rule"];
+            Dictionary<string, object> values = new Dictionary<string, object>();
+            values.Add("Name", actionName);
+            values.Add("Rules_Parent", userViewPK);
+            values.Add("DataAction", Durados.TriggerDataAction.OnDemand.ToString());
+            values.Add("WorkflowAction", Durados.WorkflowAction.JavaScript.ToString());
+            values.Add("ActionType", Durados.ActionType.Function.ToString());
+            values.Add("Category", "general");
+            values.Add("workspaceID", 0);
+            values.Add("WhereCondition", "true");
+            if (!string.IsNullOrEmpty(friendlyName))
+            {
+                values.Add("FriendlyName", friendlyName);
+
+            }
+
+            if (!string.IsNullOrEmpty(description))
+            {
+                values.Add("Description", description);
+
+            }
+
+            values.Add("Code", code);
+
+            DataRow row = ruleView.Create(values, null, null, null, null, null);
+            string rulePK = ruleView.GetPkValue(row);
+
+        }
 
         private void AddActionFromFile(string fileName, string actionName)
         {
@@ -2073,7 +2118,6 @@ namespace Durados.Web.Mvc
             values.Add("DataAction", Durados.TriggerDataAction.OnDemand.ToString());
             values.Add("WorkflowAction", Durados.WorkflowAction.JavaScript.ToString());
             values.Add("WhereCondition", "true");
-
             values.Add("Code", code);
 
             DataRow row = ruleView.Create(values, null, null, null, null, null);
@@ -2093,7 +2137,11 @@ namespace Durados.Web.Mvc
             
         }
 
-        
+        private void AddHelloWorld()
+        {
+            AddFunctionFromFile(Database.HelloWorldActionFileName, Database.HelloWorldActionName, Database.HelloWorldActionFriendlyName, "This is an example of a server-side JavaScript function");
+
+        }
 
         private void AddChangePasswordOverride()
         {
