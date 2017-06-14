@@ -46,7 +46,10 @@ namespace Durados.Web.Mvc.UI.Helpers.Search
             object id = GetId(row);
             if (EntityType == Durados.EntityType.Action)
             {
-                return new { id = id, name = GetName(row, q), objectId = GetObjectId((int)id), foundAt = Name, snippets = GetSnippets(row, q, snippetLength, highlightTag, tabChars) };
+                var view = GetView((int)id);
+                var objectId = view.ID;
+                var objectName = view.Name;
+                return new { id = id, name = GetName(row, q), objectId = objectId, objectName = objectName, foundAt = Name, snippets = GetSnippets(row, q, snippetLength, highlightTag, tabChars) };
             }
             else
             {
@@ -54,13 +57,13 @@ namespace Durados.Web.Mvc.UI.Helpers.Search
             }
         }
 
-        private object GetObjectId(int actionId)
+        private View GetView(int actionId)
         {
             var ruleAndAction = CronHelper.GetRuleAndAction(actionId);
 
             View view = (View)ruleAndAction["view"];
 
-            return view.ID;
+            return view;
         }
 
         protected virtual string GetName(System.Data.DataRowView row, string q)
