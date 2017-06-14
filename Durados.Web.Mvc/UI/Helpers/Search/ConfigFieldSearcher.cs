@@ -49,6 +49,7 @@ namespace Durados.Web.Mvc.UI.Helpers.Search
                 var view = GetView((int)id);
                 var objectId = view.ID;
                 var objectName = view.Name;
+
                 return new { id = id, name = GetName(row, q), objectId = objectId, objectName = objectName, foundAt = Name, snippets = GetSnippets(row, q, snippetLength, highlightTag, tabChars) };
             }
             else
