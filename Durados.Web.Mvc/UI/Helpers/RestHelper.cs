@@ -5690,10 +5690,12 @@ namespace Durados.Web.Mvc.UI.Helpers
                 if (selection.select)
                 {
                     id = CreateAction(selection, beforeCreateCallback, beforeCreateInDatabaseEventHandler, afterCreateBeforeCommitCallback, afterCreateAfterCommitCallback);
+                    result.select = true;
                 }
                 else
                 {
                     id = DeleteAction(selection);
+                    result.select = false;
                 }
                 result.result = true;
                 result.functionId = id.Value;
@@ -5760,6 +5762,7 @@ namespace Durados.Web.Mvc.UI.Helpers
             values.Add("UseSqlParser", "false");
             values.Add("WhereCondition", "true");
             values.Add("Category", "general");
+            values.Add("WorkspaceID", 0);
             values.Add("Description", selection.description);
                 
             var dataRow = ruleView.Create(values, null, beforeCreateCallback, beforeCreateInDatabaseEventHandler, afterCreateBeforeCommitCallback, afterCreateAfterCommitCallback);

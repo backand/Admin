@@ -51,9 +51,12 @@ namespace Durados.Web.Mvc.Logging
             
             var campaign = new Segment.Model.Dict();
 
-            foreach (string key in data.Keys)
+            if (data != null)
             {
-                campaign.Add(key, data[key]);
+                foreach (string key in data.Keys)
+                {
+                    campaign.Add(key, data[key]);
+                }
             }
 
             return campaign;
@@ -167,9 +170,12 @@ namespace Durados.Web.Mvc.Logging
         private Dict GetPage(Dictionary<string, object> data)
         {
             var page = new Segment.Model.Dict();
-            if (data.ContainsKey("path")) page.Add("path", (string)data["path"]);
-            if (data.ContainsKey("search")) page.Add("search", (string)data["search"]);
-            if (data.ContainsKey("url")) page.Add("url", (string)data["url"]);
+            if (data != null)
+            {
+                if (data.ContainsKey("path")) page.Add("path", (string)data["path"]);
+                if (data.ContainsKey("search")) page.Add("search", (string)data["search"]);
+                if (data.ContainsKey("url")) page.Add("url", (string)data["url"]);
+            }
 
             return page;
         }
