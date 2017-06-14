@@ -76,7 +76,7 @@ namespace Durados.Workflow
 
             if (request.status != 200)
             {
-                throw new NodeJsException(request.responseText);
+                throw new NodeJsException(request.responseText.TrimStart("{}; ".ToCharArray()));
             }
 
             Dictionary<string, object> response = null;
@@ -116,12 +116,12 @@ namespace Durados.Workflow
                     }
                     else
                     {
-                        throw new NodeJsException(request.responseText);
+                        throw new NodeJsException(request.responseText.TrimStart("{}; ".ToCharArray()));
                     }
                 }
                 else
                 {
-                    throw new NodeJsException(request.responseText);
+                    throw new NodeJsException(request.responseText.TrimStart("{}; ".ToCharArray()));
                 }
             }
 
@@ -157,7 +157,7 @@ namespace Durados.Workflow
 
             if (request.status != 200)
             {
-                throw new NodeJsException(request.responseText);
+                throw new NodeJsException(request.responseText.TrimStart("{}; ".ToCharArray()));
             }
 
             Dictionary<string, object>[] response = null;
@@ -192,7 +192,7 @@ namespace Durados.Workflow
 
             if (request.status != 200)
             {
-                throw new NodeJsException(request.responseText);
+                throw new NodeJsException(request.responseText.TrimStart("{}; ".ToCharArray()));
             }
 
             object response = null;
@@ -276,7 +276,7 @@ namespace Durados.Workflow
 
             if (request.status != 200)
             {
-                throw new NodeJsException(request.responseText);
+                throw new NodeJsException(request.responseText.TrimStart("{}; ".ToCharArray()));
             }
 
             Dictionary<string, object> response = null;
@@ -316,12 +316,12 @@ namespace Durados.Workflow
                     }
                     else
                     {
-                        throw new NodeJsException(request.responseText);
+                        throw new NodeJsException(request.responseText.TrimStart("{}; ".ToCharArray()));
                     }
                 }
                 else
                 {
-                    throw new NodeJsException(request.responseText);
+                    throw new NodeJsException(request.responseText.TrimStart("{}; ".ToCharArray()));
                 }
             }
 
@@ -351,7 +351,7 @@ namespace Durados.Workflow
         {
             if (request.status != 200)
             {
-                throw new NodeJsException(request.responseText);
+                throw new NodeJsException(request.responseText.TrimStart("{}; ".ToCharArray()));
             }
 
             Dictionary<string, object> response = null;
@@ -400,7 +400,7 @@ namespace Durados.Workflow
             }
             else
             {
-                throw new NodeJsException(request.responseText);
+                throw new NodeJsException(request.responseText.TrimStart("{}; ".ToCharArray()));
             }
 
             //if (response.ContainsKey(FunctionError))
