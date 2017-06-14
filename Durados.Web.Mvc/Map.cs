@@ -672,8 +672,10 @@ namespace Durados.Web.Mvc
 
                     if (!(this is DuradosMap) && !HasRule("_root", Database.HelloWorldActionName))
                     {
+                        
                         AddHelloWorld();
                         Commit();
+                        
                     }
                     
 
@@ -772,6 +774,12 @@ namespace Durados.Web.Mvc
 
         public bool HasRule(string viewName, string ruleName)
         {
+            ConfigAccess configAccess = new DataAccess.ConfigAccess();
+            string viewPK = configAccess.GetViewPK(viewName, configDatabase.ConnectionString);
+            if (viewPK == null)
+            {
+                return true;
+            }
             return Database.Views[viewName].GetRules().Where(r => r.Name.Equals(ruleName)).Count() > 0;
         }
 
@@ -2075,11 +2083,13 @@ namespace Durados.Web.Mvc
             string code = Maps.Instance.GetCode(fileName);
 
             ConfigAccess configAccess = new DataAccess.ConfigAccess();
-            string userViewPK = configAccess.GetViewPK("_root", configDatabase.ConnectionString);
+            string viewPK = configAccess.GetViewPK("_root", configDatabase.ConnectionString);
+            if (string.IsNullOrEmpty(viewPK))
+                return;
             View ruleView = (View)configDatabase.Views["Rule"];
             Dictionary<string, object> values = new Dictionary<string, object>();
             values.Add("Name", actionName);
-            values.Add("Rules_Parent", userViewPK);
+            values.Add("Rules_Parent", viewPK);
             values.Add("DataAction", Durados.TriggerDataAction.OnDemand.ToString());
             values.Add("WorkflowAction", Durados.WorkflowAction.JavaScript.ToString());
             values.Add("ActionType", Durados.ActionType.Function.ToString());
