@@ -62,6 +62,7 @@
   <ItemGroup>
     <Compile Include="AppLockerGetterTests.cs" />
     <Compile Include="BackandBaseTest.cs" />
+    <Compile Include="DecamalTest.cs" />
     <Compile Include="FarmTest.cs" />
     <Compile Include="MemoryCacheTests.cs" />
     <Compile Include="RestHelperKeysTests.cs" />

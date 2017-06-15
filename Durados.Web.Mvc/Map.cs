@@ -670,13 +670,13 @@ namespace Durados.Web.Mvc
                         Commit();
                     }
 
-                    if (!(this is DuradosMap) && !HasRule("_root", Database.HelloWorldActionName))
-                    {
+                    //if (!(this is DuradosMap) && !HasRule("_root", Database.HelloWorldActionName))
+                    //{
                         
-                        AddHelloWorld();
-                        Commit();
+                    //    AddHelloWorld();
+                    //    Commit();
                         
-                    }
+                    //}
                     
 
                     //if (!(this is DuradosMap) && !HasRule(Database.ChangePasswordOverride))
