@@ -224,6 +224,7 @@
     <Compile Include="Analytics\ReportDataType.cs" />
     <Compile Include="Analytics\ReportParameters.cs" />
     <Compile Include="Aws\AppNameHandler.cs" />
+    <Compile Include="Aws\S3.cs" />
     <Compile Include="Azure\CacheFactory.cs" />
     <Compile Include="Azure\ILargeObjectCachingStamp.cs" />
     <Compile Include="Azure\DuradosStorage.cs" />

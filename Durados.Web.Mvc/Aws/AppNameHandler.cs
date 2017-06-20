@@ -12,6 +12,13 @@ namespace Durados.Web.Mvc.Aws
         private string S3HostingBucketName = System.Configuration.ConfigurationManager.AppSettings["S3Bucket"] ?? "hosting.backand.net";
         private string S3NodeJsBucketName = System.Configuration.ConfigurationManager.AppSettings["NodeJSBucket"] ?? "nodejs.backand.net";
 
+        private S3 s3;
+
+        public AppNameHandler()
+        {
+            s3 = new S3(string.Empty);
+        }
+
         public void Rename(string oldName, string newName)
         {
             HandleS3(oldName, newName);
@@ -37,7 +44,7 @@ namespace Durados.Web.Mvc.Aws
 
         private void ChangeFolderName(string S3StorageBucketName, string oldName, string newName)
         {
-            throw new NotImplementedException();
+            s3.ChangeFolderName(S3StorageBucketName, oldName, newName);
         }
 
         private void HandleHosting(string oldName, string newName)

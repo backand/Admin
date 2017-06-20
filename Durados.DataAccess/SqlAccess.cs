@@ -10016,7 +10016,14 @@ namespace Durados.DataAccess
                     catch { }
                     if (!identicalSystemConnection)
                     {
-                        sysCommand.Connection.Close();
+                        if (sysCommand != null)
+                        {
+                            try
+                            {
+                                sysCommand.Connection.Close();
+                            }
+                            catch { }
+                        }
                     }
                 }
             }
