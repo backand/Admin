@@ -505,9 +505,9 @@ namespace BackAnd.Web.Api.Controllers
         private string GetFriendlyName(Dictionary<string, object> values)
         {
             if (values.ContainsKey(nameFieldName) && values[nameFieldName] != null)
-                return values[nameFieldName].ToString().GetDecamal();
+                return System.Globalization.CultureInfo.CurrentCulture.TextInfo.ToTitleCase(values[nameFieldName].ToString().GetDecamal());
             else if (values.ContainsKey(NameFieldName) && values[NameFieldName] != null)
-                return values[NameFieldName].ToString().GetDecamal();
+                return System.Globalization.CultureInfo.CurrentCulture.TextInfo.ToTitleCase(values[NameFieldName].ToString().GetDecamal());
             else
                 return string.Empty;
         }

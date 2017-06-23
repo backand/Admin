@@ -1461,7 +1461,8 @@ namespace System
                 string ss = d.ToString();
                 ss = ss.Trim('-');
                 ss = string.Join(" ", ss.Split(new char[1]{'-'}));
-                return System.Globalization.CultureInfo.CurrentCulture.TextInfo.ToTitleCase(ss);
+                //return System.Globalization.CultureInfo.CurrentCulture.TextInfo.ToTitleCase(ss);
+                return ss;
             }
             catch
             {
