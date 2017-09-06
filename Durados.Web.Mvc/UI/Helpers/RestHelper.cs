@@ -5626,11 +5626,79 @@ namespace Durados.Web.Mvc.UI.Helpers
         private Dictionary<string, object> GetLambdaListByRegions(Cloud cloud)
         {
             Dictionary<string, object> regions = new Dictionary<string, object>();
+            if(cloud.CloudVendor == CloudVendor.Azure)
+            {
+                object[] funcs = new object[2] ;
+                funcs[0] = new
+                {
+                    id="/subscriptions/SUBSCRIPTION_ID/resourceGroups/RESOURCE_GROUP_NAME/providers/Microsoft.Web/sites/FUNCTION_APP_NAME/functions/FUNCTION_NAME",
+                    name="serverlessdemo/unittesthttp2",
+                    type="Microsoft.Web/sites/functions",
+                    location="West US",
+                    properties= new {  
+                        name = "unittesthttp2",
+                        function_app_id="/subscriptions/SUBSCRIPTION_ID/resourceGroups/RESOURCE_GROUP_NAME/providers/Microsoft.Web/sites/FUNCTION_APP_NAME",
+                        script_root_path_href="https://FUNCTION_APP_NAME.scm.azurewebsites.net/api/vfs/site/wwwroot/FUNCTION_NAME/",
+                        script_href="https://FUNCTION_APP_NAME.scm.azurewebsites.net/api/vfs/site/wwwroot/FUNCTION_NAME/index.js",
+                        config_href="https://FUNCTION_APP_NAME.scm.azurewebsites.net/api/vfs/site/wwwroot/FUNCTION_NAME/function.json",
+                        test_data_href="https://FUNCTION_APP_NAME.scm.azurewebsites.net/api/vfs/data/functions/sampledata/FUNCTION_NAME.dat",
+                        secrets_file_href="https://FUNCTION_APP_NAME.scm.azurewebsites.net/api/vfs/data/functions/secrets/FUNCTION_NAME.json",
+                        href="https://FUNCTION_APP_NAME.scm.azurewebsites.net/api/functions/FUNCTION_NAME",
+                        config= new {  
+                            bindings=new List<object>()
+                                //{
+                                //    type="http",
+                                //    direction="in",
+                                //    name="req"
+                                //}
+                            
+                        },
+                        files = "null",
+                        test_data="",
+                        selected = false
+                    }
+                };
+                funcs[1] = new
+               {
+                   id = "/subscriptions/SUBSCRIPTION_ID/resourceGroups/RESOURCE_GROUP_NAME/providers/Microsoft.Web/sites/FUNCTION_APP_NAME/functions/FUNCTION_NAME",
+                   name = "serverlessdemo/unittesthttp2",
+                   type = "Microsoft.Web/sites/functions",
+                   location = "West US",
+                   properties = new
+                   {
+                       name = "unittesthttp2",
+                       function_app_id = "/subscriptions/SUBSCRIPTION_ID/resourceGroups/RESOURCE_GROUP_NAME/providers/Microsoft.Web/sites/FUNCTION_APP_NAME",
+                       script_root_path_href = "https://FUNCTION_APP_NAME.scm.azurewebsites.net/api/vfs/site/wwwroot/FUNCTION_NAME/",
+                       script_href = "https://FUNCTION_APP_NAME.scm.azurewebsites.net/api/vfs/site/wwwroot/FUNCTION_NAME/index.js",
+                       config_href = "https://FUNCTION_APP_NAME.scm.azurewebsites.net/api/vfs/site/wwwroot/FUNCTION_NAME/function.json",
+                       test_data_href = "https://FUNCTION_APP_NAME.scm.azurewebsites.net/api/vfs/data/functions/sampledata/FUNCTION_NAME.dat",
+                       secrets_file_href = "https://FUNCTION_APP_NAME.scm.azurewebsites.net/api/vfs/data/functions/secrets/FUNCTION_NAME.json",
+                       href = "https://FUNCTION_APP_NAME.scm.azurewebsites.net/api/functions/FUNCTION_NAME",
+                       config = new
+                       {
+                           bindings = new List<object>()
+                           //{
+                           //    type="http",
+                           //    direction="in",
+                           //    name="req"
+                           //}
 
+                       },
+                       files = "null",
+                       test_data = "",
+                       selected = false
+                   }
+               };
+
+
+                    regions.Add("general",funcs);
+                  return regions;
+            }
+                 
             Durados.Workflow.NodeJS nodejs = new Durados.Workflow.NodeJS();
 
-            Durados.Security.Aws.AwsCredentials[] credentials = cloud.GetAwsCredentials();
-            foreach (Durados.Security.Aws.AwsCredentials credential in credentials)
+            Durados.Security.Cloud.ICloudCredentials[] credentials = cloud.GetCloudCredentials();
+            foreach (Durados.Security.Cloud.ICloudCredentials credential in credentials)
             {
                 regions.Add(credential.Region, GetLambdaList(nodejs, credential));
             }
@@ -5641,7 +5709,7 @@ namespace Durados.Web.Mvc.UI.Helpers
             return regions;
         }
 
-        private Dictionary<string, object>[] GetLambdaList(Durados.Workflow.NodeJS nodejs, Durados.Security.Aws.AwsCredentials credential)
+        private Dictionary<string, object>[] GetLambdaList(Durados.Workflow.NodeJS nodejs, Durados.Security.Cloud.ICloudCredentials credential)
         {
             var lambdaList = nodejs.GetLambdaList(credential);
 

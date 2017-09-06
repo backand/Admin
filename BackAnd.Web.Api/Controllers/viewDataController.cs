@@ -927,6 +927,10 @@ namespace BackAnd.Web.Api.Controllers
                     }
                 }
             }
+            else if (e.View.Name.Equals(Durados.Database.CloudViewName))
+            {
+                // validate account credentials
+            }
             base.BeforeEdit(e);
         }
 

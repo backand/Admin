@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Durados.Security.Aws
+namespace Durados.Security.Cloud
 {
-    public interface IAwsCredentials
+    public interface ICloudCredentials
     {
         string AccessKeyID { get; set; }
 

@@ -3783,12 +3783,8 @@ namespace Durados.Web.Mvc
             foreach (System.Data.DataRowView row in dataView)
             {
                 int id = (int)row["Id"];
-                string accessKeyId = row.Row.IsNull("AccessKeyId") ? null : (string)row["AccessKeyId"];
-                string awsRegion = row.Row.IsNull("AwsRegion") ? null : (string)row["AwsRegion"]; 
-                CloudVendor cloudVendor = row.Row.IsNull("CloudVendor") ? CloudVendor.AWS : (CloudVendor)Enum.Parse(typeof(CloudVendor), (string)row["CloudVendor"]);
-                string encryptedSecretAccessKey = row.Row.IsNull("EncryptedSecretAccessKey") ? null : (string)row["EncryptedSecretAccessKey"];
-                string name = row.Row.IsNull("Name") ? null : (string)row["Name"]; 
-                Database.Clouds.Add(id, new Cloud(Database) { Id = id, AccessKeyId = accessKeyId, AwsRegion = awsRegion, CloudVendor = cloudVendor, EncryptedSecretAccessKey = encryptedSecretAccessKey, Name = name });
+                Durados.Cloud cloud = CloudFactory.GetCloud(row, id, Database);
+                Database.Clouds.Add(id, cloud);
             }
         }
 

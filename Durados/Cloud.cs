@@ -1,4 +1,4 @@
-﻿using Durados.Security.Aws;
+﻿using Durados.Security.Cloud;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -20,9 +20,9 @@ namespace Durados
 
         public CloudVendor CloudVendor { get; set; }
 
-        public string AwsRegion { get; set; }
+        public string Region { get; set; }
 
-        public string AccessKeyId { get; set; }
+        public virtual string AccessKeyId { get; set; }
 
         public string EncryptedSecretAccessKey { get; set; }
 
@@ -41,13 +41,13 @@ namespace Durados
             }
         }
 
-        public string[] AwsRegions
+        public string[] Regions
         {
             get
             {
-                if (string.IsNullOrEmpty(AwsRegion))
+                if (string.IsNullOrEmpty(Region))
                     return new string[0];
-                return AwsRegion.Split(new char[1] { ',' }, StringSplitOptions.RemoveEmptyEntries);
+                return Region.Split(new char[1] { ',' }, StringSplitOptions.RemoveEmptyEntries);
             }
         }
 
@@ -58,19 +58,49 @@ namespace Durados
         //    return new AwsCredentials() { AccessKeyID = AccessKeyId, SecretAccessKey = DecryptedSecretAccessKey, Region = AwsRegion.ToString() };
         //}
 
-        public AwsCredentials[] GetAwsCredentials()
+        public virtual ICloudCredentials[] GetCloudCredentials()
         {
             List<AwsCredentials> list = new List<AwsCredentials>();
-            foreach (string region in AwsRegions)
+            foreach (string region in Regions)
             {
                 list.Add(new AwsCredentials() { AccessKeyID = AccessKeyId, SecretAccessKey = DecryptedSecretAccessKey, Region = region });
             }
             return list.ToArray();
         }
     }
+    public class AzureCloud : Cloud
+    {
+        public override string AccessKeyId {
+        
+        get{ return "aaaaa";}
+       // set{AccessKeyId = value;}
+        }
+    
+        public AzureCloud(Database database)
+            : base(database)
+        {
+             
+         }
+         
+        public override ICloudCredentials[] GetCloudCredentials()
+        {
+            List<ICloudCredentials> list = new List<ICloudCredentials>();
+            foreach (string region in Regions)
+            {
+                list.Add(new AzureCredentials() { AccessKeyID = AccessKeyId, SecretAccessKey = DecryptedSecretAccessKey });
+            }
+            return list.ToArray();
+        }
+
+        
+   
+       
+
+    }
 
     public enum CloudVendor
     {
         AWS
+        ,Azure
     }
 }

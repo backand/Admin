@@ -41,7 +41,7 @@ namespace Durados.Workflow
             return values.ContainsKey("{{$$debug$$}}") || System.Web.HttpContext.Current.Request.QueryString["$$debug$$"] == "true"; ;
         }
 
-        public virtual void ExecuteOld(object controller, Dictionary<string, Parameter> parameters, View view, Dictionary<string, object> values, DataRow prevRow, string pk, string connectionString, int currentUsetId, string currentUserRole, IDbCommand command, IDbCommand sysCommand, string actionName, string arn, Durados.Security.Aws.IAwsCredentials awsCredentials)
+        public virtual void ExecuteOld(object controller, Dictionary<string, Parameter> parameters, View view, Dictionary<string, object> values, DataRow prevRow, string pk, string connectionString, int currentUsetId, string currentUserRole, IDbCommand command, IDbCommand sysCommand, string actionName, string arn, Durados.Security.Cloud.ICloudCredentials awsCredentials)
         {
             const string Payload = "Payload";
             const string ErrorMessage = "errorMessage";
@@ -139,16 +139,16 @@ namespace Durados.Workflow
             }
         }
 
-        public virtual Dictionary<string, object>[] GetLambdaList(Durados.Security.Aws.IAwsCredentials awsCredentials)
+        public virtual Dictionary<string, object>[] GetLambdaList(Durados.Security.Cloud.ICloudCredentials cloudCredentials)
         {
             string url = BaseUrl + "/getLambdaList";
             XMLHttpRequest request = new XMLHttpRequest();
             request.open("POST", url, false);
             Dictionary<string, object> data = new Dictionary<string, object>();
 
-            data.Add("awsRegion", awsCredentials.Region);
-            data.Add("accessKeyId", awsCredentials.AccessKeyID);
-            data.Add("secretAccessKey", awsCredentials.SecretAccessKey);
+            data.Add("awsRegion", cloudCredentials.Region);
+            data.Add("accessKeyId", cloudCredentials.AccessKeyID);
+            data.Add("secretAccessKey", cloudCredentials.SecretAccessKey);
             
             request.setRequestHeader("content-type", "application/json");
 
@@ -173,7 +173,7 @@ namespace Durados.Workflow
             return response;
         }
 
-        public virtual object Download(Durados.Security.Aws.IAwsCredentials awsCredentials, string lambdaFunctionName)
+        public virtual object Download(Durados.Security.Cloud.ICloudCredentials awsCredentials, string lambdaFunctionName)
         {
             string url = BaseUrl + "/downloadLambda";
             XMLHttpRequest request = new XMLHttpRequest();
@@ -209,7 +209,7 @@ namespace Durados.Workflow
         }
 
         
-        public virtual void Execute(object controller, Dictionary<string, Parameter> parameters, View view, Dictionary<string, object> values, DataRow prevRow, string pk, string connectionString, int currentUserId, string currentUserRole, IDbCommand command, IDbCommand sysCommand, string actionName, string arn, Durados.Security.Aws.IAwsCredentials awsCredentials, bool isLambda)
+        public virtual void Execute(object controller, Dictionary<string, Parameter> parameters, View view, Dictionary<string, object> values, DataRow prevRow, string pk, string connectionString, int currentUserId, string currentUserRole, IDbCommand command, IDbCommand sysCommand, string actionName, string arn, Durados.Security.Cloud.ICloudCredentials awsCredentials, bool isLambda)
         {
             
             bool isDebug = IsDebug(values);

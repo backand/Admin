@@ -322,6 +322,7 @@ namespace BackAnd.Web.Api.Controllers
     public class apiController : ApiController, IHasMap, Durados.Data.IData
     {
         protected const string JsonNull = "\"null\"";
+        public const string CloudProviderPropertyName = "cloudProvider";
         //
         // GET: /v1/
         protected Map map = null;
@@ -1049,7 +1050,10 @@ namespace BackAnd.Web.Api.Controllers
                 e.History = GetNewHistory();
                 e.UserId = currentUserId;
             }
-
+            if (e.View.Name.Equals(Durados.Database.CloudViewName))
+            {
+                //validate credentials
+            }
             CreateWorkflowEngine().PerformActions(this, e.View, TriggerDataAction.BeforeCreate, e.Values, e.PrimaryKey, null, Map.Database.ConnectionString, currentUserId, currentUserRole, e.Command, e.SysCommand);
         }
 

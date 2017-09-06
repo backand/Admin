@@ -105,6 +105,10 @@ namespace BackAnd.Web.Api.Controllers
                         categories.Add(category);
                     }
                 }
+                if(rule.ContainsKey("actionType")  && rule["actionType"] != null &&  rule["actionType"].ToString() == Durados.ActionType.Function.ToString() && !rule.ContainsKey(CloudProviderPropertyName))
+                {
+                    rule.Add(CloudProviderPropertyName, GetCloudProviderName(rule));
+                }
             }
 
             if (!IsAdmin())
@@ -133,6 +137,13 @@ namespace BackAnd.Web.Api.Controllers
 
             
             relatedObjects.Add("categories", categories.ToArray());
+        }
+
+        private object GetCloudProviderName(Dictionary<string, object> rule)
+        {
+            if (rule.ContainsKey("lambdaArn") && rule["lambdaArn"] != null && rule["lambdaArn"] is string && !rule["lambdaArn"].ToString().Contains(":aws:"))
+                return Durados.CloudVendor.Azure.ToString();
+            return Durados.CloudVendor.AWS.ToString();
         }
 
         private void RemoveNotAllowedRules(Dictionary<string, object> items)
