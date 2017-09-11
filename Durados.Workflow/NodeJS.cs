@@ -139,17 +139,15 @@ namespace Durados.Workflow
             }
         }
 
-        public virtual Dictionary<string, object>[] GetLambdaList(Durados.Security.Cloud.ICloudCredentials cloudCredentials)
+        public virtual Dictionary<string, Dictionary<string, object>[]> GetLambdaList(Durados.Security.Cloud.ICloudCredentials cloudCredentials)
         {
-            string url = BaseUrl + "/getLambdaList";
+            string url = BaseUrl + "/getFunctionsList";
             XMLHttpRequest request = new XMLHttpRequest();
             request.open("POST", url, false);
             Dictionary<string, object> data = new Dictionary<string, object>();
+            data.Add("credentials", cloudCredentials.GetCredentials());
+            data.Add("cloudProvider", cloudCredentials.GetProvider());
 
-            data.Add("awsRegion", cloudCredentials.Region);
-            data.Add("accessKeyId", cloudCredentials.AccessKeyID);
-            data.Add("secretAccessKey", cloudCredentials.SecretAccessKey);
-            
             request.setRequestHeader("content-type", "application/json");
 
             System.Web.Script.Serialization.JavaScriptSerializer jss = new System.Web.Script.Serialization.JavaScriptSerializer();
@@ -160,10 +158,10 @@ namespace Durados.Workflow
                 throw new NodeJsException(request.responseText.TrimStart("{}; ".ToCharArray()));
             }
 
-            Dictionary<string, object>[] response = null;
+            Dictionary<string,Dictionary<string, object>[]> response = null;
             try
             {
-                response = jss.Deserialize<Dictionary<string, object>[]>(request.responseText);
+                response = jss.Deserialize<Dictionary<string, Dictionary<string, object>[]>>(request.responseText);
             }
             catch (Exception exception)
             {
@@ -173,16 +171,18 @@ namespace Durados.Workflow
             return response;
         }
 
-        public virtual object Download(Durados.Security.Cloud.ICloudCredentials awsCredentials, string lambdaFunctionName)
+        public virtual object Download(Durados.Security.Cloud.ICloudCredentials cloudCredentials, string lambdaFunctionName)
         {
             string url = BaseUrl + "/downloadLambda";
             XMLHttpRequest request = new XMLHttpRequest();
             request.open("POST", url, false);
             Dictionary<string, object> data = new Dictionary<string, object>();
+            data.Add("credentials",cloudCredentials.GetCredentials());
+            data.Add("cloudProvider", cloudCredentials.GetProvider() );
 
-            data.Add("awsRegion", awsCredentials.Region);
-            data.Add("accessKeyId", awsCredentials.AccessKeyID);
-            data.Add("secretAccessKey", awsCredentials.SecretAccessKey);
+            //data.Add("awsRegion", awsCredentials.Region);
+            //data.Add("accessKeyId", awsCredentials.AccessKeyID);
+            //data.Add("secretAccessKey", awsCredentials.SecretAccessKey);
             data.Add("functionName", lambdaFunctionName);
 
             request.setRequestHeader("content-type", "application/json");
@@ -217,7 +217,7 @@ namespace Durados.Workflow
             string url = BaseUrl + "/invokeLambda";
             XMLHttpRequest request = new XMLHttpRequest();
             request.open("POST", url, false);
-            Dictionary<string, object> data = new Dictionary<string, object>();
+            Dictionary<string, object> data = awsCredentials.GetCredentials();
 
             Dictionary<string, object> payload = GetCallLambdaPayload(controller, parameters, view, values, prevRow, pk, connectionString, currentUserId, currentUserRole, command);
 
@@ -236,9 +236,9 @@ namespace Durados.Workflow
                 }
             }
 
-            data.Add("awsRegion", awsCredentials.Region);
-            data.Add("accessKeyId", awsCredentials.AccessKeyID);
-            data.Add("secretAccessKey", awsCredentials.SecretAccessKey);
+            //data.Add("awsRegion", awsCredentials.Region);
+            //data.Add("accessKeyId", awsCredentials.AccessKeyID);
+            //data.Add("secretAccessKey", awsCredentials.SecretAccessKey);
             data.Add("functionArn", functionArn);
             data.Add("payload", payload);
             Guid requestId = Guid.NewGuid();

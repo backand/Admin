@@ -8,10 +8,12 @@ namespace Durados.Security.Cloud
 {
     public interface ICloudCredentials
     {
-        string AccessKeyID { get; set; }
+        ICloudForCreds Cloud { get; set; }
 
-        string SecretAccessKey { get; set; }
+        Dictionary<string, object> GetCredentials();
 
         string Region { get; set; }
+
+        string GetProvider();
     }
 }

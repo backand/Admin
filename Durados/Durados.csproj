@@ -152,7 +152,7 @@
     </Compile>
     <Compile Include="Page.cs" />
     <Compile Include="Security\Aws\AwsCredentials.cs" />
-    <Compile Include="Security\Aws\IAwsCredentials.cs" />
+    <Compile Include="Security\ICloudCredentials.cs" />
     <Compile Include="Security\Azure\AzureCredentials.cs" />
     <Compile Include="SmartRun\RunWithRetry.cs" />
     <Compile Include="Security\Ssh\ISession.cs" />

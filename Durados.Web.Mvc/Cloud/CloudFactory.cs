@@ -7,7 +7,7 @@ using Durados;
 
 namespace Durados.Web.Mvc
 {
-    class CloudFactory
+    public class CloudFactory
     {
         public static  Durados.Cloud GetCloud(System.Data.DataRowView row, int id, Database Database )
         {
@@ -20,7 +20,17 @@ namespace Durados.Web.Mvc
             {
                
                 case CloudVendor.Azure:
-                    return new AzureCloud(Database) { Id = id, AccessKeyId = accessKeyId, Region = awsRegion, CloudVendor = cloudVendor, EncryptedSecretAccessKey = encryptedSecretAccessKey, Name = name };
+                    {
+                        string encryptedPassword = row.Row.IsNull("Password") ? null : (string)row["Password"];
+                        string tenant = row.Row.IsNull("tenant") ? null : (string)row["tenant"];
+                        string appId = row.Row.IsNull("appId") ? null : (string)row["appId"];
+                        string subscriptionId = row.Row.IsNull("subscriptionId") ? null : (string)row["subscriptionId"];
+                        Cloud cloud = new Cloud(Database) { Id = id, AccessKeyId = accessKeyId, Region = awsRegion, CloudVendor = cloudVendor, EncryptedSecretAccessKey = encryptedSecretAccessKey, Name = name };
+                        cloud.provider = new AzureCloud(cloud) { AppId = appId, SubscriptionId= subscriptionId, EncryptedPassword=encryptedPassword, tenant= tenant};
+                       
+                        return cloud;
+
+                    }
                     
                 default:
                     return new Cloud(Database) { Id = id, AccessKeyId = accessKeyId, Region = awsRegion, CloudVendor = cloudVendor, EncryptedSecretAccessKey = encryptedSecretAccessKey, Name = name };

@@ -1061,11 +1061,11 @@ namespace BackAnd.Web.Api.Controllers
         {
             foreach (Field field in view.GetSysEncryptedFields())
             {
-                if (values.ContainsKey(field.JsonName))
+                if (values.ContainsKey(field.JsonName) && !string.IsNullOrEmpty(values[field.JsonName].ToString()))
                 {
                     values[field.JsonName] = map.Encrypt(values[field.JsonName].ToString());
                 }
-                else if (values.ContainsKey(field.Name))
+                else if (values.ContainsKey(field.Name) && !string.IsNullOrEmpty(values[field.Name].ToString()))
                 {
                     values[field.Name] = map.Encrypt(values[field.Name].ToString());
                 }

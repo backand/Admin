@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Durados
 {
-    public class Cloud
+    public class Cloud : ICloudProvider, ICloudForCreds
     {
         public Cloud(Database database)
         {
@@ -22,7 +22,7 @@ namespace Durados
 
         public string Region { get; set; }
 
-        public virtual string AccessKeyId { get; set; }
+        public string AccessKeyId { get; set; }
 
         public string EncryptedSecretAccessKey { get; set; }
 
@@ -53,54 +53,162 @@ namespace Durados
 
         public Database Database { get; private set; }
 
+        public ICloudProvider provider = null;
+
         //public AwsCredentials GetAwsCredentials()
         //{
         //    return new AwsCredentials() { AccessKeyID = AccessKeyId, SecretAccessKey = DecryptedSecretAccessKey, Region = AwsRegion.ToString() };
         //}
 
-        public virtual ICloudCredentials[] GetCloudCredentials()
+        public ICloudCredentials[] GetCloudCredentials()
         {
+            if (provider != null)
+                return provider.GetCloudCredentials();
             List<AwsCredentials> list = new List<AwsCredentials>();
             foreach (string region in Regions)
             {
-                list.Add(new AwsCredentials() { AccessKeyID = AccessKeyId, SecretAccessKey = DecryptedSecretAccessKey, Region = region });
+                list.Add(new AwsCredentials() { AccessKeyID = AccessKeyId, SecretAccessKey = DecryptedSecretAccessKey, Region = region, Cloud = (ICloudForCreds)this });
             }
             return list.ToArray();
         }
-    }
-    public class AzureCloud : Cloud
-    {
-        public override string AccessKeyId {
-        
-        get{ return "aaaaa";}
-       // set{AccessKeyId = value;}
-        }
-    
-        public AzureCloud(Database database)
-            : base(database)
+
+        public string GetCloudDescriptor()
         {
-             
-         }
-         
-        public override ICloudCredentials[] GetCloudCredentials()
+
+            if (provider != null)
+                return provider.GetCloudDescriptor();
+            return AccessKeyId;
+
+
+        }
+
+
+        public void SetSelectedFunctions(Dictionary<string, Dictionary<string, object>[]>.ValueCollection valueCollection, View functionView)
+        {
+            if (provider != null)
+            {
+                provider.SetSelectedFunctions(valueCollection, functionView);
+                return;
+            }
+            foreach (var lambdaList in valueCollection)
+            {
+                foreach (var lambdaFunction in lambdaList)
+                {
+                    const string FunctionId = "functionId";
+                    const string ARN = "FunctionArn";
+                    const string SELECTED = "selected";
+                    if (!lambdaFunction.ContainsKey(ARN))
+                        throw new DuradosException("ORM did not return lambda list with FunctionArn");
+                    string arn = lambdaFunction[ARN].ToString();
+                    Rule rule = GetRuleByArn(arn, functionView);
+                    bool selected = (rule != null);
+                    lambdaFunction.Add(SELECTED, selected);
+                    if (rule != null)
+                        lambdaFunction.Add(FunctionId, rule.ID);
+                }
+            }
+        }
+
+        private Rule GetRuleByArn(string arn, View functionView)
+        {
+            return functionView.GetRules().Where(r => r.LambdaArn == arn).FirstOrDefault();
+        }
+
+    }
+    public class AzureCloud : ICloudProvider, ICloudForCreds
+    {
+        public AzureCloud(Cloud cloud)
+        {
+            parent = cloud;
+        }
+        public string GetCloudDescriptor()
+        {
+            return AppId;
+
+        }
+
+        public string SubscriptionId { get; set; }
+        public string AppId { get; set; }
+
+
+        public string EncryptedPassword { get; set; }
+
+        private string decryptedPassword = null;
+
+        public string DecryptedPassword
+        {
+            get
+            {
+                if (decryptedPassword == null)
+                {
+                    decryptedPassword = parent.Database.DecryptKey(EncryptedPassword);
+                }
+
+                return decryptedPassword;
+            }
+        }
+
+        public string tenant { get; set; }
+
+        Cloud parent = null;
+
+
+        public ICloudCredentials[] GetCloudCredentials()
         {
             List<ICloudCredentials> list = new List<ICloudCredentials>();
-            foreach (string region in Regions)
-            {
-                list.Add(new AzureCredentials() { AccessKeyID = AccessKeyId, SecretAccessKey = DecryptedSecretAccessKey });
-            }
+
+            list.Add(new AzureCredentials() { tenant = tenant, SubscriptionId = SubscriptionId, AppId = AppId, Password = DecryptedPassword, Cloud = this });
+
             return list.ToArray();
         }
 
-        
-   
-       
+
+
+
+        public void SetSelectedFunctions(Dictionary<string, Dictionary<string, object>[]>.ValueCollection valueCollection, View functionView)
+        {
+            foreach (var lambdaList in valueCollection)
+            {
+                foreach (var lambdaFunction in lambdaList)
+                {
+                    const string FunctionId = "functionId";
+                    const string ARN = "name";
+
+                    const string SELECTED = "selected";
+                    if (!lambdaFunction.ContainsKey(ARN))
+                        throw new DuradosException("ORM did not return lambda list with Function name");
+                    string arn = lambdaFunction[ARN].ToString();
+                    Rule rule = GetRuleByName(arn, functionView);
+                    bool selected = (rule != null);
+                    lambdaFunction.Add(SELECTED, selected);
+                    if (rule != null)
+                        lambdaFunction.Add(FunctionId, rule.ID);
+                }
+            }
+        }
+
+        private Rule GetRuleByName(string name, View functionView)
+        {
+            return functionView.GetRules().Where(r => r.LambdaName == name).FirstOrDefault();
+        }
+    }
+
+    public interface ICloudProvider
+    {
+        string GetCloudDescriptor();
+        ICloudCredentials[] GetCloudCredentials();
+        void SetSelectedFunctions(Dictionary<string, Dictionary<string, object>[]>.ValueCollection valueCollection, View functionView);
+
 
     }
 
+    public interface ICloudForCreds
+    {
+        void SetSelectedFunctions(Dictionary<string, Dictionary<string, object>[]>.ValueCollection valueCollection, View functionView);
+    }
     public enum CloudVendor
     {
         AWS
-        ,Azure
+        , Azure
     }
 }

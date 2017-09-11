@@ -3000,6 +3000,17 @@ namespace Durados.Web.Mvc
             encryptedSecretAccessKeyField.SysEncrypted = true;
             encryptedSecretAccessKeyField.HideInEdit = true;
             encryptedSecretAccessKeyField.HideInTable = true;
+            encryptedSecretAccessKeyField.Required = false;
+            ColumnField accessKeyIdField = cloudView.Fields["AccessKeyId"] as ColumnField;
+            accessKeyIdField.Required = false;
+            ColumnField awsRegionField = cloudView.Fields["AwsRegion"] as ColumnField;
+            awsRegionField.Required = false;
+            ColumnField passwordField = cloudView.Fields["password"] as ColumnField;
+            passwordField.SysEncrypted = true;
+            passwordField.HideInEdit = true;
+            passwordField.HideInTable = true;
+
+            
 
             db.Views["durados_Cloud"].SystemView = true;
         }

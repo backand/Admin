@@ -139,7 +139,7 @@ namespace BackAnd.Web.Api.Controllers
             relatedObjects.Add("categories", categories.ToArray());
         }
 
-        private object GetCloudProviderName(Dictionary<string, object> rule)
+        private string GetCloudProviderName(Dictionary<string, object> rule)
         {
             if (rule.ContainsKey("lambdaArn") && rule["lambdaArn"] != null && rule["lambdaArn"] is string && !rule["lambdaArn"].ToString().Contains(":aws:"))
                 return Durados.CloudVendor.Azure.ToString();
@@ -798,6 +798,7 @@ namespace BackAnd.Web.Api.Controllers
             }
 
             string actionName = e.Values[Name].ToString();
+            string cloudId = GetCloudProviderName(null);
             if (fileName == null)
             {
                 fileName = actionName + ".zip";

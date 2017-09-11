@@ -5603,7 +5603,7 @@ namespace Durados.Web.Mvc.UI.Helpers
             foreach (Dictionary<string, object> cloudJson in cloudsJson)
             {
                 int cloudId = Convert.ToInt32(cloudJson["id"]);
-                cloudJson["functions"] = GetLambdaListByRegions(Maps.Instance.GetMap().Database.Clouds[cloudId]);
+                cloudJson["functions"] = GetLambdaListByGroups(Maps.Instance.GetMap().Database.Clouds[cloudId]);
             }
 
             json.Add("data", cloudsJson);
@@ -5617,108 +5617,75 @@ namespace Durados.Web.Mvc.UI.Helpers
             
             foreach (Cloud cloud in Maps.Instance.GetMap().Database.Clouds.Values)
             {
-                cloudsJson.Add(new Dictionary<string, object>() { { "id", cloud.Id }, { "name", cloud.Name }, { "accessKeyId", cloud.AccessKeyId }, { "functions", null } });
+                cloudsJson.Add(new Dictionary<string, object>() { { "id", cloud.Id }, { "name", cloud.Name }, { "accessKeyId", cloud.GetCloudDescriptor() }, { "cloudVendor", cloud.CloudVendor.ToString() }, { "functions", null } });
             }
 
             return cloudsJson.ToArray();
         }
 
-        private Dictionary<string, object> GetLambdaListByRegions(Cloud cloud)
+        private Dictionary<string, object> GetLambdaListByGroups(Cloud cloud)
         {
-            Dictionary<string, object> regions = new Dictionary<string, object>();
-            if(cloud.CloudVendor == CloudVendor.Azure)
-            {
-                object[] funcs = new object[2] ;
-                funcs[0] = new
-                {
-                    id="/subscriptions/SUBSCRIPTION_ID/resourceGroups/RESOURCE_GROUP_NAME/providers/Microsoft.Web/sites/FUNCTION_APP_NAME/functions/FUNCTION_NAME",
-                    name="serverlessdemo/unittesthttp2",
-                    type="Microsoft.Web/sites/functions",
-                    location="West US",
-                    properties= new {  
-                        name = "unittesthttp2",
-                        function_app_id="/subscriptions/SUBSCRIPTION_ID/resourceGroups/RESOURCE_GROUP_NAME/providers/Microsoft.Web/sites/FUNCTION_APP_NAME",
-                        script_root_path_href="https://FUNCTION_APP_NAME.scm.azurewebsites.net/api/vfs/site/wwwroot/FUNCTION_NAME/",
-                        script_href="https://FUNCTION_APP_NAME.scm.azurewebsites.net/api/vfs/site/wwwroot/FUNCTION_NAME/index.js",
-                        config_href="https://FUNCTION_APP_NAME.scm.azurewebsites.net/api/vfs/site/wwwroot/FUNCTION_NAME/function.json",
-                        test_data_href="https://FUNCTION_APP_NAME.scm.azurewebsites.net/api/vfs/data/functions/sampledata/FUNCTION_NAME.dat",
-                        secrets_file_href="https://FUNCTION_APP_NAME.scm.azurewebsites.net/api/vfs/data/functions/secrets/FUNCTION_NAME.json",
-                        href="https://FUNCTION_APP_NAME.scm.azurewebsites.net/api/functions/FUNCTION_NAME",
-                        config= new {  
-                            bindings=new List<object>()
-                                //{
-                                //    type="http",
-                                //    direction="in",
-                                //    name="req"
-                                //}
+            Dictionary<string, object> groups = new Dictionary<string, object>();
                             
-                        },
-                        files = "null",
-                        test_data="",
-                        selected = false
-                    }
-                };
-                funcs[1] = new
-               {
-                   id = "/subscriptions/SUBSCRIPTION_ID/resourceGroups/RESOURCE_GROUP_NAME/providers/Microsoft.Web/sites/FUNCTION_APP_NAME/functions/FUNCTION_NAME",
-                   name = "serverlessdemo/unittesthttp2",
-                   type = "Microsoft.Web/sites/functions",
-                   location = "West US",
-                   properties = new
-                   {
-                       name = "unittesthttp2",
-                       function_app_id = "/subscriptions/SUBSCRIPTION_ID/resourceGroups/RESOURCE_GROUP_NAME/providers/Microsoft.Web/sites/FUNCTION_APP_NAME",
-                       script_root_path_href = "https://FUNCTION_APP_NAME.scm.azurewebsites.net/api/vfs/site/wwwroot/FUNCTION_NAME/",
-                       script_href = "https://FUNCTION_APP_NAME.scm.azurewebsites.net/api/vfs/site/wwwroot/FUNCTION_NAME/index.js",
-                       config_href = "https://FUNCTION_APP_NAME.scm.azurewebsites.net/api/vfs/site/wwwroot/FUNCTION_NAME/function.json",
-                       test_data_href = "https://FUNCTION_APP_NAME.scm.azurewebsites.net/api/vfs/data/functions/sampledata/FUNCTION_NAME.dat",
-                       secrets_file_href = "https://FUNCTION_APP_NAME.scm.azurewebsites.net/api/vfs/data/functions/secrets/FUNCTION_NAME.json",
-                       href = "https://FUNCTION_APP_NAME.scm.azurewebsites.net/api/functions/FUNCTION_NAME",
-                       config = new
-                       {
-                           bindings = new List<object>()
-                           //{
-                           //    type="http",
-                           //    direction="in",
-                           //    name="req"
-                           //}
-
-                       },
-                       files = "null",
-                       test_data = "",
-                       selected = false
-                   }
-               };
-
-
-                    regions.Add("general",funcs);
-                  return regions;
-            }
-                 
             Durados.Workflow.NodeJS nodejs = new Durados.Workflow.NodeJS();
 
             Durados.Security.Cloud.ICloudCredentials[] credentials = cloud.GetCloudCredentials();
             foreach (Durados.Security.Cloud.ICloudCredentials credential in credentials)
             {
-                regions.Add(credential.Region, GetLambdaList(nodejs, credential));
+                
+                Dictionary<string, Dictionary<string, object>[]>  funcListGroups = GetLambdaList(nodejs, credential);
+                foreach (var funcList in funcListGroups)
+                {
+                    if (!groups.Keys.Contains(funcList.Key))
+                            groups.Add(funcList.Key, funcList.Value);
+                }
+                
             }
 
             //Durados.Security.Aws.AwsCredentials credential = cloud.GetAwsCredentials();
             //regions.Add(credential.Region, nodejs.GetLambdaList(credential));
 
-            return regions;
+            return groups;
         }
 
-        private Dictionary<string, object>[] GetLambdaList(Durados.Workflow.NodeJS nodejs, Durados.Security.Cloud.ICloudCredentials credential)
+     
+
+
+        private Dictionary<string, Dictionary<string, object>[]> GetLambdaList(Durados.Workflow.NodeJS nodejs, Durados.Security.Cloud.ICloudCredentials credential)
         {
             var lambdaList = nodejs.GetLambdaList(credential);
 
-            SetSelectedFunctions(lambdaList);
+           credential.Cloud.SetSelectedFunctions(lambdaList.Values, functionView);
 
             return lambdaList;
         }
 
-        private void SetSelectedFunctions(Dictionary<string, object>[] lambdaList)
+        private void SetSelectedFunctions(Dictionary<string, Dictionary<string, object>[]>.ValueCollection valueCollection)
+        {
+            foreach (var lambdaList in valueCollection)
+            {
+                foreach (var lambdaFunction in lambdaList)
+                {
+                    const string FunctionId = "functionId";
+                    const string ARN = "FunctionArn";
+                    const string SELECTED = "selected";
+                    if (!lambdaFunction.ContainsKey(ARN))
+                        throw new DuradosException("ORM did not return lambda list with FunctionArn");
+                    string arn = lambdaFunction[ARN].ToString();
+                    Rule rule = GetRuleByArn(arn);
+                    bool selected = (rule != null);
+                    lambdaFunction.Add(SELECTED, selected);
+                    if (rule != null)
+                        lambdaFunction.Add(FunctionId, rule.ID);
+                }
+            }
+        }
+
+        
+
+        
+
+        private void SetSelectedFunctions( Dictionary<string, object>[] lambdaList)
         {
             foreach (var lambdaFunction in lambdaList)
             {
