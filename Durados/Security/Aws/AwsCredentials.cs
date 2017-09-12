@@ -9,7 +9,7 @@ namespace Durados.Security.Cloud
     public class AwsCredentials : ICloudCredentials
     {
         public ICloudForCreds Cloud { get; set; }
-        const string PROVIDER = "AWS";
+        //const string PROVIDER = CloudVendor.AWS.ToString();
         public string AccessKeyID { get; set; }
 
         public string SecretAccessKey { get; set; }
@@ -29,7 +29,7 @@ namespace Durados.Security.Cloud
         }
         public string GetProvider()
         {
-            return PROVIDER;
+            return Cloud.CloudVendor.ToString();
         }
     }
 }

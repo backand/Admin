@@ -11,7 +11,7 @@ namespace Durados.Security.Cloud
         //public string AccessKeyID { get; set; }
 
         //public string SecretAccessKey { get; set; }
-        const string PROVIDER = "Azure";
+        //const string PROVIDER = CloudVendor.Azure.ToString();
 
         public ICloudForCreds Cloud { get; set; }
         public string tenant { get; set; }
@@ -24,7 +24,7 @@ namespace Durados.Security.Cloud
 
         public string GetProvider()
         {
-            return PROVIDER;
+            return Cloud.CloudVendor.ToString();
         }
 
         public Dictionary<string, object> GetCredentials()

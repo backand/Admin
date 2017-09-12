@@ -5729,7 +5729,12 @@ namespace Durados.Web.Mvc.UI.Helpers
                 }
                 else
                 {
-                    id = DeleteAction(selection);
+                    Cloud cloud = Maps.Instance.GetMap().Database.Clouds[selection.cloudId];
+                    
+                    if (cloud == null)
+                        throw new FunctionCloudNotExists(selection.name, selection.cloudId);
+
+                    id = DeleteAction(selection, cloud);
                     result.select = false;
                 }
                 result.result = true;
@@ -5748,12 +5753,12 @@ namespace Durados.Web.Mvc.UI.Helpers
         View functionView = (View)Maps.Instance.GetMap().Database.Views["_root"];
 
 
-        private int? DeleteAction(LambdaSelection selection)
+        private int? DeleteAction(LambdaSelection selection, Cloud cloud)
         {
             if (string.IsNullOrEmpty(selection.arn))
                 throw new LambdaFunctionSelectionNotContainsArn(selection.name);
 
-            Rule rule = GetRuleByArn(selection);
+            Rule rule = cloud.GetRuleByDescriptor(selection.arn,selection.name,functionView);
 
             if (rule == null)
                 throw new LambdaFunctionSelectionNotFound(selection.name);

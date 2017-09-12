@@ -25,8 +25,8 @@ namespace Durados.Web.Mvc
                         string tenant = row.Row.IsNull("tenant") ? null : (string)row["tenant"];
                         string appId = row.Row.IsNull("appId") ? null : (string)row["appId"];
                         string subscriptionId = row.Row.IsNull("subscriptionId") ? null : (string)row["subscriptionId"];
-                        Cloud cloud = new Cloud(Database) { Id = id, AccessKeyId = accessKeyId, Region = awsRegion, CloudVendor = cloudVendor, EncryptedSecretAccessKey = encryptedSecretAccessKey, Name = name };
-                        cloud.provider = new AzureCloud(cloud) { AppId = appId, SubscriptionId= subscriptionId, EncryptedPassword=encryptedPassword, tenant= tenant};
+                        Cloud cloud = new AzureCloud(Database) { Id = id, AppId = appId, SubscriptionId = subscriptionId, EncryptedPassword = encryptedPassword, tenant = tenant, CloudVendor = cloudVendor, Name = name };
+                        
                        
                         return cloud;
 
