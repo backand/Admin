@@ -5758,7 +5758,7 @@ namespace Durados.Web.Mvc.UI.Helpers
             if (string.IsNullOrEmpty(selection.arn))
                 throw new LambdaFunctionSelectionNotContainsArn(selection.name);
 
-            Rule rule = cloud.GetRuleByDescriptor(selection.arn,selection.name,functionView);
+            Rule rule = cloud.GetRuleByArn(selection.arn,selection.name,functionView);
 
             if (rule == null)
                 throw new LambdaFunctionSelectionNotFound(selection.name);

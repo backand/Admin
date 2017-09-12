@@ -29,6 +29,8 @@ namespace Durados.Security.Cloud
         }
         public string GetProvider()
         {
+            if(Cloud == null)
+                return CloudVendor.AWS.ToString();
             return Cloud.CloudVendor.ToString();
         }
     }

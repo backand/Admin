@@ -104,7 +104,7 @@ namespace Durados
                         throw new DuradosException("ORM did not return lambda list with Function name");
                     string arn = lambdaFunction[ARN].ToString();
                     string name = lambdaFunction[FunctionName].ToString();
-                    Rule rule = GetRuleByDescriptor(arn,name, functionView);
+                    Rule rule = GetRuleByArn(arn,name, functionView);
                     bool selected = (rule != null);
                     lambdaFunction.Add(SELECTED, selected);
                     if (rule != null)
@@ -113,7 +113,7 @@ namespace Durados
             }
         }
 
-        public virtual Rule GetRuleByDescriptor(string arn, string name,View functionView)
+        public virtual Rule GetRuleByArn(string arn, string name,View functionView)
         {
             return functionView.GetRules().Where(r => r.LambdaArn == arn).FirstOrDefault();
         }
@@ -190,7 +190,7 @@ namespace Durados
                     string functionName = lambdaFunction[FunctionName].ToString();
 
                     string appId = lambdaFunction[AppName].ToString();
-                    Rule rule = GetRuleByDescriptor(appId,functionName,  functionView);
+                    Rule rule = GetRuleByArn(appId,functionName,  functionView);
                     bool selected = (rule != null );
                     lambdaFunction.Add(SELECTED, selected);
                     if (rule != null)
@@ -199,10 +199,6 @@ namespace Durados
             }
         }
 
-        public override Rule GetRuleByDescriptor( string appId,string name,  View functionView)
-        {
-            return functionView.GetRules().Where(r => r.LambdaName == name && r.LambdaArn == appId).FirstOrDefault();
-        }
     }
 
     public interface ICloudProvider

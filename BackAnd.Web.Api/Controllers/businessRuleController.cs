@@ -798,14 +798,26 @@ namespace BackAnd.Web.Api.Controllers
             }
 
             string actionName = e.Values[Name].ToString();
-            string cloudId = GetCloudProviderName(null);
+            
+            string cloudIdStr = null;
+            
+            if (e.Values.ContainsKey("cloudSecurity"))
+                cloudIdStr = e.Values["cloudSecurity"].ToString();
+            
+            string cloudProvider = null;
+            int cloudId ;
+            
+            if(!string.IsNullOrEmpty(cloudIdStr) && int.TryParse(cloudIdStr,out cloudId))
+                cloudProvider = Maps.Instance.GetMap().Database.Clouds[cloudId].CloudVendor.ToString();
+            
             if (fileName == null)
             {
                 fileName = actionName + ".zip";
             }
             string functionName = Map.AppName + "_" + viewName + "_" + actionName;
             string folder = Map.AppName + "/" + viewName + "/" + actionName;
-            nodeJS.Create(Maps.NodeJSBucket, folder, fileName, functionName, "handler", "handler");
+
+            nodeJS.Create(Maps.NodeJSBucket, folder, fileName, functionName, "handler", "handler", cloudProvider);
         }
 
         private bool IsNodeJSFunction(Durados.CreateEventArgs e)
