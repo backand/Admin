@@ -5719,6 +5719,12 @@ namespace Durados.Web.Mvc.UI.Helpers
         private LambdaSelectionResult Select(LambdaSelection selection, BeforeCreateEventHandler beforeCreateCallback, BeforeCreateInDatabaseEventHandler beforeCreateInDatabaseEventHandler, AfterCreateEventHandler afterCreateBeforeCommitCallback, AfterCreateEventHandler afterCreateAfterCommitCallback)
         {
             LambdaSelectionResult result = new LambdaSelectionResult() { cloudId = selection.cloudId, name = selection.name };
+            
+            Dictionary<int,Cloud> clouds = Maps.Instance.GetMap().Database.Clouds;
+            if (clouds == null || clouds.Count() == 0 || !clouds.ContainsKey(selection.cloudId) || clouds[selection.cloudId] == null)
+                 throw new FunctionCloudNotExists(selection.name, selection.cloudId);
+
+            Cloud cloud = clouds[selection.cloudId];          
             int? id;
             try
             {
@@ -5729,10 +5735,7 @@ namespace Durados.Web.Mvc.UI.Helpers
                 }
                 else
                 {
-                    Cloud cloud = Maps.Instance.GetMap().Database.Clouds[selection.cloudId];
                     
-                    if (cloud == null)
-                        throw new FunctionCloudNotExists(selection.name, selection.cloudId);
 
                     id = DeleteAction(selection, cloud);
                     result.select = false;

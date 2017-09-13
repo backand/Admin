@@ -135,7 +135,6 @@ namespace Durados
         public string SubscriptionId { get; set; }
         public string AppId { get; set; }
 
-
         public string EncryptedPassword { get; set; }
 
         private string decryptedPassword = null;
@@ -155,9 +154,6 @@ namespace Durados
 
         public string tenant { get; set; }
 
-        
-
-
         public override ICloudCredentials[] GetCloudCredentials()
         {
             List<ICloudCredentials> list = new List<ICloudCredentials>();
@@ -165,38 +161,6 @@ namespace Durados
             list.Add(new AzureCredentials() { tenant = tenant, SubscriptionId = SubscriptionId, AppId = AppId, Password = DecryptedPassword, Cloud = this });
 
             return list.ToArray();
-        }
-
-
-
-
-        public override void SetSelectedFunctions(Dictionary<string, Dictionary<string, object>[]>.ValueCollection valueCollection, View functionView)
-        {
-            foreach (var lambdaList in valueCollection)
-            {
-                foreach (var lambdaFunction in lambdaList)
-                {
-                    const string FunctionId = "functionId";
-
-                    const string FunctionName = "FunctionName";
-                    const string AppName = "AppName";
-
-                    const string SELECTED = "selected";
-                    if (!lambdaFunction.ContainsKey(FunctionName))
-                        throw new DuradosException("ORM did not return Azure function list with Function name");
-                    if (!lambdaFunction.ContainsKey(AppName))
-                        throw new DuradosException("ORM did not return  Azure function list  with app name");
-
-                    string functionName = lambdaFunction[FunctionName].ToString();
-
-                    string appId = lambdaFunction[AppName].ToString();
-                    Rule rule = GetRuleByArn(appId,functionName,  functionView);
-                    bool selected = (rule != null );
-                    lambdaFunction.Add(SELECTED, selected);
-                    if (rule != null)
-                        lambdaFunction.Add(FunctionId, rule.ID);
-                }
-            }
         }
 
     }
