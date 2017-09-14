@@ -38,7 +38,6 @@ var console = new Backand.console(); var socket = new Backand.socket(); var file
     return exports;
 });
 
-
 (function (root, factory) {
     if (typeof define === 'function' && define.amd) {
         define(factory);
@@ -157,4 +156,29 @@ var console = new Backand.console(); var socket = new Backand.socket(); var file
 });
 var $http = atomic;
 
+(function (root, factory) {
+    if (typeof define === 'function' && define.amd) {
+        define(factory);
+    }
+    else if (typeof ports === 'object') {
+        module.exports = factory;
+    }
+    else {
+        root.backand = factory(root);
+    }
+})
+(this, function (root) {
+    'use strict';
+    var exports = {
+	    fn: {
+	        post: function(name, data, parameters, headers){
+	            return $http({ method: "POST", url: CONSTS.apiUrl + "/1/function/general/" + name, data: data, params: {parameters:parameters}, headers:headers});
+	        }, 
+	        get: function(name, parameters, headers){
+	            return $http({ method: "GET", url: CONSTS.apiUrl + "/1/function/general/" + name, params: {parameters:parameters}, headers:headers});
+	        }
+	    }
+	}
 
+    return exports;
+});
