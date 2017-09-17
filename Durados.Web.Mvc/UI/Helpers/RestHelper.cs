@@ -5579,7 +5579,7 @@ namespace Durados.Web.Mvc.UI.Helpers
         public string name { get; set; }
         public string arn { get; set; }
         public string description { get; set; }
-        public Dictionary<string, object> functionObject { get; set; }
+        public Dictionary<string, object> lambdaProperties { get; set; }
         public string friendlyName { get; set; }
         public bool select { get; set; }
     }
@@ -5821,7 +5821,7 @@ namespace Durados.Web.Mvc.UI.Helpers
         private static string GetFilteredFunctionObject(LambdaSelection selection, Cloud cloud)
         {
             string functionObject = null;
-            Dictionary<string, object> functionObjectDic = cloud.GetFunctionObject(selection.functionObject);
+            Dictionary<string, object> functionObjectDic = cloud.GetFunctionObject(selection.lambdaProperties);
             if (functionObjectDic != null && functionObjectDic.Count > 0)
                 functionObject = new System.Web.Script.Serialization.JavaScriptSerializer().Serialize(functionObjectDic);//Json.JsonSerializer.Serialize(functionObjectDic);
             return functionObject;
