@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.Serialization;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -118,59 +119,40 @@ namespace Durados
             return functionView.GetRules().Where(r => r.LambdaArn == arn).FirstOrDefault();
         }
 
-    }
-    public class AzureCloud : Cloud, ICloudProvider, ICloudForCreds
-    {
-        public AzureCloud(Durados.Database database)
-            : base(database)
+
+        public virtual Dictionary<string, object> GetFunctionObject(Dictionary<string, object> functionObject)
+        {
+            return null;
+        }
+
+        public virtual  ICloudCredentials GetCredentialsForRule(Rule rule, string arn)
         {
             
-        }
-        public override string GetCloudDescriptor()
-        {
-            return AppId;
-
-        }
-
-        public string SubscriptionId { get; set; }
-        public string AppId { get; set; }
-
-        public string EncryptedPassword { get; set; }
-
-        private string decryptedPassword = null;
-
-        public string DecryptedPassword
-        {
-            get
+            string[] regions = this.Region.ToString().Split(new char[1] { ',' }, StringSplitOptions.RemoveEmptyEntries);
+            string region = string.Empty;
+            if (regions.Length == 1)
+                region = regions[0];
+            else
             {
-                if (decryptedPassword == null)
+                foreach (string r in regions)
                 {
-                    decryptedPassword = Database.DecryptKey(EncryptedPassword);
+                    if (arn.Contains(r))
+                    {
+                        region = r;
+                        break;
+                    }
                 }
-
-                return decryptedPassword;
             }
+            string secretAccessKey = this.DecryptedSecretAccessKey;
+            string accessKeyID = this.AccessKeyId;
+            return new Durados.Security.Cloud.AwsCredentials() { Region = region, SecretAccessKey = secretAccessKey, AccessKeyID = accessKeyID };
         }
-
-        public string tenant { get; set; }
-
-        public override ICloudCredentials[] GetCloudCredentials()
-        {
-            List<ICloudCredentials> list = new List<ICloudCredentials>();
-
-            list.Add(new AzureCredentials() { tenant = tenant, SubscriptionId = SubscriptionId, AppId = AppId, Password = DecryptedPassword, Cloud = this });
-
-            return list.ToArray();
-        }
-
     }
-
     public interface ICloudProvider
     {
         string GetCloudDescriptor();
         ICloudCredentials[] GetCloudCredentials();
         //void SetSelectedFunctions(Dictionary<string, Dictionary<string, object>[]>.ValueCollection valueCollection, View functionView);
-
 
     }
 
@@ -178,10 +160,13 @@ namespace Durados
     {
         CloudVendor CloudVendor { get; set; }
         void SetSelectedFunctions(Dictionary<string, Dictionary<string, object>[]>.ValueCollection valueCollection, View functionView);
+
+     
     }
     public enum CloudVendor
     {
         AWS
         , Azure
+        ,GCP
     }
 }

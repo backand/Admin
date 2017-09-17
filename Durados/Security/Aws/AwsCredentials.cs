@@ -33,5 +33,15 @@ namespace Durados.Security.Cloud
                 return CloudVendor.AWS.ToString();
             return Cloud.CloudVendor.ToString();
         }
+
+
+        public  Dictionary<string, object> GetFunctionObject(string functionArn)
+        {
+            Dictionary<string, object> data = new Dictionary<string, object>();
+
+            data.Add("arn", functionArn);
+            return data;
+           
+        }
     }
 }

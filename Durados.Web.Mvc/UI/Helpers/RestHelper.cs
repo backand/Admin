@@ -5579,6 +5579,7 @@ namespace Durados.Web.Mvc.UI.Helpers
         public string name { get; set; }
         public string arn { get; set; }
         public string description { get; set; }
+        public Dictionary<string, object> functionObject { get; set; }
         public string friendlyName { get; set; }
         public bool select { get; set; }
     }
@@ -5730,7 +5731,7 @@ namespace Durados.Web.Mvc.UI.Helpers
             {
                 if (selection.select)
                 {
-                    id = CreateAction(selection, beforeCreateCallback, beforeCreateInDatabaseEventHandler, afterCreateBeforeCommitCallback, afterCreateAfterCommitCallback);
+                    id = CreateAction(selection, cloud, beforeCreateCallback, beforeCreateInDatabaseEventHandler, afterCreateBeforeCommitCallback, afterCreateAfterCommitCallback);
                     result.select = true;
                 }
                 else
@@ -5772,7 +5773,7 @@ namespace Durados.Web.Mvc.UI.Helpers
 
         }
 
-        private int? CreateAction(LambdaSelection selection, BeforeCreateEventHandler beforeCreateCallback, BeforeCreateInDatabaseEventHandler beforeCreateInDatabaseEventHandler, AfterCreateEventHandler afterCreateBeforeCommitCallback, AfterCreateEventHandler afterCreateAfterCommitCallback)
+        private int? CreateAction(LambdaSelection selection, Cloud cloud, BeforeCreateEventHandler beforeCreateCallback, BeforeCreateInDatabaseEventHandler beforeCreateInDatabaseEventHandler, AfterCreateEventHandler afterCreateBeforeCommitCallback, AfterCreateEventHandler afterCreateAfterCommitCallback)
         {
             if (string.IsNullOrEmpty(selection.arn))
                 throw new LambdaFunctionSelectionNotContainsArn(selection.name);
@@ -5790,11 +5791,15 @@ namespace Durados.Web.Mvc.UI.Helpers
                 newName = GetUniqueName(newName);
             }
 
+            string functionObject = GetFilteredFunctionObject(selection, cloud);
+
+            
             Dictionary<string, object> values = new Dictionary<string, object>();
 
             values.Add("Name", newName);
             values.Add("LambdaName", selection.name);
             values.Add("LambdaArn", selection.arn);
+            values.Add("LambdaProperties", functionObject);
             values.Add("CloudSecurity", selection.cloudId);
             values.Add("ActionType", ActionType.Function.ToString());
             values.Add("WorkflowAction", WorkflowAction.Lambda.ToString());
@@ -5811,6 +5816,15 @@ namespace Durados.Web.Mvc.UI.Helpers
             var dataRow = ruleView.Create(values, null, beforeCreateCallback, beforeCreateInDatabaseEventHandler, afterCreateBeforeCommitCallback, afterCreateAfterCommitCallback);
 
             return System.Convert.ToInt32(ruleView.GetPkValue(dataRow));
+        }
+
+        private static string GetFilteredFunctionObject(LambdaSelection selection, Cloud cloud)
+        {
+            string functionObject = null;
+            Dictionary<string, object> functionObjectDic = cloud.GetFunctionObject(selection.functionObject);
+            if (functionObjectDic != null && functionObjectDic.Count > 0)
+                functionObject = new System.Web.Script.Serialization.JavaScriptSerializer().Serialize(functionObjectDic);//Json.JsonSerializer.Serialize(functionObjectDic);
+            return functionObject;
         }
 
         private string GetUniqueName(string newName)

@@ -8,20 +8,14 @@ namespace Durados.Security.Cloud
 {
     public class AzureCredentials : ICloudCredentials
     {
-        //public string AccessKeyID { get; set; }
-
-        //public string SecretAccessKey { get; set; }
-        //const string PROVIDER = CloudVendor.Azure.ToString();
-
         public ICloudForCreds Cloud { get; set; }
-        public string tenant { get; set; }
-        public string AppId { get; set; }
-        public string SubscriptionId { get; set; }
+        //public string tenant { get { return (Cloud as AzureCloud).tenant; } }
+        //public string AppId { get { return (Cloud as AzureCloud).AppId; } }
+        //public string SubscriptionId { get { return (Cloud as AzureCloud).SubscriptionId; } }
+        //public string Password { get { return (Cloud as AzureCloud).DecryptedPassword; } }
+        //public string Region { get { return "general"; } set { } }
 
-        public string Password { get; set; }
-
-        public string Region { get { return "general"; } set { } }
-
+        public AzureFunction FuncObject { get; set; }
         public string GetProvider()
         {
             return Cloud.CloudVendor.ToString();
@@ -31,10 +25,22 @@ namespace Durados.Security.Cloud
         {
             Dictionary<string, object> data = new Dictionary<string, object>();
 
-            data.Add("appId", AppId);
-            data.Add("tenant", tenant);
-            data.Add("subscriptionId", SubscriptionId);
-            data.Add("password", Password);
+            data.Add("appId", (Cloud as AzureCloud).AppId);
+            data.Add("tenant", (Cloud as AzureCloud).tenant);
+            data.Add("subscriptionId", (Cloud as AzureCloud).SubscriptionId);
+            data.Add("password", (Cloud as AzureCloud).DecryptedPassword);
+
+            return data;
+        }
+        public  Dictionary<string, object> GetFunctionObject(string functionArn)
+        {
+            Dictionary<string, object> data = new Dictionary<string, object>();
+
+            data.Add("authLevel", FuncObject.authLevel);
+            data.Add("trigger", FuncObject.trigger);
+            data.Add("key", FuncObject.key);
+            data.Add("name", FuncObject.name);
+            data.Add("appName", FuncObject.appName);
 
             return data;
         }

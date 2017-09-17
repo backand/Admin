@@ -152,6 +152,9 @@
     </Compile>
     <Compile Include="Page.cs" />
     <Compile Include="Security\Aws\AwsCredentials.cs" />
+    <Compile Include="Security\Azure\AzureCloud.cs" />
+    <Compile Include="Security\Google\GoogleCloud.cs" />
+    <Compile Include="Security\Google\GoogleCredentials.cs" />
     <Compile Include="Security\ICloudCredentials.cs" />
     <Compile Include="Security\Azure\AzureCredentials.cs" />
     <Compile Include="SmartRun\RunWithRetry.cs" />
@@ -216,6 +219,7 @@
   <ItemGroup>
     <None Include="packages.config" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

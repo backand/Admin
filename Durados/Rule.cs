@@ -260,7 +260,8 @@ namespace Durados
 
         [Durados.Config.Attributes.ColumnProperty()]
         public string LambdaArn { get; set; }
-
+        [Durados.Config.Attributes.ColumnProperty()]
+        public string LambdaProperties { get; set; }
         [Durados.Config.Attributes.ColumnProperty()]
         public int CloudSecurity { get; set; }
 

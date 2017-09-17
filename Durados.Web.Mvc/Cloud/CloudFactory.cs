@@ -31,6 +31,18 @@ namespace Durados.Web.Mvc
                         return cloud;
 
                     }
+                case CloudVendor.GCP:
+                    {
+                        string projectName = row.Row.IsNull("ProjectName") ? null : (string)row["ProjectName"];
+                        string clientEmail = row.Row.IsNull("ClientEmail") ? null : (string)row["ClientEmail"];
+                        string encryptedPrivateKey = row.Row.IsNull("EncryptedPrivateKey") ? null : (string)row["EncryptedPrivateKey"];
+
+                        Cloud cloud = new GoogleCloud(Database) { Id = id, EncryptedPrivateKey = encryptedPrivateKey, ClientEmail = clientEmail, ProjectName = projectName, CloudVendor = cloudVendor, Name = name };
+
+
+                        return cloud;
+
+                    }
                     
                 default:
                     return new Cloud(Database) { Id = id, AccessKeyId = accessKeyId, Region = awsRegion, CloudVendor = cloudVendor, EncryptedSecretAccessKey = encryptedSecretAccessKey, Name = name };

@@ -2064,32 +2064,15 @@ namespace Durados
 
         public Durados.Security.Cloud.ICloudCredentials GetRuleCredentials(Rule rule)
         {
-            return GetRuleCredentials(rule.CloudSecurity, rule.LambdaArn);
+            return GetRuleCredentials(rule, rule.LambdaArn);
         }
 
-        public Durados.Security.Cloud.ICloudCredentials GetRuleCredentials(int cloudId, string arn)
+        public Durados.Security.Cloud.ICloudCredentials GetRuleCredentials(Rule rule, string arn)
         {
-            string[] regions = Database.Clouds[cloudId].Region.ToString().Split(new char[1] { ',' }, StringSplitOptions.RemoveEmptyEntries);
-            string region = string.Empty;
-            if (regions.Length == 1)
-                region = regions[0];
-            else
-            {
-                foreach (string r in regions)
-                {
-                    if (arn.Contains(r))
-                    {
-                        region = r;
-                        break;
-                    }
-                }
-            }
-            string secretAccessKey = Database.Clouds[cloudId].DecryptedSecretAccessKey;
-            string accessKeyID = Database.Clouds[cloudId].AccessKeyId;
-            return new Durados.Security.Cloud.AwsCredentials() { Region = region, SecretAccessKey = secretAccessKey, AccessKeyID = accessKeyID };
+            int cloudId = rule.CloudSecurity;
+            Cloud cloud = Database.Clouds[cloudId];
+            return cloud.GetCredentialsForRule(rule, arn);
         }
-
-
     }
 
     public class DataActionEventArgs : EventArgs

@@ -35,6 +35,18 @@ namespace Durados.Workflow
             return payload;
  
         }
+        private Dictionary<string, object> GetCallLambdaPayloadExternal(object controller, Dictionary<string, Parameter> parameters, View view, Dictionary<string, object> values, DataRow prevRow, string pk, string connectionString, int currentUsetId, string currentUserRole, IDbCommand command)
+        {
+            JsActionArguments arguments = new JsActionArguments(controller, parameters, view, values, prevRow, pk, connectionString, currentUsetId, currentUserRole, command);
+
+            Dictionary<string, object> payload = new Dictionary<string, object>();
+
+           
+            payload.Add("userProfile", arguments.UserProfile);
+            return payload;
+
+        }
+
 
         private bool IsDebug(Dictionary<string, object> values)
         {
@@ -220,6 +232,7 @@ namespace Durados.Workflow
             Dictionary<string, object> data = new Dictionary<string, object>();
             data.Add("credentials", cloudCredentials.GetCredentials());
             data.Add("cloudProvider", cloudCredentials.GetProvider());
+            data.Add("method", GetActionMethod());
             Dictionary<string, object> payload = GetCallLambdaPayload(controller, parameters, view, values, prevRow, pk, connectionString, currentUserId, currentUserRole, command);
 
             string folder = view.Database.GetCurrentAppName();
@@ -227,12 +240,19 @@ namespace Durados.Workflow
             if (isLambda)
             {
                 functionArn = arn;
-                payload = new Dictionary<string, object>();
+                payload = GetCallLambdaPayloadExternal(controller, parameters, view, values, prevRow, pk, connectionString, currentUserId, currentUserRole, command);
+                
                 foreach (string key in values.Keys)
                 {
+                    string stripedKey = key.StripToken();
+                    if (payload.ContainsKey(stripedKey))
+                    {
+                        throw new WorkflowEngineException("You can not add " + stripedKey  + " parameter in the request body");
+                    }
+
                     if (key != DebugKey)
                     {
-                        payload.Add(key.ReplaceToken("{{", "").ReplaceToken("}}", ""), values[key]);
+                        payload.Add(stripedKey, values[key]);
                     }
                 }
             }
@@ -240,10 +260,10 @@ namespace Durados.Workflow
             //data.Add("awsRegion", awsCredentials.Region);
             //data.Add("accessKeyId", awsCredentials.AccessKeyID);
             //data.Add("secretAccessKey", awsCredentials.SecretAccessKey);
-            Dictionary<string, object> function = new Dictionary<string, object>();
-            function.Add("arn", functionArn);
+            //Dictionary<string, object> function = new Dictionary<string, object>();
+            //function.Add("arn",);
             data.Add("payload", payload);
-            data.Add("function", function);
+            data.Add("function", cloudCredentials.GetFunctionObject(functionArn));
             Guid requestId = Guid.NewGuid();
             if (isDebug)
             {
@@ -345,6 +365,13 @@ namespace Durados.Workflow
             }
         }
 
+        private string GetActionMethod()
+        {
+            if (System.Web.HttpContext.Current != null && System.Web.HttpContext.Current.Request != null)
+                return System.Web.HttpContext.Current.Request.HttpMethod;
+            return null;
+        }
+
         private bool IsFunction(View view)
         {
             return view.Name == "_root";
@@ -371,7 +398,7 @@ namespace Durados.Workflow
             if (response.ContainsKey(Payload))
             {
                 responsePayload = response[Payload];
-                if (((string)responsePayload).EndsWith("Z\""))
+                if ((responsePayload is string) &&((string)responsePayload).EndsWith("Z\""))
                 {
                     try
                     {
