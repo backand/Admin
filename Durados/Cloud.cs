@@ -167,6 +167,6 @@ namespace Durados
     {
         AWS
         , Azure
-        ,GCP
+        , Google
     }
 }

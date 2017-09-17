@@ -31,7 +31,7 @@ namespace Durados.Web.Mvc
                         return cloud;
 
                     }
-                case CloudVendor.GCP:
+                case CloudVendor.Google:
                     {
                         string projectName = row.Row.IsNull("ProjectName") ? null : (string)row["ProjectName"];
                         string clientEmail = row.Row.IsNull("ClientEmail") ? null : (string)row["ClientEmail"];
