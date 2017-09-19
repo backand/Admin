@@ -164,13 +164,15 @@ namespace Durados.Workflow
 
             System.Web.Script.Serialization.JavaScriptSerializer jss = new System.Web.Script.Serialization.JavaScriptSerializer();
             request.send(jss.Serialize(data));
+            
+            Dictionary<string,Dictionary<string, object>[]> response = null;
 
             if (request.status != 200)
             {
-                throw new NodeJsException(request.responseText.TrimStart("{}; ".ToCharArray()));
+                throw new NodeJsLambdaListException(request.responseText.TrimStart("{}; ".ToCharArray()));
+
             }
 
-            Dictionary<string,Dictionary<string, object>[]> response = null;
             try
             {
                 response = jss.Deserialize<Dictionary<string, Dictionary<string, object>[]>>(request.responseText);

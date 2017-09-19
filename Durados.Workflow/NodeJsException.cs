@@ -17,4 +17,16 @@ namespace Durados.Workflow
             HttpStatusCode = httpStatusCode;
         }
     }
+
+
+
+    public class NodeJsLambdaListException : NodeJsException
+    {
+        public NodeJsLambdaListException(string message, bool jsonFormat = false, HttpStatusCode httpStatusCode = HttpStatusCode.InternalServerError)
+            : base(message,jsonFormat,httpStatusCode)
+        {
+            
+        }
+    }
+
 }

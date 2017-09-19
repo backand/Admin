@@ -85,12 +85,9 @@ namespace Durados
 
 
         public virtual void SetSelectedFunctions(Dictionary<string, Dictionary<string, object>[]>.ValueCollection valueCollection, View functionView)
-        {
-            //if (provider != null)
-            //{
-            //    provider.SetSelectedFunctions(valueCollection, functionView);
-            //    return;
-            //}
+        { 
+            if (isErrorInFunctionObject(valueCollection)) return;
+
             foreach (var lambdaList in valueCollection)
             {
                 foreach (var lambdaFunction in lambdaList)
@@ -99,6 +96,7 @@ namespace Durados
                     const string ARN = "FunctionArn";
                     const string FunctionName = "FunctionName";
                     const string SELECTED = "selected";
+
                     if (!lambdaFunction.ContainsKey(ARN))
                         throw new DuradosException("ORM did not return lambda list with FunctionArn");
                     if (!lambdaFunction.ContainsKey(FunctionName))
@@ -112,6 +110,11 @@ namespace Durados
                         lambdaFunction.Add(FunctionId, rule.ID);
                 }
             }
+        }
+
+        protected bool isErrorInFunctionObject(Dictionary<string, Dictionary<string, object>[]>.ValueCollection valueCollection)
+        {
+            return (valueCollection == null || valueCollection.Count == 0 || valueCollection.First() == null);
         }
 
         public virtual Rule GetRuleByArn(string arn, string name,View functionView)

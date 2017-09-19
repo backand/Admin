@@ -5604,8 +5604,18 @@ namespace Durados.Web.Mvc.UI.Helpers
             foreach (Dictionary<string, object> cloudJson in cloudsJson)
             {
                 int cloudId = Convert.ToInt32(cloudJson["id"]);
-                cloudJson["functions"] = GetLambdaListByGroups(Maps.Instance.GetMap().Database.Clouds[cloudId]);
+                try
+                {
+                    cloudJson["functions"] = GetLambdaListByGroups(Maps.Instance.GetMap().Database.Clouds[cloudId]); 
+                }
+                catch (Durados.Workflow.NodeJsLambdaListException ex)
+                {
+                    cloudJson.Add("error", new { message = ex.Message });
+                }
+                
             }
+            
+            json["totalRows"] = cloudsJson.Count();
 
             json.Add("data", cloudsJson);
 
