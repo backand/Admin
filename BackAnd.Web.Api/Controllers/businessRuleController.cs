@@ -107,7 +107,7 @@ namespace BackAnd.Web.Api.Controllers
                 }
                 if(rule.ContainsKey("actionType")  && rule["actionType"] != null &&  rule["actionType"].ToString() == Durados.ActionType.Function.ToString() && !rule.ContainsKey(CloudProviderPropertyName))
                 {
-                    rule.Add(CloudProviderPropertyName, GetCloudProviderName(rule));
+                    rule.Add(CloudProviderPropertyName, GetCloudVendor(rule));
                 }
             }
 
@@ -799,16 +799,8 @@ namespace BackAnd.Web.Api.Controllers
 
             string actionName = e.Values[Name].ToString();
             
-            string cloudIdStr = null;
-            
-            if (e.Values.ContainsKey("cloudSecurity"))
-                cloudIdStr = e.Values["cloudSecurity"].ToString();
-            
-            string cloudProvider = null;
-            int cloudId ;
-            
-            if(!string.IsNullOrEmpty(cloudIdStr) && int.TryParse(cloudIdStr,out cloudId))
-                cloudProvider = Maps.Instance.GetMap().Database.Clouds[cloudId].CloudVendor.ToString();
+           
+            string cloudProvider = GetCloudVendor(e.Values);
             
             if (fileName == null)
             {
@@ -818,6 +810,20 @@ namespace BackAnd.Web.Api.Controllers
             string folder = Map.AppName + "/" + viewName + "/" + actionName;
 
             nodeJS.Create(Maps.NodeJSBucket, folder, fileName, functionName, "handler", "handler", cloudProvider);
+        }
+
+        private static string GetCloudVendor(Dictionary<string,object>  vals)
+        {
+            string cloudIdStr = null;
+            if (vals.ContainsKey("cloudSecurity"))
+                cloudIdStr = vals["cloudSecurity"].ToString();
+
+            string cloudProvider = Durados.CloudVendor.AWS.ToString() ;
+            int cloudId;
+
+            if (!string.IsNullOrEmpty(cloudIdStr) && int.TryParse(cloudIdStr, out cloudId) && Maps.Instance.GetMap().Database.Clouds.ContainsKey(cloudId))
+                cloudProvider = Maps.Instance.GetMap().Database.Clouds[cloudId].CloudVendor.ToString();
+            return cloudProvider;
         }
 
         private bool IsNodeJSFunction(Durados.CreateEventArgs e)

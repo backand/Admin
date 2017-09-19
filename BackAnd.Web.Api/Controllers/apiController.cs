@@ -1027,7 +1027,7 @@ namespace BackAnd.Web.Api.Controllers
 
         protected virtual void BeforeCreate(CreateEventArgs e)
         {
-
+            HandleCloudView(e);
             LoadCreationSignature(e.View, e.Values);
             LoadModificationSignature(e.View, e.Values);
             HandleSpecialDefaults((Durados.Web.Mvc.View)e.View, e.Values);
@@ -1050,10 +1050,7 @@ namespace BackAnd.Web.Api.Controllers
                 e.History = GetNewHistory();
                 e.UserId = currentUserId;
             }
-            if (e.View.Name.Equals(Durados.Database.CloudViewName))
-            {
-                //validate credentials
-            }
+            
             CreateWorkflowEngine().PerformActions(this, e.View, TriggerDataAction.BeforeCreate, e.Values, e.PrimaryKey, null, Map.Database.ConnectionString, currentUserId, currentUserRole, e.Command, e.SysCommand);
         }
 
@@ -1390,6 +1387,11 @@ namespace BackAnd.Web.Api.Controllers
 
         protected virtual void BeforeEdit(EditEventArgs e)
         {
+           
+               
+           HandleCloudView(e);
+
+           
             HandleEncryptedHiddenFields(e);
             
             HandleEncryption(e.View, e.Values);
@@ -1443,6 +1445,38 @@ namespace BackAnd.Web.Api.Controllers
             {
                 CreateWorkflowEngine().PerformActions(this, e.View, TriggerDataAction.BeforeEdit, e.Values, e.PrimaryKey, e.PrevRow, Map.Database.ConnectionString, currentUserId, currentUserRole, e.Command, e.SysCommand);
             }
+        }
+        protected void HandleCloudView(Durados.DataActionEventArgs e)
+        {
+            if (!e.View.Name.Equals(Durados.Database.CloudViewName))
+                return;
+            Durados.Cloud cloud = CloudFactory.GetCloud(e, Map.Database);
+            if( e is EditEventArgs)
+            {
+
+                CloudVendor cloudVendor = !e.Values.ContainsKey("CloudVendor") ? CloudVendor.AWS : (CloudVendor)Enum.Parse(typeof(CloudVendor), (string)e.Values["CloudVendor"]);
+
+                if ( !e.Values.ContainsKey("CloudVendor") && !(cloudVendor == CloudVendor.AWS && (e.Values.ContainsKey("AccessKeyId") || e.Values.ContainsKey("EncryptedSecretAccessKey"))
+                   || (cloudVendor == CloudVendor.Azure && e.Values.ContainsKey("password"))
+                   || (cloudVendor == CloudVendor.GCP && e.Values.ContainsKey("EncryptedPrivateKey"))))
+                    
+                    return;
+
+            }
+
+            Durados.Workflow.NodeJS nodejs = new Durados.Workflow.NodeJS();
+
+            if (cloud.CloudVendor == CloudVendor.GCP && e.Values.ContainsKey("EncryptedPrivateKey") && e.Values["EncryptedPrivateKey"] != null)
+            {
+                string privateKey = HttpUtility.HtmlDecode(e.Values["EncryptedPrivateKey"].ToString());
+                (cloud as GoogleCloud).EncryptedPrivateKey = Map.Encrypt(privateKey);
+                e.Values["EncryptedPrivateKey"] = privateKey;
+            }
+
+            foreach (var creds in cloud.GetCloudCredentials())
+                nodejs.GetLambdaList(creds);
+            
+
         }
 
         protected virtual void HandleEncryptedHiddenFields(EditEventArgs e)

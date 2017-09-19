@@ -53,9 +53,47 @@ namespace Durados.Web.Mvc
 
 
 
-        public static Cloud GetCloud(EditEventArgs e)
+        public static Cloud GetCloud(DataActionEventArgs e, Database Database )
         {
-            return null;
+            string accessKeyId = !e.Values.ContainsKey("AccessKeyId") ? null : (string)e.Values["AccessKeyId"];
+            string awsRegion = !e.Values.ContainsKey("AwsRegion") ? null : (string)e.Values["AwsRegion"];
+            CloudVendor cloudVendor = !e.Values.ContainsKey("CloudVendor") ? CloudVendor.AWS : (CloudVendor)Enum.Parse(typeof(CloudVendor), (string)e.Values["CloudVendor"]);
+            string encryptedSecretAccessKey = !e.Values.ContainsKey("EncryptedSecretAccessKey") ? null : (string)e.Values["EncryptedSecretAccessKey"];
+            string name = !e.Values.ContainsKey("Name") ? null : (string)e.Values["Name"];
+            switch (cloudVendor)
+            {
+
+                case CloudVendor.Azure:
+                    {
+                        string encryptedPassword = !e.Values.ContainsKey("password") ? null : (string)e.Values["password"];
+                        string tenant = !e.Values.ContainsKey("tenant") ? null : (string)e.Values["tenant"];
+                        string appId = !e.Values.ContainsKey("appId") ? null : (string)e.Values["appId"];
+                        string subscriptionId = !e.Values.ContainsKey("subscriptionId") ? null : (string)e.Values["subscriptionId"];
+                        Cloud cloud = new AzureCloud(Database) {  AppId = appId, SubscriptionId = subscriptionId, EncryptedPassword = encryptedPassword, tenant = tenant, CloudVendor = cloudVendor, Name = name };
+
+
+                        return cloud;
+
+                    }
+                case CloudVendor.GCP:
+                    {
+                        string projectName = !e.Values.ContainsKey("ProjectName") ? null : (string)e.Values["ProjectName"];
+                        string clientEmail = !e.Values.ContainsKey("ClientEmail") ? null : (string)e.Values["ClientEmail"];
+                        string encryptedPrivateKey = !e.Values.ContainsKey("EncryptedPrivateKey") ? null : (string)e.Values["EncryptedPrivateKey"];
+
+                        Cloud cloud = new GoogleCloud(Database) {  EncryptedPrivateKey = encryptedPrivateKey, ClientEmail = clientEmail, ProjectName = projectName, CloudVendor = cloudVendor, Name = name };
+
+
+                        return cloud;
+
+                    }
+
+                default:
+                    return new Cloud(Database) {  AccessKeyId = accessKeyId, Region = awsRegion, CloudVendor = cloudVendor, EncryptedSecretAccessKey = encryptedSecretAccessKey, Name = name };
+
+            }
+           
+
             //throw new NotImplementedException();
         }
     }

@@ -78,7 +78,6 @@ namespace Durados
             }
             return list.ToArray();
         }
-
         public virtual string GetCloudDescriptor()
         {
 
