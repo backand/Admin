@@ -33,7 +33,12 @@ namespace Durados
             {
                 if (decryptedPassword == null)
                 {
-                    decryptedPassword = Database.DecryptKey(EncryptedPassword);
+                    try
+                    {
+                        decryptedPassword = Database.DecryptKey(EncryptedPassword);
+                    }
+                    catch (DuradosException)
+                    {}
                 }
 
                 return decryptedPassword;

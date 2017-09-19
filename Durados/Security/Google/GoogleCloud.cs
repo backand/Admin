@@ -32,7 +32,13 @@ namespace Durados
             {
                 if (decryptedPrivateKey == null)
                 {
-                    decryptedPrivateKey = Database.DecryptKey(EncryptedPrivateKey);
+                    try
+                    {
+                        decryptedPrivateKey = Database.DecryptKey(EncryptedPrivateKey);
+                    }
+                    catch (DuradosException)
+                    {}
+                    
                 }
 
                 return decryptedPrivateKey;

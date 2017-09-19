@@ -35,7 +35,13 @@ namespace Durados
             {
                 if (decryptedSecretAccessKey == null)
                 {
-                    decryptedSecretAccessKey = Database.DecryptKey(EncryptedSecretAccessKey);
+                    try
+                    {
+                        decryptedSecretAccessKey = Database.DecryptKey(EncryptedSecretAccessKey);
+                    }
+                    catch (DuradosException)
+                    {}
+                    
                 }
 
                 return decryptedSecretAccessKey;

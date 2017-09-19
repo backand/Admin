@@ -51,6 +51,12 @@ namespace Durados.Web.Mvc
             
         }
 
-       
+
+
+        public static Cloud GetCloud(EditEventArgs e)
+        {
+            return null;
+            //throw new NotImplementedException();
+        }
     }
 }

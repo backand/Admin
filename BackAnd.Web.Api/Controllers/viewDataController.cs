@@ -929,9 +929,16 @@ namespace BackAnd.Web.Api.Controllers
             }
             else if (e.View.Name.Equals(Durados.Database.CloudViewName))
             {
-                // validate account credentials
+                //HandleCloudView(e);
             }
             base.BeforeEdit(e);
+        }
+
+        private void HandleCloudView(Durados.EditEventArgs e)
+        {
+
+            Durados.Cloud cloud = CloudFactory.GetCloud(e);
+
         }
 
         protected override void BeforeDelete(Durados.DeleteEventArgs e)
