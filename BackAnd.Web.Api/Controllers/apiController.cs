@@ -1027,11 +1027,12 @@ namespace BackAnd.Web.Api.Controllers
 
         protected virtual void BeforeCreate(CreateEventArgs e)
         {
-            HandleCloudView(e);
+           
             LoadCreationSignature(e.View, e.Values);
             LoadModificationSignature(e.View, e.Values);
             HandleSpecialDefaults((Durados.Web.Mvc.View)e.View, e.Values);
             HandleEncryption(e.View, e.Values);
+            HandleCloudView(e);
 
             int currentUserId = Convert.ToInt32(Map.Database.GetUserID());
             string currentUserRole = null;
@@ -1388,15 +1389,15 @@ namespace BackAnd.Web.Api.Controllers
         protected virtual void BeforeEdit(EditEventArgs e)
         {
            
-               
-           HandleCloudView(e);
-
-           
             HandleEncryptedHiddenFields(e);
             
             HandleEncryption(e.View, e.Values);
 
             LoadModificationSignature(e.View, e.Values);
+           
+            HandleCloudView(e);
+
+           
 
             //if (IsApprovalProcessUserView(e.View))
             //{
@@ -1465,13 +1466,6 @@ namespace BackAnd.Web.Api.Controllers
             }
 
             Durados.Workflow.NodeJS nodejs = new Durados.Workflow.NodeJS();
-
-            if (cloud.CloudVendor == CloudVendor.GCP && e.Values.ContainsKey("EncryptedPrivateKey") && e.Values["EncryptedPrivateKey"] != null)
-            {
-                string privateKey = HttpUtility.HtmlDecode(e.Values["EncryptedPrivateKey"].ToString());
-                (cloud as GoogleCloud).EncryptedPrivateKey = Map.Encrypt(privateKey);
-                e.Values["EncryptedPrivateKey"] = privateKey;
-            }
 
             foreach (var creds in cloud.GetCloudCredentials())
                 nodejs.GetLambdaList(creds);
