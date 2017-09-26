@@ -1451,25 +1451,42 @@ namespace BackAnd.Web.Api.Controllers
         {
             if (!e.View.Name.Equals(Durados.Database.CloudViewName))
                 return;
+            
+            if (e is DeleteEventArgs)
+            {
+                Durados.Cloud deleteCloud = Map.Database.Clouds.Values.Where(c => c.Id.ToString() == e.PrimaryKey).FirstOrDefault();
+                DeleteCloudFunctions(deleteCloud);
+                return;
+            }
 
+            string cloudVendorStr = !e.Values.ContainsKey("CloudVendor") || string.IsNullOrEmpty(((e.Values["CloudVendor"]?? string.Empty).ToString()) ) ? CloudVendor.AWS.ToString(): e.Values["CloudVendor"].ToString();
+            
+            CloudVendor cloudVendor;
+
+            if (string.IsNullOrEmpty(cloudVendorStr) || !Enum.TryParse<CloudVendor>(cloudVendorStr, out cloudVendor))
+                throw new Durados.Data.DataHandlerException((int)HttpStatusCode.NotFound ,Messages.CloudVendorNotFound,null);
+
+            string cloudTypeStr = !e.Values.ContainsKey("Type") || string.IsNullOrEmpty(((e.Values["Type"] ?? string.Empty).ToString())) ? CloudType.Function.ToString() : e.Values["Type"].ToString();
+
+            CloudType cloudType;
+
+            if (string.IsNullOrEmpty(cloudTypeStr) || !Enum.TryParse<CloudType>(cloudTypeStr, out cloudType))
+                throw new Durados.Data.DataHandlerException((int)HttpStatusCode.NotFound, Messages.CloudTypeNotFound, null);
+
+            e.Values["Type"] = cloudType.ToString();
+/*
             if( e is EditEventArgs)
             {
 
-                CloudVendor cloudVendor = !e.Values.ContainsKey("CloudVendor") ? CloudVendor.AWS : (CloudVendor)Enum.Parse(typeof(CloudVendor), (string)e.Values["CloudVendor"]);
-
-                if ( !e.Values.ContainsKey("CloudVendor") && !(cloudVendor == CloudVendor.AWS && (e.Values.ContainsKey("AccessKeyId") || e.Values.ContainsKey("EncryptedSecretAccessKey"))
-                   || (cloudVendor == CloudVendor.Azure && e.Values.ContainsKey("password"))
-                   || (cloudVendor == CloudVendor.GCP && e.Values.ContainsKey("EncryptedPrivateKey"))))
+                if ( (cloudVendor == CloudVendor.AWS && (!e.Values.ContainsKey("AccessKeyId") && !e.Values.ContainsKey("EncryptedSecretAccessKey"))
+                    || (cloudVendor == CloudVendor.Azure && !e.Values.ContainsKey("password"))
+                    || (cloudVendor == CloudVendor.GCP && !e.Values.ContainsKey("EncryptedPrivateKey"))))
                     
                     return;
 
             }
-            Durados.Cloud cloud = Map.Database.Clouds.Values.Where(c => c.Id.ToString() == e.PrimaryKey).FirstOrDefault();
-            if (e is DeleteEventArgs)
-            {
-                DeleteCloudFunctions(cloud);
-                return;
-            }
+            */
+            Durados.Cloud cloud = CloudFactory.GetCloud(e, Map.Database);
             Durados.Workflow.NodeJS nodejs = new Durados.Workflow.NodeJS();
 
             foreach (var creds in cloud.GetCloudCredentials())
@@ -2411,6 +2428,8 @@ namespace BackAnd.Web.Api.Controllers
         public static readonly string MigrationAlreadyStartedWithStatusStarted = "{0} has already started its migration.";
         public static readonly string MigrationAlreadyStartedWithStatusFinished = "{0} has already finished its migration. If you want to migrate again please create a new app.";
         public static readonly string NotSignInToApp = "Please sign in to an app";
+        public static readonly string CloudVendorNotFound = "This cloud vendor is not currently supported";
+        public static readonly string CloudTypeNotFound = "This cloud service type is not currently supported";
 
         
         
