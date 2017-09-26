@@ -4,6 +4,7 @@
 -- DROP TABLE IF EXISTS `durados_Action`;
 CREATE TABLE `durados_Cloud` (
   `Id` int AUTO_INCREMENT NOT NULL,
+  `Type` varchar(50)  NOT NULL,
   `Name` varchar(250) NOT NULL,
   `CloudVendor` varchar(50) NOT NULL,
   `AwsRegion` varchar(250)  NULL,

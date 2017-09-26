@@ -3020,7 +3020,12 @@ namespace Durados.Web.Mvc
                 privateKeyField.HideInEdit = true;
                 privateKeyField.HideInTable = true;
             }
-            
+            if (cloudView.Fields.ContainsKey("Type"))
+            {
+                ColumnField typeField = cloudView.Fields["Type"] as ColumnField;
+                typeField.HideInEdit = true;
+                typeField.HideInTable = true;
+            }
 
             db.Views["durados_Cloud"].SystemView = true;
         }

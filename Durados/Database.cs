@@ -85,6 +85,7 @@ namespace Durados
         public static readonly string EnableDecryptionKey = "EnableDecryption";
 
         public static readonly string CloudViewName = "durados_Cloud";
+       
         
         public virtual Guid Guid
         {
@@ -1232,6 +1233,7 @@ namespace Durados
         }
 
         private bool translateAllViews = false;
+        
         [Durados.Config.Attributes.ColumnProperty(Description = "If true than Translate user table display names and lables. The default is false.")]
         public virtual bool TranslateAllViews
         {

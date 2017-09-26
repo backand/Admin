@@ -17,6 +17,7 @@ namespace Durados
 
         public int Id { get; set; }
 
+        public CloudType Type{get; set; }
         public string Name { get; set; }
 
         public CloudVendor CloudVendor { get; set; }
@@ -176,5 +177,10 @@ namespace Durados
         AWS
         , Azure
         , GCP
+    }
+    public enum CloudType
+    {
+        Function
+            ,Storage
     }
 }

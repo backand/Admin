@@ -73,6 +73,8 @@ namespace Durados
 
         public override ICloudCredentials GetCredentialsForRule(Rule rule, string arn)
         {
+            if(rule ==null || rule.LambdaProperties == null)
+                return new AzureCredentials() { FuncObject = null, Cloud = (ICloudForCreds)this };
 
             System.Runtime.Serialization.Json.DataContractJsonSerializer jss = new System.Runtime.Serialization.Json.DataContractJsonSerializer(typeof(AzureFunction));
 

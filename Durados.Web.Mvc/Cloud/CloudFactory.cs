@@ -11,6 +11,7 @@ namespace Durados.Web.Mvc
     {
         public static  Durados.Cloud GetCloud(System.Data.DataRowView row, int id, Database Database )
         {
+            CloudType type = row.Row.IsNull("type") ? CloudType.Function : (CloudType)Enum.Parse(typeof(CloudType), (string)row["type"]);
             string accessKeyId = row.Row.IsNull("AccessKeyId") ? null : (string)row["AccessKeyId"];
             string awsRegion = row.Row.IsNull("AwsRegion") ? null : (string)row["AwsRegion"];
             CloudVendor cloudVendor = row.Row.IsNull("CloudVendor") ? CloudVendor.AWS : (CloudVendor)Enum.Parse(typeof(CloudVendor), (string)row["CloudVendor"]);
@@ -25,7 +26,7 @@ namespace Durados.Web.Mvc
                         string tenant = row.Row.IsNull("tenant") ? null : (string)row["tenant"];
                         string appId = row.Row.IsNull("appId") ? null : (string)row["appId"];
                         string subscriptionId = row.Row.IsNull("subscriptionId") ? null : (string)row["subscriptionId"];
-                        Cloud cloud = new AzureCloud(Database) { Id = id, AppId = appId, SubscriptionId = subscriptionId, EncryptedPassword = encryptedPassword, tenant = tenant, CloudVendor = cloudVendor, Name = name };
+                        Cloud cloud = new AzureCloud(Database) { Id = id, AppId = appId, SubscriptionId = subscriptionId, EncryptedPassword = encryptedPassword, tenant = tenant, CloudVendor = cloudVendor, Name = name, Type = type };
                         
                        
                         return cloud;
@@ -37,7 +38,7 @@ namespace Durados.Web.Mvc
                         string clientEmail = row.Row.IsNull("ClientEmail") ? null : (string)row["ClientEmail"];
                         string encryptedPrivateKey = row.Row.IsNull("EncryptedPrivateKey") ? null : (string)row["EncryptedPrivateKey"];
 
-                        Cloud cloud = new GoogleCloud(Database) { Id = id, EncryptedPrivateKey = encryptedPrivateKey, ClientEmail = clientEmail, ProjectName = projectName, CloudVendor = cloudVendor, Name = name };
+                        Cloud cloud = new GoogleCloud(Database) { Id = id, EncryptedPrivateKey = encryptedPrivateKey, ClientEmail = clientEmail, ProjectName = projectName, CloudVendor = cloudVendor, Name = name, Type = type  };
 
 
                         return cloud;
@@ -45,7 +46,7 @@ namespace Durados.Web.Mvc
                     }
                     
                 default:
-                    return new Cloud(Database) { Id = id, AccessKeyId = accessKeyId, Region = awsRegion, CloudVendor = cloudVendor, EncryptedSecretAccessKey = encryptedSecretAccessKey, Name = name };
+                    return new Cloud(Database) { Id = id, AccessKeyId = accessKeyId, Region = awsRegion, CloudVendor = cloudVendor, EncryptedSecretAccessKey = encryptedSecretAccessKey, Name = name, Type = type };
                     
             }
             
@@ -55,6 +56,7 @@ namespace Durados.Web.Mvc
 
         public static Cloud GetCloud(DataActionEventArgs e, Database Database )
         {
+            CloudType type = !e.Values.ContainsKey("type") ? CloudType.Function : (CloudType)Enum.Parse(typeof(CloudType), (string)e.Values["type"]);
             string accessKeyId = !e.Values.ContainsKey("AccessKeyId") ? null : (string)e.Values["AccessKeyId"];
             string awsRegion = !e.Values.ContainsKey("AwsRegion") ? null : (string)e.Values["AwsRegion"];
             CloudVendor cloudVendor = !e.Values.ContainsKey("CloudVendor") ? CloudVendor.AWS : (CloudVendor)Enum.Parse(typeof(CloudVendor), (string)e.Values["CloudVendor"]);
@@ -69,7 +71,7 @@ namespace Durados.Web.Mvc
                         string tenant = !e.Values.ContainsKey("tenant") ? null : (string)e.Values["tenant"];
                         string appId = !e.Values.ContainsKey("appId") ? null : (string)e.Values["appId"];
                         string subscriptionId = !e.Values.ContainsKey("subscriptionId") ? null : (string)e.Values["subscriptionId"];
-                        Cloud cloud = new AzureCloud(Database) {  AppId = appId, SubscriptionId = subscriptionId, EncryptedPassword = encryptedPassword, tenant = tenant, CloudVendor = cloudVendor, Name = name };
+                        Cloud cloud = new AzureCloud(Database) { AppId = appId, SubscriptionId = subscriptionId, EncryptedPassword = encryptedPassword, tenant = tenant, CloudVendor = cloudVendor, Name = name, Type = type };
 
 
                         return cloud;
@@ -81,7 +83,7 @@ namespace Durados.Web.Mvc
                         string clientEmail = !e.Values.ContainsKey("ClientEmail") ? null : (string)e.Values["ClientEmail"];
                         string encryptedPrivateKey = !e.Values.ContainsKey("EncryptedPrivateKey") ? null : (string)e.Values["EncryptedPrivateKey"];
 
-                        Cloud cloud = new GoogleCloud(Database) {  EncryptedPrivateKey = encryptedPrivateKey, ClientEmail = clientEmail, ProjectName = projectName, CloudVendor = cloudVendor, Name = name };
+                        Cloud cloud = new GoogleCloud(Database) { EncryptedPrivateKey = encryptedPrivateKey, ClientEmail = clientEmail, ProjectName = projectName, CloudVendor = cloudVendor, Name = name, Type = type };
 
 
                         return cloud;
@@ -89,7 +91,7 @@ namespace Durados.Web.Mvc
                     }
 
                 default:
-                    return new Cloud(Database) {  AccessKeyId = accessKeyId, Region = awsRegion, CloudVendor = cloudVendor, EncryptedSecretAccessKey = encryptedSecretAccessKey, Name = name };
+                    return new Cloud(Database) { AccessKeyId = accessKeyId, Region = awsRegion, CloudVendor = cloudVendor, EncryptedSecretAccessKey = encryptedSecretAccessKey, Name = name, Type = type };
 
             }
            

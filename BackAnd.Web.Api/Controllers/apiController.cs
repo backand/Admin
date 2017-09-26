@@ -1451,7 +1451,7 @@ namespace BackAnd.Web.Api.Controllers
         {
             if (!e.View.Name.Equals(Durados.Database.CloudViewName))
                 return;
-            Durados.Cloud cloud = CloudFactory.GetCloud(e, Map.Database);
+
             if( e is EditEventArgs)
             {
 
@@ -1464,12 +1464,49 @@ namespace BackAnd.Web.Api.Controllers
                     return;
 
             }
-
+            Durados.Cloud cloud = Map.Database.Clouds.Values.Where(c => c.Id.ToString() == e.PrimaryKey).FirstOrDefault();
+            if (e is DeleteEventArgs)
+            {
+                DeleteCloudFunctions(cloud);
+                return;
+            }
             Durados.Workflow.NodeJS nodejs = new Durados.Workflow.NodeJS();
 
             foreach (var creds in cloud.GetCloudCredentials())
                 nodejs.GetLambdaList(creds);
             
+
+        }
+
+        private void DeleteCloudFunctions(Cloud cloud)
+        {
+            try
+            {
+                if (!IsAdmin())
+                {
+                    throw new DuradosException("Forbidden");
+                }
+
+                Durados.Web.Mvc.View ruleView = (Durados.Web.Mvc.View)Map.GetConfigDatabase().Views["Rule"];
+                Durados.Web.Mvc.View functionView = (Durados.Web.Mvc.View)Maps.Instance.GetMap().Database.Views["_root"];
+                var rules = functionView.GetRules().Where(r => r.CloudSecurity == cloud.Id);
+                
+                if (rules.Count() == 0)
+                    return;
+
+                foreach (Durados.Rule rule in rules)
+                {
+                    ruleView.Delete(rule.ID.ToString(), null, null, null);
+                }
+                RefreshConfigCache();
+
+            }
+            catch (Exception exception)
+            {
+                throw new BackAndApiUnexpectedResponseException(exception, this);
+
+            }
+
 
         }
 
@@ -1981,6 +2018,7 @@ namespace BackAnd.Web.Api.Controllers
             //Workflow.Engine wfe = CreateWorkflowEngine();
             if (Database == null)
                 Database = Map.Database;
+            HandleCloudView(e);
             string userViewName = ((Durados.Web.Mvc.Database)Database).UserViewName;
             if (e.View.Name == userViewName)
             {

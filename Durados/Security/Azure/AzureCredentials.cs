@@ -9,11 +9,6 @@ namespace Durados.Security.Cloud
     public class AzureCredentials : ICloudCredentials
     {
         public ICloudForCreds Cloud { get; set; }
-        //public string tenant { get { return (Cloud as AzureCloud).tenant; } }
-        //public string AppId { get { return (Cloud as AzureCloud).AppId; } }
-        //public string SubscriptionId { get { return (Cloud as AzureCloud).SubscriptionId; } }
-        //public string Password { get { return (Cloud as AzureCloud).DecryptedPassword; } }
-        //public string Region { get { return "general"; } set { } }
 
         public AzureFunction FuncObject { get; set; }
         public string GetProvider()
@@ -35,7 +30,8 @@ namespace Durados.Security.Cloud
         public  Dictionary<string, object> GetFunctionObject(string functionArn)
         {
             Dictionary<string, object> data = new Dictionary<string, object>();
-
+            if (FuncObject == null)
+                return data;
             data.Add("authLevel", FuncObject.authLevel);
             data.Add("trigger", FuncObject.trigger);
             data.Add("key", FuncObject.key);
