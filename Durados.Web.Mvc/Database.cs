@@ -2088,7 +2088,11 @@ namespace Durados.Web.Mvc
 
         protected override void LoadClouds()
         {
-            this.Map.LoadClouds();
+            this.Map.LoadClouds(Map.Database.Clouds, CloudType.Function);
+        }
+        protected override void LoadStorages()
+        {
+            this.Map.LoadClouds(Map.Database.CloudStorages, CloudType.Storage);
         }
     }
 }

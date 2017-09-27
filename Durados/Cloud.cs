@@ -177,6 +177,7 @@ namespace Durados
         AWS
         , Azure
         , GCP
+        , Local
     }
     public enum CloudType
     {

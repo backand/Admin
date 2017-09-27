@@ -539,18 +539,18 @@ namespace Durados
             private set { crons = value; }
         }
 
-        private Dictionary<int, Cloud> clouds = null;
+        private Dictionary<int, Cloud> cloudsFunctions = null;
         public Dictionary<int, Cloud> Clouds
         {
             get
             {
-                if (clouds == null)
+                if (cloudsFunctions == null)
                 {
-                    clouds = new Dictionary<int, Cloud>();
+                    cloudsFunctions = new Dictionary<int, Cloud>();
                     LoadClouds();
                 }
 
-                return clouds;
+                return cloudsFunctions;
             }
         }
 
@@ -559,6 +559,25 @@ namespace Durados
             throw new NotImplementedException();
         }
 
+        private Dictionary<int, Cloud> cloudStorages = null;
+        public Dictionary<int, Cloud> CloudStorages
+        {
+            get
+            {
+                if (cloudStorages == null)
+                {
+                    cloudStorages = new Dictionary<int, Cloud>();
+                    LoadStorages();
+                }
+
+                return cloudStorages;
+            }
+        }
+
+        protected virtual void LoadStorages()
+        {
+            throw new NotImplementedException();
+        }
         [Durados.Config.Attributes.ParentProperty(TableName = "MyCharts")]
         public MyCharts MyCharts { get; set; }
 

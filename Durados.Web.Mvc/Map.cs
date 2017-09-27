@@ -3801,19 +3801,20 @@ namespace Durados.Web.Mvc
             }
         }
 
-        public void LoadClouds()
+        public void LoadClouds(Dictionary<int, Cloud> dictionary,  CloudType type)
         {
             View view = (View)Database.Views["durados_Cloud"];
             int rowCount;
             DataView dataView = view.FillPage(1, 1000, null, null, null, out rowCount, null, null);
+            dataView.RowFilter = "(Type = '" + type.ToString() + "')";
             foreach (System.Data.DataRowView row in dataView)
             {
                 int id = (int)row["Id"];
                 Durados.Cloud cloud = CloudFactory.GetCloud(row, id, Database);
-                Database.Clouds.Add(id, cloud);
+                dictionary.Add(id, cloud);
             }
         }
-
+        
         public void UpdateAppInfo()
         {
             if (SiteInfo != null)
@@ -5404,6 +5405,7 @@ namespace Durados.Web.Mvc
             
             return security.encrypt(text, Guid.ToString() + Maps.AwsAccountSecretKeyPart);
         }
+
     }
 
     
