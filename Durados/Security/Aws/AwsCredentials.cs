@@ -43,5 +43,6 @@ namespace Durados.Security.Cloud
             return data;
            
         }
+
     }
 }

@@ -11,11 +11,10 @@ namespace Durados.Security.Cloud
         ICloudForCreds Cloud { get; set; }
 
         Dictionary<string, object> GetCredentials();
-      
-        //string Region { get; set; }
 
         string GetProvider();
 
         Dictionary<string, object> GetFunctionObject(string functionArn);
     }
+    
 }

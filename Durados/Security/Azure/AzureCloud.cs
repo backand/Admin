@@ -47,6 +47,15 @@ namespace Durados
 
         public string tenant { get; set; }
         public string SubscriptionId { get; set; }
+        private string connectionString;
+        public string ConnectionString
+        {
+            get
+            {
+                return connectionString;
+            }
+            set { connectionString = value; }
+        }
       
         public override ICloudCredentials[] GetCloudCredentials()
         {
@@ -68,6 +77,13 @@ namespace Durados
 
             return filteredObject;
 
+
+        }
+
+        public override Dictionary<string, object> GetCredentialsForStorage()
+        {
+
+            return new Dictionary<string, object>() { { "connectionString", ConnectionString }};
 
         }
 

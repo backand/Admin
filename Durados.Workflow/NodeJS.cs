@@ -193,10 +193,6 @@ namespace Durados.Workflow
             Dictionary<string, object> data = new Dictionary<string, object>();
             data.Add("credentials",cloudCredentials.GetCredentials());
             data.Add("cloudProvider", cloudCredentials.GetProvider() );
-
-            //data.Add("awsRegion", awsCredentials.Region);
-            //data.Add("accessKeyId", awsCredentials.AccessKeyID);
-            //data.Add("secretAccessKey", awsCredentials.SecretAccessKey);
             data.Add("functionName", lambdaFunctionName);
 
             request.setRequestHeader("content-type", "application/json");
@@ -259,11 +255,6 @@ namespace Durados.Workflow
                 }
             }
 
-            //data.Add("awsRegion", awsCredentials.Region);
-            //data.Add("accessKeyId", awsCredentials.AccessKeyID);
-            //data.Add("secretAccessKey", awsCredentials.SecretAccessKey);
-            //Dictionary<string, object> function = new Dictionary<string, object>();
-            //function.Add("arn",);
             data.Add("payload", payload);
             data.Add("function", cloudCredentials.GetFunctionObject(functionArn));
             Guid requestId = Guid.NewGuid();

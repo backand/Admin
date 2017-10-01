@@ -26,7 +26,8 @@ namespace Durados.Web.Mvc
                         string tenant = row.Row.IsNull("tenant") ? null : (string)row["tenant"];
                         string appId = row.Row.IsNull("appId") ? null : (string)row["appId"];
                         string subscriptionId = row.Row.IsNull("subscriptionId") ? null : (string)row["subscriptionId"];
-                        Cloud cloud = new AzureCloud(Database) { Id = id, AppId = appId, SubscriptionId = subscriptionId, EncryptedPassword = encryptedPassword, tenant = tenant, CloudVendor = cloudVendor, Name = name, Type = type };
+                        string connectionString = row.Row.IsNull("connectionString") ? null : (string)row["connectionString"];
+                        Cloud cloud = new AzureCloud(Database) { Id = id, AppId = appId, SubscriptionId = subscriptionId, EncryptedPassword = encryptedPassword, tenant = tenant, CloudVendor = cloudVendor, Name = name, ConnectionString = connectionString, Type = type };
                         
                        
                         return cloud;
@@ -71,7 +72,9 @@ namespace Durados.Web.Mvc
                         string tenant = !e.Values.ContainsKey("tenant") ? null : (string)e.Values["tenant"];
                         string appId = !e.Values.ContainsKey("appId") ? null : (string)e.Values["appId"];
                         string subscriptionId = !e.Values.ContainsKey("subscriptionId") ? null : (string)e.Values["subscriptionId"];
-                        Cloud cloud = new AzureCloud(Database) { AppId = appId, SubscriptionId = subscriptionId, EncryptedPassword = encryptedPassword, tenant = tenant, CloudVendor = cloudVendor, Name = name, Type = type };
+                        string connectionString = !e.Values.ContainsKey("connectionString") ? null : (string)e.Values["connectionString"];
+                        
+                        Cloud cloud = new AzureCloud(Database) { AppId = appId, SubscriptionId = subscriptionId, EncryptedPassword = encryptedPassword, tenant = tenant, CloudVendor = cloudVendor, Name = name, ConnectionString= connectionString, Type = type };
 
 
                         return cloud;

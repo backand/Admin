@@ -79,16 +79,17 @@ namespace Durados
             }
             return list.ToArray();
         }
+        public virtual Dictionary<string, object> GetCredentialsForStorage()
+        {
+
+            return new Dictionary<string, object>() { { "accessKeyId", AccessKeyId }, { "secretAccessKey", DecryptedSecretAccessKey } };
+            
+        }
         public virtual string GetCloudDescriptor()
         {
 
-            //if (provider != null)
-            //    return provider.GetCloudDescriptor();
             return AccessKeyId;
-
-
         }
-
 
         public virtual void SetSelectedFunctions(Dictionary<string, Dictionary<string, object>[]>.ValueCollection valueCollection, View functionView)
         { 
@@ -109,7 +110,7 @@ namespace Durados
                         throw new DuradosException("ORM did not return lambda list with Function name");
                     string arn = lambdaFunction[ARN].ToString();
                     string name = lambdaFunction[FunctionName].ToString();
-                    Rule rule = GetRuleByArn(arn,name, functionView);
+                    Rule rule = GetRuleByArn(arn,name, this.Id, functionView);
                     bool selected = (rule != null);
                     lambdaFunction.Add(SELECTED, selected);
                     if (rule != null)
@@ -123,9 +124,9 @@ namespace Durados
             return (valueCollection == null || valueCollection.Count == 0 || valueCollection.First() == null);
         }
 
-        public virtual Rule GetRuleByArn(string arn, string name,View functionView)
+        public virtual Rule GetRuleByArn(string arn, string name, int cloudId,View functionView)
         {
-            return functionView.GetRules().Where(r => r.LambdaArn == arn).FirstOrDefault();
+            return functionView.GetRules().Where(r => r.LambdaArn == arn && r.CloudSecurity == cloudId ).FirstOrDefault();
         }
 
 
@@ -156,11 +157,25 @@ namespace Durados
             string accessKeyID = this.AccessKeyId;
             return new Durados.Security.Cloud.AwsCredentials() { Region = region, SecretAccessKey = secretAccessKey, AccessKeyID = accessKeyID };
         }
+
+        public virtual Dictionary<string,object>  GetStorageDetails(string fileName, string bucket, string path)
+        {
+            Dictionary<string, object> data = new Dictionary<string, object>();
+            data.Add("fileName",fileName);
+            data.Add("bucket",bucket);
+            data.Add("dir", path);               
+             
+            return data;
+        }
     }
     public interface ICloudProvider
     {
         string GetCloudDescriptor();
         ICloudCredentials[] GetCloudCredentials();
+
+        Dictionary<string, object> GetCredentialsForStorage();
+      
+
         //void SetSelectedFunctions(Dictionary<string, Dictionary<string, object>[]>.ValueCollection valueCollection, View functionView);
 
     }
@@ -172,6 +187,8 @@ namespace Durados
 
      
     }
+
+    
     public enum CloudVendor
     {
         AWS

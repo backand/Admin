@@ -50,7 +50,7 @@ namespace BackAnd.Web.Api.Controllers
 
                 byte[] bytes = Convert.FromBase64String(filedata);
 
-                Backand.files files = new Backand.files();
+                Backand.cloudFiles files = new Backand.cloudFiles();
                 string url = files.upload(filename, filedata);
                 return Ok(new { url = url });
             }
@@ -74,7 +74,7 @@ namespace BackAnd.Web.Api.Controllers
                     return ResponseMessage(Request.CreateResponse(HttpStatusCode.Conflict, "You must send the filename parameter"));
                 String filename = System.Web.HttpContext.Current.Server.UrlDecode((String)jsonPostDict["filename"]);
                 
-                Backand.files files = new Backand.files();
+                Backand.cloudFiles files = new Backand.cloudFiles();
                 files.delete(filename);
                 return Ok();
             }

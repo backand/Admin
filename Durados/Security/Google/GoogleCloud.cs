@@ -55,6 +55,12 @@ namespace Durados
             return list.ToArray();
         }
 
+        public override Dictionary<string, object> GetCredentialsForStorage()
+        {
+
+            return new Dictionary<string, object>() { { "privateKey", DecryptedPrivateKey }, { "clientEmail", ClientEmail } };
+
+        }
         public override Dictionary<string, object> GetFunctionObject(Dictionary<string, object> functionObject)
         {
             Dictionary<string, object> filteredObject = new Dictionary<string, object>();

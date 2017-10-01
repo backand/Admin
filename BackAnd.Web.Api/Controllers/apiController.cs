@@ -1455,7 +1455,8 @@ namespace BackAnd.Web.Api.Controllers
             if (e is DeleteEventArgs)
             {
                 Durados.Cloud deleteCloud = Map.Database.Clouds.Values.Where(c => c.Id.ToString() == e.PrimaryKey).FirstOrDefault();
-                DeleteCloudFunctions(deleteCloud);
+                if(deleteCloud != null)                    
+                    DeleteCloudFunctions(deleteCloud);
                 return;
             }
 
