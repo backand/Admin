@@ -163,7 +163,8 @@ namespace Durados
             Dictionary<string, object> data = new Dictionary<string, object>();
             data.Add("fileName",fileName);
             data.Add("bucket",bucket);
-            data.Add("dir", path);               
+            if(!string.IsNullOrEmpty(path))
+                data.Add("dir", path);               
              
             return data;
         }
