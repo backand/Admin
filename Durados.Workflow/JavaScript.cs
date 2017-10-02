@@ -21,7 +21,7 @@ namespace Durados.Workflow
         const string FILEDATA = "filedata";
         public static readonly string ActionInfo = "ActionInfo";
         public static readonly string ActionHeaderKey = "Backand-Action-Guid";
-        
+        public static readonly string StorageAccountsKey = "storage_accounts";
         #endregion
 
         private static string xhr = null;
@@ -716,6 +716,7 @@ namespace Durados.Workflow
                 upload = true;
                 System.Web.HttpContext.Current.Items["file_stream"] = clientParameters[FILEDATA];
                 clientParameters[FILEDATA] = "file_stream";
+                System.Web.HttpContext.Current.Items[StorageAccountsKey] = view.Database.CloudStorages;
                 clientParametersToSend = clientParameters;
             }
             var dbRow = parser.Parse(Newtonsoft.Json.JsonConvert.SerializeObject(oldRow));
@@ -755,7 +756,7 @@ namespace Durados.Workflow
             Backand.Logger.Log(startMessage, 502);
 
 
-            var call = new Jint.Engine(cfg => cfg.AllowClr(typeof(Backand.XMLHttpRequest).Assembly), timeoutInterval, 160, new ActionPath() { @object = view.JsonName, action = actionName });
+            var call = new Jint.Engine(cfg => cfg.AllowClr(typeof(Backand.XMLHttpRequest).Assembly), timeoutInterval, 184, new ActionPath() { @object = view.JsonName, action = actionName });
 
             try
             {

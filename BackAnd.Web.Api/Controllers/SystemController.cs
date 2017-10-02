@@ -104,7 +104,7 @@ namespace BackAnd.Web.Api.Controllers
 
         private string GetNodeVersion()
         {
-            string url = GetSocketUrl();
+            string url = GetNodeUrl();
             var httpWebRequest = (HttpWebRequest)WebRequest.Create(url);
             httpWebRequest.Method = "GET";
             httpWebRequest.Timeout = 150;

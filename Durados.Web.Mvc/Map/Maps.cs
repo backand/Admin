@@ -30,7 +30,7 @@ using System.Collections.Specialized;
 using System.Configuration;
 using System.Web.Script.Serialization;
 using System.Runtime.Caching;
-using Durados.Security.Aws;
+using Durados.Security.Cloud;
 
 namespace Durados.Web.Mvc
 {

@@ -105,6 +105,10 @@ namespace BackAnd.Web.Api.Controllers
                         categories.Add(category);
                     }
                 }
+                if(rule.ContainsKey("actionType")  && rule["actionType"] != null &&  rule["actionType"].ToString() == Durados.ActionType.Function.ToString() && !rule.ContainsKey(CloudProviderPropertyName))
+                {
+                    rule.Add(CloudProviderPropertyName, GetCloudVendor(rule));
+                }
             }
 
             if (!IsAdmin())
@@ -133,6 +137,13 @@ namespace BackAnd.Web.Api.Controllers
 
             
             relatedObjects.Add("categories", categories.ToArray());
+        }
+
+        private string GetCloudProviderName(Dictionary<string, object> rule)
+        {
+            if (rule.ContainsKey("lambdaArn") && rule["lambdaArn"] != null && rule["lambdaArn"] is string && !rule["lambdaArn"].ToString().Contains(":aws:"))
+                return Durados.CloudVendor.Azure.ToString();
+            return Durados.CloudVendor.AWS.ToString();
         }
 
         private void RemoveNotAllowedRules(Dictionary<string, object> items)
@@ -787,13 +798,32 @@ namespace BackAnd.Web.Api.Controllers
             }
 
             string actionName = e.Values[Name].ToString();
+            
+           
+            string cloudProvider = GetCloudVendor(e.Values);
+            
             if (fileName == null)
             {
                 fileName = actionName + ".zip";
             }
             string functionName = Map.AppName + "_" + viewName + "_" + actionName;
             string folder = Map.AppName + "/" + viewName + "/" + actionName;
-            nodeJS.Create(Maps.NodeJSBucket, folder, fileName, functionName, "handler", "handler");
+
+            nodeJS.Create(Maps.NodeJSBucket, folder, fileName, functionName, "handler", "handler", cloudProvider);
+        }
+
+        private static string GetCloudVendor(Dictionary<string,object>  vals)
+        {
+            string cloudIdStr = null;
+            if (vals.ContainsKey("cloudSecurity"))
+                cloudIdStr = vals["cloudSecurity"].ToString();
+
+            string cloudProvider = Durados.CloudVendor.AWS.ToString() ;
+            int cloudId;
+
+            if (!string.IsNullOrEmpty(cloudIdStr) && int.TryParse(cloudIdStr, out cloudId) && Maps.Instance.GetMap().Database.Clouds.ContainsKey(cloudId))
+                cloudProvider = Maps.Instance.GetMap().Database.Clouds[cloudId].CloudVendor.ToString();
+            return cloudProvider;
         }
 
         private bool IsNodeJSFunction(Durados.CreateEventArgs e)

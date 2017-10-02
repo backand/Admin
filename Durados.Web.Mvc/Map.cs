@@ -3000,6 +3000,32 @@ namespace Durados.Web.Mvc
             encryptedSecretAccessKeyField.SysEncrypted = true;
             encryptedSecretAccessKeyField.HideInEdit = true;
             encryptedSecretAccessKeyField.HideInTable = true;
+            encryptedSecretAccessKeyField.Required = false;
+            ColumnField accessKeyIdField = cloudView.Fields["AccessKeyId"] as ColumnField;
+            accessKeyIdField.Required = false;
+            ColumnField awsRegionField = cloudView.Fields["AwsRegion"] as ColumnField;
+            awsRegionField.Required = false;
+            if (cloudView.Fields.ContainsKey("password"))
+            {
+                ColumnField passwordField = cloudView.Fields["password"] as ColumnField;
+                passwordField.SysEncrypted = true;
+                passwordField.HideInEdit = true;
+                passwordField.HideInTable = true;
+            }
+
+            if (cloudView.Fields.ContainsKey("EncryptedPrivateKey"))
+            {
+                ColumnField privateKeyField = cloudView.Fields["EncryptedPrivateKey"] as ColumnField;
+                privateKeyField.SysEncrypted = true;
+                privateKeyField.HideInEdit = true;
+                privateKeyField.HideInTable = true;
+            }
+            if (cloudView.Fields.ContainsKey("Type"))
+            {
+                ColumnField typeField = cloudView.Fields["Type"] as ColumnField;
+                typeField.HideInEdit = true;
+                typeField.HideInTable = true;
+            }
 
             db.Views["durados_Cloud"].SystemView = true;
         }
@@ -3775,23 +3801,20 @@ namespace Durados.Web.Mvc
             }
         }
 
-        public void LoadClouds()
+        public void LoadClouds(Dictionary<int, Cloud> dictionary,  CloudType type)
         {
             View view = (View)Database.Views["durados_Cloud"];
             int rowCount;
             DataView dataView = view.FillPage(1, 1000, null, null, null, out rowCount, null, null);
+            dataView.RowFilter = "(Type = '" + type.ToString() + "')";
             foreach (System.Data.DataRowView row in dataView)
             {
                 int id = (int)row["Id"];
-                string accessKeyId = row.Row.IsNull("AccessKeyId") ? null : (string)row["AccessKeyId"];
-                string awsRegion = row.Row.IsNull("AwsRegion") ? null : (string)row["AwsRegion"]; 
-                CloudVendor cloudVendor = row.Row.IsNull("CloudVendor") ? CloudVendor.AWS : (CloudVendor)Enum.Parse(typeof(CloudVendor), (string)row["CloudVendor"]);
-                string encryptedSecretAccessKey = row.Row.IsNull("EncryptedSecretAccessKey") ? null : (string)row["EncryptedSecretAccessKey"];
-                string name = row.Row.IsNull("Name") ? null : (string)row["Name"]; 
-                Database.Clouds.Add(id, new Cloud(Database) { Id = id, AccessKeyId = accessKeyId, AwsRegion = awsRegion, CloudVendor = cloudVendor, EncryptedSecretAccessKey = encryptedSecretAccessKey, Name = name });
+                Durados.Cloud cloud = CloudFactory.GetCloud(row, id, Database);
+                dictionary.Add(id, cloud);
             }
         }
-
+        
         public void UpdateAppInfo()
         {
             if (SiteInfo != null)
@@ -5382,6 +5405,7 @@ namespace Durados.Web.Mvc
             
             return security.encrypt(text, Guid.ToString() + Maps.AwsAccountSecretKeyPart);
         }
+
     }
 
     

@@ -5579,6 +5579,7 @@ namespace Durados.Web.Mvc.UI.Helpers
         public string name { get; set; }
         public string arn { get; set; }
         public string description { get; set; }
+        public Dictionary<string, object> lambdaProperties { get; set; }
         public string friendlyName { get; set; }
         public bool select { get; set; }
     }
@@ -5603,8 +5604,18 @@ namespace Durados.Web.Mvc.UI.Helpers
             foreach (Dictionary<string, object> cloudJson in cloudsJson)
             {
                 int cloudId = Convert.ToInt32(cloudJson["id"]);
-                cloudJson["functions"] = GetLambdaListByRegions(Maps.Instance.GetMap().Database.Clouds[cloudId]);
+                try
+                {
+                    cloudJson["functions"] = GetLambdaListByGroups(Maps.Instance.GetMap().Database.Clouds[cloudId]); 
+                }
+                catch (Durados.Workflow.NodeJsLambdaListException ex)
+                {
+                    cloudJson.Add("error", new { message = ex.Message });
+                }
+                
             }
+            
+            json["totalRows"] = cloudsJson.Count();
 
             json.Add("data", cloudsJson);
 
@@ -5617,40 +5628,75 @@ namespace Durados.Web.Mvc.UI.Helpers
             
             foreach (Cloud cloud in Maps.Instance.GetMap().Database.Clouds.Values)
             {
-                cloudsJson.Add(new Dictionary<string, object>() { { "id", cloud.Id }, { "name", cloud.Name }, { "accessKeyId", cloud.AccessKeyId }, { "functions", null } });
+                cloudsJson.Add(new Dictionary<string, object>() { { "id", cloud.Id }, { "name", cloud.Name }, { "accessKeyId", cloud.GetCloudDescriptor() }, { "cloudVendor", cloud.CloudVendor.ToString() }, { "functions", null } });
             }
 
             return cloudsJson.ToArray();
         }
 
-        private Dictionary<string, object> GetLambdaListByRegions(Cloud cloud)
+        private Dictionary<string, object> GetLambdaListByGroups(Cloud cloud)
         {
-            Dictionary<string, object> regions = new Dictionary<string, object>();
-
+            Dictionary<string, object> groups = new Dictionary<string, object>();
+                            
             Durados.Workflow.NodeJS nodejs = new Durados.Workflow.NodeJS();
 
-            Durados.Security.Aws.AwsCredentials[] credentials = cloud.GetAwsCredentials();
-            foreach (Durados.Security.Aws.AwsCredentials credential in credentials)
+            Durados.Security.Cloud.ICloudCredentials[] credentials = cloud.GetCloudCredentials();
+            foreach (Durados.Security.Cloud.ICloudCredentials credential in credentials)
             {
-                regions.Add(credential.Region, GetLambdaList(nodejs, credential));
+                
+                Dictionary<string, Dictionary<string, object>[]>  funcListGroups = GetLambdaList(nodejs, credential);
+                foreach (var funcList in funcListGroups)
+                {
+                    if (!groups.Keys.Contains(funcList.Key))
+                            groups.Add(funcList.Key, funcList.Value);
+                }
+                
             }
 
             //Durados.Security.Aws.AwsCredentials credential = cloud.GetAwsCredentials();
             //regions.Add(credential.Region, nodejs.GetLambdaList(credential));
 
-            return regions;
+            return groups;
         }
 
-        private Dictionary<string, object>[] GetLambdaList(Durados.Workflow.NodeJS nodejs, Durados.Security.Aws.AwsCredentials credential)
+     
+
+
+        private Dictionary<string, Dictionary<string, object>[]> GetLambdaList(Durados.Workflow.NodeJS nodejs, Durados.Security.Cloud.ICloudCredentials credential)
         {
             var lambdaList = nodejs.GetLambdaList(credential);
 
-            SetSelectedFunctions(lambdaList);
+           credential.Cloud.SetSelectedFunctions(lambdaList.Values, functionView);
 
             return lambdaList;
         }
 
-        private void SetSelectedFunctions(Dictionary<string, object>[] lambdaList)
+        private void SetSelectedFunctions(Dictionary<string, Dictionary<string, object>[]>.ValueCollection valueCollection)
+        {
+            foreach (var lambdaList in valueCollection)
+            {
+                foreach (var lambdaFunction in lambdaList)
+                {
+                    const string FunctionId = "functionId";
+                    const string ARN = "FunctionArn";
+                    const string SELECTED = "selected";
+                    if (!lambdaFunction.ContainsKey(ARN))
+                        throw new DuradosException("ORM did not return lambda list with FunctionArn");
+                    string arn = lambdaFunction[ARN].ToString();
+                    Rule rule = GetRuleByArn(arn);
+                    bool selected = (rule != null);
+                    lambdaFunction.Add(SELECTED, selected);
+                    if (rule != null)
+                        lambdaFunction.Add(FunctionId, rule.ID);
+                }
+            }
+        }
+
+        
+
+        
+
+        private void SetSelectedFunctions( Dictionary<string, object>[] lambdaList)
         {
             foreach (var lambdaFunction in lambdaList)
             {
@@ -5684,17 +5730,25 @@ namespace Durados.Web.Mvc.UI.Helpers
         private LambdaSelectionResult Select(LambdaSelection selection, BeforeCreateEventHandler beforeCreateCallback, BeforeCreateInDatabaseEventHandler beforeCreateInDatabaseEventHandler, AfterCreateEventHandler afterCreateBeforeCommitCallback, AfterCreateEventHandler afterCreateAfterCommitCallback)
         {
             LambdaSelectionResult result = new LambdaSelectionResult() { cloudId = selection.cloudId, name = selection.name };
+            
+            Dictionary<int,Cloud> clouds = Maps.Instance.GetMap().Database.Clouds;
+            if (clouds == null || clouds.Count() == 0 || !clouds.ContainsKey(selection.cloudId) || clouds[selection.cloudId] == null)
+                 throw new FunctionCloudNotExists(selection.name, selection.cloudId);
+
+            Cloud cloud = clouds[selection.cloudId];          
             int? id;
             try
             {
                 if (selection.select)
                 {
-                    id = CreateAction(selection, beforeCreateCallback, beforeCreateInDatabaseEventHandler, afterCreateBeforeCommitCallback, afterCreateAfterCommitCallback);
+                    id = CreateAction(selection, cloud, beforeCreateCallback, beforeCreateInDatabaseEventHandler, afterCreateBeforeCommitCallback, afterCreateAfterCommitCallback);
                     result.select = true;
                 }
                 else
                 {
-                    id = DeleteAction(selection);
+                    
+
+                    id = DeleteAction(selection, cloud);
                     result.select = false;
                 }
                 result.result = true;
@@ -5713,12 +5767,12 @@ namespace Durados.Web.Mvc.UI.Helpers
         View functionView = (View)Maps.Instance.GetMap().Database.Views["_root"];
 
 
-        private int? DeleteAction(LambdaSelection selection)
+        private int? DeleteAction(LambdaSelection selection, Cloud cloud)
         {
             if (string.IsNullOrEmpty(selection.arn))
                 throw new LambdaFunctionSelectionNotContainsArn(selection.name);
 
-            Rule rule = GetRuleByArn(selection);
+            Rule rule = cloud.GetRuleByArn(selection.arn,selection.name, cloud.Id, functionView);
 
             if (rule == null)
                 throw new LambdaFunctionSelectionNotFound(selection.name);
@@ -5729,7 +5783,7 @@ namespace Durados.Web.Mvc.UI.Helpers
 
         }
 
-        private int? CreateAction(LambdaSelection selection, BeforeCreateEventHandler beforeCreateCallback, BeforeCreateInDatabaseEventHandler beforeCreateInDatabaseEventHandler, AfterCreateEventHandler afterCreateBeforeCommitCallback, AfterCreateEventHandler afterCreateAfterCommitCallback)
+        private int? CreateAction(LambdaSelection selection, Cloud cloud, BeforeCreateEventHandler beforeCreateCallback, BeforeCreateInDatabaseEventHandler beforeCreateInDatabaseEventHandler, AfterCreateEventHandler afterCreateBeforeCommitCallback, AfterCreateEventHandler afterCreateAfterCommitCallback)
         {
             if (string.IsNullOrEmpty(selection.arn))
                 throw new LambdaFunctionSelectionNotContainsArn(selection.name);
@@ -5747,11 +5801,15 @@ namespace Durados.Web.Mvc.UI.Helpers
                 newName = GetUniqueName(newName);
             }
 
+            string functionObject = GetFilteredFunctionObject(selection, cloud);
+
+            
             Dictionary<string, object> values = new Dictionary<string, object>();
 
             values.Add("Name", newName);
             values.Add("LambdaName", selection.name);
             values.Add("LambdaArn", selection.arn);
+            values.Add("LambdaProperties", functionObject);
             values.Add("CloudSecurity", selection.cloudId);
             values.Add("ActionType", ActionType.Function.ToString());
             values.Add("WorkflowAction", WorkflowAction.Lambda.ToString());
@@ -5768,6 +5826,15 @@ namespace Durados.Web.Mvc.UI.Helpers
             var dataRow = ruleView.Create(values, null, beforeCreateCallback, beforeCreateInDatabaseEventHandler, afterCreateBeforeCommitCallback, afterCreateAfterCommitCallback);
 
             return System.Convert.ToInt32(ruleView.GetPkValue(dataRow));
+        }
+
+        private static string GetFilteredFunctionObject(LambdaSelection selection, Cloud cloud)
+        {
+            string functionObject = null;
+            Dictionary<string, object> functionObjectDic = cloud.GetFunctionObject(selection.lambdaProperties);
+            if (functionObjectDic != null && functionObjectDic.Count > 0)
+                functionObject = new System.Web.Script.Serialization.JavaScriptSerializer().Serialize(functionObjectDic);//Json.JsonSerializer.Serialize(functionObjectDic);
+            return functionObject;
         }
 
         private string GetUniqueName(string newName)

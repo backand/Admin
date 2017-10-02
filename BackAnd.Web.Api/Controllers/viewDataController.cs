@@ -927,8 +927,11 @@ namespace BackAnd.Web.Api.Controllers
                     }
                 }
             }
+           
             base.BeforeEdit(e);
         }
+
+       
 
         protected override void BeforeDelete(Durados.DeleteEventArgs e)
         {

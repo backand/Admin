@@ -13,4 +13,12 @@ namespace Durados.Web.Mvc.UI.Helpers
 
         }
     }
+    class FunctionCloudNotExists : DuradosException
+    {
+        public FunctionCloudNotExists(string name, int cloudId)
+            : base("The function " + name + " cloudId " + cloudId.ToString() + " reference dose not exists")
+        {
+
+        }
+    }
 }

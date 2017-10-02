@@ -344,6 +344,13 @@ namespace System
 
         }
 
+        public static string StripToken(this string content)
+        {
+            return content.ReplaceToken(Database.DictionaryPrefix, "").ReplaceToken(Database.DictionaryPostfix, "");
+
+        }
+
+
         public static string AsToken(this string content, bool current)
         {
             if (content.StartsWith("{{"))

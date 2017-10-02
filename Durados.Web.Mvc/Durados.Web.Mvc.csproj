@@ -230,6 +230,7 @@
     <Compile Include="Azure\DuradosStorage.cs" />
     <Compile Include="Azure\StorageHelper.cs" />
     <Compile Include="ChildrenField.cs" />
+    <Compile Include="Cloud\CloudFactory.cs" />
     <Compile Include="ColumnField.cs" />
     <Compile Include="Config\IProject.cs" />
     <Compile Include="Controllers\AccountController.cs" />

@@ -35,13 +35,25 @@ namespace Durados.Workflow
             return payload;
  
         }
+        private Dictionary<string, object> GetCallLambdaPayloadExternal(object controller, Dictionary<string, Parameter> parameters, View view, Dictionary<string, object> values, DataRow prevRow, string pk, string connectionString, int currentUsetId, string currentUserRole, IDbCommand command)
+        {
+            JsActionArguments arguments = new JsActionArguments(controller, parameters, view, values, prevRow, pk, connectionString, currentUsetId, currentUserRole, command);
+
+            Dictionary<string, object> payload = new Dictionary<string, object>();
+
+           
+            payload.Add("userProfile", arguments.UserProfile);
+            return payload;
+
+        }
+
 
         private bool IsDebug(Dictionary<string, object> values)
         {
             return values.ContainsKey("{{$$debug$$}}") || System.Web.HttpContext.Current.Request.QueryString["$$debug$$"] == "true"; ;
         }
 
-        public virtual void ExecuteOld(object controller, Dictionary<string, Parameter> parameters, View view, Dictionary<string, object> values, DataRow prevRow, string pk, string connectionString, int currentUsetId, string currentUserRole, IDbCommand command, IDbCommand sysCommand, string actionName, string arn, Durados.Security.Aws.IAwsCredentials awsCredentials)
+        public virtual void ExecuteOld(object controller, Dictionary<string, Parameter> parameters, View view, Dictionary<string, object> values, DataRow prevRow, string pk, string connectionString, int currentUsetId, string currentUserRole, IDbCommand command, IDbCommand sysCommand, string actionName, string arn, Durados.Security.Cloud.ICloudCredentials awsCredentials)
         {
             const string Payload = "Payload";
             const string ErrorMessage = "errorMessage";
@@ -139,31 +151,31 @@ namespace Durados.Workflow
             }
         }
 
-        public virtual Dictionary<string, object>[] GetLambdaList(Durados.Security.Aws.IAwsCredentials awsCredentials)
+        public virtual Dictionary<string, Dictionary<string, object>[]> GetLambdaList(Durados.Security.Cloud.ICloudCredentials cloudCredentials)
         {
-            string url = BaseUrl + "/getLambdaList";
+            string url = BaseUrl + "/getFunctionsList";
             XMLHttpRequest request = new XMLHttpRequest();
             request.open("POST", url, false);
             Dictionary<string, object> data = new Dictionary<string, object>();
+            data.Add("credentials", cloudCredentials.GetCredentials());
+            data.Add("cloudProvider", cloudCredentials.GetProvider());
 
-            data.Add("awsRegion", awsCredentials.Region);
-            data.Add("accessKeyId", awsCredentials.AccessKeyID);
-            data.Add("secretAccessKey", awsCredentials.SecretAccessKey);
-            
             request.setRequestHeader("content-type", "application/json");
 
             System.Web.Script.Serialization.JavaScriptSerializer jss = new System.Web.Script.Serialization.JavaScriptSerializer();
             request.send(jss.Serialize(data));
+            
+            Dictionary<string,Dictionary<string, object>[]> response = null;
 
             if (request.status != 200)
             {
-                throw new NodeJsException(request.responseText.TrimStart("{}; ".ToCharArray()));
+                throw new NodeJsLambdaListException(request.responseText.TrimStart("{}; ".ToCharArray()));
+
             }
 
-            Dictionary<string, object>[] response = null;
             try
             {
-                response = jss.Deserialize<Dictionary<string, object>[]>(request.responseText);
+                response = jss.Deserialize<Dictionary<string, Dictionary<string, object>[]>>(request.responseText);
             }
             catch (Exception exception)
             {
@@ -173,16 +185,14 @@ namespace Durados.Workflow
             return response;
         }
 
-        public virtual object Download(Durados.Security.Aws.IAwsCredentials awsCredentials, string lambdaFunctionName)
+        public virtual object Download(Durados.Security.Cloud.ICloudCredentials cloudCredentials, string lambdaFunctionName)
         {
             string url = BaseUrl + "/downloadLambda";
             XMLHttpRequest request = new XMLHttpRequest();
             request.open("POST", url, false);
             Dictionary<string, object> data = new Dictionary<string, object>();
-
-            data.Add("awsRegion", awsCredentials.Region);
-            data.Add("accessKeyId", awsCredentials.AccessKeyID);
-            data.Add("secretAccessKey", awsCredentials.SecretAccessKey);
+            data.Add("credentials",cloudCredentials.GetCredentials());
+            data.Add("cloudProvider", cloudCredentials.GetProvider() );
             data.Add("functionName", lambdaFunctionName);
 
             request.setRequestHeader("content-type", "application/json");
@@ -209,16 +219,18 @@ namespace Durados.Workflow
         }
 
         
-        public virtual void Execute(object controller, Dictionary<string, Parameter> parameters, View view, Dictionary<string, object> values, DataRow prevRow, string pk, string connectionString, int currentUserId, string currentUserRole, IDbCommand command, IDbCommand sysCommand, string actionName, string arn, Durados.Security.Aws.IAwsCredentials awsCredentials, bool isLambda)
+        public virtual void Execute(object controller, Dictionary<string, Parameter> parameters, View view, Dictionary<string, object> values, DataRow prevRow, string pk, string connectionString, int currentUserId, string currentUserRole, IDbCommand command, IDbCommand sysCommand, string actionName, string arn, Durados.Security.Cloud.ICloudCredentials cloudCredentials, bool isLambda)
         {
             
             bool isDebug = IsDebug(values);
 
-            string url = BaseUrl + "/invokeLambda";
+            string url = BaseUrl + "/invokeFunction";
             XMLHttpRequest request = new XMLHttpRequest();
             request.open("POST", url, false);
             Dictionary<string, object> data = new Dictionary<string, object>();
-
+            data.Add("credentials", cloudCredentials.GetCredentials());
+            data.Add("cloudProvider", cloudCredentials.GetProvider());
+            data.Add("method", GetActionMethod());
             Dictionary<string, object> payload = GetCallLambdaPayload(controller, parameters, view, values, prevRow, pk, connectionString, currentUserId, currentUserRole, command);
 
             string folder = view.Database.GetCurrentAppName();
@@ -226,21 +238,25 @@ namespace Durados.Workflow
             if (isLambda)
             {
                 functionArn = arn;
-                payload = new Dictionary<string, object>();
+                payload = GetCallLambdaPayloadExternal(controller, parameters, view, values, prevRow, pk, connectionString, currentUserId, currentUserRole, command);
+                
                 foreach (string key in values.Keys)
                 {
+                    string stripedKey = key.StripToken();
+                    if (payload.ContainsKey(stripedKey))
+                    {
+                        throw new WorkflowEngineException("You can not add " + stripedKey  + " parameter in the request body");
+                    }
+
                     if (key != DebugKey)
                     {
-                        payload.Add(key.ReplaceToken("{{", "").ReplaceToken("}}", ""), values[key]);
+                        payload.Add(stripedKey, values[key]);
                     }
                 }
             }
 
-            data.Add("awsRegion", awsCredentials.Region);
-            data.Add("accessKeyId", awsCredentials.AccessKeyID);
-            data.Add("secretAccessKey", awsCredentials.SecretAccessKey);
-            data.Add("functionArn", functionArn);
             data.Add("payload", payload);
+            data.Add("function", cloudCredentials.GetFunctionObject(functionArn));
             Guid requestId = Guid.NewGuid();
             if (isDebug)
             {
@@ -342,6 +358,13 @@ namespace Durados.Workflow
             }
         }
 
+        private string GetActionMethod()
+        {
+            if (System.Web.HttpContext.Current != null && System.Web.HttpContext.Current.Request != null)
+                return System.Web.HttpContext.Current.Request.HttpMethod;
+            return null;
+        }
+
         private bool IsFunction(View view)
         {
             return view.Name == "_root";
@@ -368,7 +391,7 @@ namespace Durados.Workflow
             if (response.ContainsKey(Payload))
             {
                 responsePayload = response[Payload];
-                if (((string)responsePayload).EndsWith("Z\""))
+                if ((responsePayload is string) &&((string)responsePayload).EndsWith("Z\""))
                 {
                     try
                     {
@@ -545,7 +568,7 @@ namespace Durados.Workflow
         /// <param name="functionName">the lambda function name</param>
         /// <param name="handlerName">the js file with the root function</param>
         /// <param name="callFunctionName">the root function name</param>
-        public virtual void Create(string bucket, string folder, string fileName, string functionName, string handlerName, string callFunctionName, string arn = ARN, int memorySize = MemorySize, int timeout = Timeout)
+        public virtual void Create(string bucket, string folder, string fileName, string functionName, string handlerName, string callFunctionName,string cloudProvider, string arn = ARN, int memorySize = MemorySize, int timeout = Timeout)
         {
             string url = BaseUrl + "/createLambda";
             XMLHttpRequest request = new XMLHttpRequest();
@@ -561,6 +584,8 @@ namespace Durados.Workflow
             data.Add("Role", arn);
             data.Add("memorySize", memorySize);
             data.Add("timeout", timeout);
+            data.Add("cloudProvider", cloudProvider);
+
             
 
             request.setRequestHeader("content-type", "application/json");

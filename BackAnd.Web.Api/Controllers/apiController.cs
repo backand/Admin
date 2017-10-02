@@ -322,6 +322,7 @@ namespace BackAnd.Web.Api.Controllers
     public class apiController : ApiController, IHasMap, Durados.Data.IData
     {
         protected const string JsonNull = "\"null\"";
+        public const string CloudProviderPropertyName = "cloudProvider";
         //
         // GET: /v1/
         protected Map map = null;
@@ -1026,11 +1027,12 @@ namespace BackAnd.Web.Api.Controllers
 
         protected virtual void BeforeCreate(CreateEventArgs e)
         {
-
+           
             LoadCreationSignature(e.View, e.Values);
             LoadModificationSignature(e.View, e.Values);
             HandleSpecialDefaults((Durados.Web.Mvc.View)e.View, e.Values);
             HandleEncryption(e.View, e.Values);
+            HandleCloudView(e);
 
             int currentUserId = Convert.ToInt32(Map.Database.GetUserID());
             string currentUserRole = null;
@@ -1049,7 +1051,7 @@ namespace BackAnd.Web.Api.Controllers
                 e.History = GetNewHistory();
                 e.UserId = currentUserId;
             }
-
+            
             CreateWorkflowEngine().PerformActions(this, e.View, TriggerDataAction.BeforeCreate, e.Values, e.PrimaryKey, null, Map.Database.ConnectionString, currentUserId, currentUserRole, e.Command, e.SysCommand);
         }
 
@@ -1057,11 +1059,11 @@ namespace BackAnd.Web.Api.Controllers
         {
             foreach (Field field in view.GetSysEncryptedFields())
             {
-                if (values.ContainsKey(field.JsonName))
+                if (values.ContainsKey(field.JsonName) && !string.IsNullOrEmpty(values[field.JsonName].ToString()))
                 {
                     values[field.JsonName] = map.Encrypt(values[field.JsonName].ToString());
                 }
-                else if (values.ContainsKey(field.Name))
+                else if (values.ContainsKey(field.Name) && !string.IsNullOrEmpty(values[field.Name].ToString()))
                 {
                     values[field.Name] = map.Encrypt(values[field.Name].ToString());
                 }
@@ -1386,11 +1388,16 @@ namespace BackAnd.Web.Api.Controllers
 
         protected virtual void BeforeEdit(EditEventArgs e)
         {
+           
             HandleEncryptedHiddenFields(e);
             
             HandleEncryption(e.View, e.Values);
 
             LoadModificationSignature(e.View, e.Values);
+           
+            HandleCloudView(e);
+
+           
 
             //if (IsApprovalProcessUserView(e.View))
             //{
@@ -1439,6 +1446,86 @@ namespace BackAnd.Web.Api.Controllers
             {
                 CreateWorkflowEngine().PerformActions(this, e.View, TriggerDataAction.BeforeEdit, e.Values, e.PrimaryKey, e.PrevRow, Map.Database.ConnectionString, currentUserId, currentUserRole, e.Command, e.SysCommand);
             }
+        }
+        protected void HandleCloudView(Durados.DataActionEventArgs e)
+        {
+            if (!e.View.Name.Equals(Durados.Database.CloudViewName))
+                return;
+            
+            if (e is DeleteEventArgs)
+            {
+                Durados.Cloud deleteCloud = Map.Database.Clouds.Values.Where(c => c.Id.ToString() == e.PrimaryKey).FirstOrDefault();
+                if(deleteCloud != null)                    
+                    DeleteCloudFunctions(deleteCloud);
+                return;
+            }
+
+            string cloudVendorStr = !e.Values.ContainsKey("CloudVendor") || string.IsNullOrEmpty(((e.Values["CloudVendor"]?? string.Empty).ToString()) ) ? CloudVendor.AWS.ToString(): e.Values["CloudVendor"].ToString();
+            
+            CloudVendor cloudVendor;
+
+            if (string.IsNullOrEmpty(cloudVendorStr) || !Enum.TryParse<CloudVendor>(cloudVendorStr, out cloudVendor))
+                throw new Durados.Data.DataHandlerException((int)HttpStatusCode.NotFound ,Messages.CloudVendorNotFound,null);
+
+            string cloudTypeStr = !e.Values.ContainsKey("Type") || string.IsNullOrEmpty(((e.Values["Type"] ?? string.Empty).ToString())) ? CloudType.Function.ToString() : e.Values["Type"].ToString();
+
+            CloudType cloudType;
+
+            if (string.IsNullOrEmpty(cloudTypeStr) || !Enum.TryParse<CloudType>(cloudTypeStr, out cloudType))
+                throw new Durados.Data.DataHandlerException((int)HttpStatusCode.NotFound, Messages.CloudTypeNotFound, null);
+
+            e.Values["Type"] = cloudType.ToString();
+/*
+            if( e is EditEventArgs)
+            {
+
+                if ( (cloudVendor == CloudVendor.AWS && (!e.Values.ContainsKey("AccessKeyId") && !e.Values.ContainsKey("EncryptedSecretAccessKey"))
+                    || (cloudVendor == CloudVendor.Azure && !e.Values.ContainsKey("password"))
+                    || (cloudVendor == CloudVendor.GCP && !e.Values.ContainsKey("EncryptedPrivateKey"))))
+                    
+                    return;
+
+            }
+            */
+            Durados.Cloud cloud = CloudFactory.GetCloud(e, Map.Database);
+            Durados.Workflow.NodeJS nodejs = new Durados.Workflow.NodeJS();
+
+            foreach (var creds in cloud.GetCloudCredentials())
+                nodejs.GetLambdaList(creds);
+            
+
+        }
+
+        private void DeleteCloudFunctions(Cloud cloud)
+        {
+            try
+            {
+                if (!IsAdmin())
+                {
+                    throw new DuradosException("Forbidden");
+                }
+
+                Durados.Web.Mvc.View ruleView = (Durados.Web.Mvc.View)Map.GetConfigDatabase().Views["Rule"];
+                Durados.Web.Mvc.View functionView = (Durados.Web.Mvc.View)Maps.Instance.GetMap().Database.Views["_root"];
+                var rules = functionView.GetRules().Where(r => r.CloudSecurity == cloud.Id);
+                
+                if (rules.Count() == 0)
+                    return;
+
+                foreach (Durados.Rule rule in rules)
+                {
+                    ruleView.Delete(rule.ID.ToString(), null, null, null);
+                }
+                RefreshConfigCache();
+
+            }
+            catch (Exception exception)
+            {
+                throw new BackAndApiUnexpectedResponseException(exception, this);
+
+            }
+
+
         }
 
         protected virtual void HandleEncryptedHiddenFields(EditEventArgs e)
@@ -1949,6 +2036,7 @@ namespace BackAnd.Web.Api.Controllers
             //Workflow.Engine wfe = CreateWorkflowEngine();
             if (Database == null)
                 Database = Map.Database;
+            HandleCloudView(e);
             string userViewName = ((Durados.Web.Mvc.Database)Database).UserViewName;
             if (e.View.Name == userViewName)
             {
@@ -2341,6 +2429,8 @@ namespace BackAnd.Web.Api.Controllers
         public static readonly string MigrationAlreadyStartedWithStatusStarted = "{0} has already started its migration.";
         public static readonly string MigrationAlreadyStartedWithStatusFinished = "{0} has already finished its migration. If you want to migrate again please create a new app.";
         public static readonly string NotSignInToApp = "Please sign in to an app";
+        public static readonly string CloudVendorNotFound = "This cloud vendor is not currently supported";
+        public static readonly string CloudTypeNotFound = "This cloud service type is not currently supported";
 
         
         

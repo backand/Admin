@@ -114,6 +114,8 @@
   <ItemGroup>
     <Compile Include="Analytics.cs" />
     <Compile Include="ApprovalProcess.cs" />
+    <Compile Include="CloudStorage\filesBackand.cs" />
+    <Compile Include="CloudStorage\cloudFiles.cs" />
     <Compile Include="console.cs" />
     <Compile Include="Cookie.cs" />
     <Compile Include="DoNotLogException.cs" />
@@ -128,7 +130,7 @@
     <Compile Include="security.cs" />
     <Compile Include="ParseAuth.cs" />
     <Compile Include="JavaScript.cs" />
-    <Compile Include="files.cs" />
+    <Compile Include="CloudStorage\files.cs" />
     <Compile Include="request.cs" />
     <Compile Include="socket.cs" />
     <Compile Include="SqlExecuteException.cs" />
