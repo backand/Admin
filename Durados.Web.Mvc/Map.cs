@@ -5330,7 +5330,14 @@ namespace Durados.Web.Mvc
                 }
                 else
                 {
-                    _provider = new SqlMembershipProvider();
+                    if (System.Web.Security.Membership.Provider is SqlMembershipProvider)
+                    {
+                        _provider = new SqlMembershipProvider();
+                    }
+                    else
+                    {
+                        _provider = new MySql.Web.Security.MySQLMembershipProvider();
+                    }
                     _provider.Initialize("AspNetSqlMembershipProviderMulti", Database.GetSecuritySettings(Id));
                 }
             }
