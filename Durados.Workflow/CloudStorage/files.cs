@@ -96,7 +96,7 @@ namespace Backand
     public static class StorageFactoey
     {
 
-        internal static IFiles GetCloudStorage(string providerAccount)
+        public static IFiles GetCloudStorage(string providerAccount)
         {
             //IFiles files = null;
          

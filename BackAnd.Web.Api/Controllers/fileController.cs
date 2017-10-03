@@ -50,7 +50,7 @@ namespace BackAnd.Web.Api.Controllers
 
                 byte[] bytes = Convert.FromBase64String(filedata);
 
-                Backand.cloudFiles files = new Backand.cloudFiles();
+                IFiles files = StorageFactory.GetCloudStorage();
                 string url = files.upload(filename, filedata);
                 return Ok(new { url = url });
             }
