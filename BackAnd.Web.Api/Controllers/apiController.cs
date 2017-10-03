@@ -1474,6 +1474,9 @@ namespace BackAnd.Web.Api.Controllers
             if (string.IsNullOrEmpty(cloudTypeStr) || !Enum.TryParse<CloudType>(cloudTypeStr, out cloudType))
                 throw new Durados.Data.DataHandlerException((int)HttpStatusCode.NotFound, Messages.CloudTypeNotFound, null);
 
+            if(IsAccountNameValid(e))
+                throw new Durados.Data.DataHandlerException((int)HttpStatusCode.Conflict, Messages.MissingCloudNameOrDuplicate, null);
+
             e.Values["Type"] = cloudType.ToString();
 /*
             if( e is EditEventArgs)
@@ -1494,6 +1497,15 @@ namespace BackAnd.Web.Api.Controllers
                 nodejs.GetLambdaList(creds);
             
 
+        }
+
+        private bool IsAccountNameValid(Durados.DataActionEventArgs e)
+        {
+            return !e.Values.ContainsKey("Name")
+                || string.IsNullOrEmpty((e.Values["Name"] ?? "").ToString())
+                || Database.CloudStorages.Where(c => c.Value.Name.Equals(e.Values["Name"].ToString(), StringComparison.CurrentCultureIgnoreCase)).Count() > 0
+                || Database.Clouds.Where(c => c.Value.Name.Equals(e.Values["Name"].ToString(), StringComparison.CurrentCultureIgnoreCase)).Count() > 0;
+                
         }
 
         private void DeleteCloudFunctions(Cloud cloud)
@@ -2431,11 +2443,8 @@ namespace BackAnd.Web.Api.Controllers
         public static readonly string NotSignInToApp = "Please sign in to an app";
         public static readonly string CloudVendorNotFound = "This cloud vendor is not currently supported";
         public static readonly string CloudTypeNotFound = "This cloud service type is not currently supported";
+        public static readonly string MissingCloudNameOrDuplicate = "You are missing the account name, or this account name is already in use";
 
-        
-        
-        
-        
     }
 
    

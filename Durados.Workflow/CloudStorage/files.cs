@@ -96,7 +96,7 @@ namespace Backand
     public static class StorageFactoey
     {
 
-        public static IFiles GetCloudStorage(string providerAccount)
+        public static IFiles GetCloudStorage(string providerAccount = null)
         {
             //IFiles files = null;
          
@@ -116,14 +116,22 @@ namespace Backand
             if (System.Web.HttpContext.Current.Items[Durados.Workflow.JavaScript.StorageAccountsKey] != null)
                 storage = (System.Web.HttpContext.Current.Items[Durados.Workflow.JavaScript.StorageAccountsKey] as Dictionary<int, Durados.Cloud>);
 
-            if (!string.IsNullOrEmpty(providerAccount))
+            if (!string.IsNullOrEmpty(providerAccount) && storage.Count>0) // case - the provider is provided
             {
-                cloud = storage.Values.Where<Durados.Cloud>(v => v.Name == providerAccount).First();
+                cloud = storage.Values.Where<Durados.Cloud>(v => v.Name.Equals(providerAccount, StringComparison.CurrentCultureIgnoreCase)).FirstOrDefault();
+                if(cloud == null)
+                    throw new Durados.DuradosException(Messages.MissingStorageProvider);
+
             }
-            else if( storage != null && storage.Count > 0)
+
+            else if (storage != null && storage.Count > 0)// case - the provider is NOT provided
             {
                 cloud = storage.Values.FirstOrDefault();
             }
+            
+            if(!string.IsNullOrEmpty(providerAccount) && ( storage ==null ||storage.Count == 0))
+                throw new   Durados.DuradosException(Messages.MissingStorageProvider);
+
             return cloud;
         }
 
@@ -136,6 +144,8 @@ namespace Backand
         public static readonly string MissingFileData = "Missing the filedata parameter missing.";
         public static readonly string MissingBucket = "Missing the bucket parameter  missing.";
         public static string MissingStorageObjectInJS = "Missing storage object in ORM";
+        public static string MissingStorageProvider = "Storage Provider account was not found.";
+
         
     }
 
