@@ -9,6 +9,7 @@ using Owin;
 //using AngularJSAuthentication.API.Providers.BackAnd.Web.Api.Providers;
 using Owin.Security.Providers.GitHub;
 using System;
+using System.Collections.Generic;
 using System.Configuration;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
@@ -54,6 +55,37 @@ namespace BackAnd.Web.Api
             }
 
             Analytics.Init();
+
+            var properties = new Dictionary<string, object>();
+            properties.Add("AppName", "aaa");
+
+            //pass any properties through the Owin context Environment
+            app.Use(typeof(PropertiesMiddleware), new object[] { properties });
+        }
+
+        public class PropertiesMiddleware : OwinMiddleware
+        {
+            Dictionary<string, object> _properties = null;
+
+            public PropertiesMiddleware(OwinMiddleware next, Dictionary<string, object> properties)
+                : base(next)
+            {
+                _properties = properties;
+            }
+
+            public async override Task Invoke(IOwinContext context)
+            {
+                if (_properties != null)
+                {
+                    foreach (var prop in _properties)
+                        if (context.Get<object>(prop.Key) == null)
+                        {
+                            context.Set<object>(prop.Key, prop.Value);
+                        }
+                }
+
+                await Next.Invoke(context);
+            }
         }
 
         public static OAuthAuthorizationServerOptions OAuthOptions { get; private set; }
