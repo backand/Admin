@@ -153,10 +153,14 @@
     <Compile Include="Page.cs" />
     <Compile Include="Security\Aws\AwsCredentials.cs" />
     <Compile Include="Security\Azure\AzureCloud.cs" />
+    <Compile Include="Security\FnProject\FnProjectCloud.cs" />
+    <Compile Include="Security\FnProject\FnProjectCredentials.cs" />
     <Compile Include="Security\Google\GoogleCloud.cs" />
     <Compile Include="Security\Google\GoogleCredentials.cs" />
     <Compile Include="Security\ICloudCredentials.cs" />
     <Compile Include="Security\Azure\AzureCredentials.cs" />
+    <Compile Include="Security\OpenFaas\OpenFaasCloud.cs" />
+    <Compile Include="Security\OpenFaas\OpenFaasCredentials.cs" />
     <Compile Include="SmartRun\RunWithRetry.cs" />
     <Compile Include="Security\Ssh\ISession.cs" />
     <Compile Include="Security\Ssh\ITunnel.cs" />

@@ -45,7 +45,32 @@ namespace Durados.Web.Mvc
                         return cloud;
 
                     }
-                    
+
+                case CloudVendor.FnProject:
+                    {
+                        string connectionString = row.Row.IsNull("connectionString") ? null : (string)row["connectionString"];
+                        string gateway = row.Row.IsNull("gateway") ? null : (string)row["gateway"];
+
+                        Cloud cloud = new FnProjectCloud(Database) { Id = id, gateway = gateway, connectionString = connectionString, CloudVendor = cloudVendor, Name = name, Type = type };
+
+
+                        return cloud;
+
+                    }
+
+                case CloudVendor.OpenFaas:
+                    {
+                        string projectName = row.Row.IsNull("ProjectName") ? null : (string)row["ProjectName"];
+                        string connectionString = row.Row.IsNull("connectionString") ? null : (string)row["connectionString"];
+                        string gateway = row.Row.IsNull("gateway") ? null : (string)row["gateway"];
+
+                        Cloud cloud = new OpenFaasCloud(Database) { Id = id, projectName = projectName, gateway = gateway, connectionString = connectionString, CloudVendor = cloudVendor, Name = name, Type = type };
+
+
+                        return cloud;
+
+                    }
+
                 default:
                     return new Cloud(Database) { Id = id, AccessKeyId = accessKeyId, Region = awsRegion, CloudVendor = cloudVendor, EncryptedSecretAccessKey = encryptedSecretAccessKey, Name = name, Type = type };
                     
@@ -87,6 +112,31 @@ namespace Durados.Web.Mvc
                         string encryptedPrivateKey = !e.Values.ContainsKey("EncryptedPrivateKey") ? null : (string)e.Values["EncryptedPrivateKey"];
 
                         Cloud cloud = new GoogleCloud(Database) { EncryptedPrivateKey = encryptedPrivateKey, ClientEmail = clientEmail, ProjectName = projectName, CloudVendor = cloudVendor, Name = name, Type = type };
+
+
+                        return cloud;
+
+                    }
+
+                case CloudVendor.FnProject:
+                    {
+                        string connectionString = !e.Values.ContainsKey("connectionString") ? null : (string)e.Values["connectionString"];
+                        string gateway = !e.Values.ContainsKey("gateway") ? null : (string)e.Values["gateway"];
+                        
+                        Cloud cloud = new FnProjectCloud(Database) { gateway = gateway, connectionString = connectionString, CloudVendor = cloudVendor, Name = name, Type = type };
+
+
+                        return cloud;
+
+                    }
+
+                case CloudVendor.OpenFaas:
+                    {
+                        string projectName = !e.Values.ContainsKey("ProjectName") ? null : (string)e.Values["ProjectName"];
+                        string connectionString = !e.Values.ContainsKey("connectionString") ? null : (string)e.Values["connectionString"];
+                        string gateway = !e.Values.ContainsKey("gateway") ? null : (string)e.Values["gateway"];
+                        
+                        Cloud cloud = new OpenFaasCloud(Database) { projectName = projectName, gateway = gateway, connectionString = connectionString, CloudVendor = cloudVendor, Name = name, Type = type };
 
 
                         return cloud;

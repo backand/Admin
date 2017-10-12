@@ -196,6 +196,8 @@ namespace Durados
         , Azure
         , GCP
         , Local
+        , FnProject
+        , OpenFaas
     }
     public enum CloudType
     {
