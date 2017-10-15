@@ -23,7 +23,10 @@ namespace Backand
         {
             return upload(fileName, fileData, null,null);
         }
-
+        public string upload(string fileName, string fileData, string providerAccount, string bucket, string path)
+        {
+            return upload(fileName, fileData, bucket, path);
+        }
         public virtual string upload(string fileName, string fileData, string bucket, string path)
         {
             fileData = CheckFileSize(fileData);
@@ -167,6 +170,9 @@ namespace Backand
         {
             delete(fileName, bucket, null);
         }
+
+
+     
     }
 
    

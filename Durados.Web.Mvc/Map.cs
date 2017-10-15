@@ -3026,7 +3026,13 @@ namespace Durados.Web.Mvc
                 typeField.HideInEdit = true;
                 typeField.HideInTable = true;
             }
-
+            if (cloudView.Fields.ContainsKey("ConnectionString"))
+            {
+                ColumnField connectionStringField = cloudView.Fields["ConnectionString"] as ColumnField;
+                connectionStringField.SysEncrypted = true;
+                connectionStringField.HideInEdit = true;
+                connectionStringField.HideInTable = true;
+            }
             db.Views["durados_Cloud"].SystemView = true;
         }
 

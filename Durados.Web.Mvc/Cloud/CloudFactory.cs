@@ -98,8 +98,8 @@ namespace Durados.Web.Mvc
                         string appId = !e.Values.ContainsKey("appId") ? null : (string)e.Values["appId"];
                         string subscriptionId = !e.Values.ContainsKey("subscriptionId") ? null : (string)e.Values["subscriptionId"];
                         string connectionString = !e.Values.ContainsKey("connectionString") ? null : (string)e.Values["connectionString"];
-                        
-                        Cloud cloud = new AzureCloud(Database) { AppId = appId, SubscriptionId = subscriptionId, EncryptedPassword = encryptedPassword, tenant = tenant, CloudVendor = cloudVendor, Name = name, ConnectionString= connectionString, Type = type };
+
+                        Cloud cloud = new AzureCloud(Database) { AppId = appId, SubscriptionId = subscriptionId, EncryptedPassword = encryptedPassword, tenant = tenant, CloudVendor = cloudVendor, Name = name, ConnectionString = connectionString, Type = type };
 
 
                         return cloud;

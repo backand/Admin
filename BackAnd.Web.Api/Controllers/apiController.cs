@@ -1474,8 +1474,8 @@ namespace BackAnd.Web.Api.Controllers
             if (string.IsNullOrEmpty(cloudTypeStr) || !Enum.TryParse<CloudType>(cloudTypeStr, out cloudType))
                 throw new Durados.Data.DataHandlerException((int)HttpStatusCode.NotFound, Messages.CloudTypeNotFound, null);
 
-            if(IsAccountNameValid(e))
-                throw new Durados.Data.DataHandlerException((int)HttpStatusCode.Conflict, Messages.MissingCloudNameOrDuplicate, null);
+            CheckAccountNameValid(e);
+                
 
             e.Values["Type"] = cloudType.ToString();
 /*
@@ -1492,19 +1492,36 @@ namespace BackAnd.Web.Api.Controllers
             */
             Durados.Cloud cloud = CloudFactory.GetCloud(e, Map.Database);
             Durados.Workflow.NodeJS nodejs = new Durados.Workflow.NodeJS();
-
+            if (cloudType == CloudType.Storage)
+                return;
             foreach (var creds in cloud.GetCloudCredentials())
                 nodejs.GetLambdaList(creds);
             
 
         }
 
-        private bool IsAccountNameValid(Durados.DataActionEventArgs e)
+        private void CheckAccountNameValid(Durados.DataActionEventArgs e)
         {
-            return !e.Values.ContainsKey("Name")
-                || string.IsNullOrEmpty((e.Values["Name"] ?? "").ToString())
-                || Database.CloudStorages.Where(c => c.Value.Name.Equals(e.Values["Name"].ToString(), StringComparison.CurrentCultureIgnoreCase)).Count() > 0
-                || Database.Clouds.Where(c => c.Value.Name.Equals(e.Values["Name"].ToString(), StringComparison.CurrentCultureIgnoreCase)).Count() > 0;
+            if( !e.Values.ContainsKey("Name")
+                || string.IsNullOrEmpty((e.Values["Name"] ?? "").ToString()))
+                  
+                     throw new Durados.Data.DataHandlerException((int)HttpStatusCode.PartialContent, Messages.MissingCloudName, null);
+             bool exists =    
+                 Database.CloudStorages.Where(c => c.Value.Name.Equals(e.Values["Name"].ToString(), StringComparison.CurrentCulture)).Count() > 0
+                || Database.Clouds.Where(c => c.Value.Name.Equals(e.Values["Name"].ToString(), StringComparison.CurrentCulture)).Count() > 0;
+                
+            if(e is CreateEventArgs && exists)
+                throw new Durados.Data.DataHandlerException((int)HttpStatusCode.Ambiguous, Messages.DuplicateCloudName, null);
+
+            else if (e is EditEventArgs && !exists)
+            {
+                Durados.Cloud cloud = Database.CloudStorages.Values.Where(c => c.Name.Equals(e.Values["Name"].ToString(), StringComparison.CurrentCulture)).FirstOrDefault();
+                if( cloud == null)
+                    cloud = Database.Clouds.Values.Where(c => c.Name.Equals(e.Values["Name"].ToString(), StringComparison.CurrentCulture)).FirstOrDefault();
+
+                if( cloud != null && cloud.Id.ToString() != e.PrimaryKey)
+                    throw new Durados.Data.DataHandlerException((int)HttpStatusCode.Ambiguous, Messages.DuplicateCloudName, null);
+            }
                 
         }
 
@@ -2443,7 +2460,8 @@ namespace BackAnd.Web.Api.Controllers
         public static readonly string NotSignInToApp = "Please sign in to an app";
         public static readonly string CloudVendorNotFound = "This cloud vendor is not currently supported";
         public static readonly string CloudTypeNotFound = "This cloud service type is not currently supported";
-        public static readonly string MissingCloudNameOrDuplicate = "You are missing the account name, or this account name is already in use";
+        public static readonly string DuplicateCloudName = "This account name is already in use";
+        public static readonly string MissingCloudName = "Please provide the account name";
 
     }
 

@@ -24,9 +24,9 @@ namespace Backand
             return files.upload(fileName, fileData,  bucket, path);
         }
 
-        public string upload(string fileName, string fileData, string bucket, string path)
+        public string upload(string fileName, string fileData, string accountProvider, string bucket)
         {
-            return upload(fileName, fileData, null,  bucket, path);
+            return upload(fileName, fileData, accountProvider, bucket, null);
         }
         
         public string upload(string fileName, string fileData, string bucket)
@@ -57,9 +57,9 @@ namespace Backand
         {
             delete(fileName, providerAccount, bucket, null);
         }
-        public void delete(string fileName, string providerAccount)
+        public void delete(string fileName, string bucket)
         {
-            delete(fileName, providerAccount, null, null);
+            delete(fileName, null, bucket, null);
         }
 
         public void delete(string fileName)
@@ -79,8 +79,9 @@ namespace Backand
 
     public interface IFiles
     {
-        
-        string upload(string fileName, string fileData, string bucket, string path);
+        string upload(string fileName, string fileData, string providerAccount, string bucket);
+
+        string upload(string fileName, string fileData, string providerAccount, string bucket, string path);
 
         string upload(string fileName, string fileData, string bucket);
         
@@ -118,7 +119,7 @@ namespace Backand
 
             if (!string.IsNullOrEmpty(providerAccount) && storage.Count>0) // case - the provider is provided
             {
-                cloud = storage.Values.Where<Durados.Cloud>(v => v.Name.Equals(providerAccount, StringComparison.CurrentCultureIgnoreCase)).FirstOrDefault();
+                cloud = storage.Values.Where<Durados.Cloud>(v => v.Name.Equals(providerAccount, StringComparison.CurrentCulture)).FirstOrDefault();
                 if(cloud == null)
                     throw new Durados.DuradosException(Messages.MissingStorageProvider);
 
@@ -141,8 +142,8 @@ namespace Backand
     public class Messages
     {
         public static readonly string MissingFileName = "Missing the fileName parameter.";
-        public static readonly string MissingFileData = "Missing the filedata parameter missing.";
-        public static readonly string MissingBucket = "Missing the bucket parameter  missing.";
+        public static readonly string MissingFileData = "Missing the filedata parameter.";
+        public static readonly string MissingBucket = "Missing the bucket parameter.";
         public static string MissingStorageObjectInJS = "Missing storage object in ORM";
         public static string MissingStorageProvider = "Storage Provider account was not found.";
 

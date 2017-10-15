@@ -444,7 +444,7 @@ namespace Jint.Runtime
             catch (Exception e)
             {
                 string trace = _engine.GetTrace(lastStatement, e.Message);
-                string message = e.InnerException == null ? e.Message : string.Format("{0} The target return :{1}", e.Message, e.InnerException.Message);
+                string message = e.InnerException == null ? e.Message : string.Format("The target response :{0}",  e.InnerException.Message);
                 throw new JavaScriptException(_engine.Error.Construct(new JsValue[] { message, trace }));
                 
             }

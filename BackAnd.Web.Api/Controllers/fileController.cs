@@ -74,7 +74,8 @@ namespace BackAnd.Web.Api.Controllers
                     return ResponseMessage(Request.CreateResponse(HttpStatusCode.Conflict, "You must send the filename parameter"));
                 String filename = System.Web.HttpContext.Current.Server.UrlDecode((String)jsonPostDict["filename"]);
                 
-                Backand.cloudFiles files = new Backand.cloudFiles();
+                Backand.IFiles files = Backand.StorageFactoey.GetCloudStorage();
+                
                 files.delete(filename);
                 return Ok();
             }
