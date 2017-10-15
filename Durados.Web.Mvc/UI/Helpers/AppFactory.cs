@@ -85,7 +85,7 @@ namespace Durados.Web.Mvc.UI.Helpers
 
         private  string GetCreateNewSchemaAndUserSql(NewDatabaseParameters newDbParameters)
         {
-            string sql = string.Format(@"CREATE  DATABASE IF NOT EXISTS `{0}` CharSet=utf8;
+            string sql = string.Format(@"CREATE  DATABASE IF NOT EXISTS `{0}` CharSet=utf8mb4;
                             CREATE USER '{1}'@'%'  IDENTIFIED BY  '{2}';
                             GRANT ALL ON `{0}`.* TO '{1}'@'%';", newDbParameters.DbName, newDbParameters.Username, newDbParameters.Password);
             return sql;
