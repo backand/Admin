@@ -15,7 +15,7 @@ namespace Durados.DataAccess
         }
         public static string GetConnectionStringSchema(bool useSSH)
         {
-            return (useSSH ? "server=localhost;database={1};User Id={2};password={3};CharSet=utf8;UseProcedureBodies=true;" : "server={0};database={1};User Id={2};password={3}") + ";port={4};convert zero datetime=True;default command timeout=90;Connection Timeout=60;CharSet=utf8;UseProcedureBodies=true;";
+            return (useSSH ? "server=localhost;database={1};User Id={2};password={3};CharSet=utf8mb4;UseProcedureBodies=true;" : "server={0};database={1};User Id={2};password={3}") + ";port={4};convert zero datetime=True;default command timeout=90;Connection Timeout=60;CharSet=utf8mb4;UseProcedureBodies=true;";
         }
         protected override System.Data.IDbConnection GetNewConnection(string connectionString)
         {

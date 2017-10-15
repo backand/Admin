@@ -18,8 +18,8 @@ CREATE TABLE `durados_Cloud` (
   `EncryptedPrivateKey` VARCHAR(4000) NULL ,
 	`ClientEmail` VARCHAR(150) NULL ,
 	`ProjectName` VARCHAR(150) NULL ,
-	`connectionString` VARCHAR(300) NULL,
-	`gateway` VARCHAR(300) NULL,
+	`ConnectionString` VARCHAR(300) NULL,
+	`Gateway` VARCHAR(300) NULL,
   PRIMARY KEY (`Id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
