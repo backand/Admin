@@ -1492,7 +1492,8 @@ namespace BackAnd.Web.Api.Controllers
             */
             Durados.Cloud cloud = CloudFactory.GetCloud(e, Map.Database);
             Durados.Workflow.NodeJS nodejs = new Durados.Workflow.NodeJS();
-
+            if (cloudType == CloudType.Storage)
+                return;
             foreach (var creds in cloud.GetCloudCredentials())
                 nodejs.GetLambdaList(creds);
             
