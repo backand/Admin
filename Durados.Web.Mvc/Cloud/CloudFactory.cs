@@ -26,7 +26,7 @@ namespace Durados.Web.Mvc
                         string tenant = row.Row.IsNull("tenant") ? null : (string)row["tenant"];
                         string appId = row.Row.IsNull("appId") ? null : (string)row["appId"];
                         string subscriptionId = row.Row.IsNull("subscriptionId") ? null : (string)row["subscriptionId"];
-                        string connectionString = row.Row.IsNull("connectionString") ? null : (string)row["connectionString"];
+                        string connectionString = row.Row.IsNull("ConnectionString") ? null : (string)row["ConnectionString"];
                         Cloud cloud = new AzureCloud(Database) { Id = id, AppId = appId, SubscriptionId = subscriptionId, EncryptedPassword = encryptedPassword, tenant = tenant, CloudVendor = cloudVendor, Name = name, ConnectionString = connectionString, Type = type };
                         
                        
@@ -48,8 +48,8 @@ namespace Durados.Web.Mvc
 
                 case CloudVendor.FnProject:
                     {
-                        string connectionString = row.Row.IsNull("connectionString") ? null : (string)row["connectionString"];
-                        string gateway = row.Row.IsNull("gateway") ? null : (string)row["gateway"];
+                        string connectionString = row.Row.IsNull("ConnectionString") ? null : (string)row["ConnectionString"];
+                        string gateway = row.Row.IsNull("Gateway") ? null : (string)row["Gateway"];
 
                         Cloud cloud = new FnProjectCloud(Database) { Id = id, gateway = gateway, connectionString = connectionString, CloudVendor = cloudVendor, Name = name, Type = type };
 
@@ -61,8 +61,8 @@ namespace Durados.Web.Mvc
                 case CloudVendor.OpenFaas:
                     {
                         string projectName = row.Row.IsNull("ProjectName") ? null : (string)row["ProjectName"];
-                        string connectionString = row.Row.IsNull("connectionString") ? null : (string)row["connectionString"];
-                        string gateway = row.Row.IsNull("gateway") ? null : (string)row["gateway"];
+                        string connectionString = row.Row.IsNull("ConnectionString") ? null : (string)row["ConnectionString"];
+                        string gateway = row.Row.IsNull("Gateway") ? null : (string)row["Gateway"];
 
                         Cloud cloud = new OpenFaasCloud(Database) { Id = id, projectName = projectName, gateway = gateway, connectionString = connectionString, CloudVendor = cloudVendor, Name = name, Type = type };
 
@@ -97,7 +97,7 @@ namespace Durados.Web.Mvc
                         string tenant = !e.Values.ContainsKey("tenant") ? null : (string)e.Values["tenant"];
                         string appId = !e.Values.ContainsKey("appId") ? null : (string)e.Values["appId"];
                         string subscriptionId = !e.Values.ContainsKey("subscriptionId") ? null : (string)e.Values["subscriptionId"];
-                        string connectionString = !e.Values.ContainsKey("connectionString") ? null : (string)e.Values["connectionString"];
+                        string connectionString = !e.Values.ContainsKey("ConnectionString") ? null : (string)e.Values["ConnectionString"];
 
                         Cloud cloud = new AzureCloud(Database) { AppId = appId, SubscriptionId = subscriptionId, EncryptedPassword = encryptedPassword, tenant = tenant, CloudVendor = cloudVendor, Name = name, ConnectionString = connectionString, Type = type };
 
@@ -120,8 +120,8 @@ namespace Durados.Web.Mvc
 
                 case CloudVendor.FnProject:
                     {
-                        string connectionString = !e.Values.ContainsKey("connectionString") ? null : (string)e.Values["connectionString"];
-                        string gateway = !e.Values.ContainsKey("gateway") ? null : (string)e.Values["gateway"];
+                        string connectionString = !e.Values.ContainsKey("ConnectionString") ? null : (string)e.Values["ConnectionString"];
+                        string gateway = !e.Values.ContainsKey("Gateway") ? null : (string)e.Values["Gateway"];
                         
                         Cloud cloud = new FnProjectCloud(Database) { gateway = gateway, connectionString = connectionString, CloudVendor = cloudVendor, Name = name, Type = type };
 
@@ -133,8 +133,8 @@ namespace Durados.Web.Mvc
                 case CloudVendor.OpenFaas:
                     {
                         string projectName = !e.Values.ContainsKey("ProjectName") ? null : (string)e.Values["ProjectName"];
-                        string connectionString = !e.Values.ContainsKey("connectionString") ? null : (string)e.Values["connectionString"];
-                        string gateway = !e.Values.ContainsKey("gateway") ? null : (string)e.Values["gateway"];
+                        string connectionString = !e.Values.ContainsKey("ConnectionString") ? null : (string)e.Values["ConnectionString"];
+                        string gateway = !e.Values.ContainsKey("Gateway") ? null : (string)e.Values["Gateway"];
                         
                         Cloud cloud = new OpenFaasCloud(Database) { projectName = projectName, gateway = gateway, connectionString = connectionString, CloudVendor = cloudVendor, Name = name, Type = type };
 
