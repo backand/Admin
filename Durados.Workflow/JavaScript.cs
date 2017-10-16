@@ -19,6 +19,7 @@ namespace Durados.Workflow
 
         public static readonly string ReturnedValueKey = "$$ReturnedValueKey$$";
         const string FILEDATA = "filedata";
+        const string FILENAME = "filename";
         public static readonly string ActionInfo = "ActionInfo";
         public static readonly string ActionHeaderKey = "Backand-Action-Guid";
         public static readonly string StorageAccountsKey = "storage_accounts";
@@ -716,9 +717,14 @@ namespace Durados.Workflow
                 upload = true;
                 System.Web.HttpContext.Current.Items["file_stream"] = clientParameters[FILEDATA];
                 clientParameters[FILEDATA] = "file_stream";
-                System.Web.HttpContext.Current.Items[StorageAccountsKey] = view.Database.CloudStorages;
                 clientParametersToSend = clientParameters;
             }
+
+            if (clientParameters.ContainsKey(FILEDATA) || clientParameters.ContainsKey(FILENAME))
+            {
+                System.Web.HttpContext.Current.Items[StorageAccountsKey] = view.Database.CloudStorages;
+            }
+
             var dbRow = parser.Parse(Newtonsoft.Json.JsonConvert.SerializeObject(oldRow));
             var userProfile2 = parser.Parse(Newtonsoft.Json.JsonConvert.SerializeObject(userProfile));
             var CONSTS2 = parser.Parse(Newtonsoft.Json.JsonConvert.SerializeObject(CONSTS));

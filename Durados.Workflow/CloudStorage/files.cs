@@ -117,7 +117,7 @@ namespace Backand
             if (System.Web.HttpContext.Current.Items[Durados.Workflow.JavaScript.StorageAccountsKey] != null)
                 storage = (System.Web.HttpContext.Current.Items[Durados.Workflow.JavaScript.StorageAccountsKey] as Dictionary<int, Durados.Cloud>);
 
-            if (!string.IsNullOrEmpty(providerAccount) && storage.Count>0) // case - the provider is provided
+            if (!string.IsNullOrEmpty(providerAccount) && storage != null && storage.Count>0) // case - the provider is provided
             {
                 cloud = storage.Values.Where<Durados.Cloud>(v => v.Name.Equals(providerAccount, StringComparison.CurrentCulture)).FirstOrDefault();
                 if(cloud == null)
