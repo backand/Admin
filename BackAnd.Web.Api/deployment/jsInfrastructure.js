@@ -61,7 +61,7 @@ var console = new Backand.console(); var socket = new Backand.socket(); var file
         }
         return [result, req];
     };
-    var xhr = function (type, url, data, async, headers) {
+    var xhr1 = function (type, url, data, async, headers) {
         var methods = {
             success: function () { },
             error: function () { }
@@ -79,6 +79,7 @@ var console = new Backand.console(); var socket = new Backand.socket(); var file
         /*request.onreadystatechange = function () {      if (request.readyState === 4) {        if (request.status >= 200 && request.status < 300) {          methods.success.apply(methods, parse(request));        } else {          methods.error.apply(methods, parse(request));        }      }    }; */
         if (data) request.send(data);
         else request.send();
+
         var callbacks = { success: function (callback) { methods.success = callback; return callbacks; }, error: function (callback) { methods.error = callback; return callbacks; } };
         if (async) {
             return callbacks;
@@ -102,6 +103,39 @@ var console = new Backand.console(); var socket = new Backand.socket(); var file
             }
         }
     };
+
+    var xhr = function (type, url, data, async, headers) {
+        var errorContainMessage = function (err) {
+            var messages = ['Could not create SSL/TLS secure channel'];
+            for (var i = 0; i < messages.length; i++) {
+                if ((err.message && err.message.indexOf(messages[i]) >= 0) || (err.indexOf && err.indexOf(messages[i]) >= 0)) {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        try {
+            return xhr1(type, url, data, async, headers);
+        }
+        catch (err1) {
+            var er = err1;
+                
+            var tries = 3;
+            var currentTry = 0;
+            while (errorContainMessage(er) && currentTry < tries) {
+                try {
+                    currentTry++;
+                    return xhr1(type, url, data, async, headers);
+                }
+                catch (err3) {
+                    er = err3;
+                }
+            }
+            throw err1;
+        }
+    
+    }
     var isString = function (s) {
         return (typeof s == 'string' || s instanceof String) || (Object.prototype.toString.call(s) == '[object String]');
     }

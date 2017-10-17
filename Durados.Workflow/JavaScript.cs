@@ -761,8 +761,8 @@ namespace Durados.Workflow
 
             Backand.Logger.Log(startMessage, 502);
 
-
-            var call = new Jint.Engine(cfg => cfg.AllowClr(typeof(Backand.XMLHttpRequest).Assembly), timeoutInterval, 184, new ActionPath() { @object = view.JsonName, action = actionName });
+            int startLine = 218;
+            var call = new Jint.Engine(cfg => cfg.AllowClr(typeof(Backand.XMLHttpRequest).Assembly), timeoutInterval, startLine, new ActionPath() { @object = view.JsonName, action = actionName });
 
             try
             {
