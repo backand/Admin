@@ -39,7 +39,7 @@ namespace Backand
 
             if (request.status != 200)
             {
-                throw new Durados.DuradosException("Server return status " + request.status + ", " + request.responseText);
+                throw new Durados.DuradosException(request.responseText);//"Server return status " + request.status + ", " +
             }
         }
 

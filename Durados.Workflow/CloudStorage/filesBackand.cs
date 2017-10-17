@@ -89,7 +89,7 @@ namespace Backand
                 if (Logger != null)
                     Logger.Log("files", "upload", fileName, "Server return status " + request.status, request.responseText, 1, "upload " + fileName, DateTime.Now, 0);
 
-                throw new Durados.DuradosException("Server return status " + request.status + ", " + request.responseText);
+                throw new Durados.DuradosException(request.responseText);//"Server return status " + request.status + ", " +
             }
 
             if (Logger != null)
