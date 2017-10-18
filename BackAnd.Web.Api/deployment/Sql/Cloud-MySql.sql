@@ -10,7 +10,7 @@ CREATE TABLE `durados_Cloud` (
   `AwsRegion` varchar(250)  NULL,
   `AccessKeyId` varchar(50)  NULL,
   `EncryptedSecretAccessKey` varchar(500)  NULL,
-  `Description` varchar(1000) Null,
+  `Description` varchar(200) Null,
   `subscriptionId` varchar(150)  NULL,
   `appId` varchar(150)  NULL,
   `password` varchar(500)  NULL,
