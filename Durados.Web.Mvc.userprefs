@@ -1,0 +1,26 @@
+﻿<Properties StartupConfiguration="{444966E0-5C1D-4176-86DD-7508368314FA}|">
+  <MonoDevelop.Ide.Workbench ActiveDocument="BackAnd.Web.Api/Providers/SimpleAuthorizationServerProvider.cs">
+    <Files>
+      <File FileName="BackAnd.Web.Api/Controllers/userController.cs" Line="1241" Column="70" />
+      <File FileName="BackAnd.Web.Api/Providers/SimpleAuthorizationServerProvider.cs" Line="334" Column="1" />
+      <File FileName="BackAnd.Web.Api/Controllers/apiController.cs" Line="2385" Column="16" />
+      <File FileName="BackAnd.Web.Api/App_Start/WebApiConfig.cs" Line="401" Column="1" />
+      <File FileName="BackAnd.Web.Api/Global.asax.cs" Line="1" Column="1" />
+      <File FileName="BackAnd.Web.Api/Startup.cs" Line="82" Column="45" />
+    </Files>
+  </MonoDevelop.Ide.Workbench>
+  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
+  <MonoDevelop.Ide.DebuggingService.Breakpoints>
+    <BreakpointStore>
+      <Breakpoint file="/Users/itay/dev/Admin/Durados.Web.Mvc/Map.cs" relfile="Durados.Web.Mvc/Map.cs" line="504" column="1" />
+      <Breakpoint file="/Users/itay/dev/Admin/Durados.Web.Mvc/Map/Maps.cs" relfile="Durados.Web.Mvc/Map/Maps.cs" line="618" column="51" />
+      <Breakpoint file="/Users/itay/dev/Admin/Durados.Web.Mvc/Map/Maps.cs" relfile="Durados.Web.Mvc/Map/Maps.cs" line="626" column="1" />
+      <Catchpoint exceptionName="System.Exception" includeSubclasses="True" />
+      <Breakpoint file="/Users/itay/dev/Admin/BackAnd.Web.Api/Providers/SimpleAuthorizationServerProvider.cs" relfile="BackAnd.Web.Api/Providers/SimpleAuthorizationServerProvider.cs" line="334" column="1" />
+      <Breakpoint file="/Users/itay/dev/Admin/BackAnd.Web.Api/Startup.cs" relfile="BackAnd.Web.Api/Startup.cs" line="82" column="45" />
+    </BreakpointStore>
+  </MonoDevelop.Ide.DebuggingService.Breakpoints>
+  <MonoDevelop.Ide.ItemProperties.BackAnd.Web.Api PreferredExecutionTarget="MonoDevelop.Default" />
+  <MonoDevelop.Ide.DebuggingService.PinnedWatches />
+  <MultiItemStartupConfigurations />
+</Properties>
