@@ -2465,7 +2465,7 @@ namespace Durados.Web.Mvc
 
         private static string GetStringFromFile(string fileName, ref string jsonString)
         {
-            fileName = Path.GetDirectoryName(AppDomain.CurrentDomain.BaseDirectory) + @"\" + fileName;
+            fileName = Path.GetDirectoryName(AppDomain.CurrentDomain.BaseDirectory) + fileName;
             if (jsonString == null)
             {
                 jsonString = GetTextFileContent(fileName);

@@ -130,6 +130,8 @@ namespace Durados.Web.Mvc.Farm
         internal static ConnectionMultiplexer CreateRedisConnection(string connectionString)
         {
             ConfigurationOptions options = ConfigurationOptions.Parse(connectionString);
+            options.AbortOnConnectFail = false;
+
             ConnectionMultiplexer redis = null;
             try
             {

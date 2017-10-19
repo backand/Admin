@@ -161,8 +161,7 @@ namespace Durados.Web.Mvc.Controllers.Api
             {
                 string uri = GetErrorUri(exception);
                 Response.Headers.Add("Location", uri);
-                throw new System.Web.Http.HttpResponseException(HttpStatusCode.SeeOther);
-
+                throw new System.Web.Http.HttpResponseException(new HttpResponseMessage(System.Net.HttpStatusCode.SeeOther));
             }
         }
 
@@ -176,7 +175,7 @@ namespace Durados.Web.Mvc.Controllers.Api
             {
                 if (string.IsNullOrEmpty(pk))
                 {
-                    throw new System.Web.Http.HttpResponseException(System.Net.HttpStatusCode.NotFound);
+                    throw new System.Web.Http.HttpResponseException(new HttpResponseMessage(System.Net.HttpStatusCode.NotFound));
                 }
 
                 Response.StatusCode = (int)HttpStatusCode.OK;
@@ -187,7 +186,7 @@ namespace Durados.Web.Mvc.Controllers.Api
             {
                  string uri = GetErrorUri(exception);
                 Response.Headers.Add("Location", uri);
-                throw new System.Web.Http.HttpResponseException(HttpStatusCode.SeeOther);
+                throw new System.Web.Http.HttpResponseException(new HttpResponseMessage(System.Net.HttpStatusCode.SeeOther));
 
              
             }
@@ -238,7 +237,7 @@ namespace Durados.Web.Mvc.Controllers.Api
             {
                 if (string.IsNullOrEmpty(name))
                 {
-                    throw new System.Web.Http.HttpResponseException(System.Net.HttpStatusCode.NotFound);
+                    throw new System.Web.Http.HttpResponseException(new HttpResponseMessage(System.Net.HttpStatusCode.NotFound));
                 }
 
                 var item = GetItemFromRequest();
@@ -252,7 +251,7 @@ namespace Durados.Web.Mvc.Controllers.Api
             {
                 string uri = GetErrorUri(exception);
                 Response.Headers.Add("Location", uri);
-                throw new System.Web.Http.HttpResponseException(HttpStatusCode.SeeOther);
+                throw new System.Web.Http.HttpResponseException(new HttpResponseMessage(System.Net.HttpStatusCode.SeeOther));
 
 
             }

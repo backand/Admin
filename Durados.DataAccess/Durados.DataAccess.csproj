@@ -65,13 +65,6 @@
     <Reference Include="MailChimp">
       <HintPath>..\Duradus.Web.Mvc.App\deployment\MailChimp.dll</HintPath>
     </Reference>
-    <Reference Include="Mono.Security, Version=4.0.0.0, Culture=neutral, PublicKeyToken=0738eb9f132ed756, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\Npgsql.2.2.5\lib\net45\Mono.Security.dll</HintPath>
-    </Reference>
-    <Reference Include="Mono.Security.Protocol.Tls">
-      <HintPath>..\Duradus.Web.Mvc.App\deployment\Mono.Security.Protocol.Tls.dll</HintPath>
-    </Reference>
     <Reference Include="MySql.Data, Version=6.4.6.0, Culture=neutral, PublicKeyToken=c5687fc88969c44d, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\Duradus.Web.Mvc.App\deployment\MySql.Data.dll</HintPath>
@@ -92,17 +85,17 @@
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core">
-      <RequiredTargetFramework>3.5</RequiredTargetFramework>
     </Reference>
     <Reference Include="System.Web.Extensions" />
     <Reference Include="System.Xml.Linq">
-      <RequiredTargetFramework>3.5</RequiredTargetFramework>
     </Reference>
     <Reference Include="System.Data.DataSetExtensions">
-      <RequiredTargetFramework>3.5</RequiredTargetFramework>
     </Reference>
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
+    <Reference Include="Mono.Security.Protocol.Tls">
+      <HintPath>..\Duradus.Web.Mvc.App\deployment\Mono.Security.Protocol.Tls.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AfterCommitDispatcher.cs" />
