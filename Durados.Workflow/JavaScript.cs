@@ -47,6 +47,28 @@ namespace Durados.Workflow
             return xhr;
         }
 
+        private static int? lineStart = null;
+
+        public int GetLineStart()
+        {
+            return GetLineStart(defaultJsInfrastructureFileName);
+        }
+        public static int GetLineStart(string jsInfrastructureFileName)
+        {
+            if (!lineStart.HasValue)
+            {
+                if (File.Exists(jsInfrastructureFileName))
+                {
+                    lineStart = File.ReadLines(jsInfrastructureFileName).Count();
+                }
+                else
+                {
+                    throw new System.IO.FileNotFoundException("The js infrastructure file was not found", jsInfrastructureFileName);
+                }
+            }
+            return lineStart.Value;
+        }
+        
         static int logLimit = -1;
         public static int LogLimit
         {
@@ -761,8 +783,7 @@ namespace Durados.Workflow
 
             Backand.Logger.Log(startMessage, 502);
 
-            int startLine = 218;
-            var call = new Jint.Engine(cfg => cfg.AllowClr(typeof(Backand.XMLHttpRequest).Assembly), timeoutInterval, startLine, new ActionPath() { @object = view.JsonName, action = actionName });
+            var call = new Jint.Engine(cfg => cfg.AllowClr(typeof(Backand.XMLHttpRequest).Assembly), timeoutInterval, GetLineStart(), new ActionPath() { @object = view.JsonName, action = actionName });
 
             try
             {

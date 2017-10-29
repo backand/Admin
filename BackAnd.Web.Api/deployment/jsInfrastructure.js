@@ -201,8 +201,37 @@ var $http = atomic;
         root.backand = factory(root);
     }
 })
+
+
+
 (this, function (root) {
     'use strict';
+
+    var getOwnPropertySymbols = Object.getOwnPropertySymbols;
+    var hasOwnProperty = Object.prototype.hasOwnProperty;
+    var propIsEnumerable = Object.prototype.propertyIsEnumerable;
+
+    var toObject = function(val) {
+        if (val === null || val === undefined) {
+            throw new TypeError('Object.assign cannot be called with null or undefined');
+        }
+
+        return Object(val);
+    }
+
+    var isObject = function(obj) {
+        return obj === Object(obj);
+    }
+
+    var stringifyIfObject = function (val) {
+        if (isObject(val)) {
+            return JSON.stringify(val);
+        }
+        else {
+            return val;
+        }
+    }
+
     var exports = {
 	    fn: {
 	        post: function(name, data, parameters, headers){
@@ -211,6 +240,32 @@ var $http = atomic;
 	        get: function(name, parameters, headers){
 	            return $http({ method: "GET", url: CONSTS.apiUrl + "/1/function/general/" + name, params: {parameters:parameters}, headers:headers});
 	        }
+	    },
+	    objectAssign: function (target, source) {
+	        var from;
+	        var to = toObject(target);
+	        var symbols;
+
+	        for (var s = 1; s < arguments.length; s++) {
+	            from = Object(arguments[s]);
+
+	            for (var key in from) {
+	                if (hasOwnProperty.call(from, key)) {
+	                    to[key] = stringifyIfObject(from[key]);
+	                }
+	            }
+
+	            if (getOwnPropertySymbols) {
+	                symbols = getOwnPropertySymbols(from);
+	                for (var i = 0; i < symbols.length; i++) {
+	                    if (propIsEnumerable.call(from, symbols[i])) {
+	                        to[symbols[i]] = stringifyIfObject(from[symbols[i]]);
+	                    }
+	                }
+	            }
+	        }
+
+	        return to;
 	    }
 	}
 
