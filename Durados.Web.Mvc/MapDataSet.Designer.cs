@@ -40,8 +40,6 @@ namespace Durados.Web.Mvc {
         
         private durados_SqlProductDataTable tabledurados_SqlProduct;
         
-        private durados_ThemeDataTable tabledurados_Theme;
-        
         private durados_AppStatDataTable tabledurados_AppStat;
         
         private backand_ActionTemplateDataTable tablebackand_ActionTemplate;
@@ -73,8 +71,6 @@ namespace Durados.Web.Mvc {
         private global::System.Data.DataRelation relationdurados_App_durados_DnsAlias;
         
         private global::System.Data.DataRelation relationdurados_SqlProduct_durados_SqlConnection;
-        
-        private global::System.Data.DataRelation relationFK_durados_App_durados_Theme;
         
         private global::System.Data.DataRelation relationFK_durados_AppStat_durados_App;
         
@@ -133,9 +129,6 @@ namespace Durados.Web.Mvc {
                 }
                 if ((ds.Tables["durados_SqlProduct"] != null)) {
                     base.Tables.Add(new durados_SqlProductDataTable(ds.Tables["durados_SqlProduct"]));
-                }
-                if ((ds.Tables["durados_Theme"] != null)) {
-                    base.Tables.Add(new durados_ThemeDataTable(ds.Tables["durados_Theme"]));
                 }
                 if ((ds.Tables["durados_AppStat"] != null)) {
                     base.Tables.Add(new durados_AppStatDataTable(ds.Tables["durados_AppStat"]));
@@ -241,16 +234,6 @@ namespace Durados.Web.Mvc {
         public durados_SqlProductDataTable durados_SqlProduct {
             get {
                 return this.tabledurados_SqlProduct;
-            }
-        }
-        
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
-        [global::System.ComponentModel.Browsable(false)]
-        [global::System.ComponentModel.DesignerSerializationVisibility(global::System.ComponentModel.DesignerSerializationVisibility.Content)]
-        public durados_ThemeDataTable durados_Theme {
-            get {
-                return this.tabledurados_Theme;
             }
         }
         
@@ -375,9 +358,6 @@ namespace Durados.Web.Mvc {
                 if ((ds.Tables["durados_SqlProduct"] != null)) {
                     base.Tables.Add(new durados_SqlProductDataTable(ds.Tables["durados_SqlProduct"]));
                 }
-                if ((ds.Tables["durados_Theme"] != null)) {
-                    base.Tables.Add(new durados_ThemeDataTable(ds.Tables["durados_Theme"]));
-                }
                 if ((ds.Tables["durados_AppStat"] != null)) {
                     base.Tables.Add(new durados_AppStatDataTable(ds.Tables["durados_AppStat"]));
                 }
@@ -468,12 +448,6 @@ namespace Durados.Web.Mvc {
                     this.tabledurados_SqlProduct.InitVars();
                 }
             }
-            this.tabledurados_Theme = ((durados_ThemeDataTable)(base.Tables["durados_Theme"]));
-            if ((initTable == true)) {
-                if ((this.tabledurados_Theme != null)) {
-                    this.tabledurados_Theme.InitVars();
-                }
-            }
             this.tabledurados_AppStat = ((durados_AppStatDataTable)(base.Tables["durados_AppStat"]));
             if ((initTable == true)) {
                 if ((this.tabledurados_AppStat != null)) {
@@ -505,7 +479,6 @@ namespace Durados.Web.Mvc {
             this.relationFK_durados_App_durados_SqlConnection_System = this.Relations["FK_durados_App_durados_SqlConnection_System"];
             this.relationdurados_App_durados_DnsAlias = this.Relations["durados_App_durados_DnsAlias"];
             this.relationdurados_SqlProduct_durados_SqlConnection = this.Relations["durados_SqlProduct_durados_SqlConnection"];
-            this.relationFK_durados_App_durados_Theme = this.Relations["FK_durados_App_durados_Theme"];
             this.relationFK_durados_AppStat_durados_App = this.Relations["FK_durados_AppStat_durados_App"];
             this.relationv_durados_User_durados_UserSocial = this.Relations["v_durados_User_durados_UserSocial"];
             this.relationdurados_App_durados_UserSocial = this.Relations["durados_App_durados_UserSocial"];
@@ -535,8 +508,6 @@ namespace Durados.Web.Mvc {
             base.Tables.Add(this.tabledurados_DnsAlias);
             this.tabledurados_SqlProduct = new durados_SqlProductDataTable();
             base.Tables.Add(this.tabledurados_SqlProduct);
-            this.tabledurados_Theme = new durados_ThemeDataTable();
-            base.Tables.Add(this.tabledurados_Theme);
             this.tabledurados_AppStat = new durados_AppStatDataTable();
             base.Tables.Add(this.tabledurados_AppStat);
             this.tablebackand_ActionTemplate = new backand_ActionTemplateDataTable();
@@ -595,10 +566,6 @@ namespace Durados.Web.Mvc {
                         this.tabledurados_SqlProduct.IdColumn}, new global::System.Data.DataColumn[] {
                         this.tabledurados_SqlConnection.SqlProductIdColumn}, false);
             this.Relations.Add(this.relationdurados_SqlProduct_durados_SqlConnection);
-            this.relationFK_durados_App_durados_Theme = new global::System.Data.DataRelation("FK_durados_App_durados_Theme", new global::System.Data.DataColumn[] {
-                        this.tabledurados_Theme.IdColumn}, new global::System.Data.DataColumn[] {
-                        this.tabledurados_App.ThemeIdColumn}, false);
-            this.Relations.Add(this.relationFK_durados_App_durados_Theme);
             this.relationFK_durados_AppStat_durados_App = new global::System.Data.DataRelation("FK_durados_AppStat_durados_App", new global::System.Data.DataColumn[] {
                         this.tabledurados_App.IdColumn}, new global::System.Data.DataColumn[] {
                         this.tabledurados_AppStat.AppIdColumn}, false);
@@ -658,12 +625,6 @@ namespace Durados.Web.Mvc {
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
         private bool ShouldSerializedurados_SqlProduct() {
-            return false;
-        }
-        
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
-        private bool ShouldSerializedurados_Theme() {
             return false;
         }
         
@@ -763,9 +724,6 @@ namespace Durados.Web.Mvc {
         
         [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
         public delegate void durados_SqlProductRowChangeEventHandler(object sender, durados_SqlProductRowChangeEvent e);
-        
-        [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
-        public delegate void durados_ThemeRowChangeEventHandler(object sender, durados_ThemeRowChangeEvent e);
         
         [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
         public delegate void durados_AppStatRowChangeEventHandler(object sender, durados_AppStatRowChangeEvent e);
@@ -1301,7 +1259,7 @@ namespace Durados.Web.Mvc {
                         string Title, 
                         bool Basic, 
                         System.Guid Guid, 
-                        durados_ThemeRow parentdurados_ThemeRowByFK_durados_App_durados_Theme, 
+                        int ThemeId, 
                         string CustomThemePath, 
                         int DatabaseStatus, 
                         int TemplateStatus, 
@@ -1345,7 +1303,7 @@ namespace Durados.Web.Mvc {
                         Title,
                         Basic,
                         Guid,
-                        null,
+                        ThemeId,
                         CustomThemePath,
                         DatabaseStatus,
                         TemplateStatus,
@@ -1376,9 +1334,6 @@ namespace Durados.Web.Mvc {
                 }
                 if ((parentdurados_SqlConnectionRowByFK_durados_App_durados_SqlConnection_Security != null)) {
                     columnValuesArray[24] = parentdurados_SqlConnectionRowByFK_durados_App_durados_SqlConnection_Security[0];
-                }
-                if ((parentdurados_ThemeRowByFK_durados_App_durados_Theme != null)) {
-                    columnValuesArray[28] = parentdurados_ThemeRowByFK_durados_App_durados_Theme[0];
                 }
                 rowdurados_AppRow.ItemArray = columnValuesArray;
                 this.Rows.Add(rowdurados_AppRow);
@@ -4135,300 +4090,6 @@ namespace Durados.Web.Mvc {
         ///</summary>
         [global::System.Serializable()]
         [global::System.Xml.Serialization.XmlSchemaProviderAttribute("GetTypedTableSchema")]
-        public partial class durados_ThemeDataTable : global::System.Data.TypedTableBase<durados_ThemeRow> {
-            
-            private global::System.Data.DataColumn columnId;
-            
-            private global::System.Data.DataColumn columnName;
-            
-            private global::System.Data.DataColumn columnRelativePath;
-            
-            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
-            public durados_ThemeDataTable() {
-                this.TableName = "durados_Theme";
-                this.BeginInit();
-                this.InitClass();
-                this.EndInit();
-            }
-            
-            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
-            internal durados_ThemeDataTable(global::System.Data.DataTable table) {
-                this.TableName = table.TableName;
-                if ((table.CaseSensitive != table.DataSet.CaseSensitive)) {
-                    this.CaseSensitive = table.CaseSensitive;
-                }
-                if ((table.Locale.ToString() != table.DataSet.Locale.ToString())) {
-                    this.Locale = table.Locale;
-                }
-                if ((table.Namespace != table.DataSet.Namespace)) {
-                    this.Namespace = table.Namespace;
-                }
-                this.Prefix = table.Prefix;
-                this.MinimumCapacity = table.MinimumCapacity;
-            }
-            
-            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
-            protected durados_ThemeDataTable(global::System.Runtime.Serialization.SerializationInfo info, global::System.Runtime.Serialization.StreamingContext context) : 
-                    base(info, context) {
-                this.InitVars();
-            }
-            
-            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
-            public global::System.Data.DataColumn IdColumn {
-                get {
-                    return this.columnId;
-                }
-            }
-            
-            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
-            public global::System.Data.DataColumn NameColumn {
-                get {
-                    return this.columnName;
-                }
-            }
-            
-            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
-            public global::System.Data.DataColumn RelativePathColumn {
-                get {
-                    return this.columnRelativePath;
-                }
-            }
-            
-            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
-            [global::System.ComponentModel.Browsable(false)]
-            public int Count {
-                get {
-                    return this.Rows.Count;
-                }
-            }
-            
-            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
-            public durados_ThemeRow this[int index] {
-                get {
-                    return ((durados_ThemeRow)(this.Rows[index]));
-                }
-            }
-            
-            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
-            public event durados_ThemeRowChangeEventHandler durados_ThemeRowChanging;
-            
-            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
-            public event durados_ThemeRowChangeEventHandler durados_ThemeRowChanged;
-            
-            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
-            public event durados_ThemeRowChangeEventHandler durados_ThemeRowDeleting;
-            
-            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
-            public event durados_ThemeRowChangeEventHandler durados_ThemeRowDeleted;
-            
-            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
-            public void Adddurados_ThemeRow(durados_ThemeRow row) {
-                this.Rows.Add(row);
-            }
-            
-            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
-            public durados_ThemeRow Adddurados_ThemeRow(string Name, string RelativePath) {
-                durados_ThemeRow rowdurados_ThemeRow = ((durados_ThemeRow)(this.NewRow()));
-                object[] columnValuesArray = new object[] {
-                        null,
-                        Name,
-                        RelativePath};
-                rowdurados_ThemeRow.ItemArray = columnValuesArray;
-                this.Rows.Add(rowdurados_ThemeRow);
-                return rowdurados_ThemeRow;
-            }
-            
-            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
-            public durados_ThemeRow FindById(int Id) {
-                return ((durados_ThemeRow)(this.Rows.Find(new object[] {
-                            Id})));
-            }
-            
-            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
-            public override global::System.Data.DataTable Clone() {
-                durados_ThemeDataTable cln = ((durados_ThemeDataTable)(base.Clone()));
-                cln.InitVars();
-                return cln;
-            }
-            
-            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
-            protected override global::System.Data.DataTable CreateInstance() {
-                return new durados_ThemeDataTable();
-            }
-            
-            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
-            internal void InitVars() {
-                this.columnId = base.Columns["Id"];
-                this.columnName = base.Columns["Name"];
-                this.columnRelativePath = base.Columns["RelativePath"];
-            }
-            
-            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
-            private void InitClass() {
-                this.columnId = new global::System.Data.DataColumn("Id", typeof(int), null, global::System.Data.MappingType.Element);
-                base.Columns.Add(this.columnId);
-                this.columnName = new global::System.Data.DataColumn("Name", typeof(string), null, global::System.Data.MappingType.Element);
-                base.Columns.Add(this.columnName);
-                this.columnRelativePath = new global::System.Data.DataColumn("RelativePath", typeof(string), null, global::System.Data.MappingType.Element);
-                base.Columns.Add(this.columnRelativePath);
-                this.Constraints.Add(new global::System.Data.UniqueConstraint("Constraint1", new global::System.Data.DataColumn[] {
-                                this.columnId}, true));
-                this.columnId.AutoIncrement = true;
-                this.columnId.AutoIncrementSeed = -1;
-                this.columnId.AutoIncrementStep = -1;
-                this.columnId.AllowDBNull = false;
-                this.columnId.ReadOnly = true;
-                this.columnId.Unique = true;
-                this.columnName.AllowDBNull = false;
-                this.columnName.MaxLength = 50;
-                this.columnRelativePath.AllowDBNull = false;
-                this.columnRelativePath.MaxLength = 250;
-            }
-            
-            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
-            public durados_ThemeRow Newdurados_ThemeRow() {
-                return ((durados_ThemeRow)(this.NewRow()));
-            }
-            
-            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
-            protected override global::System.Data.DataRow NewRowFromBuilder(global::System.Data.DataRowBuilder builder) {
-                return new durados_ThemeRow(builder);
-            }
-            
-            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
-            protected override global::System.Type GetRowType() {
-                return typeof(durados_ThemeRow);
-            }
-            
-            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
-            protected override void OnRowChanged(global::System.Data.DataRowChangeEventArgs e) {
-                base.OnRowChanged(e);
-                if ((this.durados_ThemeRowChanged != null)) {
-                    this.durados_ThemeRowChanged(this, new durados_ThemeRowChangeEvent(((durados_ThemeRow)(e.Row)), e.Action));
-                }
-            }
-            
-            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
-            protected override void OnRowChanging(global::System.Data.DataRowChangeEventArgs e) {
-                base.OnRowChanging(e);
-                if ((this.durados_ThemeRowChanging != null)) {
-                    this.durados_ThemeRowChanging(this, new durados_ThemeRowChangeEvent(((durados_ThemeRow)(e.Row)), e.Action));
-                }
-            }
-            
-            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
-            protected override void OnRowDeleted(global::System.Data.DataRowChangeEventArgs e) {
-                base.OnRowDeleted(e);
-                if ((this.durados_ThemeRowDeleted != null)) {
-                    this.durados_ThemeRowDeleted(this, new durados_ThemeRowChangeEvent(((durados_ThemeRow)(e.Row)), e.Action));
-                }
-            }
-            
-            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
-            protected override void OnRowDeleting(global::System.Data.DataRowChangeEventArgs e) {
-                base.OnRowDeleting(e);
-                if ((this.durados_ThemeRowDeleting != null)) {
-                    this.durados_ThemeRowDeleting(this, new durados_ThemeRowChangeEvent(((durados_ThemeRow)(e.Row)), e.Action));
-                }
-            }
-            
-            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
-            public void Removedurados_ThemeRow(durados_ThemeRow row) {
-                this.Rows.Remove(row);
-            }
-            
-            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
-            public static global::System.Xml.Schema.XmlSchemaComplexType GetTypedTableSchema(global::System.Xml.Schema.XmlSchemaSet xs) {
-                global::System.Xml.Schema.XmlSchemaComplexType type = new global::System.Xml.Schema.XmlSchemaComplexType();
-                global::System.Xml.Schema.XmlSchemaSequence sequence = new global::System.Xml.Schema.XmlSchemaSequence();
-                MapDataSet ds = new MapDataSet();
-                global::System.Xml.Schema.XmlSchemaAny any1 = new global::System.Xml.Schema.XmlSchemaAny();
-                any1.Namespace = "http://www.w3.org/2001/XMLSchema";
-                any1.MinOccurs = new decimal(0);
-                any1.MaxOccurs = decimal.MaxValue;
-                any1.ProcessContents = global::System.Xml.Schema.XmlSchemaContentProcessing.Lax;
-                sequence.Items.Add(any1);
-                global::System.Xml.Schema.XmlSchemaAny any2 = new global::System.Xml.Schema.XmlSchemaAny();
-                any2.Namespace = "urn:schemas-microsoft-com:xml-diffgram-v1";
-                any2.MinOccurs = new decimal(1);
-                any2.ProcessContents = global::System.Xml.Schema.XmlSchemaContentProcessing.Lax;
-                sequence.Items.Add(any2);
-                global::System.Xml.Schema.XmlSchemaAttribute attribute1 = new global::System.Xml.Schema.XmlSchemaAttribute();
-                attribute1.Name = "namespace";
-                attribute1.FixedValue = ds.Namespace;
-                type.Attributes.Add(attribute1);
-                global::System.Xml.Schema.XmlSchemaAttribute attribute2 = new global::System.Xml.Schema.XmlSchemaAttribute();
-                attribute2.Name = "tableTypeName";
-                attribute2.FixedValue = "durados_ThemeDataTable";
-                type.Attributes.Add(attribute2);
-                type.Particle = sequence;
-                global::System.Xml.Schema.XmlSchema dsSchema = ds.GetSchemaSerializable();
-                if (xs.Contains(dsSchema.TargetNamespace)) {
-                    global::System.IO.MemoryStream s1 = new global::System.IO.MemoryStream();
-                    global::System.IO.MemoryStream s2 = new global::System.IO.MemoryStream();
-                    try {
-                        global::System.Xml.Schema.XmlSchema schema = null;
-                        dsSchema.Write(s1);
-                        for (global::System.Collections.IEnumerator schemas = xs.Schemas(dsSchema.TargetNamespace).GetEnumerator(); schemas.MoveNext(); ) {
-                            schema = ((global::System.Xml.Schema.XmlSchema)(schemas.Current));
-                            s2.SetLength(0);
-                            schema.Write(s2);
-                            if ((s1.Length == s2.Length)) {
-                                s1.Position = 0;
-                                s2.Position = 0;
-                                for (; ((s1.Position != s1.Length) 
-                                            && (s1.ReadByte() == s2.ReadByte())); ) {
-                                    ;
-                                }
-                                if ((s1.Position == s1.Length)) {
-                                    return type;
-                                }
-                            }
-                        }
-                    }
-                    finally {
-                        if ((s1 != null)) {
-                            s1.Close();
-                        }
-                        if ((s2 != null)) {
-                            s2.Close();
-                        }
-                    }
-                }
-                xs.Add(dsSchema);
-                return type;
-            }
-        }
-        
-        /// <summary>
-        ///Represents the strongly named DataTable class.
-        ///</summary>
-        [global::System.Serializable()]
-        [global::System.Xml.Serialization.XmlSchemaProviderAttribute("GetTypedTableSchema")]
         public partial class durados_AppStatDataTable : global::System.Data.TypedTableBase<durados_AppStatRow> {
             
             private global::System.Data.DataColumn columnId;
@@ -6413,17 +6074,6 @@ namespace Durados.Web.Mvc {
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
-            public durados_ThemeRow durados_ThemeRow {
-                get {
-                    return ((durados_ThemeRow)(this.GetParentRow(this.Table.ParentRelations["FK_durados_App_durados_Theme"])));
-                }
-                set {
-                    this.SetParentRow(value, this.Table.ParentRelations["FK_durados_App_durados_Theme"]);
-                }
-            }
-            
-            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
             public bool IsToDeleteDateNull() {
                 return this.IsNull(this.tabledurados_App.ToDeleteDateColumn);
             }
@@ -8198,65 +7848,6 @@ namespace Durados.Web.Mvc {
         /// <summary>
         ///Represents strongly named DataRow class.
         ///</summary>
-        public partial class durados_ThemeRow : global::System.Data.DataRow {
-            
-            private durados_ThemeDataTable tabledurados_Theme;
-            
-            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
-            internal durados_ThemeRow(global::System.Data.DataRowBuilder rb) : 
-                    base(rb) {
-                this.tabledurados_Theme = ((durados_ThemeDataTable)(this.Table));
-            }
-            
-            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
-            public int Id {
-                get {
-                    return ((int)(this[this.tabledurados_Theme.IdColumn]));
-                }
-                set {
-                    this[this.tabledurados_Theme.IdColumn] = value;
-                }
-            }
-            
-            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
-            public string Name {
-                get {
-                    return ((string)(this[this.tabledurados_Theme.NameColumn]));
-                }
-                set {
-                    this[this.tabledurados_Theme.NameColumn] = value;
-                }
-            }
-            
-            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
-            public string RelativePath {
-                get {
-                    return ((string)(this[this.tabledurados_Theme.RelativePathColumn]));
-                }
-                set {
-                    this[this.tabledurados_Theme.RelativePathColumn] = value;
-                }
-            }
-            
-            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
-            public durados_AppRow[] Getdurados_AppRows() {
-                if ((this.Table.ChildRelations["FK_durados_App_durados_Theme"] == null)) {
-                    return new durados_AppRow[0];
-                }
-                else {
-                    return ((durados_AppRow[])(base.GetChildRows(this.Table.ChildRelations["FK_durados_App_durados_Theme"])));
-                }
-            }
-        }
-        
-        /// <summary>
-        ///Represents strongly named DataRow class.
-        ///</summary>
         public partial class durados_AppStatRow : global::System.Data.DataRow {
             
             private durados_AppStatDataTable tabledurados_AppStat;
@@ -9427,40 +9018,6 @@ namespace Durados.Web.Mvc {
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
             public durados_SqlProductRow Row {
-                get {
-                    return this.eventRow;
-                }
-            }
-            
-            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
-            public global::System.Data.DataRowAction Action {
-                get {
-                    return this.eventAction;
-                }
-            }
-        }
-        
-        /// <summary>
-        ///Row event argument class
-        ///</summary>
-        [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
-        public class durados_ThemeRowChangeEvent : global::System.EventArgs {
-            
-            private durados_ThemeRow eventRow;
-            
-            private global::System.Data.DataRowAction eventAction;
-            
-            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
-            public durados_ThemeRowChangeEvent(durados_ThemeRow row, global::System.Data.DataRowAction action) {
-                this.eventRow = row;
-                this.eventAction = action;
-            }
-            
-            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
-            public durados_ThemeRow Row {
                 get {
                     return this.eventRow;
                 }
@@ -13182,355 +12739,6 @@ SELECT Id, Name, Ordinal FROM durados_SqlProduct WHERE (Id = @Id)";
     [global::System.ComponentModel.DesignerAttribute("Microsoft.VSDesigner.DataSource.Design.TableAdapterDesigner, Microsoft.VSDesigner" +
         ", Version=10.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a")]
     [global::System.ComponentModel.Design.HelpKeywordAttribute("vs.data.TableAdapter")]
-    public partial class durados_ThemeTableAdapter : global::System.ComponentModel.Component {
-        
-        private global::System.Data.SqlClient.SqlDataAdapter _adapter;
-        
-        private global::System.Data.SqlClient.SqlConnection _connection;
-        
-        private global::System.Data.SqlClient.SqlTransaction _transaction;
-        
-        private global::System.Data.SqlClient.SqlCommand[] _commandCollection;
-        
-        private bool _clearBeforeFill;
-        
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
-        public durados_ThemeTableAdapter() {
-            this.ClearBeforeFill = true;
-        }
-        
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
-        protected internal global::System.Data.SqlClient.SqlDataAdapter Adapter {
-            get {
-                if ((this._adapter == null)) {
-                    this.InitAdapter();
-                }
-                return this._adapter;
-            }
-        }
-        
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
-        internal global::System.Data.SqlClient.SqlConnection Connection {
-            get {
-                if ((this._connection == null)) {
-                    this.InitConnection();
-                }
-                return this._connection;
-            }
-            set {
-                this._connection = value;
-                if ((this.Adapter.InsertCommand != null)) {
-                    this.Adapter.InsertCommand.Connection = value;
-                }
-                if ((this.Adapter.DeleteCommand != null)) {
-                    this.Adapter.DeleteCommand.Connection = value;
-                }
-                if ((this.Adapter.UpdateCommand != null)) {
-                    this.Adapter.UpdateCommand.Connection = value;
-                }
-                for (int i = 0; (i < this.CommandCollection.Length); i = (i + 1)) {
-                    if ((this.CommandCollection[i] != null)) {
-                        ((global::System.Data.SqlClient.SqlCommand)(this.CommandCollection[i])).Connection = value;
-                    }
-                }
-            }
-        }
-        
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
-        internal global::System.Data.SqlClient.SqlTransaction Transaction {
-            get {
-                return this._transaction;
-            }
-            set {
-                this._transaction = value;
-                for (int i = 0; (i < this.CommandCollection.Length); i = (i + 1)) {
-                    this.CommandCollection[i].Transaction = this._transaction;
-                }
-                if (((this.Adapter != null) 
-                            && (this.Adapter.DeleteCommand != null))) {
-                    this.Adapter.DeleteCommand.Transaction = this._transaction;
-                }
-                if (((this.Adapter != null) 
-                            && (this.Adapter.InsertCommand != null))) {
-                    this.Adapter.InsertCommand.Transaction = this._transaction;
-                }
-                if (((this.Adapter != null) 
-                            && (this.Adapter.UpdateCommand != null))) {
-                    this.Adapter.UpdateCommand.Transaction = this._transaction;
-                }
-            }
-        }
-        
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
-        protected global::System.Data.SqlClient.SqlCommand[] CommandCollection {
-            get {
-                if ((this._commandCollection == null)) {
-                    this.InitCommandCollection();
-                }
-                return this._commandCollection;
-            }
-        }
-        
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
-        public bool ClearBeforeFill {
-            get {
-                return this._clearBeforeFill;
-            }
-            set {
-                this._clearBeforeFill = value;
-            }
-        }
-        
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
-        private void InitAdapter() {
-            this._adapter = new global::System.Data.SqlClient.SqlDataAdapter();
-            global::System.Data.Common.DataTableMapping tableMapping = new global::System.Data.Common.DataTableMapping();
-            tableMapping.SourceTable = "Table";
-            tableMapping.DataSetTable = "durados_Theme";
-            tableMapping.ColumnMappings.Add("Id", "Id");
-            tableMapping.ColumnMappings.Add("Name", "Name");
-            tableMapping.ColumnMappings.Add("RelativePath", "RelativePath");
-            this._adapter.TableMappings.Add(tableMapping);
-            this._adapter.DeleteCommand = new global::System.Data.SqlClient.SqlCommand();
-            this._adapter.DeleteCommand.Connection = this.Connection;
-            this._adapter.DeleteCommand.CommandText = "DELETE FROM [dbo].[durados_Theme] WHERE (([Id] = @Original_Id) AND ([Name] = @Ori" +
-                "ginal_Name) AND ([RelativePath] = @Original_RelativePath))";
-            this._adapter.DeleteCommand.CommandType = global::System.Data.CommandType.Text;
-            this._adapter.DeleteCommand.Parameters.Add(new global::System.Data.SqlClient.SqlParameter("@Original_Id", global::System.Data.SqlDbType.Int, 0, global::System.Data.ParameterDirection.Input, 0, 0, "Id", global::System.Data.DataRowVersion.Original, false, null, "", "", ""));
-            this._adapter.DeleteCommand.Parameters.Add(new global::System.Data.SqlClient.SqlParameter("@Original_Name", global::System.Data.SqlDbType.NVarChar, 0, global::System.Data.ParameterDirection.Input, 0, 0, "Name", global::System.Data.DataRowVersion.Original, false, null, "", "", ""));
-            this._adapter.DeleteCommand.Parameters.Add(new global::System.Data.SqlClient.SqlParameter("@Original_RelativePath", global::System.Data.SqlDbType.NVarChar, 0, global::System.Data.ParameterDirection.Input, 0, 0, "RelativePath", global::System.Data.DataRowVersion.Original, false, null, "", "", ""));
-            this._adapter.InsertCommand = new global::System.Data.SqlClient.SqlCommand();
-            this._adapter.InsertCommand.Connection = this.Connection;
-            this._adapter.InsertCommand.CommandText = "INSERT INTO [dbo].[durados_Theme] ([Name], [RelativePath]) VALUES (@Name, @Relati" +
-                "vePath);\r\nSELECT Id, Name, RelativePath FROM durados_Theme WHERE (Id = SCOPE_IDE" +
-                "NTITY())";
-            this._adapter.InsertCommand.CommandType = global::System.Data.CommandType.Text;
-            this._adapter.InsertCommand.Parameters.Add(new global::System.Data.SqlClient.SqlParameter("@Name", global::System.Data.SqlDbType.NVarChar, 0, global::System.Data.ParameterDirection.Input, 0, 0, "Name", global::System.Data.DataRowVersion.Current, false, null, "", "", ""));
-            this._adapter.InsertCommand.Parameters.Add(new global::System.Data.SqlClient.SqlParameter("@RelativePath", global::System.Data.SqlDbType.NVarChar, 0, global::System.Data.ParameterDirection.Input, 0, 0, "RelativePath", global::System.Data.DataRowVersion.Current, false, null, "", "", ""));
-            this._adapter.UpdateCommand = new global::System.Data.SqlClient.SqlCommand();
-            this._adapter.UpdateCommand.Connection = this.Connection;
-            this._adapter.UpdateCommand.CommandText = "UPDATE [dbo].[durados_Theme] SET [Name] = @Name, [RelativePath] = @RelativePath W" +
-                "HERE (([Id] = @Original_Id) AND ([Name] = @Original_Name) AND ([RelativePath] = " +
-                "@Original_RelativePath));\r\nSELECT Id, Name, RelativePath FROM durados_Theme WHER" +
-                "E (Id = @Id)";
-            this._adapter.UpdateCommand.CommandType = global::System.Data.CommandType.Text;
-            this._adapter.UpdateCommand.Parameters.Add(new global::System.Data.SqlClient.SqlParameter("@Name", global::System.Data.SqlDbType.NVarChar, 0, global::System.Data.ParameterDirection.Input, 0, 0, "Name", global::System.Data.DataRowVersion.Current, false, null, "", "", ""));
-            this._adapter.UpdateCommand.Parameters.Add(new global::System.Data.SqlClient.SqlParameter("@RelativePath", global::System.Data.SqlDbType.NVarChar, 0, global::System.Data.ParameterDirection.Input, 0, 0, "RelativePath", global::System.Data.DataRowVersion.Current, false, null, "", "", ""));
-            this._adapter.UpdateCommand.Parameters.Add(new global::System.Data.SqlClient.SqlParameter("@Original_Id", global::System.Data.SqlDbType.Int, 0, global::System.Data.ParameterDirection.Input, 0, 0, "Id", global::System.Data.DataRowVersion.Original, false, null, "", "", ""));
-            this._adapter.UpdateCommand.Parameters.Add(new global::System.Data.SqlClient.SqlParameter("@Original_Name", global::System.Data.SqlDbType.NVarChar, 0, global::System.Data.ParameterDirection.Input, 0, 0, "Name", global::System.Data.DataRowVersion.Original, false, null, "", "", ""));
-            this._adapter.UpdateCommand.Parameters.Add(new global::System.Data.SqlClient.SqlParameter("@Original_RelativePath", global::System.Data.SqlDbType.NVarChar, 0, global::System.Data.ParameterDirection.Input, 0, 0, "RelativePath", global::System.Data.DataRowVersion.Original, false, null, "", "", ""));
-            this._adapter.UpdateCommand.Parameters.Add(new global::System.Data.SqlClient.SqlParameter("@Id", global::System.Data.SqlDbType.Int, 4, global::System.Data.ParameterDirection.Input, 0, 0, "Id", global::System.Data.DataRowVersion.Current, false, null, "", "", ""));
-        }
-        
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
-        private void InitConnection() {
-            this._connection = new global::System.Data.SqlClient.SqlConnection();
-            this._connection.ConnectionString = global::Durados.Web.Mvc.Properties.Settings.Default.duradosConnectionString;
-        }
-        
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
-        private void InitCommandCollection() {
-            this._commandCollection = new global::System.Data.SqlClient.SqlCommand[1];
-            this._commandCollection[0] = new global::System.Data.SqlClient.SqlCommand();
-            this._commandCollection[0].Connection = this.Connection;
-            this._commandCollection[0].CommandText = "SELECT Id, Name, RelativePath FROM dbo.durados_Theme";
-            this._commandCollection[0].CommandType = global::System.Data.CommandType.Text;
-        }
-        
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
-        [global::System.ComponentModel.Design.HelpKeywordAttribute("vs.data.TableAdapter")]
-        [global::System.ComponentModel.DataObjectMethodAttribute(global::System.ComponentModel.DataObjectMethodType.Fill, true)]
-        public virtual int Fill(MapDataSet.durados_ThemeDataTable dataTable) {
-            this.Adapter.SelectCommand = this.CommandCollection[0];
-            if ((this.ClearBeforeFill == true)) {
-                dataTable.Clear();
-            }
-            int returnValue = this.Adapter.Fill(dataTable);
-            return returnValue;
-        }
-        
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
-        [global::System.ComponentModel.Design.HelpKeywordAttribute("vs.data.TableAdapter")]
-        [global::System.ComponentModel.DataObjectMethodAttribute(global::System.ComponentModel.DataObjectMethodType.Select, true)]
-        public virtual MapDataSet.durados_ThemeDataTable GetData() {
-            this.Adapter.SelectCommand = this.CommandCollection[0];
-            MapDataSet.durados_ThemeDataTable dataTable = new MapDataSet.durados_ThemeDataTable();
-            this.Adapter.Fill(dataTable);
-            return dataTable;
-        }
-        
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
-        [global::System.ComponentModel.Design.HelpKeywordAttribute("vs.data.TableAdapter")]
-        public virtual int Update(MapDataSet.durados_ThemeDataTable dataTable) {
-            return this.Adapter.Update(dataTable);
-        }
-        
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
-        [global::System.ComponentModel.Design.HelpKeywordAttribute("vs.data.TableAdapter")]
-        public virtual int Update(MapDataSet dataSet) {
-            return this.Adapter.Update(dataSet, "durados_Theme");
-        }
-        
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
-        [global::System.ComponentModel.Design.HelpKeywordAttribute("vs.data.TableAdapter")]
-        public virtual int Update(global::System.Data.DataRow dataRow) {
-            return this.Adapter.Update(new global::System.Data.DataRow[] {
-                        dataRow});
-        }
-        
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
-        [global::System.ComponentModel.Design.HelpKeywordAttribute("vs.data.TableAdapter")]
-        public virtual int Update(global::System.Data.DataRow[] dataRows) {
-            return this.Adapter.Update(dataRows);
-        }
-        
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
-        [global::System.ComponentModel.Design.HelpKeywordAttribute("vs.data.TableAdapter")]
-        [global::System.ComponentModel.DataObjectMethodAttribute(global::System.ComponentModel.DataObjectMethodType.Delete, true)]
-        public virtual int Delete(int Original_Id, string Original_Name, string Original_RelativePath) {
-            this.Adapter.DeleteCommand.Parameters[0].Value = ((int)(Original_Id));
-            if ((Original_Name == null)) {
-                throw new global::System.ArgumentNullException("Original_Name");
-            }
-            else {
-                this.Adapter.DeleteCommand.Parameters[1].Value = ((string)(Original_Name));
-            }
-            if ((Original_RelativePath == null)) {
-                throw new global::System.ArgumentNullException("Original_RelativePath");
-            }
-            else {
-                this.Adapter.DeleteCommand.Parameters[2].Value = ((string)(Original_RelativePath));
-            }
-            global::System.Data.ConnectionState previousConnectionState = this.Adapter.DeleteCommand.Connection.State;
-            if (((this.Adapter.DeleteCommand.Connection.State & global::System.Data.ConnectionState.Open) 
-                        != global::System.Data.ConnectionState.Open)) {
-                this.Adapter.DeleteCommand.Connection.Open();
-            }
-            try {
-                int returnValue = this.Adapter.DeleteCommand.ExecuteNonQuery();
-                return returnValue;
-            }
-            finally {
-                if ((previousConnectionState == global::System.Data.ConnectionState.Closed)) {
-                    this.Adapter.DeleteCommand.Connection.Close();
-                }
-            }
-        }
-        
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
-        [global::System.ComponentModel.Design.HelpKeywordAttribute("vs.data.TableAdapter")]
-        [global::System.ComponentModel.DataObjectMethodAttribute(global::System.ComponentModel.DataObjectMethodType.Insert, true)]
-        public virtual int Insert(string Name, string RelativePath) {
-            if ((Name == null)) {
-                throw new global::System.ArgumentNullException("Name");
-            }
-            else {
-                this.Adapter.InsertCommand.Parameters[0].Value = ((string)(Name));
-            }
-            if ((RelativePath == null)) {
-                throw new global::System.ArgumentNullException("RelativePath");
-            }
-            else {
-                this.Adapter.InsertCommand.Parameters[1].Value = ((string)(RelativePath));
-            }
-            global::System.Data.ConnectionState previousConnectionState = this.Adapter.InsertCommand.Connection.State;
-            if (((this.Adapter.InsertCommand.Connection.State & global::System.Data.ConnectionState.Open) 
-                        != global::System.Data.ConnectionState.Open)) {
-                this.Adapter.InsertCommand.Connection.Open();
-            }
-            try {
-                int returnValue = this.Adapter.InsertCommand.ExecuteNonQuery();
-                return returnValue;
-            }
-            finally {
-                if ((previousConnectionState == global::System.Data.ConnectionState.Closed)) {
-                    this.Adapter.InsertCommand.Connection.Close();
-                }
-            }
-        }
-        
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
-        [global::System.ComponentModel.Design.HelpKeywordAttribute("vs.data.TableAdapter")]
-        [global::System.ComponentModel.DataObjectMethodAttribute(global::System.ComponentModel.DataObjectMethodType.Update, true)]
-        public virtual int Update(string Name, string RelativePath, int Original_Id, string Original_Name, string Original_RelativePath, int Id) {
-            if ((Name == null)) {
-                throw new global::System.ArgumentNullException("Name");
-            }
-            else {
-                this.Adapter.UpdateCommand.Parameters[0].Value = ((string)(Name));
-            }
-            if ((RelativePath == null)) {
-                throw new global::System.ArgumentNullException("RelativePath");
-            }
-            else {
-                this.Adapter.UpdateCommand.Parameters[1].Value = ((string)(RelativePath));
-            }
-            this.Adapter.UpdateCommand.Parameters[2].Value = ((int)(Original_Id));
-            if ((Original_Name == null)) {
-                throw new global::System.ArgumentNullException("Original_Name");
-            }
-            else {
-                this.Adapter.UpdateCommand.Parameters[3].Value = ((string)(Original_Name));
-            }
-            if ((Original_RelativePath == null)) {
-                throw new global::System.ArgumentNullException("Original_RelativePath");
-            }
-            else {
-                this.Adapter.UpdateCommand.Parameters[4].Value = ((string)(Original_RelativePath));
-            }
-            this.Adapter.UpdateCommand.Parameters[5].Value = ((int)(Id));
-            global::System.Data.ConnectionState previousConnectionState = this.Adapter.UpdateCommand.Connection.State;
-            if (((this.Adapter.UpdateCommand.Connection.State & global::System.Data.ConnectionState.Open) 
-                        != global::System.Data.ConnectionState.Open)) {
-                this.Adapter.UpdateCommand.Connection.Open();
-            }
-            try {
-                int returnValue = this.Adapter.UpdateCommand.ExecuteNonQuery();
-                return returnValue;
-            }
-            finally {
-                if ((previousConnectionState == global::System.Data.ConnectionState.Closed)) {
-                    this.Adapter.UpdateCommand.Connection.Close();
-                }
-            }
-        }
-        
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
-        [global::System.ComponentModel.Design.HelpKeywordAttribute("vs.data.TableAdapter")]
-        [global::System.ComponentModel.DataObjectMethodAttribute(global::System.ComponentModel.DataObjectMethodType.Update, true)]
-        public virtual int Update(string Name, string RelativePath, int Original_Id, string Original_Name, string Original_RelativePath) {
-            return this.Update(Name, RelativePath, Original_Id, Original_Name, Original_RelativePath, Original_Id);
-        }
-    }
-    
-    /// <summary>
-    ///Represents the connection and commands used to retrieve and save data.
-    ///</summary>
-    [global::System.ComponentModel.DesignerCategoryAttribute("code")]
-    [global::System.ComponentModel.ToolboxItem(true)]
-    [global::System.ComponentModel.DataObjectAttribute(true)]
-    [global::System.ComponentModel.DesignerAttribute("Microsoft.VSDesigner.DataSource.Design.TableAdapterDesigner, Microsoft.VSDesigner" +
-        ", Version=10.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a")]
-    [global::System.ComponentModel.Design.HelpKeywordAttribute("vs.data.TableAdapter")]
     public partial class durados_AppStatTableAdapter : global::System.ComponentModel.Component {
         
         private global::System.Data.SqlClient.SqlDataAdapter _adapter;
@@ -15288,8 +14496,6 @@ SELECT id, UserId, Provider, SocialId FROM durados_UserSocial WHERE (id = @id)";
         
         private durados_SqlProductTableAdapter _durados_SqlProductTableAdapter;
         
-        private durados_ThemeTableAdapter _durados_ThemeTableAdapter;
-        
         private durados_AppStatTableAdapter _durados_AppStatTableAdapter;
         
         private backand_ActionTemplateTableAdapter _backand_ActionTemplateTableAdapter;
@@ -15414,20 +14620,6 @@ SELECT id, UserId, Provider, SocialId FROM durados_UserSocial WHERE (id = @id)";
         [global::System.ComponentModel.EditorAttribute("Microsoft.VSDesigner.DataSource.Design.TableAdapterManagerPropertyEditor, Microso" +
             "ft.VSDesigner, Version=10.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3" +
             "a", "System.Drawing.Design.UITypeEditor")]
-        public durados_ThemeTableAdapter durados_ThemeTableAdapter {
-            get {
-                return this._durados_ThemeTableAdapter;
-            }
-            set {
-                this._durados_ThemeTableAdapter = value;
-            }
-        }
-        
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
-        [global::System.ComponentModel.EditorAttribute("Microsoft.VSDesigner.DataSource.Design.TableAdapterManagerPropertyEditor, Microso" +
-            "ft.VSDesigner, Version=10.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3" +
-            "a", "System.Drawing.Design.UITypeEditor")]
         public durados_AppStatTableAdapter durados_AppStatTableAdapter {
             get {
                 return this._durados_AppStatTableAdapter;
@@ -15512,10 +14704,6 @@ SELECT id, UserId, Provider, SocialId FROM durados_UserSocial WHERE (id = @id)";
                             && (this._durados_SqlProductTableAdapter.Connection != null))) {
                     return this._durados_SqlProductTableAdapter.Connection;
                 }
-                if (((this._durados_ThemeTableAdapter != null) 
-                            && (this._durados_ThemeTableAdapter.Connection != null))) {
-                    return this._durados_ThemeTableAdapter.Connection;
-                }
                 if (((this._durados_AppStatTableAdapter != null) 
                             && (this._durados_AppStatTableAdapter.Connection != null))) {
                     return this._durados_AppStatTableAdapter.Connection;
@@ -15562,9 +14750,6 @@ SELECT id, UserId, Provider, SocialId FROM durados_UserSocial WHERE (id = @id)";
                 if ((this._durados_SqlProductTableAdapter != null)) {
                     count = (count + 1);
                 }
-                if ((this._durados_ThemeTableAdapter != null)) {
-                    count = (count + 1);
-                }
                 if ((this._durados_AppStatTableAdapter != null)) {
                     count = (count + 1);
                 }
@@ -15609,15 +14794,6 @@ SELECT id, UserId, Provider, SocialId FROM durados_UserSocial WHERE (id = @id)";
                 if (((updatedRows != null) 
                             && (0 < updatedRows.Length))) {
                     result = (result + this._durados_DataSourceTypeTableAdapter.Update(updatedRows));
-                    allChangedRows.AddRange(updatedRows);
-                }
-            }
-            if ((this._durados_ThemeTableAdapter != null)) {
-                global::System.Data.DataRow[] updatedRows = dataSet.durados_Theme.Select(null, null, global::System.Data.DataViewRowState.ModifiedCurrent);
-                updatedRows = this.GetRealUpdatedRows(updatedRows, allAddedRows);
-                if (((updatedRows != null) 
-                            && (0 < updatedRows.Length))) {
-                    result = (result + this._durados_ThemeTableAdapter.Update(updatedRows));
                     allChangedRows.AddRange(updatedRows);
                 }
             }
@@ -15716,14 +14892,6 @@ SELECT id, UserId, Provider, SocialId FROM durados_UserSocial WHERE (id = @id)";
                 if (((addedRows != null) 
                             && (0 < addedRows.Length))) {
                     result = (result + this._durados_DataSourceTypeTableAdapter.Update(addedRows));
-                    allAddedRows.AddRange(addedRows);
-                }
-            }
-            if ((this._durados_ThemeTableAdapter != null)) {
-                global::System.Data.DataRow[] addedRows = dataSet.durados_Theme.Select(null, null, global::System.Data.DataViewRowState.Added);
-                if (((addedRows != null) 
-                            && (0 < addedRows.Length))) {
-                    result = (result + this._durados_ThemeTableAdapter.Update(addedRows));
                     allAddedRows.AddRange(addedRows);
                 }
             }
@@ -15851,14 +15019,6 @@ SELECT id, UserId, Provider, SocialId FROM durados_UserSocial WHERE (id = @id)";
                     allChangedRows.AddRange(deletedRows);
                 }
             }
-            if ((this._durados_ThemeTableAdapter != null)) {
-                global::System.Data.DataRow[] deletedRows = dataSet.durados_Theme.Select(null, null, global::System.Data.DataViewRowState.Deleted);
-                if (((deletedRows != null) 
-                            && (0 < deletedRows.Length))) {
-                    result = (result + this._durados_ThemeTableAdapter.Update(deletedRows));
-                    allChangedRows.AddRange(deletedRows);
-                }
-            }
             if ((this._durados_DataSourceTypeTableAdapter != null)) {
                 global::System.Data.DataRow[] deletedRows = dataSet.durados_DataSourceType.Select(null, null, global::System.Data.DataViewRowState.Deleted);
                 if (((deletedRows != null) 
@@ -15954,11 +15114,6 @@ SELECT id, UserId, Provider, SocialId FROM durados_UserSocial WHERE (id = @id)";
             }
             if (((this._durados_SqlProductTableAdapter != null) 
                         && (this.MatchTableAdapterConnection(this._durados_SqlProductTableAdapter.Connection) == false))) {
-                throw new global::System.ArgumentException("All TableAdapters managed by a TableAdapterManager must use the same connection s" +
-                        "tring.");
-            }
-            if (((this._durados_ThemeTableAdapter != null) 
-                        && (this.MatchTableAdapterConnection(this._durados_ThemeTableAdapter.Connection) == false))) {
                 throw new global::System.ArgumentException("All TableAdapters managed by a TableAdapterManager must use the same connection s" +
                         "tring.");
             }
@@ -16070,15 +15225,6 @@ SELECT id, UserId, Provider, SocialId FROM durados_UserSocial WHERE (id = @id)";
                     if (this._durados_SqlProductTableAdapter.Adapter.AcceptChangesDuringUpdate) {
                         this._durados_SqlProductTableAdapter.Adapter.AcceptChangesDuringUpdate = false;
                         adaptersWithAcceptChangesDuringUpdate.Add(this._durados_SqlProductTableAdapter.Adapter);
-                    }
-                }
-                if ((this._durados_ThemeTableAdapter != null)) {
-                    revertConnections.Add(this._durados_ThemeTableAdapter, this._durados_ThemeTableAdapter.Connection);
-                    this._durados_ThemeTableAdapter.Connection = ((global::System.Data.SqlClient.SqlConnection)(workConnection));
-                    this._durados_ThemeTableAdapter.Transaction = ((global::System.Data.SqlClient.SqlTransaction)(workTransaction));
-                    if (this._durados_ThemeTableAdapter.Adapter.AcceptChangesDuringUpdate) {
-                        this._durados_ThemeTableAdapter.Adapter.AcceptChangesDuringUpdate = false;
-                        adaptersWithAcceptChangesDuringUpdate.Add(this._durados_ThemeTableAdapter.Adapter);
                     }
                 }
                 if ((this._durados_AppStatTableAdapter != null)) {
@@ -16193,10 +15339,6 @@ SELECT id, UserId, Provider, SocialId FROM durados_UserSocial WHERE (id = @id)";
                 if ((this._durados_SqlProductTableAdapter != null)) {
                     this._durados_SqlProductTableAdapter.Connection = ((global::System.Data.SqlClient.SqlConnection)(revertConnections[this._durados_SqlProductTableAdapter]));
                     this._durados_SqlProductTableAdapter.Transaction = null;
-                }
-                if ((this._durados_ThemeTableAdapter != null)) {
-                    this._durados_ThemeTableAdapter.Connection = ((global::System.Data.SqlClient.SqlConnection)(revertConnections[this._durados_ThemeTableAdapter]));
-                    this._durados_ThemeTableAdapter.Transaction = null;
                 }
                 if ((this._durados_AppStatTableAdapter != null)) {
                     this._durados_AppStatTableAdapter.Connection = ((global::System.Data.SqlClient.SqlConnection)(revertConnections[this._durados_AppStatTableAdapter]));

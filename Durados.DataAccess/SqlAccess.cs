@@ -7,6 +7,7 @@ using System.Text.RegularExpressions;
 using System.Text;
 
 using Durados;
+using Durados.DataAccess;
 
 namespace Durados.DataAccess
 {
@@ -46,6 +47,8 @@ namespace Durados.DataAccess
             else
                 return new SqlConnection(connectionString);
         }
+
+        
 
         static bool connection_ValidateRemoteCertificateCallback(System.Security.Cryptography.X509Certificates.X509Certificate cert, System.Security.Cryptography.X509Certificates.X509Chain chain, System.Net.Security.SslPolicyErrors errors)
         {
@@ -2973,8 +2976,9 @@ namespace Durados.DataAccess
             string s = string.Empty;
             if (!view.Database.EnableDecryption)
                 return s;
-
-            string sql = "OPEN SYMMETRIC KEY {0} DECRYPTION BY CERTIFICATE {1} ";
+            ISqlTextBuilder sqlBuilder = GetSqlTextBuilder(view);
+            string sql = sqlBuilder.GetOpenCertificatesStatement(); ;
+            
             HashSet<string> keys = new HashSet<string>();
 
             foreach (ColumnField columnField in view.GetEncryptedColumns())
@@ -2992,7 +2996,8 @@ namespace Durados.DataAccess
         private string GetCloseCertificatesStatement(Durados.View view)
         {
             string s = string.Empty;
-            string sql = " close SYMMETRIC KEY {0} ";
+            ISqlTextBuilder sqlBuilder = GetSqlTextBuilder(view);
+            string sql = sqlBuilder.GetCloseCertificatesStatement();
             HashSet<string> keys = new HashSet<string>();
             foreach (ColumnField columnField in view.GetEncryptedColumns())
             {
@@ -3009,10 +3014,10 @@ namespace Durados.DataAccess
         private string GetEncryptedColumnsStatement(Durados.View view)
         {
             string s = string.Empty;
-
+            ISqlTextBuilder sqlBuilder = GetSqlTextBuilder(view);
             foreach (ColumnField columnField in view.GetEncryptedColumns())
             {
-                s += string.Format(" CONVERT(NVARCHAR(250), DECRYPTBYKEY({0})) AS {1}, ", columnField.EncryptedName, columnField.DatabaseNames);
+                s += sqlBuilder.GetEncryptedColumnsStatement(columnField.EncryptedName, columnField.DatabaseNames);
 
             }
 
@@ -3326,7 +3331,7 @@ namespace Durados.DataAccess
         {
             return new SqlSchema();
         }
-
+        
         private string GetDistinctSelect(DataTable table)
         {
             StringBuilder s = new StringBuilder();
@@ -6654,7 +6659,7 @@ namespace Durados.DataAccess
             foreach (string columnName in columnNamesList)
             {
                 if (view.Fields.ContainsKey(columnName) && view.Fields[columnName].FieldType == FieldType.Column && ((ColumnField)view.Fields[columnName]).Encrypted)
-                    delimitedColumns += "ENCRYPTBYKEY(KEY_GUID('" + ((ColumnField)view.Fields[columnName]).GetSymmetricKeyName() + "'),"+sqlTextBuilder.DbParameterPrefix +  GetVarFromName(columnName) + ")" + comma;
+                    delimitedColumns += sqlTextBuilder.GetDbEncrypytedColumnSql(((ColumnField)view.Fields[columnName]).GetSymmetricKeyName(), GetVarFromName(columnName)) + comma;
                 else if (view.Fields.ContainsKey(columnName) && view.Fields[columnName].IsPoint)
                 {
                     delimitedColumns += GetPointForInsert(view.Fields[columnName], columnName, sqlTextBuilder);
@@ -8068,6 +8073,12 @@ namespace Durados.DataAccess
                 }
             }
         }
+        public virtual SqlProduct GetSqlProduct() {
+            
+                return SqlProduct.SqlServer;
+        }
+
+        
     }
 
     /// <summary>
@@ -12257,5 +12268,246 @@ public class SqlTextBuilder : ISqlTextBuilder
     public virtual string GetPointFieldStatement(string tableName, string columnName)
     {
         return string.Empty;
+    }
+
+
+
+    public virtual string GetEncryptedColumnsStatement(string encryptedName, string databaseNames)
+    {
+        return string.Format(" CONVERT(NVARCHAR(250), DECRYPTBYKEY({0})) AS {1}, ", encryptedName, databaseNames);
+    }
+
+    public virtual string GetCloseCertificatesStatement()
+    {
+        return " close SYMMETRIC KEY {0} ";
+    }
+
+    public virtual string GetOpenCertificatesStatement()
+    {
+        return "OPEN SYMMETRIC KEY {0} DECRYPTION BY CERTIFICATE {1} ";
+    }
+
+
+
+    public virtual string GetDbEncrypytedColumnSql(string symetricKeyName, string columnName)
+    {
+        return "ENCRYPTBYKEY(KEY_GUID('" +symetricKeyName + "')," + DbParameterPrefix + columnName + ")" ;
+    }
+}
+
+public class SqlMainSchema :ISqlMainSchema
+{
+    public virtual IDbConnection GetNewConnection()
+    {
+        return new SqlConnection();
+    }
+    public virtual IDbConnection GetNewConnection(string connectionString)
+    {
+        return new SqlConnection(connectionString);
+    }
+    public virtual IDbCommand GetNewCommand()
+    {
+        return new SqlCommand();
+    }
+    public virtual IDbCommand GetNewCommand(string sql, IDbConnection connection)
+    {
+        return new SqlCommand(sql,(SqlConnection)connection);
+    }
+    public  virtual  string GetEmailBySocialIdSql()
+    {
+        return "select UserId from durados_UserSocial where Provider = @Provider and SocialId = @SocialId and AppId = @AppId";
+    }
+
+    public  virtual  string GetEmailBySocialIdSql2()
+    {
+        return "select UserId from durados_UserSocial where Provider = @Provider and SocialId = @SocialId and AppId is null";
+    }
+
+    public  virtual  string GetSocialIdlByEmail()
+    {
+        return "select SocialId from durados_UserSocial WITH(NOLOCK) where Provider = @Provider and UserId = @UserId and AppId = @AppId";
+    }
+
+    public  virtual  string GetSocialIdlByEmail2()
+    {
+        return "select SocialId from durados_UserSocial WITH(NOLOCK) where Provider = @Provider and UserId = @UserId and AppId is null";
+    }
+
+    public  virtual  string InsertNewUserSql(string tableName,string userTable)
+    {
+        return "if NOT EXISTS (Select [Username] From  [" + tableName + "] WHERE [Username] = @Username) begin INSERT INTO ["+userTable+"] ([Username],[FirstName],[LastName],[Email],[Role],[Guid]) VALUES (@Username,@FirstName,@LastName,@Email,@Role,@Guid) end";
+              
+    }
+
+    public  virtual  string GetInsertUserAppSql()
+    {
+        return "INSERT INTO [durados_UserApp] ([UserId],[AppId],[Role]) VALUES (@UserId,@AppId,@Role)";
+    }
+
+    public  virtual  string GetUserSql()
+    {
+        return "SELECT TOP 1 [durados_user].[id] FROM durados_user WITH(NOLOCK)  WHERE [durados_user].[username]=@username";
+    }
+
+    public  virtual  string GetUserTempTokenSql()
+    {
+        return "SELECT TOP 1 Id FROM [durados_ValidGuid] WITH(NOLOCK)  WHERE UserGuid=@UserGuid and Used=0";
+    }
+
+    public  virtual  string GetUserNameByGuidSql()
+    {
+        return "SELECT TOP 1 username FROM durados_user WITH(NOLOCK)  WHERE guid=@guid";
+    }
+
+    public  virtual  string GetDeleteUserSql()
+    {
+        return "delete FROM durados_user WHERE [username]=@username";
+    }
+
+    public  virtual  string GetUserBelongToMoreThanOneAppSql()
+    {
+        return "select id FROM durados_userapp WHERE [userid]=@userid and appid<>@appid";
+    }
+
+    public  virtual  string GetHasAppsSql()
+    {
+        return string.Format("SELECT TOP 1 id FROM durados_app WITH(NOLOCK)  WHERE creator=@id"); 
+    }
+
+    public  virtual  string GetInviteAdminBeforeSignUpSql(string username, string appId)
+    {
+        return string.Format("insert into durados_Invite (username, appId) values ('{0}', {1})", username,appId);
+    }
+
+    public  virtual  string GetInviteAdminAfterSignupSql(string username)
+    {
+        return string.Format("select appId from durados_Invite where username = '{0}'", username);
+    }
+
+    public  virtual  string GetInviteAdminAfterSignupSql(int userId, string appId, string role)
+    {
+        return string.Format("insert into durados_UserApp (UserId, AppId, Role) values ({0},{1},'{2}')", userId, appId, role);
+    }
+
+    public  virtual  string GetDeleteInviteUser(string username)
+    {
+        return string.Format("delete durados_Invite where Username = '{0}'", username);
+    }
+
+    public virtual string GetAppsPermanentFilter()
+    {
+ 	    return "(durados_App.toDelete =0 AND (durados_App.Creator = [m_User] or durados_App.id in (select durados_UserApp.AppId from durados_UserApp where durados_UserApp.UserId = [m_User] and (durados_UserApp.Role = 'Admin' or durados_UserApp.Role = 'Developer'))))";
+    }
+
+
+    public virtual string GetWakeupCallToAppSql()
+    {
+        return "select [Id],[Url] from dbo.durados_App with (NOLOCK) where [Creator] is null";
+    }
+
+
+    public virtual string GetAppsCountsql()
+    {
+        return "SELECT COUNT(*) FROM dbo.durados_App a with(nolock) INNER JOIN dbo.durados_PlugInInstance p WITH(NOLOCK) ON a.id = p.Appid WHERE Deleted =0 AND p.selected=1";
+    }
+
+    public virtual string GetSqlProductSql()
+    {
+        return  "SELECT dbo.durados_SqlConnection.SqlProductId FROM dbo.durados_App WITH(NOLOCK) INNER JOIN dbo.durados_SqlConnection WITH(NOLOCK) ON dbo.durados_App.SqlConnectionId = dbo.durados_SqlConnection.Id WHERE (dbo.durados_App.Name = @AppName)";
+    }
+
+    
+    public virtual string GetAppsExistsSql(string appName)
+    {
+        return "SELECT Id FROM durados_App WITH(NOLOCK) WHERE Name = N'" + appName + "'";
+    }
+
+    public virtual  string GetAppsExistsForUserSql(string appName, int? userId)
+    {
+        return "SELECT dbo.durados_App.Id FROM dbo.durados_App WITH(NOLOCK), dbo.durados_UserApp WITH(NOLOCK) WHERE (dbo.durados_App.Name = N'" + appName + "' AND ((dbo.durados_UserApp.UserId=" + userId + " AND dbo.durados_UserApp.AppId = dbo.durados_App.Id) or dbo.durados_App.Creator=" + userId + ") ) group by(dbo.durados_App.Id)";
+    }
+
+    public virtual string GetPaymentStatusSql(string appName)
+    {
+        return "SELECT PaymentStatus FROM durados_App with(nolock) WHERE Name = N'" + appName + "'";
+    }
+
+    public virtual string GetCurrentAppIdSql(string server, string catalog, string username, string userId)
+    {
+        return string.Format("SELECT Id FROM durados_SqlConnection WHERE ServerName=N'{0}' AND Catalog=N'{1}' AND Username=N'{2}' AND DuradosUser={3}", server, catalog, username, userId);
+    }
+
+
+    public virtual string GetPlanForAppSql(int appId)
+    {
+        return  "SELECT top(1) PlanId FROM durados_AppPlan WHERE AppId=" + appId + " order by PurchaseDate desc";
+    }
+
+    public virtual string GetFindAndUpdateAppInMainSql(int? templateId)
+    {
+        return 
+        "begin tran getFromPool " +
+                "declare @appId int " +
+                "select top(1) @appId = id from durados_App with(UPDLOCK) where TemplateId " + (templateId.HasValue ? " = " + templateId.Value : " is null ").ToString() + " and creator = @poolCreator and DatabaseStatus = 1 order by id asc; " +
+                "delete from durados_App where [Name] = @Name; " +
+                "update durados_App " +
+                "set creator = @creator, " +
+                "[CreatedDate] = @CreatedDate, " +
+                "[Name] = @Name, " +
+                "[Title] = @Title " +
+                "where id = @appId; " +
+                "select @appId " +
+                "commit tran getFromPool";
+    }
+
+    public virtual string GetAppNameByGuidFromDb(string guid)
+    {
+        return "select [name] from durados_App with(nolock) where [Guid] = '" + guid + "'";
+    }
+    public virtual string GetAppNamesWithPrefixSql(string appNamePrefix)
+    {
+        return "select name from durados_app where name like '" + appNamePrefix + "%'";
+    }
+
+    public virtual string GetDropDatabaseSql(string name)
+    {
+        return "ALTER DATABASE " + name + " SET SINGLE_USER WITH ROLLBACK IMMEDIATE; drop database " + name;
+    }
+
+
+    public virtual string GetHasOtherConnectiosSql(string appDatabase)
+    {
+        return "select count(*) from dbo.durados_SqlConnection where [Catalog] = N'" + appDatabase + "'";
+    }
+
+    
+    public virtual string GetUpdateLogModelExceptionSql()
+    {
+        return "update [backand_model] set errorMessage = @errorMessage, errorTrace = @errorTrace where id=@id";
+    }
+
+    public virtual string GetSaveChangesIndicationFromDb2(string Id)
+    {
+        return "select ConfigChangesIndication from durados_App with(nolock) where id = " + Id;
+    }
+
+    public virtual string GetSetSaveChangesIndicationFromDbSql(int config, string Id)
+    {
+        return "UPDATE durados_App SET ConfigChangesIndication = " + config + " WHERE id = " + Id;
+    }
+
+    public virtual string GetLogModelSql()
+    {
+        return "INSERT INTO [backand_model] ([appName], [username], [timestamp], [input], [output], [valid], [action]) values (@appName, @username, @timestamp, @input, @output, @valid, @action); SELECT IDENT_CURRENT(N'backand_model') AS ID";
+    }
+
+    public virtual string GetAppLimitSql(string Id)
+    {
+        return "SELECT  Name, Limit FROM durados_AppLimits WITH(NOLOCK) WHERE AppId = " + Id;
+    }
+
+    public virtual string GetDeleteUserSql(int userId, string appId)
+    {
+        return string.Format("DELETE durados_UserApp WHERE UserId = {0} AND AppId = {1}");
     }
 }

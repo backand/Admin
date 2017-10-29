@@ -19,6 +19,7 @@ using BackAnd.Web.Api.Controllers.Admin;
 using Durados.Web.Mvc.Webhook;
 using Durados.Web.Mvc.UI.Helpers.Cloning;
 using System.Runtime.Caching;
+using System.Data.Common;
 /*
  HTTP Verb	|Entire Collection (e.g. /customers)	                                                        |Specific Item (e.g. /customers/{id})
 -----------------------------------------------------------------------------------------------------------------------------------------------
@@ -1194,11 +1195,12 @@ namespace BackAnd.Web.Api.Controllers
             //Maps.Instance.Restart(name);
 
         }
+        /* TODO: Main MySQL depricated
         private string GetThemePath(int? themeId)
         {
             return Maps.Instance.GetTheme(themeId).RelativePath;
         }
-
+        */
         //public Dictionary<string, object> CreateAppGet2(string template, string name, string title, string server, string catalog, string username, string password, bool usingSsh, bool usingSsl, string sshRemoteHost, string sshUser, string sshPassword, string sshPrivateKey, int sshPort, int productPort, string zone, string characterSetName, string engine, string engineVersion, int? themeId)
         //{
         //    Durados.SqlProduct? product = Durados.Web.Mvc.UI.Helpers.RDSNewDatabaseFactory.GetSqlProductfromTemplate(template);
@@ -1451,7 +1453,9 @@ namespace BackAnd.Web.Api.Controllers
             values.Add("TemplateFile", string.Empty);
             values.Add("FK_durados_App_durados_SqlConnection_Security_Parent", string.Empty);
             values.Add("Basic", basic);
-            values.Add("FK_durados_App_durados_Theme_Parent", (themeId ?? Maps.DefaultThemeId).ToString());
+            /* TODO: Main MySQL depricated 
+             * values.Add("FK_durados_App_durados_Theme_Parent", (themeId ?? Maps.DefaultThemeId).ToString());
+             */
             if (templateId.HasValue)
             {
                 string templateIdFieldName = view.GetFieldByColumnNames("TemplateId").Name;
@@ -1572,7 +1576,10 @@ namespace BackAnd.Web.Api.Controllers
 
             }
             var builder = new UriBuilder(System.Web.HttpContext.Current.Request.Url);
-            string previewUrl = "http://" + name + Durados.Web.Mvc.Maps.UserPreviewUrl + GetThemePath(themeId);
+            string previewUrl = "http://" + name + Durados.Web.Mvc.Maps.UserPreviewUrl;
+            /* TODO: Main MySQL depricated
+             * +GetThemePath(themeId);
+             */
 
             return new Dictionary<string, object>() { { "Success", true }, { "Url", Maps.GetAppUrl(name) }, { "previewUrl", previewUrl } };
         }
@@ -2838,8 +2845,8 @@ namespace BackAnd.Web.Api.Controllers
         {
 
             string connectionString = null;
-            System.Data.SqlClient.SqlConnectionStringBuilder builder = new System.Data.SqlClient.SqlConnectionStringBuilder();
-            builder.ConnectionString = Map.connectionString;
+            DbConnectionStringBuilder builder = Maps.GetMapsConnectionStringBuilder(); ;
+            //builder.ConnectionString = Map.connectionString;
 
             bool hasServer = !string.IsNullOrEmpty(serverName);
             bool hasCatalog = !string.IsNullOrEmpty(catalog);
@@ -2853,7 +2860,7 @@ namespace BackAnd.Web.Api.Controllers
             {
                 if (!hasServer)
                 {
-                    serverName = builder.DataSource;
+                    serverName = builder.Server();
 
                 }
                 connectionString = "Data Source={0};Initial Catalog={1};Integrated Security=True;";
@@ -2897,7 +2904,7 @@ namespace BackAnd.Web.Api.Controllers
                 if (!hasServer)
                 {
                     if (Maps.AllowLocalConnection)
-                        serverName = builder.DataSource;
+                        serverName = builder.Server();
                     else
                         throw new Durados.DuradosException("Server Name is missing");
                 }
@@ -2905,7 +2912,7 @@ namespace BackAnd.Web.Api.Controllers
                 if (!hasUsername)
                 {
                     if (Maps.AllowLocalConnection)
-                        username = builder.UserID;
+                        username = builder.UserId();
                     else
                         throw new Durados.DuradosException("Username Name is missing");
                 }
@@ -2913,7 +2920,7 @@ namespace BackAnd.Web.Api.Controllers
                 if (!hasPassword)
                 {
                     if (Maps.AllowLocalConnection)
-                        password = builder.Password;
+                        password = builder.Password();
                     else
                         throw new Durados.DuradosException("Password Name is missing");
                 }

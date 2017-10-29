@@ -19,10 +19,11 @@ using Durados.Web.Mvc.Controllers;
 using BackAnd.Web.Api.Controllers.Filters;
 using System.Threading.Tasks;
 using System.Collections;
-using System.Data.SqlClient;
+using System.Data.Common;
 using Durados.Web.Mvc.Infrastructure;
 using Durados.Web.Mvc.Farm;
 using System.Runtime.Caching;
+
 
 /*
  HTTP Verb	|Entire Collection (e.g. /customers)	                                                        |Specific Item (e.g. /customers/{id})
@@ -584,16 +585,18 @@ namespace BackAnd.Web.Api.Controllers
             {
                 if (logModelId.HasValue)
                 {
-                    using (System.Data.SqlClient.SqlConnection connection = new System.Data.SqlClient.SqlConnection(Maps.Instance.DuradosMap.connectionString))
+                    ISqlMainSchema sqlMain =  Maps.GetMainAppSqlSchema();
+                    using (IDbConnection connection = sqlMain.GetNewConnection(Maps.Instance.ConnectionString))
                     {
                         connection.Open();
-                        string sql = "update [backand_model] set errorMessage = @errorMessage, errorTrace = @errorTrace where id=@id";
+                        string sql = sqlMain.GetUpdateLogModelExceptionSql();
 
-                        using (System.Data.SqlClient.SqlCommand command = new System.Data.SqlClient.SqlCommand(sql, connection))
+                        using (IDbCommand command = sqlMain.GetNewCommand(sql, connection))
                         {
-                            command.Parameters.AddWithValue("errorMessage", exception.Message);
-                            command.Parameters.AddWithValue("errorTrace", exception.StackTrace);
-                            command.Parameters.AddWithValue("id", logModelId.Value);
+                            GetDataParameter("errorMessage",exception.Message, command);
+                            GetDataParameter("errorTrace", exception.StackTrace, command);
+                            GetDataParameter("id",  logModelId.Value, command);
+
                             command.ExecuteNonQuery();
 
                         }
@@ -609,30 +612,39 @@ namespace BackAnd.Web.Api.Controllers
             }
         }
 
+        protected static void GetDataParameter(string name,object val, IDbCommand command)
+        {
+            var parameter = command.CreateParameter();
+            parameter.ParameterName = name;
+            parameter.Value = val;
+            command.Parameters.Add(parameter);
+        }
+
         protected int? logModelId = null;
 
         private void LogModel(string appName, string username, DateTime timestamp, string input, string output, string valid, string action)
         {
-            using (System.Data.SqlClient.SqlConnection connection = new System.Data.SqlClient.SqlConnection(Maps.Instance.DuradosMap.connectionString))
+            ISqlMainSchema sqlMain = Maps.GetMainAppSqlSchema();
+            using (IDbConnection connection = sqlMain.GetNewConnection(Maps.Instance.ConnectionString))
             {
                 connection.Open();
-                string sql = "insert into [backand_model] ([appName], [username], [timestamp], [input], [output], [valid], [action]) values (@appName, @username, @timestamp, @input, @output, @valid, @action); SELECT IDENT_CURRENT(N'backand_model') AS ID";
+                string sql = sqlMain.GetLogModelSql(); 
 
-                using (System.Data.SqlClient.SqlCommand command = new System.Data.SqlClient.SqlCommand(sql, connection))
+                using (IDbCommand command = sqlMain.GetNewCommand(sql, connection))
                 {
                     try
                     {
-                        command.Parameters.AddWithValue("appName", appName);
-                        command.Parameters.AddWithValue("username", username);
-                        command.Parameters.AddWithValue("timestamp", timestamp);
-                        command.Parameters.AddWithValue("input", input);
-                        command.Parameters.AddWithValue("output", output);
-                        command.Parameters.AddWithValue("valid", valid);
-                        command.Parameters.AddWithValue("action", action);
+                        GetDataParameter("appName", appName,command);
+                        GetDataParameter("username", username, command);
+                        GetDataParameter("timestamp", timestamp, command);
+                        GetDataParameter("input", input, command);
+                        GetDataParameter("output", output, command);
+                        GetDataParameter("valid", valid, command);
+                        GetDataParameter("action", action, command);
                         object scalar = command.ExecuteScalar();
                         logModelId = Convert.ToInt32(scalar);
                     }
-                    catch (SqlException e)
+                    catch (DbException e)
                     {
                         Maps.Instance.DuradosMap.Logger.Log("Model", "Validate", "LogModel", e, 1, command.CommandText + "; " + connection.ConnectionString);
                
@@ -1096,6 +1108,7 @@ namespace BackAnd.Web.Api.Controllers
             //LoadModificationSignature(view, values);
         }
 
+        /* TODO: MySql Main app deprecate
         private void HandleCurrentUserDefault(Durados.Web.Mvc.View view, Dictionary<string, object> values)
         {
             HandleCurrentUserDefault(view, values, false);
@@ -1113,7 +1126,7 @@ namespace BackAnd.Web.Api.Controllers
                 }
             }
         }
-
+        */
         private void HandleCurrentUserDefault(Durados.Web.Mvc.View view, Dictionary<string, object> values, bool import)
         {
             var fields = view.Fields.Values.Where(f => f.FieldType == FieldType.Parent && f.DefaultValue != null && f.DefaultValue.ToString().ToLower() == Durados.Web.Mvc.Database.UserPlaceHolder.ToLower());
@@ -1138,6 +1151,7 @@ namespace BackAnd.Web.Api.Controllers
             }
 
         }
+        /* TODO: MySql Main app deprecated
         protected virtual void HandleMultiTenancyUser(string currentRole, string newUser)
         {
             //string userViewName = ((Database)Database).UserViewName;
@@ -1161,7 +1175,7 @@ namespace BackAnd.Web.Api.Controllers
             //Maps.Instance.DuradosMap.Database.Views["durados_UserApp"].Create(values, null, view_BeforeCreate, view_BeforeCreateInDatabase, view_AfterCreateBeforeCommit, view_AfterCreateAfterCommit);
             //}
         }
-
+        */
         private void HandleCreationDate(Durados.View view, Dictionary<string, object> values)
         {
 
@@ -1962,24 +1976,25 @@ namespace BackAnd.Web.Api.Controllers
             wfe.PerformActions(this, e.View, TriggerDataAction.AfterEdit, e.Values, e.PrimaryKey, e.PrevRow, Map.Database.ConnectionString, Convert.ToInt32(((Durados.Web.Mvc.Database)e.View.Database).GetUserID()), ((Durados.Web.Mvc.Database)e.View.Database).GetUserRole(), e.Command, e.SysCommand);
            
             wfe.Notifier.Notify((Durados.Web.Mvc.View)e.View, 1, GetUsername(), e.OldNewValues, e.PrimaryKey, e.PrevRow, this, e.Values, GetSiteWithoutQueryString(), GetMainSiteWithoutQueryString());
-             
-            const string Active = "Active";
-            if (e.View.Name == "Durados_Language")
-            {
-                bool prevActive = !e.PrevRow.IsNull(Active) && Convert.ToBoolean(e.PrevRow[Active]);
-                bool currActive = e.Values.ContainsKey(Active) && Convert.ToBoolean(e.Values[Active]);
+            /* TODO: Main MySql  deprectaed
+           const string Active = "Active";
+           
+           if (e.View.Name == "Durados_Language")
+           {
+               bool prevActive = !e.PrevRow.IsNull(Active) && Convert.ToBoolean(e.PrevRow[Active]);
+               bool currActive = e.Values.ContainsKey(Active) && Convert.ToBoolean(e.Values[Active]);
 
-                if (!prevActive && currActive)
-                {
-                    string code = e.PrevRow["Code"].ToString();
-                    string scriptFile = Maps.GetDeploymentPath("Sql/Localization/" + code + "pack.sql");
+               if (!prevActive && currActive)
+               {
+                   string code = e.PrevRow["Code"].ToString();
+                   string scriptFile = Maps.GetDeploymentPath("Sql/Localization/" + code + "pack.sql");
 
-                    SqlAccess sqlAcces = new SqlAccess();
-                    sqlAcces.RunScriptFile(scriptFile, Map.GetLocalizationDatabase().ConnectionString);
-                    Map.Database.Localizer.SetCurrentUserLanguageCode(code);
-                }
-            }
-
+                   SqlAccess sqlAcces = new SqlAccess();
+                   sqlAcces.RunScriptFile(scriptFile, Map.GetLocalizationDatabase().ConnectionString);
+                   Map.Database.Localizer.SetCurrentUserLanguageCode(code);
+               }
+           }
+           */
             if (e.View.Name == "durados_Cloud")
             {
                 RefreshConfigCache();
@@ -2081,8 +2096,8 @@ namespace BackAnd.Web.Api.Controllers
                     {
                         int userId = Maps.Instance.DuradosMap.Database.GetUserID(deletedUsername);
                         string appId = Map.Id;
-                        SqlAccess sqlAccess = new SqlAccess();
-                        sqlAccess.ExecuteNonQuery(Maps.Instance.DuradosMap.connectionString, string.Format("delete durados_UserApp where UserId = {0} and AppId = {1}", userId, appId));
+                        SqlAccess sqlAccess = Maps.GetMainAppSqlAccess();
+                        sqlAccess.ExecuteNonQuery(Maps.Instance.DuradosMap.connectionString, Maps.GetMainAppSqlSchema().GetDeleteUserSql( userId, appId));
                     }
                 }
                 catch { }

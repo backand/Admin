@@ -103,7 +103,9 @@ namespace Durados.Web.Mvc.Controllers
             {
                 HandleLayoutType(e);
                 ApplyToAllViews(e);
-                UpdateTheme(e);
+                /* TODO: Main MySQL depricated
+                 * UpdateTheme(e);
+                 */
             }
           
             else if (e.View.Name == "Field")
@@ -312,7 +314,7 @@ namespace Durados.Web.Mvc.Controllers
 
             }
         }
-
+        /* TODO: Main MySQL depricated
         public JsonResult GetPreviewPath()
         {
             return Json(Map.GetPreviewPath());
@@ -321,6 +323,7 @@ namespace Durados.Web.Mvc.Controllers
         {
             return Json(Map.Theme.Path);
         }
+        
         private void UpdateTheme(EditEventArgs e)
         {
             try
@@ -345,7 +348,7 @@ namespace Durados.Web.Mvc.Controllers
                 {
                     path = e.Values["CustomThemePath"].ToString();
                 }
-
+               
                 Theme theme = new Theme() { Id = currentThemeId, Name = name, Path = path };
 
                 Map.UpdateTheme(theme);
@@ -355,6 +358,7 @@ namespace Durados.Web.Mvc.Controllers
                 Map.Logger.Log(GetControllerNameForLog(this.ControllerContext), this.ControllerContext.RouteData.Values["action"].ToString(), exception.Source, exception, 1, "UpdateTheme");
             }
         }
+         * */
 
         private void ApplyToAllViews(EditEventArgs e)
         {
@@ -2795,9 +2799,10 @@ namespace Durados.Web.Mvc.Controllers
             else if (view.Name == "View")
             {
                 DataRow row = base.GetDataRow(view, pk);
-
+                /* TODO: Main MySQL depricated
                 try
                 {
+
                     row["Theme"] = Map.Theme.Name;
                     if (Map.Theme.Id == Maps.CustomTheme)
                     {
@@ -2808,6 +2813,7 @@ namespace Durados.Web.Mvc.Controllers
                 {
                     Map.Database.Logger.Log(GetControllerNameForLog(this.ControllerContext), this.ControllerContext.RouteData.Values["action"].ToString(), "GetDataRow", exception, 1, "Update theme from cache");
                 }
+                 */
                 return row;
             }
             else

@@ -69,4 +69,12 @@
     string FromDual();
 
     string GetPointFieldStatement(string tableName, string columnName);
+
+    string GetEncryptedColumnsStatement(string encryptedName, string databaseNames);
+
+    string GetCloseCertificatesStatement();
+
+    string GetOpenCertificatesStatement();
+
+    string GetDbEncrypytedColumnSql(string p, string columnName);
 }

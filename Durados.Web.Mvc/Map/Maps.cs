@@ -7,7 +7,7 @@ using System.Xml;
 using System.Web;
 using System.IO;
 using System.Reflection;
-using System.Data.SqlClient;
+
 
 using Microsoft.WindowsAzure;
 using Microsoft.WindowsAzure.ServiceRuntime;
@@ -164,18 +164,15 @@ namespace Durados.Web.Mvc
                     //duradosMap.Database.BackandSSO = true;
 
                     View appView = (View)duradosMap.Database.Views["durados_App"];
-                    appView.PermanentFilter = "(durados_App.toDelete =0 AND (durados_App.Creator = [m_User] or durados_App.id in (select durados_UserApp.AppId from durados_UserApp where durados_UserApp.UserId = [m_User] and (durados_UserApp.[Role] = 'Admin' or durados_UserApp.[Role] = 'Developer'))))";
+
+                    appView.PermanentFilter = SqlMainSchema.GetAppsPermanentFilter();
                     appView.Controller = "MultiTenancy";
 
                     View connectionView = (View)duradosMap.Database.Views["durados_SqlConnection"];
                     connectionView.PermanentFilter = "";// "DuradosUser = [Durados_User] ";//OR durados_SqlConnection.id  in 
-                    //((select SqlConnectionId from durados_app inner join durados_userApp on durados_app.id =durados_userApp.appId where durados_UserApp.UserId = [Durados_User])
-                    //union
-                    //(select SystemSqlConnectionId from durados_app inner join durados_userApp on durados_app.id =durados_userApp.appId where durados_UserApp.UserId = [Durados_User]))";
 
-                    //maps = new Dictionary<string, Map>();
                     mapsCache = CacheFactory.CreateCache<Map>("maps");
-
+                    /* TODO: Main MySQL depricated
                     LoadDnsAliases();
 
                     PluginsCache = new Dictionary<PlugInType, PluginCache>();
@@ -184,10 +181,12 @@ namespace Durados.Web.Mvc
                     {
                         PluginsCache.Add(plugInType, new PluginCache());
                     }
+                      */
                 }
             }
         }
 
+       
 
 
         public static Maps Instance
@@ -204,15 +203,16 @@ namespace Durados.Web.Mvc
 
         public void WakeupCalltoApps()
         {
-            using (SqlConnection connection = new SqlConnection(duradosMap.connectionString))
+            ISqlMainSchema sqlSchema = GetMainAppSqlSchema();
+            using (IDbConnection connection = sqlSchema.GetNewConnection(duradosMap.connectionString))
             {
                 connection.Open();
 
-                string sql = "select [Id],[Url] from dbo.durados_App with (NOLOCK) where [Creator] is null";
+                string sql = sqlSchema.GetWakeupCallToAppSql();
 
-                using (SqlCommand command = new SqlCommand(sql, connection))
+                using (IDbCommand command = sqlSchema.GetNewCommand(sql, connection))
                 {
-                    using (SqlDataReader reader = command.ExecuteReader())
+                    using (IDataReader reader = command.ExecuteReader())
                     {
                         int urlOrdinal = reader.GetOrdinal("Url");
 
@@ -228,1094 +228,1120 @@ namespace Durados.Web.Mvc
             }
 
         }
+        /* TODO: Main MySQL depricated
+       private void LoadDnsAliases()
+       {
+           DnsAliases = new Dictionary<string, string>();
+
+           using (SqlConnection connection = new SqlConnection(duradosMap.connectionString))
+           {
+               connection.Open();
+
+               string sql = "SELECT dbo.durados_DnsAlias.Alias, dbo.durados_App.Name FROM dbo.durados_App with (NOLOCK) INNER JOIN dbo.durados_DnsAlias with (NOLOCK) ON dbo.durados_App.Id = dbo.durados_DnsAlias.AppId";
+
+               using (SqlCommand command = new SqlCommand(sql, connection))
+               {
+                   using (SqlDataReader reader = command.ExecuteReader())
+                   {
+                       int aliasOrdinal = reader.GetOrdinal("Alias");
+                       int nameOrdinal = reader.GetOrdinal("Name");
+                       while (reader.Read())
+                       {
+                           DnsAliases.Add(reader.GetString(aliasOrdinal).ToLower(), reader.GetString(nameOrdinal).ToLower());
+                       }
+                   }
+               }
+           }
+
+       }
+        */
+       static Maps()
+       {
+           host = System.Configuration.ConfigurationManager.AppSettings["durados_host"] ?? "durados.com";
+           poolCreator = Convert.ToInt32(System.Configuration.ConfigurationManager.AppSettings["poolCreator"] ?? "55555");
+           poolShouldBeUsed = Convert.ToBoolean(System.Configuration.ConfigurationManager.AppSettings["poolShouldBeUsed"] ?? "false");
+
+           redisConnectionString = System.Configuration.ConfigurationManager.AppSettings["redisConnectionString"] ?? "pub-redis-10938.us-east-1-4.3.ec2.garantiadata.com:10938,password=bell1234,allowAdmin=true";
+           redisHostAndPort = System.Configuration.ConfigurationManager.AppSettings["redisHostAndPort"];
+
+
+           mainAppConfigName = System.Configuration.ConfigurationManager.AppSettings["mainAppConfigName"] ?? "backand";
+           hostByUs = Convert.ToBoolean(System.Configuration.ConfigurationManager.AppSettings["hostByUs"] ?? "false");
+           duradosAppName = System.Configuration.ConfigurationManager.AppSettings["durados_appName"] ?? "www";
+           demoAzureUsername = System.Configuration.ConfigurationManager.AppSettings["demoAzureUsername"] ?? "itayher";
+           demoAzurePassword = System.Configuration.ConfigurationManager.AppSettings["demoAzurePassword"] ?? "Durados2012";
+           demoSqlUsername = System.Configuration.ConfigurationManager.AppSettings["demoSqlUsername"] ?? "durados";
+           demoSqlPassword = System.Configuration.ConfigurationManager.AppSettings["demoSqlPassword"] ?? "durados";
+           demoDatabaseName = System.Configuration.ConfigurationManager.AppSettings["demoDatabaseName"] ?? "Northwind";
+           demoConfigFilename = System.Configuration.ConfigurationManager.AppSettings["demoConfigFilename"] ?? "Northwind";
+           demoAzureServer = System.Configuration.ConfigurationManager.AppSettings["demoAzureServer"] ?? "tcp:d9gwdrhh5n.database.windows.net,1433";
+           demoOnPremiseServer = System.Configuration.ConfigurationManager.AppSettings["demoOnPremiseServer"] ?? @"durados.info\sqlexpress";
+           demoCreatePending = Convert.ToBoolean(System.Configuration.ConfigurationManager.AppSettings["demoCreatePending"] ?? "true");
+           demoPendingNext = Convert.ToInt32(System.Configuration.ConfigurationManager.AppSettings["demoPendingNext"] ?? "5");
+           demoFtpTempHost = System.Configuration.ConfigurationManager.AppSettings["demoFtpTempHost"] ?? "temp";
+           demoFtpHost = System.Configuration.ConfigurationManager.AppSettings["demoFtpHost"] ?? "durados.info";
+           demoFtpPort = System.Configuration.ConfigurationManager.AppSettings["demoFtpPort"] ?? "21";
+           demoFtpFileSizeLimitKb = Convert.ToInt64(System.Configuration.ConfigurationManager.AppSettings["demoFtpFileSizeLimitKb"] ?? "1024");
+           demoFtpFolderSizeLimitKb = Convert.ToInt64(System.Configuration.ConfigurationManager.AppSettings["demoFtpFolderSizeLimitKb"] ?? "1024");
+           demoFtpUser = System.Configuration.ConfigurationManager.AppSettings["demoFtpUser"] ?? "itay";
+           demoFtpPassword = System.Configuration.ConfigurationManager.AppSettings["demoFtpPassword"] ?? "dio2008";
+           demoFtpPhysicalPath = System.Configuration.ConfigurationManager.AppSettings["demoFtpPhysicalPath"] ?? @"C:\FTP\";
+           demoUploadSourcePath = System.Configuration.ConfigurationManager.AppSettings["demoUploadSourcePath"] ?? "/Uploads/220/";
+           demoOnPremiseSourcePath = System.Configuration.ConfigurationManager.AppSettings["demoOnPremiseSourcePath"] ?? @"C:\Dev\Databases\";
+           allowLocalConnection = Convert.ToBoolean(System.Configuration.ConfigurationManager.AppSettings["allowLocalConnection"] ?? "false");
+           cloud = Convert.ToBoolean(System.Configuration.ConfigurationManager.AppSettings["cloud"] ?? "false"); // false;// RoleEnvironment.IsAvailable;//
+           multiTenancy = Convert.ToBoolean(System.Configuration.ConfigurationManager.AppSettings["multiTenancy"] ?? "false");
+           useSecureConnection = Convert.ToBoolean(System.Configuration.ConfigurationManager.AppSettings["UseSecureConnection"] ?? "false");
+           skin = Convert.ToBoolean(System.Configuration.ConfigurationManager.AppSettings["skin"] ?? "false");
+           duradosAppPrefix = Convert.ToString(System.Configuration.ConfigurationManager.AppSettings["duradosAppSysPrefix"] ?? "durados_AppSys_");
+           duradosAppSysPrefix = Convert.ToString(System.Configuration.ConfigurationManager.AppSettings["duradosAppPrefix"] ?? "durados_App_");
+           debug = Convert.ToBoolean(System.Configuration.ConfigurationManager.AppSettings["debug"] ?? "false");
+           appNameMax = Convert.ToInt32(System.Configuration.ConfigurationManager.AppSettings["appNameMax"] ?? "32");
+           dropAppDatabase = Convert.ToBoolean(System.Configuration.ConfigurationManager.AppSettings["dropAppDatabase"] ?? "true");
+           privateCloud = Convert.ToBoolean(System.Configuration.ConfigurationManager.AppSettings["privateCloud"] ?? "false");
+           ConfigPath = Convert.ToString(System.Configuration.ConfigurationManager.AppSettings["configPath"] ?? "~/Config/");
+           plugInSampleGenerationCount = Convert.ToInt32(System.Configuration.ConfigurationManager.AppSettings["plugInSampleGenerationCount"] ?? "5");
+
+           superDeveloper = Convert.ToString(System.Configuration.ConfigurationManager.AppSettings["superDeveloper"] ?? "dev@devitout.com").ToLower();
+
+           DownloadDenyPolicy = Convert.ToBoolean(System.Configuration.ConfigurationManager.AppSettings["DownloadDenyPolicy"] ?? "true");
+           OldAdminHttp = Convert.ToBoolean(System.Configuration.ConfigurationManager.AppSettings["OldAdminHttp"] ?? "false");
+           AllowedDownloadFileTypes = Convert.ToString(System.Configuration.ConfigurationManager.AppSettings["AllowedDownloadFileTypes"] ?? allowedDownloadFileTypesDefault).Split(',').ToArray();
+           DenyDownloadFileTypes = Convert.ToString(System.Configuration.ConfigurationManager.AppSettings["DenyDownloadFileTypes"] ?? denyDownloadFileTypesDefault).Split(',').ToArray();
+
+           ReservedAppNames = Convert.ToString(System.Configuration.ConfigurationManager.AppSettings["ReservedAppNames"] ?? reservedAppNames).Split(',').Select(k => k).ToHashSet<string>();
+
+           azureDatabasePendingPool = new PendingPool(demoPendingNext);
+           onPremiseDatabasePendingPool = new PendingPool(demoPendingNext);
+
+           AzureStorageAccountName = System.Configuration.ConfigurationManager.AppSettings["AzureStorageAccountName"];
+           if (AzureStorageAccountName == null)
+           {
+               throw new DuradosException("Please add the AzureStorageAccountName to the web.config.");
+           }
+
+           ConfigAzureStorageAccountName = System.Configuration.ConfigurationManager.AppSettings["ConfigAzureStorageAccountName"];
+           if (ConfigAzureStorageAccountName == null)
+           {
+               throw new DuradosException("Please add the ConfigAzureStorageAccountName to the web.config.");
+           }
+
+           AzureStorageAccountKey = System.Configuration.ConfigurationManager.AppSettings["AzureStorageAccountKey"];
+           if (AzureStorageAccountKey == null)
+           {
+               throw new DuradosException("Please add the AzureStorageAccountKey to the web.config.");
+           }
 
-        private void LoadDnsAliases()
-        {
-            DnsAliases = new Dictionary<string, string>();
-
-            using (SqlConnection connection = new SqlConnection(duradosMap.connectionString))
-            {
-                connection.Open();
-
-                string sql = "SELECT dbo.durados_DnsAlias.Alias, dbo.durados_App.Name FROM dbo.durados_App with (NOLOCK) INNER JOIN dbo.durados_DnsAlias with (NOLOCK) ON dbo.durados_App.Id = dbo.durados_DnsAlias.AppId";
-
-                using (SqlCommand command = new SqlCommand(sql, connection))
-                {
-                    using (SqlDataReader reader = command.ExecuteReader())
-                    {
-                        int aliasOrdinal = reader.GetOrdinal("Alias");
-                        int nameOrdinal = reader.GetOrdinal("Name");
-                        while (reader.Read())
-                        {
-                            DnsAliases.Add(reader.GetString(aliasOrdinal).ToLower(), reader.GetString(nameOrdinal).ToLower());
-                        }
-                    }
-                }
-            }
-
-        }
-
-        static Maps()
-        {
-            host = System.Configuration.ConfigurationManager.AppSettings["durados_host"] ?? "durados.com";
-            poolCreator = Convert.ToInt32(System.Configuration.ConfigurationManager.AppSettings["poolCreator"] ?? "55555");
-            poolShouldBeUsed = Convert.ToBoolean(System.Configuration.ConfigurationManager.AppSettings["poolShouldBeUsed"] ?? "false");
-
-            redisConnectionString = System.Configuration.ConfigurationManager.AppSettings["redisConnectionString"] ?? "pub-redis-10938.us-east-1-4.3.ec2.garantiadata.com:10938,password=bell1234,allowAdmin=true";
-            redisHostAndPort = System.Configuration.ConfigurationManager.AppSettings["redisHostAndPort"];
-
-
-            mainAppConfigName = System.Configuration.ConfigurationManager.AppSettings["mainAppConfigName"] ?? "backand";
-            hostByUs = Convert.ToBoolean(System.Configuration.ConfigurationManager.AppSettings["hostByUs"] ?? "false");
-            duradosAppName = System.Configuration.ConfigurationManager.AppSettings["durados_appName"] ?? "www";
-            demoAzureUsername = System.Configuration.ConfigurationManager.AppSettings["demoAzureUsername"] ?? "itayher";
-            demoAzurePassword = System.Configuration.ConfigurationManager.AppSettings["demoAzurePassword"] ?? "Durados2012";
-            demoSqlUsername = System.Configuration.ConfigurationManager.AppSettings["demoSqlUsername"] ?? "durados";
-            demoSqlPassword = System.Configuration.ConfigurationManager.AppSettings["demoSqlPassword"] ?? "durados";
-            demoDatabaseName = System.Configuration.ConfigurationManager.AppSettings["demoDatabaseName"] ?? "Northwind";
-            demoConfigFilename = System.Configuration.ConfigurationManager.AppSettings["demoConfigFilename"] ?? "Northwind";
-            demoAzureServer = System.Configuration.ConfigurationManager.AppSettings["demoAzureServer"] ?? "tcp:d9gwdrhh5n.database.windows.net,1433";
-            demoOnPremiseServer = System.Configuration.ConfigurationManager.AppSettings["demoOnPremiseServer"] ?? @"durados.info\sqlexpress";
-            demoCreatePending = Convert.ToBoolean(System.Configuration.ConfigurationManager.AppSettings["demoCreatePending"] ?? "true");
-            demoPendingNext = Convert.ToInt32(System.Configuration.ConfigurationManager.AppSettings["demoPendingNext"] ?? "5");
-            demoFtpTempHost = System.Configuration.ConfigurationManager.AppSettings["demoFtpTempHost"] ?? "temp";
-            demoFtpHost = System.Configuration.ConfigurationManager.AppSettings["demoFtpHost"] ?? "durados.info";
-            demoFtpPort = System.Configuration.ConfigurationManager.AppSettings["demoFtpPort"] ?? "21";
-            demoFtpFileSizeLimitKb = Convert.ToInt64(System.Configuration.ConfigurationManager.AppSettings["demoFtpFileSizeLimitKb"] ?? "1024");
-            demoFtpFolderSizeLimitKb = Convert.ToInt64(System.Configuration.ConfigurationManager.AppSettings["demoFtpFolderSizeLimitKb"] ?? "1024");
-            demoFtpUser = System.Configuration.ConfigurationManager.AppSettings["demoFtpUser"] ?? "itay";
-            demoFtpPassword = System.Configuration.ConfigurationManager.AppSettings["demoFtpPassword"] ?? "dio2008";
-            demoFtpPhysicalPath = System.Configuration.ConfigurationManager.AppSettings["demoFtpPhysicalPath"] ?? @"C:\FTP\";
-            demoUploadSourcePath = System.Configuration.ConfigurationManager.AppSettings["demoUploadSourcePath"] ?? "/Uploads/220/";
-            demoOnPremiseSourcePath = System.Configuration.ConfigurationManager.AppSettings["demoOnPremiseSourcePath"] ?? @"C:\Dev\Databases\";
-            allowLocalConnection = Convert.ToBoolean(System.Configuration.ConfigurationManager.AppSettings["allowLocalConnection"] ?? "false");
-            cloud = Convert.ToBoolean(System.Configuration.ConfigurationManager.AppSettings["cloud"] ?? "false"); // false;// RoleEnvironment.IsAvailable;//
-            multiTenancy = Convert.ToBoolean(System.Configuration.ConfigurationManager.AppSettings["multiTenancy"] ?? "false");
-            useSecureConnection = Convert.ToBoolean(System.Configuration.ConfigurationManager.AppSettings["UseSecureConnection"] ?? "false");
-            skin = Convert.ToBoolean(System.Configuration.ConfigurationManager.AppSettings["skin"] ?? "false");
-            duradosAppPrefix = Convert.ToString(System.Configuration.ConfigurationManager.AppSettings["duradosAppSysPrefix"] ?? "durados_AppSys_");
-            duradosAppSysPrefix = Convert.ToString(System.Configuration.ConfigurationManager.AppSettings["duradosAppPrefix"] ?? "durados_App_");
-            debug = Convert.ToBoolean(System.Configuration.ConfigurationManager.AppSettings["debug"] ?? "false");
-            appNameMax = Convert.ToInt32(System.Configuration.ConfigurationManager.AppSettings["appNameMax"] ?? "32");
-            dropAppDatabase = Convert.ToBoolean(System.Configuration.ConfigurationManager.AppSettings["dropAppDatabase"] ?? "true");
-            privateCloud = Convert.ToBoolean(System.Configuration.ConfigurationManager.AppSettings["privateCloud"] ?? "false");
-            ConfigPath = Convert.ToString(System.Configuration.ConfigurationManager.AppSettings["configPath"] ?? "~/Config/");
-            plugInSampleGenerationCount = Convert.ToInt32(System.Configuration.ConfigurationManager.AppSettings["plugInSampleGenerationCount"] ?? "5");
-
-            superDeveloper = Convert.ToString(System.Configuration.ConfigurationManager.AppSettings["superDeveloper"] ?? "dev@devitout.com").ToLower();
-
-            DownloadDenyPolicy = Convert.ToBoolean(System.Configuration.ConfigurationManager.AppSettings["DownloadDenyPolicy"] ?? "true");
-            OldAdminHttp = Convert.ToBoolean(System.Configuration.ConfigurationManager.AppSettings["OldAdminHttp"] ?? "false");
-            AllowedDownloadFileTypes = Convert.ToString(System.Configuration.ConfigurationManager.AppSettings["AllowedDownloadFileTypes"] ?? allowedDownloadFileTypesDefault).Split(',').ToArray();
-            DenyDownloadFileTypes = Convert.ToString(System.Configuration.ConfigurationManager.AppSettings["DenyDownloadFileTypes"] ?? denyDownloadFileTypesDefault).Split(',').ToArray();
-
-            ReservedAppNames = Convert.ToString(System.Configuration.ConfigurationManager.AppSettings["ReservedAppNames"] ?? reservedAppNames).Split(',').Select(k => k).ToHashSet<string>();
-
-            azureDatabasePendingPool = new PendingPool(demoPendingNext);
-            onPremiseDatabasePendingPool = new PendingPool(demoPendingNext);
-
-            AzureStorageAccountName = System.Configuration.ConfigurationManager.AppSettings["AzureStorageAccountName"];
-            if (AzureStorageAccountName == null)
-            {
-                throw new DuradosException("Please add the AzureStorageAccountName to the web.config.");
-            }
-
-            ConfigAzureStorageAccountName = System.Configuration.ConfigurationManager.AppSettings["ConfigAzureStorageAccountName"];
-            if (ConfigAzureStorageAccountName == null)
-            {
-                throw new DuradosException("Please add the ConfigAzureStorageAccountName to the web.config.");
-            }
-
-            AzureStorageAccountKey = System.Configuration.ConfigurationManager.AppSettings["AzureStorageAccountKey"];
-            if (AzureStorageAccountKey == null)
-            {
-                throw new DuradosException("Please add the AzureStorageAccountKey to the web.config.");
-            }
+           ConfigAzureStorageAccountKey = System.Configuration.ConfigurationManager.AppSettings["ConfigAzureStorageAccountKey"];
+           if (ConfigAzureStorageAccountKey == null)
+           {
+               throw new DuradosException("Please add the ConfigAzureStorageAccountKey to the web.config.");
+           }
 
-            ConfigAzureStorageAccountKey = System.Configuration.ConfigurationManager.AppSettings["ConfigAzureStorageAccountKey"];
-            if (ConfigAzureStorageAccountKey == null)
-            {
-                throw new DuradosException("Please add the ConfigAzureStorageAccountKey to the web.config.");
-            }
 
+           AzureStorageUrl = System.Configuration.ConfigurationManager.AppSettings["AzureStorageUrl"] ?? "http://{0}.blob.core.windows.net/{1}";
 
-            AzureStorageUrl = System.Configuration.ConfigurationManager.AppSettings["AzureStorageUrl"] ?? "http://{0}.blob.core.windows.net/{1}";
 
+           AzureCacheAccountKey = System.Configuration.ConfigurationManager.AppSettings["AzureCacheAccountKey"];
+           if (AzureCacheAccountKey == null)
+           {
+               throw new DuradosException("Please add the AzureCacheAccountKey to the web.config.");
+           }
 
-            AzureCacheAccountKey = System.Configuration.ConfigurationManager.AppSettings["AzureCacheAccountKey"];
-            if (AzureCacheAccountKey == null)
-            {
-                throw new DuradosException("Please add the AzureCacheAccountKey to the web.config.");
-            }
+           AzureCacheAccountName = System.Configuration.ConfigurationManager.AppSettings["AzureCacheAccountName"];
+           if (AzureCacheAccountName == null)
+           {
+               throw new DuradosException("Please add the AzureCacheAccountName to the web.config.");
+           }
 
-            AzureCacheAccountName = System.Configuration.ConfigurationManager.AppSettings["AzureCacheAccountName"];
-            if (AzureCacheAccountName == null)
-            {
-                throw new DuradosException("Please add the AzureCacheAccountName to the web.config.");
-            }
+           AzureCacheUrl = System.Configuration.ConfigurationManager.AppSettings["AzureCacheUrl"];
+           if (AzureCacheUrl == null)
+           {
+               throw new DuradosException("Please add the AzureCacheUrl to the web.config.");
+           }
 
-            AzureCacheUrl = System.Configuration.ConfigurationManager.AppSettings["AzureCacheUrl"];
-            if (AzureCacheUrl == null)
-            {
-                throw new DuradosException("Please add the AzureCacheUrl to the web.config.");
-            }
 
 
+           AzureCachePort = Convert.ToInt32(System.Configuration.ConfigurationManager.AppSettings["AzureCachePort"] ?? "22233");
 
-            AzureCachePort = Convert.ToInt32(System.Configuration.ConfigurationManager.AppSettings["AzureCachePort"] ?? "22233");
+           AzureCacheUpdateInterval = new TimeSpan(0, 0, Convert.ToInt32(System.Configuration.ConfigurationManager.AppSettings["AzureCacheUpdateInterval"] ?? "60"));
 
-            AzureCacheUpdateInterval = new TimeSpan(0, 0, Convert.ToInt32(System.Configuration.ConfigurationManager.AppSettings["AzureCacheUpdateInterval"] ?? "60"));
+           DefaultUploadName = System.Configuration.ConfigurationManager.AppSettings["DefaultUploadName"] ?? "DefaultUpload";
 
-            DefaultUploadName = System.Configuration.ConfigurationManager.AppSettings["DefaultUploadName"] ?? "DefaultUpload";
+           DefaultImageHeight = Convert.ToInt32(System.Configuration.ConfigurationManager.AppSettings["DefaultImageHeight"] ?? "80");
 
-            DefaultImageHeight = Convert.ToInt32(System.Configuration.ConfigurationManager.AppSettings["DefaultImageHeight"] ?? "80");
+           SplitProducts = Convert.ToBoolean(System.Configuration.ConfigurationManager.AppSettings["SplitProducts"] ?? "true");
 
-            SplitProducts = Convert.ToBoolean(System.Configuration.ConfigurationManager.AppSettings["SplitProducts"] ?? "true");
+           ProductsPort = new Dictionary<SqlProduct, int>();
 
-            ProductsPort = new Dictionary<SqlProduct, int>();
+           foreach (SqlProduct sqlProduct in Enum.GetValues(typeof(SqlProduct)))
+           {
+               ProductsPort.Add(sqlProduct, Convert.ToInt32(System.Configuration.ConfigurationManager.AppSettings[sqlProduct.ToString() + "Port"] ?? "80"));
+           }
 
-            foreach (SqlProduct sqlProduct in Enum.GetValues(typeof(SqlProduct)))
-            {
-                ProductsPort.Add(sqlProduct, Convert.ToInt32(System.Configuration.ConfigurationManager.AppSettings[sqlProduct.ToString() + "Port"] ?? "80"));
-            }
+           ApiUrls = (System.Configuration.ConfigurationManager.AppSettings["apiUrls"] ?? string.Empty).Split(';');
 
-            ApiUrls = (System.Configuration.ConfigurationManager.AppSettings["apiUrls"] ?? string.Empty).Split(';');
-
-            UserPreviewUrl = System.Configuration.ConfigurationManager.AppSettings["UserPreviewUrl"] ?? ".backand.loc:4012/";
-
-            S3Bucket = System.Configuration.ConfigurationManager.AppSettings["S3Bucket"];
-            if (string.IsNullOrEmpty(S3Bucket))
-            {
-                throw new DuradosException("Missing S3Bucket key in web config");
-            }
-
-            S3FilesBucket = System.Configuration.ConfigurationManager.AppSettings["S3FilesBucket"];
-
-            if (string.IsNullOrEmpty(S3FilesBucket))
-            {
-                throw new DuradosException("Missing S3FilesBucket key in web config");
-            }
-
-            ParseConverterMasterKey = System.Configuration.ConfigurationManager.AppSettings["ParseConverterMasterKey"];
-            if (string.IsNullOrEmpty(ParseConverterMasterKey))
-            {
-                throw new DuradosException("Missing ParseConverterMasterKey key in web config");
-            }
-
-            ParseConverterAdminKey = System.Configuration.ConfigurationManager.AppSettings["ParseConverterAdminKey"];
-            if (string.IsNullOrEmpty(ParseConverterAdminKey))
-            {
-                throw new DuradosException("Missing ParseConverterAdminKey key in web config");
-            }
-
-            ParseConverterObjectName = System.Configuration.ConfigurationManager.AppSettings["ParseConverterObjectName"];
-            if (string.IsNullOrEmpty(ParseConverterObjectName))
-            {
-                throw new DuradosException("Missing ParseConverterObjectName key in web config");
-            }
-
-            AppLockedMessage = System.Configuration.ConfigurationManager.AppSettings["AppLockedMessage"];
-
-            if (string.IsNullOrEmpty(AppLockedMessage))
-            {
-                throw new DuradosException("Missing AppLockedMessage key in web config");
-            }
-
-            NodeJSBucket = System.Configuration.ConfigurationManager.AppSettings["NodeJSBucket"];
-
-            if (string.IsNullOrEmpty(NodeJSBucket))
-            {
-                throw new DuradosException("Missing NodeJSBucket key in web config");
-            }
-
-
-            ExcludedEmailDomains = System.Configuration.ConfigurationManager.AppSettings["ExcludedEmailDomains"];
-
-            if (string.IsNullOrEmpty(ExcludedEmailDomains))
-            {
-                throw new DuradosException("Missing ExcludedEmailDomains key in web config");
-            }
-
-            ReportConnectionString = System.Web.Configuration.WebConfigurationManager.ConnectionStrings["reportConnectionString"].ConnectionString;
-
-            if (string.IsNullOrEmpty(ReportConnectionString))
-            {
-                throw new DuradosException("Missing reportConnectionString key in web config");
-            }
-
-            SendWelcomeEmail = System.Configuration.ConfigurationManager.AppSettings["SendWelcomeEmail"] ?? "true";
-
-            System.Net.ServicePointManager.SecurityProtocol = System.Net.SecurityProtocolType.Ssl3 | System.Net.SecurityProtocolType.Tls | System.Net.SecurityProtocolType.Tls11 | System.Net.SecurityProtocolType.Tls12;
-
-            DevUsers = System.Configuration.ConfigurationManager.AppSettings["DevUsers"].Split(',');
-
-            string embeddedReportsApiToken = System.Configuration.ConfigurationManager.AppSettings["embeddedReportsApiToken"];
-            if (string.IsNullOrEmpty(embeddedReportsApiToken))
-            {
-                throw new DuradosException("Missing embeddedReportsApiToken key in web config");
-            }
-            string embeddedReportsUrlStep1 = System.Configuration.ConfigurationManager.AppSettings["embeddedReportsUrlStep1"];
-            if (string.IsNullOrEmpty(embeddedReportsUrlStep1))
-            {
-                throw new DuradosException("Missing embeddedReportsUrlStep1 key in web config");
-            }
-            string embeddedReportsUrlStep2 = System.Configuration.ConfigurationManager.AppSettings["embeddedReportsUrlStep2"];
-            if (string.IsNullOrEmpty(embeddedReportsUrlStep2))
-            {
-                throw new DuradosException("Missing embeddedReportsUrlStep2 key in web config");
-            }
-            string embeddedReportAppPropertyName = System.Configuration.ConfigurationManager.AppSettings["embeddedReportAppPropertyName"];
-            if (string.IsNullOrEmpty(embeddedReportAppPropertyName))
-            {
-                throw new DuradosException("Missing embeddedReportAppPropertyName key in web config");
-            }
-            embeddedReportsConfig = new EmbeddedReportsConfig(embeddedReportsApiToken, embeddedReportsUrlStep1, embeddedReportsUrlStep2, embeddedReportAppPropertyName);
-
-            string awsAccessKeyId = System.Configuration.ConfigurationManager.AppSettings["awsAccessKeyId"];
-            if (string.IsNullOrEmpty(awsAccessKeyId))
-            {
-                throw new DuradosException("Missing awsAccessKeyId key in web config");
-            }
-            string awsSecretAccessKey = System.Configuration.ConfigurationManager.AppSettings["awsSecretAccessKey"];
-            if (string.IsNullOrEmpty(awsSecretAccessKey))
-            {
-                throw new DuradosException("Missing awsSecretAccessKey key in web config");
-            }
-            string awsRegion = System.Configuration.ConfigurationManager.AppSettings["awsRegion"];
-            if (string.IsNullOrEmpty(awsRegion))
-            {
-                throw new DuradosException("Missing awsRegion key in web config");
-            }
-            awsCredentials = new AwsCredentials() { AccessKeyID = awsAccessKeyId, SecretAccessKey = awsSecretAccessKey, Region = awsRegion };
-
-            LambdaArnRoot = System.Configuration.ConfigurationManager.AppSettings["lambdaArnRoot"];
-            if (string.IsNullOrEmpty(LambdaArnRoot))
-            {
-                throw new DuradosException("Missing lambdaArnRoot key in web config");
-            }
-
-            WebhooksParametersFileName = System.Configuration.ConfigurationManager.AppSettings["webhooksParametersFileName"];
-
-            cqlConfig = new CqlConfig();
-            cqlConfig.ApiUrl = System.Configuration.ConfigurationManager.AppSettings["CqlApiUrl"];
-            if (string.IsNullOrEmpty(cqlConfig.ApiUrl))
-            {
-                throw new DuradosException("Missing CqlApiUrl key in web config");
-            }
-
-            cqlConfig.AuthorizationHeader = System.Configuration.ConfigurationManager.AppSettings["CqlAuthorizationHeader"];
-            if (string.IsNullOrEmpty(cqlConfig.AuthorizationHeader))
-            {
-                throw new DuradosException("Missing CqlAuthorizationHeader key in web config");
-            }
-
-            string cqlsFileName = System.Configuration.ConfigurationManager.AppSettings["CqlsFileName"];
-            if (string.IsNullOrEmpty(cqlsFileName))
-            {
-                throw new DuradosException("Missing CqlsFileName key in web config");
-            }
-            cqlConfig.Cqls = GetCqls(cqlsFileName);
-            //GetWebhookParameters("AppCreated");
-
-
-            LambdaArn = System.Configuration.ConfigurationManager.AppSettings["lambdaArn"];
-            if (string.IsNullOrEmpty(LambdaArn))
-            {
-                throw new DuradosException("Missing lambdaArn key in web config");
-            }
-
-            CronPrefix = System.Configuration.ConfigurationManager.AppSettings["cronPrefix"];
-            if (string.IsNullOrEmpty(CronPrefix))
-            {
-                throw new DuradosException("Missing CronPrefix key in web config");
-            }
-
-            CronAuthorizationHeader = System.Configuration.ConfigurationManager.AppSettings["cronAuthorizationHeader"];
-            if (string.IsNullOrEmpty(CronAuthorizationHeader))
-            {
-                throw new DuradosException("Missing CronAuthorizationHeader key in web config");
-            }
-
-            var actionParametersKbSizeLimit = System.Configuration.ConfigurationManager.AppSettings["actionParametersKbSizeLimit"];
-            if (string.IsNullOrEmpty(actionParametersKbSizeLimit))
-            {
-                throw new DuradosException("Missing actionParametersKbSizeLimit key in web config");
-            }
-
-            limits[Limits.Cron.ToString()] = Convert.ToInt32(System.Configuration.ConfigurationManager.AppSettings["cronLimit"]);
-            limits[Limits.ActionParametersKbSize.ToString()] = Convert.ToInt32(actionParametersKbSizeLimit);
-
-
-            var actionTimeMSecLimit = System.Configuration.ConfigurationManager.AppSettings["actionTimeMSecLimit"];
-            if (string.IsNullOrEmpty(actionTimeMSecLimit))
-            {
-                throw new DuradosException("Missing actionTimeMSecLimit key in web config");
-            }
-            limits[Limits.ActionTimeMSec.ToString()] = Convert.ToInt32(actionTimeMSecLimit);
-            var uploadTimeMSecLimit = System.Configuration.ConfigurationManager.AppSettings["uploadTimeMSecLimit"];
-            if (string.IsNullOrEmpty(uploadTimeMSecLimit))
-            {
-                throw new DuradosException("Missing uploadTimeMSecLimit key in web config");
-            }
-            limits[Limits.UploadTimeMSec.ToString()] = Convert.ToInt32(uploadTimeMSecLimit);
-
-            LocalAddress = System.Configuration.ConfigurationManager.AppSettings["localAddress"] ?? "http://localhost:8080";
-
-            SocialRedirectHost = System.Configuration.ConfigurationManager.AppSettings["socialRedirectHost"];
-
-            ReturnAddressForMobile = System.Configuration.ConfigurationManager.AppSettings["returnAddressForMobile"] ?? "http://www.backandblabla.bla";
-
-            AwsAccountSecretKeyPart = System.Configuration.ConfigurationManager.AppSettings["AwsAccountSecretKeyPart"];
-        }
-
-        private static Dictionary<string, string> GetCqls(string cqlsFileName)
-        {
-            Dictionary<string, string> dic =  new Dictionary<string, string>();
-            string jsonString = GetStringFromFile(cqlsFileName, ref cqlsJsonString).Replace("\\", "\\\\");
-
-
-            Dictionary<string, object> cqls = Durados.Web.Mvc.Controllers.Api.JsonConverter.Deserialize(jsonString);
-
-            foreach (string name in cqls.Keys)
-            {
-                dic.Add(name, cqls[name].ToString());
-            }
-
-            return dic;
-        }
-
-
-
-        private static AwsCredentials awsCredentials;
-        public static AwsCredentials AwsCredentials
-        {
-            get
-            {
-                return awsCredentials;
-            }
-        }
-
-        public static string GetConfigPath(string filename)
-        {
-            //if (ConfigPath.StartsWith("~"))
-            //    return System.Web.HttpContext.Current.Server.MapPath(ConfigPath + filename);
-            //else 
-            //    return ConfigPath + filename.Replace('/','\\');
-
-            return GetConfigPath(filename, ConfigPath);
-        }
-
-        public static string GetConfigPath(string filename, string configPath)
-        {
-            if (configPath.StartsWith("~"))
-                return System.Web.HttpContext.Current.Server.MapPath(configPath + filename);
-            else
-                return configPath + filename.Replace('/', '\\');
-        }
-
-        public static string GetConfigPath(string filename, SqlProduct sqlProduct)
-        {
-            string key = sqlProduct.ToString() + "ConfigPath";
-            string configPath = System.Configuration.ConfigurationManager.AppSettings[key] ?? ConfigPath;
-
-            return GetConfigPath(filename, configPath);
-        }
-
-        public static string GetUploadPath(SqlProduct sqlProduct)
-        {
-            string key = sqlProduct.ToString() + "UploadPath";
-            string uploadPath = System.Configuration.ConfigurationManager.AppSettings[key];
-
-            if (string.IsNullOrEmpty(uploadPath))
-                return System.Web.HttpContext.Current.Server.MapPath("/Uploads/");
-            else if (uploadPath.StartsWith("~"))
-                return System.Web.HttpContext.Current.Server.MapPath(uploadPath);
-            else
-                return uploadPath;
-        }
-
-        public static string GetDeploymentPath(string filename)
-        {
-            return System.Web.HttpContext.Current.Server.MapPath("~/Deployment/") + filename;
-
-        }
-
-        public static string Version = null;
-
-        public static Dictionary<SqlProduct, int> ProductsPort { get; private set; }
-        public static bool SplitProducts { get; private set; }
-        public static string AzureStorageUrl { get; private set; }
-        public static string AzureStorageAccountName { get; private set; }
-        public static string AzureStorageAccountKey { get; private set; }
-        public static string DefaultUploadName { get; private set; }
-        public static int DefaultImageHeight { get; private set; }
-        public static string ConfigAzureStorageAccountName { get; private set; }
-        public static string ConfigAzureStorageAccountKey { get; private set; }
-        public static string[] ApiUrls { get; private set; }
-
-        public static string AzureCacheAccountKey { get; private set; }
-        public static string AzureCacheAccountName { get; private set; }
-        public static string AzureCacheUrl { get; private set; }
-        public static int AzureCachePort { get; private set; }
-        public static string UserPreviewUrl { get; private set; }
-        public static string S3Bucket { get; private set; }
-        public static string S3FilesBucket { get; private set; }
-        public static string SendWelcomeEmail { get; private set; }
-        public static string[] DevUsers { get; private set; }
-
-        public static string ParseConverterMasterKey { get; private set; }
-
-        public static string LambdaArn { get; private set; }
-        public static string LambdaArnRoot { get; private set; }
-
-        public static string CronPrefix { get; private set; }
-        public static string CronAuthorizationHeader { get; private set; }
+           UserPreviewUrl = System.Configuration.ConfigurationManager.AppSettings["UserPreviewUrl"] ?? ".backand.loc:4012/";
+
+           S3Bucket = System.Configuration.ConfigurationManager.AppSettings["S3Bucket"];
+           if (string.IsNullOrEmpty(S3Bucket))
+           {
+               throw new DuradosException("Missing S3Bucket key in web config");
+           }
+
+           S3FilesBucket = System.Configuration.ConfigurationManager.AppSettings["S3FilesBucket"];
+
+           if (string.IsNullOrEmpty(S3FilesBucket))
+           {
+               throw new DuradosException("Missing S3FilesBucket key in web config");
+           }
+
+           ParseConverterMasterKey = System.Configuration.ConfigurationManager.AppSettings["ParseConverterMasterKey"];
+           if (string.IsNullOrEmpty(ParseConverterMasterKey))
+           {
+               throw new DuradosException("Missing ParseConverterMasterKey key in web config");
+           }
+
+           ParseConverterAdminKey = System.Configuration.ConfigurationManager.AppSettings["ParseConverterAdminKey"];
+           if (string.IsNullOrEmpty(ParseConverterAdminKey))
+           {
+               throw new DuradosException("Missing ParseConverterAdminKey key in web config");
+           }
+
+           ParseConverterObjectName = System.Configuration.ConfigurationManager.AppSettings["ParseConverterObjectName"];
+           if (string.IsNullOrEmpty(ParseConverterObjectName))
+           {
+               throw new DuradosException("Missing ParseConverterObjectName key in web config");
+           }
+
+           AppLockedMessage = System.Configuration.ConfigurationManager.AppSettings["AppLockedMessage"];
+
+           if (string.IsNullOrEmpty(AppLockedMessage))
+           {
+               throw new DuradosException("Missing AppLockedMessage key in web config");
+           }
+
+           NodeJSBucket = System.Configuration.ConfigurationManager.AppSettings["NodeJSBucket"];
+
+           if (string.IsNullOrEmpty(NodeJSBucket))
+           {
+               throw new DuradosException("Missing NodeJSBucket key in web config");
+           }
+
+
+           ExcludedEmailDomains = System.Configuration.ConfigurationManager.AppSettings["ExcludedEmailDomains"];
+
+           if (string.IsNullOrEmpty(ExcludedEmailDomains))
+           {
+               throw new DuradosException("Missing ExcludedEmailDomains key in web config");
+           }
+
+           ReportConnectionString = System.Web.Configuration.WebConfigurationManager.ConnectionStrings["reportConnectionString"].ConnectionString;
+
+           if (string.IsNullOrEmpty(ReportConnectionString))
+           {
+               throw new DuradosException("Missing reportConnectionString key in web config");
+           }
+
+           SendWelcomeEmail = System.Configuration.ConfigurationManager.AppSettings["SendWelcomeEmail"] ?? "true";
+
+           System.Net.ServicePointManager.SecurityProtocol = System.Net.SecurityProtocolType.Ssl3 | System.Net.SecurityProtocolType.Tls | System.Net.SecurityProtocolType.Tls11 | System.Net.SecurityProtocolType.Tls12;
+
+           DevUsers = System.Configuration.ConfigurationManager.AppSettings["DevUsers"].Split(',');
+
+           string embeddedReportsApiToken = System.Configuration.ConfigurationManager.AppSettings["embeddedReportsApiToken"];
+           if (string.IsNullOrEmpty(embeddedReportsApiToken))
+           {
+               throw new DuradosException("Missing embeddedReportsApiToken key in web config");
+           }
+           string embeddedReportsUrlStep1 = System.Configuration.ConfigurationManager.AppSettings["embeddedReportsUrlStep1"];
+           if (string.IsNullOrEmpty(embeddedReportsUrlStep1))
+           {
+               throw new DuradosException("Missing embeddedReportsUrlStep1 key in web config");
+           }
+           string embeddedReportsUrlStep2 = System.Configuration.ConfigurationManager.AppSettings["embeddedReportsUrlStep2"];
+           if (string.IsNullOrEmpty(embeddedReportsUrlStep2))
+           {
+               throw new DuradosException("Missing embeddedReportsUrlStep2 key in web config");
+           }
+           string embeddedReportAppPropertyName = System.Configuration.ConfigurationManager.AppSettings["embeddedReportAppPropertyName"];
+           if (string.IsNullOrEmpty(embeddedReportAppPropertyName))
+           {
+               throw new DuradosException("Missing embeddedReportAppPropertyName key in web config");
+           }
+           embeddedReportsConfig = new EmbeddedReportsConfig(embeddedReportsApiToken, embeddedReportsUrlStep1, embeddedReportsUrlStep2, embeddedReportAppPropertyName);
+
+           string awsAccessKeyId = System.Configuration.ConfigurationManager.AppSettings["awsAccessKeyId"];
+           if (string.IsNullOrEmpty(awsAccessKeyId))
+           {
+               throw new DuradosException("Missing awsAccessKeyId key in web config");
+           }
+           string awsSecretAccessKey = System.Configuration.ConfigurationManager.AppSettings["awsSecretAccessKey"];
+           if (string.IsNullOrEmpty(awsSecretAccessKey))
+           {
+               throw new DuradosException("Missing awsSecretAccessKey key in web config");
+           }
+           string awsRegion = System.Configuration.ConfigurationManager.AppSettings["awsRegion"];
+           if (string.IsNullOrEmpty(awsRegion))
+           {
+               throw new DuradosException("Missing awsRegion key in web config");
+           }
+           awsCredentials = new AwsCredentials() { AccessKeyID = awsAccessKeyId, SecretAccessKey = awsSecretAccessKey, Region = awsRegion };
+
+           LambdaArnRoot = System.Configuration.ConfigurationManager.AppSettings["lambdaArnRoot"];
+           if (string.IsNullOrEmpty(LambdaArnRoot))
+           {
+               throw new DuradosException("Missing lambdaArnRoot key in web config");
+           }
+
+           WebhooksParametersFileName = System.Configuration.ConfigurationManager.AppSettings["webhooksParametersFileName"];
+
+           cqlConfig = new CqlConfig();
+           cqlConfig.ApiUrl = System.Configuration.ConfigurationManager.AppSettings["CqlApiUrl"];
+           if (string.IsNullOrEmpty(cqlConfig.ApiUrl))
+           {
+               throw new DuradosException("Missing CqlApiUrl key in web config");
+           }
+
+           cqlConfig.AuthorizationHeader = System.Configuration.ConfigurationManager.AppSettings["CqlAuthorizationHeader"];
+           if (string.IsNullOrEmpty(cqlConfig.AuthorizationHeader))
+           {
+               throw new DuradosException("Missing CqlAuthorizationHeader key in web config");
+           }
+
+           string cqlsFileName = System.Configuration.ConfigurationManager.AppSettings["CqlsFileName"];
+           if (string.IsNullOrEmpty(cqlsFileName))
+           {
+               throw new DuradosException("Missing CqlsFileName key in web config");
+           }
+           cqlConfig.Cqls = GetCqls(cqlsFileName);
+           //GetWebhookParameters("AppCreated");
+
+
+           LambdaArn = System.Configuration.ConfigurationManager.AppSettings["lambdaArn"];
+           if (string.IsNullOrEmpty(LambdaArn))
+           {
+               throw new DuradosException("Missing lambdaArn key in web config");
+           }
+
+           CronPrefix = System.Configuration.ConfigurationManager.AppSettings["cronPrefix"];
+           if (string.IsNullOrEmpty(CronPrefix))
+           {
+               throw new DuradosException("Missing CronPrefix key in web config");
+           }
+
+           CronAuthorizationHeader = System.Configuration.ConfigurationManager.AppSettings["cronAuthorizationHeader"];
+           if (string.IsNullOrEmpty(CronAuthorizationHeader))
+           {
+               throw new DuradosException("Missing CronAuthorizationHeader key in web config");
+           }
+
+           var actionParametersKbSizeLimit = System.Configuration.ConfigurationManager.AppSettings["actionParametersKbSizeLimit"];
+           if (string.IsNullOrEmpty(actionParametersKbSizeLimit))
+           {
+               throw new DuradosException("Missing actionParametersKbSizeLimit key in web config");
+           }
+
+           limits[Limits.Cron.ToString()] = Convert.ToInt32(System.Configuration.ConfigurationManager.AppSettings["cronLimit"]);
+           limits[Limits.ActionParametersKbSize.ToString()] = Convert.ToInt32(actionParametersKbSizeLimit);
+
+
+           var actionTimeMSecLimit = System.Configuration.ConfigurationManager.AppSettings["actionTimeMSecLimit"];
+           if (string.IsNullOrEmpty(actionTimeMSecLimit))
+           {
+               throw new DuradosException("Missing actionTimeMSecLimit key in web config");
+           }
+           limits[Limits.ActionTimeMSec.ToString()] = Convert.ToInt32(actionTimeMSecLimit);
+           var uploadTimeMSecLimit = System.Configuration.ConfigurationManager.AppSettings["uploadTimeMSecLimit"];
+           if (string.IsNullOrEmpty(uploadTimeMSecLimit))
+           {
+               throw new DuradosException("Missing uploadTimeMSecLimit key in web config");
+           }
+           limits[Limits.UploadTimeMSec.ToString()] = Convert.ToInt32(uploadTimeMSecLimit);
+
+           LocalAddress = System.Configuration.ConfigurationManager.AppSettings["localAddress"] ?? "http://localhost:8080";
+
+           SocialRedirectHost = System.Configuration.ConfigurationManager.AppSettings["socialRedirectHost"];
+
+           ReturnAddressForMobile = System.Configuration.ConfigurationManager.AppSettings["returnAddressForMobile"] ?? "http://www.backandblabla.bla";
+
+           AwsAccountSecretKeyPart = System.Configuration.ConfigurationManager.AppSettings["AwsAccountSecretKeyPart"];
+       }
+
+       private static Dictionary<string, string> GetCqls(string cqlsFileName)
+       {
+           Dictionary<string, string> dic =  new Dictionary<string, string>();
+           string jsonString = GetStringFromFile(cqlsFileName, ref cqlsJsonString).Replace("\\", "\\\\");
+
+
+           Dictionary<string, object> cqls = Durados.Web.Mvc.Controllers.Api.JsonConverter.Deserialize(jsonString);
+
+           foreach (string name in cqls.Keys)
+           {
+               dic.Add(name, cqls[name].ToString());
+           }
+
+           return dic;
+       }
+
+
+
+       private static AwsCredentials awsCredentials;
+       public static AwsCredentials AwsCredentials
+       {
+           get
+           {
+               return awsCredentials;
+           }
+       }
+
+       public static string GetConfigPath(string filename)
+       {
+           //if (ConfigPath.StartsWith("~"))
+           //    return System.Web.HttpContext.Current.Server.MapPath(ConfigPath + filename);
+           //else 
+           //    return ConfigPath + filename.Replace('/','\\');
+
+           return GetConfigPath(filename, ConfigPath);
+       }
+
+       public static string GetConfigPath(string filename, string configPath)
+       {
+           if (configPath.StartsWith("~"))
+               return System.Web.HttpContext.Current.Server.MapPath(configPath + filename);
+           else
+               return configPath + filename.Replace('/', '\\');
+       }
+
+       public static string GetConfigPath(string filename, SqlProduct sqlProduct)
+       {
+           string key = sqlProduct.ToString() + "ConfigPath";
+           string configPath = System.Configuration.ConfigurationManager.AppSettings[key] ?? ConfigPath;
+
+           return GetConfigPath(filename, configPath);
+       }
+
+       public static string GetUploadPath(SqlProduct sqlProduct)
+       {
+           string key = sqlProduct.ToString() + "UploadPath";
+           string uploadPath = System.Configuration.ConfigurationManager.AppSettings[key];
+
+           if (string.IsNullOrEmpty(uploadPath))
+               return System.Web.HttpContext.Current.Server.MapPath("/Uploads/");
+           else if (uploadPath.StartsWith("~"))
+               return System.Web.HttpContext.Current.Server.MapPath(uploadPath);
+           else
+               return uploadPath;
+       }
+
+       public static string GetDeploymentPath(string filename)
+       {
+           return System.Web.HttpContext.Current.Server.MapPath("~/Deployment/") + filename;
+
+       }
+
+       public static string Version = null;
+
+       public static Dictionary<SqlProduct, int> ProductsPort { get; private set; }
+       public static bool SplitProducts { get; private set; }
+       public static string AzureStorageUrl { get; private set; }
+       public static string AzureStorageAccountName { get; private set; }
+       public static string AzureStorageAccountKey { get; private set; }
+       public static string DefaultUploadName { get; private set; }
+       public static int DefaultImageHeight { get; private set; }
+       public static string ConfigAzureStorageAccountName { get; private set; }
+       public static string ConfigAzureStorageAccountKey { get; private set; }
+       public static string[] ApiUrls { get; private set; }
+
+       public static string AzureCacheAccountKey { get; private set; }
+       public static string AzureCacheAccountName { get; private set; }
+       public static string AzureCacheUrl { get; private set; }
+       public static int AzureCachePort { get; private set; }
+       public static string UserPreviewUrl { get; private set; }
+       public static string S3Bucket { get; private set; }
+       public static string S3FilesBucket { get; private set; }
+       public static string SendWelcomeEmail { get; private set; }
+       public static string[] DevUsers { get; private set; }
+
+       public static string ParseConverterMasterKey { get; private set; }
+
+       public static string LambdaArn { get; private set; }
+       public static string LambdaArnRoot { get; private set; }
+
+       public static string CronPrefix { get; private set; }
+       public static string CronAuthorizationHeader { get; private set; }
         
         
-        public static string ParseConverterAdminKey { get; private set; }
-        public static string ParseConverterObjectName { get; private set; }
-        public static string NodeJSBucket { get; private set; }
-        public static string AppLockedMessage { get; private set; }
-        public static string ExcludedEmailDomains { get; private set; }
-        public static string ReportConnectionString { get; private set; }
+       public static string ParseConverterAdminKey { get; private set; }
+       public static string ParseConverterObjectName { get; private set; }
+       public static string NodeJSBucket { get; private set; }
+       public static string AppLockedMessage { get; private set; }
+       public static string ExcludedEmailDomains { get; private set; }
+       public static string ReportConnectionString { get; private set; }
 
-        public static TimeSpan AzureCacheUpdateInterval { get; private set; }
+       public static TimeSpan AzureCacheUpdateInterval { get; private set; }
 
-        public static string ConfigPath { get; private set; }
+       public static string ConfigPath { get; private set; }
 
-        public static bool DownloadDenyPolicy { get; private set; }
-        public static string[] AllowedDownloadFileTypes { get; private set; }
-        public static string[] DenyDownloadFileTypes { get; private set; }
+       public static bool DownloadDenyPolicy { get; private set; }
+       public static string[] AllowedDownloadFileTypes { get; private set; }
+       public static string[] DenyDownloadFileTypes { get; private set; }
 
-        private Durados.Data.ICache<Map> mapsCache = null;
-        public static Dictionary<string, string> DnsAliases = null;
-        private IPersistency persistency = null;
-        private static bool multiTenancy = false;
-        private static string duradosAppPrefix;
-        private static string duradosAppSysPrefix;
-        private static bool cloud = false;
-        private static bool skin = false;
-        private static bool useSecureConnection = false;
-        private static bool debug = false;
-        private static bool dropAppDatabase = true;
-        private static int appNameMax = 32;
-        private static string host = "durados.com";
-        private static int poolCreator = 5555;
-        private static bool poolShouldBeUsed = false;
+       private Durados.Data.ICache<Map> mapsCache = null;
+       /* TODO: Main MySQL depricated
+     public static Dictionary<string, string> DnsAliases = null;
+        * */
+     private IPersistency persistency = null;
+     private static bool multiTenancy = false;
+     private static string duradosAppPrefix;
+     private static string duradosAppSysPrefix;
+     private static bool cloud = false;
+     private static bool skin = false;
+     private static bool useSecureConnection = false;
+     private static bool debug = false;
+     private static bool dropAppDatabase = true;
+     private static int appNameMax = 32;
+     private static string host = "durados.com";
+     private static int poolCreator = 5555;
+     private static bool poolShouldBeUsed = false;
 
-        private static string redisConnectionString = "";
-        private static string redisHostAndPort = "";
+     private static string redisConnectionString = "";
+     private static string redisHostAndPort = "";
         
-        private static string mainAppConfigName = "backand";
-        private static bool hostByUs = false;
-        private static string duradosAppName = "www";
-        private static string demoAzureUsername = "itayher";
-        private static string demoAzurePassword = "Durados2012";
-        private static string demoSqlUsername = "durados";
-        private static string demoSqlPassword = "durados";
-        private static string demoDatabaseName = "Northwind";
-        private static string demoConfigFilename = "Northwind";
-        private static string demoAzureServer = "tcp:d9gwdrhh5n.database.windows.net,1433";
-        private static string demoOnPremiseServer = @"durados.info\sqlexpress";
-        private static bool demoCreatePending = true;
-        private static int demoPendingNext = 5;
-        private static string demoFtpTempHost = "temp";
-        private static string demoFtpHost = "durados.info";
-        private static string demoFtpPort = "21";
-        private static long demoFtpFileSizeLimitKb = 1024;
-        private static long demoFtpFolderSizeLimitKb = 1024;
-        private static string demoFtpPhysicalPath = @"C:\FTP\";
-        private static string demoUploadSourcePath = @"C:\Dev\Demo\";
-        private static string demoOnPremiseSourcePath = @"C:\Dev\Databases\";
-        private static string demoFtpUser = "itay";
-        private static string demoFtpPassword = "dio2008";
-        private static bool allowLocalConnection = false;
-        private static PendingPool azureDatabasePendingPool;
-        private static PendingPool onPremiseDatabasePendingPool;
-        private static string PandingDatabaseSuffix = "Pending";
-        private static bool privateCloud = false;
+     private static string mainAppConfigName = "backand";
+     private static bool hostByUs = false;
+     private static string duradosAppName = "www";
+     private static string demoAzureUsername = "itayher";
+     private static string demoAzurePassword = "Durados2012";
+     private static string demoSqlUsername = "durados";
+     private static string demoSqlPassword = "durados";
+     private static string demoDatabaseName = "Northwind";
+     private static string demoConfigFilename = "Northwind";
+     private static string demoAzureServer = "tcp:d9gwdrhh5n.database.windows.net,1433";
+     private static string demoOnPremiseServer = @"durados.info\sqlexpress";
+     private static bool demoCreatePending = true;
+     private static int demoPendingNext = 5;
+     private static string demoFtpTempHost = "temp";
+     private static string demoFtpHost = "durados.info";
+     private static string demoFtpPort = "21";
+     private static long demoFtpFileSizeLimitKb = 1024;
+     private static long demoFtpFolderSizeLimitKb = 1024;
+     private static string demoFtpPhysicalPath = @"C:\FTP\";
+     private static string demoUploadSourcePath = @"C:\Dev\Demo\";
+     private static string demoOnPremiseSourcePath = @"C:\Dev\Databases\";
+     private static string demoFtpUser = "itay";
+     private static string demoFtpPassword = "dio2008";
+     private static bool allowLocalConnection = false;
+     private static PendingPool azureDatabasePendingPool;
+     private static PendingPool onPremiseDatabasePendingPool;
+     private static string PandingDatabaseSuffix = "Pending";
+     private static bool privateCloud = false;
 
-        private static bool downloadDenyPolicy = true;
-        private static string allowedDownloadFileTypesDefault = "jpg,png,gif,pdf,docx,doc,xls,xlsx,pptx,ppt";
-        private static string denyDownloadFileTypesDefault = "ade,adp,app,bas,bat,chm,cmd,cpl,crt,csh,exe,fxp,hlp,hta,inf,ins,isp,ksh,Lnk,mda,mdb,mde,mdt,mdt,mdw,mdz,msc,msi,msp,mst,ops,pcd,pif,prf,prg,pst,reg,scf,scr,sct,shb,shs,url,vb,vbe,vbs,wsc,wsf,wsh,config,dll";
-        private static string downloadActionName = "Download";
-        private static string azureAppPrefix = "app";
+     private static bool downloadDenyPolicy = true;
+     private static string allowedDownloadFileTypesDefault = "jpg,png,gif,pdf,docx,doc,xls,xlsx,pptx,ppt";
+     private static string denyDownloadFileTypesDefault = "ade,adp,app,bas,bat,chm,cmd,cpl,crt,csh,exe,fxp,hlp,hta,inf,ins,isp,ksh,Lnk,mda,mdb,mde,mdt,mdt,mdw,mdz,msc,msi,msp,mst,ops,pcd,pif,prf,prg,pst,reg,scf,scr,sct,shb,shs,url,vb,vbe,vbs,wsc,wsf,wsh,config,dll";
+     private static string downloadActionName = "Download";
+     private static string azureAppPrefix = "app";
 
-        private static int plugInSampleGenerationCount = 5;
-        private static string superDeveloper = "dev@devitout.com";
-        private static string adminButtonText = "Admin";
-        private static string publicButtonText = "Public";
-        public static bool OldAdminHttp = false;
+     private static int plugInSampleGenerationCount = 5;
+     private static string superDeveloper = "dev@devitout.com";
+     private static string adminButtonText = "Admin";
+     private static string publicButtonText = "Public";
+     public static bool OldAdminHttp = false;
 
-        private static string reservedAppNames = "api";
+     private static string reservedAppNames = "api";
 
-        private Map duradosMap = null;
-        System.Data.SqlClient.SqlConnectionStringBuilder builder = new System.Data.SqlClient.SqlConnectionStringBuilder();
+     private Map duradosMap = null;
+     System.Data.Common.DbConnectionStringBuilder builder = null;
+     public static ISqlMainSchema SqlMainSchema = GetMainAppSqlSchema();
 
-        private static CqlConfig cqlConfig;
-        public static string GetAdminButtonText()
-        {
-            return adminButtonText;
-        }
+     public static ISqlMainSchema GetMainAppSqlSchema()
+     {
+         string connectionString =  System.Configuration.ConfigurationManager.ConnectionStrings["MapsConnectionString"].ConnectionString;
+         if (MySqlAccess.IsMySqlConnectionString(connectionString))
+             return new MySqlMainSchema();
+         else
+             return new SqlMainSchema();
+     }
 
-        public static string GetPublicButtonText()
-        {
-            return publicButtonText;
-        }
+     private static CqlConfig cqlConfig;
+     public static string GetAdminButtonText()
+     {
+         return adminButtonText;
+     }
 
-        public static string GetAdminButtonUrl(Map map)
-        {
-            return "/Home/Default?workspaceId=" + map.Database.GetAdminWorkspaceId() + "&menuId=10001";
-        }
+     public static string GetPublicButtonText()
+     {
+         return publicButtonText;
+     }
 
-        public static string GetPublicButtonUrl(Map map)
-        {
-            return "/Home/Default?workspaceId=" + map.Database.GetPublicWorkspaceId();
-        }
+     public static string GetAdminButtonUrl(Map map)
+     {
+         return "/Home/Default?workspaceId=" + map.Database.GetAdminWorkspaceId() + "&menuId=10001";
+     }
 
-        public static bool IsSuperDeveloper(string userName)
-        {
-            if (string.IsNullOrEmpty(userName) && HttpContext.Current.User != null && HttpContext.Current.User.Identity != null && HttpContext.Current.User.Identity.Name != null)
-                userName = HttpContext.Current.User.Identity.Name;
-            return !string.IsNullOrEmpty(userName) && userName.Equals(SuperDeveloper);
-        }
+     public static string GetPublicButtonUrl(Map map)
+     {
+         return "/Home/Default?workspaceId=" + map.Database.GetPublicWorkspaceId();
+     }
 
-        protected virtual void InitPersistency()
-        {
-            if (multiTenancy)
-            {
+     public static bool IsSuperDeveloper(string userName)
+     {
+         if (string.IsNullOrEmpty(userName) && HttpContext.Current.User != null && HttpContext.Current.User.Identity != null && HttpContext.Current.User.Identity.Name != null)
+             userName = HttpContext.Current.User.Identity.Name;
+         return !string.IsNullOrEmpty(userName) && userName.Equals(SuperDeveloper);
+     }
 
-
-                IPersistency sqlPersistency = GetNewPersistency();
-                sqlPersistency.ConnectionString = System.Configuration.ConfigurationManager.ConnectionStrings["MapsConnectionString"].ConnectionString;
-                if (System.Configuration.ConfigurationManager.ConnectionStrings["SystemMapsConnectionString"] == null)
-                    throw new DuradosException("Please add SystemMapsConnectionString to the web.config connection strings");
-                sqlPersistency.SystemConnectionString = System.Configuration.ConfigurationManager.ConnectionStrings["SystemMapsConnectionString"].ConnectionString;
-
-                persistency = sqlPersistency;
-                builder.ConnectionString = sqlPersistency.ConnectionString;
-
-                Durados.DataAccess.ConfigAccess.storage = new Map();
-                Durados.DataAccess.ConfigAccess.multiTenancy = multiTenancy;
-                Durados.DataAccess.ConfigAccess.cloud = cloud;
+     protected virtual void InitPersistency()
+     {
+         if (multiTenancy)
+         {
 
 
-            }
-        }
+             IPersistency sqlPersistency = GetNewPersistency();
+             sqlPersistency.ConnectionString = System.Configuration.ConfigurationManager.ConnectionStrings["MapsConnectionString"].ConnectionString;
+             if (System.Configuration.ConfigurationManager.ConnectionStrings["SystemMapsConnectionString"] == null)
+                 throw new DuradosException("Please add SystemMapsConnectionString to the web.config connection strings");
+             sqlPersistency.SystemConnectionString = System.Configuration.ConfigurationManager.ConnectionStrings["SystemMapsConnectionString"].ConnectionString;
+
+             persistency = sqlPersistency;
+             builder = GetMapsConnectionStringBuilder(sqlPersistency.ConnectionString);
+
+             Durados.DataAccess.ConfigAccess.storage = new Map();
+             Durados.DataAccess.ConfigAccess.multiTenancy = multiTenancy;
+             Durados.DataAccess.ConfigAccess.cloud = cloud;
+
+
+         }
+     }
+
+     public static System.Data.Common.DbConnectionStringBuilder GetMapsConnectionStringBuilder(string connectionString= null)
+     {
+         connectionString = connectionString ?? Maps.Instance.ConnectionString;
+
+         if (MySqlAccess.IsMySqlConnectionString(connectionString))
+             return new MySql.Data.MySqlClient.MySqlConnectionStringBuilder() { ConnectionString = connectionString };
+            
+         return new System.Data.SqlClient.SqlConnectionStringBuilder() {ConnectionString =  connectionString};
+     }
 
 
 
-        public static string GetPendingDatabase(string template)
-        {
-            string next;
-            if (template == "1")
-                next = azureDatabasePendingPool.Next().ToString();
-            else
-                next = onPremiseDatabasePendingPool.Next().ToString();
-            return demoDatabaseName + PandingDatabaseSuffix + next;
-        }
+     public static string GetPendingDatabase(string template)
+     {
+         string next;
+         if (template == "1")
+             next = azureDatabasePendingPool.Next().ToString();
+         else
+             next = onPremiseDatabasePendingPool.Next().ToString();
+         return demoDatabaseName + PandingDatabaseSuffix + next;
+     }
 
-        public static CqlConfig CqlConfig
-        {
-            get
-            {
-                return cqlConfig;
-            }
-        }
+     public static CqlConfig CqlConfig
+     {
+         get
+         {
+             return cqlConfig;
+         }
+     }
 
-        public virtual IPersistency GetNewPersistency()
-        {
-            return new SqlPersistency();
-        }
+     public virtual IPersistency GetNewPersistency()
+     {
+         return new SqlPersistency();
+     }
 
-        public static bool PrivateCloud
-        {
-            get
-            {
-                return privateCloud;
-            }
-        }
+     public static bool PrivateCloud
+     {
+         get
+         {
+             return privateCloud;
+         }
+     }
 
-        public static bool DropAppDatabase
-        {
-            get
-            {
-                return dropAppDatabase;
-            }
-        }
+     public static bool DropAppDatabase
+     {
+         get
+         {
+             return dropAppDatabase;
+         }
+     }
 
-        public static bool AllowLocalConnection
-        {
-            get
-            {
-                return allowLocalConnection;
-            }
-        }
+     public static bool AllowLocalConnection
+     {
+         get
+         {
+             return allowLocalConnection;
+         }
+     }
 
-        public static string DemoFtpPhysicalPath
-        {
-            get
-            {
-                return demoFtpPhysicalPath;
-            }
-        }
+     public static string DemoFtpPhysicalPath
+     {
+         get
+         {
+             return demoFtpPhysicalPath;
+         }
+     }
 
-        public static string DemoUploadSourcePath
-        {
-            get
-            {
-                return demoUploadSourcePath;
-            }
-        }
+     public static string DemoUploadSourcePath
+     {
+         get
+         {
+             return demoUploadSourcePath;
+         }
+     }
 
 
-        public static string DemoOnPremiseSourcePath
-        {
-            get
-            {
-                return demoOnPremiseSourcePath;
-            }
-        }
+     public static string DemoOnPremiseSourcePath
+     {
+         get
+         {
+             return demoOnPremiseSourcePath;
+         }
+     }
 
-        public static string DemoFtpPassword
-        {
-            get
-            {
-                return demoFtpPassword;
-            }
-        }
+     public static string DemoFtpPassword
+     {
+         get
+         {
+             return demoFtpPassword;
+         }
+     }
 
-        public static string DemoFtpUser
-        {
-            get
-            {
-                return demoFtpUser;
-            }
-        }
+     public static string DemoFtpUser
+     {
+         get
+         {
+             return demoFtpUser;
+         }
+     }
 
-        public static string DemoFtpHost
-        {
-            get
-            {
-                return demoFtpHost;
-            }
-        }
-        public static int PoolCreator
-        {
-            get
-            {
-                return poolCreator;
-            }
-        }
+     public static string DemoFtpHost
+     {
+         get
+         {
+             return demoFtpHost;
+         }
+     }
+     public static int PoolCreator
+     {
+         get
+         {
+             return poolCreator;
+         }
+     }
         
-        public static string RedisConnectionString
-        {
-            get
-            {
-                return redisConnectionString;
-            }
-        }
+     public static string RedisConnectionString
+     {
+         get
+         {
+             return redisConnectionString;
+         }
+     }
 
-        public static string RedisHostAndPort
-        {
-            get
-            {
-                return redisHostAndPort;
-            }
-        }
+     public static string RedisHostAndPort
+     {
+         get
+         {
+             return redisHostAndPort;
+         }
+     }
 
-        public static bool PoolShouldBeUsed
-        {
-            get
-            {
-                return poolShouldBeUsed;
-            }
-        }
-
-
+     public static bool PoolShouldBeUsed
+     {
+         get
+         {
+             return poolShouldBeUsed;
+         }
+     }
 
 
-        public static string DemoFtpPort
-        {
-            get
-            {
-                return demoFtpPort;
-            }
-        }
-
-        public static long DemoFtpFileSizeLimitKb
-        {
-            get
-            {
-                return demoFtpFileSizeLimitKb;
-            }
-        }
-
-        public static long DemoFtpFolderSizeLimitKb
-        {
-            get
-            {
-                return demoFtpFolderSizeLimitKb;
-            }
-        }
-
-        public static string DemoFtpTempHost
-        {
-            get
-            {
-                return demoFtpTempHost;
-            }
-        }
-
-        public static int DemoPendingNext
-        {
-            get
-            {
-                return demoPendingNext;
-            }
-        }
-
-        public static bool DemoCreatePending
-        {
-            get
-            {
-                return demoCreatePending;
-            }
-        }
-
-        public static string DemoConfigFilename
-        {
-            get
-            {
-                return demoConfigFilename;
-            }
-        }
-
-        public static string DemoDatabaseName
-        {
-            get
-            {
-                return demoDatabaseName;
-            }
-        }
-
-        public static string DemoAzureUsername
-        {
-            get
-            {
-                return demoAzureUsername;
-            }
-        }
-
-        public static string DemoAzurePassword
-        {
-            get
-            {
-                return demoAzurePassword;
-            }
-        }
-
-        public static string DemoSqlUsername
-        {
-            get
-            {
-                return demoSqlUsername;
-            }
-        }
-
-        public static string DemoSqlPassword
-        {
-            get
-            {
-                return demoSqlPassword;
-            }
-        }
-
-        public static string DemoAzureServer
-        {
-            get
-            {
-                return demoAzureServer;
-            }
-        }
-
-        public static string DemoOnPremiseServer
-        {
-            get
-            {
-                return demoOnPremiseServer;
-            }
-        }
-
-        public static string Host
-        {
-            get
-            {
-                return host;
-            }
-        }
-
-        public static bool HostByUs
-        {
-            get
-            {
-                return hostByUs;
-            }
-        }
-
-        public static string DuradosAppName
-        {
-            get
-            {
-                return duradosAppName;
-            }
-        }
-
-        public static bool Debug
-        {
-            get
-            {
-                return debug;
-            }
-        }
-
-        public static bool UseSecureConnection
-        {
-            get
-            {
-                return useSecureConnection;
-            }
-        }
-
-        public static int AppNameMax
-        {
-            get
-            {
-                return appNameMax;
-            }
-        }
-
-        public static string SuperDeveloper
-        {
-            get
-            {
-                return superDeveloper;
-            }
-        }
 
 
-        public static int PlugInSampleGenerationCount
-        {
-            get
-            {
-                return plugInSampleGenerationCount;
-            }
-        }
+     public static string DemoFtpPort
+     {
+         get
+         {
+             return demoFtpPort;
+         }
+     }
 
-        public string ConnectionString
-        {
-            get
-            {
-                return persistency.ConnectionString;
-            }
-        }
-        public string SystemConnectionString
-        {
-            get
-            {
-                return persistency.SystemConnectionString;
-            }
-        }
+     public static long DemoFtpFileSizeLimitKb
+     {
+         get
+         {
+             return demoFtpFileSizeLimitKb;
+         }
+     }
 
-        public static bool MultiTenancy
-        {
-            get
-            {
-                return multiTenancy;
-            }
-        }
+     public static long DemoFtpFolderSizeLimitKb
+     {
+         get
+         {
+             return demoFtpFolderSizeLimitKb;
+         }
+     }
 
-        public static bool Skin
-        {
-            get
-            {
-                return skin;
-            }
-        }
+     public static string DemoFtpTempHost
+     {
+         get
+         {
+             return demoFtpTempHost;
+         }
+     }
 
-        public static string DuradosAppSysPrefix
-        {
-            get
-            {
-                return duradosAppSysPrefix;
-            }
-        }
+     public static int DemoPendingNext
+     {
+         get
+         {
+             return demoPendingNext;
+         }
+     }
 
-        public static string DuradosAppPrefix
-        {
-            get
-            {
-                return duradosAppPrefix;
-            }
-        }
+     public static bool DemoCreatePending
+     {
+         get
+         {
+             return demoCreatePending;
+         }
+     }
 
-        public static bool Cloud
-        {
-            get
-            {
-                return cloud;
-            }
-        }
+     public static string DemoConfigFilename
+     {
+         get
+         {
+             return demoConfigFilename;
+         }
+     }
 
-        public static string DownloadActionName
-        {
-            get
-            {
-                return downloadActionName;
-            }
-        }
-        public static string AzureAppPrefix
-        {
-            get
-            {
-                return azureAppPrefix;
-            }
-        }
+     public static string DemoDatabaseName
+     {
+         get
+         {
+             return demoDatabaseName;
+         }
+     }
 
-        public static string GetCurrentAppName()
-        {
-            if (System.Web.HttpContext.Current == null)
-            {
-                return null;
-            }
-            if (System.Web.HttpContext.Current.Items.Contains(Database.AppName))
-            {
-                return System.Web.HttpContext.Current.Items[Database.AppName].ToString();
-            }
+     public static string DemoAzureUsername
+     {
+         get
+         {
+             return demoAzureUsername;
+         }
+     }
 
-            if (System.Web.HttpContext.Current == null)
-                throw new DuradosException("System.Web.HttpContext.Current is null");
-            if (System.Web.HttpContext.Current.Request == null)
-                throw new DuradosException("System.Web.HttpContext.Current.Request is null");
-            if (System.Web.HttpContext.Current.Request.Headers == null)
-                throw new DuradosException("System.Web.HttpContext.Current.Request.Headers is null");
-            if (System.Web.HttpContext.Current.Request.Headers["Host"] == null)
-                throw new DuradosException("System.Web.HttpContext.Current.Request.Headers[\"Host\"] is null");
+     public static string DemoAzurePassword
+     {
+         get
+         {
+             return demoAzurePassword;
+         }
+     }
 
-            string headersHost = System.Web.HttpContext.Current.Request.Headers["Host"];
-            string port = System.Web.HttpContext.Current.Request.Url.Port.ToString();
+     public static string DemoSqlUsername
+     {
+         get
+         {
+             return demoSqlUsername;
+         }
+     }
 
-            if (headersHost.ToLower().Contains(host.ToLower()))
-            {
+     public static string DemoSqlPassword
+     {
+         get
+         {
+             return demoSqlPassword;
+         }
+     }
 
-                return headersHost.Replace("." + host, string.Empty).Replace(":" + port, string.Empty);
-            }
-            else if (DnsAliases.ContainsKey(headersHost.ToLower().Replace(":" + port, string.Empty)))
-            {
-                return DnsAliases[headersHost.ToLower().Replace(":" + port, string.Empty)];
-            }
-            else
-                return null;
-        }
+     public static string DemoAzureServer
+     {
+         get
+         {
+             return demoAzureServer;
+         }
+     }
 
-        public Map DuradosMap
-        {
-            get
-            {
-                return duradosMap;
-            }
-        }
+     public static string DemoOnPremiseServer
+     {
+         get
+         {
+             return demoOnPremiseServer;
+         }
+     }
 
-        public Map GetMap()
-        {
-            if (!multiTenancy)
-            {
-                if (this.map == null)
-                {
-                    this.map = new Map();
-                    this.map.Initiate(false);
-                }
+     public static string Host
+     {
+         get
+         {
+             return host;
+         }
+     }
 
-                return this.map;
-            }
+     public static bool HostByUs
+     {
+         get
+         {
+             return hostByUs;
+         }
+     }
 
-            Map m = GetMap(GetAppName());
+     public static string DuradosAppName
+     {
+         get
+         {
+             return duradosAppName;
+         }
+     }
 
-            if (System.Web.HttpContext.Current != null)
-            {
-                System.Web.HttpContext.Current.Items[Database.AppId] = m.Id;
-            }
+     public static bool Debug
+     {
+         get
+         {
+             return debug;
+         }
+     }
 
-            return m;
-        }
+     public static bool UseSecureConnection
+     {
+         get
+         {
+             return useSecureConnection;
+         }
+     }
 
-        string prevAppName = null;
+     public static int AppNameMax
+     {
+         get
+         {
+             return appNameMax;
+         }
+     }
 
-        public string GetAppName()
-        {
-            try
-            {
-                if (System.Web.HttpContext.Current == null)
-                {
-                    return null;
-                }
+     public static string SuperDeveloper
+     {
+         get
+         {
+             return superDeveloper;
+         }
+     }
 
-                //int l = System.Web.HttpContext.Current.Request.Url.Segments.Length;
 
-                //if (l > 3)
-                //{
+     public static int PlugInSampleGenerationCount
+     {
+         get
+         {
+             return plugInSampleGenerationCount;
+         }
+     }
 
-                //    if (System.Web.HttpContext.Current.Items.Contains("xxxzzzzzzzzz") && System.Web.HttpContext.Current.Request.Url.Segments[l - 2] == "myAppConnection/" && System.Web.HttpContext.Current.Request.HttpMethod == "POST")
-                //    {
-                //        return System.Web.HttpContext.Current.Request.Url.Segments[l - 1];
-                //    }
-                //}
+     public string ConnectionString
+     {
+         get
+         {
+             return persistency.ConnectionString;
+         }
+     }
+     public string SystemConnectionString
+     {
+         get
+         {
+             return persistency.SystemConnectionString;
+         }
+     }
 
-                if (System.Web.HttpContext.Current.Items.Contains(Database.AppName))
-                {
-                    return System.Web.HttpContext.Current.Items[Database.AppName].ToString();
-                }
+     public static bool MultiTenancy
+     {
+         get
+         {
+             return multiTenancy;
+         }
+     }
 
-                string logText = "OriginalString: " + System.Web.HttpContext.Current.Request.Url.OriginalString + "; host:" + System.Web.HttpContext.Current.Request.Headers["Host"] + "; Referer: " + System.Web.HttpContext.Current.Request.Headers["Referer"];
-                string appName = GetCurrentAppName();
-                if (appName == null || prevAppName == null || !appName.Equals(prevAppName))
-                    DuradosMap.Logger.Log("Maps", "GetAppName", appName ?? string.Empty, null, 170, logText);
-                prevAppName = appName;
-                return appName;
-            }
-            catch (Exception exception)
-            {
-                DuradosMap.Logger.Log("Maps", "GetMap", "GetAppName", exception, 5, "");
-                return null;
-            }
-        }
+     public static bool Skin
+     {
+         get
+         {
+             return skin;
+         }
+     }
 
-        private Map map = null;
+     public static string DuradosAppSysPrefix
+     {
+         get
+         {
+             return duradosAppSysPrefix;
+         }
+     }
 
-        private View GetAppView()
-        {
-            return (View)duradosMap.Database.Views["durados_App"];
-        }
+     public static string DuradosAppPrefix
+     {
+         get
+         {
+             return duradosAppPrefix;
+         }
+     }
 
-        /***Return - Plugin Type (Id) or 0 if value wasn't set or exist*/
-        private int GetPluginType(int appId)
-        {
-            SqlAccess sql = new SqlAccess();
+     public static bool Cloud
+     {
+         get
+         {
+             return cloud;
+         }
+     }
 
-            string sSqlCommand = "SELECT     dbo.durados_PlugInSite.PlugInId ";
-            sSqlCommand += "from  dbo.durados_PlugInSite with(nolock), dbo.durados_PlugInSiteApp with(nolock) ";
-            sSqlCommand += "where dbo.durados_PlugInSite.Id = dbo.durados_PlugInSiteApp.PlugInSiteId ";
-            sSqlCommand += " and  dbo.durados_PlugInSiteApp.AppId = " + appId + " ";
+     public static string DownloadActionName
+     {
+         get
+         {
+             return downloadActionName;
+         }
+     }
+     public static string AzureAppPrefix
+     {
+         get
+         {
+             return azureAppPrefix;
+         }
+     }
 
-            object scalar = sql.ExecuteScalar(duradosMap.connectionString, sSqlCommand);
+     public static string GetCurrentAppName()
+     {
+         if (System.Web.HttpContext.Current == null)
+         {
+             return null;
+         }
+         if (System.Web.HttpContext.Current.Items.Contains(Database.AppName))
+         {
+             return System.Web.HttpContext.Current.Items[Database.AppName].ToString();
+         }
 
-            if (scalar.Equals(string.Empty) || scalar == null || scalar == DBNull.Value)
-                return 0;
-            else
-                return Convert.ToInt32(scalar);
-        }
+         if (System.Web.HttpContext.Current == null)
+             throw new DuradosException("System.Web.HttpContext.Current is null");
+         if (System.Web.HttpContext.Current.Request == null)
+             throw new DuradosException("System.Web.HttpContext.Current.Request is null");
+         if (System.Web.HttpContext.Current.Request.Headers == null)
+             throw new DuradosException("System.Web.HttpContext.Current.Request.Headers is null");
+         if (System.Web.HttpContext.Current.Request.Headers["Host"] == null)
+             throw new DuradosException("System.Web.HttpContext.Current.Request.Headers[\"Host\"] is null");
 
-        public int GetPluginSiteId(int appId)
+         string headersHost = System.Web.HttpContext.Current.Request.Headers["Host"];
+         string port = System.Web.HttpContext.Current.Request.Url.Port.ToString();
+
+         if (headersHost.ToLower().Contains(host.ToLower()))
+         {
+
+             return headersHost.Replace("." + host, string.Empty).Replace(":" + port, string.Empty);
+         }
+        /* TODO: Main MySQL depricated
+         else if (DnsAliases.ContainsKey(headersHost.ToLower().Replace(":" + port, string.Empty)))
+         {
+             return DnsAliases[headersHost.ToLower().Replace(":" + port, string.Empty)];
+         }
+        */
+         else
+             return null;
+     }
+
+     public Map DuradosMap
+     {
+         get
+         {
+             return duradosMap;
+         }
+     }
+
+     public Map GetMap()
+     {
+         if (!multiTenancy)
+         {
+             if (this.map == null)
+             {
+                 this.map = new Map();
+                 this.map.Initiate(false);
+             }
+
+             return this.map;
+         }
+
+         Map m = GetMap(GetAppName());
+
+         if (System.Web.HttpContext.Current != null)
+         {
+             System.Web.HttpContext.Current.Items[Database.AppId] = m.Id;
+         }
+
+         return m;
+     }
+
+     string prevAppName = null;
+
+     public string GetAppName()
+     {
+         try
+         {
+             if (System.Web.HttpContext.Current == null)
+             {
+                 return null;
+             }
+
+             //int l = System.Web.HttpContext.Current.Request.Url.Segments.Length;
+
+             //if (l > 3)
+             //{
+
+             //    if (System.Web.HttpContext.Current.Items.Contains("xxxzzzzzzzzz") && System.Web.HttpContext.Current.Request.Url.Segments[l - 2] == "myAppConnection/" && System.Web.HttpContext.Current.Request.HttpMethod == "POST")
+             //    {
+             //        return System.Web.HttpContext.Current.Request.Url.Segments[l - 1];
+             //    }
+             //}
+
+             if (System.Web.HttpContext.Current.Items.Contains(Database.AppName))
+             {
+                 return System.Web.HttpContext.Current.Items[Database.AppName].ToString();
+             }
+
+             string logText = "OriginalString: " + System.Web.HttpContext.Current.Request.Url.OriginalString + "; host:" + System.Web.HttpContext.Current.Request.Headers["Host"] + "; Referer: " + System.Web.HttpContext.Current.Request.Headers["Referer"];
+             string appName = GetCurrentAppName();
+             if (appName == null || prevAppName == null || !appName.Equals(prevAppName))
+                 DuradosMap.Logger.Log("Maps", "GetAppName", appName ?? string.Empty, null, 170, logText);
+             prevAppName = appName;
+             return appName;
+         }
+         catch (Exception exception)
+         {
+             DuradosMap.Logger.Log("Maps", "GetMap", "GetAppName", exception, 5, "");
+             return null;
+         }
+     }
+
+     private Map map = null;
+
+     private View GetAppView()
+     {
+         return (View)duradosMap.Database.Views["durados_App"];
+     }
+
+     /***Return - Plugin Type (Id) or 0 if value wasn't set or exist*/
+     /*
+      * TODO: Main MySQL depricated
+     private int GetPluginType(int appId)
+     {
+         SqlAccess sql = new SqlAccess();
+
+         string sSqlCommand = "SELECT     dbo.durados_PlugInSite.PlugInId ";
+         sSqlCommand += "from  dbo.durados_PlugInSite with(nolock), dbo.durados_PlugInSiteApp with(nolock) ";
+         sSqlCommand += "where dbo.durados_PlugInSite.Id = dbo.durados_PlugInSiteApp.PlugInSiteId ";
+         sSqlCommand += " and  dbo.durados_PlugInSiteApp.AppId = " + appId + " ";
+
+         object scalar = sql.ExecuteScalar(duradosMap.connectionString, sSqlCommand);
+
+         if (scalar.Equals(string.Empty) || scalar == null || scalar == DBNull.Value)
+             return 0;
+         else
+             return Convert.ToInt32(scalar);
+     }
+     
+     public int GetPluginSiteId(int appId)
         {
             SqlAccess sql = new SqlAccess();
 
@@ -1330,11 +1356,13 @@ namespace Durados.Web.Mvc
             else
                 return Convert.ToInt32(scalar);
         }
-        private View GetDnsAliasView()
-        {
-            return (View)duradosMap.Database.Views["durados_DnsAlias"];
-        }
-
+      */
+        /* TODO: Main MySQL depricated
+       private View GetDnsAliasView()
+       {
+           return (View)duradosMap.Database.Views["durados_DnsAlias"];
+       }
+       */
 
         public void Rename(string oldAppName, string newAppName)
         {
@@ -1657,12 +1685,12 @@ namespace Durados.Web.Mvc
             //Durados.Diagnostics.EventViewer.WriteEvent("appRow found for: " + appName + " id: " + id, System.Diagnostics.EventLogEntryType.SuccessAudit, 500);
 
             Map map = new Map();
-
+            /* TODO: Main MySQL depricated
             map.PlugInId = GetPluginType((int)id);/***Return - Plugin Type (Id) or 0 if value wasn't set or exist*/
 
             //map.connectionString = persistency.GetConnection(appRow, builder).ToString();
 
-            int sqlProduct = 1;
+            int sqlProduct = 3;
             int systemSqlProduct = 1;
             if (appRow.durados_SqlConnectionRowByFK_durados_App_durados_SqlConnection == null)
                 throw new DuradosException("The app " + appName + " is not connected. Please connect your app.");
@@ -1781,7 +1809,7 @@ namespace Durados.Web.Mvc
             map.Environment = appRow.IsEnvironmentNull() ? null : appRow.Environment;
             map.EnvVar = appRow.IsEnvVarNull() ? null : appRow.EnvVar;
             map.LoadLimits();
-
+            /* TODO: Main MySQL depricated
             int themeId = 0;
             string themeName = "";
             string themePath = "";
@@ -1800,10 +1828,12 @@ namespace Durados.Web.Mvc
             }
 
             map.Theme = new Theme() { Id = themeId, Name = themeName, Path = themePath };
+             * */
             if (firstTime && Convert.ToBoolean(System.Configuration.ConfigurationManager.AppSettings["NotifyUserOnConsoleReady"] ?? "true"))
                 map.NotifyUser("consoleFirstTimeSubject", "consoleFirstTimeMessage");
-
-            RefreshMapDnsAlias(map);
+            /* TODO: Main MySQL depricated
+           RefreshMapDnsAlias(map);
+           */
             UpdatePlan(appRow.Id, map);
 
             newStructure = map.SaveChangesInConfigStructure();
@@ -1828,7 +1858,7 @@ namespace Durados.Web.Mvc
 
             return map;
         }
-
+        /* TODO: Main MySQL depricated
         private MapDataSet.durados_ThemeRow defaultThemeRow = null;
 
         public const int DefaultThemeId = 2;
@@ -1842,7 +1872,7 @@ namespace Durados.Web.Mvc
 
             return defaultThemeRow;
         }
-
+        
         public string GetAppThemePath(string appName)
         {
             if (string.IsNullOrEmpty(appName))
@@ -1888,14 +1918,14 @@ namespace Durados.Web.Mvc
                 return GetTheme(themeId).RelativePath;
             }
         }
-
+        
         public MapDataSet.durados_ThemeRow GetTheme(int? themeId = DefaultThemeId)
         {
             if (!themeId.HasValue)
                 themeId = DefaultThemeId;
             return (MapDataSet.durados_ThemeRow)duradosMap.Database.Views["durados_Theme"].GetDataRow(themeId.ToString());
         }
-
+        */
         public int AssignLocalPort()
         {
             return portManager.Assign();
@@ -1903,10 +1933,10 @@ namespace Durados.Web.Mvc
 
         public void UpdatePlan(int appId, Map map)
         {
-            string sql = "select top(1) PlanId from durados_AppPlan where AppId=" + appId + " order by PurchaseDate desc";
+            string sql = GetMainAppSqlSchema().GetPlanForAppSql(appId);
             try
             {
-                string scalar = (new SqlAccess()).ExecuteScalar(duradosMap.connectionString, sql);
+                string scalar = GetMainAppSqlAccess().ExecuteScalar(duradosMap.connectionString, sql);
                 if (string.IsNullOrEmpty(scalar))
                     map.Plan = 0;
                 else
@@ -1918,22 +1948,22 @@ namespace Durados.Web.Mvc
             }
 
         }
+        /* TODO: Main MySQL depricated
+       private void RefreshMapDnsAlias(Map map)
+       {
+           int rowCount = 0;
+           Dictionary<string, object> values = new Dictionary<string, object>();
 
-        private void RefreshMapDnsAlias(Map map)
-        {
-            int rowCount = 0;
-            Dictionary<string, object> values = new Dictionary<string, object>();
+           View dnsAliasView = GetDnsAliasView();
 
-            View dnsAliasView = GetDnsAliasView();
-
-            DataView dnsAliasDataView = dnsAliasView.FillPage(1, 10000, values, null, null, out rowCount, null, null);
-            map.Aliases.Clear();
-            foreach (System.Data.DataRowView dnsAliasRow in dnsAliasDataView)
-            {
-                map.Aliases.Add(dnsAliasRow["Alias"].ToString());
-            }
-        }
-
+           DataView dnsAliasDataView = dnsAliasView.FillPage(1, 10000, values, null, null, out rowCount, null, null);
+           map.Aliases.Clear();
+           foreach (System.Data.DataRowView dnsAliasRow in dnsAliasDataView)
+           {
+               map.Aliases.Add(dnsAliasRow["Alias"].ToString());
+           }
+       }
+       */
         public bool AppInCach(string appName)
         {
             return mapsCache.ContainsKey(appName);
@@ -2008,7 +2038,7 @@ namespace Durados.Web.Mvc
 
         public string GetAppNameByGuidFromDb(string guid)
         {
-            SqlAccess sql = new SqlAccess();
+            SqlAccess sqlAccess = GetMainAppSqlAccess();
             string sSqlCommand = "";
 
             Guid parsedGuid;
@@ -2017,9 +2047,9 @@ namespace Durados.Web.Mvc
                 throw new ArgumentException("Illegal token");
             }
 
-            sSqlCommand = "select [name] from durados_App with(nolock) where [Guid] = '" + guid + "'";
+            sSqlCommand = Maps.GetMainAppSqlSchema().GetAppNameByGuidFromDb(guid);
 
-            object scalar = sql.ExecuteScalar(duradosMap.connectionString, sSqlCommand);
+            object scalar = sqlAccess.ExecuteScalar(duradosMap.connectionString, sSqlCommand);
 
             if (scalar.Equals(string.Empty) || scalar == null || scalar == DBNull.Value)
                 return null;
@@ -2044,10 +2074,10 @@ namespace Durados.Web.Mvc
             }
             try
             {
-                SqlAccess sql = new SqlAccess();
-                string sSqlCommand = "select PaymentStatus from durados_App with(nolock) where Name = N'" + appName + "'";
+                SqlAccess sqlAccess = GetMainAppSqlAccess();
+                string sSqlCommand = GetMainAppSqlSchema().GetPaymentStatusSql(appName); 
 
-                object scalar = sql.ExecuteScalar(duradosMap.connectionString, sSqlCommand);
+                object scalar = sqlAccess.ExecuteScalar(duradosMap.connectionString, sSqlCommand);
 
                 if (scalar.Equals(string.Empty) || scalar == null || scalar == DBNull.Value)
                     return Billing.PaymentStatus.Active;
@@ -2060,23 +2090,29 @@ namespace Durados.Web.Mvc
             }
         }
 
+        //private SqlAccess GetMainAppSqlAccess()
+        //{
+        //    return (DuradosMap as DuradosMap).GetSqlAccess();
+        //}
+
 
         public int? AppExists(string appName, int? userId = null, bool ignoreDevUser = false)
         {
-            SqlAccess sql = new SqlAccess();
+            SqlAccess sqlAccess = GetMainAppSqlAccess();
+            ISqlMainSchema sqlMain = GetMainAppSqlSchema();
             string sSqlCommand = "";
 
             if (!userId.HasValue || (IsDevUser() && !ignoreDevUser))
             {
-                sSqlCommand = "select Id from durados_App with(nolock) where Name = N'" + appName + "'";
+                sSqlCommand = sqlMain.GetAppsExistsSql(appName); 
             }
             else
             {
-                sSqlCommand = "SELECT dbo.durados_App.Id FROM dbo.durados_App with(nolock), dbo.durados_UserApp with(nolock) where (dbo.durados_App.Name = N'" + appName + "' and ((dbo.durados_UserApp.UserId=" + userId + " and dbo.durados_UserApp.AppId = dbo.durados_App.Id) or dbo.durados_App.Creator=" + userId + ") ) group by(dbo.durados_App.Id)";
-                /*"SELECT dbo.durados_App.Id FROM dbo.durados_App with(nolock) INNER JOIN dbo.durados_UserApp with(nolock) ON dbo.durados_App.Id = dbo.durados_UserApp.AppId WHERE (dbo.durados_App.Name = N'" + appName + "' and dbo.durados_UserApp.UserId = "+userId+")";*/
+                sSqlCommand = sqlMain.GetAppsExistsForUserSql(appName, userId);
+                
             }
 
-            object scalar = sql.ExecuteScalar(duradosMap.connectionString, sSqlCommand);
+            object scalar = sqlAccess.ExecuteScalar(duradosMap.connectionString, sSqlCommand);
 
             if (scalar.Equals(string.Empty) || scalar == null || scalar == DBNull.Value)
                 return null;
@@ -2113,6 +2149,10 @@ namespace Durados.Web.Mvc
         public static string GetMainAppUrl()
         {
             return GetAppUrl(duradosAppName);
+        }
+        public static SqlAccess GetMainAppSqlAccess()
+        {
+            return (Maps.Instance.DuradosMap as DuradosMap).GetSqlAccess();
         }
 
         public static string GetmainAppConfigName()
@@ -2244,11 +2284,12 @@ namespace Durados.Web.Mvc
                 return Convert.ToInt16(HttpContext.Current.Session["AppAcount"]);
             try
             {
-                using (SqlConnection connection = new SqlConnection(System.Configuration.ConfigurationManager.ConnectionStrings["MapsConnectionString"].ConnectionString))
+                ISqlMainSchema sqlMain = GetMainAppSqlSchema();
+                using (IDbConnection connection = sqlMain.GetNewConnection(System.Configuration.ConfigurationManager.ConnectionStrings["MapsConnectionString"].ConnectionString))
                 {
                     connection.Open();
-                    string sql = "SELECT count(*) FROM dbo.durados_App a with(nolock) INNER JOIN dbo.durados_PlugInInstance p with(nolock) ON a.id = p.Appid WHERE Deleted =0 and p.selected=1";
-                    using (SqlCommand command = new SqlCommand(sql, connection))
+                    string sql = sqlMain.GetAppsCountsql(); 
+                    using (IDbCommand command = sqlMain.GetNewCommand(sql, connection))
                     {
                         object scalar = command.ExecuteScalar();
                         appCount = Convert.ToInt16(scalar);
@@ -2269,9 +2310,10 @@ namespace Durados.Web.Mvc
 
         public int? GetConnection(string server, string catalog, string username, string userId)
         {
-            SqlAccess sql = new SqlAccess();
+            SqlAccess sqlAccess = GetMainAppSqlAccess();
+            string sql = GetMainAppSqlSchema().GetCurrentAppIdSql(server, catalog, username, userId);
 
-            object scalar = sql.ExecuteScalar(duradosMap.connectionString, string.Format("select Id from durados_SqlConnection where ServerName=N'{0}' and Catalog=N'{1}' and Username=N'{2}' and DuradosUser={3}", server, catalog, username, userId));
+            object scalar = sqlAccess.ExecuteScalar(duradosMap.connectionString, sql);
 
             if (string.Empty.Equals(scalar) || scalar == null || scalar == DBNull.Value)
                 return null;
@@ -2315,18 +2357,26 @@ namespace Durados.Web.Mvc
 
         public static SqlProduct GetSqlProduct(string appName)
         {
+
             if (string.IsNullOrEmpty(appName) || appName == duradosAppName)
-                return SqlProduct.SqlServer;
+                return Maps.Instance.DuradosMap.SqlProduct;
 
             if (!appsSqlProducts.ContainsKey(appName))
             {
-                using (SqlConnection connection = new SqlConnection(System.Configuration.ConfigurationManager.ConnectionStrings["MapsConnectionString"].ConnectionString))
+                ISqlMainSchema sqlMain = GetMainAppSqlSchema();
+                string sql1 = SqlMainSchema.InsertNewUserSql("durados_User", "durados_User");
+                using (IDbConnection connection = sqlMain.GetNewConnection(System.Configuration.ConfigurationManager.ConnectionStrings["MapsConnectionString"].ConnectionString))
                 {
                     connection.Open();
-                    string sql = "SELECT dbo.durados_SqlConnection.SqlProductId FROM dbo.durados_App with(nolock) INNER JOIN dbo.durados_SqlConnection with(nolock) ON dbo.durados_App.SqlConnectionId = dbo.durados_SqlConnection.Id WHERE (dbo.durados_App.Name = @AppName)";
-                    using (SqlCommand command = new SqlCommand(sql, connection))
+                    string sql = sqlMain.GetSqlProductSql();
+                    using (IDbCommand command = sqlMain.GetNewCommand(sql, connection))
                     {
-                        command.Parameters.AddWithValue("@AppName", appName);
+                        var parameter = command.CreateParameter();
+                        parameter.ParameterName = "@AppName";
+                        parameter.Value = appName;
+
+                        command.Parameters.Add(parameter);
+                        
                         object scalar = command.ExecuteScalar();
                         if (scalar == null || scalar == DBNull.Value)
                         {

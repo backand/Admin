@@ -19,6 +19,7 @@ using Durados.Web.Mvc.Farm;
 using Durados.Data;
 using Durados.Web.Mvc.Webhook;
 using BackAnd.Web.Api.Controllers.Admin;
+using System.Data;
 /*
  HTTP Verb	|Entire Collection (e.g. /customers)	                                                        |Specific Item (e.g. /customers/{id})
 -----------------------------------------------------------------------------------------------------------------------------------------------
@@ -368,6 +369,7 @@ namespace BackAnd.Web.Api.Controllers
                 const string Name = "Name";
                 const string Title = "Title";
                 const string Environment = "Environment";
+                
 
 
                 if (values.ContainsKey(Name))
@@ -405,6 +407,7 @@ namespace BackAnd.Web.Api.Controllers
                 values.Add(Creator, view.Database.GetUserID());
                 values.Add(DatabaseStatus, (int)OnBoardingStatus.NotStarted);
 
+                
                 appName = values[Name].ToString();
 
                 string key = view.Create(values, false, view_BeforeCreate, view_BeforeCreateInDatabase, view_AfterCreateBeforeCommit, view_AfterCreateAfterCommit);
@@ -413,6 +416,7 @@ namespace BackAnd.Web.Api.Controllers
 
                 return Ok(new { __metadata = new { id = key, appName = appName } });
             }
+                // TODO : Mysql deprecated
             catch (System.Data.SqlClient.SqlException exception)
             {
                 const int DuplicateUniqueIndex = 2601;
@@ -463,8 +467,8 @@ namespace BackAnd.Web.Api.Controllers
 
         private string[] GetAppNamesWithPrefix(string appNamePrefix)
         {
-            SqlAccess sqlAccess = new SqlAccess();
-            string sql = "select name from durados_app where name like '" + appNamePrefix + "%'";
+            SqlAccess sqlAccess = Maps.GetMainAppSqlAccess();
+            string sql = Maps.GetMainAppSqlSchema().GetAppNamesWithPrefixSql(appNamePrefix);
             System.Data.DataTable table = sqlAccess.ExecuteTable(Maps.Instance.DuradosMap.connectionString, sql, null, System.Data.CommandType.Text);
             List<string> list = new List<string>();
 
@@ -784,8 +788,12 @@ namespace BackAnd.Web.Api.Controllers
             {
                 int id = Convert.ToInt32(e.PrimaryKey);
 
-                System.Data.SqlClient.SqlConnectionStringBuilder scsb = new System.Data.SqlClient.SqlConnectionStringBuilder(Maps.Instance.ConnectionString);
-                string mapServer = scsb.DataSource;
+                SqlAccess sqlAccess = Maps.GetMainAppSqlAccess();
+                SqlSchema sqlSchema = sqlAccess.GetNewSqlSchema();
+
+
+                string mapServer = sqlSchema.GetServerName(Maps.Instance.ConnectionString);
+
                 MapDataSet.durados_SqlConnectionRow systemConnectionRow = ((MapDataSet.durados_AppRow)e.PrevRow).durados_SqlConnectionRowByFK_durados_App_durados_SqlConnection_System;
                 if (systemConnectionRow != null)
                 {
@@ -829,9 +837,13 @@ namespace BackAnd.Web.Api.Controllers
 
         private bool HasOtherConnectios(string appDatabase)
         {
-            using (System.Data.SqlClient.SqlConnection connection = new System.Data.SqlClient.SqlConnection(Maps.Instance.ConnectionString))
+            ISqlMainSchema sqlSchema= Maps.GetMainAppSqlSchema();
+            string sql = sqlSchema.GetHasOtherConnectiosSql(appDatabase);
+
+            using (IDbConnection connection = sqlSchema.GetNewConnection(Maps.Instance.ConnectionString))
             {
-                using (System.Data.SqlClient.SqlCommand command = new System.Data.SqlClient.SqlCommand("select count(*) from dbo.durados_SqlConnection where [Catalog] = N'" + appDatabase + "'", connection))
+                
+                using (IDbCommand command = sqlSchema.GetNewCommand( sql,connection))
                 {
                     connection.Open();
                     object scalar = command.ExecuteScalar();
@@ -845,12 +857,17 @@ namespace BackAnd.Web.Api.Controllers
 
         private void DropDatabase(string name)
         {
-            System.Data.SqlClient.SqlConnectionStringBuilder scsb = new System.Data.SqlClient.SqlConnectionStringBuilder(Maps.Instance.ConnectionString);
+
+            //System.Data.Common.DbConnectionStringBuilder scsb = Maps.GetMapsConnectionStringBuilder(Maps.Instance.ConnectionString);
             //scsb.InitialCatalog = null;
 
-            using (System.Data.SqlClient.SqlConnection connection = new System.Data.SqlClient.SqlConnection(scsb.ConnectionString))
+
+            ISqlMainSchema sqlSchema = Maps.GetMainAppSqlSchema();
+            string sql = sqlSchema.GetDropDatabaseSql(name);
+            using (IDbConnection connection = sqlSchema.GetNewConnection(Maps.Instance.ConnectionString))
             {
-                using (System.Data.SqlClient.SqlCommand command = new System.Data.SqlClient.SqlCommand("ALTER DATABASE " + name + " SET SINGLE_USER WITH ROLLBACK IMMEDIATE; drop database " + name, connection))
+
+                using (IDbCommand command = sqlSchema.GetNewCommand(sql, connection))
                 {
                     connection.Open();
                     command.ExecuteNonQuery();

@@ -82,7 +82,7 @@ namespace Durados.DataAccess
         //    {
         //        value = (Convert.ToBoolean(value) ? 1 : 0).ToString();
         //    }
-            
+
 
         //    return Convert.ChangeType(value, dataColumn.DataType);
         //}
@@ -92,7 +92,7 @@ namespace Durados.DataAccess
             return new MySqlTextBuilder().GetPointFieldStatement(field.View.DataTable.TableName, field.GetColumnsNames()[0]);
             //return string.Format("AsText(`{0}`.`{1}`) as `{1}`", field.View.DataTable.TableName, field.GetColumnsNames()[0]);
         }
-       
+
         protected override System.Data.IDataAdapter GetNewAdapter(System.Data.IDbCommand command)
         {
             if (command is MySqlCommand)
@@ -235,7 +235,7 @@ namespace Durados.DataAccess
             }
         }
 
-        
+
         public override void DeleteDatabase(string connectionString, string catalog)
         {
 
@@ -287,11 +287,16 @@ namespace Durados.DataAccess
             {
                 Console.WriteLine(e.ToString());
                 throw new DuradosException("Failed to copy MySQL database " + sourceDatabaseName + " to " + targetDatabaseName);
-            } 
+            }
         }
+
+        public override SqlProduct GetSqlProduct()
+        {
+            return SqlProduct.MySql;
+
+        }
+
     }
-
-
     public class MySqlTextBuilder : SqlTextBuilder
     {
         public override string FromDual()
@@ -403,6 +408,25 @@ namespace Durados.DataAccess
         {
             return string.Format("CONCAT(X(`{0}`.`{1}`), \", \", Y(`{0}`.`{1}`))  as `{1}`", tableName, fieldName);
            
+        }
+
+        public override string GetEncryptedColumnsStatement(string encryptedName, string databaseNames)
+        {
+            return string.Format(" {0} AS {1}, ", encryptedName, databaseNames);
+        }
+
+        public override string GetCloseCertificatesStatement()
+        {
+            return string.Empty;
+        }
+        public override string GetOpenCertificatesStatement()
+        {
+            return string.Empty;
+        }
+
+        public override string GetDbEncrypytedColumnSql(string symetricKeyName, string columnName)
+        {
+            return columnName;
         }
     }
 
@@ -874,5 +898,224 @@ namespace Durados.DataAccess
                                         "WHERE  (ViewName = @ViewName) AND (PK = @PK) AND (FieldName = @FieldName) AND (NewValueKey = @NewValue) LIMIT 0,1 " +
                                         "ORDER BY UpdateDate DESC";
         }
+    }
+
+
+    public class MySqlMainSchema : SqlMainSchema
+    {
+        public override IDbConnection GetNewConnection()
+        {
+            return new MySqlConnection();
+        }
+        public override IDbConnection GetNewConnection(string connectionString)
+        {
+            return new MySqlConnection(connectionString);
+        }
+
+        public override IDbCommand GetNewCommand()
+        {
+            return new MySqlCommand();
+        }
+        public override IDbCommand GetNewCommand(string sql, IDbConnection connection)
+        {
+            return new MySqlCommand(sql, (MySqlConnection)connection);
+        }
+        public override string GetEmailBySocialIdSql()
+        {
+            return "SELECT UserId FROM  durados_UserSocial WHERE Provider = @Provider AND SocialId = @SocialId AND AppId = @AppId";
+        }
+
+        public override string GetEmailBySocialIdSql2()
+        {
+            return "SELECT UserId FROM  durados_UserSocial WHERE Provider = @Provider AND SocialId = @SocialId AND AppId is null";
+        }
+
+        public override string GetSocialIdlByEmail()
+        {
+            return "SELECT SocialId FROM  durados_UserSocial   WHERE Provider = @Provider AND UserId = @UserId AND AppId = @AppId";
+        }
+
+        public override string GetSocialIdlByEmail2()
+        {
+            return "SELECT SocialId FROM  durados_UserSocial   WHERE Provider = @Provider AND UserId = @UserId AND AppId is null";
+        }
+
+        public override string InsertNewUserSql(string tableName, string userTable)
+        {
+            return "INSERT INTO `" + userTable + "` (`Username`,`FirstName`,`LastName`,`Email`,`Role`,`Guid`) SELECT * FROM (SELECT @Username as UserName,@FirstName AS FirstName,@LastName AS LastName,@Email AS Email,@Role AS Role,@Guid AS Guid)  AS tmp WHERE  NOT EXISTS (SELECT `Username` FROM   `" + tableName + "` WHERE `Username` = @Username) ";
+            
+            
+        }
+
+        public override string GetInsertUserAppSql()
+        {
+            return "INSERT INTO `durados_UserApp` (`UserId`,`AppId`,`Role`) VALUES (@UserId,@AppId,@Role)";
+        }
+
+        public override string GetUserSql()
+        {
+            return "SELECT  `durados_user`.`id` FROM  durados_user WHERE `durados_user`.`username`=@username LIMIT 1";
+        }
+
+        public override string GetUserTempTokenSql()
+        {
+            return "SELECT Id FROM  `durados_ValidGuid`    WHERE UserGuid=@UserGuid AND Used=0 LIMIT 1";
+        }
+
+        public override string GetUserNameByGuidSql()
+        {
+            return "SELECT username FROM  durados_user    WHERE guid=@guid  LIMIT 1";
+        }
+
+        public override string GetDeleteUserSql()
+        {
+            return "DELETE FROM  durados_user WHERE `username`=@username";
+        }
+
+        public override string GetUserBelongToMoreThanOneAppSql()
+        {
+            return "SELECT id FROM  durados_userapp WHERE `userid`=@userid AND appid<>@appid";
+        }
+
+        public override string GetHasAppsSql()
+        {
+            return string.Format("SELECT id FROM  durados_app    WHERE creator=@id  LIMIT 1");
+        }
+
+        public override string GetInviteAdminBeforeSignUpSql(string username, string appId)
+        {
+            return string.Format("INSERT into durados_Invite (username, appId) values ('{0}', {1})", username, appId);
+        }
+
+        public override string GetInviteAdminAfterSignupSql(string username)
+        {
+            return string.Format("SELECT appId FROM  durados_Invite WHERE username = '{0}'", username);
+        }
+
+        public override string GetInviteAdminAfterSignupSql(int userId, string appId, string role)
+        {
+            return string.Format("INSERT into durados_UserApp (UserId, AppId, Role) values ({0},{1},'{2}')", userId, appId, role);
+        }
+
+        public override string GetDeleteInviteUser(string username)
+        {
+            return string.Format("DELETE FROM durados_Invite WHERE Username = '{0}'", username);
+        }
+
+        public override string GetWakeupCallToAppSql()
+        {
+            return "SELECT Id,Url FROM durados_App  WHERE `Creator` IS NULL";
+        }
+
+        public override string GetAppsCountsql()
+        {
+            return "SELECT COUNT(*) FROM durados_App a  INNER JOIN durados_PlugInInstance p  ON a.id = p.Appid WHERE Deleted =0 AND p.selected=1";
+        }
+
+        public override string GetSqlProductSql()
+        {
+            return "SELECT durados_SqlConnection.SqlProductId FROM durados_App  INNER JOIN durados_SqlConnection  ON durados_App.SqlConnectionId = durados_SqlConnection.Id WHERE (durados_App.Name = @AppName)";
+        }
+
+
+        public override string GetAppsExistsSql(string appName)
+        {
+            return "SELECT Id FROM durados_App  WHERE Name = N'" + appName + "'";
+        }
+
+        public override string GetAppsExistsForUserSql(string appName, int? userId)
+        {
+            
+            return "SELECT durados_App.Id,Name FROM durados_App  LEFT JOIN durados_UserApp ON  durados_UserApp.AppId = durados_App.Id WHERE (durados_App.Name = N'" + appName + "' and (durados_UserApp.UserId=" + userId + "  or durados_App.Creator=" + userId + ") ) GROUP BY(durados_App.Id)";
+        }
+
+
+
+        public override string GetPaymentStatusSql(string appName)
+        {
+            return "SELECT PaymentStatus FROM durados_App  WHERE Name = N'" + appName + "'";
+        }
+
+        public override string GetCurrentAppIdSql(string server, string catalog, string username, string userId)
+        {
+            return string.Format("SELECT Id FROM durados_SqlConnection WHERE ServerName=N'{0}' AND Catalog=N'{1}' AND Username=N'{2}' AND DuradosUser={3}", server, catalog, username, userId);
+        }
+
+
+        public override string GetPlanForAppSql(int appId)
+        {
+            return "SELECT PlanId FROM durados_AppPlan WHERE AppId=" + appId + " ORDER BY PurchaseDate DESC LIMIT 1";
+        }
+
+
+        public override string GetFindAndUpdateAppInMainSql(int? templateId)
+        {
+            return
+            "START TRANSACTION; " +
+                  
+                    "SELECT  @app_id  :=`Id` FROM durados_App  WHERE  TemplateId " + (templateId.HasValue ? " = " + templateId.Value : " is null ").ToString() + " AND creator = @poolCreator and DatabaseStatus = 1 ORDER BY id ASC LIMIT 1 FOR UPDATE;  " +
+                    "DELETE FROM durados_App WHERE  `Name` = @Name;  " +
+                    "UPDATE durados_App  " +
+                    "SET creator = @creator,  " +
+                    "`CreatedDate` = @CreatedDate, " +
+                    "`Name` = @Name,  " +
+                    "`Title` = @Title  " +
+                    "WHERE  id = @app_id ; " +
+                    "SELECT @app_id  ; " +
+                    "COMMIT ;";
+        }
+
+        public override string GetAppNameByGuidFromDb(string guid)
+        {
+            return "SELECT `name` FROM durados_App ` WHERE  `Guid` = '" + guid + "'";
+        }
+        public override string GetAppNamesWithPrefixSql(string appNamePrefix)
+        {
+            return "SELECT name FROM durados_app WHERE  name LIKE '" + appNamePrefix + "%'";
+        }
+
+        public override string GetDropDatabaseSql(string name)
+        {
+            return "SET FOREIGN_KEY_CHECKS=0;ALTER DATABASE " + name + " SET SINGLE_USER WITH ROLLBACK IMMEDIATE; DROP DATABASE `" + name + "`; SET FOREIGN_KEY_CHECKS=0;";
+        }
+
+
+        public override string GetHasOtherConnectiosSql(string appDatabase)
+        {
+            return "SELECT COUNT(*) FROM durados_SqlConnection WHERE  `Catalog` = N'" + appDatabase + "'";
+        }
+
+
+        public override string GetUpdateLogModelExceptionSql()
+    {
+        return "UPDATE `backand_model` SET errorMessage = @errorMessage, errorTrace = @errorTrace WHERE id=@id";
+    }
+
+        public override string GetSaveChangesIndicationFromDb2(string Id)
+        {
+            return "SELECT ConfigChangesIndication FROM durados_App  WHERE id = " + Id;
+        }
+
+        public override string GetSetSaveChangesIndicationFromDbSql(int config, string Id)
+        {
+            return "UPDATE durados_App SET ConfigChangesIndication = " + config + " WHERE id = " + Id;
+        }
+
+
+        public override string GetLogModelSql()
+        {
+            return "INSERT INTO `backand_model` (`appName`, `username`, `timestamp`, `input`, `output`, `valid`, `action`) values (@appName, @username, @timestamp, @input, @output, @valid, @action); SELECT LAST_INSERT_ID() AS ID;";
+        }
+
+        public override string GetAppLimitSql(string Id)
+        {
+            return "SELECT  Name, Limit FROM durados_AppLimits ` WHERE AppId = " + Id;
+        }
+
+        public override string GetDeleteUserSql(int userId, string appId)
+        {
+            return string.Format("DELETE durados_UserApp WHERE UserId = {0} AND AppId = {1}");
+        }
+
     }
 }

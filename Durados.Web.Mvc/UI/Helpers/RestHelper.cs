@@ -6625,20 +6625,10 @@ namespace Durados.Web.Mvc.UI.Helpers
 
         private int? FindAndUpdateAppInMain(string appName, string title, int creator, int poolCreator, string connectionString, int? templateId)
         {
-            string sql =
-                "begin tran getFromPool " +
-                "declare @appId int " +
-                "select top(1) @appId = id from durados_App with(UPDLOCK) where TemplateId " + (templateId.HasValue ? " = " + templateId.Value : " is null ").ToString() + " and creator = @poolCreator and DatabaseStatus = 1 order by id asc; " +
-                "delete from durados_App where [Name] = @Name; " +
-                "update durados_App " +
-                "set creator = @creator, " +
-                "[CreatedDate] = @CreatedDate, " +
-                "[Name] = @Name, " +
-                "[Title] = @Title " +
-                "where id = @appId; " +
-                "select @appId " +
-                "commit tran getFromPool";
-            string scalar = new SqlAccess().ExecuteScalar(connectionString, sql, new Dictionary<string, object>() { { "poolCreator", poolCreator }, { "creator", creator }, { "CreatedDate", DateTime.Now }, { "Name", appName }, { "Title", title } });
+            SqlAccess sqlAccess = Maps.GetMainAppSqlAccess();
+            string varConnectionString = string.Format("{0}{1};", connectionString,"Allow User Variables=True");
+            string sql = Maps.GetMainAppSqlSchema().GetFindAndUpdateAppInMainSql(templateId); 
+            string scalar = sqlAccess.ExecuteScalar(varConnectionString, sql, new Dictionary<string, object>() { { "poolCreator", poolCreator }, { "creator", creator }, { "CreatedDate", DateTime.Now }, { "Name", appName }, { "Title", title } });
             if (!string.IsNullOrEmpty(scalar))
             {
                 return Convert.ToInt32(scalar);

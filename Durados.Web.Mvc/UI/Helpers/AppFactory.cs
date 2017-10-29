@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Durados.DataAccess;
+using System.Data.Common;
 
 namespace Durados.Web.Mvc.UI.Helpers
 {
@@ -15,13 +16,9 @@ namespace Durados.Web.Mvc.UI.Helpers
         
         public  NewDatabaseParameters GetNewExternalDBParameters(Durados.SqlProduct sqlProduct, string id, out string server,out int port,string sampleApp)//, out string catalog
         {
-            // set all the database parameters for the createapp
-
-                Durados.Web.Mvc.UI.Helpers.NewDatabaseParameters newDbParameters = new Durados.Web.Mvc.UI.Helpers.RDSNewDatabaseFactory().GetNewParameters(sqlProduct, id);
-            //catalog = newDbParameters.DbName;
+            Durados.Web.Mvc.UI.Helpers.NewDatabaseParameters newDbParameters = new Durados.Web.Mvc.UI.Helpers.RDSNewDatabaseFactory().GetNewParameters(sqlProduct, id);
+            
             CreateNewSchemaAndUser(sqlProduct, out server,out port, newDbParameters,sampleApp);
-            //server =  newDbParameters.InstanceName; //System.Configuration.ConfigurationManager.AppSettings["AWSServer"]??".";//aws database server
-            //catalog = sqlProduct == Durados.SqlProduct.SqlServer ? newDbParameters.InstanceName : newDbParameters.DbName;
             return newDbParameters;
 
         }
@@ -116,7 +113,7 @@ namespace Durados.Web.Mvc.UI.Helpers
             port = 0;
             string spName = "durados_GetExternalAvailableInstance";
             int? connectionId= null;
-            using (System.Data.IDbConnection cnn = Durados.DataAccess.DataAccessObject.GetNewConnection(SqlProduct.SqlServer, Maps.Instance.ConnectionString))
+            using (System.Data.IDbConnection cnn = Maps.GetMainAppSqlSchema().GetNewConnection(Maps.Instance.ConnectionString))
             {
                 using (DuradosCommand command = new DuradosCommand(GetSystemProduct()))
                 {
@@ -135,19 +132,44 @@ namespace Durados.Web.Mvc.UI.Helpers
                             throw new Exception("No connection to main database", ex);
                         }
                     }
+                    var parameter = command.CreateParameter();
+                    parameter.ParameterName = "productId";
+                    parameter.Value = 3;
+                    command.Parameters.Add(parameter);
                     System.Data.IDataReader reader = command.ExecuteReader();
                     if (reader.Read())
                         connectionId = reader.GetInt32(reader.GetOrdinal("SqlConnectionId"));
                 }
             }
-
+            Durados.Web.Mvc.View view = GetView(ConnectionViewName);
             if (!connectionId.HasValue)
             {
-                Maps.Instance.DuradosMap.Logger.Log("AppFactory", null, "GetExternalAvailableInstanceConnection", null, 1, "Failed to retrive available external instance = connection id has no value");
-                throw new Exception("Failed to retrive available external instance = connection id has no value");
+                string newConnection = System.Web.Configuration.WebConfigurationManager.ConnectionStrings["AppsConnectionString"].ConnectionString;
+                DbConnectionStringBuilder builder = GetConnectionStringBuilder(Maps.Instance.ConnectionString);
+                
+                Dictionary<string,object> connectionParameters = new Dictionary<string,object>{
+                    {"Password",builder.Password()},
+                    {"Username",builder.UserId()},
+                    {"ServerName",builder.Server()},
+                    {"Catalog",builder.Database()},
+                    {"ProductPort",builder.Port()}
+                };
+                //password = Convert.ToString(connectionRow["Password"]);
+                //username = Convert.ToString(connectionRow[""]);
+                //server = Convert.ToString(connectionRow[""]);
+                //catalog = Convert.ToString(connectionRow[""]);
+                //port = Convert.ToInt32(connectionRow[""])
+                string pk = view.Create(connectionParameters);
+                int tmpId;
+                if (string.IsNullOrEmpty(pk) ||  !int.TryParse(pk,out tmpId))
+                {
+                    Maps.Instance.DuradosMap.Logger.Log("AppFactory", null, "GetExternalAvailableInstanceConnection", null, 1, "Failed to retrive available external instance = connection id has no value");
+                    throw new Exception("Failed to retrive available external instance = connection id has no value");
+                }
+                connectionId = tmpId;
             }
 
-            Durados.Web.Mvc.View view = GetView(ConnectionViewName);
+            //Durados.Web.Mvc.View view = GetView(ConnectionViewName);
             System.Data.DataRow connectionRow = view.GetDataRow(connectionId.Value.ToString());
             //Dictionary<string, object> values = new Dictionary<string, object>();
             //values.Add("Id", "&&%&=&&%& " + connectionId.Value.ToString());
@@ -199,14 +221,14 @@ namespace Durados.Web.Mvc.UI.Helpers
         }
         private SqlProduct GetSystemProduct()
         {
-            return SqlProduct.SqlServer;
+            return Maps.Instance.DuradosMap.SqlProduct; ;
         }
         public static string GetConnectionString(string serverName, string catalog, bool? integratedSecurity, string username, string password, string duradosuserId, Durados.SqlProduct sqlProduct, int localPort, bool usesSsh, bool usesSsl)
         {
 
             string connectionString = null;
-            System.Data.SqlClient.SqlConnectionStringBuilder builder = new System.Data.SqlClient.SqlConnectionStringBuilder();
-            builder.ConnectionString = Maps.Instance.ConnectionString;
+            DbConnectionStringBuilder cnnBuilder = GetConnectionStringBuilder(Maps.Instance.ConnectionString);
+  
 
             bool hasServer = !string.IsNullOrEmpty(serverName);
             bool hasCatalog = !string.IsNullOrEmpty(catalog);
@@ -220,7 +242,7 @@ namespace Durados.Web.Mvc.UI.Helpers
             {
                 if (!hasServer)
                 {
-                    serverName = builder.DataSource;
+                    serverName = cnnBuilder.Server();
 
                 }
                 connectionString = "Data Source={0};Initial Catalog={1};Integrated Security=True;";
@@ -264,7 +286,7 @@ namespace Durados.Web.Mvc.UI.Helpers
                 if (!hasServer)
                 {
                     if (Maps.AllowLocalConnection)
-                        serverName = builder.DataSource;
+                        serverName = cnnBuilder.Server();
                     else
                         throw new Durados.DuradosException("Server Name is missing");
                 }
@@ -272,7 +294,7 @@ namespace Durados.Web.Mvc.UI.Helpers
                 if (!hasUsername)
                 {
                     if (Maps.AllowLocalConnection)
-                        username = builder.UserID;
+                        username = cnnBuilder.UserId();
                     else
                         throw new Durados.DuradosException("Username is missing");
                 }
@@ -280,7 +302,7 @@ namespace Durados.Web.Mvc.UI.Helpers
                 if (!hasPassword)
                 {
                     if (Maps.AllowLocalConnection)
-                        password = builder.Password;
+                        password = cnnBuilder.Password();
                     else
                         throw new Durados.DuradosException("Password is missing");
                 }
@@ -372,6 +394,47 @@ namespace Durados.Web.Mvc.UI.Helpers
             return connStrs;
 
         }
+        public static DbConnectionStringBuilder GetConnectionStringBuilder(string connectionString)
+        {
+            if (MySqlAccess.IsMySqlConnectionString(connectionString))
+                return new MySql.Data.MySqlClient.MySqlConnectionStringBuilder(connectionString);
+            return new System.Data.SqlClient.SqlConnectionStringBuilder(connectionString);
 
+        }
+    }
+    public static class DbStringBuilderExtention
+    {
+        public static string   Server( this DbConnectionStringBuilder builder){
+            if(builder is MySql.Data.MySqlClient.MySqlConnectionStringBuilder)
+                return builder["server"].ToString();
+            return builder["Data Source"].ToString();
+        }
+
+        public static string  Database(this DbConnectionStringBuilder builder)
+        {
+            if (builder is MySql.Data.MySqlClient.MySqlConnectionStringBuilder)
+                return builder["database"].ToString();
+            return builder["Initial Catalog"].ToString();
+        }
+
+        public static string  UserId(this DbConnectionStringBuilder builder)
+        {
+            if (builder is MySql.Data.MySqlClient.MySqlConnectionStringBuilder)
+                return builder["uid"].ToString();
+            return builder["User ID"].ToString();
+        }
+
+        public static string Password(this DbConnectionStringBuilder builder)
+        {
+            if (builder is MySql.Data.MySqlClient.MySqlConnectionStringBuilder)
+                return builder["password"].ToString();
+            return builder["Password"].ToString();
+        }
+        public static string  Port(this DbConnectionStringBuilder builder)
+        {
+            if (builder is MySql.Data.MySqlClient.MySqlConnectionStringBuilder)
+                return builder["port"].ToString();
+            return builder["port"].ToString();
+        }
     }
 }

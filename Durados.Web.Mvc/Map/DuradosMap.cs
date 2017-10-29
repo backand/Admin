@@ -114,9 +114,10 @@ namespace Durados.Web.Mvc
         public Dictionary<string, string> GetUserApps(int userId)
         {
             Dictionary<string, object> values = new Dictionary<string, object>();
-            SqlAccess sqlAccess = new SqlAccess();
+            
+            SqlAccess sqlAccess = GetSqlAccess();
 
-            DataTable table = sqlAccess.ExecuteTable(Maps.Instance.DuradosMap.Database.ConnectionString, "select * from durados_App with(nolock) where durados_app.[ToDelete]=0 AND  Creator = " + userId + " or id in (select durados_UserApp.AppId from durados_UserApp with(nolock) where durados_UserApp.UserId = " + userId + ") ", null, CommandType.Text);
+            DataTable table = sqlAccess.ExecuteTable(Maps.Instance.DuradosMap.Database.ConnectionString, GetUserAppsSql(userId), null, CommandType.Text);
 
             Dictionary<string, string> apps = new Dictionary<string, string>();
             foreach (System.Data.DataRow row in table.Rows)
@@ -125,6 +126,11 @@ namespace Durados.Web.Mvc
             }
 
             return apps;
+        }
+
+        private static string GetUserAppsSql(int userId)
+        {
+            return "select * from durados_App with(nolock) where durados_app.[ToDelete]=0 AND  Creator = " + userId + " or id in (select durados_UserApp.AppId from durados_UserApp with(nolock) where durados_UserApp.UserId = " + userId + ") ";
         }
 
         public virtual string GetPlanContent()
@@ -143,15 +149,25 @@ namespace Durados.Web.Mvc
             //return string.Format("/Home/{0}/{1}?fieldName={2}&amp;fileName={3}&amp;pk='\'", DownloadActionName, "durados_App", "Image", this.Database.SiteInfo.Logo);
         }
 
+        private SqlProduct? sqlProduct = null;
         public override SqlProduct SqlProduct
         {
             get
             {
-                return SqlProduct.SqlServer;
+                if (!sqlProduct.HasValue)
+                {
+                    sqlProduct = GetMainAppSqlProduct();
+                }
+                return sqlProduct.Value;
             }
             set
             {
             }
+        }
+
+        private SqlProduct GetMainAppSqlProduct()
+        {
+            return DataAccessHelper.GetDataTableAccess(this.connectionString).GetSqlProduct();
         }
 
         public override Guid Guid
@@ -164,6 +180,11 @@ namespace Durados.Web.Mvc
             {
                 base.Guid = value;
             }
+        }
+
+        public SqlAccess GetSqlAccess()
+        {
+            return Durados.DataAccess.Rest.GetSqlAccess(SqlProduct);
         }
     }
 }
