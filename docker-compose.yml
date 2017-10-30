@@ -1,0 +1,8 @@
+version: '3'
+
+services:
+  backand.web.api:
+    image: backand.web.api
+    build:
+      context: .\BackAnd.Web.Api
+      dockerfile: Dockerfile

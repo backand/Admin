@@ -20,6 +20,7 @@
     <IISExpressWindowsAuthentication />
     <IISExpressUseClassicPipelineMode />
     <UseGlobalApplicationHostFile />
+    <Use64BitIISExpress />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -312,6 +313,10 @@
   <ItemGroup>
     <Content Include="packages.config" />
     <Content Include="deployment\webhooks.json" />
+    <None Include="Dockerfile" />
+    <None Include=".dockerignore">
+      <DependentUpon>Dockerfile</DependentUpon>
+    </None>
     <None Include="Properties\PublishProfiles\api.pubxml" />
     <None Include="Properties\PublishProfiles\BackandApi.pubxml" />
     <None Include="Web.BackandApi.config">

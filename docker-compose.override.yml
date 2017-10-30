@@ -1,0 +1,10 @@
+version: '3'
+
+services:
+  backand.web.api:
+    ports:
+      - "80"
+networks:
+  default:
+    external:
+      name: nat
