@@ -70,6 +70,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JintWinRunner", "JintWinRun
 EndProject
 Project("{E53339B2-1760-4266-BCC7-CA923CBCF16C}") = "docker-compose", "docker-compose.dcproj", "{63CFC103-E8A0-4390-BC63-392DA5E8886E}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BackAnd.AspNetCore.Api", "BackAnd.AspNetCore.Api\BackAnd.AspNetCore.Api.csproj", "{F2B75E94-970A-4CC4-A3EC-61208855FAF2}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -668,6 +670,30 @@ Global
 		{63CFC103-E8A0-4390-BC63-392DA5E8886E}.Verbose|Any CPU.Build.0 = Debug|Any CPU
 		{63CFC103-E8A0-4390-BC63-392DA5E8886E}.Verbose|x64.ActiveCfg = Debug|Any CPU
 		{63CFC103-E8A0-4390-BC63-392DA5E8886E}.Verbose|x64.Build.0 = Debug|Any CPU
+		{F2B75E94-970A-4CC4-A3EC-61208855FAF2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F2B75E94-970A-4CC4-A3EC-61208855FAF2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F2B75E94-970A-4CC4-A3EC-61208855FAF2}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{F2B75E94-970A-4CC4-A3EC-61208855FAF2}.Debug|x64.Build.0 = Debug|Any CPU
+		{F2B75E94-970A-4CC4-A3EC-61208855FAF2}.DebugLocal|Any CPU.ActiveCfg = Debug|Any CPU
+		{F2B75E94-970A-4CC4-A3EC-61208855FAF2}.DebugLocal|Any CPU.Build.0 = Debug|Any CPU
+		{F2B75E94-970A-4CC4-A3EC-61208855FAF2}.DebugLocal|x64.ActiveCfg = Debug|Any CPU
+		{F2B75E94-970A-4CC4-A3EC-61208855FAF2}.DebugLocal|x64.Build.0 = Debug|Any CPU
+		{F2B75E94-970A-4CC4-A3EC-61208855FAF2}.Log Output|Any CPU.ActiveCfg = Debug|Any CPU
+		{F2B75E94-970A-4CC4-A3EC-61208855FAF2}.Log Output|Any CPU.Build.0 = Debug|Any CPU
+		{F2B75E94-970A-4CC4-A3EC-61208855FAF2}.Log Output|x64.ActiveCfg = Debug|Any CPU
+		{F2B75E94-970A-4CC4-A3EC-61208855FAF2}.Log Output|x64.Build.0 = Debug|Any CPU
+		{F2B75E94-970A-4CC4-A3EC-61208855FAF2}.Mono|Any CPU.ActiveCfg = Debug|Any CPU
+		{F2B75E94-970A-4CC4-A3EC-61208855FAF2}.Mono|Any CPU.Build.0 = Debug|Any CPU
+		{F2B75E94-970A-4CC4-A3EC-61208855FAF2}.Mono|x64.ActiveCfg = Debug|Any CPU
+		{F2B75E94-970A-4CC4-A3EC-61208855FAF2}.Mono|x64.Build.0 = Debug|Any CPU
+		{F2B75E94-970A-4CC4-A3EC-61208855FAF2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F2B75E94-970A-4CC4-A3EC-61208855FAF2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F2B75E94-970A-4CC4-A3EC-61208855FAF2}.Release|x64.ActiveCfg = Release|Any CPU
+		{F2B75E94-970A-4CC4-A3EC-61208855FAF2}.Release|x64.Build.0 = Release|Any CPU
+		{F2B75E94-970A-4CC4-A3EC-61208855FAF2}.Verbose|Any CPU.ActiveCfg = Debug|Any CPU
+		{F2B75E94-970A-4CC4-A3EC-61208855FAF2}.Verbose|Any CPU.Build.0 = Debug|Any CPU
+		{F2B75E94-970A-4CC4-A3EC-61208855FAF2}.Verbose|x64.ActiveCfg = Debug|Any CPU
+		{F2B75E94-970A-4CC4-A3EC-61208855FAF2}.Verbose|x64.Build.0 = Debug|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
