@@ -18,7 +18,7 @@ namespace Backand
 
             IFiles files = StorageFactoey.GetCloudStorage(providerAccount);
 
-            if (files == null || files is filesBackand)
+            if (files == null || files.Cloud == null)
                 return files.upload(fileName, fileData, null, path);
 
             if (string.IsNullOrEmpty(bucket))
@@ -79,10 +79,16 @@ namespace Backand
                 return (Durados.Diagnostics.ILogger)System.Web.HttpContext.Current.Items[Durados.Database.MainLogger];
             }
         }
+
+        public virtual Durados.Cloud Cloud
+        {
+            get { return null; }
+        }
     }
 
     public interface IFiles
     {
+        Durados.Cloud Cloud { get; }
         string upload(string fileName, string fileData, string providerAccount, string bucket);
 
         string upload(string fileName, string fileData, string providerAccount, string bucket, string path);
