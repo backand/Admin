@@ -744,13 +744,16 @@ namespace BackAnd.Web.Api.Controllers.Filters
 
         private string GetAppByTokenFromDb(string anonymousToken)
         {
-            string sql = "SELECT [Name] FROM [durados_app] WITH(NOLOCK)  WHERE [AnonymousToken] =@AnonymousToken";
-            using (System.Data.SqlClient.SqlConnection cnn = new System.Data.SqlClient.SqlConnection(Maps.Instance.DuradosMap.Database.ConnectionString))
+            string sql = Maps.MainAppSchema.GetAppNameByTokenSql(Database.AnonymousToken);
+            using (IDbConnection cnn = Maps.MainAppSchema.GetNewConnection(Maps.Instance.DuradosMap.Database.ConnectionString))
             {
-                using (System.Data.SqlClient.SqlCommand command = new System.Data.SqlClient.SqlCommand(sql, cnn))
+                using (IDbCommand command = cnn.CreateCommand())
                 {
-
-                    command.Parameters.AddWithValue(Database.AnonymousToken, anonymousToken);
+                    command.CommandText = sql;
+                    var parameter = command.CreateParameter();
+                    parameter.ParameterName ="token";
+                    parameter.Value = anonymousToken;
+                    command.Parameters.Add(parameter);
                     cnn.Open();
                     object scalar = command.ExecuteScalar();
                     if (scalar == null || scalar == DBNull.Value)
@@ -821,13 +824,16 @@ namespace BackAnd.Web.Api.Controllers.Filters
         private string GetAppGuid(string appName)
         {
 
-            string sql = "SELECT [Guid] FROM [durados_app] WITH(NOLOCK)  WHERE [Name] =@appName";
-            using (System.Data.SqlClient.SqlConnection cnn = new System.Data.SqlClient.SqlConnection(Maps.Instance.DuradosMap.Database.ConnectionString))
+            string sql = Maps.MainAppSchema.GetAppGuidByName(); 
+            using (IDbConnection cnn = Maps.MainAppSchema.GetNewConnection(Maps.Instance.DuradosMap.Database.ConnectionString))
             {
-                using (System.Data.SqlClient.SqlCommand command = new System.Data.SqlClient.SqlCommand(sql, cnn))
+                using (IDbCommand command = cnn.CreateCommand())
                 {
-
-                    command.Parameters.AddWithValue("appName", appName);
+                    command.CommandText = sql;
+                    var parameter= command.CreateParameter();
+                    parameter.ParameterName = "appName";
+                    parameter.Value = appName;
+                    command.Parameters.Add(parameter);
                     cnn.Open();
                     object scalar = command.ExecuteScalar();
                     if (scalar == null || scalar == DBNull.Value)

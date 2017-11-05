@@ -585,13 +585,13 @@ namespace BackAnd.Web.Api.Controllers
             {
                 if (logModelId.HasValue)
                 {
-                    ISqlMainSchema sqlMain =  Maps.GetMainAppSqlSchema();
-                    using (IDbConnection connection = sqlMain.GetNewConnection(Maps.Instance.ConnectionString))
+                   
+                    using (IDbConnection connection = Maps.MainAppSchema.GetNewConnection(Maps.Instance.ConnectionString))
                     {
                         connection.Open();
-                        string sql = sqlMain.GetUpdateLogModelExceptionSql();
+                        string sql = Maps.MainAppSchema.GetUpdateLogModelExceptionSql();
 
-                        using (IDbCommand command = sqlMain.GetNewCommand(sql, connection))
+                        using (IDbCommand command = Maps.MainAppSchema.GetNewCommand(sql, connection))
                         {
                             GetDataParameter("errorMessage",exception.Message, command);
                             GetDataParameter("errorTrace", exception.StackTrace, command);
@@ -624,7 +624,7 @@ namespace BackAnd.Web.Api.Controllers
 
         private void LogModel(string appName, string username, DateTime timestamp, string input, string output, string valid, string action)
         {
-            ISqlMainSchema sqlMain = Maps.GetMainAppSqlSchema();
+            ISqlMainSchema sqlMain = Maps.MainAppSchema;
             using (IDbConnection connection = sqlMain.GetNewConnection(Maps.Instance.ConnectionString))
             {
                 connection.Open();
@@ -733,7 +733,7 @@ namespace BackAnd.Web.Api.Controllers
         private static bool RefreshOldAdminFailure = false;
         protected virtual void RefreshOldAdmin(string appName)
         {
-            if (RefreshOldAdminFailure)
+            if (!Maps.ExistsOldAdmin || RefreshOldAdminFailure)
                 return;
 
             string id = GetMasterGuid();
@@ -909,7 +909,8 @@ namespace BackAnd.Web.Api.Controllers
         {
             string currentUser = Maps.SuperDeveloper;
             System.Data.DataRow userRow = Maps.Instance.DuradosMap.Database.GetUserRow(currentUser);
-            string guid = userRow["Guid"].ToString();
+            string guid = (userRow == null) ? Maps.MasterOpsAuth : userRow["Guid"].ToString();
+           
             return SecurityHelper.GetTmpUserGuidFromGuid(guid);
 
         }
@@ -2096,8 +2097,8 @@ namespace BackAnd.Web.Api.Controllers
                     {
                         int userId = Maps.Instance.DuradosMap.Database.GetUserID(deletedUsername);
                         string appId = Map.Id;
-                        SqlAccess sqlAccess = Maps.GetMainAppSqlAccess();
-                        sqlAccess.ExecuteNonQuery(Maps.Instance.DuradosMap.connectionString, Maps.GetMainAppSqlSchema().GetDeleteUserSql( userId, appId));
+                        SqlAccess sqlAccess = Maps.MainAppSqlAccess;
+                        sqlAccess.ExecuteNonQuery(Maps.Instance.DuradosMap.connectionString, Maps.MainAppSchema.GetDeleteUserSql( userId, appId));
                     }
                 }
                 catch { }

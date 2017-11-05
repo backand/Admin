@@ -111,62 +111,11 @@ namespace Durados.Web.Mvc.UI.Helpers
             string password = null;
             server = null;
             port = 0;
-            string spName = "durados_GetExternalAvailableInstance";
-            int? connectionId= null;
-            using (System.Data.IDbConnection cnn = Maps.GetMainAppSqlSchema().GetNewConnection(Maps.Instance.ConnectionString))
-            {
-                using (DuradosCommand command = new DuradosCommand(GetSystemProduct()))
-                {
-                    command.Connection = cnn;
-                    command.CommandText = spName;
-                    command.CommandType = System.Data.CommandType.StoredProcedure;
-                    if (command.Connection.State == System.Data.ConnectionState.Closed)
-                    {
-                        try
-                        {
-                            command.Connection.Open();
-                        }
-                        catch(Exception ex)
-                        {
-                            Maps.Instance.DuradosMap.Logger.Log("AppFactory", null, "GetExternalAvailableInstanceConnection", null, 1, "No connection to main database");
-                            throw new Exception("No connection to main database", ex);
-                        }
-                    }
-                    var parameter = command.CreateParameter();
-                    parameter.ParameterName = "productId";
-                    parameter.Value = 3;
-                    command.Parameters.Add(parameter);
-                    System.Data.IDataReader reader = command.ExecuteReader();
-                    if (reader.Read())
-                        connectionId = reader.GetInt32(reader.GetOrdinal("SqlConnectionId"));
-                }
-            }
+            int? connectionId = GetConnectionFromExternalTable();
             Durados.Web.Mvc.View view = GetView(ConnectionViewName);
             if (!connectionId.HasValue)
             {
-                string newConnection = System.Web.Configuration.WebConfigurationManager.ConnectionStrings["AppsConnectionString"].ConnectionString;
-                DbConnectionStringBuilder builder = GetConnectionStringBuilder(Maps.Instance.ConnectionString);
-                
-                Dictionary<string,object> connectionParameters = new Dictionary<string,object>{
-                    {"Password",builder.Password()},
-                    {"Username",builder.UserId()},
-                    {"ServerName",builder.Server()},
-                    {"Catalog",builder.Database()},
-                    {"ProductPort",builder.Port()}
-                };
-                //password = Convert.ToString(connectionRow["Password"]);
-                //username = Convert.ToString(connectionRow[""]);
-                //server = Convert.ToString(connectionRow[""]);
-                //catalog = Convert.ToString(connectionRow[""]);
-                //port = Convert.ToInt32(connectionRow[""])
-                string pk = view.Create(connectionParameters);
-                int tmpId;
-                if (string.IsNullOrEmpty(pk) ||  !int.TryParse(pk,out tmpId))
-                {
-                    Maps.Instance.DuradosMap.Logger.Log("AppFactory", null, "GetExternalAvailableInstanceConnection", null, 1, "Failed to retrive available external instance = connection id has no value");
-                    throw new Exception("Failed to retrive available external instance = connection id has no value");
-                }
-                connectionId = tmpId;
+                connectionId = InsertConnectionFromConfig(connectionId, view);
             }
 
             //Durados.Web.Mvc.View view = GetView(ConnectionViewName);
@@ -184,7 +133,9 @@ namespace Durados.Web.Mvc.UI.Helpers
 
             try
             {
+                
                 password = Convert.ToString(connectionRow["Password"]);
+                password = Maps.Instance.DuradosMap.Decrypt(password);
                 username = Convert.ToString(connectionRow["Username"]);
                 server = Convert.ToString(connectionRow["ServerName"]);
                 catalog = Convert.ToString(connectionRow["Catalog"]);
@@ -202,6 +153,120 @@ namespace Durados.Web.Mvc.UI.Helpers
             
 
          
+        }
+
+        private  int? InsertConnectionFromConfig(int? connectionId, Durados.Web.Mvc.View view)
+        {
+            string newConnection = System.Web.Configuration.WebConfigurationManager.ConnectionStrings["AppsConnectionString"].ConnectionString;
+            DbConnectionStringBuilder builder = GetConnectionStringBuilder(Maps.Instance.ConnectionString);
+            string serverName = builder.Server();
+            string catalogName = builder.Database();
+            string password = builder.Password();
+            password = Maps.Instance.DuradosMap.Encrypt(password);
+            Dictionary<string, object> connectionParameters = new Dictionary<string, object>{
+                    {"Password", password},
+                    {"Username",builder.UserId()},
+                    {"ServerName",serverName},
+                    {"Catalog",builder.Database()},
+                    {"ProductPort",builder.Port()},
+                    {"durados_SqlProduct_durados_SqlConnection_Parent",builder.ProductId()}
+                };
+           
+            string pk = view.Create(connectionParameters);
+            int tmpId;
+            if (string.IsNullOrEmpty(pk) || !int.TryParse(pk, out tmpId))
+            {
+                Maps.Instance.DuradosMap.Logger.Log("AppFactory", null, "GetExternalAvailableInstanceConnection", null, 1, "Failed to retrive available external instance = connection id has no value");
+                throw new Exception("Failed to retrive available external instance = connection id has no value");
+            }
+
+            connectionId = tmpId;
+
+            //
+            return SaveExternalInstanceToDb(connectionId, serverName, catalogName);
+        }
+
+        private  int? SaveExternalInstanceToDb(int? connectionId,string serverName, string catalogName)
+        {
+            //ISqlMainSchema sqlSchema = Maps.MainAppSchema;
+            string sql = Maps.MainAppSchema.InsertNewConnectionToExternalServerTable();
+
+            using (System.Data.IDbConnection cnn = Maps.MainAppSchema.GetNewConnection(Maps.Instance.ConnectionString))
+            {
+                using (System.Data.IDbCommand command = cnn.CreateCommand())
+                {
+                    command.CommandText = sql;
+                    command.CommandType = System.Data.CommandType.Text;
+                    if (command.Connection.State == System.Data.ConnectionState.Closed)
+                    {
+                        try
+                        {
+                            command.Connection.Open();
+                        }
+                        catch (Exception ex)
+                        {
+                            Maps.Instance.DuradosMap.Logger.Log("AppFactory", null, "InsertExternalAvailableInstanceConnection", null, 1, "New connection to main database");
+                            throw new Exception("New connection to main database", ex);
+                        }
+                    }
+                    GetNewDbParameter(serverName, command, "serverName");
+                    GetNewDbParameter(catalogName, command, "catalog");
+                    GetNewDbParameter(1, command, "IsActive");
+                    GetNewDbParameter(connectionId, command, "SqlConnectionId");
+                    object scalar = command.ExecuteScalar();
+
+                    if (scalar == null || scalar == DBNull.Value)
+                    {
+                        throw new DuradosException("Fail to insert new external connection");
+                    }
+
+                }
+                //
+                return connectionId;
+            }
+        }
+
+        private static void GetNewDbParameter(object connectionId, System.Data.IDbCommand command,string parameterName)
+        {
+            var parameter = command.CreateParameter();
+            parameter.ParameterName = parameterName;
+            parameter.Value = connectionId;
+            command.Parameters.Add(parameter);
+        }
+
+        private int? GetConnectionFromExternalTable()
+        {
+            string spName = "durados_GetExternalAvailableInstance";
+            int? connectionId = null;
+            using (System.Data.IDbConnection cnn = Maps.MainAppSchema.GetNewConnection(Maps.Instance.ConnectionString))
+            {
+                using (DuradosCommand command = new DuradosCommand(GetSystemProduct()))
+                {
+                    command.Connection = cnn;
+                    command.CommandText = spName;
+                    command.CommandType = System.Data.CommandType.StoredProcedure;
+                    if (command.Connection.State == System.Data.ConnectionState.Closed)
+                    {
+                        try
+                        {
+                            command.Connection.Open();
+                        }
+                        catch (Exception ex)
+                        {
+                            Maps.Instance.DuradosMap.Logger.Log("AppFactory", null, "GetExternalAvailableInstanceConnection", null, 1, "No connection to main database");
+                            throw new Exception("No connection to main database", ex);
+                        }
+                    }
+                    var parameter = command.CreateParameter();
+                    parameter.ParameterName = "productId";
+                    parameter.Value = 3;
+                    command.Parameters.Add(parameter);
+                    System.Data.IDataReader reader = command.ExecuteReader();
+                    if (reader.Read())
+                        connectionId = reader.GetInt32(reader.GetOrdinal("SqlConnectionId"));
+                }
+            }
+            return connectionId;
         }
         public void CreateNewSystemSchemaAndUser(string connectionString,  NewDatabaseParameters newDbParameters)
         {
@@ -327,10 +392,10 @@ namespace Durados.Web.Mvc.UI.Helpers
         private List<int> GetExternalConnectionIds()
         {
             List<int> conIds = new List<int>();
-            string sql = "SELECT  SqlConnectionId  FROM durados_ExternaInstance WITH(NOLOCK) INNER JOIN durados_SqlConnection WITH(NOLOCK) on durados_SqlConnection.Id = durados_ExternaInstance.SqlConnectionId";
-            using (System.Data.IDbConnection cnn = Durados.DataAccess.DataAccessObject.GetNewConnection(SqlProduct.SqlServer, Maps.Instance.ConnectionString))
+            string sql = Maps.MainAppSchema.GetExternalConnectionIdsSql(); 
+            using (System.Data.IDbConnection cnn = Maps.MainAppSchema.GetNewConnection(Maps.Instance.ConnectionString) )
             {
-                using (DuradosCommand command = new DuradosCommand(GetSystemProduct()))
+                using (System.Data.IDbCommand command = cnn.CreateCommand())
                 {
                     command.Connection = cnn;
                     command.CommandText = sql;
@@ -436,5 +501,18 @@ namespace Durados.Web.Mvc.UI.Helpers
                 return builder["port"].ToString();
             return builder["port"].ToString();
         }
+        public static bool IntegratedSecurity(this DbConnectionStringBuilder builder)
+        {
+            if (builder is MySql.Data.MySqlClient.MySqlConnectionStringBuilder)
+                return false;
+            return Convert.ToBoolean(builder["IntegratedSecurity"]);
+        }
+        public static int ProductId(this DbConnectionStringBuilder builder)
+        {
+            if (builder is MySql.Data.MySqlClient.MySqlConnectionStringBuilder)
+                return (int)SqlProduct.MySql;
+            return (int)SqlProduct.SqlServer;
+        }
+        
     }
 }

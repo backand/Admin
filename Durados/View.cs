@@ -2263,6 +2263,7 @@ namespace Durados
     {
         private View view;
         private object filter;
+        private DataTable dataTable;
         public string Sql { get; set; }
 
         public SelectEventArgs(View view, object filter)
@@ -2271,7 +2272,13 @@ namespace Durados
             this.view = view;
             this.filter = filter;
         }
-
+        public SelectEventArgs(View view, object filter,DataTable dataTable)
+            : base()
+        {
+            this.view = view;
+            this.filter = filter;
+            this.dataTable = dataTable;
+        }
         public View View
         {
             get
@@ -2288,6 +2295,12 @@ namespace Durados
                 return filter;
             }
 
+        }
+        public DataTable DataTable{
+            get
+            {
+                return dataTable;
+            }
         }
     }
 

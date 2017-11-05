@@ -7,7 +7,7 @@ using System.Xml;
 using System.Web;
 using System.IO;
 using System.Reflection;
-using System.Data.SqlClient;
+//using System.Data.SqlClient;
 
 using Microsoft.WindowsAzure;
 using Microsoft.WindowsAzure.ServiceRuntime;
@@ -64,10 +64,10 @@ namespace Durados.Web.Mvc
 
         public object GetConnection(MapDataSet.durados_SqlConnectionRow sqlConnectionRow, int dataSourceTypeId, object builder)
         {
-            return GetConnection(sqlConnectionRow, dataSourceTypeId, (System.Data.SqlClient.SqlConnectionStringBuilder)builder);
+            return GetConnection(sqlConnectionRow, dataSourceTypeId, (System.Data.Common.DbConnectionStringBuilder)builder);
         }
 
-        public object GetConnection(MapDataSet.durados_SqlConnectionRow sqlConnectionRow, int dataSourceTypeId, System.Data.SqlClient.SqlConnectionStringBuilder builder)
+        public object GetConnection(MapDataSet.durados_SqlConnectionRow sqlConnectionRow, int dataSourceTypeId, System.Data.Common.DbConnectionStringBuilder builder)
         {
             return GetConnection(sqlConnectionRow, dataSourceTypeId, builder, GetConnectionStringTemplate(sqlConnectionRow));
         }
@@ -83,30 +83,30 @@ namespace Durados.Web.Mvc
         public object GetSqlServerConnection(MapDataSet.durados_AppRow appRow, object builder)
         {
             int dataSourceTypeId = appRow.DataSourceTypeId;
-            return GetConnection(appRow.durados_SqlConnectionRowByFK_durados_App_durados_SqlConnection, dataSourceTypeId, (System.Data.SqlClient.SqlConnectionStringBuilder)builder, "Data Source={0};Initial Catalog={1};User ID={2};Password={3};Integrated Security=False;");
+            return GetConnection(appRow.durados_SqlConnectionRowByFK_durados_App_durados_SqlConnection, dataSourceTypeId, (System.Data.Common.DbConnectionStringBuilder)builder, "Data Source={0};Initial Catalog={1};User ID={2};Password={3};Integrated Security=False;");
         }
 
         public object GetMySqlConnection(MapDataSet.durados_AppRow appRow, object builder, int localPort)
         {
             int dataSourceTypeId = appRow.DataSourceTypeId;
             bool usesSsh = !appRow.durados_SqlConnectionRowByFK_durados_App_durados_SqlConnection.IsSshUsesNull() && appRow.durados_SqlConnectionRowByFK_durados_App_durados_SqlConnection.SshUses;
-            return GetConnection(appRow.durados_SqlConnectionRowByFK_durados_App_durados_SqlConnection, dataSourceTypeId, (System.Data.SqlClient.SqlConnectionStringBuilder)builder, usesSsh ? "server=localhost;database={1};User Id={2};password={3};Allow User Variables=True;CharSet=utf8mb4;UseProcedureBodies=true;" : "server={0};database={1};User Id={2};password={3}") + ";port=" + localPort.ToString() + ";convert zero datetime=True;default command timeout=90;Connection Timeout=60;Allow User Variables=True;CharSet=utf8mb4;UseProcedureBodies=true;";
+            return GetConnection(appRow.durados_SqlConnectionRowByFK_durados_App_durados_SqlConnection, dataSourceTypeId, (System.Data.Common.DbConnectionStringBuilder)builder, usesSsh ? "server=localhost;database={1};User Id={2};password={3};Allow User Variables=True;CharSet=utf8mb4;UseProcedureBodies=true;" : "server={0};database={1};User Id={2};password={3}") + ";port=" + localPort.ToString() + ";convert zero datetime=True;default command timeout=90;Connection Timeout=60;Allow User Variables=True;CharSet=utf8mb4;UseProcedureBodies=true;";
         }
 
         public object GetPostgreConnection(MapDataSet.durados_AppRow appRow, object builder, int localPort)
         {
             int dataSourceTypeId = appRow.DataSourceTypeId;
             bool usesSsl = !appRow.durados_SqlConnectionRowByFK_durados_App_durados_SqlConnection.IsSslUsesNull() && appRow.durados_SqlConnectionRowByFK_durados_App_durados_SqlConnection.SslUses;
-            return GetConnection(appRow.durados_SqlConnectionRowByFK_durados_App_durados_SqlConnection, dataSourceTypeId, (System.Data.SqlClient.SqlConnectionStringBuilder)builder, usesSsl ? "server={0};database={1};User Id={2};password={3};SSL=true;SslMode=Require;" : "server={0};database={1};User Id={2};password={3}") + ";port=" + localPort.ToString() + ";Encoding=UNICODE;CommandTimeout=90;Timeout=60;";
+            return GetConnection(appRow.durados_SqlConnectionRowByFK_durados_App_durados_SqlConnection, dataSourceTypeId, (System.Data.Common.DbConnectionStringBuilder)builder, usesSsl ? "server={0};database={1};User Id={2};password={3};SSL=true;SslMode=Require;" : "server={0};database={1};User Id={2};password={3}") + ";port=" + localPort.ToString() + ";Encoding=UNICODE;CommandTimeout=90;Timeout=60;";
         }
 
         public object GetOracleConnection(MapDataSet.durados_AppRow appRow, object builder, int localPort)
         {
             int dataSourceTypeId = appRow.DataSourceTypeId;
             bool usesSsh = !appRow.durados_SqlConnectionRowByFK_durados_App_durados_SqlConnection.IsSshUsesNull() && appRow.durados_SqlConnectionRowByFK_durados_App_durados_SqlConnection.SshUses;
-            return GetConnection(appRow.durados_SqlConnectionRowByFK_durados_App_durados_SqlConnection, dataSourceTypeId, (System.Data.SqlClient.SqlConnectionStringBuilder)builder, OracleAccess.GetConnectionStringSchema());
+            return GetConnection(appRow.durados_SqlConnectionRowByFK_durados_App_durados_SqlConnection, dataSourceTypeId,(System.Data.Common.DbConnectionStringBuilder) builder, OracleAccess.GetConnectionStringSchema());
         }
-        public object GetConnection(MapDataSet.durados_SqlConnectionRow sqlConnectionRow, int dataSourceTypeId, System.Data.SqlClient.SqlConnectionStringBuilder builder, string template)
+        public object GetConnection(MapDataSet.durados_SqlConnectionRow sqlConnectionRow, int dataSourceTypeId, System.Data.Common.DbConnectionStringBuilder builder, string template)
         {
             string connectionString = null;
             string serverName = null;
@@ -115,19 +115,19 @@ namespace Durados.Web.Mvc
             if (dataSourceTypeId == 2 || dataSourceTypeId == 4)
             {
                 if (sqlConnectionRow.IsServerNameNull())
-                    serverName = builder.DataSource;
+                    serverName = builder.Server();
                 else
                     serverName = sqlConnectionRow.ServerName;
 
                 if (sqlConnectionRow.IsIntegratedSecurityNull())
-                    integratedSecurity = builder.IntegratedSecurity;
+                    integratedSecurity = builder.IntegratedSecurity();
                 else
                     integratedSecurity = sqlConnectionRow.IntegratedSecurity;
             }
             else
             {
-                integratedSecurity = builder.IntegratedSecurity;
-                serverName = builder.DataSource;
+                integratedSecurity = builder.IntegratedSecurity();
+                serverName = builder.Server();
             }
 
             if (integratedSecurity.HasValue && integratedSecurity.Value)
@@ -145,19 +145,19 @@ namespace Durados.Web.Mvc
                 {
 
                     if (sqlConnectionRow.IsUsernameNull())
-                        username = builder.UserID;
+                        username = builder.UserId();
                     else
                         username = sqlConnectionRow.Username;
                     if (sqlConnectionRow.IsPasswordNull())
-                        password = builder.Password;
+                        password = builder.Password();
                     else
-                        password = sqlConnectionRow.Password;
+                        password = Maps.Instance.DuradosMap.Decrypt(sqlConnectionRow.Password);
 
                 }
                 else
                 {
-                    username = builder.UserID;
-                    password = builder.Password;
+                    username = builder.UserId();
+                    password = builder.Password();
                 }
                 if (!sqlConnectionRow.IsProductPortNull())
                     return string.Format(connectionString, serverName, sqlConnectionRow.Catalog, username, password, sqlConnectionRow.ProductPort);

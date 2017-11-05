@@ -165,7 +165,27 @@ namespace Durados.Web.Mvc
             }
         }
 
+        private SqlProduct? systemSqlProduct = null;
+        public override SqlProduct SystemSqlProduct
+        {
+            get
+            {
+                if (!systemSqlProduct.HasValue)
+                {
+                    systemSqlProduct = GetMainAppSystemSqlProduct();
+                }
+                return systemSqlProduct.Value;
+            }
+            set
+            {
+            }
+        }
+
         private SqlProduct GetMainAppSqlProduct()
+        {
+            return DataAccessHelper.GetDataTableAccess(this.connectionString).GetSqlProduct();
+        }
+        private SqlProduct GetMainAppSystemSqlProduct()
         {
             return DataAccessHelper.GetDataTableAccess(this.connectionString).GetSqlProduct();
         }
@@ -174,7 +194,7 @@ namespace Durados.Web.Mvc
         {
             get
             {
-                return Guid.Parse(System.Configuration.ConfigurationManager.AppSettings["masterGuid"] ?? Guid.Empty.ToString());
+                return Guid.Parse(System.Configuration.ConfigurationManager.AppSettings["masterAppGuid"] ?? Guid.Empty.ToString());
             }
             set
             {
@@ -185,6 +205,26 @@ namespace Durados.Web.Mvc
         public SqlAccess GetSqlAccess()
         {
             return Durados.DataAccess.Rest.GetSqlAccess(SqlProduct);
+        }
+        private string masterOpsGuid = null;
+        public override string GetCreatorGuid()
+        {
+            if (masterOpsGuid == null)
+                masterOpsGuid = (System.Configuration.ConfigurationManager.AppSettings["masterOpsGuid"] ?? Guid.Empty.ToString());
+
+            return masterOpsGuid;
+        }
+        public override string Decrypt(string text)
+        {
+            if(sqlProduct == Durados.SqlProduct.MySql)
+                return base.Decrypt(text);
+            return text;
+        }
+        public override string Encrypt(string text)
+        {
+            if (sqlProduct == Durados.SqlProduct.MySql)
+                return base.Encrypt(text);
+            return text;
         }
     }
 }

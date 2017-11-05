@@ -140,16 +140,9 @@ namespace BackAnd.Web.Api.Controllers
 
                     int limit = System.Convert.ToInt32(values[key]);
 
-                    SqlAccess sa = new SqlAccess();
+                    SqlAccess sa = Maps.MainAppSqlAccess;
 
-                    string sql = "SET TRANSACTION ISOLATION LEVEL SERIALIZABLE; " +
-                                "BEGIN TRANSACTION; " +
-                                "UPDATE dbo.durados_AppLimits SET Limit = " + limit + " WHERE AppId = " + id + " and Name = '" + limits.ToString() + "';" +
-                                " IF @@ROWCOUNT = 0 " +
-                                "BEGIN " +
-                                  "INSERT into dbo.durados_AppLimits (Name, Limit, AppId) values ('" + limits.ToString() + "'," + limit + "," + id.Value + "); " +
-                                "END " +
-                                "COMMIT TRANSACTION;";
+                    string sql = Maps.MainAppSchema.GetInsertLimitsSql(limits, limit, id); 
 
                     sa.ExecuteNonQuery(Maps.Instance.DuradosMap.connectionString, sql);
                 }

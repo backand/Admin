@@ -1115,7 +1115,7 @@ namespace Durados.Web.Mvc
 
         private object GetValueFromRequestCache(string key)
         {
-            if (System.Web.HttpContext.Current.Items.Contains(key))
+            if (System.Web.HttpContext.Current != null && System.Web.HttpContext.Current.Items.Contains(key))
                 return System.Web.HttpContext.Current.Items[key];
 
             return null;

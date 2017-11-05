@@ -70,11 +70,11 @@
 
     string GetPointFieldStatement(string tableName, string columnName);
 
-    string GetEncryptedColumnsStatement(string encryptedName, string databaseNames);
+    string GetDecryptColumnStatement(string encryptedName, string databaseNames);
 
-    string GetCloseCertificatesStatement();
+    string GetCloseCertificateStatement();
 
-    string GetOpenCertificatesStatement();
+    string GetOpenCertificateStatement();
 
-    string GetDbEncrypytedColumnSql(string p, string columnName);
+    string GetDbEncryptedColumnParameterNameSql(string p, string columnName);
 }

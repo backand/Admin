@@ -1074,7 +1074,7 @@ namespace Durados.DataAccess
             }
 
             if (afterSelectCallback != null)
-                afterSelectCallback(this, new SelectEventArgs(view, filter));
+                afterSelectCallback(this, new SelectEventArgs(view, filter, table));
 
             // Performance Diagnostics
             if (view.Database.DiagnosticsReportInProgress)
@@ -2977,7 +2977,7 @@ namespace Durados.DataAccess
             if (!view.Database.EnableDecryption)
                 return s;
             ISqlTextBuilder sqlBuilder = GetSqlTextBuilder(view);
-            string sql = sqlBuilder.GetOpenCertificatesStatement(); ;
+            string sql = sqlBuilder.GetOpenCertificateStatement(); ;
             
             HashSet<string> keys = new HashSet<string>();
 
@@ -2997,7 +2997,7 @@ namespace Durados.DataAccess
         {
             string s = string.Empty;
             ISqlTextBuilder sqlBuilder = GetSqlTextBuilder(view);
-            string sql = sqlBuilder.GetCloseCertificatesStatement();
+            string sql = sqlBuilder.GetCloseCertificateStatement();
             HashSet<string> keys = new HashSet<string>();
             foreach (ColumnField columnField in view.GetEncryptedColumns())
             {
@@ -3017,7 +3017,7 @@ namespace Durados.DataAccess
             ISqlTextBuilder sqlBuilder = GetSqlTextBuilder(view);
             foreach (ColumnField columnField in view.GetEncryptedColumns())
             {
-                s += sqlBuilder.GetEncryptedColumnsStatement(columnField.EncryptedName, columnField.DatabaseNames);
+                s += sqlBuilder.GetDecryptColumnStatement( columnField.EncryptedName, columnField.DatabaseNames);
 
             }
 
@@ -3659,7 +3659,7 @@ namespace Durados.DataAccess
 
         public void ExecuteNonQuery(string connectionString, string sql)
         {
-            ExecuteNonQuery(connectionString, sql, SqlProduct.SqlServer, null, null);
+            ExecuteNonQuery(connectionString, sql, GetSqlProduct(), null, null);
         }
 
         public void ExecuteNonQuery(string connectionString, string sql, SqlProduct sqlProduct)
@@ -3669,7 +3669,7 @@ namespace Durados.DataAccess
 
         public void ExecuteNonQuery(string connectionString, string sql, Dictionary<string, object> parameters, ExecuteNonQueryRollbackCallback executeNonQueryRollbackCallback)
         {
-            ExecuteNonQuery(connectionString, sql, SqlProduct.SqlServer, parameters, executeNonQueryRollbackCallback);
+            ExecuteNonQuery(connectionString, sql, GetSqlProduct(), parameters, executeNonQueryRollbackCallback);
         }
 
 
@@ -3828,7 +3828,7 @@ namespace Durados.DataAccess
             }
         }
 
-        public SqlParameter[] ExecuteProcedure(string connectionString, string procedureName, Dictionary<string, object> parameters, List<string> outParameters,ExecuteProcedureRollbackCallback executeProcedureRollbackCallback)
+        public System.Data.IDataParameter[] ExecuteProcedure(string connectionString, string procedureName, Dictionary<string, object> parameters, List<string> outParameters,ExecuteProcedureRollbackCallback executeProcedureRollbackCallback)
         {
             using (IDbConnection connection = GetNewConnection(connectionString))
             {
@@ -3845,7 +3845,7 @@ namespace Durados.DataAccess
                     {
                         foreach (string key in parameters.Keys)
                         {
-                            
+
                             System.Data.IDataParameter dataParameter = GetNewParameter(command, key, parameters[key]);
                             dataParameter.Direction= outParameters.Contains(key) ? ParameterDirection.Output : ParameterDirection.Input;
                             command.Parameters.Add(dataParameter);
@@ -3864,8 +3864,8 @@ namespace Durados.DataAccess
                             transaction.Commit();
                     }
 
-                    List<SqlParameter> sqlParameters = new List<SqlParameter>();
-                    foreach (SqlParameter sqlParameter in command.Parameters)
+                    List<IDataParameter> sqlParameters = new List<IDataParameter>();
+                    foreach (IDataParameter sqlParameter in command.Parameters)
                     {
                         sqlParameters.Add(sqlParameter);
                     }
@@ -5445,7 +5445,7 @@ namespace Durados.DataAccess
 
             //string sql = "select * from " + sqlTextBuilder.EscapeDbObject("{0}") + " where {1}";
             //sql = string.Format(sql, tableName, GetWhereStatement(view, tableName));
-            string sql = GetSelectStatement(view, 1, 1, GetFilter(view, pk.Split(','), false), null, SortDirection.Asc).Replace("@id ","@pk_id ");
+            string sql = GetSelectStatement(view, 1, 1, GetFilter(view, pk.Split(','), false), null, SortDirection.Asc).Replace("@ID ","@pk_id ");
 
             command.CommandText = sql;
 
@@ -6659,7 +6659,7 @@ namespace Durados.DataAccess
             foreach (string columnName in columnNamesList)
             {
                 if (view.Fields.ContainsKey(columnName) && view.Fields[columnName].FieldType == FieldType.Column && ((ColumnField)view.Fields[columnName]).Encrypted)
-                    delimitedColumns += sqlTextBuilder.GetDbEncrypytedColumnSql(((ColumnField)view.Fields[columnName]).GetSymmetricKeyName(), GetVarFromName(columnName)) + comma;
+                    delimitedColumns += sqlTextBuilder.GetDbEncryptedColumnParameterNameSql(((ColumnField)view.Fields[columnName]).GetSymmetricKeyName(), GetVarFromName(columnName)) + comma;
                 else if (view.Fields.ContainsKey(columnName) && view.Fields[columnName].IsPoint)
                 {
                     delimitedColumns += GetPointForInsert(view.Fields[columnName], columnName, sqlTextBuilder);
@@ -7273,7 +7273,7 @@ namespace Durados.DataAccess
             foreach (string columnName in columnNames)
             {
                 if (view.Fields.ContainsKey(columnName) && view.Fields[columnName].FieldType == FieldType.Column && ((ColumnField)view.Fields[columnName]).Encrypted)
-                    updateSetColumns += sqlTextBuilder.EscapeDbObject(((ColumnField)view.Fields[columnName]).EncryptedName) + sqlTextBuilder.DbEquals + "ENCRYPTBYKEY(KEY_GUID('" + ((ColumnField)view.Fields[columnName]).GetSymmetricKeyName() + "')," + sqlTextBuilder.DbParameterPrefix + columnName + ")" + comma;
+                    updateSetColumns += sqlTextBuilder.EscapeDbObject(((ColumnField)view.Fields[columnName]).EncryptedName) + sqlTextBuilder.DbEquals +  sqlTextBuilder.GetDbEncryptedColumnParameterNameSql(((ColumnField)view.Fields[columnName]).GetSymmetricKeyName()  ,  columnName  ) + comma;
                 else if (view.Fields.ContainsKey(columnName) && view.Fields[columnName].IsPoint)
                 {
                     updateSetColumns += GetPointUpdateSetColumn(view.Fields[columnName], columnName, sqlTextBuilder);
@@ -12272,27 +12272,29 @@ public class SqlTextBuilder : ISqlTextBuilder
 
 
 
-    public virtual string GetEncryptedColumnsStatement(string encryptedName, string databaseNames)
+    public virtual string GetDecryptColumnStatement(string encryptedName, string databaseNames)
     {
         return string.Format(" CONVERT(NVARCHAR(250), DECRYPTBYKEY({0})) AS {1}, ", encryptedName, databaseNames);
     }
 
-    public virtual string GetCloseCertificatesStatement()
+    public virtual string GetCloseCertificateStatement()
     {
         return " close SYMMETRIC KEY {0} ";
     }
 
-    public virtual string GetOpenCertificatesStatement()
+    public virtual string GetOpenCertificateStatement()
     {
         return "OPEN SYMMETRIC KEY {0} DECRYPTION BY CERTIFICATE {1} ";
     }
 
 
 
-    public virtual string GetDbEncrypytedColumnSql(string symetricKeyName, string columnName)
+    public virtual string GetDbEncryptedColumnParameterNameSql(string symetricKeyName, string columnName)
     {
         return "ENCRYPTBYKEY(KEY_GUID('" +symetricKeyName + "')," + DbParameterPrefix + columnName + ")" ;
     }
+
+   
 }
 
 public class SqlMainSchema :ISqlMainSchema
@@ -12344,7 +12346,7 @@ public class SqlMainSchema :ISqlMainSchema
         return "INSERT INTO [durados_UserApp] ([UserId],[AppId],[Role]) VALUES (@UserId,@AppId,@Role)";
     }
 
-    public  virtual  string GetUserSql()
+    public  virtual  string GetUserIdFromUsernameSql()
     {
         return "SELECT TOP 1 [durados_user].[id] FROM durados_user WITH(NOLOCK)  WHERE [durados_user].[username]=@username";
     }
@@ -12508,6 +12510,265 @@ public class SqlMainSchema :ISqlMainSchema
 
     public virtual string GetDeleteUserSql(int userId, string appId)
     {
-        return string.Format("DELETE durados_UserApp WHERE UserId = {0} AND AppId = {1}");
+        return string.Format("DELETE durados_UserApp WHERE UserId = {0} AND AppId = {1}",userId,appId);
+    }
+
+
+    public virtual string GetUpdateAppSystemConnectionSql(int? sysConnId, string primaryKey)
+    {
+        return "UPDATE durados_App SET SystemSqlConnectionId = " + sysConnId + " WHERE id = " + primaryKey + ";";
+
+    }
+
+    public virtual string GetUpdateDBStatusSql(int onBoardingStatus, int appId)
+    {
+        return "UPDATE durados_App SET DatabaseStatus = " + onBoardingStatus + " WHERE id = " + appId + ";";
+    }
+
+
+    public virtual string GetAppIdSql(int templateId)
+    {
+        return "SELECT AppId FROM durados_Template with(NOLOCK) WHERE id = " + templateId; 
+    }
+
+    public virtual string GetDeleteAppById(int id)
+    {
+        return "DELETE durados_App with (rowlock) WHERE Id = " + id;
+    }
+
+    public virtual string GetUpdateAppConnectionsSql(int? appConnId, int? sysConnId, string primaryKey)
+    {
+        return "UPDATE durados_App SET SqlConnectionId = " + appConnId + ", SystemSqlConnectionId = " + sysConnId + " WHERE id = " + primaryKey;
+                
+    }
+
+    public virtual string GetExecCreateDB(string sysCatalog)
+    {
+        return string.Format("EXEC('CREATE DATABASE {0}')", sysCatalog);
+    }
+
+    public virtual string GetUpdateAppProduct()
+    {
+        return "UPDATE durados_App SET productType = @productType WHERE Name = @name"; 
+    }
+
+
+    public virtual string GetDbStatusSql(string appId)
+    {
+        return "SELECT DatabaseStatus FROM dbo.durados_App WITH (NOLOCK) WHERE id = " + appId; ;
+    }
+
+
+    public virtual string GetAppNameByIdSqlSql(int appId)
+    {
+            return "SELECT Name FROM dbo.durados_App WITH (NOLOCK) WHERE id = " + appId;
+            
+    }
+
+
+    public virtual  string InsertNewConnectionToExternalServerTable()
+    {
+        return "INSERT INTO durados_ExternaInstance(InstanceName ,DbName ,IsActive,Endpoint,SqlConnectionId) VALUES(@serverName,@catalog,@IsActive,@serverName,@SqlConnectionId);SELECT IDENT_CURRENT(N'durados_ExternaInstance') AS Id";
+           
+    }
+
+
+    public virtual string GetValidateSelectFunctionExistsSql()
+    {
+        return @"IF NOT EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[f_report_connection_type]') AND type in (N'FN', N'IF', N'TF', N'FS', N'FT'))
+                BEGIN
+                execute dbo.sp_executesql @statement = N'
+                -- =============================================
+                -- Author:		<Author,,Name>
+                -- Create date: <Create Date, ,>
+                -- Description:	<Description, ,>
+                -- =============================================
+                Create FUNCTION [dbo].[f_report_connection_type] 
+                (
+	                -- Add the parameters for the function here
+	                @id int
+                )
+                RETURNS int
+                AS
+                BEGIN
+	                 -- Declare the return variable here
+	                DECLARE @ResultVar int
+					 --1	console   --2	free
+	                -- Add the T-SQL statements to compute the return value here
+	                select @ResultVar = CASE 
+						WHEN ServerName IN(SELECT ServerName 
+						FROM durados_ExternaInstance WITH(NOLOCK) 
+						INNER JOIN durados_SqlConnection WITH(NOLOCK) ON durados_SqlConnection.Id = durados_ExternaInstance.SqlConnectionId)
+						  THEN 2  
+	                ELSE 1 END 
+	                FROM dbo.durados_SqlConnection c with (NOLOCK) 
+	                where id=@id
+
+	                -- Return the result of the function
+	                RETURN @ResultVar
+                END
+
+                ' 
+                END
+                ";
+    }
+
+    public virtual  string GetCreatorSql(int appId)
+    {
+        return "SELECT Creator FROM dbo.durados_App WITH (NOLOCK) WHERE dbo.durados_App.Id = " + appId; 
+    }
+
+    public virtual string GetCreatorUsername(int appId)
+    {
+        return "SELECT dbo.durados_User.[Username] FROM dbo.durados_App WITH (NOLOCK) INNER JOIN dbo.durados_User WITH (NOLOCK) ON dbo.durados_App.Creator = dbo.durados_User.ID WHERE dbo.durados_App.Id = " + appId;
+    }
+
+    public virtual  string GetNewDatabaseNameSql(int plugInType, int templateAppId)
+    {
+        return "SELECT DatabaseName, DbCount FROM durados_SampleApp WITH (NOLOCK) WHERE PlugInId = " + plugInType + " AND AppId = " + templateAppId;
+    }
+
+
+    public virtual string GetAppSql()
+    {
+        return @"SELECT a.Id, a.Name,  dbo.f_report_connection_type(a.SqlConnectionId) AS AppType, 
+                             a.Creator,cnn.ServerName, cnn.catalog ,syscnn.ServerName sysServerName,syscnn.catalog sysCatalog
+                            FROM dbo.durados_App AS a WITH (NOLOCK) INNER JOIN dbo.durados_SqlConnection AS cnn WITH (NOLOCK) ON a.SqlConnectionId = cnn.Id INNER JOIN dbo.durados_SqlConnection AS syscnn WITH (NOLOCK) ON a.SystemSqlConnectionId = syscnn.Id
+                            WHERE   [ToDelete]<>1"; ;
+    }
+
+
+    public virtual string GetUserGuidSql()
+    {
+        return "SELECT TOP 1 [durados_User].[guid] FROM durados_user WITH(NOLOCK)  WHERE [durados_User].[Username]=@username";
+    }
+
+
+
+
+    public virtual string GetAppRowByNameSql(string appName)
+    {
+        return string.Format("SELECT * FROM [durados_app] WITH(NOLOCK)  WHERE [Name] = '{0}'", appName);
+    }
+
+
+
+    public virtual string GetAppNameByTokenSql(string HeaderToken)
+    {
+        return string.Format("SELECT [Name] FROM [durados_app] WITH(NOLOCK)  WHERE [{0}] = @token", HeaderToken);
+    }
+
+
+    public virtual string GetUpdateAppToBeDeleted()
+    {
+        return "UPDATE durados_App SET [ToDelete]=1,[deleteddate] =getdate() WHERE Id=@Id"; 
+    }
+
+
+    public virtual string GetValidateUserSql(int appID, int userId)
+    {
+        return string.Format("SELECT Cast( case when exists(SELECT 1 FROM durados_App WITH(NOLOCK)  WHERE durados_app.[ToDelete]=0 AND  Id = {0} AND Creator = {1}) or exists(SELECT 1 FROM dbo.durados_UserApp WITH(NOLOCK)  WHERE  AppId = {0} AND UserId = {1}) then 1 else 0 end as bit)", appID, userId);
+    }
+
+    public virtual string GetLoadUserDataByGuidSql()
+    {
+        return string.Format("SELECT TOP 1 username FROM durados_user WITH(NOLOCK)  WHERE guid=@guid");
+    }
+
+    public virtual string GetLoadUserDataByUsernameSql(string userFields, string userViewName, string userFieldName)
+    {
+        return string.Format("SELECT TOP 1 {0} FROM {1} WITH(NOLOCK)  WHERE {2}=@username", userFields, userViewName, userFieldName);
+    }
+
+   
+
+    public virtual string GetUsernameByUsernameSql()
+    {
+        return "SELECT TOP 1 [Username] FROM [durados_User] WHERE [Username]=@Username";
+    }
+
+    public virtual string GetUsernameByUsernameInUseSql()
+    {
+        return "SELECT TOP 1 [Username] FROM [User] WHERE [Username]=@Username";
+    }
+
+    public virtual string InsertIntoPluginRegisterUsersSql()
+    {
+        return "INSERT INTO durados_PlugInRegisteredUser (PlugInUserId ,PlugInId, RegisteredUserId, SelectionDate) VALUES (@PlugInUserId ,@PlugInId, @RegisteredUserId, @SelectionDate)";
+    }
+
+    public virtual string InsertIntoUserSql()
+    {
+        return "INSERT INTO [User] ([Username],[FirstName],[LastName],[Email],[Password],[Role],[NewUser],[Comments]) VALUES (@Username,@FirstName,@LastName,@Email,@Password,@Role,@NewUser,@Comments)";
+    }
+
+
+    public virtual string GetExternalConnectionIdsSql()
+    {
+        return "SELECT  SqlConnectionId  FROM durados_ExternaInstance WITH(NOLOCK) INNER JOIN durados_SqlConnection WITH(NOLOCK) on durados_SqlConnection.Id = durados_ExternaInstance.SqlConnectionId";
+    }
+
+
+    public virtual string GetDeleteAppByName(string id)
+    {
+        return "DELETE durados_App WHERE Name = '" + id + "'";
+    }
+
+
+    public virtual string GetAppGuidByName()
+    {
+        return "SELECT [Guid] FROM [durados_app] WITH(NOLOCK)  WHERE [Name] =@appName";
+    }
+    public virtual string GetAppGuidById()
+    {
+        return "SELECT [Guid] FROM [durados_app] WITH(NOLOCK)  WHERE [Id] =@Id";
+    }
+
+    public virtual string GetUserFieldsForSelectSql()
+    {
+        return "[{0}],[{1}],[{2}],[{3}],[{4}]";
+        //return "SELECT TOP 1 [durados_user].[guid] FROM durados_user WITH(NOLOCK)  WHERE [durados_user].[username]=@username";
+
+    }
+
+
+    public virtual string GetUserAappIdSql()
+    {
+        return "SELECT TOP 1 [ID] FROM [durados_UserApp] WHERE [UserId]=@UserId AND [AppId]=@AppId";
+    }
+
+
+    public virtual string GetAppsNameSql()
+    {
+        return "SELECT dbo.durados_App.Name FROM dbo.durados_App WITH(NOLOCK) INNER JOIN dbo.durados_SqlConnection WITH(NOLOCK) ON dbo.durados_App.SqlConnectionId = dbo.durados_SqlConnection.Id WHERE (dbo.durados_SqlConnection.Id = 1)"; 
+    }
+
+
+    public virtual string GetInsertLimitsSql(Limits limits, int limit, int? id)
+    {
+        return "SET TRANSACTION ISOLATION LEVEL SERIALIZABLE; " +
+                                   "BEGIN TRANSACTION; " +
+                                   "UPDATE dbo.durados_AppLimits SET Limit = " + limit + " WHERE AppId = " + id + " and Name = '" + limits.ToString() + "';" +
+                                   " IF @@ROWCOUNT = 0 " +
+                                   "BEGIN " +
+                                     "INSERT into dbo.durados_AppLimits (Name, Limit, AppId) values ('" + limits.ToString() + "'," + limit + "," + id.Value + "); " +
+                                   "END " +
+                                   "COMMIT TRANSACTION;";
+    }
+
+
+    public virtual string GetUpdateAppConnectionAndProductSql(string newConnectionId, string image, string pk)
+    {
+        return "UPDATE durados_App SET SqlConnectionId = " + newConnectionId + ",Image= '" + image + "', DataSourceTypeId=2 WHERE Id = " + pk;
+    }
+
+
+    public virtual string GetInsertIntoUsersSql(string viewName)
+    {
+        return "INSERT INTO [" + viewName + "] ([Username],[FirstName],[LastName],[Email],[Role],[Guid]) VALUES (@Username,@FirstName,@LastName,@Email,@Role,@Guid)";
+    }
+    public virtual string GetInsertIntoUsersSql2(string viewName)
+    {
+        return "INSERT INTO [" + viewName + "] ([Username],[FirstName],[LastName],[Email],[Role],[Guid],[IsApproved]) VALUES (@Username,@FirstName,@LastName,@Email,@Role,@Guid,@IsApproved)";
     }
 }

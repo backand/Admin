@@ -20,6 +20,7 @@ using Durados.Web.Mvc.Webhook;
 using Durados.Web.Mvc.UI.Helpers.Cloning;
 using System.Runtime.Caching;
 using System.Data.Common;
+using System.Data;
 /*
  HTTP Verb	|Entire Collection (e.g. /customers)	                                                        |Specific Item (e.g. /customers/{id})
 -----------------------------------------------------------------------------------------------------------------------------------------------
@@ -196,7 +197,10 @@ namespace BackAnd.Web.Api.Controllers
         private string GetNewAppGuid(Durados.CreateEventArgs e)
         {
             Guid guid;
-            string sql = "Select [Guid] from durados_app with(nolock) where id=" + e.PrimaryKey;
+            string sql = Maps.MainAppSchema.GetAppGuidById();
+            var parameter = e.Command.CreateParameter();
+            parameter.ParameterName = "Id";
+            parameter.Value =  e.PrimaryKey;
             e.Command.CommandText = sql;
 
             object scalar = e.Command.ExecuteScalar();
@@ -228,12 +232,12 @@ namespace BackAnd.Web.Api.Controllers
             {
                 if (IsTempAppBelongToCreator(e, out tempAppId))
                 {
-                    string sqlDeleteTempApp = "delete durados_App with (rowlock) where Id = " + tempAppId.Value;
+                    string sqlDeleteTempApp = Maps.MainAppSchema.GetDeleteAppById(tempAppId.Value);
                     e.Command.CommandText = sqlDeleteTempApp;
 
                     //lock (locker1)
                    // {
-                    Durados.SmartRun.RunWithRetry.Run<System.Data.SqlClient.SqlException>(() =>
+                    Durados.SmartRun.RunWithRetry.Run<DbException>(() =>
                     {
                         e.Command.ExecuteNonQuery();
                     }, 8, 2000);
@@ -359,9 +363,8 @@ namespace BackAnd.Web.Api.Controllers
                 if (string.IsNullOrEmpty(e.PrimaryKey))
                     throw new Durados.DuradosException("Failed to save new app.");
                 string callbackUrl = string.Format("{0}/admin/myAppConnection/rdsResponse?appguid={1}&appname={2}", Maps.ApiUrls[0], GetNewAppGuid(e), e.Values["Name"].ToString());
-
-
-                string url = System.Configuration.ConfigurationManager.AppSettings["nodeServicesUrl"] + "/createRDSInstance";
+                
+              //  string url = System.Configuration.ConfigurationManager.AppSettings["nodeServicesUrl"] + "/createRDSInstance";
                 ///{"instanceName":"yrvtest23","dbName":"yrvtest23","instanceClass":"db.t1.micro","storageSize":"5","IPRange":["0.0.0.0/32"],"engine":"MySQL","engineVersion":"5.6.21","username":"yariv","password":"123456789","region":"us-east-1","characterSetName":"ASCII","callbackUrl":"http://backand-dev3.cloudapp.net:4109/admin/myAppConnection/rdsResponse?appguid=86bec9ad-3319-423d-8125-9860ccd535c4&appname=test1&success=true","authToken":"123456789","securityGroup":"bknd-Allcustomers"}
 
                 string postData = GetPostDataForCreateNewRdsDatabase(callbackUrl);
@@ -376,8 +379,8 @@ namespace BackAnd.Web.Api.Controllers
                     }
                     else
                     {
-                        string response = Durados.Web.Mvc.Infrastructure.Http.PostWebRequest(url, postData);
-                        json = Durados.Web.Mvc.UI.Json.JsonSerializer.Deserialize(response);
+                        //string response = Durados.Web.Mvc.Infrastructure.Http.PostWebRequest(url, postData);
+                        //json = Durados.Web.Mvc.UI.Json.JsonSerializer.Deserialize(response);
                     }
                 }
                 catch (Exception exception)
@@ -392,7 +395,9 @@ namespace BackAnd.Web.Api.Controllers
         }
         private string GetServerName(string connectionString)
         {
-            return new MySqlSchema().GetServerName(connectionString);
+            if (MySqlAccess.IsMySqlConnectionString(Maps.Instance.SystemConnectionString))
+                return new MySqlSchema().GetServerName(connectionString);
+            return new SqlSchema().GetServerName(connectionString);
         }
 
         private Durados.SqlProduct GetSystemSqlProduct()
@@ -549,13 +554,18 @@ namespace BackAnd.Web.Api.Controllers
 
             string dataSourceTypeId = e.Values[dataSourceTypeFieldName].ToString();
             string name = e.Values[nameFieldName].ToString();
-            System.Data.SqlClient.SqlConnectionStringBuilder builder = new System.Data.SqlClient.SqlConnectionStringBuilder();
-            builder.ConnectionString = Map.connectionString;
+            DbConnectionStringBuilder builder = Maps.GetMapsConnectionStringBuilder();
+
+            string server = builder.Server();
+            string userId = builder.UserId();
+            string password = builder.Password();
+            bool integratedSecurity = builder.IntegratedSecurity();
+
             string pk = e.PrimaryKey;
 
             string cleanName = GetCleanName(name);
 
-            Durados.SqlProduct sqlProduct = Durados.SqlProduct.SqlServer;
+            Durados.SqlProduct sqlProduct = Map.SqlProduct;
 
             if (dataSourceTypeId == "1")// || dataSourceTypeId == "4") // blank or template
             {
@@ -570,7 +580,7 @@ namespace BackAnd.Web.Api.Controllers
                 {
                     sqlAccess.ExecuteNoneQueryStoredProcedure(Maps.Instance.ConnectionString, "durados_CreateNewDatabase", values);
                 }
-                catch (System.Data.SqlClient.SqlException exception)
+                catch (DbException exception)
                 {
                     throw new Durados.DuradosException(exception.Message, exception);
                 }
@@ -590,9 +600,10 @@ namespace BackAnd.Web.Api.Controllers
                 string duradosUser = Map.Database.GetUserID();
                 string newPassword = new Durados.Web.Mvc.Controllers.AccountMembershipService().GetRandomPassword(12);
                 string newUsername = appCatalog + "User";
+
                 try
                 {
-                    CreateDatabaseUser(builder.DataSource, appCatalog, builder.UserID, builder.Password, builder.IntegratedSecurity, newUsername, newPassword, false);
+                    CreateDatabaseUser(server, appCatalog, userId, password, integratedSecurity, newUsername, newPassword, false);
                     sqlAccess.CreateDatabaseUserWithoutLogin(Map.connectionString, sysCatalog, newUsername, newPassword, "db_owner");
                 }
                 catch (Exception exception)
@@ -600,23 +611,24 @@ namespace BackAnd.Web.Api.Controllers
                     Map.Logger.Log(GetControllerNameForLog(this.ControllerContext), "CreateApp", exception.Source, exception, 1, "Failed to create database user. username=" + newUsername);
                     throw new Durados.DuradosException("Failed to create database user");
                 }
-                int? appConnId = SaveConnection(builder.DataSource, appCatalog, newUsername, newPassword, duradosUser, Durados.SqlProduct.SqlServer);
+                int? appConnId = SaveConnection(server, appCatalog, newUsername, newPassword, duradosUser, Durados.SqlProduct.SqlServer);
 
-                int? sysConnId = SaveConnection(builder.DataSource, sysCatalog, newUsername, newPassword, duradosUser, Durados.SqlProduct.SqlServer);
+                int? sysConnId = SaveConnection(server, sysCatalog, newUsername, newPassword, duradosUser, Durados.SqlProduct.SqlServer);
 
                 //values = new Dictionary<string, object>();
                 //values.Add("FK_durados_App_durados_SqlConnection_Parent", appConnId);
                 //values.Add("FK_durados_App_durados_SqlConnection_System_Parent", sysConnId);
 
                 //e.View.Edit(values, e.PrimaryKey, null, null, null, null);
+                
+                string sql = Maps.MainAppSchema.GetUpdateAppConnectionsSql(appConnId,sysConnId, e.PrimaryKey);
 
-                string sql = "update durados_App set SqlConnectionId = " + appConnId + ", SystemSqlConnectionId = " + sysConnId + " where id = " + e.PrimaryKey;
-
-                using (System.Data.SqlClient.SqlConnection connection = new System.Data.SqlClient.SqlConnection(Maps.Instance.ConnectionString))
+                using (IDbConnection connection = GetNewConnection(Maps.Instance.DuradosMap.SqlProduct,Maps.Instance.ConnectionString))
                 {
                     connection.Open();
-                    using (System.Data.SqlClient.SqlCommand command = new System.Data.SqlClient.SqlCommand(sql, connection))
+                    using (IDbCommand command = connection.CreateCommand())
                     {
+                        command.CommandText = sql;
                         command.ExecuteNonQuery();
                     }
                 }
@@ -645,10 +657,10 @@ namespace BackAnd.Web.Api.Controllers
                     {
                         try
                         {
-                            using (System.Data.SqlClient.SqlConnection connection = new System.Data.SqlClient.SqlConnection(Maps.Instance.ConnectionString))
+                            using (IDbConnection connection = GetNewConnection(Maps.Instance.DuradosMap.SqlProduct,Maps.Instance.ConnectionString))
                             {
                                 connection.Open();
-                                using (System.Data.SqlClient.SqlCommand command = new System.Data.SqlClient.SqlCommand())
+                                using (IDbCommand command = connection.CreateCommand())
                                 {
                                     command.Connection = connection;
                                     sqlAccess.ExecuteNonQuery(e.View, command, "create database " + sysCatalog, null);
@@ -663,14 +675,14 @@ namespace BackAnd.Web.Api.Controllers
 
                         try
                         {
-                            CreateDatabaseUser(builder.DataSource, sysCatalog, builder.UserID, builder.Password, builder.IntegratedSecurity, newUsername, newPassword, false);
+                            CreateDatabaseUser(server, sysCatalog, userId, password, integratedSecurity, newUsername, newPassword, false);
                         }
                         catch (Exception exception)
                         {
                             Map.Logger.Log(GetControllerNameForLog(this.ControllerContext), "CreateApp", exception.Source, exception, 1, "Failed to create database user. username=" + newUsername);
                             throw new Durados.DuradosException("Failed to create database user");
                         }
-                        sysConnId = SaveConnection(builder.DataSource, sysCatalog, newUsername, newPassword, duradosUser, Durados.SqlProduct.SqlServer);
+                        sysConnId = SaveConnection(server, sysCatalog, newUsername, newPassword, duradosUser, Durados.SqlProduct.SqlServer);
 
                     }
                     else if (systemSqlProduct == Durados.SqlProduct.MySql)
@@ -696,13 +708,14 @@ namespace BackAnd.Web.Api.Controllers
                     //values.Add("FK_durados_App_durados_SqlConnection_System_Parent", sysConnId);
 
                     //e.View.Edit(values, e.PrimaryKey, null, null, null, null);
-                    string sql = "update durados_App set SystemSqlConnectionId = " + sysConnId + " where id = " + e.PrimaryKey;
+                    string sql = Maps.MainAppSchema.GetUpdateAppSystemConnectionSql(sysConnId, e.PrimaryKey);
 
-                    using (System.Data.SqlClient.SqlConnection connection = new System.Data.SqlClient.SqlConnection(Maps.Instance.ConnectionString))
+                    using (IDbConnection connection = GetNewConnection(Map.SqlProduct, Maps.Instance.ConnectionString))
                     {
                         connection.Open();
-                        using (System.Data.SqlClient.SqlCommand command = new System.Data.SqlClient.SqlCommand(sql, connection))
+                        using (IDbCommand command = connection.CreateCommand())
                         {
+                            command.CommandText = sql;
                             command.ExecuteNonQuery();
                         }
                     }
@@ -737,19 +750,21 @@ namespace BackAnd.Web.Api.Controllers
 
                 try
                 {
+                    string sql =Maps.MainAppSchema.GetExecCreateDB(sysCatalog) ;
                     if (!sysExists)
                     {
-                        using (System.Data.SqlClient.SqlConnection connection = new System.Data.SqlClient.SqlConnection(Maps.Instance.ConnectionString))
+                        using (IDbConnection connection = GetNewConnection(Maps.Instance.DuradosMap.SqlProduct,Maps.Instance.ConnectionString))
                         {
                             connection.Open();
-                            using (System.Data.SqlClient.SqlCommand command = new System.Data.SqlClient.SqlCommand("exec('create database " + sysCatalog + "')", connection))
+                            using (IDbCommand command = connection.CreateCommand())
                             {
+                                command.CommandText = sql;
                                 command.ExecuteNonQuery();
                             }
                         }
                     }
                 }
-                catch (System.Data.SqlClient.SqlException exception)
+                catch (DbException exception)
                 {
                     throw new Durados.DuradosException("Could not create system database: " + sysCatalog + "; Additional info: " + exception.Message, exception);
                 }
@@ -758,17 +773,19 @@ namespace BackAnd.Web.Api.Controllers
                 {
                     if (!appExists)
                     {
-                        using (System.Data.SqlClient.SqlConnection connection = new System.Data.SqlClient.SqlConnection(Maps.Instance.ConnectionString))
+                        string sql = Maps.MainAppSchema.GetExecCreateDB(appCatalog);
+                        using (IDbConnection connection = GetNewConnection(Maps.Instance.DuradosMap.SqlProduct,Maps.Instance.ConnectionString))
                         {
                             connection.Open();
-                            using (System.Data.SqlClient.SqlCommand command = new System.Data.SqlClient.SqlCommand("exec('create database " + appCatalog + "')", connection))
+                            using (IDbCommand command = connection.CreateCommand())
                             {
+                                command.CommandText = sql;
                                 command.ExecuteNonQuery();
                             }
                         }
                     }
                 }
-                catch (System.Data.SqlClient.SqlException exception)
+                catch (DbException exception)
                 {
                     throw new Durados.DuradosException("Could not create app database: " + appCatalog + "; Additional info: " + exception.Message, exception);
                 }
@@ -781,7 +798,7 @@ namespace BackAnd.Web.Api.Controllers
                 {
                     if (!appExists)
                     {
-                        CreateDatabaseUser(builder.DataSource, appCatalog, builder.UserID, builder.Password, builder.IntegratedSecurity, newUsername, newPassword, false);
+                        CreateDatabaseUser(server, appCatalog, userId, password, integratedSecurity, newUsername, newPassword, false);
                         if (!sysExists)
                         {
                             sqlAccess.CreateDatabaseUserWithoutLogin(Map.connectionString, sysCatalog, newUsername, newPassword, "db_owner");
@@ -793,7 +810,7 @@ namespace BackAnd.Web.Api.Controllers
                         {
                             sqlAccess.CreateDatabaseUser(Map.connectionString, sysCatalog, newUsername, newPassword, "db_owner");
                         }
-                        catch (System.Data.SqlClient.SqlException)
+                        catch (DbException)
                         {
                             sqlAccess.CreateDatabaseUserWithoutLogin(Map.connectionString, sysCatalog, newUsername, newPassword, "db_owner");
                         }
@@ -808,13 +825,13 @@ namespace BackAnd.Web.Api.Controllers
                 int? appConnId = null;
 
                 if (!appExists)
-                    appConnId = SaveConnection(builder.DataSource, appCatalog, newUsername, newPassword, duradosUser, Durados.SqlProduct.SqlServer);
+                    appConnId = SaveConnection(server, appCatalog, newUsername, newPassword, duradosUser, Durados.SqlProduct.SqlServer);
                 else
                     appConnId = Convert.ToInt32(e.Values[appconnstrFieldName]);
 
                 int? sysConnId = null;
                 if (!sysExists)
-                    sysConnId = SaveConnection(builder.DataSource, sysCatalog, newUsername, newPassword, duradosUser, Durados.SqlProduct.SqlServer);
+                    sysConnId = SaveConnection(server, sysCatalog, newUsername, newPassword, duradosUser, Durados.SqlProduct.SqlServer);
                 else
                     sysConnId = Convert.ToInt32(e.Values[sysconnstrFieldName]);
 
@@ -824,13 +841,15 @@ namespace BackAnd.Web.Api.Controllers
 
                 //e.View.Edit(values, e.PrimaryKey, null, null, null, null);
 
-                string sql2 = "update durados_App set SqlConnectionId = " + appConnId + ", SystemSqlConnectionId = " + sysConnId + " where id = " + e.PrimaryKey;
+                string sql2 = Maps.MainAppSchema.GetUpdateAppConnectionsSql(appConnId, sysConnId, e.PrimaryKey);
+                     
 
-                using (System.Data.SqlClient.SqlConnection connection = new System.Data.SqlClient.SqlConnection(Maps.Instance.ConnectionString))
+                using (IDbConnection connection = GetConnection(Maps.Instance.DuradosMap.SqlProduct,Maps.Instance.ConnectionString))
                 {
                     connection.Open();
-                    using (System.Data.SqlClient.SqlCommand command = new System.Data.SqlClient.SqlCommand(sql2, connection))
+                    using (IDbCommand command = connection.CreateCommand())
                     {
+                        command.CommandText = sql2;
                         command.ExecuteNonQuery();
                     }
                 }
@@ -877,7 +896,7 @@ namespace BackAnd.Web.Api.Controllers
                             //values = new Dictionary<string, object>();
                             //values.Add(e.View.GetFieldByColumnNames("SqlConnectionId").Name, newConnectionId);
                             //e.View.Edit(values, e.PrimaryKey, null, null, null, null);
-                            string sql = "update durados_App set SqlConnectionId = " + newConnectionId + ",Image= '" + image + "', DataSourceTypeId=2 where Id = " + e.PrimaryKey;
+                            string sql = Maps.MainAppSchema.GetUpdateAppConnectionAndProductSql(newConnectionId, image,e.PrimaryKey); 
                             sqlAccess.ExecuteNonQuery(e.View.ConnectionString, sql);
                         }
                         sqlProduct = sqlConnectionRow.IsNull("SqlProductId") ? Durados.SqlProduct.SqlServer : (Durados.SqlProduct)sqlConnectionRow["SqlProductId"];
@@ -1015,7 +1034,7 @@ namespace BackAnd.Web.Api.Controllers
             ValidateConnection(server, catalog, username, password, Durados.SqlProduct.SqlServer, 0, false, false, null, null, null, null, null, 0, 0);
         }
 
-        SqlAccess sqlAccess = new SqlAccess();
+        SqlAccess sqlAccess = Maps.MainAppSqlAccess;
 
         private string CreateDatabase(string server, string catalog, string username, string password, string source, string template)
         {
@@ -1129,13 +1148,13 @@ namespace BackAnd.Web.Api.Controllers
         protected int? SaveConnection(string server, string catalog, string username, string password, string userId, Durados.SqlProduct sqlProduct, bool usingSsh, bool usingSsl, string sshRemoteHost, string sshUser, string sshPassword, string sshPrivateKey, int sshPort, int productPort)
         {
             View view = GetView("durados_SqlConnection");
-
+            
             Dictionary<string, object> values = new Dictionary<string, object>();
             values.Add("ServerName", server);
             values.Add("Catalog", catalog);
             values.Add("Username", username);
             values.Add("IntegratedSecurity", false);
-            values.Add("Password", password);
+            values.Add("Password", Maps.Instance.DuradosMap.Encrypt(password));
             values.Add(view.GetFieldByColumnNames("SqlProductId").Name, ((int)sqlProduct).ToString());
             values.Add(view.GetFieldByColumnNames("DuradosUser").Name, userId);
 
@@ -1486,9 +1505,9 @@ namespace BackAnd.Web.Api.Controllers
                 }
 
             }
-            catch (System.Data.SqlClient.SqlException exception)
+            catch (DbException exception)
             {
-                if (exception.Number == 2601)
+                if (exception is System.Data.SqlClient.SqlException && (exception as System.Data.SqlClient.SqlException).Number == 2601)
                 {
                     Map.Logger.Log(GetControllerNameForLog(this.ControllerContext), "CreateApp", exception.Source, exception, 6, "App name already exists");
                     return new Dictionary<string, object>() { { "Success", false }, { "Message", "Application name already exists, please enter a different name." } };
@@ -1927,8 +1946,8 @@ namespace BackAnd.Web.Api.Controllers
                 return;
 
             string sql =
-                "update durados_App set productType = @productType where Name = @name";
-            new SqlAccess().ExecuteNonQuery(Maps.Instance.DuradosMap.connectionString, sql, new Dictionary<string, object>() { { "productType", productType }, { "name", appName } }, null);
+                Maps.MainAppSchema.GetUpdateAppProduct();
+            Maps.MainAppSqlAccess.ExecuteNonQuery(Maps.Instance.DuradosMap.connectionString, sql, new Dictionary<string, object>() { { "productType", productType }, { "name", appName } }, null);
             
         }
 
@@ -2010,8 +2029,8 @@ namespace BackAnd.Web.Api.Controllers
             {
                 Maps.Instance.DuradosMap.Logger.Log("myAppConnection", "CreateApp", exception.Source, exception, 1, null);
 
-                string sql = "Update durados_App set DatabaseStatus = " + (int)OnBoardingStatus.Error + " where id = " + appId;
-                Durados.DataAccess.SqlAccess sqlAccess = new Durados.DataAccess.SqlAccess();
+                string sql = Maps.MainAppSchema.GetUpdateDBStatusSql((int)OnBoardingStatus.Error, appId);
+                Durados.DataAccess.SqlAccess sqlAccess = Maps.MainAppSqlAccess;
 
                 sqlAccess.ExecuteNonQuery(Maps.Instance.DuradosMap.connectionString, sql);
 
@@ -2085,9 +2104,9 @@ namespace BackAnd.Web.Api.Controllers
 
         private int GetAppId(int templateId)
         {
-            string sql =
-                "select AppId from durados_Template with(NOLOCK) where id = " + templateId;
-            string scalar = new SqlAccess().ExecuteScalar(Maps.Instance.DuradosMap.connectionString, sql);
+            string sql = Maps.MainAppSchema.GetAppIdSql(templateId);
+                
+            string scalar = Maps.MainAppSqlAccess.ExecuteScalar(Maps.Instance.DuradosMap.connectionString, sql);
             if (!string.IsNullOrEmpty(scalar))
             {
                 return Convert.ToInt32(scalar);
@@ -2268,8 +2287,8 @@ namespace BackAnd.Web.Api.Controllers
 
         private void UpdateDatabaseStatus(int appId, OnBoardingStatus onBoardingStatus)
         {
-            string sql = "Update durados_App set DatabaseStatus = " + (int)onBoardingStatus + " where id = " + appId;
-            Durados.DataAccess.SqlAccess sqlAccess = new Durados.DataAccess.SqlAccess();
+            string sql = Maps.MainAppSchema.GetUpdateDBStatusSql((int)onBoardingStatus, appId);
+            Durados.DataAccess.SqlAccess sqlAccess = Maps.MainAppSqlAccess;
             try
             {
                 sqlAccess.ExecuteNonQuery(Maps.Instance.DuradosMap.connectionString, sql);
@@ -2473,6 +2492,9 @@ namespace BackAnd.Web.Api.Controllers
                 if (!values.ContainsKey("ProductPort"))
                     values.Add("ProductPort", productPort);
 
+                if (Maps.Instance.DuradosMap.SqlProduct ==  Durados.SqlProduct.MySql && values.ContainsKey("password") && !string.IsNullOrEmpty((values["password"] ?? string.Empty).ToString()))
+                    values["password"] = map.Encrypt(values["password"].ToString());
+                
                 view.Update(values, connectionId.ToString(), false, view_BeforeEdit, view_BeforeEditInDatabase, view_AfterEditBeforeCommit, view_AfterEditAfterCommit);
 
                 try
@@ -2533,7 +2555,7 @@ namespace BackAnd.Web.Api.Controllers
 
         private string[] GetAppsName(int id, System.Data.IDbCommand command)
         {
-            command.CommandText = "SELECT dbo.durados_App.Name FROM dbo.durados_App with(nolock) INNER JOIN dbo.durados_SqlConnection with(nolock) ON dbo.durados_App.SqlConnectionId = dbo.durados_SqlConnection.Id WHERE (dbo.durados_SqlConnection.Id = 1)";
+            command.CommandText = Maps.MainAppSchema.GetAppsNameSql();
 
             List<string> apps = new List<string>();
 
@@ -2592,7 +2614,10 @@ namespace BackAnd.Web.Api.Controllers
 
             //connectionString = GetConnection(serverName, catalog, integratedSecurity, username, password, duradosUserId);
             //SqlConnection connection = new SqlConnection(connectionString);
-
+            if(Maps.Instance.DuradosMap.SqlProduct == sqlProduct)
+            {
+                password = map.Decrypt(password);
+            }
             connectionString = GetConnection(serverName, catalog, integratedSecurity, username, password, duradosUserId, sqlProduct, localPort, usesSsh, usesSsl);
             System.Data.IDbConnection connection = GetNewConnection(sqlProduct, connectionString);
 
@@ -3050,6 +3075,17 @@ namespace BackAnd.Web.Api.Controllers
 
             Durados.Cms.DataAccess.Email.Send(host, Map.Database.UseSmtpDefaultCredentials, port, username, password, false, to.Split(';'), new string[0], new string[1] { from }, subject, message, from, null, null, false, null, Map.Database.Logger);
 
+        }
+        protected internal override void view_AfterSelect(object sender, Durados.SelectEventArgs e)
+        {
+            if(sender is MySqlAccess && e.View != null && e.View.Name == ConnectionViewName)
+            {
+                foreach (DataRow row in (e.DataTable.AsEnumerable()))
+                {
+                    if(row["Password"] != null)
+                    row["Password"] = map.Decrypt(row["Password"].ToString());
+                }
+            }
         }
     }
 

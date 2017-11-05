@@ -20,6 +20,7 @@ using Durados.Data;
 using Durados.Web.Mvc.Webhook;
 using BackAnd.Web.Api.Controllers.Admin;
 using System.Data;
+using System.Data.Common;
 /*
  HTTP Verb	|Entire Collection (e.g. /customers)	                                                        |Specific Item (e.g. /customers/{id})
 -----------------------------------------------------------------------------------------------------------------------------------------------
@@ -417,10 +418,10 @@ namespace BackAnd.Web.Api.Controllers
                 return Ok(new { __metadata = new { id = key, appName = appName } });
             }
                 // TODO : Mysql deprecated
-            catch (System.Data.SqlClient.SqlException exception)
+            catch (DbException exception)
             {
                 const int DuplicateUniqueIndex = 2601;
-                if (exception.Number == DuplicateUniqueIndex)
+                if (  exception is System.Data.SqlClient.SqlException  && ((System.Data.SqlClient.SqlException)exception).Number == DuplicateUniqueIndex)
                 {
                     return ResponseMessage(Request.CreateResponse(HttpStatusCode.Conflict, string.Format(Messages.AppNameAlreadyExists, appName)));
                 }
@@ -467,8 +468,8 @@ namespace BackAnd.Web.Api.Controllers
 
         private string[] GetAppNamesWithPrefix(string appNamePrefix)
         {
-            SqlAccess sqlAccess = Maps.GetMainAppSqlAccess();
-            string sql = Maps.GetMainAppSqlSchema().GetAppNamesWithPrefixSql(appNamePrefix);
+            SqlAccess sqlAccess = Maps.MainAppSqlAccess;
+            string sql = Maps.MainAppSchema.GetAppNamesWithPrefixSql(appNamePrefix);
             System.Data.DataTable table = sqlAccess.ExecuteTable(Maps.Instance.DuradosMap.connectionString, sql, null, System.Data.CommandType.Text);
             List<string> list = new List<string>();
 
@@ -660,19 +661,7 @@ namespace BackAnd.Web.Api.Controllers
 
         }
 
-        //private void UpdateIsAuthApp(Map map, bool isAuthApp)
-        //{
-        //    UpdateIsAuthApp(Convert.ToInt32(map.Id), isAuthApp);
-        //    map.IsAuthApp = isAuthApp;
-        //}
-
-        //private void UpdateIsAuthApp(int id, bool isAuthApp)
-        //{
-        //    string sql = "update durados_App set IsAuthApp = @isAuthApp where id = @id";
-        //    (new SqlAccess()).ExecuteNonQuery(map.Database.SystemConnectionString, sql, Durados.SqlProduct.SqlServer, new Dictionary<string, object>() { { "id", id }, { "IsAuthApp", isAuthApp } }, null);
-
-        //}
-
+     
         private string GetAnonymousRole(Dictionary<string, object> databaseSettings)
         {
             string key = "defaultGuestRole";
@@ -695,26 +684,10 @@ namespace BackAnd.Web.Api.Controllers
                 string newName = e.Values["Name"].ToString();
                 if (!oldName.Equals(newName))
                 {
-                    //Maps.Instance.ChangeName(oldName, newName);
-                    //CreateDns(newName);
+                  
                     Maps.Instance.Restart(oldName);
                 }
 
-                //SqlProduct product = Maps.GetSqlProduct(newName);
-
-                //if (product == SqlProduct.MySql)
-                //{
-                //    string url = Maps.GetAppUrl(newName);
-                //    string[] split = url.Split(':');
-                //    url = split[0] + ":" + split[1] + ":" + Maps.ProductsPort[product] + "/Admin/Restart?id=" + Map.Database.GetUserGuid();
-
-                //    Infrastructure.Http.CallWebRequest(url);
-
-                //}
-                //else
-                //{
-                    //Maps.Instance.Restart(oldName);
-                //}
             }
         }
 
@@ -788,7 +761,7 @@ namespace BackAnd.Web.Api.Controllers
             {
                 int id = Convert.ToInt32(e.PrimaryKey);
 
-                SqlAccess sqlAccess = Maps.GetMainAppSqlAccess();
+                SqlAccess sqlAccess = Maps.MainAppSqlAccess;
                 SqlSchema sqlSchema = sqlAccess.GetNewSqlSchema();
 
 
@@ -837,7 +810,7 @@ namespace BackAnd.Web.Api.Controllers
 
         private bool HasOtherConnectios(string appDatabase)
         {
-            ISqlMainSchema sqlSchema= Maps.GetMainAppSqlSchema();
+            ISqlMainSchema sqlSchema= Maps.MainAppSchema;
             string sql = sqlSchema.GetHasOtherConnectiosSql(appDatabase);
 
             using (IDbConnection connection = sqlSchema.GetNewConnection(Maps.Instance.ConnectionString))
@@ -862,7 +835,7 @@ namespace BackAnd.Web.Api.Controllers
             //scsb.InitialCatalog = null;
 
 
-            ISqlMainSchema sqlSchema = Maps.GetMainAppSqlSchema();
+            ISqlMainSchema sqlSchema = Maps.MainAppSchema;
             string sql = sqlSchema.GetDropDatabaseSql(name);
             using (IDbConnection connection = sqlSchema.GetNewConnection(Maps.Instance.ConnectionString))
             {
@@ -899,11 +872,11 @@ namespace BackAnd.Web.Api.Controllers
                 {
                     return ResponseMessage(Request.CreateResponse(HttpStatusCode.NotFound, string.Format(Messages.ItemWithIdNotFound, id, AppViewName)));
                 }
-
+                /* TODO: Mysql Main
                 string guid = GetMasterGuid();
 
                 string qstring = "id=" + guid;     
-                
+                */
                 
                 try
                 {
@@ -946,8 +919,8 @@ namespace BackAnd.Web.Api.Controllers
                 }
                 catch { }
 
-                string sql = "delete durados_App where name = '" + id + "'";
-                (new SqlAccess()).ExecuteNonQuery(Maps.Instance.DuradosMap.connectionString, sql);
+                string sql = Maps.MainAppSchema.GetDeleteAppByName(id);  
+                Maps.MainAppSqlAccess.ExecuteNonQuery(Maps.Instance.DuradosMap.connectionString, sql);
 
 
                 Maps.Instance.DuradosMap.Logger.Log("myApps", "delete", "", null, 1, "The app " + id + " was deleted");

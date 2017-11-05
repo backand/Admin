@@ -59,11 +59,11 @@ namespace BackAnd.Web.Api.Controllers
             return string.Empty;
 
         }
-
-        public virtual string SaveInMessageBoard(Dictionary<string, Durados.Parameter> parameters, Durados.View view, Dictionary<string, object> values, System.Data.DataRow prevRow, string pk, string siteWithoutQueryString, string urlAction, string subject, string message, int currentUserId, string currentUserRole, Dictionary<int, bool> recipients)
-        {
-            return SaveInMessageBoard(parameters, (View)view, values, prevRow, pk, siteWithoutQueryString, urlAction, subject, message, currentUserId, recipients);
-        }
+         //TODO : Main Mysql
+        //public virtual string SaveInMessageBoard(Dictionary<string, Durados.Parameter> parameters, Durados.View view, Dictionary<string, object> values, System.Data.DataRow prevRow, string pk, string siteWithoutQueryString, string urlAction, string subject, string message, int currentUserId, string currentUserRole, Dictionary<int, bool> recipients)
+        //{
+        //    return SaveInMessageBoard(parameters, (View)view, values, prevRow, pk, siteWithoutQueryString, urlAction, subject, message, currentUserId, recipients);
+        //}
 
         public virtual void SaveMessageAction(View view, string pk, Durados.Web.Mvc.UI.Json.Field jsonField, Durados.Web.Mvc.Controllers.MessageBoardAction messageBoardAction)
         {

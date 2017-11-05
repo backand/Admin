@@ -165,7 +165,7 @@ namespace Durados.Web.Mvc
 
                     View appView = (View)duradosMap.Database.Views["durados_App"];
 
-                    appView.PermanentFilter = SqlMainSchema.GetAppsPermanentFilter();
+                    appView.PermanentFilter = MainAppSchema.GetAppsPermanentFilter();
                     appView.Controller = "MultiTenancy";
 
                     View connectionView = (View)duradosMap.Database.Views["durados_SqlConnection"];
@@ -203,14 +203,14 @@ namespace Durados.Web.Mvc
 
         public void WakeupCalltoApps()
         {
-            ISqlMainSchema sqlSchema = GetMainAppSqlSchema();
-            using (IDbConnection connection = sqlSchema.GetNewConnection(duradosMap.connectionString))
+            //ISqlMainSchema sqlSchema = MainAppSchema;
+            using (IDbConnection connection = MainAppSchema.GetNewConnection(duradosMap.connectionString))
             {
                 connection.Open();
 
-                string sql = sqlSchema.GetWakeupCallToAppSql();
+                string sql = MainAppSchema.GetWakeupCallToAppSql();
 
-                using (IDbCommand command = sqlSchema.GetNewCommand(sql, connection))
+                using (IDbCommand command = MainAppSchema.GetNewCommand(sql, connection))
                 {
                     using (IDataReader reader = command.ExecuteReader())
                     {
@@ -303,7 +303,7 @@ namespace Durados.Web.Mvc
            plugInSampleGenerationCount = Convert.ToInt32(System.Configuration.ConfigurationManager.AppSettings["plugInSampleGenerationCount"] ?? "5");
 
            superDeveloper = Convert.ToString(System.Configuration.ConfigurationManager.AppSettings["superDeveloper"] ?? "dev@devitout.com").ToLower();
-
+           existOldAdmin = Convert.ToBoolean(System.Configuration.ConfigurationManager.AppSettings["existOldAdmin"] ?? "false");
            DownloadDenyPolicy = Convert.ToBoolean(System.Configuration.ConfigurationManager.AppSettings["DownloadDenyPolicy"] ?? "true");
            OldAdminHttp = Convert.ToBoolean(System.Configuration.ConfigurationManager.AppSettings["OldAdminHttp"] ?? "false");
            AllowedDownloadFileTypes = Convert.ToString(System.Configuration.ConfigurationManager.AppSettings["AllowedDownloadFileTypes"] ?? allowedDownloadFileTypesDefault).Split(',').ToArray();
@@ -447,7 +447,8 @@ namespace Durados.Web.Mvc
 
            System.Net.ServicePointManager.SecurityProtocol = System.Net.SecurityProtocolType.Ssl3 | System.Net.SecurityProtocolType.Tls | System.Net.SecurityProtocolType.Tls11 | System.Net.SecurityProtocolType.Tls12;
 
-           DevUsers = System.Configuration.ConfigurationManager.AppSettings["DevUsers"].Split(',');
+           
+           DevUsers = (System.Configuration.ConfigurationManager.AppSettings["DevUsers"] ?? string.Empty).Split(',');
 
            string embeddedReportsApiToken = System.Configuration.ConfigurationManager.AppSettings["embeddedReportsApiToken"];
            if (string.IsNullOrEmpty(embeddedReportsApiToken))
@@ -566,6 +567,13 @@ namespace Durados.Web.Mvc
            ReturnAddressForMobile = System.Configuration.ConfigurationManager.AppSettings["returnAddressForMobile"] ?? "http://www.backandblabla.bla";
 
            AwsAccountSecretKeyPart = System.Configuration.ConfigurationManager.AppSettings["AwsAccountSecretKeyPart"];
+           //if (string.IsNullOrEmpty(AwsAccountSecretKeyPart))
+           //    throw new DuradosException("Missing AwsAccountSecretKeyPart key in web config");
+           
+
+           MasterOpsAuth = System.Configuration.ConfigurationManager.AppSettings["masterOpsAuth"];
+           if (string.IsNullOrEmpty(MasterOpsAuth))
+               throw new DuradosException("Missing MasterOpsAuth key in web config");
        }
 
        private static Dictionary<string, string> GetCqls(string cqlsFileName)
@@ -686,7 +694,7 @@ namespace Durados.Web.Mvc
        public static bool DownloadDenyPolicy { get; private set; }
        public static string[] AllowedDownloadFileTypes { get; private set; }
        public static string[] DenyDownloadFileTypes { get; private set; }
-
+        
        private Durados.Data.ICache<Map> mapsCache = null;
        /* TODO: Main MySQL depricated
      public static Dictionary<string, string> DnsAliases = null;
@@ -745,6 +753,7 @@ namespace Durados.Web.Mvc
 
      private static int plugInSampleGenerationCount = 5;
      private static string superDeveloper = "dev@devitout.com";
+     private static bool existOldAdmin = true;
      private static string adminButtonText = "Admin";
      private static string publicButtonText = "Public";
      public static bool OldAdminHttp = false;
@@ -753,15 +762,23 @@ namespace Durados.Web.Mvc
 
      private Map duradosMap = null;
      System.Data.Common.DbConnectionStringBuilder builder = null;
-     public static ISqlMainSchema SqlMainSchema = GetMainAppSqlSchema();
+     //public static ISqlMainSchema MainAppSchema = GetMainAppSchema();
 
-     public static ISqlMainSchema GetMainAppSqlSchema()
+     private static ISqlMainSchema mainAppSqlSchema = null;
+     public static ISqlMainSchema MainAppSchema
      {
-         string connectionString =  System.Configuration.ConfigurationManager.ConnectionStrings["MapsConnectionString"].ConnectionString;
-         if (MySqlAccess.IsMySqlConnectionString(connectionString))
-             return new MySqlMainSchema();
-         else
-             return new SqlMainSchema();
+         get
+         {
+             if (mainAppSqlSchema == null)
+             {
+                 string connectionString = System.Configuration.ConfigurationManager.ConnectionStrings["MapsConnectionString"].ConnectionString;
+                 if (MySqlAccess.IsMySqlConnectionString(connectionString))
+                     mainAppSqlSchema = new MySqlMainSchema();
+                 else
+                     mainAppSqlSchema = new SqlMainSchema();
+             }
+             return mainAppSqlSchema;
+         }
      }
 
      private static CqlConfig cqlConfig;
@@ -800,13 +817,15 @@ namespace Durados.Web.Mvc
 
              IPersistency sqlPersistency = GetNewPersistency();
              sqlPersistency.ConnectionString = System.Configuration.ConfigurationManager.ConnectionStrings["MapsConnectionString"].ConnectionString;
+
              if (System.Configuration.ConfigurationManager.ConnectionStrings["SystemMapsConnectionString"] == null)
                  throw new DuradosException("Please add SystemMapsConnectionString to the web.config connection strings");
              sqlPersistency.SystemConnectionString = System.Configuration.ConfigurationManager.ConnectionStrings["SystemMapsConnectionString"].ConnectionString;
 
              persistency = sqlPersistency;
              builder = GetMapsConnectionStringBuilder(sqlPersistency.ConnectionString);
-
+             //mainAppSqlSchema = MainAppSchema();
+             
              Durados.DataAccess.ConfigAccess.storage = new Map();
              Durados.DataAccess.ConfigAccess.multiTenancy = multiTenancy;
              Durados.DataAccess.ConfigAccess.cloud = cloud;
@@ -1124,7 +1143,13 @@ namespace Durados.Web.Mvc
              return superDeveloper;
          }
      }
-
+     public static bool ExistsOldAdmin
+     {
+         get
+         {
+             return existOldAdmin;
+         }
+     }
 
      public static int PlugInSampleGenerationCount
      {
@@ -1933,10 +1958,10 @@ namespace Durados.Web.Mvc
 
         public void UpdatePlan(int appId, Map map)
         {
-            string sql = GetMainAppSqlSchema().GetPlanForAppSql(appId);
+            string sql = MainAppSchema.GetPlanForAppSql(appId);
             try
             {
-                string scalar = GetMainAppSqlAccess().ExecuteScalar(duradosMap.connectionString, sql);
+                string scalar = MainAppSqlAccess.ExecuteScalar(duradosMap.connectionString, sql);
                 if (string.IsNullOrEmpty(scalar))
                     map.Plan = 0;
                 else
@@ -2038,7 +2063,7 @@ namespace Durados.Web.Mvc
 
         public string GetAppNameByGuidFromDb(string guid)
         {
-            SqlAccess sqlAccess = GetMainAppSqlAccess();
+            SqlAccess sqlAccess = MainAppSqlAccess;
             string sSqlCommand = "";
 
             Guid parsedGuid;
@@ -2047,7 +2072,7 @@ namespace Durados.Web.Mvc
                 throw new ArgumentException("Illegal token");
             }
 
-            sSqlCommand = Maps.GetMainAppSqlSchema().GetAppNameByGuidFromDb(guid);
+            sSqlCommand = Maps.MainAppSchema.GetAppNameByGuidFromDb(guid);
 
             object scalar = sqlAccess.ExecuteScalar(duradosMap.connectionString, sSqlCommand);
 
@@ -2074,8 +2099,8 @@ namespace Durados.Web.Mvc
             }
             try
             {
-                SqlAccess sqlAccess = GetMainAppSqlAccess();
-                string sSqlCommand = GetMainAppSqlSchema().GetPaymentStatusSql(appName); 
+                SqlAccess sqlAccess = MainAppSqlAccess;
+                string sSqlCommand = MainAppSchema.GetPaymentStatusSql(appName); 
 
                 object scalar = sqlAccess.ExecuteScalar(duradosMap.connectionString, sSqlCommand);
 
@@ -2090,7 +2115,7 @@ namespace Durados.Web.Mvc
             }
         }
 
-        //private SqlAccess GetMainAppSqlAccess()
+        //private SqlAccess MainAppSqlAccess
         //{
         //    return (DuradosMap as DuradosMap).GetSqlAccess();
         //}
@@ -2098,17 +2123,17 @@ namespace Durados.Web.Mvc
 
         public int? AppExists(string appName, int? userId = null, bool ignoreDevUser = false)
         {
-            SqlAccess sqlAccess = GetMainAppSqlAccess();
-            ISqlMainSchema sqlMain = GetMainAppSqlSchema();
+            SqlAccess sqlAccess = MainAppSqlAccess;
+            ISqlMainSchema sqlMain = MainAppSchema;
             string sSqlCommand = "";
 
             if (!userId.HasValue || (IsDevUser() && !ignoreDevUser))
             {
-                sSqlCommand = sqlMain.GetAppsExistsSql(appName); 
+                sSqlCommand = MainAppSchema.GetAppsExistsSql(appName); 
             }
             else
             {
-                sSqlCommand = sqlMain.GetAppsExistsForUserSql(appName, userId);
+                sSqlCommand = MainAppSchema.GetAppsExistsForUserSql(appName, userId);
                 
             }
 
@@ -2150,9 +2175,15 @@ namespace Durados.Web.Mvc
         {
             return GetAppUrl(duradosAppName);
         }
-        public static SqlAccess GetMainAppSqlAccess()
+        private static SqlAccess mainAppSqlAccess = null;
+        //public static SqlAccess MainAppSqlAccess
+        public static SqlAccess MainAppSqlAccess
         {
-            return (Maps.Instance.DuradosMap as DuradosMap).GetSqlAccess();
+            get
+            {
+                 return Durados.DataAccess.Rest.GetSqlAccess(Maps.instance.DuradosMap.SqlProduct);;
+            }
+
         }
 
         public static string GetmainAppConfigName()
@@ -2284,12 +2315,12 @@ namespace Durados.Web.Mvc
                 return Convert.ToInt16(HttpContext.Current.Session["AppAcount"]);
             try
             {
-                ISqlMainSchema sqlMain = GetMainAppSqlSchema();
-                using (IDbConnection connection = sqlMain.GetNewConnection(System.Configuration.ConfigurationManager.ConnectionStrings["MapsConnectionString"].ConnectionString))
+                
+                using (IDbConnection connection = MainAppSchema.GetNewConnection(System.Configuration.ConfigurationManager.ConnectionStrings["MapsConnectionString"].ConnectionString))
                 {
                     connection.Open();
-                    string sql = sqlMain.GetAppsCountsql(); 
-                    using (IDbCommand command = sqlMain.GetNewCommand(sql, connection))
+                    string sql = MainAppSchema.GetAppsCountsql();
+                    using (IDbCommand command = MainAppSchema.GetNewCommand(sql, connection))
                     {
                         object scalar = command.ExecuteScalar();
                         appCount = Convert.ToInt16(scalar);
@@ -2310,10 +2341,10 @@ namespace Durados.Web.Mvc
 
         public int? GetConnection(string server, string catalog, string username, string userId)
         {
-            SqlAccess sqlAccess = GetMainAppSqlAccess();
-            string sql = GetMainAppSqlSchema().GetCurrentAppIdSql(server, catalog, username, userId);
+            //SqlAccess sqlAccess = MainAppSqlAccess;
+            string sql = MainAppSchema.GetCurrentAppIdSql(server, catalog, username, userId);
 
-            object scalar = sqlAccess.ExecuteScalar(duradosMap.connectionString, sql);
+            object scalar = MainAppSqlAccess.ExecuteScalar(duradosMap.connectionString, sql);
 
             if (string.Empty.Equals(scalar) || scalar == null || scalar == DBNull.Value)
                 return null;
@@ -2363,13 +2394,13 @@ namespace Durados.Web.Mvc
 
             if (!appsSqlProducts.ContainsKey(appName))
             {
-                ISqlMainSchema sqlMain = GetMainAppSqlSchema();
-                string sql1 = SqlMainSchema.InsertNewUserSql("durados_User", "durados_User");
-                using (IDbConnection connection = sqlMain.GetNewConnection(System.Configuration.ConfigurationManager.ConnectionStrings["MapsConnectionString"].ConnectionString))
+                
+                string sql1 = MainAppSchema.InsertNewUserSql("durados_User", "durados_User");
+                using (IDbConnection connection = MainAppSchema.GetNewConnection(System.Configuration.ConfigurationManager.ConnectionStrings["MapsConnectionString"].ConnectionString))
                 {
                     connection.Open();
-                    string sql = sqlMain.GetSqlProductSql();
-                    using (IDbCommand command = sqlMain.GetNewCommand(sql, connection))
+                    string sql = MainAppSchema.GetSqlProductSql();
+                    using (IDbCommand command = MainAppSchema.GetNewCommand(sql, connection))
                     {
                         var parameter = command.CreateParameter();
                         parameter.ParameterName = "@AppName";
@@ -2432,16 +2463,18 @@ namespace Durados.Web.Mvc
 
         public void UpdateOnBoardingStatus(OnBoardingStatus onBoardingStatus, string appId)
         {
-            string sql = "Update durados_App set DatabaseStatus = " + (int)onBoardingStatus + " where id = " + appId;
-            Durados.DataAccess.SqlAccess sqlAccess = new Durados.DataAccess.SqlAccess();
+            string sql = Maps.MainAppSchema.GetUpdateDBStatusSql((int)onBoardingStatus,Convert.ToInt32(appId));
+            Durados.DataAccess.SqlAccess sqlAccess = Maps.MainAppSqlAccess;
 
             sqlAccess.ExecuteNonQuery(DuradosMap.connectionString, sql);
         }
 
         public OnBoardingStatus GetOnBoardingStatus(string appId)
         {
-            string sql = "select DatabaseStatus from dbo.durados_App with (NOLOCK) where id = " + appId;
-            Durados.DataAccess.SqlAccess sqlAccess = new Durados.DataAccess.SqlAccess();
+            string sql = Maps.MainAppSchema.GetDbStatusSql(appId);
+            
+            
+            Durados.DataAccess.SqlAccess sqlAccess = Maps.MainAppSqlAccess;
 
             object scalar = sqlAccess.ExecuteScalar(DuradosMap.connectionString, sql);
 
@@ -2453,8 +2486,10 @@ namespace Durados.Web.Mvc
 
         public string GetAppNameById(int appId)
         {
-            string sql = "select Name from dbo.durados_App with (NOLOCK) where id = " + appId;
-            Durados.DataAccess.SqlAccess sqlAccess = new Durados.DataAccess.SqlAccess();
+            string sql = Maps.MainAppSchema.GetAppNameByIdSqlSql(appId);
+            Durados.DataAccess.SqlAccess sqlAccess = Maps.MainAppSqlAccess;
+            
+            
 
             object scalar = sqlAccess.ExecuteScalar(DuradosMap.connectionString, sql);
 
@@ -2667,5 +2702,6 @@ namespace Durados.Web.Mvc
 
 
         public static string AwsAccountSecretKeyPart { get; private set; }
+        public static string MasterOpsAuth { get; private set; }
     }
 }

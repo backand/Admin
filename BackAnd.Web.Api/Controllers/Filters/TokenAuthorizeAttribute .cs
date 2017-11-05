@@ -7,6 +7,8 @@ using System.Security.Claims;
 using System.Web.Http;
 using System.Net;
 using Durados.Web.Mvc;
+using System.Data;
+
 
 namespace BackAnd.Web.Api.Controllers.Filters
 {
@@ -53,13 +55,16 @@ namespace BackAnd.Web.Api.Controllers.Filters
 
         protected virtual string GetAppName(string token)
         {
-            string sql = string.Format("SELECT [Name] FROM [durados_app] WITH(NOLOCK)  WHERE [{0}] = @token", HeaderToken.ToString());
-            using (System.Data.SqlClient.SqlConnection cnn = new System.Data.SqlClient.SqlConnection(Maps.Instance.DuradosMap.Database.ConnectionString))
+            string sql = Maps.MainAppSchema.GetAppNameByTokenSql(HeaderToken.ToString());
+            using (IDbConnection cnn = Maps.MainAppSchema.GetNewConnection(Maps.Instance.ConnectionString))//Getc(Maps.Instance.DuradosMap.Database.ConnectionString))
             {
-                using (System.Data.SqlClient.SqlCommand command = new System.Data.SqlClient.SqlCommand(sql, cnn))
+                using (IDbCommand command = cnn.CreateCommand())
                 {
-
-                    command.Parameters.AddWithValue("token", token);
+                    command.CommandText = sql;
+                    var parameter = command.CreateParameter();
+                    parameter.ParameterName = "token";
+                    parameter.Value = token;
+                    command.Parameters.Add(parameter);
                     cnn.Open();
                     object scalar = command.ExecuteScalar();
                     if (scalar == null || scalar == DBNull.Value)
