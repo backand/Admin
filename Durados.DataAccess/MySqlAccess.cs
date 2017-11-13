@@ -410,12 +410,15 @@ namespace Durados.DataAccess
 
         }
 
-        public override string GetDecryptColumnStatement(string encryptedName, string databaseNames)
+        public override string GetDecryptColumnForSelectStatement(string encryptedName, string databaseNames)
         {
 
-            return string.Format(" {0} AS {1}, ", encryptedName, databaseNames);
+            return string.Format(" `{0}` AS {1}, ", encryptedName, databaseNames);
         }
-
+        public override string GetDecryptColumnStatement(string encryptedName)
+        {
+            return string.Format(" `{0)` ", encryptedName);
+        }
         public override string GetCloseCertificateStatement()
         {
             return string.Empty;
@@ -1003,6 +1006,10 @@ namespace Durados.DataAccess
             return string.Format("DELETE FROM durados_Invite WHERE Username = '{0}'", username);
         }
 
+        public override string GetAppsPermanentFilter()
+        {
+            return "(durados_App.toDelete =0 AND (durados_App.Creator = [m_User] or durados_App.id in (SELECT durados_UserApp.AppId FROM durados_UserApp  WHERE durados_UserApp.UserId = [m_User] and (durados_UserApp.Role = 'Admin' or durados_UserApp.Role = 'Developer'))))";
+        }
         public override string GetWakeupCallToAppSql()
         {
             return "SELECT Id,Url FROM durados_App  WHERE `Creator` IS NULL";
@@ -1323,7 +1330,7 @@ namespace Durados.DataAccess
                                 COMMIT ;",limits.ToString(),limit,id.Value);
             
         }
-
+       
         public override string GetInsertIntoUsersSql(string viewName)
         {
             return "INSERT INTO `" + viewName + "` (`Username`,`FirstName`,`LastName`,`Email`,`Role`,`Guid`) VALUES (@Username,@FirstName,@LastName,@Email,@Role,@Guid)";
@@ -1333,6 +1340,12 @@ namespace Durados.DataAccess
         {
             return "INSERT INTO `" + viewName + "` (`Username`,`FirstName`,`LastName`,`Email`,`Role`,`Guid`,`IsApproved`) VALUES (@Username,@FirstName,@LastName,@Email,@Role,@Guid,@IsApproved)";
                                                                                                              
+        }
+
+
+        public override string GetUsersApps(int userId)
+        {
+            return "SELECT * FROM durados_App WHERE durados_App.ToDelete=0 AND  durados_App.Creator = " + userId + " OR durados_App.Id IN (SELECT durados_UserApp.AppId FROM durados_UserApp WHERE durados_UserApp.UserId = " + userId + ") ";
         }
     }
 

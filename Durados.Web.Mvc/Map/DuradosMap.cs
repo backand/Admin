@@ -130,7 +130,7 @@ namespace Durados.Web.Mvc
 
         private static string GetUserAppsSql(int userId)
         {
-            return "select * from durados_App with(nolock) where durados_app.[ToDelete]=0 AND  Creator = " + userId + " or id in (select durados_UserApp.AppId from durados_UserApp with(nolock) where durados_UserApp.UserId = " + userId + ") ";
+            return Maps.MainAppSchema.GetUsersApps(userId);
         }
 
         public virtual string GetPlanContent()

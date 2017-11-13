@@ -2922,7 +2922,7 @@ namespace Durados.DataAccess
                 ColumnField columnField = (ColumnField)view.Fields[sortColumn.TrimStart(sqlTextBuilder.EscapeDbObjectStart.ToCharArray()).TrimEnd(sqlTextBuilder.EscapeDbObjectEnd.ToCharArray())];
                 if (columnField.Encrypted)
                 {
-                    sortColumn = " CONVERT(NVARCHAR(250), DECRYPTBYKEY(" + columnField.EncryptedName + ")) ";
+                    sortColumn = sqlTextBuilder.GetDecryptColumnStatement(columnField.EncryptedName);// " CONVERT(NVARCHAR(250), DECRYPTBYKEY(" + columnField.EncryptedName + ")) ";
                 }
             }
             return string.Format(selectStatement, new object[2] { view.DataTable.TableName, string.IsNullOrEmpty(sortColumn) ? GetPrimaryKeyColumnsDelimited(view) : sortColumn + " " + direction.ToString() });
@@ -2964,7 +2964,7 @@ namespace Durados.DataAccess
                     ColumnField columnField = (ColumnField)view.Fields[sortColumn.TrimStart(sqlTextBuilder.EscapeDbObjectStart.ToCharArray()).TrimEnd(sqlTextBuilder.EscapeDbObjectEnd.ToCharArray())];
                     if (columnField.Encrypted)
                     {
-                        sortColumn = " CONVERT(NVARCHAR(250), DECRYPTBYKEY(" + columnField.EncryptedName + ")) ";
+                        sortColumn = sqlTextBuilder.GetDecryptColumnStatement(columnField.EncryptedName);// " CONVERT(NVARCHAR(250), DECRYPTBYKEY(" + columnField.EncryptedName + ")) ";
                     }
                 }
                 return string.Format(selectStatement, new object[7] { view.DataTable.TableName, sortColumn, page, pageSize, parentTable, join, direction.ToString() });
@@ -3017,7 +3017,7 @@ namespace Durados.DataAccess
             ISqlTextBuilder sqlBuilder = GetSqlTextBuilder(view);
             foreach (ColumnField columnField in view.GetEncryptedColumns())
             {
-                s += sqlBuilder.GetDecryptColumnStatement( columnField.EncryptedName, columnField.DatabaseNames);
+                s += sqlBuilder.GetDecryptColumnForSelectStatement( columnField.EncryptedName, columnField.DatabaseNames);
 
             }
 
@@ -5445,7 +5445,7 @@ namespace Durados.DataAccess
 
             //string sql = "select * from " + sqlTextBuilder.EscapeDbObject("{0}") + " where {1}";
             //sql = string.Format(sql, tableName, GetWhereStatement(view, tableName));
-            string sql = GetSelectStatement(view, 1, 1, GetFilter(view, pk.Split(','), false), null, SortDirection.Asc).Replace("@ID ","@pk_id ");
+            string sql = GetSelectStatement(view, 1, 1, GetFilter(view, pk.Split(','), false), null, SortDirection.Asc).Replace("@id ", "@pk_id ", false);
 
             command.CommandText = sql;
 
@@ -5808,7 +5808,7 @@ namespace Durados.DataAccess
                                 if (columnField.Encrypted)
                                 {
                                     //filter.WhereStatement += "CONVERT(NVARCHAR(250), DECRYPTBYKEY(" + columnField.EncryptedName + "))" + " like N'" + likePrefix + value + "%' " + logicCondition.ToString() + " ";
-                                    filter.WhereStatement += "CONVERT(NVARCHAR(250), DECRYPTBYKEY(" + columnField.EncryptedName + "))" + " like " + parameterName + " " + logicCondition.ToString() + " ";
+                                    filter.WhereStatement += sqlTextBuilder.GetDecryptColumnStatement(columnField.EncryptedName) + " like " + parameterName + " " + logicCondition.ToString() + " ";
                                 }
                                 else if (columnField.IsCalculated)
                                 {
@@ -12272,11 +12272,17 @@ public class SqlTextBuilder : ISqlTextBuilder
 
 
 
-    public virtual string GetDecryptColumnStatement(string encryptedName, string databaseNames)
+    public virtual string GetDecryptColumnForSelectStatement(string encryptedName, string databaseNames)
     {
         return string.Format(" CONVERT(NVARCHAR(250), DECRYPTBYKEY({0})) AS {1}, ", encryptedName, databaseNames);
     }
 
+    public virtual string GetDecryptColumnStatement(string encryptedName)
+    {
+        return string.Format(" CONVERT(NVARCHAR(250), DECRYPTBYKEY({0})) ", encryptedName);
+    }
+
+    
     public virtual string GetCloseCertificateStatement()
     {
         return " close SYMMETRIC KEY {0} ";
@@ -12398,7 +12404,7 @@ public class SqlMainSchema :ISqlMainSchema
 
     public virtual string GetAppsPermanentFilter()
     {
- 	    return "(durados_App.toDelete =0 AND (durados_App.Creator = [m_User] or durados_App.id in (select durados_UserApp.AppId from durados_UserApp where durados_UserApp.UserId = [m_User] and (durados_UserApp.Role = 'Admin' or durados_UserApp.Role = 'Developer'))))";
+ 	    return "(durados_App.toDelete =0 AND (durados_App.Creator = [m_User] or durados_App.id in (SELECT durados_UserApp.AppId FROM durados_UserApp WITH(NOLOCK) WHERE durados_UserApp.UserId = [m_User] and (durados_UserApp.Role = 'Admin' or durados_UserApp.Role = 'Developer'))))";
     }
 
 
@@ -12770,5 +12776,11 @@ public class SqlMainSchema :ISqlMainSchema
     public virtual string GetInsertIntoUsersSql2(string viewName)
     {
         return "INSERT INTO [" + viewName + "] ([Username],[FirstName],[LastName],[Email],[Role],[Guid],[IsApproved]) VALUES (@Username,@FirstName,@LastName,@Email,@Role,@Guid,@IsApproved)";
+    }
+
+
+    public virtual string GetUsersApps(int userId)
+    {
+        return  "SELECT * FROM durados_App WITH(NOLOCK) WHERE durados_app.[ToDelete]=0 AND  Creator = " + userId + " OR id IN (SELECT durados_UserApp.AppId FROM durados_UserApp WITH(NOLOCK) WHERE durados_UserApp.UserId = " + userId + ") ";
     }
 }

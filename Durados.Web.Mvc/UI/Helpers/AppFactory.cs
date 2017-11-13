@@ -499,13 +499,13 @@ namespace Durados.Web.Mvc.UI.Helpers
         {
             if (builder is MySql.Data.MySqlClient.MySqlConnectionStringBuilder)
                 return builder["port"].ToString();
-            return builder["port"].ToString();
+            return builder["ProductPort"].ToString();
         }
         public static bool IntegratedSecurity(this DbConnectionStringBuilder builder)
         {
             if (builder is MySql.Data.MySqlClient.MySqlConnectionStringBuilder)
                 return false;
-            return Convert.ToBoolean(builder["IntegratedSecurity"]);
+            return (builder as System.Data.SqlClient.SqlConnectionStringBuilder).IntegratedSecurity;
         }
         public static int ProductId(this DbConnectionStringBuilder builder)
         {

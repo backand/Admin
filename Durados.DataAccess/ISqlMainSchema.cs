@@ -159,5 +159,7 @@ namespace Durados.DataAccess
 
         string GetInsertIntoUsersSql(string viewName);
         string GetInsertIntoUsersSql2(string viewName);
+
+        string GetUsersApps(int userId);
     }
 }

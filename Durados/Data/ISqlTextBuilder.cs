@@ -70,7 +70,10 @@
 
     string GetPointFieldStatement(string tableName, string columnName);
 
-    string GetDecryptColumnStatement(string encryptedName, string databaseNames);
+    string GetDecryptColumnForSelectStatement(string encryptedName, string databaseNames);
+
+    string GetDecryptColumnStatement(string encryptedName);
+   
 
     string GetCloseCertificateStatement();
 
