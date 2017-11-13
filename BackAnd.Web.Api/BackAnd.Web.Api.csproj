@@ -184,7 +184,6 @@
     <Content Include="deployment\signupBeforeAction.js" />
     <Content Include="deployment\Sql\ApprovalProcess.sql" />
     <Content Include="deployment\Sql\ApprovalProcess_sandisk.sql" />
-    <Content Include="deployment\Sql\MainMapGenerateSript.sql" />
     <Content Include="deployment\Sql\Cloud.sql" />
     <Content Include="deployment\Sql\Content-MySql.sql" />
     <Content Include="deployment\Sql\Content.sql" />
@@ -210,6 +209,7 @@
     <Content Include="deployment\Sql\logTable-MySql.sql" />
     <Content Include="deployment\Sql\logTable.sql" />
     <Content Include="deployment\Sql\MailingService.sql" />
+    <Content Include="deployment\Sql\MainMapGenerate.sql" />
     <Content Include="deployment\Sql\MessageBoard.sql" />
     <Content Include="deployment\Sql\Northwind.sql" />
     <Content Include="deployment\Sql\NorthwindAdditional.sql" />
@@ -276,7 +276,6 @@
     <Compile Include="Controllers\chartDataController.cs" />
     <Compile Include="Controllers\chartConfigController.cs" />
     <Compile Include="Controllers\Filters\ConfigBackupFilterAttribute.cs" />
-    <Compile Include="Controllers\Filters\DbCommand.cs" />
     <Compile Include="Controllers\Filters\ResponseHeaderFilterAttribute.cs" />
     <Compile Include="Controllers\Filters\MasterKeyAuthorize.cs" />
     <Compile Include="Controllers\Filters\SocialAuthorizeAttribute.cs" />
