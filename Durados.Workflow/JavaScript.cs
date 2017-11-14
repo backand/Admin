@@ -355,6 +355,8 @@ namespace Durados.Workflow
 
         public static bool IsCrud(System.Net.WebRequest request)
         {
+            if (System.Web.HttpContext.Current == null || System.Web.HttpContext.Current.Request == null)
+                return false;
             string pathAndQuery = System.Web.HttpContext.Current.Request.Url.PathAndQuery.ToLower();
             if (System.Web.HttpContext.Current == null || System.Web.HttpContext.Current.Request.Headers["Authorization"] == null || (pathAndQuery.Contains("1/user") || pathAndQuery.Contains("/backandusers")))
                 return false;

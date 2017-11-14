@@ -6129,7 +6129,7 @@ namespace Durados.Web.Mvc.UI.Helpers
 
     public class RefreshToken
     {
-        static SqlAccess sql = new SqlAccess();
+        //static SqlAccess sql = new SqlAccess();
         static string key = "RefreshToken";
         static RefreshToken()
         {
@@ -6627,7 +6627,7 @@ namespace Durados.Web.Mvc.UI.Helpers
         private int? FindAndUpdateAppInMain(string appName, string title, int creator, int poolCreator, string connectionString, int? templateId)
         {
             SqlAccess sqlAccess = Maps.MainAppSqlAccess;
-            string varConnectionString = string.Format("{0}{1};", connectionString,"Allow User Variables=True");
+            string varConnectionString = string.Format("{0}{1};", connectionString, Maps.MainAppSchema.GetConnectionStringAllowVeriables());
             string sql = Maps.MainAppSchema.GetFindAndUpdateAppInMainSql(templateId); 
             string scalar = sqlAccess.ExecuteScalar(varConnectionString, sql, new Dictionary<string, object>() { { "poolCreator", poolCreator }, { "creator", creator }, { "CreatedDate", DateTime.Now }, { "Name", appName }, { "Title", title } });
             if (!string.IsNullOrEmpty(scalar))

@@ -8078,7 +8078,7 @@ namespace Durados.DataAccess
                 return SqlProduct.SqlServer;
         }
 
-        
+
     }
 
     /// <summary>
@@ -12782,5 +12782,9 @@ public class SqlMainSchema :ISqlMainSchema
     public virtual string GetUsersApps(int userId)
     {
         return  "SELECT * FROM durados_App WITH(NOLOCK) WHERE durados_app.[ToDelete]=0 AND  Creator = " + userId + " OR id IN (SELECT durados_UserApp.AppId FROM durados_UserApp WITH(NOLOCK) WHERE durados_UserApp.UserId = " + userId + ") ";
+    }
+    public virtual string GetConnectionStringAllowVeriables()
+    {
+        return string.Empty;
     }
 }

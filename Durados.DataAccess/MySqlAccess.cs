@@ -1347,6 +1347,10 @@ namespace Durados.DataAccess
         {
             return "SELECT * FROM durados_App WHERE durados_App.ToDelete=0 AND  durados_App.Creator = " + userId + " OR durados_App.Id IN (SELECT durados_UserApp.AppId FROM durados_UserApp WHERE durados_UserApp.UserId = " + userId + ") ";
         }
+        public override string GetConnectionStringAllowVeriables()
+        {
+            return "Allow User Variables=True";
+        }
     }
 
 

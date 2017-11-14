@@ -161,5 +161,7 @@ namespace Durados.DataAccess
         string GetInsertIntoUsersSql2(string viewName);
 
         string GetUsersApps(int userId);
+
+        string GetConnectionStringAllowVeriables();
     }
 }
