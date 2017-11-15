@@ -246,13 +246,13 @@ namespace Durados.Workflow
             return whereStatement.Substring(0, whereStatement.Length - 4);
         }
 
-        private IEnumerable<System.Data.SqlClient.SqlParameter> GetWhereParemeters(View view, string pk)
+        private IEnumerable<IDataParameter> GetWhereParemeters(View view, string pk)
         {
-            List<System.Data.SqlClient.SqlParameter> parameters = new List<System.Data.SqlClient.SqlParameter>();
+            List<IDataParameter> parameters = new List<IDataParameter>();
             string[] delimitedValues = pk.Split(',');
             for (int i = 0; i < view.DataTable.PrimaryKey.Length; i++)
             {
-                System.Data.SqlClient.SqlParameter parameter = new System.Data.SqlClient.SqlParameter("pk_" + view.DataTable.PrimaryKey[i].ColumnName.ReplaceNonAlphaNumeric(), Convert.ChangeType(delimitedValues[i], view.DataTable.PrimaryKey[i].DataType));
+                IDataParameter parameter = new System.Data.SqlClient.SqlParameter("pk_" + view.DataTable.PrimaryKey[i].ColumnName.ReplaceNonAlphaNumeric(), Convert.ChangeType(delimitedValues[i], view.DataTable.PrimaryKey[i].DataType));
                 parameters.Add(parameter);
             }
 
@@ -360,7 +360,7 @@ namespace Durados.Workflow
 
                 if (!string.IsNullOrEmpty(pk))
                 {
-                    foreach (SqlParameter parameter in GetWhereParemeters(view, pk))
+                    foreach (IDataParameter parameter in GetWhereParemeters(view, pk))
                     {
                         command.Parameters.Add(GetNewParameter(command, parameter.ParameterName, parameter.Value));
                     }

@@ -153,32 +153,39 @@ namespace Durados.Web.Mvc.Infrastructure
         }
         private void UpdateDeletedApp(int appId)
         {
-            SqlSchema schema = new SqlSchema();
-            using (IDbCommand command = schema.GetCommand())
+            using (IDbConnection connection = Maps.MainAppSchema.GetNewConnection(Maps.Instance.ConnectionString))
             {
-                command.Connection = schema.GetConnection(Maps.Instance.DuradosMap.connectionString);
-                command.CommandText = "UPDATE durados_App SET [ToDelete]=1,[deleteddate] =getdate() WHERE Id=@Id";
-                command.Parameters.Add(new System.Data.SqlClient.SqlParameter("Id", appId));
-                try
-                {
-                    command.Connection.Open();
-                    command.ExecuteNonQuery();
 
-                }
-                catch (Exception ex)
-                { throw new DuradosException("<br>Failed to update app " + appId.ToString()); }
-                command.CommandText = "Delete From  durados_UserApp  WHERE appId=@Id";
-
-                try
+                using (IDbCommand command = connection.CreateCommand())
                 {
-                    if (command.Connection.State == ConnectionState.Closed)
+                    //command.Connection = schema.GetConnection(Maps.Instance.DuradosMap.connectionString);
+                    command.CommandText = Maps.MainAppSchema.GetUpdateAppToBeDeleted();
+                    var parameter = command.CreateParameter();
+                    parameter.ParameterName = "Id";
+                    parameter.Value = appId;
+                    command.Parameters.Add(parameter);
+                    
+                    try
+                    {
                         command.Connection.Open();
-                    command.ExecuteNonQuery();
+                        command.ExecuteNonQuery();
+
+                    }
+                    catch (Exception ex)
+                    { throw new DuradosException("<br>Failed to update app " + appId.ToString()); }
+                    command.CommandText = "Delete From  durados_UserApp  WHERE appId=@Id";
+
+                    try
+                    {
+                        if (command.Connection.State == ConnectionState.Closed)
+                            command.Connection.Open();
+                        command.ExecuteNonQuery();
+
+                    }
+                    catch (Exception ex)
+                    { throw new DuradosException("<br>Failed to update user app " + appId.ToString()); }
 
                 }
-                catch (Exception ex)
-                { throw new DuradosException("<br>Failed to update user app " + appId.ToString()); }
-
             }
         }
 
@@ -249,12 +256,16 @@ namespace Durados.Web.Mvc.Infrastructure
         {
 
             App app = new App();
-            SqlSchema schema = new SqlSchema();
-            IDbCommand command = schema.GetCommand();
-            command.Connection = schema.GetConnection(Maps.Instance.DuradosMap.connectionString);
-            ValidateSelectFunctionExists(command);
+            ISqlMainSchema schema = Maps.MainAppSchema;;
+            IDbCommand command = schema.GetNewCommand();
+            command.Connection = schema.GetNewConnection(Maps.Instance.DuradosMap.connectionString);
+            //ValidateSelectFunctionExists(command);
             command.CommandText = sql;
-            command.Parameters.Add(new System.Data.SqlClient.SqlParameter(parameterName, parameterVal));
+            var parameter = command.CreateParameter();
+            parameter.ParameterName = parameterName;
+            parameter.Value = parameterVal;
+            command.Parameters.Add(parameter);
+            
             try
             {
                 command.Connection.Open();
@@ -284,43 +295,10 @@ namespace Durados.Web.Mvc.Infrastructure
 
         private void ValidateSelectFunctionExists(IDbCommand command)
         {
-            string sql = @"IF NOT EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[f_report_connection_type]') AND type in (N'FN', N'IF', N'TF', N'FS', N'FT'))
-                BEGIN
-                execute dbo.sp_executesql @statement = N'
-                -- =============================================
-                -- Author:		<Author,,Name>
-                -- Create date: <Create Date, ,>
-                -- Description:	<Description, ,>
-                -- =============================================
-                Create FUNCTION [dbo].[f_report_connection_type] 
-                (
-	                -- Add the parameters for the function here
-	                @id int
-                )
-                RETURNS int
-                AS
-                BEGIN
-	                 -- Declare the return variable here
-	                DECLARE @ResultVar int
-					 --1	console   --2	free
-	                -- Add the T-SQL statements to compute the return value here
-	                select @ResultVar = CASE 
-						WHEN ServerName IN(SELECT ServerName 
-						FROM durados_ExternaInstance WITH(NOLOCK) 
-						INNER JOIN durados_SqlConnection WITH(NOLOCK) ON durados_SqlConnection.Id = durados_ExternaInstance.SqlConnectionId)
-						  THEN 2  
-	                ELSE 1 END 
-	                FROM dbo.durados_SqlConnection c with (NOLOCK) 
-	                where id=@id
-
-	                -- Return the result of the function
-	                RETURN @ResultVar
-                END
-
-                ' 
-                END
-                ";
+            string sql = Maps.MainAppSchema.GetValidateSelectFunctionExistsSql();
+            if(string.IsNullOrEmpty(sql)) return;
             command.CommandText = sql;
+            
 
             try
             {
@@ -358,10 +336,7 @@ namespace Durados.Web.Mvc.Infrastructure
         }
         private static string GetAppSql()
         {
-            return @"SELECT a.Id, a.Name,  dbo.f_report_connection_type(a.SqlConnectionId) AS AppType, 
-                             a.Creator,cnn.ServerName, cnn.catalog ,syscnn.ServerName sysServerName,syscnn.catalog sysCatalog
-                            FROM dbo.durados_App AS a WITH (NOLOCK) INNER JOIN dbo.durados_SqlConnection AS cnn WITH (NOLOCK) ON a.SqlConnectionId = cnn.Id INNER JOIN dbo.durados_SqlConnection AS syscnn WITH (NOLOCK) ON a.SystemSqlConnectionId = syscnn.Id
-                            WHERE   [ToDelete]<>1";
+            return Maps.MainAppSchema.GetAppSql();
             //dbo.f_report_is_user_from_wix(a.Creator, NULL) AS inwix,   
         }
 

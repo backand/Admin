@@ -135,6 +135,7 @@
     <Content Include="Lib\DocumentFormat.OpenXml.dll" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="app.config" />
     <None Include="Lib\ABCpdf.tlb" />
   </ItemGroup>
   <ItemGroup>

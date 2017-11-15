@@ -95,7 +95,7 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\Npgsql.2.2.5\lib\net45\Mono.Security.dll</HintPath>
     </Reference>
-    <Reference Include="MySql.Data, Version=6.4.6.0, Culture=neutral, PublicKeyToken=c5687fc88969c44d, processorArchitecture=MSIL">
+    <Reference Include="MySql.Data, Version=6.3.7.0, Culture=neutral, PublicKeyToken=c5687fc88969c44d, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\Duradus.Web.Mvc.App\deployment\MySql.Data.dll</HintPath>
     </Reference>
@@ -177,7 +177,6 @@
   <ItemGroup>
     <Content Include="Config\backand.xml" />
     <Content Include="Config\backand.xml.xml" />
-    <Content Include="deployment\helloWorld.js" />
     <Content Include="deployment\jsInfrastructure.js" />
     <Content Include="deployment\accessFilter.js" />
     <Content Include="deployment\socialAuthOverride.js" />
@@ -210,6 +209,7 @@
     <Content Include="deployment\Sql\logTable-MySql.sql" />
     <Content Include="deployment\Sql\logTable.sql" />
     <Content Include="deployment\Sql\MailingService.sql" />
+    <Content Include="deployment\Sql\MainMapGenerate.sql" />
     <Content Include="deployment\Sql\MessageBoard.sql" />
     <Content Include="deployment\Sql\Northwind.sql" />
     <Content Include="deployment\Sql\NorthwindAdditional.sql" />
@@ -288,7 +288,6 @@
     <Compile Include="Controllers\uploadConfigController.cs" />
     <Compile Include="Controllers\queryDataController.cs" />
     <Compile Include="Controllers\ruleController.cs" />
-    <Compile Include="Controllers\themeController.cs" />
     <Compile Include="Controllers\systemController.cs" />
     <Compile Include="Controllers\fileController.cs" />
     <Compile Include="Controllers\businessRuleController.cs" />
@@ -385,7 +384,7 @@
           <AutoAssignPort>True</AutoAssignPort>
           <DevelopmentServerPort>5943</DevelopmentServerPort>
           <DevelopmentServerVPath>/</DevelopmentServerVPath>
-          <IISUrl>http://localhost:4110</IISUrl>
+          <IISUrl>http://localhost:8000</IISUrl>
           <OverrideIISAppRootUrl>True</OverrideIISAppRootUrl>
           <IISAppRootUrl>http://localhost:5943</IISAppRootUrl>
           <NTLMAuthentication>False</NTLMAuthentication>

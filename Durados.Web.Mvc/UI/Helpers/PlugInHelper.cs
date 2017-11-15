@@ -294,7 +294,7 @@ namespace Durados.Web.Mvc.UI.Helpers
 
         public static int? GetCreator(this Database database, int appId)
         {
-            string sql = "SELECT Creator FROM dbo.durados_App WITH (NOLOCK) WHERE dbo.durados_App.Id = " + appId;
+            string sql = SqlSchema.GetCreatorSql(appId); 
 
             string scalar = SqlAccess.ExecuteScalar(database.ConnectionString, sql);
 
@@ -306,7 +306,7 @@ namespace Durados.Web.Mvc.UI.Helpers
 
         public static string GetCreatorUsername(this Database database, int appId)
         {
-            string sql = "SELECT dbo.durados_User.[Username] FROM dbo.durados_App WITH (NOLOCK) INNER JOIN dbo.durados_User WITH (NOLOCK) ON dbo.durados_App.Creator = dbo.durados_User.ID WHERE dbo.durados_App.Id = " + appId;
+            string sql = SqlSchema.GetCreatorUsername(appId);
 
             return SqlAccess.ExecuteScalar(database.ConnectionString, sql);
         }
@@ -344,21 +344,31 @@ namespace Durados.Web.Mvc.UI.Helpers
         }
 
         private static SqlAccess _sqlAccess = null;
+        private static ISqlMainSchema _sqlSchema = null;
 
         private static SqlAccess SqlAccess
         {
             get
             {
                 if (_sqlAccess == null)
-                    _sqlAccess = new SqlAccess();
+                    _sqlAccess = Maps.MainAppSqlAccess;
 
                 return _sqlAccess;
             }
         }
+        private static ISqlMainSchema SqlSchema
+        {
+            get
+            {
+                if (_sqlSchema == null)
+                    _sqlSchema = Maps.MainAppSchema;
 
+                return _sqlSchema;
+            }
+        }
         private static string GetNewDatabaseName(Database database, int templateAppId, PlugInType plugInType, out int dbCount)
         {
-            string sql = "select DatabaseName, DbCount from durados_SampleApp WITH (NOLOCK) where PlugInId = " + ((int)plugInType) + " and AppId = " + templateAppId;
+            string sql = SqlSchema.GetNewDatabaseNameSql(((int)plugInType), templateAppId);
 
             DataTable table = SqlAccess.ExecuteTable(database.ConnectionString, sql, null, CommandType.Text);
 

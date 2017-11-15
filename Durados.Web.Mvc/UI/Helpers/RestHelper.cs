@@ -1055,15 +1055,16 @@ namespace Durados.Web.Mvc.UI.Helpers
             if (!(role == "Admin" || role == "Developer"))
                 throw new DuradosException("Only admin can get keys. your role is " + role);
 
-            string sql = string.Format("SELECT * FROM [durados_app] WITH(NOLOCK)  WHERE [Name] = '{0}'", appName);
+            string sql = Maps.MainAppSchema.GetAppRowByNameSql(appName);
 
             Dictionary<string, object> keys = new Dictionary<string, object>();
-            using (System.Data.SqlClient.SqlConnection cnn = new System.Data.SqlClient.SqlConnection(Maps.Instance.DuradosMap.Database.ConnectionString))
+            using (IDbConnection cnn = Maps.MainAppSchema.GetNewConnection(Maps.Instance.ConnectionString))
             {
-                using (System.Data.SqlClient.SqlCommand command = new System.Data.SqlClient.SqlCommand(sql, cnn))
+                using (IDbCommand command = cnn.CreateCommand())
                 {
+                    command.CommandText = sql;
                     cnn.Open();
-                    using (System.Data.SqlClient.SqlDataReader reader = command.ExecuteReader())
+                    using (IDataReader reader = command.ExecuteReader())
                     {
                         while (reader.Read())
                         {
@@ -6128,7 +6129,7 @@ namespace Durados.Web.Mvc.UI.Helpers
 
     public class RefreshToken
     {
-        static SqlAccess sql = new SqlAccess();
+        
         static string key = "RefreshToken";
         static RefreshToken()
         {
@@ -6561,9 +6562,9 @@ namespace Durados.Web.Mvc.UI.Helpers
         private void DeleteBadApp(int appId, string connectionString)
         {
 
-            string sql =
-                "delete from durados_App where [id] = @id ";
-            new SqlAccess().ExecuteNonQuery(connectionString, sql, new Dictionary<string, object>() { { "id", appId } }, null);
+            string sql = Maps.MainAppSchema.GetDeleteAppById(appId);
+
+             Maps.MainAppSqlAccess.ExecuteNonQuery(connectionString, sql, new Dictionary<string, object>() { { "id", appId } }, null);
 
         }
 
@@ -6625,20 +6626,10 @@ namespace Durados.Web.Mvc.UI.Helpers
 
         private int? FindAndUpdateAppInMain(string appName, string title, int creator, int poolCreator, string connectionString, int? templateId)
         {
-            string sql =
-                "begin tran getFromPool " +
-                "declare @appId int " +
-                "select top(1) @appId = id from durados_App with(UPDLOCK) where TemplateId " + (templateId.HasValue ? " = " + templateId.Value : " is null ").ToString() + " and creator = @poolCreator and DatabaseStatus = 1 and ToDelete = 0 order by id asc; " +
-                "delete from durados_App where [Name] = @Name; " +
-                "update durados_App " +
-                "set creator = @creator, " +
-                "[CreatedDate] = @CreatedDate, " +
-                "[Name] = @Name, " +
-                "[Title] = @Title " +
-                "where id = @appId; " +
-                "select @appId " +
-                "commit tran getFromPool";
-            string scalar = new SqlAccess().ExecuteScalar(connectionString, sql, new Dictionary<string, object>() { { "poolCreator", poolCreator }, { "creator", creator }, { "CreatedDate", DateTime.Now }, { "Name", appName }, { "Title", title } });
+            SqlAccess sqlAccess = Maps.MainAppSqlAccess;
+            string varConnectionString = string.Format("{0}{1};", connectionString, Maps.MainAppSchema.GetConnectionStringAllowVeriables());
+            string sql = Maps.MainAppSchema.GetFindAndUpdateAppInMainSql(templateId); 
+            string scalar = sqlAccess.ExecuteScalar(varConnectionString, sql, new Dictionary<string, object>() { { "poolCreator", poolCreator }, { "creator", creator }, { "CreatedDate", DateTime.Now }, { "Name", appName }, { "Title", title } });
             if (!string.IsNullOrEmpty(scalar))
             {
                 return Convert.ToInt32(scalar);

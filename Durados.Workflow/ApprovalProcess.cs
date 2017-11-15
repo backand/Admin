@@ -229,8 +229,9 @@ namespace Durados.Workflow
                 controller.GetEmailInfo(userId.ToString(), out to, out name);
                 messages.Add(approvalProcessUserId, message);
                 SendEmail(controller, to, string.Empty, message, subject);
-                string messageBoardId = ((INotifier)controller).SaveInMessageBoard(parameters, childrenField.ChildrenView, values, prevRow, approvalProcessUserId.ToString(), siteWithoutQueryString, urlAction, subject, message, currentUserId, null, new Dictionary<int,bool>());
-                ((INotifier)controller).SaveMessageAction(view, messageBoardId, "True", 5, userId); // Required Action
+                // TODO : Main MySql
+                //string messageBoardId = ((INotifier)controller).SaveInMessageBoard(parameters, childrenField.ChildrenView, values, prevRow, approvalProcessUserId.ToString(), siteWithoutQueryString, urlAction, subject, message, currentUserId, null, new Dictionary<int,bool>());
+                //((INotifier)controller).SaveMessageAction(view, messageBoardId, "True", 5, userId); // Required Action
 
             }
 

@@ -85,6 +85,8 @@ namespace Durados
         public static readonly string EnableDecryptionKey = "EnableDecryption";
 
         public static readonly string CloudViewName = "durados_Cloud";
+        public static readonly string ConnectionViewName = "durados_SqlConnection";
+        
        
         
         public virtual Guid Guid

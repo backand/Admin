@@ -377,7 +377,10 @@ namespace Durados.Workflow
 
         public static bool IsCrud(System.Net.WebRequest request)
         {
-            if (System.Web.HttpContext.Current == null || System.Web.HttpContext.Current.Request.Headers["Authorization"] == null || (System.Web.HttpContext.Current.Request.Url.PathAndQuery.ToLower().Contains("1/user/signup")))
+            if (System.Web.HttpContext.Current == null || System.Web.HttpContext.Current.Request == null)
+                return false;
+            string pathAndQuery = System.Web.HttpContext.Current.Request.Url.PathAndQuery.ToLower();
+            if (System.Web.HttpContext.Current == null || System.Web.HttpContext.Current.Request.Headers["Authorization"] == null || (pathAndQuery.Contains("1/user") || pathAndQuery.Contains("/backandusers")))
                 return false;
             if (System.Web.HttpContext.Current.Items.Contains(Database.SignupInProcess))
                 return false;
@@ -488,7 +491,8 @@ namespace Durados.Workflow
 
         private static string PerformCrud(System.Net.WebRequest request, string json, Dictionary<string, object> executeArgs)
         {
-            return PerformCrud(request, json, executeArgs, (Durados.Data.IData)executeArgs["controller"], (string)executeArgs["actionName"]);
+            
+            return PerformCrud(request, json, executeArgs, executeArgs["controller"] as Durados.Data.IData, (string)executeArgs["actionName"]);
         }
 
         private static string PerformCrud(System.Net.WebRequest request, string json, Dictionary<string, object> executeArgs, Durados.Data.IData controller, string actionName)
@@ -497,7 +501,7 @@ namespace Durados.Workflow
             {
                 throw new JavaScriptException(string.Format("The request '{0}' is repeating calling itself. Please change the action {1}", request.RequestUri.AbsoluteUri, actionName), new StackOverflowException());
             }
-            if (controller.DataHandler == null)
+            if (controller == null || controller.DataHandler == null)
             {
                 throw new DuradosException("Not performing CRUD");
             }

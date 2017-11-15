@@ -6,7 +6,7 @@ using Microsoft.WindowsAzure.StorageClient;
 using System;
 using System.Collections.Generic;
 using System.Data;
-using System.Data.SqlClient;
+//using System.Data.SqlClient;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
@@ -57,15 +57,16 @@ namespace Durados.Web.Mvc.UI.Helpers
             //int rowCount = -1;
             //DataView dataView = view.FillPage(1, 1, new Dictionary<string, object>() { { "Provider", provider }, { "SocialId", socialId } }, null, null, out rowCount, null, null);
 
-            SqlAccess sa = new SqlAccess();
+            SqlAccess sa = Maps.MainAppSqlAccess;
 
-            string sql = "select UserId from durados_UserSocial where Provider = @Provider and SocialId = @SocialId and AppId = @AppId";
+            //ISqlMainSchema sqlMain = ;
+            string sql = Maps.MainAppSchema.GetEmailBySocialIdSql();
 
             object scalar = sa.ExecuteScalar(view.ConnectionString, sql, new Dictionary<string, object>() { { "Provider", provider }, { "SocialId", socialId }, { "AppId", appId } });
 
             if (scalar == null)
             {
-                sql = "select UserId from durados_UserSocial where Provider = @Provider and SocialId = @SocialId and AppId is null";
+                sql = Maps.MainAppSchema.GetEmailBySocialIdSql2(); 
 
                 scalar = sa.ExecuteScalar(view.ConnectionString, sql, new Dictionary<string, object>() { { "Provider", provider }, { "SocialId", socialId } });
             }
@@ -90,6 +91,8 @@ namespace Durados.Web.Mvc.UI.Helpers
             //string userId = dataView[0]["UserId"].ToString();
             return GetDuradosMap().Database.GetUsernameById(userId);
         }
+
+       
 
         public string GetSocialIdlByEmail(string provider, string email, string appName)
         {
@@ -145,16 +148,18 @@ namespace Durados.Web.Mvc.UI.Helpers
         public string GetSocialIdlByEmail(string provider, int userId, int appId)
         {
             View view = GetUserSocialView();
-            
-            SqlAccess sa = new SqlAccess();
 
-            string sql = "select SocialId from durados_UserSocial WITH(NOLOCK) where Provider = @Provider and UserId = @UserId and AppId = @AppId";
+            SqlAccess sa = Maps.MainAppSqlAccess;
+
+            ISqlMainSchema sqlMain = Maps.MainAppSchema;
+
+            string sql =  sqlMain.GetSocialIdlByEmail(); 
 
             object scalar = sa.ExecuteScalar(view.ConnectionString, sql, new Dictionary<string, object>() { { "Provider", provider }, { "UserId", userId }, { "AppId", appId } });
 
             if (scalar == null)
             {
-                sql = "select SocialId from durados_UserSocial WITH(NOLOCK) where Provider = @Provider and UserId = @UserId and AppId is null";
+                sql = sqlMain.GetSocialIdlByEmail2();
 
                 scalar = sa.ExecuteScalar(view.ConnectionString, sql, new Dictionary<string, object>() { { "Provider", provider }, { "UserId", userId } });
             }
@@ -339,11 +344,14 @@ namespace Durados.Web.Mvc.UI.Helpers
 
         public Dictionary<string, object> SignUpToBackand(string username, string password, string send, string phone, string fullname, string dbtype, string dbother)
         {
-            int identity = -1;
+            
             bool DontSend = false;
             try
             {
-                Durados.DataAccess.SqlAccess sql = new Durados.DataAccess.SqlAccess();
+                Durados.DataAccess.SqlAccess sqlAccess = Maps.MainAppSqlAccess;
+
+                ISqlMainSchema sqlMain = Maps.MainAppSchema;
+
                 Dictionary<string, object> parameters = new Dictionary<string, object>();
 
                 string email = username.Trim();
@@ -351,7 +359,7 @@ namespace Durados.Web.Mvc.UI.Helpers
                 parameters.Add("@Email", email);
                 parameters.Add("@Username", username);
 
-                //if (sql.ExecuteScalar(Maps.Instance.DuradosMap.Database.ConnectionString, "SELECT TOP 1 [Username] FROM [durados_User] WHERE [Username]=@Username", parameters) != string.Empty)
+                
                 System.Web.Security.MembershipUser user = System.Web.Security.Membership.Provider.GetUser(username, false);
                 if (user != null)
                 {
@@ -396,7 +404,7 @@ namespace Durados.Web.Mvc.UI.Helpers
                 Guid guid = Guid.NewGuid();
                 parameters.Add("@Guid", guid);
 
-                sql.ExecuteNonQuery(Maps.Instance.DuradosMap.Database.ConnectionString, "if NOT EXISTS (Select [Username] From  [" + GetDuradosMap().Database.GetUserView().GetTableName() + "] WHERE [Username] = @Username) begin INSERT INTO [durados_User] ([Username],[FirstName],[LastName],[Email],[Role],[Guid]) VALUES (@Username,@FirstName,@LastName,@Email,@Role,@Guid) end", parameters, CreateMembershipCallback);
+                sqlAccess.ExecuteNonQuery(Maps.Instance.DuradosMap.Database.ConnectionString, sqlMain.InsertNewUserSql(GetDuradosMap().Database.GetUserView().GetTableName(), "durados_User"), sqlAccess.GetSqlProduct(), parameters, CreateMembershipCallback);
 
                 //System.Web.Security.MembershipUser user = System.Web.Security.Membership.Provider.GetUser(username, true);
                 //if (user != null)
@@ -420,6 +428,8 @@ namespace Durados.Web.Mvc.UI.Helpers
                 if (sendEmail)
                     SendRegistrationRequest(fullname, lastName, email, guid.ToString(), username, password, Maps.Instance.DuradosMap, DontSend);
 
+                /*
+                 *   TODO: Main MySQL depricated
                 try
                 {
                     Durados.Web.Mvc.UI.Helpers.AccountService.UpdateWebsiteUsers(username, identity);
@@ -440,6 +450,7 @@ namespace Durados.Web.Mvc.UI.Helpers
                     Maps.Instance.DuradosMap.Logger.Log("account", "SignUpToBackand", "SignUp", ex, 1, "failed to update websiteuser in ContactUs");
 
                 }
+                */
 
             }
             catch (DuradosException exception)
@@ -459,6 +470,7 @@ namespace Durados.Web.Mvc.UI.Helpers
             //return Json(new { Success = true, Message = "Success", identity = identity, DemoDefaults = GetDefaultDemo(identity) });
         }
 
+        
         protected virtual string CreateMembershipCallback(Dictionary<string, object> paraemeters)
         {
             string username = paraemeters["@Username"].ToString();
@@ -832,13 +844,16 @@ namespace Durados.Web.Mvc.UI.Helpers
         protected virtual void Activate(string username, string appName, string role)
         {
             Map map = GetMap(appName);
-            Durados.DataAccess.SqlAccess sql = new Durados.DataAccess.SqlAccess();
+            Durados.DataAccess.SqlAccess sqlAccess = Maps.MainAppSqlAccess;
+            ISqlMainSchema sqlMain = Maps.MainAppSchema;
             Dictionary<string, object> parameters = new Dictionary<string, object>();
             parameters.Add("@UserId", map.Database.GetUserID(username));
             parameters.Add("@AppId", map.Id);
             parameters.Add("@Role", role);
-            sql.ExecuteNonQuery(Maps.Instance.DuradosMap.Database.ConnectionString, "INSERT INTO [durados_UserApp] ([UserId],[AppId],[Role]) VALUES (@UserId,@AppId,@Role)", parameters, null);
+            sqlAccess.ExecuteNonQuery(Maps.Instance.DuradosMap.Database.ConnectionString, sqlMain.GetInsertUserAppSql(), parameters, null);
         }
+
+      
 
         public virtual void ActivateAdmin(string username, string appName)
         {
@@ -850,20 +865,20 @@ namespace Durados.Web.Mvc.UI.Helpers
             }
             else
             {
-                InviteAdminBeforeAignUp(username, appName);
+                InviteAdminBeforeSignUp(username, appName);
             }
 
         }
 
-        private void InviteAdminBeforeAignUp(string username, string appName)
+        private void InviteAdminBeforeSignUp(string username, string appName)
         {
-            SqlAccess sqlAccess = new SqlAccess();
-
+            SqlAccess sqlAccess = Maps.MainAppSqlAccess;
+            ISqlMainSchema sqlMain = Maps.MainAppSchema;
             try
             {
                 Map map = GetDuradosMap();
                 string appId = GetMap(appName).Id;
-                sqlAccess.ExecuteNonQuery(map.connectionString, string.Format("insert into durados_Invite (username, appId) values ('{0}', {1})", username, appId));
+                sqlAccess.ExecuteNonQuery(map.connectionString,sqlMain.GetInviteAdminBeforeSignUpSql(username, appId) );
             }
             catch (Exception exception)
             {
@@ -912,9 +927,11 @@ namespace Durados.Web.Mvc.UI.Helpers
         /// </summary>
         /// <param name="username"></param>
         /// <param name="userId"></param>
+        ///
+        /* TODO: Main MySQL depricated
         public static void UpdateWebsiteUsers(string username, int userId)
         {
-            SqlAccess sqlAccess = new SqlAccess();
+            SqlAccess sqlAccess = Maps.MainAppSqlAccess;
             string sql = @"INSERT INTO [website_UsersCookie]([UserId],[CookieGuid],[CreateDate]) 
                             VALUES(@UserId,@CookieGuid,@CreateDate)";
             Dictionary<string, object> parameters = new Dictionary<string, object>();
@@ -937,7 +954,7 @@ namespace Durados.Web.Mvc.UI.Helpers
         /// <param name="comments"></param>
         public static void InsertContactUsUsers(string email, string fullname, string comments, string phone, int requestSubjectId, int? dbType, string dbOther)
         {
-            SqlAccess sqlAccess = new SqlAccess();
+            SqlAccess sqlAccess = Maps.MainAppSqlAccess;
             Dictionary<string, object> parameters = new Dictionary<string, object>();
             parameters.Add("@Email", email);
             if (fullname == null)
@@ -972,7 +989,7 @@ namespace Durados.Web.Mvc.UI.Helpers
             sqlAccess.ExecuteNonQuery(Maps.Instance.DuradosMap.connectionString, "dbo.website_AddEditUser @Email,@FullName,@Comments,@CookieGuid,@Phone,@RequestSubject,@DBtype,@DBother", parameters, null);
 
         }
-
+        
         /// <summary>
         /// Retrun the GUID stored in the tracking cookie
         /// </summary>
@@ -986,7 +1003,7 @@ namespace Durados.Web.Mvc.UI.Helpers
             return trackingCookie.Values["guid"];
 
         }
-
+        */
         public virtual void InviteAdminAfterSignUp(string username)
         {
             try
@@ -994,21 +1011,25 @@ namespace Durados.Web.Mvc.UI.Helpers
                 Map map = GetDuradosMap();
                 int userId = GetDuradosMap().Database.GetUserID(username);
 
-                using (SqlConnection connection = new SqlConnection(map.connectionString))
+                SqlAccess sqlAccess = Maps.MainAppSqlAccess;
+                ISqlMainSchema sqlMain = Maps.MainAppSchema;
+                using (IDbConnection connection = sqlAccess.GetNewSqlSchema().GetConnection(map.connectionString))
                 {
                     connection.Open();
-
-                    SqlTransaction transaction = connection.BeginTransaction(IsolationLevel.ReadCommitted);
+                    
+                    IDbTransaction transaction = connection.BeginTransaction(IsolationLevel.ReadCommitted);
 
                     try
                     {
-                        using (SqlCommand command = new SqlCommand())
+
+
+                        using (IDbCommand command = sqlAccess.GetNewCommand())
                         {
 
                             command.Connection = connection;
                             command.Transaction = transaction;
 
-                            command.CommandText = string.Format("select appId from durados_Invite where username = '{0}'", username);
+                            command.CommandText = sqlMain.GetInviteAdminAfterSignupSql(username);
                             List<string> apps = new List<string>();
                             using (IDataReader reader = command.ExecuteReader())
                             {
@@ -1022,10 +1043,10 @@ namespace Durados.Web.Mvc.UI.Helpers
 
                             foreach (string appId in apps)
                             {
-                                command.CommandText = string.Format("insert into durados_UserApp (UserId, AppId, Role) values ({0},{1},'{2}')", userId, appId, "Admin");
+                                command.CommandText = sqlMain.GetInviteAdminAfterSignupSql(userId,appId,"Admin");
                                 command.ExecuteNonQuery();
                             }
-                            command.CommandText = string.Format("delete durados_Invite where username = '{0}'", username);
+                            command.CommandText = sqlMain.GetDeleteInviteUser(username);
                             command.ExecuteNonQuery();
                             transaction.Commit();
 
@@ -1159,8 +1180,11 @@ namespace Durados.Web.Mvc.UI.Helpers
             parameters.Add("Role", role);
             parameters.Add("Guid", Guid.NewGuid());
             parameters.Add("AppName", appName);
-            Durados.DataAccess.SqlAccess sql = new Durados.DataAccess.SqlAccess();
-            sql.ExecuteNonQuery(GetDuradosMap().Database.GetUserView().ConnectionString, "if NOT EXISTS (Select [Username] From  [" + GetDuradosMap().Database.GetUserView().GetTableName() + "] WHERE [Username] = @Username) begin INSERT INTO [" + GetDuradosMap().Database.GetUserView().GetTableName() + "] ([Username],[FirstName],[LastName],[Email],[Role],[Guid]) VALUES (@Username,@FirstName,@LastName,@Email,@Role,@Guid) end", parameters, AddToAuthenticatedUsersCallback);
+            
+            Map map = GetDuradosMap();
+            Durados.DataAccess.SqlAccess sqlAccess = Maps.MainAppSqlAccess;
+            ISqlMainSchema sqlMain = Maps.MainAppSchema;
+            sqlAccess.ExecuteNonQuery(map.Database.GetUserView().ConnectionString, sqlMain.InsertNewUserSql(GetDuradosMap().Database.GetUserView().GetTableName() , GetDuradosMap().Database.GetUserView().GetTableName() ), parameters, AddToAuthenticatedUsersCallback);
 
         }
 
@@ -1603,12 +1627,12 @@ namespace Durados.Web.Mvc.UI.Helpers
         {
             try
             {
-                Durados.DataAccess.SqlAccess sql = new Durados.DataAccess.SqlAccess();
+                Durados.DataAccess.SqlAccess sqlAccess = Maps.MainAppSqlAccess; 
 
                 Dictionary<string, object> parameters = new Dictionary<string, object>();
 
                 parameters.Add("@username", userName);
-                object guid = sql.ExecuteScalar(Maps.Instance.DuradosMap.connectionString, "SELECT TOP 1 [durados_user].[guid] FROM durados_user WITH(NOLOCK)  WHERE [durados_user].[username]=@username", parameters);
+                object guid = sqlAccess.ExecuteScalar(Maps.Instance.DuradosMap.connectionString, Maps.MainAppSchema.GetUserGuidSql(), parameters);
 
                 if (guid == null || guid == DBNull.Value)
                     throw new DuradosException("Username has no unique guid, cannot reset password.");
@@ -1626,12 +1650,14 @@ namespace Durados.Web.Mvc.UI.Helpers
         {
             try
             {
-                Durados.DataAccess.SqlAccess sql = new Durados.DataAccess.SqlAccess();
+                Durados.DataAccess.SqlAccess sqlAccess = Maps.MainAppSqlAccess;
+
+                ISqlMainSchema sqlMain = Maps.MainAppSchema;
 
                 Dictionary<string, object> parameters = new Dictionary<string, object>();
 
                 parameters.Add("@username", userName);
-                object id = sql.ExecuteScalar(Maps.Instance.DuradosMap.connectionString, "SELECT TOP 1 [durados_user].[id] FROM durados_user WITH(NOLOCK)  WHERE [durados_user].[username]=@username", parameters);
+                object id = sqlAccess.ExecuteScalar(Maps.Instance.DuradosMap.connectionString, sqlMain.GetUserIdFromUsernameSql(), parameters);
 
                 if (id == null || id == DBNull.Value)
                     throw new DuradosException("Username has no unique username.");
@@ -1652,12 +1678,14 @@ namespace Durados.Web.Mvc.UI.Helpers
             {
                 string guid = GetUserGuid(username);
 
-                Durados.DataAccess.SqlAccess sql = new Durados.DataAccess.SqlAccess();
+                Durados.DataAccess.SqlAccess sqlAccess = Maps.MainAppSqlAccess;
+
+                ISqlMainSchema sqlMain = Maps.MainAppSchema;
 
                 Dictionary<string, object> parameters = new Dictionary<string, object>();
 
                 parameters.Add("@UserGuid", guid);
-                object tempGuid = sql.ExecuteScalar(Maps.Instance.DuradosMap.connectionString, "SELECT TOP 1 Id FROM [durados_ValidGuid] WITH(NOLOCK)  WHERE UserGuid=@UserGuid and Used=0", parameters);
+                object tempGuid = sqlAccess.ExecuteScalar(Maps.Instance.DuradosMap.connectionString, sqlMain.GetUserTempTokenSql() , parameters);
 
                 if (tempGuid == null || tempGuid == DBNull.Value)
                     throw new DuradosException("Temp token not found for " + username);
@@ -1709,13 +1737,15 @@ namespace Durados.Web.Mvc.UI.Helpers
 
         private string GetUsername(string guid)
         {
-            Durados.DataAccess.SqlAccess sqlAccess = new Durados.DataAccess.SqlAccess();
+            Durados.DataAccess.SqlAccess sqlAccess = Maps.MainAppSqlAccess;
+
+            ISqlMainSchema sqlMain = Maps.MainAppSchema;
 
             Dictionary<string, object> parameters = new Dictionary<string, object>();
 
             parameters.Add("@guid", guid);
 
-            string sqlDuradosSys = string.Format("SELECT TOP 1 username FROM durados_user WITH(NOLOCK)  WHERE guid=@guid");
+            string sqlDuradosSys = sqlMain.GetUserNameByGuidSql();
 
             return sqlAccess.ExecuteScalar(Maps.Instance.ConnectionString, sqlDuradosSys, parameters);
         }
@@ -1733,13 +1763,14 @@ namespace Durados.Web.Mvc.UI.Helpers
             if (Maps.Instance.DuradosMap.Database.GetUserRow() == null)
                 throw new DuradosException("user does not exist");
 
-            Durados.DataAccess.SqlAccess sqlAccess = new Durados.DataAccess.SqlAccess();
+            Durados.DataAccess.SqlAccess sqlAccess = Maps.MainAppSqlAccess;
             Dictionary<string, object> parameters = new Dictionary<string, object>();
 
             parameters.Add("@username", username);
 
+            ISqlMainSchema sqlMain = Maps.MainAppSchema;
 
-            string sql = string.Format("delete FROM durados_user WHERE [username]=@username");
+            string sql = sqlMain.GetDeleteUserSql();
 
             if (appName != null && appName != Maps.DuradosAppName)
             {
@@ -1766,14 +1797,15 @@ namespace Durados.Web.Mvc.UI.Helpers
                 appId = Convert.ToInt32(map.Id);
             }
 
-            Durados.DataAccess.SqlAccess sqlAccess = new Durados.DataAccess.SqlAccess();
+            Durados.DataAccess.SqlAccess sqlAccess = Maps.MainAppSqlAccess;
+            ISqlMainSchema sqlMain = Maps.MainAppSchema;
             Dictionary<string, object> parameters = new Dictionary<string, object>();
 
             parameters.Add("@appid", appId);
 
             parameters.Add("@userid", id);
 
-            string sql = string.Format("select id FROM durados_userapp WHERE [userid]=@userid and appid<>@appid");
+            string sql = sqlMain.GetUserBelongToMoreThanOneAppSql();
 
             return !sqlAccess.ExecuteScalar(Maps.Instance.DuradosMap.connectionString, sql, parameters).Equals(string.Empty);
 
@@ -1785,13 +1817,13 @@ namespace Durados.Web.Mvc.UI.Helpers
         {
             int id = Maps.Instance.DuradosMap.Database.GetUserID(username);
 
-            Durados.DataAccess.SqlAccess sqlAccess = new Durados.DataAccess.SqlAccess();
-
+            Durados.DataAccess.SqlAccess sqlAccess = Maps.MainAppSqlAccess;
+            ISqlMainSchema sqlMain = Maps.MainAppSchema;
             Dictionary<string, object> parameters = new Dictionary<string, object>();
 
             parameters.Add("@id", id);
 
-            string sql = string.Format("SELECT TOP 1 id FROM durados_app WITH(NOLOCK)  WHERE creator=@id");
+            string sql = sqlMain.GetHasAppsSql();
 
             return !sqlAccess.ExecuteScalar(Maps.Instance.DuradosMap.connectionString, sql, parameters).Equals(string.Empty);
         }

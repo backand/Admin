@@ -98,5 +98,7 @@ namespace Durados.DataAccess
         string GetFirstPK(View view);
 
         void LoadForeignKeys(string connectionString, SqlProduct sqlProduct, Dictionary<string, Dictionary<string, string>> cache);
+
+        SqlProduct GetSqlProduct();
     }
 }

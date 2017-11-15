@@ -10,7 +10,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Data;
-using System.Data.SqlClient;
+using System.Data.Common;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
@@ -605,13 +605,14 @@ namespace Durados.Web.Mvc
                 u.Buid();
                 firstTime = true;
             }
-
+            /*  
+             * TODO: Main MySQL depricated 
             if (this is DuradosMap && !Maps.PrivateCloud)
             {
                 string plugInFileName = Maps.GetDeploymentPath("Sql/PlugIn.sql");
                 Durados.DataAccess.AutoGeneration.PlugIn plugIn = new Durados.DataAccess.AutoGeneration.PlugIn(systemConnectionString, plugInFileName);
             }
-
+            */
 
             AddSystemTables(ds);
             if (ds.Tables.Contains("User") && ds.Tables["User"].Columns.Contains("Password"))
@@ -714,12 +715,12 @@ namespace Durados.Web.Mvc
                 View userView = (View)Database.GetUserView();
                 userView.Precedent = true;
                 userView.AllowSelectRoles = "Developer";
+                /* TODO: Main MySQL depricated
+               string dnsAliasFileName = Maps.GetDeploymentPath("Sql/DnsAlias.sql");
 
-                string dnsAliasFileName = Maps.GetDeploymentPath("Sql/DnsAlias.sql");
+               Durados.DataAccess.AutoGeneration.DnsAlias dnsAlias = new Durados.DataAccess.AutoGeneration.DnsAlias(systemConnectionString, dnsAliasFileName);
 
-                Durados.DataAccess.AutoGeneration.DnsAlias dnsAlias = new Durados.DataAccess.AutoGeneration.DnsAlias(systemConnectionString, dnsAliasFileName);
-
-
+               */
                 View appView = (View)Database.Views["durados_App"];
 
                 Field sysConnectionField = appView.GetFieldByColumnNames("SystemSqlConnectionId");
@@ -803,7 +804,7 @@ namespace Durados.Web.Mvc
                 string message = Database.Localizer.Translate(System.Web.Mvc.CmsHelper.GetContent(messageKey));
                 message = string.IsNullOrEmpty(message) ? messageKey : message;
                 string siteWithoutQueryString = System.Web.HttpContext.Current.Request.Url.Scheme + "://" + System.Web.HttpContext.Current.Request.Url.Authority;
-                message = message.Replace("[Url]", siteWithoutQueryString).Replace("[UserPreviewUrl]", this.GetPreviewPath());
+                message = message.Replace("[Url]", siteWithoutQueryString); /* TODO: Main MySQL depricated Replace("[UserPreviewUrl]", this.GetPreviewPath()); */
                 int appId = Convert.ToInt32(Maps.Instance.GetCurrentAppId());
                 string to = Maps.Instance.DuradosMap.Database.GetCreatorUsername(appId);
 
@@ -1139,17 +1140,18 @@ namespace Durados.Web.Mvc
             {
                 return GetSaveChangesIndicationFromDb2();
             }
-            catch (SqlException)
+            catch (DbException)
             {
                 try
                 {
-                    using (SqlConnection connection = new SqlConnection(Maps.Instance.DuradosMap.connectionString))
+                    ISqlMainSchema sqlMain = Maps.MainAppSchema;
+                    using (IDbConnection connection = sqlMain.GetNewConnection(Maps.Instance.DuradosMap.connectionString))
                     {
                         connection.Open();
-                        using (SqlCommand command = new SqlCommand())
+                        using (IDbCommand command = sqlMain.GetNewCommand())
                         {
                             command.Connection = connection;
-                            new SqlSchema().AddNewColumnToTable("durados_App", "ConfigChangesIndication", DataType.SingleSelect, command);
+                            Maps.MainAppSqlAccess.GetNewSqlSchema().AddNewColumnToTable("durados_App", "ConfigChangesIndication", DataType.SingleSelect, command);
                         }
                     }
                     return GetSaveChangesIndicationFromDb2();
@@ -1167,8 +1169,9 @@ namespace Durados.Web.Mvc
 
         private int GetSaveChangesIndicationFromDb2()
         {
-            string sql = "select ConfigChangesIndication from durados_App with(nolock) where id = " + Id;
-            string scalar = new SqlAccess().ExecuteScalar(Maps.Instance.DuradosMap.connectionString, sql);
+
+            string sql = Maps.MainAppSchema.GetSaveChangesIndicationFromDb2(Id);
+            string scalar = Maps.MainAppSqlAccess.ExecuteScalar(Maps.Instance.DuradosMap.connectionString, sql);
             return Convert.ToInt32(string.IsNullOrEmpty(scalar) ? "0" : scalar);
 
         }
@@ -1177,23 +1180,25 @@ namespace Durados.Web.Mvc
         {
             int config = Convert.ToInt32(System.Configuration.ConfigurationManager.AppSettings["isChangesInConfigStructure"] ?? "0") + 1;
 
-            string sql = "Update durados_App set ConfigChangesIndication = " + config + " where id = " + Id;
-            SqlAccess sqlAccess = new SqlAccess();
+            string sql = Maps.MainAppSchema.GetSetSaveChangesIndicationFromDbSql(config,Id);
+
+            SqlAccess sqlAccess = Maps.MainAppSqlAccess;
             try
             {
                 sqlAccess.ExecuteNonQuery(Maps.Instance.DuradosMap.connectionString, sql);
             }
-            catch (SqlException)
+            catch (DbException)
             {
                 try
                 {
-                    using (SqlConnection connection = new SqlConnection(Maps.Instance.DuradosMap.connectionString))
+                    ISqlMainSchema sqlMain = Maps.MainAppSchema;
+                    using (IDbConnection connection = sqlMain.GetNewConnection(Maps.Instance.DuradosMap.connectionString)) 
                     {
                         connection.Open();
-                        using (SqlCommand command = new SqlCommand())
+                        using (IDbCommand command = sqlMain.GetNewCommand())
                         {
                             command.Connection = connection;
-                            new SqlSchema().AddNewColumnToTable("durados_App", "ConfigChangesIndication", DataType.SingleSelect, command);
+                            sqlAccess.GetNewSqlSchema().AddNewColumnToTable("durados_App", "ConfigChangesIndication", DataType.SingleSelect, command);
                         }
                     }
                     sqlAccess.ExecuteNonQuery(Maps.Instance.DuradosMap.connectionString, sql);
@@ -1570,7 +1575,7 @@ namespace Durados.Web.Mvc
         {
             SetSaveChangesIndicationFromDb();
             AddCreator();
-            AddDemo();
+           // AddDemo();
             AddNewUserVerification();
             AddBeforeSocialSignup();
             AddSendForgotPassword();
@@ -1627,7 +1632,7 @@ namespace Durados.Web.Mvc
                 return "unknown";
             }
         }
-
+        /* TODO : Main Mysql
         private void AddSyncUserRulesOld()
         {
             const string USERS = "users";
@@ -1645,7 +1650,7 @@ namespace Durados.Web.Mvc
             values.Add("WorkflowAction", Durados.WorkflowAction.Execute.ToString());
             values.Add("WhereCondition", whereCondition);
             values.Add("ExecuteMessage", "Your objects do not contain a users object. Please set the where condition to false in the Security & Auth action \"Create My App User\".");
-            values.Add("ExecuteCommand", "insert into " + sqlTextBuilder.EscapeDbObject(USERS) + " (" + sqlTextBuilder.EscapeDbObject("email") + "," + sqlTextBuilder.EscapeDbObject("firstName") + "," + sqlTextBuilder.EscapeDbObject("lastName") + ") " + sqlTextBuilder.Top("select '{{Username}}','{{FirstName}}','{{LastName}}' " + sqlTextBuilder.FromDual() + " WHERE NOT EXISTS (SELECT * FROM " + sqlTextBuilder.EscapeDbObject(USERS) + " WHERE " + sqlTextBuilder.EscapeDbObject("email") + "='{{Username}}' ) ", 1));
+            values.Add("ExecuteCommand", "INSERT INTO " + sqlTextBuilder.EscapeDbObject(USERS) + " (" + sqlTextBuilder.EscapeDbObject("email") + "," + sqlTextBuilder.EscapeDbObject("firstName") + "," + sqlTextBuilder.EscapeDbObject("lastName") + ") " + sqlTextBuilder.Top("select '{{Username}}','{{FirstName}}','{{LastName}}' " + sqlTextBuilder.FromDual() + " WHERE NOT EXISTS (SELECT * FROM " + sqlTextBuilder.EscapeDbObject(USERS) + " WHERE " + sqlTextBuilder.EscapeDbObject("email") + "='{{Username}}' ) ", 1));
             ruleView.Create(values, null, null, null, null, null);
 
             values = new Dictionary<string, object>();
@@ -1668,7 +1673,7 @@ namespace Durados.Web.Mvc
             values.Add("ExecuteCommand", "delete from " + sqlTextBuilder.EscapeDbObject(USERS) + " where " + sqlTextBuilder.EscapeDbObject("email") + " = '{{Username}}'");
             ruleView.Create(values, null, null, null, null, null);
         }
-
+        */
 
         private string GetJsCode(string internalCode)
         {
@@ -2295,35 +2300,7 @@ namespace Durados.Web.Mvc
             databaseView.Edit(values, null, null, null, null, null);
         }
 
-        private void AddDemo()
-        {
-            if (Maps.GetCurrentAppName().StartsWith(Maps.DemoDatabaseName))
-            {
-                DataAccess.SqlAccess sqlAccess = new SqlAccess();
-
-                string scriptFilename = Maps.GetDeploymentPath("Sql/NorthwindSysAdditional.sql");
-
-                try
-                {
-                    sqlAccess.RunScriptFile(scriptFilename, systemConnectionString);
-                }
-                catch (Exception exception)
-                {
-                    Logger.Log("Map", "Initiate", "AddDemo", exception, 1, "Failed to add to demo sys");
-                }
-                scriptFilename = Maps.GetDeploymentPath("Sql/NorthwindAdditional.sql");
-
-                try
-                {
-                    sqlAccess.RunScriptFile(scriptFilename, connectionString);
-                }
-                catch (Exception exception)
-                {
-                    Logger.Log("Map", "Initiate", "AddDemo", exception, 1, "Failed to add to demo");
-                }
-            }
-        }
-
+   
         private void AddCreator()
         {
 
@@ -2385,13 +2362,15 @@ namespace Durados.Web.Mvc
             if (!this.IsMainMap)
                 AddSystemCloudTable(ds);
             AddSystemRootTable(ds);
-            
+            /*
+             * TODO: Main MySQL depricated
             if (this is DuradosMap && !Maps.PrivateCloud)
             {
                 AddSystemPlugInTable(ds);
                 AddSystemMailingServiceTable(ds);
                 AddSystemMessageBoardTable(ds);
             }
+             */
         }
 
         private void ConfigSystemTables()
@@ -2412,11 +2391,14 @@ namespace Durados.Web.Mvc
             ConfigSystemRootTable();
             
             ConfigSystemPlugInTable();
+            /*
+             * TODO: Main MySQL depricated 
             if (this is DuradosMap && !Maps.PrivateCloud)
             {
                 ConfigSystemMailingServiceTable();
                 ConfigSystemMessageBoardTable();
             }
+             */
             try
             {
                 foreach (View systemView in db.Views.Values.Where(v => v.SystemView))
@@ -5160,9 +5142,9 @@ namespace Durados.Web.Mvc
                 return mapSimpleCache;
             }
         }
-
+        /* TODO: Main MySQL depricated
         public Theme Theme { get; set; }
-
+        
         public void UpdateTheme(Theme theme)
         {
             try
@@ -5184,7 +5166,7 @@ namespace Durados.Web.Mvc
                 Logger.Log("Map", "UpdateTheme", "ExecuteNonQuery", exception, 1, "theme id: " + theme.Id.ToString());
             }
         }
-
+        
         public string GetPreviewPath()
         {
             if (Theme.Id == Maps.CustomTheme)
@@ -5199,7 +5181,7 @@ namespace Durados.Web.Mvc
             }
 
         }
-
+        */
 
         private ICache<object> lockerCache = CacheFactory.CreateCache<object>("lockerCache");
 
@@ -5250,8 +5232,8 @@ namespace Durados.Web.Mvc
         {
             try
             {
-                SqlAccess sqlAccess = new SqlAccess();
-                DataTable table = sqlAccess.ExecuteTable(Maps.Instance.DuradosMap.connectionString, "select Name, Limit from durados_AppLimits with(nolock) where AppId = " + Id, null, CommandType.Text);
+                SqlAccess sqlAccess = Maps.MainAppSqlAccess;
+                DataTable table = sqlAccess.ExecuteTable(Maps.Instance.DuradosMap.connectionString, Maps.MainAppSchema.GetAppLimitSql(Id), null, CommandType.Text);
                 foreach (DataRow row in table.Rows)
                 {
                     string limitName = row["Name"].ToString();
@@ -5408,12 +5390,12 @@ namespace Durados.Web.Mvc
 
         Backand.security security = new Backand.security();
 
-        public string Decrypt(string text)
+        public virtual string Decrypt(string text)
         {
             return security.decrypt(text, Guid.ToString() + Maps.AwsAccountSecretKeyPart);
         }
 
-        public string Encrypt(string text)
+        public virtual string Encrypt(string text)
         {
             
             return security.encrypt(text, Guid.ToString() + Maps.AwsAccountSecretKeyPart);

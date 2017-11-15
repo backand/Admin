@@ -284,6 +284,7 @@ namespace Durados.Web.Mvc.UI.Helpers
 
         public static string  GetUserGuidFromTmpGuid(string tmpGuid)
         {
+            // TODO:  add specific behaior for Super user
             Durados.DataAccess.SqlAccess sqlAccess = new DataAccess.SqlAccess();
             Dictionary<string, object> parameters = new Dictionary<string, object>();
             parameters.Add("@id", tmpGuid);
@@ -293,7 +294,7 @@ namespace Durados.Web.Mvc.UI.Helpers
         }
         public static string GetTmpUserGuidFromGuid(string guid,int minutes=15)
         {
-            
+            // TODO:  add specific behaior for Super user
             Dictionary<string, object> parameters = new Dictionary<string, object>();
             
             parameters.Add("@userGuid", guid);
@@ -305,13 +306,13 @@ namespace Durados.Web.Mvc.UI.Helpers
 
         private static string CallValidUserGuidSP(Dictionary<string, object> parameters,string spName,string retParamName)
         {
-            Durados.DataAccess.SqlAccess sqlAccess = new DataAccess.SqlAccess();
+            Durados.DataAccess.SqlAccess sqlAccess = Maps.MainAppSqlAccess;
            List<string> outputsParams= new List<string>();
             outputsParams.Add(retParamName);
-            System.Data.SqlClient.SqlParameter[] sqlParameters = sqlAccess.ExecuteProcedure(Maps.Instance.ConnectionString, spName, parameters, outputsParams, null);
+            System.Data.IDataParameter[] sqlParameters = sqlAccess.ExecuteProcedure(Maps.Instance.ConnectionString, spName, parameters, outputsParams, null);
             if (sqlParameters.Length > 0)
             {
-                foreach (System.Data.SqlClient.SqlParameter parameter in sqlParameters)
+                foreach (System.Data.IDataParameter parameter in sqlParameters)
                     if (parameter.ParameterName == retParamName)
                         return parameter.Value == null ? null : parameter.Value.ToString();
             }

@@ -37,7 +37,7 @@ namespace Durados.Web.Mvc.Controllers
                 string id = this.Request.QueryString["id"];
 
                 
-                Durados.DataAccess.SqlAccess sql = new Durados.DataAccess.SqlAccess();
+                Durados.DataAccess.SqlAccess sqlAccess = Maps.MainAppSqlAccess;
 
                 Dictionary<string, object> parameters = new Dictionary<string, object>();
                 
@@ -72,7 +72,7 @@ namespace Durados.Web.Mvc.Controllers
 
 
 
-                if (sql.ExecuteScalar(Map.Database.GetUserView().ConnectionString, "SELECT TOP 1 [Username] FROM [durados_User] WHERE [Username]=@Username", parameters) != string.Empty)
+                if (sqlAccess.ExecuteScalar(Map.Database.GetUserView().ConnectionString, Maps.MainAppSchema.GetUsernameByUsernameSql(), parameters) != string.Empty)
                 {
                     throw new DuradosException(Map.Database.Localizer.Translate(username + " already exists"));
                 }
@@ -127,26 +127,28 @@ namespace Durados.Web.Mvc.Controllers
                 parameters.Add("@IsApproved", isApproved);
 
                 collection.Add("Guid", guid.ToString());
-                string userId = sql.ExecuteScalar(Maps.Instance.DuradosMap.Database.GetUserView().ConnectionString, "SELECT TOP 1 [ID] FROM [durados_User] WHERE [Username]=@Username", parameters);
+                string userId = sqlAccess.ExecuteScalar(Maps.Instance.DuradosMap.Database.GetUserView().ConnectionString, Maps.MainAppSchema.GetUserIdFromUsernameSql() , parameters);
                 ExecuteNonQueryRollbackCallback executeNonQueryRollbackCallback = CreateMembershipCallback;
                 if (!string.IsNullOrEmpty(userId))
                     executeNonQueryRollbackCallback = null;
 
-                sql.ExecuteNonQuery(Map.Database.GetUserView().ConnectionString, "INSERT INTO [" + Map.Database.GetUserView().GetTableName() + "] ([Username],[FirstName],[LastName],[Email],[Role],[Guid],[IsApproved]) VALUES (@Username,@FirstName,@LastName,@Email,@Role,@Guid,@IsApproved)", parameters, executeNonQueryRollbackCallback);
+                sqlAccess.ExecuteNonQuery(Map.Database.GetUserView().ConnectionString, Maps.MainAppSchema.GetInsertIntoUsersSql2(Map.Database.GetUserView().GetTableName()) , parameters, executeNonQueryRollbackCallback);
                 if (string.IsNullOrEmpty(appName) && !Map.IsMainMap)
                 {
                     //appName = Map.AppName;
                     
                     if (string.IsNullOrEmpty(userId))
                     {
-                        sql.ExecuteNonQuery(Maps.Instance.DuradosMap.Database.GetUserView().ConnectionString, "INSERT INTO [" + Maps.Instance.DuradosMap.Database.GetUserView().GetTableName() + "] ([Username],[FirstName],[LastName],[Email],[Role],[Guid]) VALUES (@Username,@FirstName,@LastName,@Email,@Role,@Guid)", parameters, null);
+                        string viewName =Maps.Instance.DuradosMap.Database.GetUserView().GetTableName() ;
+                        sqlAccess.ExecuteNonQuery(Maps.Instance.DuradosMap.Database.GetUserView().ConnectionString, Maps.MainAppSchema.GetInsertIntoUsersSql(viewName), parameters, null);
                     }
-                    Dictionary<string, object> parameters2 = new Dictionary<string, object>();
-                    parameters2.Add("@Username", username);
-                    parameters2.Add("@AppId", Map.Id);
-                    parameters2.Add("@Role", role);
-                    sql.ExecuteNonQuery(Maps.Instance.DuradosMap.Database.ConnectionString, "INSERT INTO [durados_UserApp_Pending] ([Username],[AppId],[Role]) VALUES (@Username,@AppId,@Role)", parameters2, null);
-                    
+                    /* TODO : Main Mysql
+                    //Dictionary<string, object> parameters2 = new Dictionary<string, object>();
+                    //parameters2.Add("@Username", username);
+                    //parameters2.Add("@AppId", Map.Id);
+                    //parameters2.Add("@Role", role);
+                    //sqlAccess.ExecuteNonQuery(Maps.Instance.DuradosMap.Database.ConnectionString, "INSERT INTO [durados_UserApp_Pending] ([Username],[AppId],[Role]) VALUES (@Username,@AppId,@Role)", parameters2, null);
+                    */
                 }
 
                 if (!string.IsNullOrEmpty(appName))
@@ -161,11 +163,11 @@ namespace Durados.Web.Mvc.Controllers
                     Dictionary<string, object> parameters2 = new Dictionary<string, object>();
                     parameters2.Add("@UserId", userId);
                     parameters2.Add("@AppId", mapId);
-                    if (string.IsNullOrEmpty(sql.ExecuteScalar(Maps.Instance.DuradosMap.connectionString, "SELECT TOP 1 [ID] FROM [durados_UserApp] WHERE [UserId]=@UserId AND [AppId]=@AppId", parameters2)))
+                    if (string.IsNullOrEmpty(sqlAccess.ExecuteScalar(Maps.Instance.DuradosMap.connectionString, "SELECT TOP 1 [ID] FROM [durados_UserApp] WHERE [UserId]=@UserId AND [AppId]=@AppId", parameters2)))
                     {
                         parameters2.Add("@newUser", username);
                         parameters2.Add("@appName", appName);
-                        sql.ExecuteNonQuery(Maps.Instance.DuradosMap.Database.ConnectionString, "durados_AssignPendingApps @newUser,@appName", parameters2, AssignPendingAppsCallback);
+                        sqlAccess.ExecuteNonQuery(Maps.Instance.DuradosMap.Database.ConnectionString, "durados_AssignPendingApps @newUser,@appName", parameters2, AssignPendingAppsCallback);
                     }
                 }
 
@@ -179,7 +181,7 @@ namespace Durados.Web.Mvc.Controllers
                         if (!user.IsApproved && Maps.MultiTenancy)
                         {
                             user.IsApproved = true;
-                            RenewUserGuid(username, Maps.Instance.GetMap(appName), sql);
+                            RenewUserGuid(username, Maps.Instance.GetMap(appName), sqlAccess);
                             System.Web.Security.Membership.UpdateUser(user);
 
                         }
@@ -248,7 +250,7 @@ namespace Durados.Web.Mvc.Controllers
 
                 int userId = Maps.Instance.DuradosMap.Database.GetUserID(username);
 
-                Durados.DataAccess.SqlAccess sql = new Durados.DataAccess.SqlAccess();
+                Durados.DataAccess.SqlAccess sqlAccess = Maps.MainAppSqlAccess;
                 Dictionary<string, object> parameters = new Dictionary<string, object>();
                 parameters.Add("@PlugInUserId", plugInUserId);
                 parameters.Add("@PlugInId", (int)PlugInType.Wix);
@@ -256,7 +258,7 @@ namespace Durados.Web.Mvc.Controllers
                 parameters.Add("@SelectionDate", DateTime.Now);
 
 
-                sql.ExecuteNonQuery(Maps.Instance.DuradosMap.Database.ConnectionString, "insert into durados_PlugInRegisteredUser (PlugInUserId ,PlugInId, RegisteredUserId, SelectionDate) values (@PlugInUserId ,@PlugInId, @RegisteredUserId, @SelectionDate)", parameters, null);
+                sqlAccess.ExecuteNonQuery(Maps.Instance.DuradosMap.Database.ConnectionString, Maps.MainAppSchema.InsertIntoPluginRegisterUsersSql(), parameters, null);
             }
             catch (Exception exception)
             {
@@ -1157,7 +1159,7 @@ namespace Durados.Web.Mvc.Controllers
         {
             try
             {
-                Durados.DataAccess.SqlAccess sql = new Durados.DataAccess.SqlAccess();
+                Durados.DataAccess.SqlAccess sqlAccess = Maps.MainAppSqlAccess;
 
                 Dictionary<string, object> parameters = new Dictionary<string, object>();
 
@@ -1176,7 +1178,7 @@ namespace Durados.Web.Mvc.Controllers
                 parameters.Add("@Username", username);
 
 
-                if (sql.ExecuteScalar(Map.Database.ConnectionString, "SELECT TOP 1 [Username] FROM [User] WHERE [Username]=@Username", parameters) != string.Empty)
+                if (sqlAccess.ExecuteScalar(Map.Database.ConnectionString, Maps.MainAppSchema.GetUsernameByUsernameInUseSql(), parameters) != string.Empty)
                 {
                     throw new DuradosException("'Username' already exist [" + collection["Username"] + "]");
                 }
@@ -1220,7 +1222,7 @@ namespace Durados.Web.Mvc.Controllers
 
 
 
-                sql.ExecuteNonQuery(Map.Database.ConnectionString, "INSERT INTO [User] ([Username],[FirstName],[LastName],[Email],[Password],[Role],[NewUser],[Comments]) VALUES (@Username,@FirstName,@LastName,@Email,@Password,@Role,@NewUser,@Comments)", parameters, CreateMembershipCallback);
+                sqlAccess.ExecuteNonQuery(Map.Database.ConnectionString, Maps.MainAppSchema.InsertIntoUserSql(),parameters, CreateMembershipCallback);
                 SendRegistrationRequest(collection);
           
 
@@ -1547,13 +1549,14 @@ namespace Durados.Web.Mvc.Controllers
 
         private void LoadUserData(string guid)
         {
-            Durados.DataAccess.SqlAccess sqlAccess = new Durados.DataAccess.SqlAccess();
+            Durados.DataAccess.SqlAccess sqlAccess = Maps.MainAppSqlAccess;
 
             Dictionary<string, object> parameters = new Dictionary<string, object>();
 
             parameters.Add("@guid", guid);
+            
 
-            string sqlDuradosSys = string.Format("SELECT TOP 1 username FROM durados_user WITH(NOLOCK)  WHERE guid=@guid");
+            string sqlDuradosSys = Maps.MainAppSchema.GetLoadUserDataByGuidSql(); 
 
             object duradosSysUser = sqlAccess.ExecuteScalar(Maps.Instance.ConnectionString, sqlDuradosSys, parameters);
 
@@ -1564,7 +1567,7 @@ namespace Durados.Web.Mvc.Controllers
 
             parameters.Add("@username", duradosSysUser.ToString());
 
-            string sql = string.Format("SELECT TOP 1 {0} FROM {1} WITH(NOLOCK)  WHERE {2}=@username", GetUserFieldsForSelect(), Map.Database.UserViewName, Map.Database.UsernameFieldName);
+            string sql = Maps.MainAppSchema.GetLoadUserDataByUsernameSql(GetUserFieldsForSelect(), Map.Database.UserViewName, Map.Database.UsernameFieldName); 
 
             object dataTable = sqlAccess.ExecuteTable(Map.Database.GetUserView().ConnectionString, sql, parameters, CommandType.Text);
 
@@ -1584,7 +1587,7 @@ namespace Durados.Web.Mvc.Controllers
         private string GetUserFieldsForSelect()
         {
             string select;
-            select = string.Format("[{0}],[{1}],[{2}],[{3}],[{4}]", Map.Database.UserGuidFieldName, Map.Database.UsernameFieldName,"FirstName","LastName","Email");
+            select = string.Format(Maps.MainAppSchema.GetUserFieldsForSelectSql() , Map.Database.UserGuidFieldName, Map.Database.UsernameFieldName, "FirstName", "LastName", "Email");
             
             return select;
         }
@@ -1920,13 +1923,14 @@ namespace Durados.Web.Mvc.Controllers
         {
             try
             {
-                Durados.DataAccess.SqlAccess sql = new Durados.DataAccess.SqlAccess();
+                Durados.DataAccess.SqlAccess sqlAccess = Maps.MainAppSqlAccess;
 
                 Dictionary<string, object> parameters = new Dictionary<string, object>();
 
                 parameters.Add("@username", userName);
                 string userViewName=Map.Database.UserViewName;
-                object guid = sql.ExecuteScalar(Maps.Instance.DuradosMap.connectionString, "SELECT TOP 1 [durados_user].[guid] FROM durados_user WITH(NOLOCK)  WHERE [durados_user].[username]=@username", parameters);
+                string sql = Maps.MainAppSchema.GetUserGuidSql();
+                object guid = sqlAccess.ExecuteScalar(Maps.Instance.DuradosMap.connectionString, sql, parameters);
 
                 if (guid == null || guid == DBNull.Value)
                     throw new DuradosException(Map.Database.Localizer.Translate("Username has no uniqe guid ,password canot be reset."));
@@ -2373,8 +2377,10 @@ namespace Durados.Web.Mvc.Controllers
 
         private bool ValidateUser(int appID, int userId)
         {
-            string sql = string.Format("select Cast( case when exists(select 1 from durados_App with(nolock) where durados_app.[ToDelete]=0 AND  Id = {0} and Creator = {1}) or exists(select 1 from dbo.durados_UserApp with(nolock) where  AppId = {0} and UserId = {1}) then 1 else 0 end as bit)", appID, userId);
-            string scalar = (new SqlAccess()).ExecuteScalar(Maps.Instance.DuradosMap.Database.ConnectionString, sql);
+
+            string sql = Maps.MainAppSchema.GetValidateUserSql(appID, userId);
+            
+            string scalar = Maps.MainAppSqlAccess.ExecuteScalar(Maps.Instance.DuradosMap.Database.ConnectionString, sql);
 
             if (string.IsNullOrEmpty(scalar))
                 return false;

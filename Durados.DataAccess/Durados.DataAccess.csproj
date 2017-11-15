@@ -123,6 +123,7 @@
     <Compile Include="AutoGeneration\Dynamic\Schema\ForeignKeys.cs" />
     <Compile Include="AutoGeneration\Dynamic\MapDataSet.cs">
       <DependentUpon>MapDataSet.xsd</DependentUpon>
+      <SubType>Component</SubType>
     </Compile>
     <Compile Include="AutoGeneration\Dynamic\MapDataSet.Designer.cs">
       <AutoGen>True</AutoGen>
@@ -141,6 +142,7 @@
     <Compile Include="ConfigAccess.cs" />
     <Compile Include="FKPath.cs" />
     <Compile Include="ILockGetter.cs" />
+    <Compile Include="ISqlMainSchema.cs" />
     <Compile Include="MailingServices\GroBootPushAppNotification.cs" />
     <Compile Include="MissingRequiredFieldWithoutDefaultValue.cs" />
     <Compile Include="OracleAccess.cs" />

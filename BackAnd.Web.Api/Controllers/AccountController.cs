@@ -129,7 +129,7 @@ namespace BackAnd.Web.Api.Controllers
         private string GetUserFieldsForSelect()
         {
             string select;
-            select = string.Format("[{0}],[{1}],[{2}],[{3}],[{4}]", Map.Database.UserGuidFieldName, Map.Database.UsernameFieldName, "FirstName", "LastName", "Email");
+            select = string.Format(Durados.Web.Mvc.Maps.MainAppSchema.GetUserFieldsForSelectSql(), Map.Database.UserGuidFieldName, Map.Database.UsernameFieldName, "FirstName", "LastName", "Email");
 
             return select;
         }
@@ -148,13 +148,13 @@ namespace BackAnd.Web.Api.Controllers
         }
         private void LoadUserData(string guid)
         {
-            Durados.DataAccess.SqlAccess sqlAccess = new Durados.DataAccess.SqlAccess();
+            Durados.DataAccess.SqlAccess sqlAccess = Durados.Web.Mvc.Maps.MainAppSqlAccess;
 
             Dictionary<string, object> parameters = new Dictionary<string, object>();
 
             parameters.Add("@guid", guid);
 
-            string sqlDuradosSys = string.Format("SELECT TOP 1 username FROM durados_user WITH(NOLOCK)  WHERE guid=@guid");
+            string sqlDuradosSys = Durados.Web.Mvc.Maps.MainAppSchema.GetLoadUserDataByGuidSql(); 
 
             object duradosSysUser = sqlAccess.ExecuteScalar(Durados.Web.Mvc.Maps.Instance.ConnectionString, sqlDuradosSys, parameters);
 
@@ -165,7 +165,7 @@ namespace BackAnd.Web.Api.Controllers
 
             parameters.Add("@username", duradosSysUser.ToString());
 
-            string sql = string.Format("SELECT TOP 1 {0} FROM {1} WITH(NOLOCK)  WHERE {2}=@username", GetUserFieldsForSelect(), Map.Database.UserViewName, Map.Database.UsernameFieldName);
+            string sql = Durados.Web.Mvc.Maps.MainAppSchema.GetLoadUserDataByUsernameSql( GetUserFieldsForSelect(), Map.Database.UserViewName, Map.Database.UsernameFieldName);
 
             object dataTable = sqlAccess.ExecuteTable(Map.Database.GetUserView().ConnectionString, sql, parameters, System.Data.CommandType.Text);
 
@@ -308,13 +308,14 @@ namespace BackAnd.Web.Api.Controllers
         {
             try
             {
-                Durados.DataAccess.SqlAccess sql = new Durados.DataAccess.SqlAccess();
+                Durados.DataAccess.SqlAccess sql = Durados.Web.Mvc.Maps.MainAppSqlAccess;
 
                 Dictionary<string, object> parameters = new Dictionary<string, object>();
 
                 parameters.Add("@username", userName);
                 string userViewName = Map.Database.UserViewName;
-                object guid = sql.ExecuteScalar(Durados.Web.Mvc.Maps.Instance.DuradosMap.connectionString, "SELECT TOP 1 [durados_user].[guid] FROM durados_user WITH(NOLOCK)  WHERE [durados_user].[username]=@username", parameters);
+                
+                object guid = sql.ExecuteScalar(Durados.Web.Mvc.Maps.Instance.DuradosMap.connectionString, Durados.Web.Mvc.Maps.MainAppSchema.GetUserGuidSql(), parameters);
 
                 if (guid == null || guid == DBNull.Value)
                     throw new Durados.DuradosException(Map.Database.Localizer.Translate("Username has no uniqe guid ,password canot be reset."));
@@ -545,12 +546,12 @@ namespace BackAnd.Web.Api.Controllers
             Dictionary<string, object> parameters2 = new Dictionary<string, object>();
             parameters2.Add("@UserId", userId);
             parameters2.Add("@AppId", mapId);
-            Durados.DataAccess.SqlAccess sql = new Durados.DataAccess.SqlAccess();
-            if (string.IsNullOrEmpty(sql.ExecuteScalar(Durados.Web.Mvc.Maps.Instance.DuradosMap.connectionString, "SELECT TOP 1 [ID] FROM [durados_UserApp] WHERE [UserId]=@UserId AND [AppId]=@AppId", parameters2)))
+            Durados.DataAccess.SqlAccess sqlAccess = Durados.Web.Mvc.Maps.MainAppSqlAccess;  
+            if (string.IsNullOrEmpty(sqlAccess.ExecuteScalar(Durados.Web.Mvc.Maps.Instance.DuradosMap.connectionString, Durados.Web.Mvc.Maps.MainAppSchema.GetUserAappIdSql(), parameters2)))
             {
                 parameters2.Add("@newUser", username);
                 parameters2.Add("@appName", appName);
-                sql.ExecuteNonQuery(Durados.Web.Mvc.Maps.Instance.DuradosMap.Database.ConnectionString, "durados_AssignPendingApps @newUser,@appName", parameters2, AssignPendingAppsCallback);
+                sqlAccess.ExecuteNonQuery(Durados.Web.Mvc.Maps.Instance.DuradosMap.Database.ConnectionString, "durados_AssignPendingApps @newUser,@appName", parameters2, AssignPendingAppsCallback);
             }
         }
 

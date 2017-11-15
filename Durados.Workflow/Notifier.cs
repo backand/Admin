@@ -47,11 +47,8 @@ namespace Durados.Workflow
             if (emailParameters.To.Length > 0)
                 Durados.Cms.DataAccess.Email.Send(host, view.Database.UseSmtpDefaultCredentials, port, username, password, false, emailParameters.To, emailParameters.Cc, emailParameters.Bcc, emailParameters.Subject, emailParameters.Message, emailParameters.From, null, null, ((INotifier)controller).DontSend, view.Database.Logger);
 
-            if (ShouldSaveInMessageBoard(controller, parameters, view, values, prevRow, pk, siteWithoutQueryString, connectionString))
-            {
-                SaveInMessageBoard(controller, parameters, view, values, prevRow, pk, siteWithoutQueryString, urlAction, connectionString, emailParameters.Subject, emailParameters.Message, currentUserId, currentUserRole, recipients);
+           
             }
-        }
 
         private Dictionary<int, bool> GetRecipients(EmailParameters emailParameters, View userView)
         {
@@ -103,16 +100,16 @@ namespace Durados.Workflow
         {
             return "SELECT " + sqlBuilder.EscapeDbObjectStart + userView.DataTable.PrimaryKey[0].ColumnName + sqlBuilder.EscapeDbObjectEnd + " FROM " + sqlBuilder.EscapeDbObjectStart + userView.DataTable.TableName + sqlBuilder.EscapeDbObjectEnd + " where Email in (" + emailString + ")";
         }
+        //TODO :Main Mysql
+        //protected virtual bool ShouldSaveInMessageBoard(object controller, Dictionary<string, Parameter> parameters, View view, Dictionary<string, object> values, DataRow prevRow, string pk, string siteWithoutQueryString, string connectionString)
+        //{
+        //    return !parameters.ContainsKey("ExcludeMessageBoard");
+        //}
 
-        protected virtual bool ShouldSaveInMessageBoard(object controller, Dictionary<string, Parameter> parameters, View view, Dictionary<string, object> values, DataRow prevRow, string pk, string siteWithoutQueryString, string connectionString)
-        {
-            return !parameters.ContainsKey("ExcludeMessageBoard");
-        }
-
-        protected virtual void SaveInMessageBoard(object controller, Dictionary<string, Parameter> parameters, View view, Dictionary<string, object> values, DataRow prevRow, string pk, string siteWithoutQueryString, string urlAction, string connectionString, string subject, string message, int currentUserId, string currentUserRole, Dictionary<int, bool> recipients)
-        {
-            ((INotifier)controller).SaveInMessageBoard(parameters, view, values, prevRow, pk, siteWithoutQueryString, urlAction, subject, message, currentUserId, currentUserRole, recipients);
-        }
+        //protected virtual void SaveInMessageBoard(object controller, Dictionary<string, Parameter> parameters, View view, Dictionary<string, object> values, DataRow prevRow, string pk, string siteWithoutQueryString, string urlAction, string connectionString, string subject, string message, int currentUserId, string currentUserRole, Dictionary<int, bool> recipients)
+        //{
+        //    ((INotifier)controller).SaveInMessageBoard(parameters, view, values, prevRow, pk, siteWithoutQueryString, urlAction, subject, message, currentUserId, currentUserRole, recipients);
+        //}
 
         protected virtual EmailParameters GetEmailParameters(object controller, Dictionary<string, Parameter> parameters, View view, Dictionary<string, object> values, DataRow prevRow, string pk, string siteWithoutQueryString, string mainSiteWithoutQueryString, string connectionString, string currentUserId, string currentUsername, string currentUserRole)
         {
@@ -155,7 +152,7 @@ namespace Durados.Workflow
         string GetSiteWithoutQueryString();
         string GetMainSiteWithoutQueryString();
         string GetUrlAction(View view, string pk);
-        string SaveInMessageBoard(Dictionary<string, Parameter> parameters, View view, Dictionary<string, object> values, DataRow prevRow, string pk, string siteWithoutQueryString, string urlAction, string subject, string message, int currentUserId, string currentUserRole, Dictionary<int, bool> recipients);
+        //string SaveInMessageBoard(Dictionary<string, Parameter> parameters, View view, Dictionary<string, object> values, DataRow prevRow, string pk, string siteWithoutQueryString, string urlAction, string subject, string message, int currentUserId, string currentUserRole, Dictionary<int, bool> recipients);
         void SaveMessageAction(View view, string pk, object value, int messageBoardAction, int userId);
 
         string GetFieldValue(Field field, string pk);

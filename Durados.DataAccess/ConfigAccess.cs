@@ -1014,9 +1014,10 @@ namespace Durados.DataAccess
             return null;
         }
 
-        public static int AddCategory(string fileName)
+        public static int? AddCategory(string fileName)
         {
-            return AddCategory(fileName, "General", 0);
+           // return AddCategory(fileName, "General", 0);
+            return null;
         }
 
         public static int AddCategory(string fileName, string name, int ordinal)

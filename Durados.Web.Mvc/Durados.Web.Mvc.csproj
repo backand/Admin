@@ -249,7 +249,6 @@
     <Compile Include="Controllers\DuradosUserController.cs" />
     <Compile Include="Controllers\MultiTenancy\ConnectionStringController.cs" />
     <Compile Include="Controllers\LocalizationController.cs" />
-    <Compile Include="Controllers\MultiTenancy\DnsAliasController.cs" />
     <Compile Include="Controllers\MultiTenancy\DemoController.cs" />
     <Compile Include="Controllers\MultiTenancy\MultiTenancyController.cs" />
     <Compile Include="Controllers\MessageBoardController.cs" />
