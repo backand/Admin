@@ -4,6 +4,7 @@ using Durados.SmartRun;
 using Durados.Web.Mvc.Azure;
 using Durados.Web.Mvc.Farm;
 using Durados.Web.Mvc.UI.Helpers;
+using Durados.Web.Mvc.UI.Helpers.Config.Cloud;
 using Microsoft.WindowsAzure.StorageClient;
 using Newtonsoft.Json;
 using System;
@@ -4323,31 +4324,46 @@ namespace Durados.Web.Mvc
             Maps.Instance.StorageCache.Add(blobName, ds);
         }
 
+        private IStorage configCloudStorage = null;
+
+        private IStorage ConfigCloudStorage
+        {
+            get
+            {
+                if (configCloudStorage == null)
+                {
+                    configCloudStorage = StorageFactory.GetStorage(Maps.ConfigCloudProvider, this);
+                }
+                return configCloudStorage;
+            }
+        }
+            
         public void ReadConfigFromCloudStorage(DataSet ds, string filename)
         {
-            CheckIfConfigIsLockedAndWait(AppName);
+            ConfigCloudStorage.Read(ds, filename, AppName, IsMainMap);
+            //CheckIfConfigIsLockedAndWait(AppName);
 
-            string containerName = Maps.GetStorageBlobName(filename);
-            CloudBlobContainer container = GetContainer(containerName);
+            //string containerName = Maps.GetStorageBlobName(filename);
+            //CloudBlobContainer container = GetContainer(containerName);
 
-            CloudBlob blob = container.GetBlobReference(containerName);
-            try
-            {
-                //BlobStream stream = blob.OpenRead();
-                //string tempFileName = fileInfo.DirectoryName + "\\temp" + filenameOnly + "." + fileInfo.Extension;
+            //CloudBlob blob = container.GetBlobReference(containerName);
+            //try
+            //{
+            //    //BlobStream stream = blob.OpenRead();
+            //    //string tempFileName = fileInfo.DirectoryName + "\\temp" + filenameOnly + "." + fileInfo.Extension;
 
-                using (MemoryStream stream = new MemoryStream())
-                {
-                    blob.DownloadToStream(stream);
+            //    using (MemoryStream stream = new MemoryStream())
+            //    {
+            //        blob.DownloadToStream(stream);
 
-                    stream.Seek(0, SeekOrigin.Begin);
+            //        stream.Seek(0, SeekOrigin.Begin);
 
-                    ds.ReadXml(stream);
-                }
-                //System.IO.File.Delete(tempFileName);
+            //        ds.ReadXml(stream);
+            //    }
+            //    //System.IO.File.Delete(tempFileName);
 
-            }
-            catch { }
+            //}
+            //catch { }
         }
 
         private void CheckIfConfigIsLockedAndWait(string appName)
@@ -4422,93 +4438,95 @@ namespace Durados.Web.Mvc
 
         public void WriteConfigToCloud2(DataSet ds, string filename, bool async, Map map)
         {
-            string containerName = Maps.GetStorageBlobName(filename);
-            Maps.Instance.StorageCache.Add(containerName, ds);
+            //string containerName = Maps.GetStorageBlobName(filename);
+            //Maps.Instance.StorageCache.Add(containerName, ds);
 
-            CloudBlobContainer container = GetContainer(containerName);
+            //CloudBlobContainer container = GetContainer(containerName);
 
-            CloudBlob blob = container.GetBlobReference(containerName);
-            blob.Properties.ContentType = "application/xml";
+            //CloudBlob blob = container.GetBlobReference(containerName);
+            //blob.Properties.ContentType = "application/xml";
 
-            if (!Maps.Instance.StorageCache.ContainsKey(containerName) || !async)
-            {
-                using (MemoryStream stream = new MemoryStream())
-                {
-                    ds.WriteXml(stream, XmlWriteMode.WriteSchema);
-                    stream.Seek(0, SeekOrigin.Begin);
-                    blob.UploadFromStream(stream);
-                    RefreshApis(map);
-                    Maps.Instance.Backup.BackupAsync(container, containerName);
-                }
-            }
-            else
-            {
-                MemoryStream stream = new MemoryStream();
-                ds.WriteXml(stream, XmlWriteMode.WriteSchema);
-                stream.Seek(0, SeekOrigin.Begin);
+            //if (!Maps.Instance.StorageCache.ContainsKey(containerName) || !async)
+            //{
+            //    using (MemoryStream stream = new MemoryStream())
+            //    {
+            //        ds.WriteXml(stream, XmlWriteMode.WriteSchema);
+            //        stream.Seek(0, SeekOrigin.Begin);
+            //        blob.UploadFromStream(stream);
+            //        RefreshApis(map);
+            //        Maps.Instance.Backup.BackupAsync(container, containerName);
+            //    }
+            //}
+            //else
+            //{
+            //    MemoryStream stream = new MemoryStream();
+            //    ds.WriteXml(stream, XmlWriteMode.WriteSchema);
+            //    stream.Seek(0, SeekOrigin.Begin);
 
-                DateTime started = DateTime.Now;
+            //    DateTime started = DateTime.Now;
 
-                blob.BeginUploadFromStream(stream, BlobTransferCompletedCallback, new BlobTransferAsyncState(blob, stream, started, container, containerName, map));
+            //    blob.BeginUploadFromStream(stream, BlobTransferCompletedCallback, new BlobTransferAsyncState(blob, stream, started, container, containerName, map));
 
-                //try
-                //{
-                //    if (map != null)
-                //    {
-                //        Maps.Instance.DuradosMap.Logger.Log("Map", "WriteConfigToCloud", map.AppName ?? string.Empty, string.Empty, string.Empty, -8, containerName + " started", started);
-                //    }
-                //}
-                //catch { }
-            }
+            //    //try
+            //    //{
+            //    //    if (map != null)
+            //    //    {
+            //    //        Maps.Instance.DuradosMap.Logger.Log("Map", "WriteConfigToCloud", map.AppName ?? string.Empty, string.Empty, string.Empty, -8, containerName + " started", started);
+            //    //    }
+            //    //}
+            //    //catch { }
+            //}
+            ConfigCloudStorage.Write(ds, filename, async, map, string.Empty);
         }
 
         public void WriteConfigToCloud3(DataSet ds, string filename, bool async, Map map, string version)
         {
-            string containerName = Maps.GetStorageBlobName(filename);
-            //Maps.Instance.StorageCache.Add(containerName, ds);
+            //string containerName = Maps.GetStorageBlobName(filename);
+            ////Maps.Instance.StorageCache.Add(containerName, ds);
 
-            CloudBlobContainer container = GetContainer(containerName);
+            //CloudBlobContainer container = GetContainer(containerName);
 
-            CloudBlob blob = container.GetBlobReference(containerName + version);
-            blob.Properties.ContentType = "application/xml";
+            //CloudBlob blob = container.GetBlobReference(containerName + version);
+            //blob.Properties.ContentType = "application/xml";
 
-            if (!Maps.Instance.StorageCache.ContainsKey(containerName) || !async)
-            {
-                using (MemoryStream stream = new MemoryStream())
-                {
-                    ds.WriteXml(stream, XmlWriteMode.WriteSchema);
-                    stream.Seek(0, SeekOrigin.Begin);
+            //if (!Maps.Instance.StorageCache.ContainsKey(containerName) || !async)
+            //{
+            //    using (MemoryStream stream = new MemoryStream())
+            //    {
+            //        ds.WriteXml(stream, XmlWriteMode.WriteSchema);
+            //        stream.Seek(0, SeekOrigin.Begin);
 
-                    blob.UploadFromStream(stream);
+            //        blob.UploadFromStream(stream);
 
-                    //RefreshApis(map);
+            //        //RefreshApis(map);
 
-                    Maps.Instance.Backup.BackupAsync(container, containerName);
+            //        Maps.Instance.Backup.BackupAsync(container, containerName);
 
-                }
-            }
-            else
-            {
-                MemoryStream stream = new MemoryStream();
-                ds.WriteXml(stream, XmlWriteMode.WriteSchema);
-                stream.Seek(0, SeekOrigin.Begin);
+            //    }
+            //}
+            //else
+            //{
+            //    MemoryStream stream = new MemoryStream();
+            //    ds.WriteXml(stream, XmlWriteMode.WriteSchema);
+            //    stream.Seek(0, SeekOrigin.Begin);
 
-                DateTime started = DateTime.Now;
+            //    DateTime started = DateTime.Now;
 
-                blob.BeginUploadFromStream(stream, BlobTransferCompletedCallback, new BlobTransferAsyncState(blob, stream, started, container, containerName, map));
+            //    blob.BeginUploadFromStream(stream, BlobTransferCompletedCallback, new BlobTransferAsyncState(blob, stream, started, container, containerName, map));
 
-                try
-                {
-                    if (map != null)
-                    {
-                        Maps.Instance.DuradosMap.Logger.Log("Map", "WriteConfigToCloud", map.AppName ?? string.Empty, string.Empty, string.Empty, -8, containerName + " started", started);
-                    }
-                }
-                catch { }
-            }
+            //    try
+            //    {
+            //        if (map != null)
+            //        {
+            //            Maps.Instance.DuradosMap.Logger.Log("Map", "WriteConfigToCloud", map.AppName ?? string.Empty, string.Empty, string.Empty, -8, containerName + " started", started);
+            //        }
+            //    }
+            //    catch { }
+            //}
+            configCloudStorage.Write(ds, filename, async, map, version);
         }
 
-        private void BlobTransferCompletedCallback(IAsyncResult result)
+        public void BlobTransferCompletedCallback(IAsyncResult result)
         {
             BlobTransferAsyncState state = (BlobTransferAsyncState)result.AsyncState;
             if (state == null || state.Map == null)
