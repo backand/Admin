@@ -48,7 +48,7 @@ namespace Durados.Workflow
                 Durados.Cms.DataAccess.Email.Send(host, view.Database.UseSmtpDefaultCredentials, port, username, password, false, emailParameters.To, emailParameters.Cc, emailParameters.Bcc, emailParameters.Subject, emailParameters.Message, emailParameters.From, null, null, ((INotifier)controller).DontSend, view.Database.Logger);
 
            
-        }
+            }
 
         private Dictionary<int, bool> GetRecipients(EmailParameters emailParameters, View userView)
         {

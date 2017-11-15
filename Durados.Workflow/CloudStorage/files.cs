@@ -7,21 +7,25 @@ namespace Backand
     public class files : IFiles
     {
         //files.upload(parameters.filename, parameters.filedata, providerAccount,parameters.bucket, parameters.path );
-        
-        public string upload(string fileName, string fileData, string providerAccount, string bucket,string path)
+
+        public string upload(string fileName, string fileData, string providerAccount, string bucket, string path)
         {
-            if(string.IsNullOrEmpty(fileName))
+            if (string.IsNullOrEmpty(fileName))
                 throw new Durados.DuradosException(Messages.MissingFileName);
-            
-            if(string.IsNullOrEmpty(fileData))
+
+            if (string.IsNullOrEmpty(fileData))
                 throw new Durados.DuradosException(Messages.MissingFileData);
+
+            IFiles files = StorageFactoey.GetCloudStorage(providerAccount);
+
+            if (files == null || files.Cloud == null)
+                return files.upload(fileName, fileData, null, path);
 
             if (string.IsNullOrEmpty(bucket))
                 throw new Durados.DuradosException(Messages.MissingBucket);
-            
-            IFiles files = StorageFactoey.GetCloudStorage(providerAccount);
-            
-            return files.upload(fileName, fileData,  bucket, path);
+
+
+            return files.upload(fileName, fileData, bucket, path);
         }
 
         public string upload(string fileName, string fileData, string accountProvider, string bucket)
@@ -75,10 +79,16 @@ namespace Backand
                 return (Durados.Diagnostics.ILogger)System.Web.HttpContext.Current.Items[Durados.Database.MainLogger];
             }
         }
+
+        public virtual Durados.Cloud Cloud
+        {
+            get { return null; }
+        }
     }
 
     public interface IFiles
     {
+        Durados.Cloud Cloud { get; }
         string upload(string fileName, string fileData, string providerAccount, string bucket);
 
         string upload(string fileName, string fileData, string providerAccount, string bucket, string path);
