@@ -6129,7 +6129,7 @@ namespace Durados.Web.Mvc.UI.Helpers
 
     public class RefreshToken
     {
-        //static SqlAccess sql = new SqlAccess();
+        
         static string key = "RefreshToken";
         static RefreshToken()
         {
