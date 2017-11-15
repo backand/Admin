@@ -6563,7 +6563,7 @@ namespace Durados.Web.Mvc.UI.Helpers
         {
 
             string sql = Maps.MainAppSchema.GetDeleteAppById(appId);
-                
+
              Maps.MainAppSqlAccess.ExecuteNonQuery(connectionString, sql, new Dictionary<string, object>() { { "id", appId } }, null);
 
         }

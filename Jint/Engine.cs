@@ -148,7 +148,7 @@ namespace Jint
 
             if (Options.IsClrAllowed())
             {
-                Global.FastAddProperty("System", new NamespaceReference(this, "System"), false, false, false);
+                //Global.FastAddProperty("System", new NamespaceReference(this, "System"), false, false, false);
                 Global.FastAddProperty("importNamespace", new ClrFunctionInstance(this, (thisObj, arguments) =>
                 {
                     return new NamespaceReference(this, TypeConverter.ToString(arguments.At(0)));

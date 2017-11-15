@@ -369,7 +369,7 @@ namespace Durados.Web.Mvc.UI.Helpers
         private static string GetNewDatabaseName(Database database, int templateAppId, PlugInType plugInType, out int dbCount)
         {
             string sql = SqlSchema.GetNewDatabaseNameSql(((int)plugInType), templateAppId);
-            
+
             DataTable table = SqlAccess.ExecuteTable(database.ConnectionString, sql, null, CommandType.Text);
 
             if (table.Rows.Count != 1)
@@ -404,7 +404,7 @@ namespace Durados.Web.Mvc.UI.Helpers
             //if (!Maps.Instance.PluginsCache[plugInType].IsPassMaxCount(templateAppId))
             //    return false;
 
-            string sql =  "select count(*) from durados_App WITH (NOLOCK) where Creator is null and TemplateId = " + templateAppId;
+            string sql = "select count(*) from durados_App WITH (NOLOCK) where Creator is null and TemplateId = " + templateAppId;
 
             string scalar = SqlAccess.ExecuteScalar(database.ConnectionString, sql);
 

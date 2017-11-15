@@ -9,7 +9,7 @@ namespace Backand
         protected string S3FilesBucket = System.Configuration.ConfigurationManager.AppSettings["S3FilesBucket"] ?? "files.backand.net";
         protected int MaxJSONSizeMB = System.Convert.ToInt32(System.Configuration.ConfigurationManager.AppSettings["FtpMaxFileSize"] ?? "5");
 
-        public Durados.Cloud Cloud{ get; set; }
+        public virtual Durados.Cloud Cloud{ get; set; }
         public filesBackand(Durados.Cloud cloud)
         {
             Cloud = cloud;
