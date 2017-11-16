@@ -1377,6 +1377,7 @@ namespace Durados.Web.Mvc.UI.Helpers
 
             if (IsView(view))
             {
+                /*
                 if (columnField.Name == "AllowCreate")
                 {
                     View realView = GetViewFromViewRow(view, dataRow);
@@ -1397,7 +1398,8 @@ namespace Durados.Web.Mvc.UI.Helpers
 
                     return realView.IsDeletable();
                 }
-                else if (columnField.Name == "HideInMenu")
+                else */
+                if (columnField.Name == "HideInMenu")
                 {
                     View realView = GetViewFromViewRow(view, dataRow);
 
