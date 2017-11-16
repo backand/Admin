@@ -380,6 +380,10 @@
     <Compile Include="UI\Helpers\CallStack\IActionEvent.cs" />
     <Compile Include="UI\Helpers\Cloning\Cloner.cs" />
     <Compile Include="UI\Helpers\Cloning\CopyOptions.cs" />
+    <Compile Include="UI\Helpers\Config\Cloud\AzureStorage.cs" />
+    <Compile Include="UI\Helpers\Config\Cloud\CloudProvider.cs" />
+    <Compile Include="UI\Helpers\Config\Cloud\IStorage.cs" />
+    <Compile Include="UI\Helpers\Config\Cloud\StorageFactory.cs" />
     <Compile Include="UI\Helpers\CronAuthorizationWasNotSuppliedException.cs" />
     <Compile Include="UI\Helpers\CronScheduler\AwsScheduler.cs" />
     <Compile Include="UI\Helpers\CronScheduler\Scheduler.cs" />

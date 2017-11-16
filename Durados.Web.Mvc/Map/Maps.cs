@@ -31,6 +31,7 @@ using System.Configuration;
 using System.Web.Script.Serialization;
 using System.Runtime.Caching;
 using Durados.Security.Cloud;
+using Durados.Web.Mvc.UI.Helpers.Config.Cloud;
 
 namespace Durados.Web.Mvc
 {
@@ -290,6 +291,7 @@ namespace Durados.Web.Mvc
            demoOnPremiseSourcePath = System.Configuration.ConfigurationManager.AppSettings["demoOnPremiseSourcePath"] ?? @"C:\Dev\Databases\";
            allowLocalConnection = Convert.ToBoolean(System.Configuration.ConfigurationManager.AppSettings["allowLocalConnection"] ?? "false");
            cloud = Convert.ToBoolean(System.Configuration.ConfigurationManager.AppSettings["cloud"] ?? "false"); // false;// RoleEnvironment.IsAvailable;//
+           configCloudProvider = (CloudProvider) Enum.Parse(typeof(CloudProvider), (System.Configuration.ConfigurationManager.AppSettings["configCloudProvider"] ?? "Azure")); // false;// RoleEnvironment.IsAvailable;//
            multiTenancy = Convert.ToBoolean(System.Configuration.ConfigurationManager.AppSettings["multiTenancy"] ?? "false");
            useSecureConnection = Convert.ToBoolean(System.Configuration.ConfigurationManager.AppSettings["UseSecureConnection"] ?? "false");
            skin = Convert.ToBoolean(System.Configuration.ConfigurationManager.AppSettings["skin"] ?? "false");
@@ -704,6 +706,8 @@ namespace Durados.Web.Mvc
      private static string duradosAppPrefix;
      private static string duradosAppSysPrefix;
      private static bool cloud = false;
+     private static CloudProvider configCloudProvider = CloudProvider.Azure;
+        
      private static bool skin = false;
      private static bool useSecureConnection = false;
      private static bool debug = false;
@@ -1214,6 +1218,15 @@ namespace Durados.Web.Mvc
          }
      }
 
+
+     public static CloudProvider ConfigCloudProvider
+     {
+         get
+         {
+             return configCloudProvider;
+         }
+     }
+        
      public static string DownloadActionName
      {
          get
