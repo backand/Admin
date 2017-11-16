@@ -1496,7 +1496,7 @@ namespace BackAnd.Web.Api.Controllers
                 }
             }
 
-            NewRelic.Api.Agent.NewRelic.AddCustomParameter(Durados.Database.RequestId, System.Web.HttpContext.Current.Items[Durados.Database.RequestId].ToString());
+            //NewRelic.Api.Agent.NewRelic.AddCustomParameter(Durados.Database.RequestId, System.Web.HttpContext.Current.Items[Durados.Database.RequestId].ToString());
             var canLoginWithProfile = GetCanLoginWithProfile(profile);
 
             if (profile.email == null)
