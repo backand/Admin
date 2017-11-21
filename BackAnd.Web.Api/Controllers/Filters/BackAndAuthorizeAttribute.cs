@@ -214,7 +214,7 @@ namespace BackAnd.Web.Api.Controllers.Filters
 
                 if (!System.Web.HttpContext.Current.Items.Contains(Database.RequestId))
                     System.Web.HttpContext.Current.Items.Add(Database.RequestId, Guid.NewGuid().ToString());
-                NewRelic.Api.Agent.NewRelic.AddCustomParameter(Durados.Database.RequestId, System.Web.HttpContext.Current.Items[Database.RequestId].ToString());
+                //NewRelic.Api.Agent.NewRelic.AddCustomParameter(Durados.Database.RequestId, System.Web.HttpContext.Current.Items[Database.RequestId].ToString());
                 //if (actionContext.Request.Headers.Contains("AppName"))
                 //{
                 try
@@ -501,7 +501,7 @@ namespace BackAnd.Web.Api.Controllers.Filters
             if (!System.Web.HttpContext.Current.Items.Contains(Database.RequestId))
                 System.Web.HttpContext.Current.Items.Add(Database.RequestId, Guid.NewGuid().ToString());
             
-            NewRelic.Api.Agent.NewRelic.AddCustomParameter(Durados.Database.RequestId, System.Web.HttpContext.Current.Items[Database.RequestId].ToString());
+            //NewRelic.Api.Agent.NewRelic.AddCustomParameter(Durados.Database.RequestId, System.Web.HttpContext.Current.Items[Database.RequestId].ToString());
             
             return true;
         }
@@ -682,7 +682,7 @@ namespace BackAnd.Web.Api.Controllers.Filters
             if (!System.Web.HttpContext.Current.Items.Contains(Database.RequestId))
                 System.Web.HttpContext.Current.Items.Add(Database.RequestId, Guid.NewGuid().ToString());
             
-            NewRelic.Api.Agent.NewRelic.AddCustomParameter(Durados.Database.RequestId, System.Web.HttpContext.Current.Items[Database.RequestId].ToString());
+            //NewRelic.Api.Agent.NewRelic.AddCustomParameter(Durados.Database.RequestId, System.Web.HttpContext.Current.Items[Database.RequestId].ToString());
                
             return true;
         }

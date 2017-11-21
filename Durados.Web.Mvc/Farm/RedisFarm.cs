@@ -44,7 +44,7 @@ namespace Durados.Web.Mvc.Farm
 
         public string SubscriberID { get; private set; }
 
-        public RedisFarmTransport(string connectionString, string roomName = "BackandElb")
+        public  RedisFarmTransport(string connectionString, string roomName = "BackandElb")
         {
             this.roomName = roomName;
             this.SubscriberID = Guid.NewGuid().ToString();
