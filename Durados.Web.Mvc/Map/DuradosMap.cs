@@ -206,13 +206,13 @@ namespace Durados.Web.Mvc
         {
             return Durados.DataAccess.Rest.GetSqlAccess(SqlProduct);
         }
-        private string masterOpsGuid = null;
+        private string masterOpsAuth = null;
         public override string GetCreatorGuid()
         {
-            if (masterOpsGuid == null)
-                masterOpsGuid = (System.Configuration.ConfigurationManager.AppSettings["masterOpsGuid"] ?? Guid.Empty.ToString());
+            if (masterOpsAuth == null || masterOpsAuth == Guid.Empty.ToString())
+                masterOpsAuth = (System.Configuration.ConfigurationManager.AppSettings["masterOpsAuth"] ?? Guid.Empty.ToString());
 
-            return masterOpsGuid;
+            return masterOpsAuth;
         }
         public override string Decrypt(string text)
         {
