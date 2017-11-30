@@ -487,7 +487,7 @@ DROP procedure IF EXISTS `durados_SetValidGuid`;
 
 DELIMITER $$
 
-CREATE DEFINER=`backandqasys`@`%` PROCEDURE `durados_SetValidGuid`(userGuid VARCHAR(50),timeSpan INT,INOUT id  VARCHAR(36)     )
+CREATE  PROCEDURE `durados_SetValidGuid`(userGuid VARCHAR(50),timeSpan INT,INOUT id  VARCHAR(36)     )
 BEGIN
 	
 	SET @user_Guid  := userGuid ;-- '457ccc1a-be1c-11e7-84d6-123ae72e6bb4'
@@ -1375,7 +1375,7 @@ DROP procedure IF EXISTS `durados_IsValidGuid`;
 
 DELIMITER $$
 
-CREATE DEFINER=`backandqasys`@`%` PROCEDURE `durados_IsValidGuid`(id varchar(50),	OUT userGuid  varchar(50) )
+CREATE PROCEDURE `durados_IsValidGuid`(id varchar(50),	OUT userGuid  varchar(50) )
 BEGIN
 	
 	
