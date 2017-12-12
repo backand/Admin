@@ -4155,7 +4155,7 @@ namespace Durados.Web.Mvc
             //{
             //    ReadConfig(ds, filename);
             //}
-            if ((Maps.Cloud && !(this is DuradosMap) && storage.Exists(filename)) || (System.IO.File.Exists(filename)))
+            if ((Maps.Cloud && !(this is DuradosMap) && ConfigCloudStorage.Exists(filename)) || (System.IO.File.Exists(filename)))
             {
                 ReadConfig(ds, filename);
             }
@@ -4264,7 +4264,7 @@ namespace Durados.Web.Mvc
 
             string containerName = Maps.GetStorageBlobName(filename);
 
-            return storage.Exists(containerName);
+            return ConfigCloudStorage.Exists(containerName);
         }
 
         public void ReadConfigFromCloud(DataSet ds, string filename)

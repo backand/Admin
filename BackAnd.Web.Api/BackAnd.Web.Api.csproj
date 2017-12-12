@@ -240,6 +240,7 @@
     <Compile Include="ChallengeResult.cs" />
     <Compile Include="Controllers\accountController.cs" />
     <Compile Include="Controllers\Admin\actionTemplateController.cs" />
+    <Compile Include="Controllers\Admin\pmigController.cs" />
     <Compile Include="Controllers\Admin\lambdaController.cs" />
     <Compile Include="Controllers\Admin\cronController.cs" />
     <Compile Include="Controllers\Admin\limitsController.cs">

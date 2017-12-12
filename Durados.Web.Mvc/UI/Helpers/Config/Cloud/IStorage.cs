@@ -12,5 +12,8 @@ namespace Durados.Web.Mvc.UI.Helpers.Config.Cloud
         void Read(DataSet ds, string filename, string appName, bool isMainMap);
 
         void Write(DataSet ds, string filename, bool async, Map map, string version);
+
+        bool Exists(string filename);
+        
     }
 }

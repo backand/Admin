@@ -1,4 +1,8 @@
-﻿using Durados.SmartRun;
+﻿using Amazon.S3.IO;
+using Amazon.S3.Model;
+using Amazon.S3.Transfer;
+using Durados.SmartRun;
+using Durados.Web.Mvc.Azure;
 using Durados.Web.Mvc.Farm;
 using Microsoft.WindowsAzure.StorageClient;
 using System;
@@ -9,13 +13,13 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Durados.Web.Mvc.UI.Helpers.Config.Cloud
+namespace Durados.Web.Mvc.UI.Helpers.Config.Cloud.AWS
 {
-    public class AzureStorage : IStorage
+    public class AwsStorage : IStorage
     {
         private Map Map;
 
-        public AzureStorage(Map map)
+        public AwsStorage(Map map)
         {
             this.Map = map;
         }
@@ -24,19 +28,19 @@ namespace Durados.Web.Mvc.UI.Helpers.Config.Cloud
         {
             CheckIfConfigIsLockedAndWait(appName, isMainMap);
 
-            string containerName = Maps.GetStorageBlobName(filename);
-            CloudBlobContainer container = GetContainer(containerName);
+            TransferUtility fileTransferUtility = GetTransferUtility();
 
-            CloudBlob blob = container.GetBlobReference(containerName);
+            
+            string containerName = Maps.GetStorageBlobName(filename);
+            string key = containerName + "/" + containerName;
+            
             try
             {
                 //BlobStream stream = blob.OpenRead();
                 //string tempFileName = fileInfo.DirectoryName + "\\temp" + filenameOnly + "." + fileInfo.Extension;
 
-                using (MemoryStream stream = new MemoryStream())
+                using (MemoryStream stream = fileTransferUtility.OpenStream(Maps.ConfigAwsStorageBucketName, key) as MemoryStream)
                 {
-                    blob.DownloadToStream(stream);
-
                     stream.Seek(0, SeekOrigin.Begin);
 
                     ds.ReadXml(stream);
@@ -47,15 +51,12 @@ namespace Durados.Web.Mvc.UI.Helpers.Config.Cloud
             catch { }
         }
 
-        Azure.DuradosStorage storage = new Azure.DuradosStorage();
+        DuradosStorage storage = new DuradosStorage();
 
-        private CloudBlobContainer GetContainer(string filename)
+        private TransferUtility GetTransferUtility()
         {
-            // Get a handle on account, create a blob service client and get container proxy
-            //var account = CloudStorageAccount.Parse(RoleEnvironment.GetConfigurationSettingValue("ConfigAzureStorage"));
-            //var client = account.CreateCloudBlobClient();
-            //return client.GetContainerReference(RoleEnvironment.GetConfigurationSettingValue("configContainer"));
-            return storage.GetContainer(filename);
+            return new
+                    TransferUtility(Maps.ConfigAwsStorageAccessKeyID, Maps.ConfigAwsStorageSecretAccessKey);
         }
 
         private void CheckIfConfigIsLockedAndWait(string appName, bool isMainMap)
@@ -87,14 +88,16 @@ namespace Durados.Web.Mvc.UI.Helpers.Config.Cloud
 
         public void Write(DataSet ds, string filename, bool async, Map map, string version)
         {
+            
+            TransferUtility fileTransferUtility = GetTransferUtility();
+
             string containerName = Maps.GetStorageBlobName(filename);
+            string key = containerName + "/" + containerName + version;
+
             if (string.IsNullOrEmpty(version))
                 Maps.Instance.StorageCache.Add(containerName, ds);
 
-            CloudBlobContainer container = GetContainer(containerName);
-
-            CloudBlob blob = container.GetBlobReference(containerName + version);
-            blob.Properties.ContentType = "application/xml";
+            
 
             if (!Maps.Instance.StorageCache.ContainsKey(containerName) || !async)
             {
@@ -102,9 +105,9 @@ namespace Durados.Web.Mvc.UI.Helpers.Config.Cloud
                 {
                     ds.WriteXml(stream, XmlWriteMode.WriteSchema);
                     stream.Seek(0, SeekOrigin.Begin);
-                    blob.UploadFromStream(stream);
+                    fileTransferUtility.Upload(stream, Maps.ConfigAwsStorageBucketName, key);
                     Map.RefreshApis(map);
-                    Maps.Instance.Backup.BackupAsync(container, containerName);
+                    //Maps.Instance.Backup.BackupAsync(container, containerName);
                 }
             }
             else
@@ -115,7 +118,8 @@ namespace Durados.Web.Mvc.UI.Helpers.Config.Cloud
 
                 DateTime started = DateTime.Now;
 
-                blob.BeginUploadFromStream(stream, BlobTransferCompletedCallback, new BlobTransferAsyncState(blob, stream, started, container, containerName, map));
+                fileTransferUtility.BeginUpload(stream, Maps.ConfigAwsStorageBucketName, key, TransferCompletedCallback, new TransferAsyncState(fileTransferUtility, stream, started, containerName, key, map));
+                
             }
         }
 
@@ -124,37 +128,61 @@ namespace Durados.Web.Mvc.UI.Helpers.Config.Cloud
             return !(blobName.EndsWith("xml"));
         }
 
-        private void BlobTransferCompletedCallback(IAsyncResult result)
+        private void TransferCompletedCallback(IAsyncResult result)
         {
-            BlobTransferAsyncState state = (BlobTransferAsyncState)result.AsyncState;
+            TransferAsyncState state = (TransferAsyncState)result.AsyncState;
             if (state == null || state.Map == null)
                 return;
 
-            if (IsBigBlob(state.BlobName))
+            if (IsBigBlob(state.ContainerName))
             {
                 FarmCachingSingeltone.Instance.AsyncCacheCompleted(state.Map.AppName);
             }
 
-            //try
-            //{
-            //    Maps.Instance.DuradosMap.Logger.Log("Map", "WriteConfigToCloud", state.Map.AppName ?? string.Empty, DateTime.Now.Subtract(state.Started).TotalMilliseconds.ToString(), string.Empty, -8, state.BlobName + " ended", DateTime.Now);
-            //}
-            //catch { }
-
+            
             Map.RefreshApis(state.Map);
 
             try
             {
-                state.Blob.EndUploadFromStream(result);
+                state.FileTransferUtility.EndUpload(result);
                 if (!Maps.IsApi2())
                 {
-                    Maps.Instance.Backup.BackupAsync(state.Container, state.BlobName);
+                    //Maps.Instance.Backup.BackupAsync(state.Container, state.BlobName);
                 }
             }
             catch (Exception exception)
             {
                 Map map = Maps.Instance.GetMap();
-                map.Logger.Log("Map", "BlobTransferCompletedCallback", map.AppName ?? string.Empty, exception, 1, string.Empty);
+                map.Logger.Log("Map", "TransferCompletedCallback", map.AppName ?? string.Empty, exception, 1, string.Empty);
+            }
+        }
+
+        public bool Exists(string filename)
+        {
+            if (Maps.Cloud)
+            {
+                System.IO.FileInfo fileInfo = new FileInfo(filename);
+                string filenameOnly = fileInfo.Name.Remove(fileInfo.Name.Length - fileInfo.Extension.Length, fileInfo.Extension.Length);
+                string containerName = filenameOnly.Replace("_", "").ToLower();
+
+                using (var client = Amazon.AWSClientFactory.CreateAmazonS3Client(Maps.ConfigAwsStorageAccessKeyID, Maps.ConfigAwsStorageSecretAccessKey))
+                {
+                    var request = new ListObjectsRequest()
+         .WithBucketName(Maps.ConfigAwsStorageBucketName)
+         .WithPrefix(containerName);
+
+                    var response = client.ListObjects(request);
+
+                    return response.S3Objects.Count > 0;
+
+                    
+                }
+
+                
+            }
+            else
+            {
+                return System.IO.File.Exists(filename);
             }
         }
     }
