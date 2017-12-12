@@ -910,8 +910,8 @@ namespace BackAnd.Web.Api.Controllers
             string currentUser = Maps.SuperDeveloper;
             System.Data.DataRow userRow = Maps.Instance.DuradosMap.Database.GetUserRow(currentUser);
             string guid = (userRow == null) ? Maps.MasterOpsAuth : userRow["Guid"].ToString();
-           
-            return SecurityHelper.GetTmpUserGuidFromGuid(guid);
+            return guid;
+            //return SecurityHelper.GetTmpUserGuidFromGuid(guid);
 
         }
 

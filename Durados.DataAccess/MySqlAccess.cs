@@ -1150,7 +1150,7 @@ namespace Durados.DataAccess
 
         public override string GetDeleteAppById(int id)
         {
-            return "DELETE FROM  durados_App WHERE Id = " + id + " FOR UPDATE";
+            return "DELETE FROM  durados_App WHERE Id = " + id ;
         }
 
         //public override string GetUpdateAppConnectionsSql(int? appConnId, int? sysConnId, string primaryKey)
