@@ -65,10 +65,14 @@ namespace BackAnd.Web.Api.Controllers
     }
 
 
-    public static class MembershipProviderExtensions
+    public class SqlServerMembershipProviderValidator
     {
+        public bool Validate(string username, string password)
+        {
+            return Validate(GetMembershipUser(username), password);
+        }
 
-        public static MembershipUser GetMembershipUser(string username)
+        private MembershipUser GetMembershipUser(string username)
         {
             return System.Web.Security.Membership.Provider.GetUser(username, false);
         }
@@ -78,7 +82,7 @@ namespace BackAnd.Web.Api.Controllers
         /// </summary>
         /// <param name="user">The membership user.</param>
         /// <exception cref="System.ArgumentNullException" />
-        public static void Validate(this MembershipUser user, string password)
+        private bool Validate(MembershipUser user, string password)
         {
             if (user == null)
             {
@@ -90,7 +94,7 @@ namespace BackAnd.Web.Api.Controllers
                 using (var connection = new SqlConnection(ConfigurationManager.ConnectionStrings["SecurityConnectionString"].ConnectionString))
                 {
                     // Get the user's (possibly encrypted or hashed) security credentials.
-                    var selectQuery = "SELECT Password, PasswordFormat, PasswordSalt FROM aspnet_Membership WHERE UserId = @userId";
+                    var selectQuery = "SELECT Password, PasswordFormat, PasswordKey FROM my_aspnet_membership WHERE UserId = @userId";
                     var cmd = new SqlCommand(selectQuery, connection);
                     cmd.Parameters.Add(new SqlParameter { ParameterName = "userId", Value = user.ProviderUserKey });
 
@@ -104,18 +108,16 @@ namespace BackAnd.Web.Api.Controllers
                     {
                         hashedPassword = (string)reader["Password"];
                         passwordFormat = (int)reader["PasswordFormat"];
-                        passwordSalt = (string)reader["PasswordSalt"];
+                        passwordSalt = (string)reader["PasswordKey"];
                     }
                     reader.Close();
                     connection.Close();
 
-                    if (EncodePassword(password, passwordSalt) != hashedPassword)
-                    {
-                        throw new Exception("wrong");
-                    }
-                    
+                    return EncodePassword(password, passwordSalt) == hashedPassword;
                 }
             }
+
+            return false;
         }
 
         private static string EncodePassword(string pass, string salt)
