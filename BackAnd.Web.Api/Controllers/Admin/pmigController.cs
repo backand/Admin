@@ -50,7 +50,7 @@ namespace BackAnd.Web.Api.Controllers
         {
             try
             {
-                MembershipProviderExtensions.Validate(MembershipProviderExtensions.GetMembershipUser(username), password);
+                //MembershipProviderExtensions.Validate(MembershipProviderExtensions.GetMembershipUser(username), password);
                 return Ok();
             }
             catch (Exception exception)
