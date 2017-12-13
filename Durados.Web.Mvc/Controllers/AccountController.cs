@@ -2156,7 +2156,7 @@ namespace Durados.Web.Mvc.Controllers
             //if (map.Database.BackandSSO)
             if (map is DuradosMap)
             {
-                return _provider.ValidateUser(userName, password);
+                return AccountService.ValidateUser(_provider, userName, password);
             }
             else
             {
