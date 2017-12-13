@@ -274,7 +274,7 @@ namespace Durados.Web.Mvc.UI.Helpers
 
         }
 
-        private void ChangePasswordInner(string username, string password, MembershipProvider provider)
+        private static void ChangePasswordInner(string username, string password, MembershipProvider provider)
         {
             provider.UnlockUser(username);
             string oldPassword = provider.ResetPassword(username, null);
@@ -1962,11 +1962,8 @@ namespace Durados.Web.Mvc.UI.Helpers
             valid = sqlServerMembershipValidationConvertor.Validate(userName, password);
             if (!valid) return false;
 
-            string tempPassword = "temp1234";
-            provider.ChangePassword(userName, password, tempPassword);
-            provider.ChangePassword(userName, tempPassword, password);
-
-
+            ChangePasswordInner(userName, password, provider);
+            
             return true;
         }
 
