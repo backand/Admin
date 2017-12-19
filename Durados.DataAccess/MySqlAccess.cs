@@ -1351,6 +1351,20 @@ namespace Durados.DataAccess
         {
             return "Allow User Variables=True";
         }
+
+        public override string GetUpdateAppMasterGuid(string appName, string columnName)
+        {
+            return string.Format("UPDATE durados_App SET `{1}` = @newGuid  WHERE `Name` = '{0}'", appName, columnName); ;
+        }
+
+        public override  string GetReportId()
+        {
+            return "SELECT Id FROM modubiz_LogStats2  WHERE SqlConId = @SqlConId and LogDate = @LogDate";
+        }
+        public override string InsertNewStatsSql()
+        {
+            return "INSERT INTO modubiz_LogStats2 (SqlConId, LogDate) VALUES (@SqlConId, @LogDate);SELECT LAST_INSERT_ID() AS ID;";
+        }
     }
 
 

@@ -1115,20 +1115,25 @@ namespace Durados.Web.Mvc.UI.Helpers
 
 
             string val = null;
-
-            using (System.Data.SqlClient.SqlConnection cnn = new System.Data.SqlClient.SqlConnection(Maps.Instance.DuradosMap.Database.ConnectionString))
+            ISqlMainSchema sqlSchema = Maps.MainAppSchema;
+            string sqlUpdate = sqlSchema.GetUpdateAppMasterGuid(appName, columnName);
+            string sqlSelect = sqlSchema.GetAppRowByNameSql(appName);
+            using (IDbConnection cnn = sqlSchema.GetNewConnection() )
             {
-                using (System.Data.SqlClient.SqlCommand command = new System.Data.SqlClient.SqlCommand("", cnn))
+                using (IDbCommand command = cnn.CreateCommand())
                 {
                     cnn.Open();
 
-                    command.CommandText = string.Format("update [durados_app] set [{1}] = @newGuid  WHERE [Name] = '{0}'", appName, columnName);
-                    command.Parameters.AddWithValue("newGuid", Guid.NewGuid());
+                    command.CommandText = sqlUpdate;
+                    IDbDataParameter parameter = command.CreateParameter();
+                    parameter.ParameterName = "newGuid";
+                    parameter.Value = Guid.NewGuid();
+                    command.Parameters.Add(parameter);
                     command.ExecuteNonQuery();
 
                     command.Parameters.Clear();
-                    command.CommandText = string.Format("SELECT * FROM [durados_app] WITH(NOLOCK)  WHERE [Name] = '{0}'", appName);
-                    using (System.Data.SqlClient.SqlDataReader reader = command.ExecuteReader())
+                    command.CommandText = sqlSelect;
+                    using (IDataReader reader = command.ExecuteReader())
                     {
                         while (reader.Read())
                         {

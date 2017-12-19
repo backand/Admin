@@ -440,7 +440,9 @@ BEGIN
 
 
 END$$
+
 DELIMITER ;
+
 DROP procedure IF EXISTS `durados_GetExternalAvailableInstance`;
 
 DELIMITER $$

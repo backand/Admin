@@ -163,5 +163,13 @@ namespace Durados.DataAccess
         string GetUsersApps(int userId);
 
         string GetConnectionStringAllowVeriables();
+
+        string GetUpdateAppMasterGuid(string appName, string columnName);
+
+        string GetReportId();
+
+        string InsertNewStatsSql();
+
+        string UpdateMeasurmentType(string measureType);
     }
 }

@@ -12787,4 +12787,25 @@ public class SqlMainSchema :ISqlMainSchema
     {
         return string.Empty;
     }
+
+
+    public virtual string  GetUpdateAppMasterGuid(string appName, string columnName)
+    {
+        return string.Format("UPDATE durados_App SET [{1}] = @newGuid  WHERE [Name] = '{0}'", appName, columnName); ;
+    }
+
+
+    public virtual string GetReportId()
+    {
+        return "SELECT Id FROM modubiz_LogStats2 WITH(NOLOCK) WHERE SqlConId = @SqlConId and LogDate = @LogDate";
+    }
+
+    public virtual string InsertNewStatsSql()
+    {
+        return "INSERT INTO modubiz_LogStats2 (SqlConId, LogDate) VALUES (@SqlConId, @LogDate); SELECT IDENT_CURRENT(N'[modubiz_LogStats2]') AS ID; ";
+    }
+    public virtual string UpdateMeasurmentType(string measureType ){
+        return "UPDATE modubiz_LogStats2 SET " + measureType + " = @value WHERE Id = @Id";
+    }
+    
 }

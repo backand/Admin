@@ -182,7 +182,7 @@ namespace Durados.Web.Mvc.Stat
 
         }
 
-        public virtual void Persist(DateTime date, object value, SqlCommand command)
+        public virtual void Persist(DateTime date, object value, IDbCommand command)
         {
             var appRow = App.GetAppRow();
             if (appRow.durados_SqlConnectionRowByFK_durados_App_durados_SqlConnection_System == null)
@@ -191,27 +191,38 @@ namespace Durados.Web.Mvc.Stat
             }
 
             int sqlConnId = appRow.durados_SqlConnectionRowByFK_durados_App_durados_SqlConnection_System.Id;
-
+            ISqlMainSchema sqlSchema = Maps.MainAppSchema;
             command.Parameters.Clear();
-            command.CommandText = "SELECT Id FROM modubiz_LogStats2 WITH(NOLOCK) WHERE SqlConId = @SqlConId and LogDate = @LogDate";
-            command.Parameters.AddWithValue("SqlConId", sqlConnId);
-            command.Parameters.AddWithValue("LogDate", date);
+            command.CommandText = sqlSchema.GetReportId();
+            AddParameter(command, sqlConnId, "SqlConId" );
+            AddParameter(command, date, "LogDate");
+
             object scalar = command.ExecuteScalar();
             if (scalar == null || scalar == DBNull.Value)
             {
-                command.CommandText = "INSERT INTO modubiz_LogStats2 (SqlConId, LogDate) VALUES (@SqlConId, @LogDate); SELECT IDENT_CURRENT(N'[modubiz_LogStats2]') AS ID; ";
+                command.CommandText = sqlSchema.InsertNewStatsSql();
                 scalar = command.ExecuteScalar();
 
             }
 
             
             command.Parameters.Clear();
-            command.CommandText = "UPDATE modubiz_LogStats2 set " + MeasurementType.ToString() + " = @value WHERE Id = @Id";
-            command.Parameters.AddWithValue("value", value is ulong ? System.Convert.ToInt64(value) : value);
-            command.Parameters.AddWithValue("Id", scalar);
+            command.CommandText = sqlSchema.UpdateMeasurmentType(MeasurementType.ToString());
+            AddParameter(command, value is ulong ? System.Convert.ToInt64(value) : value, "value");
+            AddParameter(command, scalar, "Id");
+
+
             command.ExecuteNonQuery();
 
 
+        }
+
+        private static void AddParameter(IDbCommand command, object val, string key)
+        {
+            IDbDataParameter parameter = command.CreateParameter();
+            parameter.ParameterName =key;
+            parameter.Value = val;
+            command.Parameters.Add(parameter);
         }
 
         

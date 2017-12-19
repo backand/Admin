@@ -104,16 +104,17 @@ namespace Durados.Web.Mvc.Stat
 
         private void LoadAppsMeasurments(DateTime date, MeasurementType[] measurementTypes, bool persist, Dictionary<string, Dictionary<string, object>> appsMeasurements, Dictionary<string, Dictionary<string, object>> appsWithErrors, Dictionary<string, Dictionary<string, object>> appsWithWornings, string appItem, App app)
         {
+            ISqlMainSchema sqlSchema = Maps.MainAppSchema;
             appsMeasurements[appItem].Add("AppName", app.AppName);
             foreach (MeasurementType measurementType in measurementTypes)
             {
                 try
                 {
-                    using (SqlConnection connection = new SqlConnection(Maps.ReportConnectionString))
+                    using (IDbConnection connection = sqlSchema.GetNewConnection(Maps.ReportConnectionString))
                     {
                         connection.Open();
 
-                        using (SqlCommand command = new SqlCommand())
+                        using (IDbCommand command = connection.CreateCommand())
                         {
                             command.Connection = connection;
                             object measurementValue = ProduceMeasurement(date, measurementType, app, persist, command);
@@ -202,7 +203,7 @@ namespace Durados.Web.Mvc.Stat
             return apps.ToArray();
         }
 
-        private object ProduceMeasurement(DateTime date, MeasurementType measurementType, App app, bool persist, SqlCommand persistCommand)
+        private object ProduceMeasurement(DateTime date, MeasurementType measurementType, App app, bool persist, IDbCommand persistCommand)
         {
             Measurement measurement = GetMeasurement(app, measurementType);
             object value = measurement.Get(date);
