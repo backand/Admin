@@ -12,7 +12,11 @@ namespace Durados.Web.Mvc.UI.Helpers.Config.Cloud
         {
             if (cloudProvider == CloudProvider.Azure)
             {
-                return new AzureStorage(map);
+                return new Azure.AzureStorage(map);
+            }
+            else if (cloudProvider == CloudProvider.AWS)
+            {
+                return new AWS.AwsStorage(map);
             }
             else
             {

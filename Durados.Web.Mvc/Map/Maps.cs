@@ -311,6 +311,25 @@ namespace Durados.Web.Mvc
            AllowedDownloadFileTypes = Convert.ToString(System.Configuration.ConfigurationManager.AppSettings["AllowedDownloadFileTypes"] ?? allowedDownloadFileTypesDefault).Split(',').ToArray();
            DenyDownloadFileTypes = Convert.ToString(System.Configuration.ConfigurationManager.AppSettings["DenyDownloadFileTypes"] ?? denyDownloadFileTypesDefault).Split(',').ToArray();
 
+
+           ConfigAwsStorageBucketName = System.Configuration.ConfigurationManager.AppSettings["ConfigAwsStorageBucketName"];
+           if (ConfigAwsStorageBucketName == null)
+           {
+               throw new DuradosException("Please add the ConfigAwsStorageBucketName to the web.config.");
+           }
+
+           ConfigAwsStorageAccessKeyID = System.Configuration.ConfigurationManager.AppSettings["ConfigAwsStorageAccessKeyID"];
+           if (ConfigAwsStorageAccessKeyID == null)
+           {
+               throw new DuradosException("Please add the ConfigAwsStorageAccessKeyID to the web.config.");
+           }
+
+           ConfigAwsStorageSecretAccessKey = System.Configuration.ConfigurationManager.AppSettings["ConfigAwsStorageSecretAccessKey"];
+           if (ConfigAwsStorageSecretAccessKey == null)
+           {
+               throw new DuradosException("Please add the ConfigAwsStorageSecretAccessKey to the web.config.");
+           }
+
            ReservedAppNames = Convert.ToString(System.Configuration.ConfigurationManager.AppSettings["ReservedAppNames"] ?? reservedAppNames).Split(',').Select(k => k).ToHashSet<string>();
 
            azureDatabasePendingPool = new PendingPool(demoPendingNext);
@@ -661,6 +680,11 @@ namespace Durados.Web.Mvc
        public static int DefaultImageHeight { get; private set; }
        public static string ConfigAzureStorageAccountName { get; private set; }
        public static string ConfigAzureStorageAccountKey { get; private set; }
+
+       public static string ConfigAwsStorageBucketName { get; private set; }
+       public static string ConfigAwsStorageAccessKeyID { get; private set; }
+       public static string ConfigAwsStorageSecretAccessKey { get; private set; }
+       
        public static string[] ApiUrls { get; private set; }
 
        public static string AzureCacheAccountKey { get; private set; }

@@ -274,7 +274,7 @@ namespace Durados.Web.Mvc.UI.Helpers
 
         }
 
-        private void ChangePasswordInner(string username, string password, MembershipProvider provider)
+        private static void ChangePasswordInner(string username, string password, MembershipProvider provider)
         {
             provider.UnlockUser(username);
             string oldPassword = provider.ResetPassword(username, null);
@@ -1953,10 +1953,25 @@ namespace Durados.Web.Mvc.UI.Helpers
             }
         }
 
+        private static SqlServerMembershipValidationConvertor sqlServerMembershipValidationConvertor = new SqlServerMembershipValidationConvertor();
+        public static bool ValidateUser(MembershipProvider provider, string userName, string password)
+        {
+            bool valid = provider.ValidateUser(userName, password);
+            if (valid) return true;
+
+            valid = sqlServerMembershipValidationConvertor.Validate(userName, password);
+            if (!valid) return false;
+
+            ChangePasswordInner(userName, password, provider);
+            
+            return true;
+        }
+
         public static bool MultiSignOnValidation(Map map, string userName, string password)
         {
             MembershipProvider provider = map.GetMembershipProvider();
-            bool valid = provider.ValidateUser(userName, password);
+            //bool valid = provider.ValidateUser(userName, password);
+            bool valid = ValidateUser(provider, userName, password);
             if (valid)
             {
                 provider.UnlockUser(userName);
@@ -1965,7 +1980,9 @@ namespace Durados.Web.Mvc.UI.Helpers
 
             if (provider.GetUser(userName, false) == null)
             {
-                valid = _provider.ValidateUser(userName, password);
+                //valid = _provider.ValidateUser(userName, password);
+                valid = ValidateUser(_provider, userName, password);
+            
 
                 if (!valid)
                     return valid;

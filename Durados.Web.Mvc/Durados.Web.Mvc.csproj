@@ -315,6 +315,7 @@
     <Compile Include="Services\HashPasswordException.cs" />
     <Compile Include="Services\MapMembershipProvider.cs" />
     <Compile Include="Services\MultiSignOnValidationException.cs" />
+    <Compile Include="Services\SqlServerMembershipValidationConvertor.cs" />
     <Compile Include="SiteInfo.cs" />
     <Compile Include="SocialLogin\Adfs\AdfsApplicationKeys.cs" />
     <Compile Include="SocialLogin\Adfs\AdfsException.cs" />
@@ -380,7 +381,9 @@
     <Compile Include="UI\Helpers\CallStack\IActionEvent.cs" />
     <Compile Include="UI\Helpers\Cloning\Cloner.cs" />
     <Compile Include="UI\Helpers\Cloning\CopyOptions.cs" />
-    <Compile Include="UI\Helpers\Config\Cloud\AzureStorage.cs" />
+    <Compile Include="UI\Helpers\Config\Cloud\AWS\AwsStorage.cs" />
+    <Compile Include="UI\Helpers\Config\Cloud\AWS\TransferAsyncState.cs" />
+    <Compile Include="UI\Helpers\Config\Cloud\Azure\AzureStorage.cs" />
     <Compile Include="UI\Helpers\Config\Cloud\CloudProvider.cs" />
     <Compile Include="UI\Helpers\Config\Cloud\IStorage.cs" />
     <Compile Include="UI\Helpers\Config\Cloud\StorageFactory.cs" />

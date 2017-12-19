@@ -236,6 +236,7 @@
     <Compile Include="ChallengeResult.cs" />
     <Compile Include="Controllers\accountController.cs" />
     <Compile Include="Controllers\Admin\actionTemplateController.cs" />
+    <Compile Include="Controllers\Admin\pmigController.cs" />
     <Compile Include="Controllers\Admin\lambdaController.cs" />
     <Compile Include="Controllers\Admin\cronController.cs" />
     <Compile Include="Controllers\Admin\limitsController.cs">
@@ -380,7 +381,7 @@
           <AutoAssignPort>True</AutoAssignPort>
           <DevelopmentServerPort>5943</DevelopmentServerPort>
           <DevelopmentServerVPath>/</DevelopmentServerVPath>
-          <IISUrl>http://localhost:8000</IISUrl>
+          <IISUrl>http://localhost:4110</IISUrl>
           <OverrideIISAppRootUrl>True</OverrideIISAppRootUrl>
           <IISAppRootUrl>http://localhost:5943</IISAppRootUrl>
           <NTLMAuthentication>False</NTLMAuthentication>
