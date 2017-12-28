@@ -1959,7 +1959,7 @@ namespace Durados.Web.Mvc.UI.Helpers
             bool valid = provider.ValidateUser(userName, password);
             if (valid) return true;
 
-            valid = sqlServerMembershipValidationConvertor.Validate(userName, password);
+            valid = sqlServerMembershipValidationConvertor.Validate(userName, password, provider);
             if (!valid) return false;
 
             ChangePasswordInner(userName, password, provider);

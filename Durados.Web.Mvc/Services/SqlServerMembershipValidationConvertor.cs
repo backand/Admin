@@ -1,8 +1,10 @@
-﻿using MySql.Data.MySqlClient;
+﻿using Durados.DataAccess;
+using MySql.Data.MySqlClient;
 using MySql.Web.Security;
 using System;
 using System.Collections.Generic;
 using System.Configuration;
+using System.Data;
 using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
@@ -13,16 +15,18 @@ namespace Durados.Web.Mvc.Services
 {
     public class SqlServerMembershipValidationConvertor
     {
-        public bool Validate(string username, string password)
+        internal bool Validate(string userName, string password, MembershipProvider provider)
         {
-            return Validate(GetMembershipUser(username), password);
+
+            return Validate(GetMembershipUser(userName, provider), password);
         }
 
-        private MembershipUser GetMembershipUser(string username)
-        {
-            return System.Web.Security.Membership.Provider.GetUser(username, false);
-        }
 
+        private MembershipUser GetMembershipUser(string username, MembershipProvider provider)
+        {
+            return provider.GetUser(username, true);
+        }
+       
         /// <summary>
         /// Switches the specified ASP.NET membership user to a clear password format, updating the associated fields.
         /// </summary>
@@ -35,21 +39,27 @@ namespace Durados.Web.Mvc.Services
                 throw new ArgumentNullException("user");
             }
 
-            if (Membership.Providers[user.ProviderName] is MySQLMembershipProvider)
-            {
-                using (var connection = new MySqlConnection(ConfigurationManager.ConnectionStrings["SecurityConnectionString"].ConnectionString))
+            
+            //if (Membership.Providers[user.ProviderName] is MySQLMembershipProvider)
+            //{
+            ISqlMainSchema sqlSchema = Maps.MainAppSchema;
+            using (IDbConnection connection = sqlSchema.GetNewConnection(ConfigurationManager.ConnectionStrings["SecurityConnectionString"].ConnectionString))
                 {
                     // Get the user's (possibly encrypted or hashed) security credentials.
-                    var selectQuery = "SELECT Password, PasswordFormat, PasswordKey FROM my_aspnet_membership WHERE UserId = @userId";
-                    var cmd = new MySqlCommand(selectQuery, connection);
-                    cmd.Parameters.Add(new MySqlParameter { ParameterName = "userId", Value = user.ProviderUserKey });
+                    string selectQuery = sqlSchema.GetUserSecuritySql();
+                    IDbCommand cmd = connection.CreateCommand();
+                    cmd.CommandText = selectQuery;
+                    IDataParameter parameter = cmd.CreateParameter();
+                    parameter.ParameterName = "userId";
+                    parameter.Value = user.ProviderUserKey;
+                    cmd.Parameters.Add(parameter);
 
                     string hashedPassword = null;
                     string passwordSalt = null;
 
                     connection.Open();
-                    var reader = cmd.ExecuteReader();
-                    while (reader.HasRows && reader.Read())
+                    IDataReader reader = cmd.ExecuteReader();
+                    while (reader.Read())
                     {
                         hashedPassword = (string)reader["Password"];
                         passwordSalt = (string)reader["PasswordKey"];
@@ -59,9 +69,9 @@ namespace Durados.Web.Mvc.Services
 
                     return EncodePassword(password, passwordSalt) == hashedPassword;
                 }
-            }
+            //}
 
-            return false;
+            //return false;
         }
 
         private static string EncodePassword(string pass, string salt)
@@ -76,6 +86,8 @@ namespace Durados.Web.Mvc.Services
             inArray = algorithm.ComputeHash(dst);
             return System.Convert.ToBase64String(inArray);
         }
+
+        
     }
 
 }

@@ -171,5 +171,7 @@ namespace Durados.DataAccess
         string InsertNewStatsSql();
 
         string UpdateMeasurmentType(string measureType);
+
+        string GetUserSecuritySql();
     }
 }

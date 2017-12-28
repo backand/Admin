@@ -12807,5 +12807,11 @@ public class SqlMainSchema :ISqlMainSchema
     public virtual string UpdateMeasurmentType(string measureType ){
         return "UPDATE modubiz_LogStats2 SET " + measureType + " = @value WHERE Id = @Id";
     }
+
+    public virtual string GetUserSecuritySql()
+    {
+        return "SELECT Password, PasswordFormat, PasswordSalt FROM [aspnet_Membership] WHERE UserId = @userId";
+    }
+    
     
 }

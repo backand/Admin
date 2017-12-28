@@ -483,40 +483,33 @@ DROP function IF EXISTS `f_report_connection_type`;
 
                         DELIMITER ;
 
-
-
 DROP procedure IF EXISTS `durados_SetValidGuid`;
-
 DELIMITER $$
 
-CREATE  PROCEDURE `durados_SetValidGuid`(userGuid VARCHAR(50),timeSpan INT,INOUT id  VARCHAR(36)     )
-BEGIN
-	
-	SET @user_Guid  := userGuid ;-- '457ccc1a-be1c-11e7-84d6-123ae72e6bb4'
-    
-    
-    SET @exists := (  SELECT `Id`  FROM durados_ValidGuid WHERE `UserGuid` = @user_Guid );
-	SELECT @exists as YYY;
-    
-    SET @pk := UUID();
-	SET @time_Span := timeSpan;
-	call debug_msg(TRUE,@user_Guid);
-	SELECT `Id` as tmpId FROM durados_ValidGuid WHERE`UserGuid`= @user_Guid AND ( (`time`>=NOW() AND IFNULL(used,0) =0) OR ApprovedByAdmin =1) ; 
-	
-	call debug_msg(TRUE,@exists);
-	IF @exists  IS NULL 
-	THEN
-		SET @now :=date_add(NOW(), INTERVAL @time_Span MINUTE  );
-		INSERT INTO durados_ValidGuid (`Id`,`UserGuid`,`Time`) VALUES (@pk,@user_Guid,@now);
-		SET id:=@pk;
-	ELSE
-	
-		SET id:=@exists;
-	
-	END IF;
-       
-END$$
+CREATE PROCEDURE durados_SetValidGuid(in par_userGuid VARCHAR(100), in par_timeSpan INT, inout par_id VARCHAR(300))
 
+/* ***** Object:  StoredProcedure [dbo].[durados_SetValidGuid]    Script Date: 8/13/2014 14:10:46 ***** */
+BEGIN
+    DECLARE var_exists CHAR (36) DEFAULT NULL;
+    DECLARE var_now DATETIME;
+    SELECT
+        CAST(UUID() AS CHAR)
+        INTO par_id;
+    SELECT
+        Id
+        INTO var_exists
+        FROM durados_ValidGuid
+        WHERE UserGuid = par_userGuid AND ((`Time` >= NOW() AND COALESCE(Used, 0) = 0) OR approvedByAdmin = 1);
+
+    IF var_exists IS NULL THEN
+        SET var_now := DATE_ADD(NOW(), INTERVAL par_timeSpan MINUTE);
+        INSERT INTO durados_ValidGuid
+            (Id, UserGuid, `Time`)
+            VALUES (par_id, par_userGuid, var_now);
+    ELSE
+        SET par_id := var_exists;
+    END IF;
+END;$$
 DELIMITER ;
 
 
