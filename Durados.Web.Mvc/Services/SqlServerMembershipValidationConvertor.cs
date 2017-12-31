@@ -18,8 +18,10 @@ namespace Durados.Web.Mvc.Services
         internal bool Validate(string userName, string password, MembershipProvider provider)
         {
             MembershipUser user = GetMembershipUser(userName, provider);
-            if(user == null)
-                throw new ArgumentNullException(string.Format("user:{0}:::{1}:::In::{2}",userName,password,provider.ApplicationName));
+            
+            if (user == null)
+                return false;
+                
             return Validate(user, password);
         }
 
