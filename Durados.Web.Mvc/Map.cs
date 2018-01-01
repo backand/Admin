@@ -3662,8 +3662,10 @@ namespace Durados.Web.Mvc
 
         private void BackupConfig(string filename)
         {
+            if (Database.LongProductName == filename)
+                return;
+            
             string containerName = Maps.GetStorageBlobName(filename);
-
             CloudBlobContainer container = GetContainer(containerName);
 
             (new Durados.Web.Mvc.Azure.BlobBackup()).BackupSync(container, containerName, Database.ConfigVersion);
