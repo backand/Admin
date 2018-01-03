@@ -1365,6 +1365,13 @@ namespace Durados.DataAccess
         {
             return "INSERT INTO modubiz_LogStats2 (SqlConId, LogDate) VALUES (@SqlConId, @LogDate);SELECT LAST_INSERT_ID() AS ID;";
         }
+
+
+        public override string GetUserSecuritySql()
+        {
+            return "SELECT Password, PasswordFormat, PasswordKey FROM `my_aspnet_membership` WHERE UserId = @userId";
+        }
+    
     }
 
 
