@@ -279,8 +279,54 @@ namespace Durados.Web.Mvc.UI.Helpers
             provider.UnlockUser(username);
             string oldPassword = provider.ResetPassword(username, null);
             provider.ChangePassword(username, oldPassword, password);
+            UpdateMembershipFailureCount(username, provider);
 
-            
+
+        }
+
+        private static void UpdateMembershipFailureCount(string username, MembershipProvider provider)
+        {
+            if(string.IsNullOrEmpty(username) || provider == null)
+                return;
+
+            MembershipUser user = provider.GetUser(username, false);
+            if(user == null || user.ProviderUserKey == null || user.ProviderUserKey.ToString() == string.Empty)
+                return;
+
+            var  userId = user.ProviderUserKey;
+            try
+            {
+                if (provider is MySql.Web.Security.MySQLMembershipProvider)
+                {
+                    ISqlMainSchema sqlSchema = Maps.MainAppSchema;
+                    string sql = sqlSchema.GetUpdateFailedPasswordAttemptCountSql();
+                    using (IDbConnection connection = sqlSchema.GetNewConnection(System.Configuration.ConfigurationManager.ConnectionStrings["SecurityConnectionString"].ConnectionString))
+                    {
+                        IDbCommand cmd = connection.CreateCommand();
+                        cmd.CommandText = sql;
+                        cmd.Parameters.Clear();
+                        IDataParameter parameterUser = cmd.CreateParameter();
+                        parameterUser.ParameterName = "userId";
+                        parameterUser.Value = userId;
+                        cmd.Parameters.Add(parameterUser);
+
+                        IDataParameter parameterCnt = cmd.CreateParameter();
+                        parameterCnt.ParameterName = "count";
+                        parameterCnt.Value = 0;
+                        cmd.Parameters.Add(parameterCnt);
+
+                        connection.Open();
+
+                        if (cmd.ExecuteNonQuery() < 0)
+                            throw new System.Configuration.Provider.ProviderException("Unable to update failure count.");
+
+                    }
+                }
+            }
+            catch (MySql.Data.MySqlClient.MySqlException e)
+            {
+                Maps.Instance.DuradosMap.Logger.Log("AccountService", "ResetPassword", "UpdateMembershipFailureCount", e, 1, string.Format("membershipUserId:{0},username:{1}", userId??string.Empty, username));
+            }
 
         }
 

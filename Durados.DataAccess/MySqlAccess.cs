@@ -1371,6 +1371,13 @@ namespace Durados.DataAccess
         {
             return "SELECT Password, PasswordFormat, PasswordKey FROM `my_aspnet_membership` WHERE UserId = @userId";
         }
+        public override string GetUpdateFailedPasswordAttemptCountSql()
+        {
+            return @"UPDATE my_aspnet_membership 
+                                SET FailedPasswordAttemptCount = @count WHERE userId=@userId";
+
+        }
+                
     
     }
 

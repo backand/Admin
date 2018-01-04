@@ -72,7 +72,7 @@ namespace Durados.Web.Mvc
             DefaultSymmetricKeyName = GetDefaultSymmetricKeyName();
             DefaultCertificateName = GetDefaultCertificateName();
             DefaultSymmetricKeyAlgorithm = SymmetricKeyAlgorithm.TRIPLE_DES;
-            MaxInvalidPasswordAttempts = 5;
+            MaxInvalidPasswordAttempts = 6;
             MinRequiredPasswordLength = 6;
             MinRequiredNonalphanumericCharacters = 0;
             PasswordAttemptWindow = 10;

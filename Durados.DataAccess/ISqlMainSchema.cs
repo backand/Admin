@@ -173,5 +173,7 @@ namespace Durados.DataAccess
         string UpdateMeasurmentType(string measureType);
 
         string GetUserSecuritySql();
+
+        string GetUpdateFailedPasswordAttemptCountSql();
     }
 }

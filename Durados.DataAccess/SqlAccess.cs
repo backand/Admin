@@ -12812,6 +12812,11 @@ public class SqlMainSchema :ISqlMainSchema
     {
         return "SELECT Password, PasswordFormat, PasswordSalt FROM [aspnet_Membership] WHERE UserId = @userId";
     }
-    
+    public virtual string GetUpdateFailedPasswordAttemptCountSql()
+    {
+        return @"UPDATE aspnet_membership 
+                                SET FailedPasswordAttemptCount = @count WHERE userId=@userId";
+
+    }
     
 }
