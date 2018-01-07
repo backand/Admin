@@ -1061,7 +1061,7 @@ namespace Durados.DataAccess
             return
             "START TRANSACTION; " +
 
-                    "SELECT  @app_id  :=`Id` FROM durados_App  WHERE  TemplateId " + (templateId.HasValue ? " = " + templateId.Value : " is null ").ToString() + " AND Creator = @poolCreator and DatabaseStatus = 1 ORDER BY id ASC LIMIT 1 FOR UPDATE;  " +
+                    "SELECT  @app_id  :=`Id` FROM durados_App  WHERE  TemplateId " + (templateId.HasValue ? " = " + templateId.Value : " is null ").ToString() + " AND Creator = @poolCreator and DatabaseStatus = 1 AND   ToDelete = 0  ORDER BY id ASC LIMIT 1 FOR UPDATE;  " +
                     "DELETE FROM durados_App WHERE  `Name` = @Name;  " +
                     "UPDATE durados_App  " +
                     "SET Creator = @creator,  " +

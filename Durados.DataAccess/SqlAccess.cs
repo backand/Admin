@@ -12456,7 +12456,7 @@ public class SqlMainSchema :ISqlMainSchema
         return 
         "begin tran getFromPool " +
                 "declare @appId int " +
-                "select top(1) @appId = id from durados_App with(UPDLOCK) where TemplateId " + (templateId.HasValue ? " = " + templateId.Value : " is null ").ToString() + " and creator = @poolCreator and DatabaseStatus = 1 order by id asc; " +
+                "select top(1) @appId = id from durados_App with(UPDLOCK) where TemplateId " + (templateId.HasValue ? " = " + templateId.Value : " is null ").ToString() + " and creator = @poolCreator and DatabaseStatus = 1 AND  ToDelete = 0  order by id asc; " +
                 "delete from durados_App where [Name] = @Name; " +
                 "update durados_App " +
                 "set creator = @creator, " +
