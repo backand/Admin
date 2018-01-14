@@ -422,8 +422,9 @@ namespace Durados.Workflow
         {
             string localhost = "localhost";
             string backand = "backand";
+            string[] localAddress = (System.Configuration.ConfigurationManager.AppSettings["localAddress"] ?? string.Empty).Split(',');
 
-            return request.RequestUri.AbsoluteUri.Contains(localhost) || request.RequestUri.AbsoluteUri.ToLower().Contains(backand);
+            return request.RequestUri.AbsoluteUri.Contains(localhost) || request.RequestUri.AbsoluteUri.ToLower().Contains(backand) || localAddress.Contains(request.RequestUri.Scheme + "://" + request.RequestUri.Authority);
         }
 
         public static string PerformCrud(System.Net.WebRequest request, string json)
