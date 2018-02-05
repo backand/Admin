@@ -23,8 +23,8 @@ namespace Durados.Security.Cloud
         {
             Dictionary<string, object> data = new Dictionary<string, object>();
 
-            data.Add("gateway", (Cloud as FnProjectCloud).gateway);
-            data.Add("connectionString", (Cloud as FnProjectCloud).connectionString);
+            data.Add("gateway", (Cloud as OpenFaasCloud).gateway);
+            data.Add("connectionString", (Cloud as OpenFaasCloud).connectionString);
             
 
             return data;
