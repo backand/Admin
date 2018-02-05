@@ -53,7 +53,7 @@ namespace Durados
         public override ICloudCredentials GetCredentialsForRule(Rule rule, string arn)
         {
 
-            System.Runtime.Serialization.Json.DataContractJsonSerializer jss = new System.Runtime.Serialization.Json.DataContractJsonSerializer(typeof(FnProjectFunction));
+            System.Runtime.Serialization.Json.DataContractJsonSerializer jss = new System.Runtime.Serialization.Json.DataContractJsonSerializer(typeof(OpenFaasFunction));
 
             System.IO.MemoryStream ms = new System.IO.MemoryStream(System.Text.ASCIIEncoding.ASCII.GetBytes(rule.LambdaProperties));
 
